@@ -7,4 +7,4 @@ on:
 
 jobs:
   commitlint:
-    uses: edx/.github/.github/workflows/commitlint.yml@master
+    uses: openedx/.github/.github/workflows/commitlint.yml@master

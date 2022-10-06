@@ -326,18 +326,20 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         save = False
         updated_provider_type = validated_data.get('provider_type') or instance.provider_type
+        course = self._get_course()
         for key in self.Meta.course_fields:
             value = validated_data.get(key)
+            course_value = course.discussions_settings.get(key, None)
             # Delay loading course till we know something has actually been updated
-            if value is not None and value != getattr(instance, key):
-                self._get_course().discussions_settings[key] = value
+            if value is not None and value != course_value:
+                course.discussions_settings[key] = value
                 save = True
         new_plugin_config = validated_data.get('plugin_configuration', None)
         if new_plugin_config and new_plugin_config != instance.plugin_configuration:
             save = True
             # Any fields here that aren't already stored in the course structure
             # or in other models should be stored here.
-            self._get_course().discussions_settings[updated_provider_type] = {
+            course.discussions_settings[updated_provider_type] = {
                 key: value
                 for key, value in new_plugin_config.items()
                 if (
@@ -346,7 +348,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
                 )
             }
         if save:
-            modulestore().update_item(self._get_course(), self.context['user_id'])
+            modulestore().update_item(course, self.context['user_id'])
         return instance
 
 

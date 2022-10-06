@@ -11,15 +11,16 @@ import ddt
 import pytest
 import pytz
 from django.test import TestCase
+from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
 from submissions.models import score_reset, score_set
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from common.djangoapps.util.date_utils import to_timestamp
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from ..constants import ScoreDatabaseTableEnum
 from ..signals.handlers import (
@@ -388,10 +389,12 @@ class CourseEventsSignalsTest(ModuleStoreTestCase):
             }
         )
 
+    @override_settings(OUTCOME_SURVEYS_EVENTS_ENABLED=True)
     @patch('lms.djangoapps.grades.events.segment.track')
-    def test_segment_event_on_course_grade_passed_first_time(self, segment_track_mock):
+    @patch('lms.djangoapps.grades.signals.signals.SCHEDULE_FOLLOW_UP_SEGMENT_EVENT_FOR_COURSE_PASSED_FIRST_TIME.send')
+    def test_segment_event_on_course_grade_passed_first_time(self, signal_mock, segment_track_mock):
         course = CourseOverviewFactory()
-        __ = CourseEnrollmentFactory(
+        enrollment = CourseEnrollmentFactory(
             is_active=True,
             mode='verified',
             course=course,
@@ -420,10 +423,20 @@ class CourseEventsSignalsTest(ModuleStoreTestCase):
             self.user.id,
             'edx.course.learner.passed.first_time',
             {
-                'LMS_USER_ID': self.user.id,
-                'COURSERUN_KEY': str(course.id),
+                'LMS_ENROLLMENT_ID': enrollment.id,
                 'COURSE_TITLE': course.display_name,
                 'COURSE_ORG_NAME': course.org,
-                'PASSED': 1,
+            }
+        )
+
+        assert signal_mock.call_count == 1
+        signal_mock.assert_called_with(
+            sender=None,
+            user_id=self.user.id,
+            course_id=course.id,
+            event_properties={
+                'LMS_ENROLLMENT_ID': enrollment.id,
+                'COURSE_TITLE': course.display_name,
+                'COURSE_ORG_NAME': course.org,
             }
         )

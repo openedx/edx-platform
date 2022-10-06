@@ -9,11 +9,12 @@ from functools import partial
 
 import yaml
 
+from django.conf import settings
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string
+from pkg_resources import resource_isdir, resource_string, resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
@@ -876,10 +877,47 @@ Template = namedtuple("Template", "metadata data children")
 
 class ResourceTemplates:
     """
-    Gets the templates associated w/ a containing cls. The cls must have a 'template_dir_name' attribute.
-    It finds the templates as directly in this directory under 'templates'.
+    Gets the yaml templates associated with a containing cls for display in the Studio.
+
+    The cls must have a 'template_dir_name' attribute. It finds the templates as directly
+    in this directory under 'templates'.
+
+    Additional templates can be loaded by setting the
+    CUSTOM_RESOURCE_TEMPLATES_DIRECTORY configuration setting.
+
+    Note that a template must end with ".yaml" extension otherwise it will not be
+    loaded.
     """
     template_packages = [__name__]
+
+    @classmethod
+    def _load_template(cls, template_path, template_id):
+        """
+        Reads an loads the yaml content provided in the template_path and
+        return the content as a dictionary.
+        """
+        if not os.path.exists(template_path):
+            return None
+
+        with open(template_path) as file_object:
+            template = yaml.safe_load(file_object)
+            template['template_id'] = template_id
+            return template
+
+    @classmethod
+    def _load_templates_in_dir(cls, dirpath):
+        """
+        Lists every resource template found in the provided dirpath.
+        """
+        templates = []
+        for template_file in os.listdir(dirpath):
+            if not template_file.endswith('.yaml'):
+                log.warning("Skipping unknown template file %s", template_file)
+                continue
+
+            template = cls._load_template(os.path.join(dirpath, template_file), template_file)
+            templates.append(template)
+        return templates
 
     @classmethod
     def templates(cls):
@@ -888,23 +926,15 @@ class ResourceTemplates:
         to seed a module of this type.
 
         Expects a class attribute template_dir_name that defines the directory
-        inside the 'templates' resource directory to pull templates from
+        inside the 'templates' resource directory to pull templates from.
         """
-        templates = []
-        dirname = cls.get_template_dir()
-        if dirname is not None:
-            for pkg in cls.template_packages:
-                if not resource_isdir(pkg, dirname):
-                    continue
-                for template_file in resource_listdir(pkg, dirname):
-                    if not template_file.endswith('.yaml'):
-                        log.warning("Skipping unknown template file %s", template_file)
-                        continue
-                    template_content = resource_string(pkg, os.path.join(dirname, template_file))
-                    template = yaml.safe_load(template_content)
-                    template['template_id'] = template_file
-                    templates.append(template)
-        return templates
+        templates = {}
+
+        for dirpath in cls.get_template_dirpaths():
+            for template in cls._load_templates_in_dir(dirpath):
+                templates[template['template_id']] = template
+
+        return list(templates.values())
 
     @classmethod
     def get_template_dir(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -922,21 +952,52 @@ class ResourceTemplates:
             return None
 
     @classmethod
+    def get_template_dirpaths(cls):
+        """
+        Returns of list of directories containing resource templates.
+        """
+        template_dirpaths = []
+        template_dirname = cls.get_template_dir()
+        if template_dirname and resource_isdir(__name__, template_dirname):
+            template_dirpaths.append(resource_filename(__name__, template_dirname))
+
+        custom_template_dir = cls.get_custom_template_dir()
+        if custom_template_dir:
+            template_dirpaths.append(custom_template_dir)
+        return template_dirpaths
+
+    @classmethod
+    def get_custom_template_dir(cls):
+        """
+        If settings.CUSTOM_RESOURCE_TEMPLATES_DIRECTORY is defined, check if it has a
+        subdirectory named as the class's template_dir_name and return the full path.
+        """
+        template_dir_name = getattr(cls, 'template_dir_name', None)
+
+        if template_dir_name is None:
+            return
+
+        resource_dir = settings.CUSTOM_RESOURCE_TEMPLATES_DIRECTORY
+
+        if not resource_dir:
+            return None
+
+        template_dir_path = os.path.join(resource_dir, template_dir_name)
+
+        if os.path.exists(template_dir_path):
+            return template_dir_path
+        return None
+
+    @classmethod
     def get_template(cls, template_id):
         """
         Get a single template by the given id (which is the file name identifying it w/in the class's
         template_dir_name)
-
         """
-        dirname = cls.get_template_dir()
-        if dirname is not None:
-            path = os.path.join(dirname, template_id)
-            for pkg in cls.template_packages:
-                if resource_exists(pkg, path):
-                    template_content = resource_string(pkg, path)
-                    template = yaml.safe_load(template_content)
-                    template['template_id'] = template_id
-                    return template
+        for directory in sorted(cls.get_template_dirpaths(), reverse=True):
+            abs_path = os.path.join(directory, template_id)
+            if os.path.exists(abs_path):
+                return cls._load_template(abs_path, template_id)
 
 
 class ConfigurableFragmentWrapper:
@@ -1012,25 +1073,11 @@ class MetricsMixin:
 
     def render(self, block, view_name, context=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         start_time = time.time()
-        status = "success"
         try:
             return super().render(block, view_name, context=context)
-        except:
-            status = "failure"
-            raise
-
         finally:
             end_time = time.time()
             duration = end_time - start_time
-            course_id = getattr(self, 'course_id', '')
-            tags = [  # lint-amnesty, pylint: disable=unused-variable
-                f'view_name:{view_name}',
-                'action:render',
-                f'action_status:{status}',
-                f'course_id:{course_id}',
-                f'block_type:{block.scope_ids.block_type}',
-                f'block_family:{block.entry_point}',
-            ]
             log.debug(
                 "%.3fs - render %s.%s (%s)",
                 duration,
@@ -1041,25 +1088,11 @@ class MetricsMixin:
 
     def handle(self, block, handler_name, request, suffix=''):  # lint-amnesty, pylint: disable=missing-function-docstring
         start_time = time.time()
-        status = "success"
         try:
             return super().handle(block, handler_name, request, suffix=suffix)
-        except:
-            status = "failure"
-            raise
-
         finally:
             end_time = time.time()
             duration = end_time - start_time
-            course_id = getattr(self, 'course_id', '')
-            tags = [  # lint-amnesty, pylint: disable=unused-variable
-                f'handler_name:{handler_name}',
-                'action:handle',
-                f'action_status:{status}',
-                f'course_id:{course_id}',
-                f'block_type:{block.scope_ids.block_type}',
-                f'block_family:{block.entry_point}',
-            ]
             log.debug(
                 "%.3fs - handle %s.%s (%s)",
                 duration,
@@ -1626,7 +1659,6 @@ class ModuleSystemShim:
             'runtime.hostname is deprecated. Please use `LMS_BASE` from `django.conf.settings`.',
             DeprecationWarning, stacklevel=3,
         )
-        from django.conf import settings
         return settings.LMS_BASE
 
     @property
@@ -1645,6 +1677,32 @@ class ModuleSystemShim:
         if rebind_user_service:
             return partial(rebind_user_service.rebind_noauth_module_to_user)
 
+    # noinspection PyPep8Naming
+    @property
+    def STATIC_URL(self):  # pylint: disable=invalid-name
+        """
+        Returns the base URL for static assets.
+        Deprecated in favor of the settings.STATIC_URL configuration.
+        """
+        warnings.warn(
+            'runtime.STATIC_URL is deprecated. Please use settings.STATIC_URL instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return settings.STATIC_URL
+
+    @property
+    def course_id(self):
+        """
+        Old API to get the course ID.
+
+        Deprecated in favor of `runtime.scope_ids.usage_id.context_key`.
+        """
+        warnings.warn(
+            "`runtime.course_id` is deprecated. Use `context_key` instead: `runtime.scope_ids.usage_id.context_key`.",
+            DeprecationWarning, stacklevel=3,
+        )
+        return self.descriptor_runtime.course_id.for_branch(None)
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1661,20 +1719,14 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
         self,
-        static_url,
         track_function,
         get_module,
         descriptor_runtime,
         publish=None,
-        course_id=None,
-        error_descriptor_class=None,
-        field_data=None,
         **kwargs,
     ):
         """
         Create a closure around the system environment.
-
-        static_url - the base URL to static assets
 
         track_function - function of (event_type, event), intended for logging
                          or otherwise tracking the event.
@@ -1687,29 +1739,18 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
 
-        course_id - the course_id containing this module
-
         publish(event) - A function that allows XModules to publish events (such as grade changes)
-
-        error_descriptor_class - The class to use to render XModules with errors
-
-        field_data - the `FieldData` to use for backing XBlock storage.
         """
 
-        # Usage_store is unused, and field_data is often supplanted with an
-        # explicit field_data during construct_xblock.
         kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
         kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
-        super().__init__(field_data=field_data, **kwargs)
+        super().__init__(**kwargs)
 
-        self.STATIC_URL = static_url
         self.track_function = track_function
         self.get_module = get_module
-        self.course_id = course_id
 
         if publish:
             self.publish = publish
-        self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
 
         self.descriptor_runtime = descriptor_runtime

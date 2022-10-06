@@ -26,17 +26,17 @@ from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 from xblock.scorable import ScorableXBlockMixin, Score
 
-from capa import responsetypes
-from capa.capa_problem import LoncapaProblem, LoncapaSystem
-from capa.inputtypes import Status
-from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
+from xmodule.capa import responsetypes
+from xmodule.capa.capa_problem import LoncapaProblem, LoncapaSystem
+from xmodule.capa.inputtypes import Status
+from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+from xmodule.capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xmodule.contentstore.django import contentstore
 from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_module import RawMixin
-from xmodule.util.sandboxing import get_python_lib_zip
+from xmodule.util.sandboxing import SandboxService
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
@@ -140,7 +140,7 @@ class ProblemBlock(
     An XBlock representing a "problem".
 
     A problem contains zero or more respondable items, such as multiple choice,
-    numeric response, true/false, etc. See common/lib/capa/capa/responsetypes.py
+    numeric response, true/false, etc. See xmodule/capa/responsetypes.py
     for the full ensemble.
 
     The rendering logic of a problem is largely encapsulated within
@@ -630,7 +630,6 @@ class ProblemBlock(
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=None,
-            STATIC_URL=None,
             xqueue=None,
             matlab_api_key=None,
         )
@@ -685,13 +684,14 @@ class ProblemBlock(
             anonymous_student_id=None,
             cache=None,
             can_execute_unsafe_code=lambda: None,
-            get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, self.runtime.course_id)),
+            get_python_lib_zip=(
+                lambda: SandboxService(contentstore, self.scope_ids.usage_id.context_key).get_python_lib_zip()
+            ),
             DEBUG=None,
             i18n=self.runtime.service(self, "i18n"),
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=1,
-            STATIC_URL=None,
             xqueue=None,
             matlab_api_key=None,
         )
@@ -839,7 +839,6 @@ class ProblemBlock(
             render_template=self.runtime.service(self, 'mako').render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
-            STATIC_URL=self.runtime.STATIC_URL,
             xqueue=self.runtime.service(self, 'xqueue'),
             matlab_api_key=self.matlab_api_key
         )
@@ -1717,7 +1716,7 @@ class ProblemBlock(
         answers_without_files = convert_files_to_filenames(answers)
         event_info['answers'] = answers_without_files
 
-        metric_name = 'capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
+        metric_name = 'xmodule.capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
         # Can override current time
         current_time = datetime.datetime.now(utc)
         if override_time is not False:

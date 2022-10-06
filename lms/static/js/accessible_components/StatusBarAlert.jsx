@@ -14,7 +14,7 @@ export class StatusAlertRenderer {
     if (element) {
       /*
       These props match the defaults mostly in the paragon lib:
-      https://github.com/edx/paragon/tree/master/src/StatusAlert
+      https://github.com/openedx/paragon/tree/master/src/StatusAlert
       but are made explicit in the case of a upstream change to defaults
       */
       ReactDOM.render(

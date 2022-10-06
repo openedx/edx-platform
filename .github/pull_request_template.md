@@ -11,7 +11,7 @@ Use conventional commits to separate and summarize commits logically:
 https://open-edx-proposals.readthedocs.io/en/latest/oep-0051-bp-conventional-commits.html
 
 Use this template as a guide. Omit sections that don't apply. You may link to information rather than copy it.
-More details about the template are at https://github.com/edx/open-edx-proposals/pull/180
+More details about the template are at https://github.com/openedx/open-edx-proposals/pull/180
 (link will be updated when that document merges)
 -->
 
@@ -47,3 +47,4 @@ Please provide detailed step-by-step instructions for testing this change.
 Include anything else that will help reviewers and consumers understand the change.
 - Does this change depend on other changes elsewhere?
 - Any special concerns or limitations? For example: deprecations, migrations, security, or accessibility.
+- If your [database migration](https://openedx.atlassian.net/wiki/spaces/AC/pages/23003228/Everything+About+Database+Migrations) can't be rolled back easily.

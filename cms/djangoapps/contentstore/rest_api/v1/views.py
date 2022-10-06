@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from cms.djangoapps.contentstore.views.course import get_course_and_check_access
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from xmodule.course_module import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -98,8 +99,13 @@ class ProctoredExamSettingsView(APIView):
             data = {}
 
             data['proctored_exam_settings'] = proctored_exam_settings
-            data['available_proctoring_providers'] = get_available_providers()
             data['course_start_date'] = course_metadata['start'].get('value')
+
+            available_providers = get_available_providers()
+            if not exams_ida_enabled(CourseKey.from_string(course_id)):
+                available_providers.remove('lti_external')
+
+            data['available_proctoring_providers'] = available_providers
 
             serializer = ProctoredExamConfigurationSerializer(data)
 
@@ -147,8 +153,8 @@ class ProctoredExamSettingsView(APIView):
             # merge updated settings with all existing settings.
             # do this because fields that could not be modified are excluded from the result
             course_metadata = {**course_metadata, **updated_data}
-            updated_setttings = self._get_proctored_exam_setting_values(course_metadata)
-            serializer = ProctoredExamSettingsSerializer(updated_setttings)
+            updated_settings = self._get_proctored_exam_setting_values(course_metadata)
+            serializer = ProctoredExamSettingsSerializer(updated_settings)
             return Response({
                 'proctored_exam_settings': serializer.data
             })

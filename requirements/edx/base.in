@@ -11,7 +11,6 @@
 -c ../constraints.txt
 
 -r github.in              # Forks and other dependencies not yet on PyPI
--r local.in               # Packages in edx-platform which have their own setup.py
 -r paver.txt              # Requirements for running paver commands
 
 # Please follow these guidelines whenever you change this file:
@@ -81,9 +80,12 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-edx-django-utils>=5.0.0            # Utilities for cache, monitoring, and plugins
+# Need IP address code that was moved to edx-django-utils 5.1.0
+edx-django-utils>=5.1.0             # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
+# 0.6.2 introduces topic prefixing
+edx-event-bus-kafka>=0.6.2          # Kafka implementation of event bus
 edx-milestones
 edx-name-affirmation
 edx-opaque-keys
@@ -111,7 +113,7 @@ ipaddress                           # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lxml                                # XML parser
-learner-pathway-progress==1.0.1     # A plugin for lms to track learners progress in pathays
+learner-pathway-progress    # A plugin for lms to track learners progress in pathays
 lti-consumer-xblock>=4.1.1
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering
@@ -123,9 +125,11 @@ nltk                                # Natural language processing; used by the c
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 openedx-calc                        # Library supporting mathematical calculations for Open edX
-openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
+openedx-events>=0.12.0              # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
-ora2>=4.4.0
+optimizely-sdk                      # Optimizely full stack SDK for Python
+ora2>=4.5.0
+outcome-surveys                     # edx-platform plugin to send and track segment events needed for surveys
 path
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.

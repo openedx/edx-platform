@@ -61,7 +61,7 @@ Experiment Results
 
 Bokchoy tests were disabled for PRs for 3 weeks.  In that time only one change went out that was not caught by other test suites.  The change in question did not impact edx.org and was specific how configuration is read into the system.  The bokchoy tests did not detect any other failures that were not caught by other tests.  The `PR` where we monitored Bokchoy daily has more specific details.
 
-.. _PR: https://github.com/edx/edx-platform/pull/23682
+.. _PR: https://github.com/openedx/edx-platform/pull/23682
 
 Decision
 ========

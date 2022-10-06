@@ -239,7 +239,10 @@ def compose_and_send_activation_email(user, profile, user_registration=None, red
         configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     )
 
-    send_activation_email.delay(str(msg), from_address)
+    try:
+        send_activation_email.delay(str(msg), from_address)
+    except Exception:  # pylint: disable=broad-except
+        log.exception(f'Activation email task failed for user {user.id}.')
 
 
 @login_required
@@ -384,7 +387,8 @@ def change_enrollment(request, check_access=True):
             try:
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
-                    CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
+                    CourseEnrollment.enroll(user, course_id, check_access=check_access,
+                                            mode=enroll_mode, request=request)
             except Exception:  # pylint: disable=broad-except
                 return HttpResponseBadRequest(_("Could not enroll"))
 

@@ -1,77 +1,22 @@
 /**
- * plugin.js
+ * Copyright (c) Tiny Technologies, Inc. All rights reserved.
+ * Licensed under the LGPL or a commercial license.
+ * For LGPL see License.txt in the project root for license information.
+ * For commercial licenses see https://www.tiny.cloud/
  *
- * Copyright, Moxiecode Systems AB
- * Released under LGPL License.
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
+ * Version: 5.5.1 (2020-10-01)
  */
+(function () {
+    'use strict';
 
-/*global tinymce:true */
+    var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
-tinymce.PluginManager.add('contextmenu', function(editor) {
-	var menu, contextmenuNeverUseNative = editor.settings.contextmenu_never_use_native;
+    function Plugin () {
+      global.add('contextmenu', function () {
+        console.warn('Context menu plugin is now built in to the core editor, please remove it from your editor configuration');
+      });
+    }
 
-	editor.on('contextmenu', function(e) {
-		var contextmenu;
+    Plugin();
 
-		// Block TinyMCE menu on ctrlKey
-		if (e.ctrlKey && !contextmenuNeverUseNative) {
-			return;
-		}
-
-		e.preventDefault();
-
-		contextmenu = editor.settings.contextmenu || 'link image inserttable | cell row column deletetable';
-
-		// Render menu
-		if (!menu) {
-			var items = [];
-
-			tinymce.each(contextmenu.split(/[ ,]/), function(name) {
-				var item = editor.menuItems[name];
-
-				if (name == '|') {
-					item = {text: name};
-				}
-
-				if (item) {
-					item.shortcut = ''; // Hide shortcuts
-					items.push(item);
-				}
-			});
-
-			for (var i = 0; i < items.length; i++) {
-				if (items[i].text == '|') {
-					if (i === 0 || i == items.length - 1) {
-						items.splice(i, 1);
-					}
-				}
-			}
-
-			menu = new tinymce.ui.Menu({
-				items: items,
-				context: 'contextmenu'
-			}).addClass('contextmenu').renderTo();
-
-			editor.on('remove', function() {
-				menu.remove();
-				menu = null;
-			});
-		} else {
-			menu.show();
-		}
-
-		// Position menu
-		var pos = {x: e.pageX, y: e.pageY};
-
-		if (!editor.inline) {
-			pos = tinymce.DOM.getPos(editor.getContentAreaContainer());
-			pos.x += e.clientX;
-			pos.y += e.clientY;
-		}
-
-		menu.moveTo(pos.x, pos.y);
-	});
-});
+}());

@@ -14,7 +14,7 @@ def plugin_settings(settings):
     .. toggle_warning: TinyMCE is needed to show an editor in the studio.
     .. toggle_use_cases: open_edx
     .. toggle_creation_date: 2017-11-08
-    .. toggle_tickets: https://github.com/edx/edx-platform/pull/16496
+    .. toggle_tickets: https://github.com/openedx/edx-platform/pull/16496
     """
     settings.FEATURES['ENABLE_ANNOUNCEMENTS'] = False
     # Configure number of announcements to show per page

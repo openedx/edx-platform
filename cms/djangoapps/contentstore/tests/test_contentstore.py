@@ -1485,6 +1485,12 @@ class ContentStoreTest(ContentStoreTestCase):
         """Test viewing the course overview page with an existing course"""
         course = CourseFactory.create()
         resp = self._show_course_overview(course.id)
+
+        # course_handler raise 404 for old mongo course
+        if course.id.deprecated:
+            self.assertEqual(resp.status_code, 404)
+            return
+
         self.assertContains(
             resp,
             '<article class="outline outline-complex outline-course" data-locator="{locator}" data-course-key="{course_key}">'.format(  # lint-amnesty, pylint: disable=line-too-long
@@ -1550,6 +1556,12 @@ class ContentStoreTest(ContentStoreTestCase):
         course_key = course_items[0].id
 
         resp = self._show_course_overview(course_key)
+
+        # course_handler raise 404 for old mongo course
+        if course_key.deprecated:
+            self.assertEqual(resp.status_code, 404)
+            return
+
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Chapter 2')
 
@@ -1879,6 +1891,10 @@ class RerunCourseTest(ContentStoreTestCase):
         rerun_course_data.update(destination_course_data)
         destination_course_key = _get_course_id(self.store, destination_course_data)
 
+        # course_handler raise 404 for old mongo course
+        if destination_course_key.deprecated:
+            raise SkipTest('OldMongo Deprecation')
+
         # post the request
         course_url = get_url('course_handler', destination_course_key, 'course_key_string')
         response = self.client.ajax_post(course_url, rerun_course_data)
@@ -1935,7 +1951,7 @@ class RerunCourseTest(ContentStoreTestCase):
         """
         Test when rerunning a course with no videos, VAL copies nothing
         """
-        source_course = CourseFactory.create()
+        source_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         destination_course_key = self.post_rerun_request(source_course.id)
         self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
         videos, __ = get_videos_for_course(str(destination_course_key))
@@ -1948,7 +1964,10 @@ class RerunCourseTest(ContentStoreTestCase):
         Test when rerunning a course with video upload token, video upload token is not copied to new course.
         """
         # Create a course with video upload token.
-        source_course = CourseFactory.create(video_upload_pipeline={"course_video_upload_token": 'test-token'})
+        source_course = CourseFactory.create(
+            video_upload_pipeline={"course_video_upload_token": 'test-token'},
+            default_store=ModuleStoreEnum.Type.split
+        )
 
         destination_course_key = self.post_rerun_request(source_course.id)
         self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
@@ -1961,7 +1980,7 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertEqual(new_course.video_upload_pipeline, {})
 
     def test_rerun_course_success(self):
-        source_course = CourseFactory.create()
+        source_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         create_video(
             dict(
                 edx_video_id="tree-hugger",
@@ -1987,14 +2006,17 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertEqual(new_course.video_upload_pipeline, {})
 
     def test_rerun_course_resets_advertised_date(self):
-        source_course = CourseFactory.create(advertised_start="01-12-2015")
+        source_course = CourseFactory.create(
+            advertised_start="01-12-2015",
+            default_store=ModuleStoreEnum.Type.split
+        )
         destination_course_key = self.post_rerun_request(source_course.id)
         destination_course = self.store.get_course(destination_course_key)
 
         self.assertEqual(None, destination_course.advertised_start)
 
     def test_rerun_of_rerun(self):
-        source_course = CourseFactory.create()
+        source_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         rerun_course_key = self.post_rerun_request(source_course.id)
         rerun_of_rerun_data = {
             'org': rerun_course_key.org,
@@ -2006,7 +2028,7 @@ class RerunCourseTest(ContentStoreTestCase):
         self.verify_rerun_course(rerun_course_key, rerun_of_rerun_course_key, rerun_of_rerun_data['display_name'])
 
     def test_rerun_course_fail_no_source_course(self):
-        existent_course_key = CourseFactory.create().id
+        existent_course_key = CourseFactory.create(default_store=ModuleStoreEnum.Type.split).id
         non_existent_course_key = CourseLocator("org", "non_existent_course", "non_existent_run")
         destination_course_key = self.post_rerun_request(non_existent_course_key)
 
@@ -2045,7 +2067,7 @@ class RerunCourseTest(ContentStoreTestCase):
 
     def test_rerun_with_permission_denied(self):
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-            source_course = CourseFactory.create()
+            source_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
             auth.add_users(self.user, CourseCreatorRole(), self.user)
             self.user.is_staff = False
             self.user.save()
@@ -2074,7 +2096,7 @@ class RerunCourseTest(ContentStoreTestCase):
             'xmodule.modulestore.mixed.MixedModuleStore.clone_course',
             mock.Mock(side_effect=Exception()),
         ):
-            source_course = CourseFactory.create()
+            source_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
             message_too_long = "traceback".rjust(CourseRerunState.MAX_MESSAGE_LENGTH * 2, '-')
             with mock.patch('traceback.format_exc', return_value=message_too_long):
                 destination_course_key = self.post_rerun_request(source_course.id)
@@ -2087,37 +2109,38 @@ class RerunCourseTest(ContentStoreTestCase):
         """
         Test that unique wiki_slug is assigned to rerun course.
         """
-        course_data = {
-            'org': 'edX',
-            'number': '123',
-            'display_name': 'Rerun Course',
-            'run': '2013'
-        }
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            course_data = {
+                'org': 'edX',
+                'number': '123',
+                'display_name': 'Rerun Course',
+                'run': '2013'
+            }
 
-        source_wiki_slug = '{}.{}.{}'.format(course_data['org'], course_data['number'], course_data['run'])
+            source_wiki_slug = '{}.{}.{}'.format(course_data['org'], course_data['number'], course_data['run'])
 
-        source_course_key = _get_course_id(self.store, course_data)
-        _create_course(self, source_course_key, course_data)
-        source_course = self.store.get_course(source_course_key)
+            source_course_key = _get_course_id(self.store, course_data)
+            _create_course(self, source_course_key, course_data)
+            source_course = self.store.get_course(source_course_key)
 
-        # Verify created course's wiki_slug.
-        self.assertEqual(source_course.wiki_slug, source_wiki_slug)
+            # Verify created course's wiki_slug.
+            self.assertEqual(source_course.wiki_slug, source_wiki_slug)
 
-        destination_course_data = course_data
-        destination_course_data['run'] = '2013_Rerun'
+            destination_course_data = course_data
+            destination_course_data['run'] = '2013_Rerun'
 
-        destination_course_key = self.post_rerun_request(
-            source_course.id, destination_course_data=destination_course_data
-        )
-        self.verify_rerun_course(source_course.id, destination_course_key, destination_course_data['display_name'])
-        destination_course = self.store.get_course(destination_course_key)
+            destination_course_key = self.post_rerun_request(
+                source_course.id, destination_course_data=destination_course_data
+            )
+            self.verify_rerun_course(source_course.id, destination_course_key, destination_course_data['display_name'])
+            destination_course = self.store.get_course(destination_course_key)
 
-        destination_wiki_slug = '{}.{}.{}'.format(
-            destination_course.id.org, destination_course.id.course, destination_course.id.run
-        )
+            destination_wiki_slug = '{}.{}.{}'.format(
+                destination_course.id.org, destination_course.id.course, destination_course.id.run
+            )
 
-        # Verify rerun course's wiki_slug.
-        self.assertEqual(destination_course.wiki_slug, destination_wiki_slug)
+            # Verify rerun course's wiki_slug.
+            self.assertEqual(destination_course.wiki_slug, destination_wiki_slug)
 
 
 class ContentLicenseTest(ContentStoreTestCase):
@@ -2198,6 +2221,10 @@ def _create_course(test, course_key, course_data):
     """
     Creates a course via an AJAX request and verifies the URL returned in the response.
     """
+    # course_handler raise 404 for old mongo course
+    if course_key.deprecated:
+        raise SkipTest('OldMongo Deprecation')
+
     course_url = get_url('course_handler', course_key, 'course_key_string')
     response = test.client.ajax_post(course_url, course_data)
     test.assertEqual(response.status_code, 200)

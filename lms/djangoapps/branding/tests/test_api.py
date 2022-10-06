@@ -86,6 +86,10 @@ class TestFooter(TestCase):
     def test_get_footer(self):
         actual_footer = get_footer(is_secure=True)
         business_url = 'https://business.edx.org/?utm_campaign=edX.org+Referral&utm_source=edX.org&utm_medium=Footer'
+        facebook_url = 'http://www.facebook.com/EdxOnline'
+        linkedin_url = 'http://www.linkedin.com/company/edx'
+        twitter_url = 'https://twitter.com/edXOnline'
+        reddit_url = 'http://www.reddit.com/r/edx'
         expected_footer = {
             'copyright': '\xa9 \xe9dX.  All rights reserved except where noted. '
                          ' edX, Open edX and their respective logos are '
@@ -143,15 +147,15 @@ class TestFooter(TestCase):
                  'url': 'https://edx.org/media-kit'}
             ],
             'social_links': [
-                {'url': '#', 'action': 'Like \xe9dX on Facebook', 'name': 'facebook',
+                {'url': facebook_url, 'action': 'Like \xe9dX on Facebook', 'name': 'facebook',
                  'icon-class': 'fa-facebook-square', 'title': 'Facebook'},
-                {'url': '#', 'action': 'Follow \xe9dX on Twitter', 'name': 'twitter',
+                {'url': twitter_url, 'action': 'Follow \xe9dX on Twitter', 'name': 'twitter',
                  'icon-class': 'fa-twitter-square', 'title': 'Twitter'},
-                {'url': '#', 'action': 'Follow \xe9dX on LinkedIn', 'name': 'linkedin',
+                {'url': linkedin_url, 'action': 'Follow \xe9dX on LinkedIn', 'name': 'linkedin',
                  'icon-class': 'fa-linkedin-square', 'title': 'LinkedIn'},
                 {'url': '#', 'action': 'Follow \xe9dX on Instagram', 'name': 'instagram',
                  'icon-class': 'fa-instagram', 'title': 'Instagram'},
-                {'url': '#', 'action': 'Subscribe to the \xe9dX subreddit',
+                {'url': reddit_url, 'action': 'Subscribe to the \xe9dX subreddit',
                  'name': 'reddit', 'icon-class': 'fa-reddit-square', 'title': 'Reddit'}
             ],
             'mobile_links': [],

@@ -14,19 +14,23 @@ import httpretty
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
+
+from lms.djangoapps.discussion.config.waffle import ENABLE_LEARNERS_STATS
+from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import get_retired_username_by_username
+from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
@@ -516,7 +520,8 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "provider": "legacy",
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
-                "user_is_privileged": False,
+                "has_moderation_privileges": False,
+                "is_group_ta": False,
                 'is_user_admin': False,
                 "user_roles": ["Student"],
                 'learners_tab_enabled': False,
@@ -924,7 +929,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "unread_comment_count": 3,
             "voted": True,
             "author": self.author.username,
-            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
             "abuse_flagged_count": None,
         })]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
@@ -1299,7 +1304,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'rendered_body': '<p>Edited body</p>',
             'preview_body': 'Edited body',
             'editable_fields': [
-                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
                 'title', 'topic_id', 'type', 'voted'
             ],
             'created_at': 'Test Created Date',
@@ -1352,7 +1357,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'read': True,
             'closed': True,
             'abuse_flagged': value,
-            'editable_fields': ['abuse_flagged', 'read'],
+            'editable_fields': ['abuse_flagged', 'copy_link', 'read'],
             'comment_count': 1, 'unread_comment_count': 0
         })
 
@@ -1383,7 +1388,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'comment_count': 1,
             'read': True,
             'editable_fields': [
-                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
                 'title', 'topic_id', 'type', 'voted'
             ],
             'response_count': 2
@@ -1410,7 +1415,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'comment_count': 1,
             'can_delete': False,
             'read': True,
-            'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
+            'editable_fields': ['abuse_flagged', 'copy_link', 'following', 'read', 'voted'],
             'response_count': 2
         })
 
@@ -1445,6 +1450,156 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_thread_error_response(self.thread_id, 404)
         response = self.client.delete(self.url)
         assert response.status_code == 404
+
+
+@httpretty.activate
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for LearnerThreadView list"""
+
+    def setUp(self):
+        """
+        Sets up the test case
+        """
+        super().setUp()
+        self.author = self.user
+        self.remove_keys = [
+            "abuse_flaggers",
+            "body",
+            "children",
+            "commentable_id",
+            "endorsed",
+            "last_activity_at",
+            "resp_total",
+            "thread_type",
+            "user_id",
+            "username",
+            "votes",
+        ]
+        self.replace_keys = [
+            {"from": "unread_comments_count", "to": "unread_comment_count"},
+            {"from": "comments_count", "to": "comment_count"},
+        ]
+        self.add_keys = [
+            {"key": "author", "value": self.author.username},
+            {"key": "abuse_flagged", "value": False},
+            {"key": "author_label", "value": None},
+            {"key": "can_delete", "value": True},
+            {"key": "close_reason", "value": None},
+            {
+                "key": "comment_list_url",
+                "value": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread"
+            },
+            {
+                "key": "editable_fields",
+                "value": [
+                    'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body',
+                    'read', 'title', 'topic_id', 'type', 'voted'
+                ]
+            },
+            {"key": "endorsed_comment_list_url", "value": None},
+            {"key": "following", "value": False},
+            {"key": "group_name", "value": None},
+            {"key": "has_endorsed", "value": False},
+            {"key": "last_edit", "value": None},
+            {"key": "non_endorsed_comment_list_url", "value": None},
+            {"key": "preview_body", "value": "Test body"},
+            {"key": "raw_body", "value": "Test body"},
+
+            {"key": "rendered_body", "value": "<p>Test body</p>"},
+            {"key": "response_count", "value": 0},
+            {"key": "topic_id", "value": "test_topic"},
+            {"key": "type", "value": "discussion"},
+            {"key": "users", "value": {
+                self.user.username: {
+                    "profile": {
+                        "image": {
+                            "has_image": False,
+                            "image_url_full": "http://testserver/static/default_500.png",
+                            "image_url_large": "http://testserver/static/default_120.png",
+                            "image_url_medium": "http://testserver/static/default_50.png",
+                            "image_url_small": "http://testserver/static/default_30.png",
+                        }
+                    }
+                }
+            }},
+            {"key": "vote_count", "value": 4},
+            {"key": "voted", "value": False},
+
+        ]
+        self.url = reverse("discussion_learner_threads", kwargs={'course_id': str(self.course.id)})
+
+    def update_thread(self, thread):
+        """
+        This function updates the thread by adding and remove some keys.
+        Value of these keys has been defined in setUp function
+        """
+        for element in self.add_keys:
+            thread[element['key']] = element['value']
+        for pair in self.replace_keys:
+            thread[pair['to']] = thread.pop(pair['from'])
+        for key in self.remove_keys:
+            thread.pop(key)
+        thread['comment_count'] += 1
+        return thread
+
+    def test_basic(self):
+        """
+        Tests the data is fetched correctly
+
+        Note: test_basic is required as the name because DiscussionAPIViewTestMixin
+              calls this test case automatically
+        """
+        self.register_get_user_response(self.user)
+        expected_cs_comments_response = {
+            "collection": [make_minimal_cs_thread({
+                "id": "test_thread",
+                "course_id": str(self.course.id),
+                "commentable_id": "test_topic",
+                "user_id": str(self.user.id),
+                "username": self.user.username,
+                "created_at": "2015-04-28T00:00:00Z",
+                "updated_at": "2015-04-28T11:11:11Z",
+                "title": "Test Title",
+                "body": "Test body",
+                "votes": {"up_count": 4},
+                "comments_count": 5,
+                "unread_comments_count": 3,
+            })],
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        self.url += f"?username={self.user.username}"
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        expected_api_response = expected_cs_comments_response['collection']
+
+        for thread in expected_api_response:
+            self.update_thread(thread)
+
+        assert response_data['results'] == expected_api_response
+        assert response_data['pagination'] == {
+            "next": None,
+            "previous": None,
+            "count": 1,
+            "num_pages": 1,
+        }
+
+    def test_no_username_given(self):
+        """
+        Tests that 404 response is returned when no username is passed
+        """
+        response = self.client.get(self.url)
+        assert response.status_code == 404
+
+    def test_not_authenticated(self):
+        """
+        This test is called by DiscussionAPIViewTestMixin and is not required in
+        our case
+        """
+        assert True
 
 
 @ddt.ddt
@@ -2740,7 +2895,9 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 
 @ddt.ddt
 @httpretty.activate
-class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase):
+@override_waffle_flag(ENABLE_LEARNERS_STATS, True)
+class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase,
+                              SharedModuleStoreTestCase):
     """
     Tests for the course stats endpoint
     """
@@ -2748,11 +2905,12 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self) -> None:
         super().setUp()
-        self.course_key = 'course-v1:test+test+test'
-        seed_permissions_roles(self.course_key)
+        self.course = CourseFactory.create()
+        self.course_key = str(self.course.id)
+        seed_permissions_roles(self.course.id)
         self.user = UserFactory(username='user')
         self.moderator = UserFactory(username='moderator')
-        moderator_role = Role.objects.get(name="Moderator", course_id=self.course_key)
+        moderator_role = Role.objects.get(name="Moderator", course_id=self.course.id)
         moderator_role.users.add(self.moderator)
         self.stats = [
             {
@@ -2765,6 +2923,16 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
             }
             for idx in range(10)
         ]
+
+        for stat in self.stats:
+            user = UserFactory.create(
+                username=stat['username'],
+                email=f"{stat['username']}@example.com",
+                password='12345'
+            )
+            CourseEnrollment.enroll(user, self.course.id, mode='audit')
+
+        CourseEnrollment.enroll(self.moderator, self.course.id, mode='audit')
         self.stats_without_flags = [{**stat, "active_flags": None, "inactive_flags": None} for stat in self.stats]
         self.register_course_stats_response(self.course_key, self.stats, 1, 3)
         self.url = reverse("discussion_course_activity_stats", kwargs={"course_key_string": self.course_key})
@@ -2823,3 +2991,49 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         self.client.login(username=self.user.username, password='test')
         response = self.client.get(self.url, {"order_by": order_by})
         assert "order_by" in response.json()["field_errors"]
+
+    @ddt.data(
+        ('user', 'user-0,user-1,user-2,user-3,user-4,user-5,user-6,user-7,user-8,user-9'),
+        ('moderator', 'moderator'),
+    )
+    @ddt.unpack
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param(self, username_search_string, comma_separated_usernames):
+        """
+        Test for endpoint with username param.
+        """
+        params = {'username': username_search_string}
+        self.client.login(username=self.moderator.username, password='test')
+        self.client.get(self.url, params)
+        assert urlparse(
+            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
+        ).path == f'/api/v1/users/{self.course_key}/stats'
+        assert parse_qs(
+            urlparse(httpretty.last_request().path).query  # lint-amnesty, pylint: disable=no-member
+        ).get('usernames', [None]) == [comma_separated_usernames]
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param_with_no_matches(self):
+        """
+        Test for endpoint with username param with no matches.
+        """
+        params = {'username': 'unknown'}
+        self.client.login(username=self.moderator.username, password='test')
+        response = self.client.get(self.url, params)
+        data = response.json()
+        self.assertFalse(data['results'])
+        assert data['pagination']['count'] == 0
+
+    @ddt.data(
+        'user-0',
+        'USER-1',
+        'User-2',
+        'UsEr-3'
+    )
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param_case(self, username_search_string):
+        """
+        Test user search function is case-insensitive.
+        """
+        response = get_usernames_from_search_string(self.course_key, username_search_string, 1, 1)
+        assert response == (username_search_string.lower(), 1, 1)

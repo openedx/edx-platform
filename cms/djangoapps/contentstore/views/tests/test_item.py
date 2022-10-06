@@ -2253,6 +2253,9 @@ class TestComponentTemplates(CourseTestCase):
         XBlockStudioConfiguration.objects.create(name='video', enabled=True, support_level="us")
         # ORA Block has it's own category.
         XBlockStudioConfiguration.objects.create(name='openassessment', enabled=True, support_level="us")
+        # Library Sourced Block and Library Content block has it's own category.
+        XBlockStudioConfiguration.objects.create(name='library_sourced', enabled=True, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='library_content', enabled=True, support_level="fs")
         # XBlock masquerading as a problem
         XBlockStudioConfiguration.objects.create(name='drag-and-drop-v2', enabled=True, support_level="fs")
         XBlockStudioConfiguration.objects.create(name='staffgradedxblock', enabled=True, support_level="us")
@@ -2291,10 +2294,11 @@ class TestComponentTemplates(CourseTestCase):
         """
         self._verify_basic_component("discussion", "Discussion")
         self._verify_basic_component("video", "Video")
-        self._verify_basic_component("openassessment", "Blank Open Response Assessment", True, 6)
+        self._verify_basic_component("openassessment", "Peer Assessment Only", True, 5)
         self._verify_basic_component_display_name("discussion", "Discussion")
         self._verify_basic_component_display_name("video", "Video")
         self._verify_basic_component_display_name("openassessment", "Open Response")
+        self.assertGreater(len(self.get_templates_of_type('library')), 0)
         self.assertGreater(len(self.get_templates_of_type('html')), 0)
         self.assertGreater(len(self.get_templates_of_type('problem')), 0)
         self.assertIsNone(self.get_templates_of_type('advanced'))

@@ -20,8 +20,8 @@ from .models import BlockStructureConfiguration
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2017-02-23
 # .. toggle_target_removal_date: 2017-05-23
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/14358,
-#   https://github.com/edx/edx-platform/pull/14571,
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14358,
+#   https://github.com/openedx/edx-platform/pull/14571,
 #   https://openedx.atlassian.net/browse/DEPR-144
 INVALIDATE_CACHE_ON_PUBLISH = WaffleSwitch(
     "block_structure.invalidate_cache_on_publish", __name__
@@ -41,8 +41,8 @@ INVALIDATE_CACHE_ON_PUBLISH = WaffleSwitch(
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2017-02-23
 # .. toggle_target_removal_date: 2017-05-23
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/14512,
-#   https://github.com/edx/edx-platform/pull/14770,
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14512,
+#   https://github.com/openedx/edx-platform/pull/14770,
 #   https://openedx.atlassian.net/browse/DEPR-145
 STORAGE_BACKING_FOR_CACHE = WaffleSwitch(
     "block_structure.storage_backing_for_cache", __name__
@@ -59,8 +59,8 @@ STORAGE_BACKING_FOR_CACHE = WaffleSwitch(
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2017-02-23
 # .. toggle_target_removal_date: 2017-05-23
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/14512,
-#   https://github.com/edx/edx-platform/pull/14770,
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14512,
+#   https://github.com/openedx/edx-platform/pull/14770,
 #   https://openedx.atlassian.net/browse/DEPR-143
 RAISE_ERROR_WHEN_NOT_FOUND = WaffleSwitch(
     "block_structure.raise_error_when_not_found", __name__

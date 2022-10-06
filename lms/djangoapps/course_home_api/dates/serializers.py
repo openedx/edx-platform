@@ -36,8 +36,7 @@ class DateSummarySerializer(serializers.Serializer):
 
     def get_link(self, block):
         if block.link:
-            request = self.context.get('request')
-            return request.build_absolute_uri(block.link)
+            return block.link
         return ''
 
     def get_first_component_block_id(self, block):

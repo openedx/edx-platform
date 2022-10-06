@@ -4,14 +4,13 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 
 import logging
 from functools import wraps
-from typing import Dict, Optional
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404, HttpResponseForbidden, HttpResponseServerError
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -48,14 +47,9 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     strip_none
 )
 from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserException
-from lms.djangoapps.discussion.toggles import (
-    ENABLE_DISCUSSIONS_MFE,
-    ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE,
-    ENABLE_DISCUSSIONS_MFE_BANNER
-)
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
-from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
     get_discussion_categories_ids,
@@ -269,6 +263,20 @@ def inline_discussion(request, course_key, discussion_id):
     })
 
 
+def redirect_forum_url_to_new_mfe(request, course_id):
+    """
+    Returns the redirect link when user opens default discussion homepage
+    """
+    course_key = CourseKey.from_string(course_id)
+    discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
+
+    redirect_url = None
+    if discussions_mfe_enabled:
+        mfe_base_url = settings.DISCUSSIONS_MICROFRONTEND_URL
+        redirect_url = f"{mfe_base_url}/{str(course_key)}"
+    return redirect_url
+
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @login_required
 @use_bulk_ops
@@ -307,9 +315,27 @@ def forum_form_discussion(request, course_key):
             'corrected_text': query_params['corrected_text'],
         })
     else:
+        redirect_url = redirect_forum_url_to_new_mfe(request, str(course.id))
+        if redirect_url:
+            return redirect(redirect_url)
+
         course_id = str(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion')
+
+
+def redirect_thread_url_to_new_mfe(request, course_id, thread_id):
+    """
+    Returns MFE url of the thread if the user is not privileged
+    """
+    course_key = CourseKey.from_string(course_id)
+    discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
+    redirect_url = None
+    if discussions_mfe_enabled:
+        mfe_base_url = settings.DISCUSSIONS_MICROFRONTEND_URL
+        if thread_id:
+            redirect_url = f"{mfe_base_url}/{str(course_key)}/posts/{thread_id}"
+    return redirect_url
 
 
 @require_GET
@@ -361,6 +387,10 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'annotated_content_info': annotated_content_info,
         })
     else:
+        redirect_url = redirect_thread_url_to_new_mfe(request, str(course.id), thread_id)
+        if redirect_url:
+            return redirect(redirect_url)
+
         course_id = str(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion', discussion_id=discussion_id, thread_id=thread_id)
@@ -620,6 +650,11 @@ def user_profile(request, course_key, user_id):
                 'annotated_content_info': context['annotated_content_info'],
             })
         else:
+            discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
+            if discussions_mfe_enabled:
+                mfe_base_url = settings.DISCUSSIONS_MICROFRONTEND_URL
+                return redirect(f"{mfe_base_url}/{str(course_key)}/learners")
+
             tab_view = CourseTabView()
 
             # To avoid mathjax loading from 'mathjax_include.html'
@@ -715,48 +750,6 @@ def followed_threads(request, course_key, user_id):
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
 
-def _discussions_mfe_context(query_params: Dict,
-                             course_key: CourseKey,
-                             is_educator_or_staff=False,
-                             legacy_only_view=False,
-                             is_privileged=False) -> Optional[Dict]:
-    """
-    Returns the context for rendering the MFE banner and MFE.
-
-    Args:
-        query_params (Dict): request query parameters
-        course_key (CourseKey): course for which to get URL
-
-    Returns:
-        A URL for the MFE experience if active for the current request or None
-    """
-    mfe_url = get_discussions_mfe_url(course_key)
-    if not mfe_url:
-        return {"show_banner": False, "show_mfe": False}
-    discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
-    discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
-    enabled_for_educator_or_staff = is_educator_or_staff and discussions_mfe_enabled
-    enable_mfe = enabled_for_educator_or_staff or discussions_mfe_enabled_for_everyone
-    # Show the MFE if the new MFE is enabled,
-    # and if the legacy experience is not requested via query param
-    # and if the current view isn't only that's only supported by the legacy view
-    show_mfe = (
-        query_params.get("discussions_experience", "").lower() != "legacy"
-        and enable_mfe
-        and not legacy_only_view
-    )
-    forum_url = reverse("forum_form_discussion", args=[course_key])
-    return {
-        "show_mfe": show_mfe,
-        "legacy_url": f"{forum_url}?discussions_experience=legacy",
-        "mfe_url": f"{forum_url}?discussions_experience=new",
-        "share_feedback_url": settings.DISCUSSIONS_MFE_FEEDBACK_URL,
-        "course_key": course_key,
-        "show_banner": enable_mfe and (is_privileged or ENABLE_DISCUSSIONS_MFE_BANNER),
-        "discussions_mfe_url": mfe_url,
-    }
-
-
 def is_course_staff(course_key: CourseKey, user: User):
     """
     Check if user has course instructor or course staff role.
@@ -767,7 +760,8 @@ def is_course_staff(course_key: CourseKey, user: User):
 def is_privileged_user(course_key: CourseKey, user: User):
     """
     Returns True if user has one of following course role
-    Administrator, Moderator, Group Moderator, Community TA
+    Administrator, Moderator, Group Moderator, Community TA,
+    Global Staff, Course Instructor or Course Staff.
     """
     forum_roles = [
         FORUM_ROLE_COMMUNITY_TA,
@@ -777,6 +771,21 @@ def is_privileged_user(course_key: CourseKey, user: User):
     ]
     has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
     return GlobalStaff().has_user(user) or is_course_staff(course_key, user) or has_course_role
+
+
+def is_user_moderator(course_key: CourseKey, user: User):
+    """
+    Returns True if user has one of following course role
+    Administrator, Moderator, Group Moderator, Community TA.
+    """
+    forum_roles = [
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_GROUP_MODERATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_ADMINISTRATOR
+    ]
+    has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
+    return has_course_role
 
 
 class DiscussionBoardFragmentView(EdxFragmentView):
@@ -809,21 +818,6 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
         force_legacy_view = (profile_page_context or thread_id or discussion_id)
         is_educator_or_staff = is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user)
-        is_privileged = is_privileged_user(course_key, request.user)
-        mfe_context = _discussions_mfe_context(request.GET, course_key, is_educator_or_staff, force_legacy_view,
-                                               is_privileged)
-        if mfe_context["show_mfe"]:
-            fragment = Fragment(render_to_string('discussion/discussion_mfe_embed.html', mfe_context))
-            fragment.add_css(
-                """
-                #discussions-mfe-tab-embed {
-                    width: 100%;
-                    min-height: 800px;
-                    border: none;
-                }
-                """
-            )
-            return fragment
         try:
             base_context = _create_base_discussion_view_context(request, course_key)
             # Note:
@@ -848,7 +842,6 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             context.update({
                 'course_expiration_fragment': course_expiration_fragment,
             })
-            context.update(mfe_context)
             if profile_page_context:
                 # EDUCATOR-2119: styles are hard to reconcile if the profile page isn't also a fragment
                 html = render_to_string('discussion/discussion_profile_page.html', profile_page_context)

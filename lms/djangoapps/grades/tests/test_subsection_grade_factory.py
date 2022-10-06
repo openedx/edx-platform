@@ -10,7 +10,6 @@ from django.conf import settings
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
-from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 
 from ..constants import GradeOverrideFeatureEnum
 from ..models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
@@ -104,29 +103,6 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         verify_update_if_higher((2, 4), (2, 4))  # previous value was equivalent
         verify_update_if_higher((1, 4), (2, 4))  # previous value was greater
         verify_update_if_higher((3, 4), (3, 4))  # previous value was less
-
-    @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
-    @ddt.data(
-        (True, True),
-        (True, False),
-        (False, True),
-        (False, False),
-    )
-    @ddt.unpack
-    def test_subsection_grade_feature_gating(self, feature_flag, course_setting):
-        # Grades are only saved if the feature flag and the advanced setting are
-        # both set to True.
-        with patch(
-            'lms.djangoapps.grades.models.PersistentSubsectionGrade.bulk_read_grades'
-        ) as mock_read_saved_grade:
-            with persistent_grades_feature_flags(
-                global_flag=feature_flag,
-                enabled_for_all_courses=False,
-                course_id=self.course.id,
-                enabled_for_course=course_setting
-            ):
-                self.subsection_grade_factory.create(self.sequence)
-        assert mock_read_saved_grade.called == (feature_flag and course_setting)
 
     @ddt.data(
         (0, None),

@@ -107,7 +107,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
     def test_dump_course_ids(self):
         output = self.call_command('dump_course_ids')
-        dumped_courses = output.strip().split('\n')
+        dumped_courses = (output.strip() or []) and output.strip().split('\n')
         course_ids = {str(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
         assert course_ids == dumped_ids

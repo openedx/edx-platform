@@ -10,4 +10,4 @@ The following are currently implemented:
 
 2. LoginWithAccessTokenView
 
-   1st party (open-edx) OAuth 2.0 access token -> session cookie
+   1st party (open-edx) OAuth 2.0 access token (bearer/jwt) -> session cookie

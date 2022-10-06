@@ -27,7 +27,6 @@ from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
@@ -880,60 +879,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                 },
                 "subcategories": {},
                 "children": [("Topic C", TYPE_ENTRY), ("Topic A", TYPE_ENTRY), ("Topic B", TYPE_ENTRY)]
-            }
-        )
-
-    def test_sort_alpha(self):
-        self.course.discussion_sort_alpha = True
-        self.create_discussion("Chapter", "Discussion D")
-        self.create_discussion("Chapter", "Discussion A")
-        self.create_discussion("Chapter", "Discussion E")
-        self.create_discussion("Chapter", "Discussion C")
-        self.create_discussion("Chapter", "Discussion B")
-
-        self.assert_category_map_equals(
-            {
-                "entries": {},
-                "subcategories": {
-                    "Chapter": {
-                        "entries": {
-                            "Discussion D": {
-                                "id": "discussion1",
-                                "sort_key": "Discussion D",
-                                "is_divided": False,
-                            },
-                            "Discussion A": {
-                                "id": "discussion2",
-                                "sort_key": "Discussion A",
-                                "is_divided": False,
-                            },
-                            "Discussion E": {
-                                "id": "discussion3",
-                                "sort_key": "Discussion E",
-                                "is_divided": False,
-                            },
-                            "Discussion C": {
-                                "id": "discussion4",
-                                "sort_key": "Discussion C",
-                                "is_divided": False,
-                            },
-                            "Discussion B": {
-                                "id": "discussion5",
-                                "sort_key": "Discussion B",
-                                "is_divided": False,
-                            }
-                        },
-                        "subcategories": {},
-                        "children": [
-                            ("Discussion A", TYPE_ENTRY),
-                            ("Discussion B", TYPE_ENTRY),
-                            ("Discussion C", TYPE_ENTRY),
-                            ("Discussion D", TYPE_ENTRY),
-                            ("Discussion E", TYPE_ENTRY)
-                        ]
-                    }
-                },
-                "children": [("Chapter", TYPE_SUBCATEGORY)]
             }
         )
 

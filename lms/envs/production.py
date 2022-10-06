@@ -1034,12 +1034,14 @@ EXPLICIT_QUEUES = {
     'lms.djangoapps.grades.tasks.recalculate_course_and_subsection_grades_for_user': {
         'queue': POLICY_CHANGE_GRADES_ROUTING_KEY},
     'lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3': {
-        'queue': RECALCULATE_GRADES_ROUTING_KEY},
+        'queue': SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.revoke_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update': {
+        'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
+    'openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
@@ -1071,3 +1073,10 @@ REST_FRAMEWORK.update(ENV_TOKENS.get('REST_FRAMEWORK', {}))
 
 ############################# CELERY ############################
 CELERY_IMPORTS.extend(ENV_TOKENS.get('CELERY_EXTRA_IMPORTS', []))
+
+# keys for  big blue button live provider
+COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
+    "KEY": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_KEY', None),
+    "SECRET": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_SECRET', None),
+    "URL": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_URL', None),
+}

@@ -10,7 +10,7 @@ These directories specify the Python (and system) dependencies for the LMS and S
 (In a normal `OEP-18`_-compliant repository, the ``*.in`` and ``*.txt`` files would be
 directly in the requirements directory.)
 
-.. _OEP-18: https://github.com/edx/open-edx-proposals/blob/master/oeps/oep-0018-bp-python-dependencies.rst
+.. _OEP-18: https://github.com/openedx/open-edx-proposals/blob/master/oeps/oep-0018-bp-python-dependencies.rst
 
 Upgrading/downgrading just one dependency
 -----------------------------------------

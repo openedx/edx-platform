@@ -64,12 +64,28 @@ pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
 pre-requirements: ## install Python requirements for running pip-tools
+	pip install -qr requirements/pip.txt
 	pip install -qr requirements/edx/pip-tools.txt
 
-requirements: pre-requirements ## install development environment requirements
+local-requirements:
+# 	edx-platform installs some Python projects from within the edx-platform repo itself.
+	pip install -e .
+
+dev-requirements: pre-requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
 	@# of it if it does not.  Shell wildcarding can't do that with default options.
 	pip-sync -q requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
+	make local-requirements
+
+base-requirements: pre-requirements
+	pip-sync requirements/edx/base.txt
+	make local-requirements
+
+test-requirements: pre-requirements
+	pip-sync --pip-args="--exists-action=w" requirements/edx/testing.txt
+	make local-requirements
+
+requirements: dev-requirements ## install development environment requirements
 
 shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
 	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
@@ -116,8 +132,6 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 		pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
 		export REBUILD=''; \
 	done
-	# Post process all of the files generated above to work around open pip-tools issues
-	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
 	# Let tox control the Django version for tests
 	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp

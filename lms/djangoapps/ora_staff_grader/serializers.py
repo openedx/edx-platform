@@ -87,6 +87,7 @@ class OpenResponseMetadataSerializer(serializers.Serializer):
     prompts = serializers.ListField()
     type = serializers.SerializerMethodField()
     textResponseConfig = serializers.SerializerMethodField()
+    textResponseEditor = serializers.CharField(source='text_response_editor')
     fileUploadResponseConfig = serializers.SerializerMethodField()
     rubricConfig = RubricConfigSerializer(source="*")
 
@@ -105,6 +106,7 @@ class OpenResponseMetadataSerializer(serializers.Serializer):
             "prompts",
             "type",
             "textResponseConfig",
+            "textResponseEditor",
             "fileUploadResponseConfig",
             "rubricConfig",
         ]

@@ -611,6 +611,9 @@ PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
+############## Exams CONFIGURATION SETTINGS ####################
+EXAMS_SERVICE_URL = 'http://exams.example.com/api/v1'
+
 ############### Settings for Django Rate limit #####################
 
 RATELIMIT_RATE = '2/m'
@@ -640,3 +643,29 @@ SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
 #################### Network configuration ####################
 # Tests are not behind any proxies
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
+
+COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
+    "KEY": "***",
+    "SECRET": "***",
+    "URL": "***",
+}
+
+################## MFE API ####################
+ENABLE_MFE_CONFIG_API = True
+MFE_CONFIG = {
+    "BASE_URL": "https://name_of_mfe.example.com",
+    "LANGUAGE_PREFERENCE_COOKIE_NAME": "example-language-preference",
+    "LOGO_URL": "https://courses.example.com/logo.png"
+}
+
+MFE_CONFIG_OVERRIDES = {
+    "mymfe": {
+        "LANGUAGE_PREFERENCE_COOKIE_NAME": "mymfe-language-preference",
+        "LOGO_URL": "https://courses.example.com/mymfe-logo.png",
+    },
+    "yourmfe": {
+        "LANGUAGE_PREFERENCE_COOKIE_NAME": "yourmfe-language-preference",
+        "LOGO_URL": "https://courses.example.com/yourmfe-logo.png",
+    },
+}

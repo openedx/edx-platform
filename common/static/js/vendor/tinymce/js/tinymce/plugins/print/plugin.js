@@ -1,32 +1,53 @@
 /**
- * plugin.js
+ * Copyright (c) Tiny Technologies, Inc. All rights reserved.
+ * Licensed under the LGPL or a commercial license.
+ * For LGPL see License.txt in the project root for license information.
+ * For commercial licenses see https://www.tiny.cloud/
  *
- * Copyright, Moxiecode Systems AB
- * Released under LGPL License.
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
+ * Version: 5.5.1 (2020-10-01)
  */
+(function () {
+    'use strict';
 
-/*global tinymce:true */
+    var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
 
-tinymce.PluginManager.add('print', function(editor) {
-	editor.addCommand('mcePrint', function() {
-		editor.getWin().print();
-	});
+    var global$1 = tinymce.util.Tools.resolve('tinymce.Env');
 
-	editor.addButton('print', {
-		title: 'Print',
-		cmd: 'mcePrint'
-	});
+    var register = function (editor) {
+      editor.addCommand('mcePrint', function () {
+        if (global$1.browser.isIE()) {
+          editor.getDoc().execCommand('print', false, null);
+        } else {
+          editor.getWin().print();
+        }
+      });
+    };
 
-	editor.addShortcut('Ctrl+P', '', 'mcePrint');
+    var register$1 = function (editor) {
+      editor.ui.registry.addButton('print', {
+        icon: 'print',
+        tooltip: 'Print',
+        onAction: function () {
+          return editor.execCommand('mcePrint');
+        }
+      });
+      editor.ui.registry.addMenuItem('print', {
+        text: 'Print...',
+        icon: 'print',
+        onAction: function () {
+          return editor.execCommand('mcePrint');
+        }
+      });
+    };
 
-	editor.addMenuItem('print', {
-		text: 'Print',
-		cmd: 'mcePrint',
-		icon: 'print',
-		shortcut: 'Ctrl+P',
-		context: 'file'
-	});
-});
+    function Plugin () {
+      global.add('print', function (editor) {
+        register(editor);
+        register$1(editor);
+        editor.addShortcut('Meta+P', '', 'mcePrint');
+      });
+    }
+
+    Plugin();
+
+}());

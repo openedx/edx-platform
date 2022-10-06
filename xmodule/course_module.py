@@ -267,6 +267,7 @@ def get_available_providers():  # lint-amnesty, pylint: disable=missing-function
     )
 
     available_providers = [provider for provider in proctoring_backend_settings if provider != 'DEFAULT']
+    available_providers.append('lti_external')
     available_providers.sort()
     return available_providers
 
@@ -403,14 +404,6 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         ),
         scope=Scope.settings
     )
-    discussion_sort_alpha = Boolean(
-        display_name=_("Discussion Sorting Alphabetical"),
-        scope=Scope.settings, default=False,
-        help=_(
-            "Enter true or false. If true, discussion categories and subcategories are sorted alphabetically. "
-            "If false, they are sorted chronologically by creation date and time."
-        )
-    )
     discussions_settings = Dict(
         display_name=_("Discussions Plugin Settings"),
         scope=Scope.settings,
@@ -418,7 +411,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         default={
             "enable_in_context": True,
             "enable_graded_units": False,
-            "unit_level_visibility": False,
+            "unit_level_visibility": True,
         }
     )
     announcement = Date(

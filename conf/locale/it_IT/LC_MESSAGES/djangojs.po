@@ -40,7 +40,7 @@
 # Pietro Lombardo <pietrolombardo1979@gmail.com>, 2014-2015
 # Sarina Canelake <sarina@tcril.org>, 2014
 # Stefania Carta <info@stefaniacarta.com>, 2015
-# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2021
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2021-2022
 # Thimoty Barbieri <thimoty@thimoty.it>, 2014
 # Tiziana Longeri <tiziana.longeri@polimi.it>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -89,9 +89,10 @@
 # Translators:
 # 04d576a65812d0fea671136aba4b73ba_d8a218d <ab142ce9a1bdb1fb9d86bf942d5aca84_263701>, 2015
 # Domenico Casanica <domenico.casanica@sistinf.it>, 2021
+# Ilaria Botti <ilabotti@gmail.com>, 2022
 # Mauri Macera, 2021
 # Pietro Lombardo <pietrolombardo1979@gmail.com>, 2014-2015
-# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2021
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2021-2022
 # Thimoty Barbieri <thimoty@thimoty.it>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Italian (Italy) (http://www.transifex.com/open-edx/edx-platform/language/it_IT/)
@@ -102,6 +103,7 @@
 # anna.ghetti <anna.ghetti@student.unife.it>, 2014
 # 04d576a65812d0fea671136aba4b73ba_d8a218d <ab142ce9a1bdb1fb9d86bf942d5aca84_263701>, 2015
 # Domenico Casanica <domenico.casanica@sistinf.it>, 2021
+# Ilaria Botti <ilabotti@gmail.com>, 2022
 # Mauri Macera, 2021
 # Nicola Cois <nicolacois@hotmail.com>, 2014
 # Pietro Lombardo <pietrolombardo1979@gmail.com>, 2014-2016
@@ -111,9 +113,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-12 20:43+0000\n"
+"POT-Creation-Date: 2022-09-18 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Mauri Macera, 2021\n"
+"Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2022\n"
 "Language-Team: Italian (Italy) (http://www.transifex.com/open-edx/edx-platform/language/it_IT/)\n"
 "Language: it_IT\n"
 "MIME-Version: 1.0\n"
@@ -124,7 +126,7 @@ msgstr ""
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 #: cms/static/js/views/video_transcripts.js
-#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+#: xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -142,9 +144,9 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js
-#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
-#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
+#: lms/static/js/views/fields.js
+#: xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Saving"
 msgstr "Salvataggio in corso"
 
@@ -182,10 +184,10 @@ msgstr "Cancella"
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
 #: cms/static/js/views/validation.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -217,9 +219,8 @@ msgstr "Caricamento"
 #: cms/static/js/views/active_video_upload.js
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/demographics_collection/Wizard.jsx
-#: lms/static/js/student_account/tos_modal.js
+#: lms/static/js/student_account/tos_modal.js xmodule/js/src/html/edit.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
@@ -230,8 +231,7 @@ msgstr "Chiudi"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/assets.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/static/js/views/assets.js xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
@@ -249,8 +249,7 @@ msgstr "Scegli File"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/js/Markdown.Editor.js
+#: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
@@ -259,8 +258,7 @@ msgstr "OK"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/course_video_settings.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/static/js/views/course_video_settings.js xmodule/js/src/html/edit.js
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "None"
 msgstr "Nessuno"
@@ -278,8 +276,7 @@ msgstr "Rimuovi"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/manage_users_and_roles.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/static/js/views/manage_users_and_roles.js xmodule/js/src/html/edit.js
 msgid "Ok"
 msgstr "Ok"
 
@@ -302,8 +299,7 @@ msgstr "Carica  il File"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/certificate-editor.underscore
+#: xmodule/js/src/html/edit.js cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
@@ -322,7 +318,7 @@ msgstr "Salva"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/course_outline_modals.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Advanced"
 msgstr "Avanzato"
@@ -364,1730 +360,6 @@ msgstr "Allerta"
 msgid "Error"
 msgstr "Errore"
 
-#: common/lib/xmodule/xmodule/assets/library_content/public/js/library_content_edit.js
-#: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
-msgid "Updating with latest library content"
-msgstr "Aggiornamento con gli ultimi contenuti della libreria"
-
-#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Loading..."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Selected blocks"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid "Unable to update settings"
-msgstr "Impossibile aggiornare le impostazioni"
-
-#: common/lib/xmodule/xmodule/assets/split_test/public/js/split_test_author_view.js
-#: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
-msgid "Creating missing groups"
-msgstr "Sto creando i gruppi mancanti"
-
-#: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
-msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr "{start_strong}{total}{end_strong} parole inviate in totale."
-
-#: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
-msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr "text_word_{uniqueId} title_word_{uniqueId}"
-
-#: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
-msgid "title_word_{uniqueId}"
-msgstr "title_word_{uniqueId}"
-
-#: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
-msgid "text_word_{uniqueId}"
-msgstr "text_word_{uniqueId}"
-
-#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-msgid "Show Annotations"
-msgstr "Mostra le Annotazioni"
-
-#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-msgid "Hide Annotations"
-msgstr "Nascondi le Annotazioni"
-
-#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-msgid "Expand Instructions"
-msgstr "Espandi le Istruzioni"
-
-#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-msgid "Collapse Instructions"
-msgstr "Nascondi le Istruzioni"
-
-#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-msgid "Commentary"
-msgstr "Commentario"
-
-#: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-msgid "Reply to Annotation"
-msgstr "Risposta all'Annotazione"
-
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (graded, results hidden)"
-msgid_plural "{num_points} points possible (graded, results hidden)"
-msgstr[0] "{num_points} punto possibile (valutato, risultati nascosti)"
-msgstr[1] "{num_points} punti possibili (valutato, risultati nascosti)"
-msgstr[2] "{num_points} punti possibili (valutato, risultati nascosti)"
-
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (ungraded, results hidden)"
-msgid_plural "{num_points} points possible (ungraded, results hidden)"
-msgstr[0] "{num_points} punto possibile (non valutato, risultati nascosti)"
-msgstr[1] "{num_points} punti possibili (non valutato, risultati nascosti)"
-msgstr[2] "{num_points} punti possibili (non valutato, risultati nascosti)"
-
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (graded)"
-msgid_plural "{num_points} points possible (graded)"
-msgstr[0] "{num_points} punto possibile (valutato)"
-msgstr[1] "{num_points} punti possibili (valutato)"
-msgstr[2] "{num_points} punti possibili (valutato)"
-
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (ungraded)"
-msgid_plural "{num_points} points possible (ungraded)"
-msgstr[0] "{num_points} punto possibile (non valutato)"
-msgstr[1] "{num_points} punti possibili (non valutato)"
-msgstr[2] "{num_points} punti possibili (non valutato)"
-
-#. Translators: {earned} is the number of points earned. {possible} is the
-#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
-#. points will always be at least 1. We pluralize based on the total number of
-#. points (example: 0/1 point; 1/2 points);
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{earned}/{possible} point (graded)"
-msgid_plural "{earned}/{possible} points (graded)"
-msgstr[0] "{earned}/{possible} punto (valutato)"
-msgstr[1] "{earned}/{possible} punti (valutato)"
-msgstr[2] "{earned}/{possible} punti (valutato)"
-
-#. Translators: {earned} is the number of points earned. {possible} is the
-#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
-#. points will always be at least 1. We pluralize based on the total number of
-#. points (example: 0/1 point; 1/2 points);
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{earned}/{possible} point (ungraded)"
-msgid_plural "{earned}/{possible} points (ungraded)"
-msgstr[0] "{earned}/{possible} punto (non valutato)"
-msgstr[1] "{earned}/{possible} punti (non valutato)"
-msgstr[2] "{earned}/{possible} punti (non valutato)"
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "The grading process is still running. Refresh the page to see updates."
-msgstr ""
-"La valutazione è ancora in corso. Aggiorna la pagina per visualizzare gli "
-"aggiornamenti."
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Could not grade your answer. The submission was aborted."
-msgstr "Impossibile valutare la tua risposta. L'invio è stato annullato."
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid ""
-"Submission aborted! Sorry, your browser does not support file uploads. If "
-"you can, please use Chrome or Safari which have been verified to support "
-"file uploads."
-msgstr ""
-"Invio annullato! Il browser non supporta il caricamento di file. Se "
-"possibile, utilizza Chrome o Safari che supportano il caricamento dei file. "
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "You submitted {filename}; only {allowedFiles} are allowed."
-msgstr ""
-"Il file {filename} inviato non è nel formato corretto; sono consentiti solo "
-"file {allowedFiles}."
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Your file {filename} is too large (max size: {maxSize}MB)."
-msgstr "Il file {filename} è troppo grande (dimensione massima: {maxSize}MB)."
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "You did not submit the required files: {requiredFiles}."
-msgstr "Non hai inviato i file richiesti: {requiredFiles}."
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "You did not select any files to submit."
-msgstr "Non hai selezionato file da inviare."
-
-#. Translators: This is only translated to allow for reordering of label and
-#. associated status.;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{label}: {status}"
-msgstr "{label}: {status}"
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "This problem has been reset."
-msgstr "Il problema è stato risolto."
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "unsubmitted"
-msgstr "non inviato"
-
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid ""
-"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
-msgstr ""
-"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Paragraph"
-msgstr "Paragrafo"
-
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Preformatted"
-msgstr "Preformattato"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 3"
-msgstr "Titolo 3"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 4"
-msgstr "Titolo 4"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 5"
-msgstr "Titolo 5"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 6"
-msgstr "Titolo 6"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Add to Dictionary"
-msgstr "Aggiungi al Dizionario"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Align center"
-msgstr "Allinea al centro"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Align left"
-msgstr "Allinea a sinistra"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Align right"
-msgstr "Allinea a destra"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Alignment"
-msgstr "Allineamento"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Alternative source"
-msgstr "Sorgente alternativa"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Anchor"
-msgstr "Ancoraggio"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Anchors"
-msgstr "Ancoraggi"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Author"
-msgstr "Autore"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Background color"
-msgstr "Colore di sfondo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/js/Markdown.Editor.js
-msgid "Blockquote"
-msgstr "Citazione"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Blocks"
-msgstr "Blocchi"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Body"
-msgstr "Corpo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Bold"
-msgstr "Grassetto"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Border color"
-msgstr "Colore del bordo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Border"
-msgstr "Bordo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Bottom"
-msgstr "In basso"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Bullet list"
-msgstr "Elenco puntato"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Caption"
-msgstr "Didascalia"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Cell padding"
-msgstr "Spaziatura celle"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Cell properties"
-msgstr "Proprietà della cella"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Cell spacing"
-msgstr "Spaziatura della cella"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Cell type"
-msgstr "Tipo di cella"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Cell"
-msgstr "Cella"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Center"
-msgstr "Al centro"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Circle"
-msgstr "Cerchio"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Clear formatting"
-msgstr "Rimuovi formattazione"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#. Translators: this is a toolbar button tooltip from the raw HTML editor
-#. displayed in the browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Code block"
-msgstr "Frammento di codice"
-
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
-msgid "Code"
-msgstr "Codice"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Color"
-msgstr "Colore"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Cols"
-msgstr "Colonne"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Column group"
-msgstr "Gruppo di colonne"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Column"
-msgstr "Colonna"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Constrain proportions"
-msgstr "Mantieni proporzioni"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Copy row"
-msgstr "Copia riga"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Copy"
-msgstr "Copia"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Could not find the specified string."
-msgstr "Impossibile trovare la stringa indicata."
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Custom color"
-msgstr "Colore personalizzato"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Custom..."
-msgstr "Personalizzato..."
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Cut row"
-msgstr "Taglia riga"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Cut"
-msgstr "Taglia"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Decrease indent"
-msgstr "Riduci indentazione"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Default"
-msgstr "Predefinito"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Delete column"
-msgstr "Elimina colonna"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Delete row"
-msgstr "Elimina riga"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Delete table"
-msgstr "Elimina tabella"
-
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "Description"
-msgstr "Descrizione"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Dimensions"
-msgstr "Dimensioni"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Disc"
-msgstr "Disco"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Div"
-msgstr "Div"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Document properties"
-msgstr "Proprietà del documento"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Edit HTML"
-msgstr "Modifica HTML"
-
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/course_info_handouts.underscore
-#: cms/templates/js/course_info_update.underscore
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/partition-group-details.underscore
-#: cms/templates/js/show-textbook.underscore
-#: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/xblock-string-field-editor.underscore
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Edit"
-msgstr "Modifica"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Embed"
-msgstr "Incorpora"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Emoticons"
-msgstr "Emoticon"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Encoding"
-msgstr "Codifica"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "File"
-msgstr "File"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Find and replace"
-msgstr "Trova e sostituisci"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Find next"
-msgstr "Trova successivo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Find previous"
-msgstr "Trova precedente"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Find"
-msgstr "Trova"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Finish"
-msgstr "Fine"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Font Family"
-msgstr "Nome del carattere"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Font Sizes"
-msgstr "Dimensione del carattere"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Footer"
-msgstr "Piè di pagina"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Format"
-msgstr "Formato"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Formats"
-msgstr "Formati"
-
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/common/templates/image-modal.underscore
-msgid "Fullscreen"
-msgstr "A schermo intero"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "General"
-msgstr "Generale"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "H Align"
-msgstr "Allineamento orizzontale"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Header 1"
-msgstr "Intestazione 1"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Header 2"
-msgstr "Intestazione 2"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Header 3"
-msgstr "Intestazione 3"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Header 4"
-msgstr "Intestazione 4"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Header 5"
-msgstr "Intestazione 5"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Header 6"
-msgstr "Intestazione 6"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Header cell"
-msgstr "Intestazione cella"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-msgid "Header"
-msgstr "Intestazione"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Headers"
-msgstr "Intestazioni"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 1"
-msgstr "Titolo 1"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Heading 2"
-msgstr "Titolo 2"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Headings"
-msgstr "Titoli"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Height"
-msgstr "Altezza"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Horizontal line"
-msgstr "Linea orizzontale"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Horizontal space"
-msgstr "Spaziatura orizzontale"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "HTML source code"
-msgstr "Codice sorgente HTML"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Ignore all"
-msgstr "Ignora tutti"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Ignore"
-msgstr "Ignora"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Image description"
-msgstr "Descrizione dell'immagine"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Increase indent"
-msgstr "Aumenta rientro"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Inline"
-msgstr "In linea"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert column after"
-msgstr "Inserisci colonna a destra"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert column before"
-msgstr "Inserisci colonna a sinistra"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert date/time"
-msgstr "Inserisci data/ora"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert image"
-msgstr "Inserisci immagine"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert link"
-msgstr "Inserisci collegamento"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert row after"
-msgstr "Inserisci riga sotto"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert row before"
-msgstr "Inserisci riga sopra"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert table"
-msgstr "Inserisci tabella"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert template"
-msgstr "Inserisci modello"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert video"
-msgstr "Inserisci video"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert"
-msgstr "Inserisci"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert/edit image"
-msgstr "Inserisci/modifica immagine"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert/edit link"
-msgstr "Inserisci/modifica collegamento"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert/edit video"
-msgstr "Inserisci/modifica collegamento"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Italic"
-msgstr "Corsivo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Justify"
-msgstr "Giustifica"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Keywords"
-msgstr "Parole chiave"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Left to right"
-msgstr "Da sinistra a destra"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Left"
-msgstr "A sinistra"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Lower Alpha"
-msgstr "Lettere minuscole"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Lower Greek"
-msgstr "Lettere greche minuscole"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Lower Roman"
-msgstr "Cifre romane minuscole"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Match case"
-msgstr "Maiuscole/minuscole"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Merge cells"
-msgstr "Unisci celle"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Middle"
-msgstr "Al centro"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "New document"
-msgstr "Nuovo documento"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "New window"
-msgstr "Nuova finestra"
-
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/js/demographics_collection/Wizard.jsx
-#: cms/templates/js/paging-header.underscore
-#: common/static/common/templates/components/paging-footer.underscore
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Next"
-msgstr "Prossimo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "No color"
-msgstr "Nessun colore"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Nonbreaking space"
-msgstr "Spazio unificatore"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Numbered list"
-msgstr "Elenco numerato"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Page break"
-msgstr "Interruzione di pagina"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Paste as text"
-msgstr "Incolla come testo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid ""
-"Paste is now in plain text mode. Contents will now be pasted as plain text "
-"until you toggle this option off."
-msgstr ""
-"La funzione Incolla è ora in modalità testo normale. Il contenuto verrà "
-"incollato come testo normale fino alla disattivazione di tale opzione."
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Paste row after"
-msgstr "Incolla riga dopo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Paste row before"
-msgstr "Incolla riga prima"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Paste your embed code below:"
-msgstr "Incollare di seguito il codice incorporato:"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Paste"
-msgstr "Incolla"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Poster"
-msgstr "Poster"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Pre"
-msgstr "Pre"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Prev"
-msgstr "Prec"
-
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js lms/static/js/customwmd.js
-#: cms/templates/js/asset-library.underscore
-msgid "Preview"
-msgstr "Anteprima"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Print"
-msgstr "Stampa"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Redo"
-msgstr "Annulla"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Remove link"
-msgstr "Rimuovi collegamento"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Replace all"
-msgstr "Sostituisci tutti"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Replace with"
-msgstr "Sostituisci con"
-
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/metadata-file-uploader-item.underscore
-#: cms/templates/js/video-transcripts.underscore
-#: cms/templates/js/video/metadata-translations-item.underscore
-msgid "Replace"
-msgstr "Rimpiazza"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Restore last draft"
-msgstr "Ripristina l'ultima bozza"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid ""
-"Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
-"ALT-0 for help"
-msgstr ""
-"Area di testo formattato. Premere ALT-F9 per il menu. Premere ALT-F10 per la"
-" barra degli strumenti. Premere ALT-0 per la guida"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Right to left"
-msgstr "Da destra a sinistra"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Right"
-msgstr "A destra"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Robots"
-msgstr "Robot"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Row group"
-msgstr "Gruppo di righe"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Row properties"
-msgstr "Proprietà della riga"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Row type"
-msgstr "Tipo di riga"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Row"
-msgstr "Riga"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Rows"
-msgstr "Righe"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Scope"
-msgstr "Ambito"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Select all"
-msgstr "Seleziona tutto"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Show blocks"
-msgstr "Mostra blocchi"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Show invisible characters"
-msgstr "Mostra caratteri non visibili"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Source code"
-msgstr "Codice sorgente"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Source"
-msgstr "Sorgente"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Special character"
-msgstr "Carattere speciale"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Spellcheck"
-msgstr "Controllo ortografico"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Split cell"
-msgstr "Dividi cella"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Square"
-msgstr "Quadrato"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Start search"
-msgstr "Avvia ricerca"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Strikethrough"
-msgstr "Barrato"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Style"
-msgstr "Stile"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Subscript"
-msgstr "Pedice"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Superscript"
-msgstr "Apice"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Table properties"
-msgstr "Proprietà della tabella"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Table"
-msgstr "Tabella"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Target"
-msgstr "Obiettivo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Templates"
-msgstr "Modelli"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Text color"
-msgstr "Colore del testo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Text to display"
-msgstr "Testo da visualizzare"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid ""
-"The URL you entered seems to be an email address. Do you want to add the "
-"required mailto: prefix?"
-msgstr ""
-"L'URL inserito risulta essere un indirizzo e-mail. Aggiungere il prefisso "
-"obbligatorio mailto:?"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid ""
-"The URL you entered seems to be an external link. Do you want to add the "
-"required http:// prefix?"
-msgstr ""
-"L'URL inserito risulta essere un collegamento esterno. Aggiungere il "
-"prefisso obbligatorio http://?"
-
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/course-instructor-details.underscore
-#: cms/templates/js/signatory-details.underscore
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Title"
-msgstr "Titolo"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Tools"
-msgstr "Strumenti"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Top"
-msgstr "In alto"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Underline"
-msgstr "Sottolineato"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Undo"
-msgstr "Annulla"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Upper Alpha"
-msgstr "Lettere maiuscole"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Upper Roman"
-msgstr "Lettere romane maiuscole"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Url"
-msgstr "Url"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "V Align"
-msgstr "Allineamento verticale"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Vertical space"
-msgstr "Spaziatura verticale"
-
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
-#: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
-msgid "View"
-msgstr "Visualizza"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Visual aids"
-msgstr "Strumenti visivi"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Whole words"
-msgstr "Parole intere"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Width"
-msgstr "Larghezza"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Words: {0}"
-msgstr "Parole: {0}"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "You have unsaved changes are you sure you want to navigate away?"
-msgstr ""
-"Sono presenti modifiche non salvate. Si desidera abbandonare la pagina?"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid ""
-"Your browser doesn't support direct access to the clipboard. Please use the "
-"Ctrl+X/C/V keyboard shortcuts instead."
-msgstr ""
-"Il browser non supporta l'accesso diretto agli Appunti. Utilizzare i tasti "
-"di scelta rapida Ctrl+X/C/V."
-
-#. Translators: this is a toolbar button tooltip from the raw HTML editor
-#. displayed in the browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Insert/Edit Image"
-msgstr "Insersci/Modifica immagine"
-
-#: common/lib/xmodule/xmodule/js/src/lti/lti.js
-msgid ""
-"Click OK to have your username and e-mail address sent to a 3rd party application.\n"
-"\n"
-"Click Cancel to return to this page without sending your information."
-msgstr "terze"
-
-#: common/lib/xmodule/xmodule/js/src/lti/lti.js
-msgid ""
-"Click OK to have your username sent to a 3rd party application.\n"
-"\n"
-"Click Cancel to return to this page without sending your information."
-msgstr ""
-"Clicca OK per mandare il tuo username a un'applicazione di terze parti.\n"
-"Clicca Annulla per ritornare indietro a questo pagina senza mandare alcuna informazione."
-
-#: common/lib/xmodule/xmodule/js/src/lti/lti.js
-msgid ""
-"Click OK to have your e-mail address sent to a 3rd party application.\n"
-"\n"
-"Click Cancel to return to this page without sending your information."
-msgstr ""
-"Seleziona OK per inviare il tuo indirizzo e-mail a un'applicazione di terze "
-"parti. Seleziona Annulla per ritornare a questa pagina senza inviare alcuna "
-"informazione."
-
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-msgid "incorrect"
-msgstr "sbagliato"
-
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-msgid "correct"
-msgstr "corretto"
-
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-msgid "answer"
-msgstr "risposta"
-
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-msgid "Short explanation"
-msgstr "Breve spiegazione"
-
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-msgid ""
-"If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
-"\n"
-"Proceed to the Advanced Editor and convert this problem to XML?"
-msgstr ""
-"Se usi un Editor Avanzato, questo problema sarà convertito in XML e non sarai in grado di ritornare all'interfaccia del Editor Semplificato.\n"
-"\n"
-"Procedi all'Editor Avanzato e converti il problema in XML?"
-
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-msgid ""
-"An answer option has been left blank. Please review and edit the component."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-msgid "Explanation"
-msgstr "Spiegazione"
-
-#: common/lib/xmodule/xmodule/js/src/sequence/display.js
-msgid ""
-"Sequence error! Cannot navigate to %(tab_name)s in the current "
-"SequenceModule. Please contact the course staff."
-msgstr ""
-"Errore di sequenza! Non è possibile navigare nel tab %(tab_name)s "
-"nell'attuale SequenceModule. Contattare lo staff del corso."
-
-#: common/lib/xmodule/xmodule/js/src/sequence/display.js
-#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
-msgid "Bookmarked"
-msgstr "Salvato nei segnalibri"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
-#: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
-msgid "Play"
-msgstr "Play"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
-msgid "Pause"
-msgstr "Pausa"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Mute"
-msgstr "Audio disattivato"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Unmute"
-msgstr "Audio attivato"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
-msgid "Exit full browser"
-msgstr "Esci dal browser a schermo intero"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
-msgid "Fill browser"
-msgstr "Riempi browser"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-msgid "Speed"
-msgstr "Velocità"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
-msgid "Auto-advance"
-msgstr "Avanzamento automatico"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Volume"
-msgstr "Volume"
-
-#. Translators: Volume level equals 0%.
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Muted"
-msgstr "Audio disattivato"
-
-#. Translators: Volume level in range ]0,20]%
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Very low"
-msgstr "Molto Basso"
-
-#. Translators: Volume level in range ]20,40]%
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Low"
-msgstr "Basso"
-
-#. Translators: Volume level in range ]40,60]%
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Average"
-msgstr "Normale"
-
-#. Translators: Volume level in range ]60,80]%
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Loud"
-msgstr "Alto"
-
-#. Translators: Volume level in range ]80,99]%
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Very loud"
-msgstr "Molto Alto"
-
-#. Translators: Volume level equals 100%.
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Maximum"
-msgstr "Massimo"
-
-#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-msgid "This browser cannot play .mp4, .ogg, or .webm files."
-msgstr "Questo browser non può riprodurre file .mp4, .ogg e .webm ."
-
-#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-msgid "Try using a different browser, such as Google Chrome."
-msgstr "Prova ad usare un browser diverso, come Google Chrome."
-
-#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-msgid "High Definition"
-msgstr "Alta definizione"
-
-#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-msgid "off"
-msgstr "off"
-
-#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-msgid "on"
-msgstr "on"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "Video position. Press space to toggle playback"
-msgstr ""
-"Posizione video. Premi la barra spaziatrice per avviare/arrestare la "
-"riproduzione"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "Video ended"
-msgstr "Video finito"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "Video position"
-msgstr "Posizione del video"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "%(value)s hour"
-msgid_plural "%(value)s hours"
-msgstr[0] "%(value)s ora"
-msgstr[1] "%(value)s ore"
-msgstr[2] "%(value)s ore"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "%(value)s minute"
-msgid_plural "%(value)s minutes"
-msgstr[0] "%(value)s minuto"
-msgstr[1] "%(value)s minuti"
-msgstr[2] "%(value)s minuti"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "%(value)s second"
-msgid_plural "%(value)s seconds"
-msgstr[0] "%(value)s secondo"
-msgstr[1] "%(value)s secondi"
-msgstr[2] "%(value)s secondi"
-
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid ""
-"Click on this button to mute or unmute this video or press UP or DOWN "
-"buttons to increase or decrease volume level."
-msgstr ""
-"Fai clic su questo pulsante per azzerare o ripristinare il volume del video "
-"o premi i pulsanti PIÙ o MENO per incrementare o diminuire il livello del "
-"volume."
-
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-msgid "Adjust video volume"
-msgstr "Regola il volume del video"
-
-#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-msgid ""
-"Press UP to enter the speed menu then use the UP and DOWN arrow keys to "
-"navigate the different speeds, then press ENTER to change to the selected "
-"speed."
-msgstr ""
-"Premi la freccia verso l'alto per accedere al menu della velocità, quindi "
-"utilizza le frecce verso l'alto e il basso per navigare tra le diverse "
-"velocità, quindi premi INVIO per passare alla velocità selezionata. "
-
-#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-msgid "Adjust video speed"
-msgstr "Regola la velocità del video"
-
-#: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-msgid "Video speed: "
-msgstr "Velocità del video:"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
-msgid "Skip"
-msgstr "Salta"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_poster.js
-msgid "Play video"
-msgstr "Riproduci video"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
-msgid "Do not show again"
-msgstr "Non mostrare più"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Open language menu"
-msgstr "Apri il menu della lingua"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Transcript will be displayed when you start playing the video."
-msgstr ""
-"La trascrizione del video verrà mostrata quando inizierai a guardare il "
-"video"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid ""
-"Activating a link in this group will skip to the corresponding point in the "
-"video."
-msgstr ""
-"Attivando un link in questo gruppo si passerò al corrispondente punto nel "
-"video."
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Video transcript"
-msgstr "Trascrizione del video"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Start of transcript. Skip to the end."
-msgstr "Inizio della trascrizione. Vai alla fine"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "End of transcript. Skip to the start."
-msgstr "Fine della trascrizione. Torna all'inizio"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid ""
-"Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
-" keys to navigate language options. Press ENTER to change to the selected "
-"language."
-msgstr ""
-"Premi il tasto freccia SU per entrare nel menù linguaggio ora usa i tasti "
-"freccia SU e GIÙ per navigare le opzioni del linguaggio. Premi INVIO per "
-"passare alla lingua selezionata."
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Hide closed captions"
-msgstr "Nascondi le didascalie chiuse"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "(Caption will be displayed when you start playing the video.)"
-msgstr ""
-"(La trascrizione del video verrà mostrata quando inizierai a guardare il "
-"video)"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn on closed captioning"
-msgstr "Attiva i sottotitoli"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn on transcripts"
-msgstr "Attiva le trascrizioni"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn off transcripts"
-msgstr "Disattiva le trascrizioni"
-
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 #: cms/templates/js/move-xblock-list.underscore
 msgid "View child items"
@@ -2099,7 +371,7 @@ msgstr "Naviga su"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
-msgstr ""
+msgstr "Navigazione"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
@@ -2667,19 +939,19 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
-msgstr ""
+msgstr "Dettagli"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "the more quickly and helpfully we can respond!"
-msgstr ""
+msgstr "il più velocemente ed utilmente potremo rispondere!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
-msgstr ""
+msgstr "Crea Ticket di Supporto"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr ""
+msgstr "In che cosa possiamo aiutarti, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2687,7 +959,7 @@ msgstr "Accedi a {platform} in modo da consentirci di aiutarti meglio."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Need help logging in?"
-msgstr ""
+msgstr "Hai bisogno di aiuto per accedere?"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -3271,6 +1543,12 @@ msgstr "testo enfatizzato"
 msgid "enter link description here"
 msgstr "Inserisci qui la descrizione del link"
 
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
+msgid "Blockquote"
+msgstr "Citazione"
+
 #: lms/static/js/Markdown.Editor.js
 msgid "enter code here"
 msgstr "inserisci qui il codice"
@@ -3288,6 +1566,9 @@ msgid ""
 "You have been logged out of your account. Click Okay to log in again now. "
 "Click Cancel to stay on this page (you must log in again to save your work)."
 msgstr ""
+"Sei stato disconnesso dal tuo account. Fai clic su Ok per accedere "
+"nuovamente. Fai clic su Annulla per rimanere su questa pagina (devi accedere"
+" di nuovo per salvare il tuo lavoro)."
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
@@ -3358,12 +1639,16 @@ msgstr ""
 #: lms/static/js/certificates/views/certificate_allowlist.js
 msgid "Student Removed from certificate allowlist successfully."
 msgstr ""
+"Studente rimosso con successo dalla lista dei contatti autorizzati ai "
+"certificati."
 
 #: lms/static/js/certificates/views/certificate_allowlist.js
 msgid ""
 "Could not find Certificate Exception in the allowlist. Please refresh the "
 "page and try again"
 msgstr ""
+"Impossibile trovare l'Eccezione del Certificato nella lista dei contatti "
+"autorizzati. Per cortesia aggiorna la pagina e riprova"
 
 #: lms/static/js/certificates/views/certificate_allowlist.js
 #: lms/static/js/certificates/views/certificate_allowlist_editor.js
@@ -3387,66 +1672,85 @@ msgstr ""
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners were successfully added to exception list"
 msgstr ""
+" gli studenti sono stati aggiunti con successo all'elenco delle eccezioni"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learner was successfully added to the exception list"
-msgstr ""
+msgstr " lo studente è stato aggiunto con successo all'elenco delle eccezioni"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " records are not in the correct format and have not been added to the "
 "exception list"
 msgstr ""
+"i record non sono nel formato corretto e non sono stati aggiunti "
+"all&#39;elenco delle eccezioni"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " record is not in the correct format and has not been added to the exception"
 " list"
 msgstr ""
+"il record non è nel formato corretto e non è stato aggiunto all&#39;elenco "
+"delle eccezioni"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner accounts cannot be found and have not been added to the exception "
 "list"
 msgstr ""
+"non sono stati trovati account dello studente e non sono stati aggiunti "
+"all'elenco delle eccezioni"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner account cannot be found and has not been added to the exception "
 "list"
 msgstr ""
+"non è stato trovato nessun account dello studente e non è stato aggiunto "
+"all'elenco delle eccezioni"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners already appear on the exception list in this course"
 msgstr ""
+" gli studenti sono già presenti nell'elenco delle eccezioni di questo corso"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learner already appears on the exception list in this course"
 msgstr ""
+"lo studente è già presente nell'elenco delle eccezioni di questo corso"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learners are not enrolled in this course and have not added to the "
 "exception list"
 msgstr ""
+" gli studenti non sono iscritti a questo corso e non sono stati aggiunti "
+"all'elenco delle eccezioni"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner is not enrolled in this course and has not been added to the "
 "exception list"
 msgstr ""
+" lo studente non è iscritto a questo corso e non è stato aggiunto all'elenco"
+" delle eccezioni"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learners have an active certificate invalidation in this course and have "
 "not been added to the exception list"
 msgstr ""
+"l'annullamento del certificato degli studenti per questo corso è attivo e "
+"non sono stati aggiunti all'elenco delle eccezioni"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner has an active certificate invalidation in this course and has not "
 "been added to the exception list"
 msgstr ""
+"l'annullamento del certificato dello studente per questo corso è attivo e "
+"non è stato aggiunto all'elenco delle eccezioni"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners encountered unknown errors"
@@ -3508,6 +1812,14 @@ msgstr "Meno"
 #: lms/static/js/customwmd.js
 msgid "HTML preview of post"
 msgstr "Anteprima HTML del post"
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: lms/static/js/customwmd.js xmodule/js/src/html/edit.js
+#: cms/templates/js/asset-library.underscore
+msgid "Preview"
+msgstr "Anteprima"
 
 #: lms/static/js/customwmd.js
 #: common/static/common/templates/discussion/templates.underscore
@@ -3590,47 +1902,56 @@ msgstr "Aiutaci a rendere edX migliore per tutti!"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Why does edX collect this information?"
-msgstr ""
+msgstr "Perché edX raccoglie queste informazioni?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "An error occurred while attempting to retrieve or save the information "
 "below. Please try again later."
 msgstr ""
+"Si è verificato un errore durante il tentativo di recuperare o salvare le "
+"informazioni seguenti. Prova di nuovo più tardi."
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What was the total combined income, during the last 12 months, of all "
 "members of your family? "
 msgstr ""
+"Qual è stato il reddito totale complessivo, negli ultimi 12 mesi, di tutti i"
+" membri della tua famiglia? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
 "National Guard?"
 msgstr ""
+"Hai mai prestato servizio attivo nelle forze armate, nelle riserve o nella "
+"guardia nazionale degli Stati Uniti? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What is the highest level of education that you have achieved so far?"
 msgstr ""
+"Qual è il livello di istruzione più elevato che hai raggiunto finora? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What is the highest level of education that any of your parents or guardians"
 " have achieved?"
 msgstr ""
+"Qual è il livello di istruzione più elevato raggiunto da uno dei tuoi "
+"genitori o tutori? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select employment status"
-msgstr ""
+msgstr "Seleziona occupazione"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you currently work in?"
-msgstr ""
+msgstr "In quale settore lavori attualmente? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you want to work in?"
-msgstr ""
+msgstr "In quale settore vuoi lavorare? "
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -3646,19 +1967,29 @@ msgstr "chiudi questionario"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "finish later"
-msgstr ""
+msgstr "termina più tardi"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
-msgstr ""
+msgstr "Torna alla mia dashboard"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
-msgstr ""
+msgstr "Termina più tardi"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "next page"
-msgstr ""
+msgstr "pagina successiva "
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: lms/static/js/demographics_collection/Wizard.jsx
+#: xmodule/js/src/html/edit.js cms/templates/js/paging-header.underscore
+#: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Next"
+msgstr "Prossimo"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -3666,7 +1997,7 @@ msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "Vedi %s corsi"
 msgstr[1] "Vedi %s coursi"
-msgstr[2] "Vedi %s coursi"
+msgstr[2] "Vedi %s corsi"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -3908,6 +2239,10 @@ msgstr "Nome utente sconosciuto: {user}"
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Invalid email address: {email}"
 msgstr "Indirizzo email non valido: {email}"
+
+#: lms/static/js/groups/views/cohort_editor.js
+msgid "Cohort assignment not allowed: {email_or_username}"
+msgstr "Assegnazione di coorte non consentita: {email_or_username}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "There was an error when trying to add learners:"
@@ -4777,10 +3112,44 @@ msgid ""
 "To access the courses available to you through {enterpriseName}, visit the "
 "{enterpriseName} dashboard."
 msgstr ""
+"Per accedere ai corsi disponibili per te di {enterpriseName}, visita la "
+"dashboard di {enterpriseName}."
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid "Go to dashboard"
 msgstr "Vai alla dashboard"
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid "Recommendations for you"
+msgstr "Consigli per te"
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid "loading"
+msgstr "Caricamento in corso"
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid ""
+"Browse recently launched courses and see what's new in your favorite "
+"subjects."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid "Explore courses"
+msgstr "Esplora corsi"
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid "More opportunities for you"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid " to learn"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid ""
+"We've added 500+ learning opportunities to create one of the world's most "
+"comprehensive free-to-degree online learning platforms."
+msgstr ""
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
@@ -4975,7 +3344,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
-msgstr ""
+msgstr "Prima di procedere, per favore {htmlStart}{emailMsg}{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -5727,6 +4096,11 @@ msgstr "Voto Finale"
 msgid "Bookmark this page"
 msgstr "Aggiungi ai preferiti"
 
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+#: xmodule/js/src/sequence/display.js
+msgid "Bookmarked"
+msgstr "Salvato nei segnalibri"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
 msgid_plural "{total_results} results found for \"{search_term}\""
@@ -5823,6 +4197,1697 @@ msgstr "Risultati conseguiti"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
 msgstr "Profilo"
+
+#: xmodule/assets/library_content/public/js/library_content_edit.js
+#: xmodule/js/public/js/library_content_edit.js
+msgid "Updating with latest library content"
+msgstr "Aggiornamento con gli ultimi contenuti della libreria"
+
+#: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Loading..."
+msgstr "Caricamento..."
+
+#: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Selected blocks"
+msgstr "Blocchi selezionati"
+
+#: xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid "Unable to update settings"
+msgstr "Impossibile aggiornare le impostazioni"
+
+#: xmodule/assets/split_test/public/js/split_test_author_view.js
+#: xmodule/js/public/js/split_test_author_view.js
+msgid "Creating missing groups"
+msgstr "Sto creando i gruppi mancanti"
+
+#: xmodule/assets/word_cloud/src/js/word_cloud_main.js
+msgid "{start_strong}{total}{end_strong} words submitted in total."
+msgstr "{start_strong}{total}{end_strong} parole inviate in totale."
+
+#: xmodule/assets/word_cloud/src/js/word_cloud_main.js
+msgid "text_word_{uniqueId} title_word_{uniqueId}"
+msgstr "text_word_{uniqueId} title_word_{uniqueId}"
+
+#: xmodule/assets/word_cloud/src/js/word_cloud_main.js
+msgid "title_word_{uniqueId}"
+msgstr "title_word_{uniqueId}"
+
+#: xmodule/assets/word_cloud/src/js/word_cloud_main.js
+msgid "text_word_{uniqueId}"
+msgstr "text_word_{uniqueId}"
+
+#: xmodule/js/src/annotatable/display.js
+msgid "Show Annotations"
+msgstr "Mostra le Annotazioni"
+
+#: xmodule/js/src/annotatable/display.js
+msgid "Hide Annotations"
+msgstr "Nascondi le Annotazioni"
+
+#: xmodule/js/src/annotatable/display.js
+msgid "Expand Instructions"
+msgstr "Espandi le Istruzioni"
+
+#: xmodule/js/src/annotatable/display.js
+msgid "Collapse Instructions"
+msgstr "Nascondi le Istruzioni"
+
+#: xmodule/js/src/annotatable/display.js
+msgid "Commentary"
+msgstr "Commentario"
+
+#: xmodule/js/src/annotatable/display.js
+msgid "Reply to Annotation"
+msgstr "Risposta all'Annotazione"
+
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
+#: xmodule/js/src/capa/display.js
+msgid "{num_points} point possible (graded, results hidden)"
+msgid_plural "{num_points} points possible (graded, results hidden)"
+msgstr[0] "{num_points} punto possibile (valutato, risultati nascosti)"
+msgstr[1] "{num_points} punti possibili (valutato, risultati nascosti)"
+msgstr[2] "{num_points} punti possibili (valutato, risultati nascosti)"
+
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
+#: xmodule/js/src/capa/display.js
+msgid "{num_points} point possible (ungraded, results hidden)"
+msgid_plural "{num_points} points possible (ungraded, results hidden)"
+msgstr[0] "{num_points} punto possibile (non valutato, risultati nascosti)"
+msgstr[1] "{num_points} punti possibili (non valutato, risultati nascosti)"
+msgstr[2] "{num_points} punti possibili (non valutato, risultati nascosti)"
+
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
+#: xmodule/js/src/capa/display.js
+msgid "{num_points} point possible (graded)"
+msgid_plural "{num_points} points possible (graded)"
+msgstr[0] "{num_points} punto possibile (valutato)"
+msgstr[1] "{num_points} punti possibili (valutato)"
+msgstr[2] "{num_points} punti possibili (valutato)"
+
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
+#: xmodule/js/src/capa/display.js
+msgid "{num_points} point possible (ungraded)"
+msgid_plural "{num_points} points possible (ungraded)"
+msgstr[0] "{num_points} punto possibile (non valutato)"
+msgstr[1] "{num_points} punti possibili (non valutato)"
+msgstr[2] "{num_points} punti possibili (non valutato)"
+
+#. Translators: {earned} is the number of points earned. {possible} is the
+#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
+#. points will always be at least 1. We pluralize based on the total number of
+#. points (example: 0/1 point; 1/2 points);
+#: xmodule/js/src/capa/display.js
+msgid "{earned}/{possible} point (graded)"
+msgid_plural "{earned}/{possible} points (graded)"
+msgstr[0] "{earned}/{possible} punto (valutato)"
+msgstr[1] "{earned}/{possible} punti (valutato)"
+msgstr[2] "{earned}/{possible} punti (valutato)"
+
+#. Translators: {earned} is the number of points earned. {possible} is the
+#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
+#. points will always be at least 1. We pluralize based on the total number of
+#. points (example: 0/1 point; 1/2 points);
+#: xmodule/js/src/capa/display.js
+msgid "{earned}/{possible} point (ungraded)"
+msgid_plural "{earned}/{possible} points (ungraded)"
+msgstr[0] "{earned}/{possible} punto (non valutato)"
+msgstr[1] "{earned}/{possible} punti (non valutato)"
+msgstr[2] "{earned}/{possible} punti (non valutato)"
+
+#: xmodule/js/src/capa/display.js
+msgid "The grading process is still running. Refresh the page to see updates."
+msgstr ""
+"La valutazione è ancora in corso. Aggiorna la pagina per visualizzare gli "
+"aggiornamenti."
+
+#: xmodule/js/src/capa/display.js
+msgid "Could not grade your answer. The submission was aborted."
+msgstr "Impossibile valutare la tua risposta. L'invio è stato annullato."
+
+#: xmodule/js/src/capa/display.js
+msgid ""
+"Submission aborted! Sorry, your browser does not support file uploads. If "
+"you can, please use Chrome or Safari which have been verified to support "
+"file uploads."
+msgstr ""
+"Invio annullato! Il browser non supporta il caricamento di file. Se "
+"possibile, utilizza Chrome o Safari che supportano il caricamento dei file. "
+
+#: xmodule/js/src/capa/display.js
+msgid "You submitted {filename}; only {allowedFiles} are allowed."
+msgstr ""
+"Il file {filename} inviato non è nel formato corretto; sono consentiti solo "
+"file {allowedFiles}."
+
+#: xmodule/js/src/capa/display.js
+msgid "Your file {filename} is too large (max size: {maxSize}MB)."
+msgstr "Il file {filename} è troppo grande (dimensione massima: {maxSize}MB)."
+
+#: xmodule/js/src/capa/display.js
+msgid "You did not submit the required files: {requiredFiles}."
+msgstr "Non hai inviato i file richiesti: {requiredFiles}."
+
+#: xmodule/js/src/capa/display.js
+msgid "You did not select any files to submit."
+msgstr "Non hai selezionato file da inviare."
+
+#. Translators: This is only translated to allow for reordering of label and
+#. associated status.;
+#: xmodule/js/src/capa/display.js
+msgid "{label}: {status}"
+msgstr "{label}: {status}"
+
+#: xmodule/js/src/capa/display.js
+msgid "This problem has been reset."
+msgstr "Il problema è stato risolto."
+
+#: xmodule/js/src/capa/display.js
+msgid "unsubmitted"
+msgstr "non inviato"
+
+#: xmodule/js/src/html/edit.js
+msgid ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
+msgstr ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Paragraph"
+msgstr "Paragrafo"
+
+#: xmodule/js/src/html/edit.js
+msgid "Preformatted"
+msgstr "Preformattato"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Heading 3"
+msgstr "Titolo 3"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Heading 4"
+msgstr "Titolo 4"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Heading 5"
+msgstr "Titolo 5"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Heading 6"
+msgstr "Titolo 6"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Add to Dictionary"
+msgstr "Aggiungi al Dizionario"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Align center"
+msgstr "Allinea al centro"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Align left"
+msgstr "Allinea a sinistra"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Align right"
+msgstr "Allinea a destra"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Alignment"
+msgstr "Allineamento"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Alternative source"
+msgstr "Sorgente alternativa"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Anchor"
+msgstr "Ancoraggio"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Anchors"
+msgstr "Ancoraggi"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Author"
+msgstr "Autore"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Background color"
+msgstr "Colore di sfondo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Blocks"
+msgstr "Blocchi"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Body"
+msgstr "Corpo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Bold"
+msgstr "Grassetto"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Border color"
+msgstr "Colore del bordo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Border"
+msgstr "Bordo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Bottom"
+msgstr "In basso"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Bullet list"
+msgstr "Elenco puntato"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Caption"
+msgstr "Didascalia"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Cell padding"
+msgstr "Spaziatura celle"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Cell properties"
+msgstr "Proprietà della cella"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Cell spacing"
+msgstr "Spaziatura della cella"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Cell type"
+msgstr "Tipo di cella"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Cell"
+msgstr "Cella"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Center"
+msgstr "Al centro"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Circle"
+msgstr "Cerchio"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Clear formatting"
+msgstr "Rimuovi formattazione"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#. Translators: this is a toolbar button tooltip from the raw HTML editor
+#. displayed in the browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Code block"
+msgstr "Frammento di codice"
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+#: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+msgid "Code"
+msgstr "Codice"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Color"
+msgstr "Colore"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Cols"
+msgstr "Colonne"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Column group"
+msgstr "Gruppo di colonne"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Column"
+msgstr "Colonna"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Constrain proportions"
+msgstr "Mantieni proporzioni"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Copy row"
+msgstr "Copia riga"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Copy"
+msgstr "Copia"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Could not find the specified string."
+msgstr "Impossibile trovare la stringa indicata."
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Custom color"
+msgstr "Colore personalizzato"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Custom..."
+msgstr "Personalizzato..."
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Cut row"
+msgstr "Taglia riga"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Cut"
+msgstr "Taglia"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Decrease indent"
+msgstr "Riduci indentazione"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Default"
+msgstr "Predefinito"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Delete column"
+msgstr "Elimina colonna"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Delete row"
+msgstr "Elimina riga"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Delete table"
+msgstr "Elimina tabella"
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Description"
+msgstr "Descrizione"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Dimensions"
+msgstr "Dimensioni"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Disc"
+msgstr "Disco"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Div"
+msgstr "Div"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Document properties"
+msgstr "Proprietà del documento"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Edit HTML"
+msgstr "Modifica HTML"
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js cms/templates/js/certificate-details.underscore
+#: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Edit"
+msgstr "Modifica"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Embed"
+msgstr "Incorpora"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Emoticons"
+msgstr "Emoticon"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Encoding"
+msgstr "Codifica"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "File"
+msgstr "File"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Find and replace"
+msgstr "Trova e sostituisci"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Find next"
+msgstr "Trova successivo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Find previous"
+msgstr "Trova precedente"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Find"
+msgstr "Trova"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Finish"
+msgstr "Fine"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Font Family"
+msgstr "Nome del carattere"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Font Sizes"
+msgstr "Dimensione del carattere"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Footer"
+msgstr "Piè di pagina"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Format"
+msgstr "Formato"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Formats"
+msgstr "Formati"
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+#: common/static/common/templates/image-modal.underscore
+msgid "Fullscreen"
+msgstr "A schermo intero"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "General"
+msgstr "Generale"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "H Align"
+msgstr "Allineamento orizzontale"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Header 1"
+msgstr "Intestazione 1"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Header 2"
+msgstr "Intestazione 2"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Header 3"
+msgstr "Intestazione 3"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Header 4"
+msgstr "Intestazione 4"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Header 5"
+msgstr "Intestazione 5"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Header 6"
+msgstr "Intestazione 6"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Header cell"
+msgstr "Intestazione cella"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js xmodule/js/src/problem/edit.js
+msgid "Header"
+msgstr "Intestazione"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Headers"
+msgstr "Intestazioni"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Heading 1"
+msgstr "Titolo 1"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Heading 2"
+msgstr "Titolo 2"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Headings"
+msgstr "Titoli"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Height"
+msgstr "Altezza"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Horizontal line"
+msgstr "Linea orizzontale"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Horizontal space"
+msgstr "Spaziatura orizzontale"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "HTML source code"
+msgstr "Codice sorgente HTML"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Ignore all"
+msgstr "Ignora tutti"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Ignore"
+msgstr "Ignora"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Image description"
+msgstr "Descrizione dell'immagine"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Increase indent"
+msgstr "Aumenta rientro"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Inline"
+msgstr "In linea"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert column after"
+msgstr "Inserisci colonna a destra"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert column before"
+msgstr "Inserisci colonna a sinistra"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert date/time"
+msgstr "Inserisci data/ora"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert image"
+msgstr "Inserisci immagine"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert link"
+msgstr "Inserisci collegamento"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert row after"
+msgstr "Inserisci riga sotto"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert row before"
+msgstr "Inserisci riga sopra"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert table"
+msgstr "Inserisci tabella"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert template"
+msgstr "Inserisci modello"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert video"
+msgstr "Inserisci video"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert"
+msgstr "Inserisci"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert/edit image"
+msgstr "Inserisci/modifica immagine"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert/edit link"
+msgstr "Inserisci/modifica collegamento"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert/edit video"
+msgstr "Inserisci/modifica collegamento"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Italic"
+msgstr "Corsivo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Justify"
+msgstr "Giustifica"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Keywords"
+msgstr "Parole chiave"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Left to right"
+msgstr "Da sinistra a destra"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Left"
+msgstr "A sinistra"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Lower Alpha"
+msgstr "Lettere minuscole"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Lower Greek"
+msgstr "Lettere greche minuscole"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Lower Roman"
+msgstr "Cifre romane minuscole"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Match case"
+msgstr "Maiuscole/minuscole"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Merge cells"
+msgstr "Unisci celle"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Middle"
+msgstr "Al centro"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "New document"
+msgstr "Nuovo documento"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "New window"
+msgstr "Nuova finestra"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "No color"
+msgstr "Nessun colore"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Nonbreaking space"
+msgstr "Spazio unificatore"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Numbered list"
+msgstr "Elenco numerato"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Page break"
+msgstr "Interruzione di pagina"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Paste as text"
+msgstr "Incolla come testo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid ""
+"Paste is now in plain text mode. Contents will now be pasted as plain text "
+"until you toggle this option off."
+msgstr ""
+"La funzione Incolla è ora in modalità testo normale. Il contenuto verrà "
+"incollato come testo normale fino alla disattivazione di tale opzione."
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Paste row after"
+msgstr "Incolla riga dopo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Paste row before"
+msgstr "Incolla riga prima"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Paste your embed code below:"
+msgstr "Incollare di seguito il codice incorporato:"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Paste"
+msgstr "Incolla"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Poster"
+msgstr "Poster"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Pre"
+msgstr "Pre"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Prev"
+msgstr "Prec"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Print"
+msgstr "Stampa"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Redo"
+msgstr "Annulla"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Remove link"
+msgstr "Rimuovi collegamento"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Replace all"
+msgstr "Sostituisci tutti"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Replace with"
+msgstr "Sostituisci con"
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video-transcripts.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Replace"
+msgstr "Rimpiazza"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Restore last draft"
+msgstr "Ripristina l'ultima bozza"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid ""
+"Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
+"ALT-0 for help"
+msgstr ""
+"Area di testo formattato. Premere ALT-F9 per il menu. Premere ALT-F10 per la"
+" barra degli strumenti. Premere ALT-0 per la guida"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Right to left"
+msgstr "Da destra a sinistra"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Right"
+msgstr "A destra"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Robots"
+msgstr "Robot"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Row group"
+msgstr "Gruppo di righe"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Row properties"
+msgstr "Proprietà della riga"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Row type"
+msgstr "Tipo di riga"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Row"
+msgstr "Riga"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Rows"
+msgstr "Righe"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Scope"
+msgstr "Ambito"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Select all"
+msgstr "Seleziona tutto"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Show blocks"
+msgstr "Mostra blocchi"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Show invisible characters"
+msgstr "Mostra caratteri non visibili"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Source code"
+msgstr "Codice sorgente"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Source"
+msgstr "Sorgente"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Special character"
+msgstr "Carattere speciale"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Spellcheck"
+msgstr "Controllo ortografico"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Split cell"
+msgstr "Dividi cella"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Square"
+msgstr "Quadrato"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Start search"
+msgstr "Avvia ricerca"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Strikethrough"
+msgstr "Barrato"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Style"
+msgstr "Stile"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Subscript"
+msgstr "Pedice"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Superscript"
+msgstr "Apice"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Table properties"
+msgstr "Proprietà della tabella"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Table"
+msgstr "Tabella"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Target"
+msgstr "Obiettivo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Templates"
+msgstr "Modelli"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Text color"
+msgstr "Colore del testo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Text to display"
+msgstr "Testo da visualizzare"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid ""
+"The URL you entered seems to be an email address. Do you want to add the "
+"required mailto: prefix?"
+msgstr ""
+"L'URL inserito risulta essere un indirizzo e-mail. Aggiungere il prefisso "
+"obbligatorio mailto:?"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid ""
+"The URL you entered seems to be an external link. Do you want to add the "
+"required http:// prefix?"
+msgstr ""
+"L'URL inserito risulta essere un collegamento esterno. Aggiungere il "
+"prefisso obbligatorio http://?"
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Title"
+msgstr "Titolo"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Tools"
+msgstr "Strumenti"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Top"
+msgstr "In alto"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Underline"
+msgstr "Sottolineato"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Undo"
+msgstr "Annulla"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Upper Alpha"
+msgstr "Lettere maiuscole"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Upper Roman"
+msgstr "Lettere romane maiuscole"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Url"
+msgstr "Url"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "V Align"
+msgstr "Allineamento verticale"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Vertical space"
+msgstr "Spaziatura verticale"
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+#: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
+msgid "View"
+msgstr "Visualizza"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Visual aids"
+msgstr "Strumenti visivi"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Whole words"
+msgstr "Parole intere"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Width"
+msgstr "Larghezza"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Words: {0}"
+msgstr "Parole: {0}"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "You have unsaved changes are you sure you want to navigate away?"
+msgstr ""
+"Sono presenti modifiche non salvate. Si desidera abbandonare la pagina?"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid ""
+"Your browser doesn't support direct access to the clipboard. Please use the "
+"Ctrl+X/C/V keyboard shortcuts instead."
+msgstr ""
+"Il browser non supporta l'accesso diretto agli Appunti. Utilizzare i tasti "
+"di scelta rapida Ctrl+X/C/V."
+
+#. Translators: this is a toolbar button tooltip from the raw HTML editor
+#. displayed in the browser when a user needs to edit HTML
+#: xmodule/js/src/html/edit.js
+msgid "Insert/Edit Image"
+msgstr "Insersci/Modifica immagine"
+
+#: xmodule/js/src/lti/lti.js
+msgid ""
+"Click OK to have your username and e-mail address sent to a 3rd party application.\n"
+"\n"
+"Click Cancel to return to this page without sending your information."
+msgstr "terze"
+
+#: xmodule/js/src/lti/lti.js
+msgid ""
+"Click OK to have your username sent to a 3rd party application.\n"
+"\n"
+"Click Cancel to return to this page without sending your information."
+msgstr ""
+"Clicca OK per mandare il tuo username a un'applicazione di terze parti.\n"
+"Clicca Annulla per ritornare indietro a questo pagina senza mandare alcuna informazione."
+
+#: xmodule/js/src/lti/lti.js
+msgid ""
+"Click OK to have your e-mail address sent to a 3rd party application.\n"
+"\n"
+"Click Cancel to return to this page without sending your information."
+msgstr ""
+"Seleziona OK per inviare il tuo indirizzo e-mail a un'applicazione di terze "
+"parti. Seleziona Annulla per ritornare a questa pagina senza inviare alcuna "
+"informazione."
+
+#: xmodule/js/src/problem/edit.js
+msgid "incorrect"
+msgstr "sbagliato"
+
+#: xmodule/js/src/problem/edit.js
+msgid "correct"
+msgstr "corretto"
+
+#: xmodule/js/src/problem/edit.js
+msgid "answer"
+msgstr "risposta"
+
+#: xmodule/js/src/problem/edit.js
+msgid "Short explanation"
+msgstr "Breve spiegazione"
+
+#: xmodule/js/src/problem/edit.js
+msgid ""
+"If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
+"\n"
+"Proceed to the Advanced Editor and convert this problem to XML?"
+msgstr ""
+"Se usi un Editor Avanzato, questo problema sarà convertito in XML e non sarai in grado di ritornare all'interfaccia del Editor Semplificato.\n"
+"\n"
+"Procedi all'Editor Avanzato e converti il problema in XML?"
+
+#: xmodule/js/src/problem/edit.js
+msgid ""
+"An answer option has been left blank. Please review and edit the component."
+msgstr ""
+"È stata lasciata una risposta in bianco. Per favore, controlla e modifica."
+
+#: xmodule/js/src/problem/edit.js
+msgid "Explanation"
+msgstr "Spiegazione"
+
+#: xmodule/js/src/sequence/display.js
+msgid ""
+"Sequence error! Cannot navigate to %(tab_name)s in the current "
+"SequenceModule. Please contact the course staff."
+msgstr ""
+"Errore di sequenza! Non è possibile navigare nel tab %(tab_name)s "
+"nell'attuale SequenceModule. Contattare lo staff del corso."
+
+#: xmodule/js/src/video/00_i18n.js
+#: xmodule/js/src/video/09_play_pause_control.js
+#: xmodule/js/src/video/09_play_skip_control.js
+msgid "Play"
+msgstr "Play"
+
+#: xmodule/js/src/video/00_i18n.js
+#: xmodule/js/src/video/09_play_pause_control.js
+msgid "Pause"
+msgstr "Pausa"
+
+#: xmodule/js/src/video/00_i18n.js
+msgid "Mute"
+msgstr "Audio disattivato"
+
+#: xmodule/js/src/video/00_i18n.js
+msgid "Unmute"
+msgstr "Audio attivato"
+
+#: xmodule/js/src/video/00_i18n.js
+#: xmodule/js/src/video/04_video_full_screen.js
+msgid "Exit full browser"
+msgstr "Esci dal browser a schermo intero"
+
+#: xmodule/js/src/video/00_i18n.js
+#: xmodule/js/src/video/04_video_full_screen.js
+msgid "Fill browser"
+msgstr "Riempi browser"
+
+#: xmodule/js/src/video/00_i18n.js
+#: xmodule/js/src/video/08_video_speed_control.js
+msgid "Speed"
+msgstr "Velocità"
+
+#: xmodule/js/src/video/00_i18n.js
+#: xmodule/js/src/video/08_video_auto_advance_control.js
+msgid "Auto-advance"
+msgstr "Avanzamento automatico"
+
+#: xmodule/js/src/video/00_i18n.js
+#: xmodule/js/src/video/07_video_volume_control.js
+msgid "Volume"
+msgstr "Volume"
+
+#. Translators: Volume level equals 0%.
+#: xmodule/js/src/video/00_i18n.js
+msgid "Muted"
+msgstr "Audio disattivato"
+
+#. Translators: Volume level in range ]0,20]%
+#: xmodule/js/src/video/00_i18n.js
+msgid "Very low"
+msgstr "Molto Basso"
+
+#. Translators: Volume level in range ]20,40]%
+#: xmodule/js/src/video/00_i18n.js
+msgid "Low"
+msgstr "Basso"
+
+#. Translators: Volume level in range ]40,60]%
+#: xmodule/js/src/video/00_i18n.js
+msgid "Average"
+msgstr "Normale"
+
+#. Translators: Volume level in range ]60,80]%
+#: xmodule/js/src/video/00_i18n.js
+msgid "Loud"
+msgstr "Alto"
+
+#. Translators: Volume level in range ]80,99]%
+#: xmodule/js/src/video/00_i18n.js
+msgid "Very loud"
+msgstr "Molto Alto"
+
+#. Translators: Volume level equals 100%.
+#: xmodule/js/src/video/00_i18n.js
+msgid "Maximum"
+msgstr "Massimo"
+
+#: xmodule/js/src/video/02_html5_video.js
+msgid "This browser cannot play .mp4, .ogg, or .webm files."
+msgstr "Questo browser non può riprodurre file .mp4, .ogg e .webm ."
+
+#: xmodule/js/src/video/02_html5_video.js
+msgid "Try using a different browser, such as Google Chrome."
+msgstr "Prova ad usare un browser diverso, come Google Chrome."
+
+#: xmodule/js/src/video/05_video_quality_control.js
+msgid "High Definition"
+msgstr "Alta definizione"
+
+#: xmodule/js/src/video/05_video_quality_control.js
+msgid "off"
+msgstr "off"
+
+#: xmodule/js/src/video/05_video_quality_control.js
+msgid "on"
+msgstr "on"
+
+#: xmodule/js/src/video/06_video_progress_slider.js
+msgid "Video position. Press space to toggle playback"
+msgstr ""
+"Posizione video. Premi la barra spaziatrice per avviare/arrestare la "
+"riproduzione"
+
+#: xmodule/js/src/video/06_video_progress_slider.js
+msgid "Video ended"
+msgstr "Video finito"
+
+#: xmodule/js/src/video/06_video_progress_slider.js
+msgid "Video position"
+msgstr "Posizione del video"
+
+#: xmodule/js/src/video/06_video_progress_slider.js
+msgid "%(value)s hour"
+msgid_plural "%(value)s hours"
+msgstr[0] "%(value)s ora"
+msgstr[1] "%(value)s ore"
+msgstr[2] "%(value)s ore"
+
+#: xmodule/js/src/video/06_video_progress_slider.js
+msgid "%(value)s minute"
+msgid_plural "%(value)s minutes"
+msgstr[0] "%(value)s minuto"
+msgstr[1] "%(value)s minuti"
+msgstr[2] "%(value)s minuti"
+
+#: xmodule/js/src/video/06_video_progress_slider.js
+msgid "%(value)s second"
+msgid_plural "%(value)s seconds"
+msgstr[0] "%(value)s secondo"
+msgstr[1] "%(value)s secondi"
+msgstr[2] "%(value)s secondi"
+
+#: xmodule/js/src/video/07_video_volume_control.js
+msgid ""
+"Click on this button to mute or unmute this video or press UP or DOWN "
+"buttons to increase or decrease volume level."
+msgstr ""
+"Fai clic su questo pulsante per azzerare o ripristinare il volume del video "
+"o premi i pulsanti PIÙ o MENO per incrementare o diminuire il livello del "
+"volume."
+
+#: xmodule/js/src/video/07_video_volume_control.js
+msgid "Adjust video volume"
+msgstr "Regola il volume del video"
+
+#: xmodule/js/src/video/08_video_speed_control.js
+msgid ""
+"Press UP to enter the speed menu then use the UP and DOWN arrow keys to "
+"navigate the different speeds, then press ENTER to change to the selected "
+"speed."
+msgstr ""
+"Premi la freccia verso l'alto per accedere al menu della velocità, quindi "
+"utilizza le frecce verso l'alto e il basso per navigare tra le diverse "
+"velocità, quindi premi INVIO per passare alla velocità selezionata. "
+
+#: xmodule/js/src/video/08_video_speed_control.js
+msgid "Adjust video speed"
+msgstr "Regola la velocità del video"
+
+#: xmodule/js/src/video/08_video_speed_control.js
+msgid "Video speed: "
+msgstr "Velocità del video:"
+
+#: xmodule/js/src/video/09_play_skip_control.js
+msgid "Skip"
+msgstr "Salta"
+
+#: xmodule/js/src/video/09_poster.js
+msgid "Play video"
+msgstr "Riproduci video"
+
+#: xmodule/js/src/video/09_skip_control.js
+msgid "Do not show again"
+msgstr "Non mostrare più"
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid "Open language menu"
+msgstr "Apri il menu della lingua"
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid "Transcript will be displayed when you start playing the video."
+msgstr ""
+"La trascrizione del video verrà mostrata quando inizierai a guardare il "
+"video"
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid ""
+"Activating a link in this group will skip to the corresponding point in the "
+"video."
+msgstr ""
+"Attivando un link in questo gruppo si passerò al corrispondente punto nel "
+"video."
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid "Video transcript"
+msgstr "Trascrizione del video"
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid "Start of transcript. Skip to the end."
+msgstr "Inizio della trascrizione. Vai alla fine"
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid "End of transcript. Skip to the start."
+msgstr "Fine della trascrizione. Torna all'inizio"
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid ""
+"Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
+" keys to navigate language options. Press ENTER to change to the selected "
+"language."
+msgstr ""
+"Premi il tasto freccia SU per entrare nel menù linguaggio ora usa i tasti "
+"freccia SU e GIÙ per navigare le opzioni del linguaggio. Premi INVIO per "
+"passare alla lingua selezionata."
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid "Hide closed captions"
+msgstr "Nascondi le didascalie chiuse"
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid "(Caption will be displayed when you start playing the video.)"
+msgstr ""
+"(La trascrizione del video verrà mostrata quando inizierai a guardare il "
+"video)"
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid "Turn on closed captioning"
+msgstr "Attiva i sottotitoli"
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid "Turn on transcripts"
+msgstr "Attiva le trascrizioni"
+
+#: xmodule/js/src/video/09_video_caption.js
+msgid "Turn off transcripts"
+msgstr "Disattiva le trascrizioni"
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
@@ -6027,24 +6092,25 @@ msgstr "Si è verificato un errore durante il caricamento"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr ""
+msgstr "Organizzazione:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr ""
+msgstr "Numero Corso"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr ""
+msgstr "Avanzamento Corso:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr ""
+msgstr "(Sola lettura)"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr ""
+msgstr "Riesegui il corso"
 
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Vedi Live"
@@ -6152,12 +6218,16 @@ msgstr ""
 #: cms/static/js/models/settings/course_details.js
 msgid "The certificate display behavior must be one of: {behavior_options}"
 msgstr ""
+"Il comportamento di visualizzazione del certificato deve essere uno di: "
+"{behavior_options}"
 
 #: cms/static/js/models/settings/course_details.js
 msgid ""
 "The certificates display behavior must be {valid_option} if certificate "
 "available date is set."
 msgstr ""
+"Il comportamento di visualizzazione dei certificati deve essere "
+"{valid_option} se è impostata la data di disponibilità del certificato."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
@@ -6727,6 +6797,7 @@ msgstr "Elemento"
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Studio's having trouble parsing the problem component's content"
 msgstr ""
+"Studio ha problemi ad analizzare il contenuto del componente problematico"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move"
@@ -7854,24 +7925,12 @@ msgid "Status"
 msgstr "Staus"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Download URL"
-msgstr "URL di download "
-
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Grade"
 msgstr "Voto"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Last Updated"
 msgstr "Ultimo aggiornamento "
-
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Download the user's certificate"
-msgstr "Scarica il certificato dell'utente "
-
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Not available"
-msgstr "Non disponibile"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Regenerate"
@@ -8125,7 +8184,7 @@ msgstr "Data di inizio"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Due Date"
-msgstr "Data finale"
+msgstr "Data di consegna"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "remove all"
@@ -8223,7 +8282,7 @@ msgstr "Inizia: %(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "Starts"
-msgstr "Inizi"
+msgstr "Inizia"
 
 #: lms/templates/discovery/filter_bar.underscore
 msgid "Clear All"
@@ -8372,6 +8431,10 @@ msgstr "Aggiungi all'elenco delle eccezioni "
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "Generate Exception Certificates"
 msgstr "Genera certificati eccezione "
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Certificate exceptions group selection"
+msgstr "Selezione del gruppo di eccezioni al certificato"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
@@ -9138,7 +9201,7 @@ msgstr "o crearne uno nuovo qui "
 
 #: lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"
-msgstr "Supporta la ricerca nella formazione fornendo ulteriori informazioni "
+msgstr "Supporta la ricerca sull'educazione fornendo ulteriori informazioni"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
@@ -10434,7 +10497,7 @@ msgstr "Valutato come:"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Due:"
-msgstr "Dovuto:"
+msgstr "Consegna:"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after course end date"
@@ -10627,7 +10690,7 @@ msgstr "Post"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Enable discussion"
-msgstr ""
+msgstr "Abilita discussione"
 
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
@@ -11061,29 +11124,35 @@ msgstr "Annulla data/ora rilascio"
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid "Due in:"
-msgstr ""
+msgstr "Scadenza tra:"
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid "weeks from learner enrollment date"
-msgstr ""
+msgstr "settimane dalla data di iscrizione dello studente"
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
 "If a learner starts on {startDate}, this subsection will be due on "
 "{projectedDueIn}."
 msgstr ""
+"Se uno studente inizia il {startDate}, questa sottosezione scadrà il "
+"{projectedDueIn}."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
 "The maximum number of weeks this subsection can be due in is 18 weeks from "
 "the learner enrollment date."
 msgstr ""
+"Il numero massimo di settimane in cui questa sottosezione può essere dovuta "
+"è di 18 settimane dalla data di iscrizione dello studente."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
 "The minimum number of weeks this subsection can be due in is 1 week from the"
 " learner enrollment date."
 msgstr ""
+"Il numero minimo di settimane in cui questa sottosezione può essere dovuta è"
+" di 1 settimana dalla data di iscrizione dello studente."
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid "Assessment Results Visibility"
@@ -11285,6 +11354,10 @@ msgid ""
 "reverted back to a basic or timed exam. You may not configure it as a "
 "proctored exam now. Contact edX Support for assistance."
 msgstr ""
+"Questa sottosezione è stata rilasciata agli studenti come esame "
+"supervisionato, ma è stata ripristinata a un esame di base oa tempo. Non "
+"puoi configurarlo come esame sorvegliato ora. Contattare l&#39;assistenza "
+"edX per assistenza."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
@@ -11293,6 +11366,10 @@ msgid ""
 "a basic exam by selecting 'None', or a timed exam, but you will NOT be able "
 "to configure it as a proctored exam in the future."
 msgstr ""
+"Questo esame controllato è stato rilasciato agli studenti. Non puoi "
+"convertirlo in un altro tipo di esame speciale. Puoi ripristinare questa "
+"sottosezione come esame di base selezionando &quot;Nessuno&quot; o un esame "
+"a tempo, ma NON potrai configurarlo come esame supervisionato in futuro."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
@@ -11321,6 +11398,11 @@ msgid ""
 "examination rules. Please note that setting this exam as proctored will "
 "change the visibility settings to \"Hide content after due date.\""
 msgstr ""
+"Gli esami controllati sono a tempo e registrano il video di ogni studente "
+"che sostiene l&#39;esame. I video vengono quindi rivisti per garantire che "
+"gli studenti seguano tutte le regole dell&#39;esame. Tieni presente che "
+"l&#39;impostazione di questo esame come controllato cambierà le impostazioni"
+" di visibilità in &quot;Nascondi contenuto dopo la data di scadenza&quot;."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"

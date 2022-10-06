@@ -71,7 +71,7 @@ Test Locations
 
 -  Python unit and integration tests: Located in subpackages called
    ``tests``. For example, the tests for the ``capa`` package are
-   located in ``common/lib/capa/capa/tests``.
+   located in ``xmodule/capa/tests``.
 
 -  Javascript unit tests: Located in ``spec`` folders. For example,
    ``xmodule/js/spec`` and
@@ -223,7 +223,7 @@ run one of these commands::
     paver test_system -s cms -t common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
     pytest common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
-.. _YouTube stub server: https://github.com/edx/edx-platform/blob/master/common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
+.. _YouTube stub server: https://github.com/openedx/edx-platform/blob/master/common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
 
 Debugging Unittest Flakiness
@@ -432,7 +432,7 @@ Factories are often implemented using `FactoryBoy`_.
 
 In general, factories should be located close to the code they use. For
 example, the factory for creating problem XML definitions is located in
-``common/lib/capa/capa/tests/response_xml_factory.py`` because the
+``xmodule/capa/tests/response_xml_factory.py`` because the
 ``capa`` package handles problem XML.
 
 .. _FactoryBoy: https://readthedocs.org/projects/factoryboy/

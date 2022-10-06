@@ -6,7 +6,13 @@ allows us to share code between the XModuleMixin and CourseOverview and
 BlockStructure.
 """
 
+from datetime import datetime
+from logging import getLogger
 from markupsafe import Markup
+
+from dateutil.tz import tzlocal
+
+logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
 def url_name_for_block(block):
@@ -80,3 +86,26 @@ def display_name_with_default_escaped(block):
     # markupsafe.striptags() and fixing issues, better to put that energy toward
     # migrating away from this method altogether.
     return Markup(display_name_with_default(block)).striptags()
+
+
+def get_datetime_field(xblock, name, default):
+    """
+    This method was moved from BlockStructureBlockData because some of the datetime
+    that was cached from previous version of dateutil does not live here. This will
+    be use as share code for reusability and Wack-a-mole situation of the same bug.
+
+    Creates a new datetime object to avoid issues occurring due to upgrading
+    python-datetuil version from 2.4.0
+    More info: https://openedx.atlassian.net/browse/BOM-2245
+    """
+    field = getattr(xblock, name, default)
+    if isinstance(field, datetime):
+        if isinstance(field.tzinfo, tzlocal) and not hasattr(field.tzinfo, '_hasdst'):
+            # Todo: This log statement is added for temporary use only
+            logger.info('Python-dateutil logs: Making datetime field compatible to python-dateutil package')
+            return datetime(
+                year=field.year, month=field.month, day=field.day,
+                hour=field.hour, minute=field.minute, second=field.second,
+                tzinfo=tzlocal()
+            )
+    return field

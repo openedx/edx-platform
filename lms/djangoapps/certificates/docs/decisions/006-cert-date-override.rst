@@ -64,4 +64,4 @@ The date override data (if present) will be included in the post to
 `Credentials`_ whenever this signal is called. Credentials will save and use
 this data for the Program Record page.
 
-.. _Credentials: https://github.com/edx/credentials
+.. _Credentials: https://github.com/openedx/credentials

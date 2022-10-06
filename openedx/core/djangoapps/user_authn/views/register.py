@@ -21,6 +21,7 @@ from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
+from django_countries import countries
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import WaffleFlag
 from openedx_events.learning.data import UserData, UserPersonalData
@@ -213,6 +214,7 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         tos_required=tos_required,
     )
     custom_form = get_registration_extension_form(data=params)
+    is_marketable = params.get('marketing_emails_opt_in') in ['true', '1']
 
     # Perform operations within a transaction that are critical to account creation
     with outer_atomic():
@@ -226,6 +228,17 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         new_user = authenticate_new_user(request, user.username, form.cleaned_data['password'])
         django_login(request, new_user)
         request.session.set_expiry(0)
+
+    try:
+        _record_is_marketable_attribute(is_marketable, new_user)
+    # Don't prevent a user from registering if is_marketable is not being set.
+    # Also update the is_marketable value to None so that it is consistent with
+    # our database when we send it to segment.
+    except Exception:   # pylint: disable=broad-except
+        log.exception('Error while setting is_marketable attribute.')
+        is_marketable = None
+
+    _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable)
 
     # Sites using multiple languages need to record the language used during registration.
     # If not, compose_and_send_activation_email will be sent in site's default language only.
@@ -253,9 +266,6 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         except Exception:  # pylint: disable=broad-except
             log.exception(f"Enable discussion notifications failed for user {user.id}.")
 
-    is_marketable = params.get('marketing_emails_opt_in') in ['true', '1']
-    _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable)
-
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
 
@@ -276,7 +286,6 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
 
     try:
         _record_registration_attributions(request, new_user)
-        _record_is_marketable_attribute(is_marketable, new_user)
     # Don't prevent a user from registering due to attribution errors.
     except Exception:   # pylint: disable=broad-except
         log.exception('Error while attributing cookies to user registration.')
@@ -580,6 +589,10 @@ class RegistrationView(APIView):
         if response:
             return response
 
+        response = self._handle_country_code_validation(request, data)
+        if response:
+            return response
+
         response, user = self._create_account(request, data)
         if response:
             return response
@@ -599,6 +612,27 @@ class RegistrationView(APIView):
         mark_user_change_as_expected(user.id)
         return response
 
+    def _handle_country_code_validation(self, request, data):
+        # pylint: disable=no-member
+        country = data.get('country')
+        is_valid_country_code = country in dict(countries).keys()
+
+        errors = {}
+        error_code = 'invalid-country'
+        error_message = accounts_settings.REQUIRED_FIELD_COUNTRY_MSG
+        extra_fields = configuration_helpers.get_value(
+            'REGISTRATION_EXTRA_FIELDS',
+            getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
+        )
+
+        if extra_fields.get('country', 'hidden') == 'required' and not is_valid_country_code:
+            errors['country'] = [{'user_message': error_message}]
+        elif country and not is_valid_country_code:
+            errors['country'] = [{'user_message': error_message}]
+
+        if errors:
+            return self._create_response(request, errors, status_code=400, error_code=error_code)
+
     def _handle_duplicate_email_username(self, request, data):
         # pylint: disable=no-member
         # TODO Verify whether this check is needed here - it may be duplicated in user_api.
@@ -606,22 +640,15 @@ class RegistrationView(APIView):
         username = data.get('username')
         errors = {}
 
-        # TODO: remove the is_authn_mfe check and use the new error message as default after redesign
-        is_authn_mfe = data.get('is_authn_mfe', False)
-
         error_code = 'duplicate'
         if email is not None and email_exists_or_retired(email):
             error_code += '-email'
-            error_message = accounts_settings.AUTHN_EMAIL_CONFLICT_MSG if is_authn_mfe else (
-                accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)
-            )
+            error_message = accounts_settings.AUTHN_EMAIL_CONFLICT_MSG
             errors['email'] = [{'user_message': error_message}]
 
         if username is not None and username_exists_or_retired(username):
             error_code += '-username'
-            error_message = accounts_settings.AUTHN_USERNAME_CONFLICT_MSG if is_authn_mfe else (
-                accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)
-            )
+            error_message = accounts_settings.AUTHN_USERNAME_CONFLICT_MSG
             errors['username'] = [{'user_message': error_message}]
             errors['username_suggestions'] = generate_username_suggestions(username)
 
@@ -788,7 +815,6 @@ class RegistrationValidationView(APIView):
     # This end-point is available to anonymous users, so no authentication is needed.
     authentication_classes = []
     username_suggestions = []
-    api_version = 'v1'
 
     def name_handler(self, request):
         """ Validates whether fullname is valid """
@@ -803,7 +829,7 @@ class RegistrationValidationView(APIView):
         """ Validates whether the username is valid. """
         username = request.data.get('username')
         invalid_username_error = get_username_validation_error(username)
-        username_exists_error = get_username_existence_validation_error(username, self.api_version)
+        username_exists_error = get_username_existence_validation_error(username)
         if username_exists_error:
             self.username_suggestions = generate_username_suggestions(username)
         # We prefer seeing for invalidity first.
@@ -813,8 +839,8 @@ class RegistrationValidationView(APIView):
     def email_handler(self, request):
         """ Validates whether the email address is valid. """
         email = request.data.get('email')
-        invalid_email_error = get_email_validation_error(email, self.api_version)
-        email_exists_error = get_email_existence_validation_error(email, self.api_version)
+        invalid_email_error = get_email_validation_error(email)
+        email_exists_error = get_email_existence_validation_error(email)
         # We prefer seeing for invalidity first.
         # Some invalid emails (like a blank one for superusers) may exist.
         return invalid_email_error or email_exists_error
@@ -870,9 +896,6 @@ class RegistrationValidationView(APIView):
         can get extra verification checks if entered along with others,
         like when the password may not equal the username.
         """
-        # TODO: remove is_authn_mfe after redesign-master is merged in frontend-app-authn
-        #  and use the new messages as default
-        is_auth_mfe = request.data.get('is_authn_mfe')
         field_key = request.data.get('form_field_key')
         validation_decisions = {}
 
@@ -882,9 +905,6 @@ class RegistrationValidationView(APIView):
             """
             validation = self.validation_handlers[field_name](self, request)
             validation_decisions[field_name] = validation
-
-        if is_auth_mfe:
-            self.api_version = 'v2'
 
         if field_key and field_key in self.validation_handlers:
             update_validations(field_key)

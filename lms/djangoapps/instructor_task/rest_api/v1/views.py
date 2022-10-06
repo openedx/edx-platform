@@ -16,7 +16,7 @@ from rest_framework import generics, status
 
 from lms.djangoapps.bulk_email.api import update_course_email
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
-from lms.djangoapps.instructor_task.models import InstructorTaskSchedule, SCHEDULED
+from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule, SCHEDULED
 from lms.djangoapps.instructor_task.rest_api.v1.exceptions import TaskUpdateException
 from lms.djangoapps.instructor_task.rest_api.v1.serializers import ScheduledBulkEmailSerializer
 from lms.djangoapps.instructor_task.rest_api.v1.permissions import CanViewOrModifyScheduledBulkCourseEmailTasks
@@ -106,6 +106,7 @@ class ModifyScheduledBulkEmailInstructorTask(generics.DestroyAPIView, generics.U
         # update the task's status to REVOKED and then delete the task schedule instance
         log.info(f"Revoking instructor task with id '{task.id}' for course '{task.course_id}'")
         task.task_state = REVOKED
+        task.task_output = InstructorTask.create_output_for_revoked()
         task.save()
         schedule.delete()
 
