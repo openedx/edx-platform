@@ -66,6 +66,7 @@ from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credi
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
@@ -1156,6 +1157,13 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
             verified_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
                                 verified_mode.expiration_datetime.isoformat())
+
+            date_placeholder_format = configuration_helpers.get_value_for_org(
+                course_module.location.org,
+                'SCHEDULE_DETAIL_FORMAT',
+                settings.SCHEDULE_DETAIL_FORMAT
+            ).upper()
+
             settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
@@ -1180,6 +1188,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                 'enable_extended_course_details': enable_extended_course_details,
                 'upgrade_deadline': upgrade_deadline,
                 'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
+                'date_placeholder_format': date_placeholder_format,
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
@@ -1214,6 +1223,12 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
                 course_details = CourseDetails.fetch(course_key)
+
+                # Fetch the prefered timezone setup by the user
+                # and pass it as part of Json response
+                user_timezone = UserPreference.get_value(request.user, 'time_zone')
+                course_details.user_timezone = user_timezone
+
                 return JsonResponse(
                     course_details,
                     # encoder serializes dates, old locations, and instances

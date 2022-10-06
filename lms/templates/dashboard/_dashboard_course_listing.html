@@ -257,11 +257,11 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 % endif
 
                 ## We should only show the gear dropdown if the user is able to refund/unenroll from their entitlement
-                ## and/or if they have selected a course run and email_settings are enabled
+                ## and/or if they have selected a course run, unenrollment is not disabled, and email_settings are enabled
                 ## as these are the only actions currently available
                 % if entitlement and (can_refund_entitlement or show_email_settings):
                     <%include file='_dashboard_entitlement_actions.html' args='course_overview=course_overview,entitlement=entitlement,dashboard_index=dashboard_index, can_refund_entitlement=can_refund_entitlement, show_email_settings=show_email_settings'/>
-                % elif not entitlement:
+                % elif not entitlement and (can_unenroll or partner_managed_enrollment or show_email_settings):
                     <div class="wrapper-action-more" data-course-key="${enrollment.course_id}">
                       <button type="button" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" aria-controls="actions-dropdown-${dashboard_index}" data-course-number="${course_overview.number}" data-course-name="${course_overview.display_name_with_default}" data-dashboard-index="${dashboard_index}">
                         <span class="sr">${_('Course options for')}</span>

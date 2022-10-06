@@ -6,8 +6,8 @@ runs:
     - name: collect tests from all modules
       shell: bash
       run: |
-        echo "root_cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test cms/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
-        echo "root_lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ common/lib/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+        echo "root_cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test -p no:warnings cms/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+        echo "root_lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test -p no:warnings lms/ openedx/ common/djangoapps/ common/lib/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
 
     - name: get GHA unit test paths
       shell: bash
@@ -19,8 +19,8 @@ runs:
     - name: collect tests from GHA unit test shards
       shell: bash
       run: |
-        echo "cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test ${{ env.cms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
-        echo "lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test ${{ env.lms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+        echo "cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test -p no:warnings ${{ env.cms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+        echo "lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test -p no:warnings ${{ env.lms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
 
 
     - name: add unit tests count

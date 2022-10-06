@@ -223,7 +223,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             <li class="field-group field-group-course-start" id="course-start">
               <div class="field date" id="field-course-start-date">
                 <label for="course-start-date">${_("Course Start Date")}</label>
-                <input type="text" class="start-date date start datepicker" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+                <input type="text" class="start-date date start datepicker" id="course-start-date" placeholder="${date_placeholder_format}" autocomplete="off" />
                 <span class="icon icon-inline fa fa-calendar-check-o datepicker-icon" aria-hidden="true"></span>
                 <span class="tip tip-stacked">${_("First day the course begins")}</span>
               </div>
@@ -238,7 +238,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             <li class="field-group field-group-course-end" id="course-end">
               <div class="field date" id="field-course-end-date">
                 <label for="course-end-date">${_("Course End Date")}</label>
-                <input type="text" class="end-date date end" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+                <input type="text" class="end-date date end" id="course-end-date" placeholder="${date_placeholder_format}" autocomplete="off" />
                 <span class="icon icon-inline fa fa-calendar-check-o datepicker-icon" aria-hidden="true"></span>
                 <span class="tip tip-stacked">${_("Last day your course is active")}</span>
               </div>
@@ -304,8 +304,9 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 <div class="field date" id="field-certificate-available-date" >
               % endif
                 <label for="certificate-available-date">${_("Certificates Available Date")}</label>
-                <input type="text" class="certificate-available-date date start datepicker" id="certificate-available-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+                <input type="text" class="certificate-available-date date start datepicker" id="certificate-available-date" placeholder="${date_placeholder_format}" autocomplete="off" />
                 <span class="icon icon-inline fa fa-calendar-check-o datepicker-icon" aria-hidden="true"></span>
+                <span class="tip tip-stacked">${_("By default, 48 hours after course end date")}</span>
               </div>
             </li>
           </ol>
@@ -315,7 +316,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             <li class="field-group field-group-enrollment-start" id="enrollment-start">
               <div class="field date" id="field-enrollment-start-date">
                 <label for="course-enrollment-start-date">${_("Enrollment Start Date")}</label>
-                <input type="text" class="start-date date start" id="course-enrollment-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+                <input type="text" class="start-date date start" id="course-enrollment-start-date" placeholder="${date_placeholder_format}" autocomplete="off" />
                 <span class="icon icon-inline fa fa-calendar-check-o datepicker-icon" aria-hidden="true"></span>
                 <span class="tip tip-stacked">${_("First day students can enroll")}</span>
               </div>
@@ -333,7 +334,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             <li class="field-group field-group-enrollment-end" id="enrollment-end">
               <div class="field date ${enrollment_end_editable_class}" id="field-enrollment-end-date">
                 <label for="course-enrollment-end-date">${_("Enrollment End Date")}</label>
-                <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" ${enrollment_end_readonly} />
+                <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="${date_placeholder_format}" autocomplete="off" ${enrollment_end_readonly} />
                 <span class="icon icon-inline fa fa-calendar-check-o datepicker-icon" aria-hidden="true"></span>
                 <span class="tip tip-stacked">
                   ${_("Last day students can enroll.")}
@@ -356,7 +357,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             <li class="field-group field-group-upgrade-deadline" id="upgrade-deadline">
               <div class="field date is-not-editable" id="field-upgrade-deadline-date">
                 <label for="course-upgrade-deadline-date">${_("Upgrade Deadline Date")}</label>
-                <input type="text" class="date upgrade-deadline" id="course-upgrade-deadline-date" placeholder="MM/DD/YYYY" autocomplete="off" readonly aria-readonly="true" />
+                <input type="text" class="date upgrade-deadline" id="course-upgrade-deadline-date" placeholder="${date_placeholder_format}" autocomplete="off" readonly aria-readonly="true" />
                 <span class="tip tip-stacked">
                   ${_("Last day students can upgrade to a verified enrollment.")}
                   ${_("Contact your {platform_name} partner manager to update these settings.").format(platform_name=settings.PLATFORM_NAME)}

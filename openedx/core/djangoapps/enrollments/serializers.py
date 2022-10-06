@@ -5,10 +5,13 @@ Serializers for all Course Enrollment related return objects.
 
 import logging
 
+from django.core.exceptions import PermissionDenied
 from rest_framework import serializers
+from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 
 log = logging.getLogger(__name__)
 
@@ -83,15 +86,49 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     """
     course_details = CourseSerializer(source="course_overview")
-    user = serializers.SerializerMethodField('get_username')
+    user = serializers.SerializerMethodField("get_username")
+    finished = serializers.SerializerMethodField()
+    grading = serializers.SerializerMethodField()
 
     def get_username(self, model):
         """Retrieves the username from the associated model."""
         return model.username
 
-    class Meta:
+    def get_finished(self, model):
+        """Retrieve finished course."""
+        course = modulestore().get_course(model.course_id)
+        if course:
+            try:
+                coursegrade = CourseGradeFactory().read(model.user, course).passed
+            except PermissionDenied:
+                return False
+            return coursegrade
+        return False
+
+    def get_grading(self, model):
+        """Retrieve course grade."""
+        course = modulestore().get_course(model.course_id)
+        course_grade = None
+        summary = []
+        current_grade = 0
+        if course:
+            try:
+                course_grade = CourseGradeFactory().read(model.user, course)
+                current_grade = int(course_grade.percent * 100)
+                for section in course_grade.summary.get('section_breakdown'):
+                    if section.get('prominent'):
+                        summary.append(section)
+            except PermissionDenied:
+                pass
+        return [
+            {'current_grade': current_grade,
+             'certificate_eligible': course_grade.passed if course_grade else False,
+             'summary': summary}
+        ]
+
+    class Meta(object):
         model = CourseEnrollment
-        fields = ('created', 'mode', 'is_active', 'course_details', 'user')
+        fields = ('created', 'mode', 'is_active', 'course_details', 'user', 'finished', 'grading')
         lookup_field = 'username'
 
 

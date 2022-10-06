@@ -5,6 +5,7 @@ consist primarily of authentication, request validation, and serialization.
 """
 
 
+import json
 import logging
 
 from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-import-order
@@ -17,6 +18,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import \
 from edx_rest_framework_extensions.auth.session.authentication import \
     SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.generics import ListAPIView  # lint-amnesty, pylint: disable=wrong-import-order
@@ -29,6 +31,8 @@ from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
+from lms.djangoapps.courseware.courses import get_course
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
@@ -45,7 +49,10 @@ from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApi
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import (
+    BearerAuthenticationAllowInactiveUser,
+    OAuth2AuthenticationAllowInactiveUser
+)
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.exceptions import CourseNotFoundError
@@ -973,3 +980,164 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         if usernames:
             queryset = queryset.filter(user__username__in=usernames)
         return queryset
+
+
+@can_disable_rate_limit
+class SubmissionHistoryView(APIView, ApiKeyPermissionMixIn):
+    """
+    Submission history view.
+    """
+    authentication_classes = (OAuth2AuthenticationAllowInactiveUser, EnrollmentCrossDomainSessionAuth)
+    permission_classes = (ApiKeyHeaderPermissionIsAuthenticated, )
+
+    def get(self, request):
+        """
+        Get submission history details.
+
+        **Usecases**:
+
+            Regular users can only retrieve their own submission history and users with GlobalStaff status
+            can retrieve everyone's submission history.
+
+        **Example Requests**:
+
+            GET /api/enrollment/v1/submission_history?course_id=course_id
+            GET /api/enrollment/v1/submission_history?course_id=course_id&user=username
+            GET /api/enrollment/v1/submission_history?course_id=course_id&all_users=true
+
+        **Query Parameters for GET**
+
+            * course_id: Course id to retrieve submission history.
+            * username: Single username for which this view will retrieve the submission history details.
+                If no username specified the requester's username will be used.
+            * all_users: If true and if the requester has the correct permissions,
+                retrieve history submission from every user in a course id.
+
+        **Response Values**:
+
+            If there's an error while getting the submission history an empty response will
+            be returned.
+            The submission history response has the following attributes:
+
+                * Results: A list of submission history:
+                    * course_id: Course id
+                    * course_name: Course name
+                    * user: Username
+                    * problems: List of problems
+                        * location: problem location
+                        * name: problem's display name
+                        * submission_history: List of submission history
+                            * state: State of submission.
+                            * grade: Grade.
+                            * max_grade: Maximum possible grade.
+                        * data: problem's data.
+        """
+        username = request.GET.get('username', request.user.username)
+        data = []
+        if GlobalStaff().has_user(request.user):
+            all_users = bool(request.GET.get('all', False))
+        else:
+            all_users = False
+        course_id = request.GET.get('course_id')
+
+        if not (all_users or username == request.user.username or GlobalStaff().has_user(request.user) or
+                self.has_api_key_permissions(request)):
+            return Response(data)
+
+        course_enrollments = CourseEnrollment.objects.select_related('user').filter(is_active=True)
+        if course_id:
+            if not course_id.startswith("course-v1:"):
+                course_id = "course-v1:{}".format(course_id)
+            try:
+                course_enrollments = course_enrollments.filter(
+                    course_id=CourseLocator.from_string(course_id.replace(' ', '+'))
+                ).order_by('created')
+            except KeyError:
+                return Response(data)
+
+        if not all_users:
+            course_enrollments = course_enrollments.filter(user__username=username).order_by('created')
+
+        courses = {}
+        for course_enrollment in course_enrollments:
+            try:
+                course_list = courses.get(course_enrollment.course_id)
+                if course_list:
+                    course, course_children = course_list
+                else:
+                    course = get_course(course_enrollment.course_id, depth=4)
+                    course_children = course.get_children()
+                    courses[course_enrollment.course_id] = [course, course_children]
+            except ValueError:
+                continue
+            course_data = self._get_course_data(course_enrollment, course, course_children)
+            data.append(course_data)
+
+        return Response({'results': data})
+
+    def _get_problem_data(self, course_enrollment, component):
+        """
+        Get problem data from a course enrollment.
+
+        Args:
+        -----
+        course_enrollment: Course Enrollment.
+        component: Component to analyze.
+        """
+        problem_data = {
+            'location': str(component.location),
+            'name': component.display_name,
+            'submission_history': [],
+            'data': component.data
+        }
+
+        csm = StudentModule.objects.filter(
+            module_state_key=component.location,
+            student__username=course_enrollment.user.username,
+            course_id=course_enrollment.course_id)
+
+        scores = BaseStudentModuleHistory.get_history(csm)
+        for i, score in enumerate(scores):
+            if i % 2 == 1:
+                continue
+
+            state = score.state
+            if state is not None:
+                state = json.loads(state)
+
+            history_data = {
+                'state': state,
+                'grade': score.grade,
+                'max_grade': score.max_grade
+            }
+            problem_data['submission_history'].append(history_data)
+
+        return problem_data
+
+    def _get_course_data(self, course_enrollment, course, course_children):
+        """
+        Get course data.
+
+        Params:
+        --------
+
+        course_enrollment (CourseEnrollment): course enrollment
+        course: course
+        course_children: course children
+        """
+
+        course_data = {
+            'course_id': str(course_enrollment.course_id),
+            'course_name': course.display_name_with_default,
+            'user': course_enrollment.user.username,
+            'problems': []
+        }
+        for section in course_children:
+            for subsection in section.get_children():
+                for vertical in subsection.get_children():
+                    for component in vertical.get_children():
+                        if component.location.category == 'problem' and getattr(component, 'has_score', False):
+                            problem_data = self._get_problem_data(course_enrollment, component)
+                            course_data['problems'].append(problem_data)
+
+        return course_data
