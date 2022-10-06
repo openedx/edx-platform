@@ -319,7 +319,7 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
             "show_email_settings_for": [course.id],
             "show_courseware_link": {course.id: {"has_access": True}},
             "resume_course_urls": {course.id: "some_url"},
-            "use_ecommerce_payment_flow": True,
+            "ecommerce_payment_page": random_url(),
         }
 
     def serialize_test_enrollment(self):
@@ -334,7 +334,7 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
 
     def test_with_data(self):
         output = self.serialize_test_enrollment()
-        # Serializaiton set up so all fields will have values to make testing easy
+        # Serialization set up so all fields will have values to make testing easy
         for key in output:
             assert output[key] is not None
 
@@ -356,21 +356,39 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
 
         assert output["isAuditAccessExpired"] is True
 
-    def test_user_can_upgrade(self):
+    @ddt.data(
+        (random_url(), True, uuid4(), True),
+        (None, True, uuid4(), False),
+        (random_url(), False, uuid4(), False),
+        (random_url(), True, None, False),
+    )
+    @ddt.unpack
+    def test_user_can_upgrade(
+        self, mock_payment_url, mock_show_upsell, mock_sku, expected_can_upgrade
+    ):
+        # Given a test enrollment
         input_data = self.create_test_enrollment()
         input_context = self.create_test_context(input_data.course)
 
-        # Example audit expired context
+        # ... with payment page, upsell, and SKU info
         input_context.update(
             {
+                "ecommerce_payment_page": mock_payment_url,
                 "course_mode_info": {
-                    input_data.course.id: {"show_upsell": True, "verified_sku": uuid4()}
-                }
+                    input_data.course.id: {
+                        "show_upsell": mock_show_upsell,
+                        "verified_sku": mock_sku,
+                    }
+                },
             }
         )
 
+        # When I serialize
         output = EnrollmentSerializer(input_data, context=input_context).data
-        assert output["canUpgrade"] is True
+
+        # Then I correctly return whether or not the user can upgrade
+        # (If any of the payment page, upsell, or sku aren't provided, this is False)
+        self.assertEqual(output["canUpgrade"], expected_can_upgrade)
 
     @ddt.data(None, "", "some_url")
     def test_has_started(self, resume_url):
