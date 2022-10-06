@@ -7,7 +7,7 @@ from common.djangoapps.student.roles import CourseCreatorRole, OrgStaffRole
 
 from student.tests.factories import UserFactory
 
-from .. import course_roles
+from openedx.core.djangoapps.appsembler.tahoe_idp import course_roles
 
 
 @pytest.mark.django_db

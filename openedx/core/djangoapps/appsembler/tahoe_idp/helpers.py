@@ -15,12 +15,6 @@ from tahoe_sites.api import is_active_admin_on_organization, get_organization_fo
 import third_party_auth
 from third_party_auth.pipeline import running as pipeline_running
 
-
-from .constants import (
-    TAHOE_IDP_BACKEND_NAME,
-    TAHOE_IDP_PROVIDER_NAME,
-)
-
 from student.roles import (
     CourseAccessRole,
     CourseCreatorRole,
@@ -31,6 +25,14 @@ from student.roles import (
 )
 
 from tahoe_idp import api as tahoe_idp_api
+
+
+from .constants import (
+    TAHOE_IDP_BACKEND_NAME,
+    TAHOE_IDP_PROVIDER_NAME,
+)
+
+from .course_roles import TahoeCourseAuthorRole
 
 
 def is_tahoe_idp_enabled():
@@ -148,7 +150,7 @@ def is_studio_allowed_for_user(user, organization=None):
     OR the user is staff user
     OR the user is an admin on the organization
     OR the user has deprecated_has_course_specific_role()
-    OR the user has (OrgStaffRole) or (OrgInstructorRole) role
+    OR the user has (OrgStaffRole) or (OrgInstructorRole) or (TahoeCourseAuthorRole) role
 
     :param user: the user in question
     :param organization: the user's organization. If the user is not super admin or staff, this value will be used
@@ -168,9 +170,12 @@ def is_studio_allowed_for_user(user, organization=None):
         return True
 
     short_name = organization.short_name
-    has_org_wide_role = OrgStaffRole(short_name).has_user(user) or OrgInstructorRole(short_name).has_user(user)
 
-    return has_org_wide_role
+    for org_wide_role in [OrgStaffRole, OrgInstructorRole, TahoeCourseAuthorRole]:
+        if org_wide_role(short_name).has_user(user):
+            return True
+
+    return False
 
 
 def is_studio_login_form_overridden():

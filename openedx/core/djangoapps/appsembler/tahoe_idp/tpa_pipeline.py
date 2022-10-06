@@ -6,12 +6,11 @@ import logging
 import beeline
 import tahoe_sites.api
 
-from openedx.core.djangoapps.appsembler.auth import course_roles
 
 from tahoe_idp import api as tahoe_idp_api
 
+from . import course_roles
 from .helpers import store_idp_metadata_in_user_profile
-
 from .constants import TAHOE_IDP_BACKEND_NAME
 
 log = logging.getLogger(__name__)
@@ -38,6 +37,7 @@ def tahoe_idp_user_updates(auth_entry, strategy, details, user=None, *args, **kw
     if user and backend_name == TAHOE_IDP_BACKEND_NAME:
         set_as_admin = details['tahoe_idp_is_organization_admin']
         set_as_organization_staff = details['tahoe_idp_is_organization_staff']
+        set_as_course_author = details['tahoe_idp_is_course_author']
 
         organization = tahoe_sites.api.get_current_organization(strategy.request)
 
@@ -53,6 +53,7 @@ def tahoe_idp_user_updates(auth_entry, strategy, details, user=None, *args, **kw
         course_roles.update_organization_staff_roles(
             user=user,
             organization_short_name=organization_short_name,
+            set_as_course_author=set_as_course_author,
             set_as_organization_staff=set_as_organization_staff,
         )
 

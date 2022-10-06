@@ -8,6 +8,7 @@ from django.conf import settings
 import tahoe_sites.api
 
 from common.djangoapps.student.roles import CourseCreatorRole, OrgStaffRole
+from ..course_roles import TahoeCourseAuthorRole
 from ..tpa_pipeline import tahoe_idp_user_updates
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -37,40 +38,58 @@ def test_tahoe_idp_step_in_settings():
     assert idp_step_index == force_sync_step_index + 1, 'Tahoe IdP step should be right after `user_details_force_sync`'
 
 
-@pytest.mark.parametrize('user_details,should_be_admin,should_be_staff,message', [
-    (
-        {
+@pytest.mark.parametrize('test_case', [
+    {
+        'user_details': {
             'tahoe_idp_is_organization_admin': False,
             'tahoe_idp_is_organization_staff': False,
+            'tahoe_idp_is_course_author': False,
             'tahoe_idp_metadata': {'field': 'some value'},
         },
-        False,
-        False,
-        'Check for learner',
-    ),
-    (
-        {
+        'should_be_admin': False,
+        'should_be_staff': False,
+        'should_be_author': False,
+        'message': 'Check for learner',
+    },
+    {
+        'user_details': {
             'tahoe_idp_is_organization_admin': False,
             'tahoe_idp_is_organization_staff': True,
+            'tahoe_idp_is_course_author': False,
             'tahoe_idp_metadata': {'field': 'some value'},
         },
-        False,
-        True,
-        'Check for Studio',
-    ),
-    (
-        {
+        'should_be_admin': False,
+        'should_be_staff': True,
+        'should_be_author': False,
+        'message': 'Check for Studio',
+    },
+    {
+        'user_details': {
             'tahoe_idp_is_organization_admin': True,
             'tahoe_idp_is_organization_staff': True,
+            'tahoe_idp_is_course_author': False,
             'tahoe_idp_metadata': {'field': 'some value'},
         },
-        True,
-        True,
-        'Check for Admins',
-    ),
+        'should_be_admin': True,
+        'should_be_staff': True,
+        'should_be_author': False,
+        'message': 'Check for Admins',
+    },
+    {
+        'user_details': {
+            'tahoe_idp_is_organization_admin': False,
+            'tahoe_idp_is_organization_staff': False,
+            'tahoe_idp_is_course_author': True,
+            'tahoe_idp_metadata': {'field': 'some value'},
+        },
+        'should_be_admin': False,
+        'should_be_staff': False,
+        'should_be_author': True,
+        'message': 'Check for Course Authors',
+    },
 ])
 @pytest.mark.django_db
-def test_tahoe_idp_roles_step_roles(user_details, should_be_admin, should_be_staff, message):
+def test_tahoe_idp_roles_step_roles(test_case):
     """
     Tests for happy scenarios of the `tahoe_idp_user_updates` step.
     """
@@ -88,15 +107,18 @@ def test_tahoe_idp_roles_step_roles(user_details, should_be_admin, should_be_sta
         tahoe_idp_user_updates(
             auth_entry=None,
             strategy=strategy,
-            details=user_details,
+            details=test_case['user_details'],
             user=user,
         )
-
     org_role = OrgStaffRole(organization.short_name)
+    tahoe_author_role = TahoeCourseAuthorRole(organization.short_name)
     creator_role = CourseCreatorRole()
-    assert org_role.has_user(user) == should_be_staff, message
-    assert creator_role.has_user(user) == should_be_staff, message
-    assert tahoe_sites.api.is_active_admin_on_organization(user, organization) == should_be_admin, message
+    message = test_case['message']
+    should_be_course_creator = test_case['should_be_staff'] or test_case['should_be_author']
+    assert org_role.has_user(user) == test_case['should_be_staff'], message
+    assert creator_role.has_user(user) == should_be_course_creator, message
+    assert tahoe_author_role.has_user(user) == test_case['should_be_author'], message
+    assert tahoe_sites.api.is_active_admin_on_organization(user, organization) == test_case['should_be_admin'], message
     assert user.profile.get_meta() == {'tahoe_idp_metadata': {'field': 'some value'}}
     mock_update_tahoe_user_id.assert_called_once_with(user)
 
