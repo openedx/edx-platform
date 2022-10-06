@@ -4,6 +4,7 @@ Student Views
 
 
 import datetime
+import json
 import logging
 import urllib.parse
 import uuid
@@ -327,19 +328,20 @@ def change_enrollment(request, check_access=True):
     if not user.is_authenticated:
         return HttpResponseForbidden()
 
+    body = json.loads(request.body.decode('utf-8'))
     # Ensure we received a course_id
-    action = request.POST.get("enrollment_action")
-    if 'course_id' not in request.POST:
+    action = body.get("enrollment_action")
+    if 'course_id' not in body:
         return HttpResponseBadRequest(_("Course id not specified"))
 
     try:
-        course_id = CourseKey.from_string(request.POST.get("course_id"))
+        course_id = CourseKey.from_string(body.get("course_id"))
     except InvalidKeyError:
         log.warning(
             "User %s tried to %s with invalid course id: %s",
             user.username,
             action,
-            request.POST.get("course_id"),
+            body.get("course_id"),
         )
         return HttpResponseBadRequest(_("Invalid course id"))
 
