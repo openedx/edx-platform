@@ -50,10 +50,14 @@ class UserInfoSerializer(serializers.ModelSerializer):
                   'first_name', 'last_name', 'email', 'school')
 
 class TeacherSerializer(serializers.ModelSerializer):
+    user_id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
     class Meta:
         model = Teacher
-        fields = ('id', 'name', 'profile_image')
+        fields = ('id', 'user_id', 'name', 'profile_image')
+    
+    def get_user_id(self, obj):
+        return obj.gen_user.user.id
 
     def get_name(self, obj):
         profile = UserProfile.objects.filter(user=obj.gen_user.user).first()
@@ -88,7 +92,7 @@ class ClassListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Class
-        fields = ('group_id', 'name', 'current_unit', 'lesson')
+        fields = ('id', 'name', 'group_id', 'current_unit', 'lesson')
 
 
 class ClassSummarySerializer(serializers.ModelSerializer):
@@ -114,21 +118,19 @@ class FavoriteClassSerializer(serializers.Serializer):
 class JournalListSerializer(serializers.ModelSerializer):
     skill = SkillSerializer(read_only=True)
     teacher = TeacherSerializer(read_only=True)
-    created = serializers.DateTimeField(format="%d/%m/%Y")
     class Meta:
         model = JournalPost
-        fields = ('id', 'title', 'skill', 'description', 'teacher', 'type', 'created')
-
+        fields = ('id', 'title', 'skill', 'description', 'teacher', 'journal_type', 'created')
 
 class StudentPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = JournalPost
-        fields = ('student', 'title', 'skill', 'description', 'type')
+        fields = ('student', 'title', 'skill', 'description', 'journal_type')
         extra_kwargs = {'skill': {'required': True, 'allow_null': False}}
 
 
 class TeacherFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = JournalPost
-        fields = ('teacher', 'student', 'title', 'description', 'type')
+        fields = ('teacher', 'student', 'title', 'description', 'journal_type')
         extra_kwargs = {'teacher': {'required': True, 'allow_null': False}}

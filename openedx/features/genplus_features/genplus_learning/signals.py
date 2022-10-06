@@ -59,18 +59,19 @@ def gen_class_changed(sender, instance, *args, **kwargs):
         _create_class_unit_and_lessons(instance)
 
 
-@receiver(m2m_changed, sender=Class.students.through)
-def class_students_changed(sender, instance, action, **kwargs):
-    pk_set = kwargs.pop('pk_set', None)
-    if action == "post_add":
-        if isinstance(instance, Class) and instance.program:
-            genplus_learning_tasks.enroll_class_students_to_program.apply_async(
-                args=[instance.pk, instance.program.pk],
-                kwargs={
-                    'class_student_ids': list(pk_set),
-                },
-                countdown=settings.PROGRAM_ENROLLMENT_COUNTDOWN
-            )
+# TODO : modification required after m2m relation change
+# @receiver(m2m_changed, sender=Class.students.through)
+# def class_students_changed(sender, instance, action, **kwargs):
+#     pk_set = kwargs.pop('pk_set', None)
+#     if action == "post_add":
+#         if isinstance(instance, Class) and instance.program:
+#             genplus_learning_tasks.enroll_class_students_to_program.apply_async(
+#                 args=[instance.pk, instance.program.pk],
+#                 kwargs={
+#                     'class_student_ids': list(pk_set),
+#                 },
+#                 countdown=settings.PROGRAM_ENROLLMENT_COUNTDOWN
+#             )
 
 
 @receiver(post_save, sender=BlockCompletion)

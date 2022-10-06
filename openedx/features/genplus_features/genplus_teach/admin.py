@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Article, Reflection, ReflectionAnswer, ArticleRating, MediaType, Gtcs
+from .models import Article, Reflection, ReflectionAnswer, ArticleRating, MediaType, Gtcs, ArticleViewLog
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -28,3 +28,4 @@ admin.site.register(ReflectionAnswer)
 admin.site.register(ArticleRating)
 admin.site.register(Gtcs)
 admin.site.register(MediaType)
+admin.site.register(ArticleViewLog)

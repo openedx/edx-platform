@@ -23,16 +23,14 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Teacher)
 def create_teacher(sender, instance, created, **kwargs):
-    if created:
-        classes = Class.objects.filter(school=instance.gen_user.school)
-        instance.classes.add(*classes)
+    classes = Class.objects.filter(school=instance.gen_user.school)
+    instance.classes.add(*classes)
 
 
 @receiver(post_save, sender=Class)
 def create_gen_class(sender, instance, created, **kwargs):
-    if created:
-        teachers = Teacher.objects.filter(gen_user__school=instance.school)
-        instance.teachers.add(*teachers)
+    teachers = Teacher.objects.filter(gen_user__school=instance.school)
+    instance.teachers.add(*teachers)
 
 
 # capturing activity of student during onboard character selection
@@ -46,18 +44,17 @@ def create_activity_on_onboarded(sender, instance, created, update_fields=None, 
             target=instance.gen_user.student
         )
 
-
-# capturing activity of student/teacher during journal posting
-@receiver(post_save, sender=JournalPost)
-def create_activity_for_journal(sender, instance, created, **kwargs):
-    if created:
-        activity_type = ActivityTypes.JOURNAL_ENTRY_BY_TEACHER
-        if instance.type == JournalTypes.STUDENT_POST:
-            activity_type = ActivityTypes.JOURNAL_ENTRY_BY_STUDENT
-        Activity.objects.create(
-            actor=instance.teacher,
-            type=activity_type,
-            action_object=instance,
-            target=instance.student
-        )
-
+# TODO: Need to fix this
+# # capturing activity of student/teacher during journal posting
+# @receiver(post_save, sender=JournalPost)
+# def create_activity_for_journal(sender, instance, created, **kwargs):
+#     if created:
+#         activity_type = ActivityTypes.JOURNAL_ENTRY_BY_TEACHER
+#         if instance.journal_type == JournalTypes.STUDENT_POST:
+#             activity_type = ActivityTypes.JOURNAL_ENTRY_BY_STUDENT
+#         Activity.objects.create(
+#             actor=instance.teacher,
+#             type=activity_type,
+#             action_object=instance,
+#             target=instance.student
+#         )

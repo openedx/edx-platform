@@ -2,20 +2,20 @@ import os
 from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+
+from .constants import GenUserRoles, ClassColors, JournalTypes, SchoolTypes, ClassTypes, ActivityTypes
 from django.core.exceptions import ValidationError
-from .constants import GenUserRoles, ClassColors, JournalTypes
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-
-from .constants import GenUserRoles, ClassColors, JournalTypes, ActivityTypes
-
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 
 class School(TimeStampedModel):
+    SCHOOL_CHOICES = SchoolTypes.__MODEL_CHOICES__
     guid = models.CharField(primary_key=True, max_length=128)
     name = models.CharField(max_length=64)
     external_id = models.CharField(max_length=32)
+    type = models.CharField(blank=True, null=True, max_length=32, choices=SCHOOL_CHOICES)
 
     def __str__(self):
         return self.name
@@ -86,7 +86,12 @@ class GenUser(models.Model):
         return self.role == GenUserRoles.TEACHING_STAFF
 
     def __str__(self):
-        return self.user.username
+        if self.user:
+            return self.user.username
+        elif self.temp_user:
+            return self.temp_user.username
+        else:
+            return str(self.pk)
 
 
 class Student(models.Model):
@@ -99,7 +104,12 @@ class Student(models.Model):
         return self.gen_user.user
 
     def __str__(self):
-        return self.user.username
+        if self.gen_user.user:
+            return self.gen_user.user.username
+        elif self.gen_user.temp_user:
+            return self.gen_user.temp_user.username
+        else:
+            return str(self.gen_user.pk)
 
 
 class ClassManager(models.Manager):
@@ -109,15 +119,16 @@ class ClassManager(models.Manager):
 
 class Class(TimeStampedModel):
     COLOR_CHOICES = ClassColors.__MODEL_CHOICES__
+    CLASS_CHOICES = ClassTypes.__MODEL_CHOICES__
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='classes')
-    group_id = models.CharField(primary_key=True, max_length=128)
+    type = models.CharField(blank=True, null=True, max_length=32, choices=CLASS_CHOICES)
+    group_id = models.CharField(max_length=128)
     color = models.CharField(blank=True, null=True, max_length=32, choices=COLOR_CHOICES)
     image = models.ImageField(upload_to='gen_plus_classes', null=True, blank=True)
     name = models.CharField(max_length=128)
     is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
-    students = models.ManyToManyField(Student, related_name='classes', blank=True)
-    program = models.ForeignKey('genplus_learning.Program', on_delete=models.CASCADE, null=True, blank=True,
-                                related_name="classes")
+    students = models.ManyToManyField(Student, blank=True, through="genplus.ClassStudents")
+    program = models.ForeignKey('genplus_learning.Program', on_delete=models.CASCADE, null=True, blank=True, related_name="classes")
     objects = models.Manager()
     visible_objects = ClassManager()
 
@@ -128,6 +139,7 @@ class Class(TimeStampedModel):
 class Teacher(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
     profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True, blank=True)
+    # TODO : need to remove the through model
     classes = models.ManyToManyField(Class, related_name='teachers', through="genplus.TeacherClass")
 
     @property
@@ -144,6 +156,12 @@ class TeacherClass(models.Model):
     is_favorite = models.BooleanField(default=False)
 
 
+class ClassStudents(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    gen_class = models.ForeignKey(Class, on_delete=models.CASCADE)
+    is_visible = models.BooleanField(default=True)
+
+
 class JournalPost(TimeStampedModel):
     JOURNAL_TYPE_CHOICES = JournalTypes.__MODEL_CHOICES__
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="journal_posts")
@@ -151,7 +169,7 @@ class JournalPost(TimeStampedModel):
     title = models.CharField(max_length=128)
     skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True)
     description = models.TextField()
-    type = models.CharField(max_length=32, choices=JOURNAL_TYPE_CHOICES)
+    journal_type = models.CharField(max_length=32, choices=JOURNAL_TYPE_CHOICES)
 
 
 class ActivityManager(models.Manager):

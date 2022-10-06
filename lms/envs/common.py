@@ -3129,7 +3129,6 @@ INSTALLED_APPS = [
     # in the LMS process at the moment, so anything that has Django admin access
     # permissions needs to be listed as an LMS app or the script will fail.
     'user_tasks',
-    'adminsortable2',
 ]
 
 ######################### GENPLUS APPS #################################
@@ -3148,7 +3147,9 @@ GENPLUS_INSTALLED_APPS = [
     'openedx.features.genplus_features.genplus_badges',
 
     # installed third party apps
-    'tinymce'
+    'tinymce',
+    'adminsortable2',
+    'drf_multiple_model',
 ]
 
 INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
@@ -3178,7 +3179,7 @@ CSRF_TRUSTED_ORIGINS = []
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
-RM_UNIFY_API = 'https://api.platform.rmunify.com/graph/'
+RM_UNIFY_URL = 'https://api.platform.rmunify.com/graph/'
 RM_UNIFY_KEY = 'place-rmunify-key-here'
 RM_UNIFY_SECRET = 'rmunify-secret'
 

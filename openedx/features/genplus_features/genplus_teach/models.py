@@ -34,6 +34,7 @@ class Article(TimeStampedModel):
     skills = models.ManyToManyField(Skill, related_name='articles')
     gtcs = models.ManyToManyField(Gtcs, related_name='articles')
     media_types = models.ManyToManyField(MediaType, related_name='articles')
+    summary = HTMLField()
     content = HTMLField()
     author = models.CharField(max_length=1024, help_text='Add name of the author')
     time = models.PositiveIntegerField(default=0, help_text='Time required to read/watch/listen the article')
@@ -64,7 +65,7 @@ class Article(TimeStampedModel):
     def save(self, **kwargs):
         read_time = self.get_read_time(self.title, self.content)
         watch_time = self.get_video_time(self.content)
-        self.time = read_time + watch_time
+        self.time = self.time + read_time + watch_time
         super().save(**kwargs)
 
     @staticmethod
@@ -77,7 +78,7 @@ class Article(TimeStampedModel):
         video_time = 0
         links = re.findall(r'(https?://www.youtube.com\S+)', content)
         for link in links:
-            watch_link = link.replace('"', ' ').replace('embed/', '?v=')
+            watch_link = link.replace('"', ' ').replace('embed/', 'watch?v=')
             video_time += self.get_yt_video_time(watch_link)
 
         return video_time
@@ -92,6 +93,7 @@ class Article(TimeStampedModel):
             return t/60
         except Exception as e:
             logger.exception(e)
+            return 0
 
 
 class Reflection(TimeStampedModel):
@@ -139,4 +141,12 @@ class ArticleViewLog(TimeStampedModel):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='view_logs')
     count = models.PositiveIntegerField(default=0, help_text='Views count on each article.')
-    engagement = models.PositiveIntegerField(default=0, help_text='Length of engagement (minutes/seconds)')
+    engagement = models.PositiveIntegerField(default=0, help_text='Length of engagement in seconds')
+
+    def __str__(self):
+        return '{} has view count {} of "{}" with engagement time of {} seconds'.format(
+            self.teacher.gen_user.user.username,
+            self.count,
+            self.article.title,
+            self.engagement
+        )

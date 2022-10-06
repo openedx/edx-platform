@@ -48,6 +48,7 @@ django-cors-headers                 # Used to allow to configure CORS headers fo
 django-countries                    # Country data for Django forms and model fields
 django-crum                         # Middleware that stores the current request and user in thread local storage
 django-extensions
+django-rest-multiple-models
 django-admin-sortable2
 django-fernet-fields                # via edx-enterprise (should be added to its setup.py)
 django-filter                       # Allows users to filter Django querysets dynamically
@@ -162,5 +163,6 @@ user-util                           # Functionality for retiring users (GDPR com
 web-fragments                       # Provides the ability to render fragments of web pages
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
+xhtml2pdf
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
