@@ -156,8 +156,7 @@ class EnrollmentSerializer(serializers.Serializer):
     """
     Info about this particular enrollment.
     Derived from a CourseEnrollment with added context:
-    - "use_ecommerce_payment_flow" (bool): whether or not we use an ecommerce flow to
-      upsell.
+    - "ecommerce_payment_page" (url): ecommerce page, used to determine if we can upgrade.
     - "course_mode_info" (dict): keyed by course ID with the following values:
         - "expiration_datetime" (int): when the verified mode will expire.
         - "show_upsell" (bool): whether or not we offer an upsell for this course.
@@ -201,9 +200,7 @@ class EnrollmentSerializer(serializers.Serializer):
 
     def get_canUpgrade(self, enrollment):
         """Determine if a user can upgrade this enrollment to verified track"""
-        use_ecommerce_payment_flow = self.context.get(
-            "use_ecommerce_payment_flow", False
-        )
+        use_ecommerce_payment_flow = bool(self.context.get("ecommerce_payment_page"))
         course_mode_info = self.context.get("course_mode_info", {}).get(
             enrollment.course_id, {}
         )
