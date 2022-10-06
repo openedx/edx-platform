@@ -736,9 +736,9 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/base.in
     #   blockstore
-newrelic==8.2.0.181
+newrelic @ git+https://github.com/newrelic/newrelic-python-agent.git@cf306cea7eed4a6b4a954622438628fd34cd9824
     # via
-    #   -r requirements/edx/base.in
+    #   -r requirements/edx/github.in
     #   edx-django-utils
 nltk==3.7
     # via
