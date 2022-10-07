@@ -982,7 +982,8 @@ openedx-events==0.8.1
     # via -r requirements/edx/testing.txt
 openedx-filters==0.7.0
     # via -r requirements/edx/testing.txt
-ora2==4.1.2
+# TODO: Backport https://github.com/openedx/edx-ora2/pull/1869 to Olive if it uses a lower version than 4.5.0.
+ora2 @ git+https://github.com/open-craft/edx-ora2@agrendalath/bb-6151-nutmeg_backport
     # via -r requirements/edx/testing.txt
 packaging==21.3
     # via
