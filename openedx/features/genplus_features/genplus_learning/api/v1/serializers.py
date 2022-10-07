@@ -1,6 +1,4 @@
 from rest_framework import serializers
-
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
 from openedx.features.genplus_features.genplus_learning.models import (
     Program,
@@ -18,6 +16,7 @@ from openedx.features.genplus_features.genplus_learning.utils import (
 from openedx.features.genplus_features.genplus.models import Student, JournalPost,  Activity, Teacher
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
 from openedx.features.genplus_features.genplus.api.v1.serializers import TeacherSerializer
+from openedx.features.genplus_features.common.utils import get_generic_serializer
 
 
 class UnitSerializer(serializers.ModelSerializer):
@@ -131,18 +130,8 @@ class ClassStudentSerializer(serializers.ModelSerializer):
         return results
 
 
-def get_generic_serializer(model_arg):
-    class GenericSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = model_arg
-            fields = '__all__'
-            depth = 1
-
-    return GenericSerializer
-
-
 StudentSerializer = get_generic_serializer(Student)
-JournalPostSerializer  = get_generic_serializer(JournalPost)
+JournalPostSerializer = get_generic_serializer(JournalPost)
 UnitBlockCompletionSerializer = get_generic_serializer(UnitBlockCompletion)
 BoosterBadgeAwardSerializer = get_generic_serializer(BoosterBadgeAward)
 
@@ -173,4 +162,4 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Activity
-        fields = ('id', 'type','actor', 'action_object', 'target', 'created')
+        fields = ('id', 'type', 'actor', 'action_object', 'target', 'is_read', 'created')

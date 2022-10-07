@@ -103,6 +103,10 @@ class Student(models.Model):
     def user(self):
         return self.gen_user.user
 
+    @property
+    def has_access_to_lessons(self):
+        return self.classes.count() > 0
+
     def __str__(self):
         if self.gen_user.user:
             return self.gen_user.user.username
@@ -157,7 +161,7 @@ class TeacherClass(models.Model):
 
 
 class ClassStudents(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='classes')
     gen_class = models.ForeignKey(Class, on_delete=models.CASCADE)
     is_visible = models.BooleanField(default=True)
 
@@ -174,7 +178,8 @@ class JournalPost(TimeStampedModel):
 
 class ActivityManager(models.Manager):
     def student_activities(self, student_id=None):
-        return super().get_queryset().filter(target_content_type__model='student', target_object_id=student_id)
+        return super().get_queryset().filter(target_content_type__model='student',
+                                             target_object_id=student_id).order_by('-created')
 
 
 class Activity(TimeStampedModel):
@@ -217,4 +222,5 @@ class Activity(TimeStampedModel):
         'action_object_content_type',
         'action_object_object_id'
     )
+    is_read = models.BooleanField(default=False)
     objects = ActivityManager()

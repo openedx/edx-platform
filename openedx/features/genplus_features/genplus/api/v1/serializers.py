@@ -20,6 +20,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
         if instance.gen_user.is_student:
             student_profile = {
                 'on_board': gen_user.student.onboarded,
+                'has_access_to_lessons': gen_user.student.has_access_to_lessons,
                 'character_id': gen_user.student.character.id
                 if gen_user.student.character else None,
                 'profile_image': request.build_absolute_uri(

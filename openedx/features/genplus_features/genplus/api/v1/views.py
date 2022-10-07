@@ -124,7 +124,7 @@ class CharacterViewSet(GenzMixin, viewsets.ModelViewSet):
         if request.data.get("onboarded") and not self.gen_user.student.onboarded:
             student.onboarded = True
 
-        student.save(update_fields=['onboarded',])
+        student.save(update_fields=['onboarded', 'character'])
         return Response(SuccessMessages.CHARACTER_SELECTED, status=status.HTTP_204_NO_CONTENT)
 
 
