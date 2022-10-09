@@ -9,6 +9,7 @@
 # Abdallah Nassif <a.nassif012@gmail.com>, 2013-2014
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdelmageed Ismail <mido.a@hotmail.com>, 2014
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 # Abdullatif El Ali <abdullatifalali@gmail.com>, 2014
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
@@ -109,6 +110,7 @@
 # Translators:
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2019
 # NELC Open edX Translation <openedx@elc.edu.sa>, 2021
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
@@ -119,6 +121,7 @@
 # 6e68c7971a89e50e680ae9444d303c8f, 2016
 # Abdallah Nassif <a.nassif012@gmail.com>, 2016
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 # Ali Hasan <ahasan@qrf.org>, 2014,2016
 # Ahmad <reload_cobra2@yahoo.com>, 2015
 # ahmed hai <a7medpeace@gmail.com>, 2017
@@ -3786,11 +3789,11 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NAME"
-msgstr "اسم الطلب"
+msgstr "اسم الطلبية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER PLACED"
-msgstr "تم وضع الطلب"
+msgstr "تاريخ الطلبية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "TOTAL"
@@ -3798,19 +3801,18 @@ msgstr "المجموع الكلي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NUMBER"
-msgstr "رقم الطلب"
+msgstr "رقم الطلبية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "My Orders"
-msgstr "طلبات شرائي"
+msgstr "طلبياتي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "This page contains information about orders that you have placed with "
 "{platform_name}."
 msgstr ""
-"تحتوي هذه الصفحة على معلومات عن طلبات الشراء التي قمت بها في "
-"{platform_name}."
+"تحتوي هذه الصفحة على معلومات عن الطلبيات التي قمت بها عند {platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -3946,7 +3948,7 @@ msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
-msgstr "عذرًا، لم يمكن تقديم الطلب."
+msgstr "عذرًا، لم يمكن تقديم الطلبية."
 
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Take a photo of your ID"
@@ -4097,12 +4099,12 @@ msgstr "النتيجة الكلية"
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmark this page"
-msgstr "إضافة الصفحة للمفضلة"
+msgstr "التأشير على الصفحة"
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 #: xmodule/js/src/sequence/display.js
 msgid "Bookmarked"
-msgstr "جرى وضع علامة"
+msgstr "تم التأشير على الصفحة"
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
@@ -7435,7 +7437,7 @@ msgstr "معلومات الحساب"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
-msgstr "سجل الطلبات"
+msgstr "سجل الطلبيات"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid ""
@@ -9767,19 +9769,20 @@ msgstr "التقاط صورة "
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "Bookmarked on"
-msgstr "جرى وضع علامة مرجعيّة بتاريخ"
+msgstr "تم التأشير في"
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "You have not bookmarked any courseware pages yet"
-msgstr "لم تضع أي أشارة مرجعيّة لأي من صفحات محتويات المساق بعد"
+msgstr "لم تؤشّر بعد على أي صفحة من صفحات المساق"
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid ""
 "Use bookmarks to help you easily return to courseware pages. To bookmark a "
 "page, click \"Bookmark this page\" under the page title."
 msgstr ""
-"استخدم العلامات المرجعيّة لتتمكّن من العودة إلى صفحات محتويات المساق بسهولة."
-" لوضع علامة مرجعيّة لصفحة معيّنة، اختر \"علامة مرجعيّة\" تحت عنوان الصفحة."
+"استخدم الإشارات المرجعيّة لتسهل على نفسك العودة إلى صفحات المساق. من العودة "
+"إلى صفحات المساق. للتأشير على صفحة ما،  انقر على \"التأشير على هذه الصفحة\" "
+"تحت عنوان الصفحة."
 
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
