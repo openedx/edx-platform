@@ -84,7 +84,7 @@ from openedx.core.djangolib.js_utils import (
                   % if can_create_organizations:
                     <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-course-org tip-error-new-course-org" />
                   % else:
-                    <select style="padding: 10px" class="new-course-org" id="course-language" name="new-course-org" required aria-describedby="tip-new-course-org tip-error-new-course-org">
+                    <select class="new-course-org" id="new-course-org" name="new-course-org" required aria-describedby="tip-new-course-org tip-error-new-course-org">
                       % for org in allowed_organizations:
                         <option value="${org}">${org}</option>
                       % endfor
