@@ -80,4 +80,4 @@ jobs:
         LMS_CFG: lms/envs/bok_choy.yml
       run: |
         echo "CREATE DATABASE IF NOT EXISTS edxtest;" | sudo mysql -u root
-        ./manage.py lms --settings test lintmigrations --project-root-path=. --database=bok_choy --git-commit-id `git rev-parse origin/master`
+        ./manage.py lms --settings test lintmigrations --project-root-path=. --database=edxtest --git-commit-id `git rev-parse origin/master`
