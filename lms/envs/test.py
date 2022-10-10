@@ -669,3 +669,6 @@ MFE_CONFIG_OVERRIDES = {
         "LOGO_URL": "https://courses.example.com/yourmfe-logo.png",
     },
 }
+
+################# Migration Linting ###########
+INSTALLED_APPS.append('django_migration_linter')

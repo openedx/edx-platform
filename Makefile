@@ -169,4 +169,4 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push "openedx/cms-dev:${GITHUB_SHA}"
 
 migration_linter_ci:
-	python manage.py --settings=lms.envs.test lms lintmigrations --project-root-path `.` --git-commit-id `git rev-parse origin/master`
+	python manage.py lms lintmigrations --git-commit-id `git rev-parse origin/master`

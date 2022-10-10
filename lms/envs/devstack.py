@@ -78,7 +78,7 @@ DJFS = {
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar']
+INSTALLED_APPS += ['debug_toolbar', 'django_migration_linter']
 MIDDLEWARE += [
     'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
