@@ -163,7 +163,15 @@ from openedx.core.djangolib.js_utils import (
                 </li>
                 <li class="field text required">
                   <label for="new-library-org">${_("Organization")}</label>
-                  <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
+                  % if can_create_organizations:
+                    <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
+                  % else:
+                    <select style="padding: 10px" class="new-library-org" id="new-library-org" name="new-library-org" required aria-describedby="tip-new-library-org tip-error-new-library-org">
+                      % for org in allowed_organizations:
+                        <option value="${org}">${org}</option>
+                      % endfor
+                    </select>
+                  % endif
                   <span class="tip" id="tip-new-library-org">${_("The public organization name for your library.")} ${_("This cannot be changed.")}</span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-library-org"></span>
                 </li>
