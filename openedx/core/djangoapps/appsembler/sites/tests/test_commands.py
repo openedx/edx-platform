@@ -102,7 +102,8 @@ class CreateDevstackSiteCommandTestCase(TestCase):
         with patch.object(Command, 'congrats') as mock_congrats:
             call_command('create_devstack_site', self.name, 'localhost')
 
-        mock_congrats.assert_called_once()  # Ensure that congrats message is printed
+        assert mock_congrats.called  # Ensure that congrats message is printed
+        assert mock_congrats.call_count == 1  # Ensure that congrats message is printed once
 
         # Ensure objects are created correctly.
         assert Site.objects.get(domain=self.site_name)
