@@ -252,7 +252,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
             'marketing_url': 'https://www.edx.org/course/introduction-to-computer-science-and-programming-7'
         }
 
-    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations', )
+    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations')
     @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_course_data')
     def test_no_recommendations_from_amplitude(self, mocked_get_course_data,
                                                mocked_get_personalized_course_recommendations):

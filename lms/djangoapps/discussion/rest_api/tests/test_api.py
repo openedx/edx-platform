@@ -503,6 +503,7 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         ways in which a user may not have access are:
 
         * Module is visible to staff only
+        * Module has a start date in the future
         * Module is accessible only to a group the user is not in
 
         Also, there is a case that ensures that a category with no accessible
@@ -574,7 +575,12 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                         self.make_expected_tree("courseware-3", "Cohort B"),
                         self.make_expected_tree("courseware-1", "Everybody"),
                     ]
-                )
+                ),
+                self.make_expected_tree(
+                    None,
+                    "Second",
+                    [self.make_expected_tree("courseware-5", "Future Start Date")]
+                ),
             ],
             "non_courseware_topics": [
                 self.make_expected_tree("non-courseware-topic-id", "Test Topic"),
@@ -599,45 +605,8 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                     None,
                     "Second",
                     [
+                        self.make_expected_tree("courseware-5", "Future Start Date"),
                         self.make_expected_tree("courseware-4", "Staff Only"),
-                    ]
-                ),
-            ],
-            "non_courseware_topics": [
-                self.make_expected_tree("non-courseware-topic-id", "Test Topic"),
-            ],
-        }
-        assert staff_actual == staff_expected
-
-    def test_un_released_discussion_topic(self):
-        """
-        Test discussion topics that have not yet started
-        """
-        staff = StaffFactory.create(course_key=self.course.id)
-        with self.store.bulk_operations(self.course.id, emit_signals=False):
-            self.store.update_item(self.course, self.user.id)
-            self.make_discussion_xblock(
-                "courseware-2",
-                "First",
-                "Released",
-                start=datetime.now(UTC) - timedelta(days=1)
-            )
-            self.make_discussion_xblock(
-                "courseware-3",
-                "First",
-                "Future release",
-                start=datetime.now(UTC) + timedelta(days=1)
-            )
-
-        self.request.user = staff
-        staff_actual = self.get_course_topics()
-        staff_expected = {
-            "courseware_topics": [
-                self.make_expected_tree(
-                    None,
-                    "First",
-                    [
-                        self.make_expected_tree("courseware-2", "Released"),
                     ]
                 ),
             ],

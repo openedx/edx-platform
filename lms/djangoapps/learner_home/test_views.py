@@ -2,20 +2,22 @@
 
 from contextlib import contextmanager
 import json
-from unittest import TestCase
+from unittest import mock, TestCase
 from unittest.mock import Mock, patch
 from urllib.parse import urlencode
 from uuid import uuid4
 
 import ddt
 from django.conf import settings
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.student.toggles import ENABLE_AMPLITUDE_RECOMMENDATIONS
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
@@ -42,14 +44,14 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseFactory as CatalogCourseFactory,
+)
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.djangoapps.catalog.tests.factories import (
-    CourseFactory as CatalogCourseFactory,
-)
 
 
 ENTERPRISE_ENABLED = "ENABLE_ENTERPRISE_INTEGRATION"
@@ -750,3 +752,86 @@ class TestDashboardMasquerade(BaseTestDashboardView):
         # username has priority in the lookup
         assert response.status_code == 200
         assert self.get_first_course_id(response) == str(user_3_enrollment.course_id)
+
+
+class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
+    """Unit tests for the course recommendations on learner home page."""
+
+    password = 'test'
+    url = reverse_lazy('learner_home:courses')
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=self.password)
+        self.recommended_courses = ['MITx+6.00.1x', 'IBM+PY0101EN', 'HarvardX+CS50P', 'UQx+IELTSx', 'HarvardX+CS50x',
+                                    'Harvard+CS50z', 'BabsonX+EPS03x', 'TUMx+QPLS2x', 'NYUx+FCS.NET.1', 'MichinX+101x']
+        self.course_data = {
+            'course_key': 'MITx+6.00.1x',
+            'title': 'Introduction to Computer Science and Programming Using Python',
+            'owners': [{'logo_image_url': 'https://www.logo_image_url.com'}],
+            'marketing_url': 'https://www.marketing_url.com'
+        }
+
+    @override_waffle_flag(ENABLE_AMPLITUDE_RECOMMENDATIONS, active=False)
+    def test_waffle_flag_off(self):
+        """
+        Verify API returns 400 if waffle flag is off.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, None)
+
+    @override_waffle_flag(ENABLE_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @mock.patch('lms.djangoapps.learner_home.views.get_personalized_course_recommendations')
+    @mock.patch('lms.djangoapps.learner_home.views.get_course_data')
+    def test_no_recommendations_from_amplitude(self, mocked_get_course_data,
+                                               mocked_get_personalized_course_recommendations):
+        """
+        Verify API returns 400 if no course recommendations from amplitude.
+        """
+        mocked_get_personalized_course_recommendations.return_value = [False, []]
+        mocked_get_course_data.return_value = self.course_data
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, None)
+
+    @override_waffle_flag(ENABLE_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @mock.patch('lms.djangoapps.learner_home.views.get_personalized_course_recommendations')
+    @mock.patch('lms.djangoapps.learner_home.views.get_course_data')
+    def test_get_course_recommendations(self, mocked_get_course_data,
+                                        mocked_get_personalized_course_recommendations):
+        """
+        Verify API returns course recommendations.
+        """
+        mocked_get_personalized_course_recommendations.return_value = [False, self.recommended_courses]
+        mocked_get_course_data.return_value = self.course_data
+        expected_recommendations_length = 5
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get('is_personalized_recommendation'), True)
+        self.assertEqual(len(response.data.get('courses')), expected_recommendations_length)
+
+    @override_waffle_flag(ENABLE_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @mock.patch('lms.djangoapps.learner_home.views.get_personalized_course_recommendations')
+    @mock.patch('lms.djangoapps.learner_home.views.get_course_data')
+    def test_get_enrollable_course_recommendations(self, mocked_get_course_data,
+                                                   mocked_get_personalized_course_recommendations):
+        """
+        Verify API returns course recommendations for courses in which user is not enrolled.
+        """
+        mocked_get_personalized_course_recommendations.return_value = [False, self.recommended_courses]
+        mocked_get_course_data.return_value = self.course_data
+        course_keys = ['course-v1:IBM+PY0101EN+Run_0', 'course-v1:UQx+IELTSx+Run_0', 'course-v1:MITx+6.00.1x+Run_0',
+                       'course-v1:HarvardX+CS50P+Run_0', 'course-v1:Harvard+CS50z+Run_0', 'course-v1:TUMx+QPLS2x+Run_0']
+        expected_recommendations = 4
+        # enrolling in 6 courses
+        for course_key in course_keys:
+            CourseEnrollmentFactory(course_id=course_key, user=self.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get('is_personalized_recommendation'), True)
+        self.assertEqual(len(response.data.get('courses')), expected_recommendations)

@@ -12,4 +12,5 @@ urlpatterns = [
     re_path(
         r"^mock/init/?", mock_views.InitializeView.as_view(), name="mock_initialize"
     ),
+    re_path(r"^recommendation/courses/$", views.CourseRecommendationApiView.as_view(), name="courses"),
 ]
