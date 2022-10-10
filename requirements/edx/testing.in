@@ -48,3 +48,4 @@ tox-battery               # Makes tox aware of requirements file changes
 unidiff                   # Required by coverage_pytest_plugin
 pylint-pytest==0.3.0      # A Pylint plugin to suppress pytest-related false positives.
 pact-python               # Library for contract testing
+django-migration-linter   # Tool to test/verify migrations compatibility
