@@ -234,6 +234,8 @@ class _ContentSerializer(serializers.Serializer):
         """
         Returns a boolean indicating whether the requester has flagged the
         content as abusive.
+        If requester has moderation privileges, this will return True if content
+        is flagged by anyone.
         """
         total_abuse_flaggers = len(obj.get("abuse_flaggers", []))
         return (
@@ -329,10 +331,11 @@ class ThreadSerializer(_ContentSerializer):
 
     def get_abuse_flagged_count(self, obj):
         """
-        Returns the number of users that flagged content as abusive only if user has staff permissions
+        Returns the number of users that flagged content as abusive
+        only if user has staff permissions
         """
         if _validate_privileged_access(self.context):
-            return obj.get("abuse_flagged_count")
+            return len(obj.get("abuse_flaggers", []))
 
     def get_pinned(self, obj):
         """

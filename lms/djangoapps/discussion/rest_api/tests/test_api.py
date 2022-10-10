@@ -1906,6 +1906,7 @@ class CreateThreadTest(
                 "type",
                 "voted",
             ],
+            "abuse_flagged_count": 0,
         })
         assert actual == expected
         self.assertEqual(
