@@ -663,7 +663,7 @@ lazy==1.5
     #   acid-xblock
     #   lti-consumer-xblock
     #   ora2
-learner-pathway-progress==1.3.2
+learner-pathway-progress==1.3.3
     # via -r requirements/edx/base.in
 levenshtein==0.20.5
     # via python-levenshtein
