@@ -2,13 +2,13 @@ on: [pull_request]
 name: 'Merge conflicts'
 
 jobs:
-  report_master:
-    name: 'koa, lilac, maple, nutmeg and master'
+  report:
+    name: 'nutmeg and master'
     uses: appsembler/action-conflict-counter/.github/workflows/report-via-comment.yml@main
     with:
       local_base_branch: ${{ github.base_ref }}
       upstream_repo: 'https://github.com/edx/edx-platform.git'
-      upstream_branches: 'open-release/koa.master,open-release/lilac.master,open-release/maple.master,open-release/nutmeg.master,master'
+      upstream_branches: 'open-release/nutmeg.master,master'
       exclude_paths: 'cms/static/js/,conf/locale/,lms/static/js/,package.json,package-lock.json,.github/'
     secrets:
       custom_github_token: ${{ secrets.GITHUB_TOKEN }}
