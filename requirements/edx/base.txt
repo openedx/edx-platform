@@ -180,7 +180,7 @@ deprecated==1.2.13
     # via
     #   jwcrypto
     #   redis
-django==3.2.15
+django==3.2.16
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.in
@@ -264,7 +264,7 @@ django-config-models==2.3.0
     #   lti-consumer-xblock
 django-cors-headers==3.13.0
     # via -r requirements/edx/base.in
-django-countries==7.3.2
+django-countries==7.4.2
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -451,7 +451,7 @@ edx-django-release-util==1.2.0
     #   blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.in
-edx-django-utils==5.1.0
+edx-django-utils==5.2.0
     # via
     #   -r requirements/edx/base.in
     #   blockstore
@@ -485,7 +485,7 @@ edx-enterprise==3.57.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   learner-pathway-progress
-edx-event-bus-kafka==1.0.0
+edx-event-bus-kafka==1.1.0
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.9.1
     # via ora2
@@ -614,7 +614,7 @@ idna==3.4
     #   yarl
 importlib-metadata==5.0.0
     # via markdown
-importlib-resources==5.9.0
+importlib-resources==5.10.0
     # via jsonschema
 inflection==0.5.1
     # via drf-yasg
@@ -1109,7 +1109,7 @@ tqdm==4.64.1
     # via nltk
 types-cryptography==3.3.23
     # via pyjwt
-typing-extensions==4.3.0
+typing-extensions==4.4.0
     # via
     #   django-countries
     #   snowflake-connector-python
@@ -1200,7 +1200,7 @@ xss-utils==0.4.0
     # via -r requirements/edx/base.in
 yarl==1.8.1
     # via aiohttp
-zipp==3.8.1
+zipp==3.9.0
     # via
     #   importlib-metadata
     #   importlib-resources
