@@ -107,3 +107,25 @@ class StudentBoosterBadgeView(generics.ListAPIView):
         context = super(StudentBoosterBadgeView, self).get_serializer_context()
         context.update({'user': self.get_user()})
         return context
+
+
+class StudentActiveProgramBadgesView(generics.ListAPIView):
+    serializer_class = ProgramBadgeSerializer
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsStudent]
+
+    def get_queryset(self):
+        gen_class = self.request.user.gen_user.student.classes.first()
+
+        if gen_class:
+            program = gen_class.program
+            return BadgeClass.objects.prefetch_related('badgeassertion_set') \
+                .filter(issuing_component='genplus__program',
+                        slug=program.slug)
+
+        return BadgeClass.objects.none()
+
+    def get_serializer_context(self):
+        context = super(StudentActiveProgramBadgesView, self).get_serializer_context()
+        context.update({'user': self.request.user})
+        return context

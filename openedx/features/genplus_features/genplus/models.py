@@ -131,7 +131,7 @@ class Class(TimeStampedModel):
     image = models.ImageField(upload_to='gen_plus_classes', null=True, blank=True)
     name = models.CharField(max_length=128)
     is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
-    students = models.ManyToManyField(Student, blank=True, through="genplus.ClassStudents")
+    students = models.ManyToManyField(Student, blank=True, through="genplus.ClassStudents", related_name='classes')
     program = models.ForeignKey('genplus_learning.Program', on_delete=models.CASCADE, null=True, blank=True, related_name="classes")
     objects = models.Manager()
     visible_objects = ClassManager()
@@ -161,7 +161,7 @@ class TeacherClass(models.Model):
 
 
 class ClassStudents(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='classes')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
     gen_class = models.ForeignKey(Class, on_delete=models.CASCADE)
     is_visible = models.BooleanField(default=True)
 
