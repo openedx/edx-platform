@@ -1,20 +1,3 @@
-<!--
-
-🌰🌰
-🌰🌰🌰🌰         🌰 Note: the Nutmeg master branch has been created.  Please consider whether your change
-    🌰🌰🌰🌰     should also be applied to Nutmeg. If so, make another pull request against the
-🌰🌰🌰🌰         open-release/nutmeg.master branch, or ping @nedbat for help or questions.
-🌰🌰
-
-Please give your pull request a short but descriptive title.
-Use conventional commits to separate and summarize commits logically:
-https://open-edx-proposals.readthedocs.io/en/latest/oep-0051-bp-conventional-commits.html
-
-Use this template as a guide. Omit sections that don't apply. You may link to information rather than copy it.
-More details about the template are at https://github.com/openedx/open-edx-proposals/pull/180
-(link will be updated when that document merges)
--->
-
 ## Description
 
 Describe what this pull request changes, and why. Include implications for people using this change.
