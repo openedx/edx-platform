@@ -30,10 +30,10 @@ class Command(BaseCommand):
         organization_domain = options['domain']
 
         self.stdout.write('Removing "%s" in progress...' % organization_domain)
-        organization = self._get_site(organization_domain)
+        site = self._get_site(organization_domain)
 
         with transaction.atomic():
-            delete_site(organization)
+            delete_site(site)
 
             if not options['commit']:
                 transaction.set_rollback(True)
