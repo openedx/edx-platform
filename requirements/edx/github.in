@@ -61,14 +61,6 @@ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29
 # original repo is not maintained any more.
 git+https://github.com/openedx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776#egg=django-require==1.0.12
 
-# Pinned 2022-10-06: New Relic 8.2.0.181 adds instrumentation for confluent-kafka
-# but causes errors in event production if a dict is used for headers. This is fixed
-# in <https://github.com/newrelic/newrelic-python-agent/pull/645> but NR would like us
-# to test the fix (the pinned commit below) before they make their next release.
-# Once it's released, we should remove this pin and restore the line in base.in.
-# Unpinning is tracked in <https://github.com/openedx/event-bus-kafka/issues/52>.
-git+https://github.com/newrelic/newrelic-python-agent.git@cf306cea7eed4a6b4a954622438628fd34cd9824#egg=newrelic==8.3.0.0
-
 
 # Our libraries:
 -e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1  # Note: Blockstore 1.2.2 is failing.
