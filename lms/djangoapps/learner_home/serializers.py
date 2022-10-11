@@ -39,6 +39,20 @@ class PlatformSettingsSerializer(serializers.Serializer):
     courseSearchUrl = serializers.URLField()
 
 
+class SocialMediaSiteSettingsSerializer(serializers.Serializer):
+    """Social media sharing config for a particular website"""
+
+    isEnabled = serializers.BooleanField(source="is_enabled")
+    utmParams = serializers.CharField(source="utm_params")
+
+
+class SocialShareSettingsSerializer(serializers.Serializer):
+    """Serializer for social media sharing config"""
+
+    facebook = SocialMediaSiteSettingsSerializer()
+    twitter = SocialMediaSiteSettingsSerializer()
+
+
 class CourseProviderSerializer(serializers.Serializer):
     """Info about a course provider (institution/business) from a CourseOverview"""
 
@@ -51,6 +65,10 @@ class CourseSerializer(serializers.Serializer):
     bannerImgSrc = serializers.URLField(source="image_urls.small")
     courseName = serializers.CharField(source="display_name_with_default")
     courseNumber = serializers.CharField(source="display_number_with_default")
+    socialShareUrl = serializers.SerializerMethodField()
+
+    def get_socialShareUrl(self, instance):
+        return self.context.get("course_share_urls", {}).get(instance.id)
 
 
 class CourseRunSerializer(serializers.Serializer):
@@ -546,6 +564,7 @@ class LearnerDashboardSerializer(serializers.Serializer):
     enterpriseDashboard = EnterpriseDashboardSerializer(allow_null=True)
     platformSettings = PlatformSettingsSerializer()
     courses = serializers.SerializerMethodField()
+    socialShareSettings = SocialShareSettingsSerializer()
     suggestedCourses = serializers.ListField(
         child=SuggestedCourseSerializer(), allow_empty=True
     )

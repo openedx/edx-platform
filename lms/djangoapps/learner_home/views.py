@@ -5,6 +5,10 @@ import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import MultipleObjectsReturned
+from common.djangoapps.util.course import (
+    get_encoded_course_sharing_utm_params,
+    get_link_for_about_page,
+)
 from edx_django_utils import monitoring as monitoring_utils
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied, NotFound
@@ -296,6 +300,35 @@ def get_suggested_courses():
     )
 
 
+def get_social_share_settings():
+    """Config around social media sharing campaigns"""
+
+    share_settings = configuration_helpers.get_value(
+        "SOCIAL_SHARING_SETTINGS", getattr(settings, "SOCIAL_SHARING_SETTINGS", {})
+    )
+
+    utm_sources = get_encoded_course_sharing_utm_params()
+
+    return {
+        "facebook": {
+            "is_enabled": share_settings.get("DASHBOARD_FACEBOOK", False),
+            "utm_params": utm_sources.get("facebook"),
+        },
+        "twitter": {
+            "is_enabled": share_settings.get("DASHBOARD_TWITTER", False),
+            "utm_params": utm_sources.get("twitter"),
+        },
+    }
+
+
+def get_course_share_urls(course_enrollments):
+    """Get course URLs for sharing on social media"""
+    return {
+        course_enrollment.course_id: get_link_for_about_page(course_enrollment.course)
+        for course_enrollment in course_enrollments
+    }
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -381,12 +414,17 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Get suggested courses
         suggested_courses = get_suggested_courses().get("courses", [])
 
+        # Get social media sharing config
+        social_share_settings = get_social_share_settings()
+        course_share_urls = get_course_share_urls(course_enrollments)
+
         learner_dash_data = {
             "emailConfirmation": email_confirmation,
             "enterpriseDashboard": enterprise_customer,
             "platformSettings": get_platform_settings(),
             "enrollments": course_enrollments,
             "unfulfilledEntitlements": unfulfilled_entitlements,
+            "socialShareSettings": social_share_settings,
             "suggestedCourses": suggested_courses,
         }
 
@@ -397,6 +435,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "course_optouts": course_optouts,
             "course_access_checks": course_access_checks,
             "resume_course_urls": resume_button_urls,
+            "course_share_urls": course_share_urls,
             "show_email_settings_for": show_email_settings_for,
             "fulfilled_entitlements": fulfilled_entitlements_by_course_key,
             "course_entitlement_available_sessions": course_entitlement_available_sessions,
