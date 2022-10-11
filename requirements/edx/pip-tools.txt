@@ -14,7 +14,7 @@ packaging==21.3
     # via build
 pep517==0.13.0
     # via build
-pip-tools==6.8.0
+pip-tools==6.9.0
     # via -r requirements/edx/pip-tools.in
 pyparsing==3.0.9
     # via packaging
