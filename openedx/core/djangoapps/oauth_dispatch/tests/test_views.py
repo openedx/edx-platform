@@ -382,7 +382,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         Test JWT token is not returned, and that Bearer token is returned instead
         """
         mock_is_request_from_mobile_app.return_value = True
-        response = self._post_request(self.user, self.dot_app, token_type='jwt')
+        response = self._post_request(self.user, self.dot_app, token_type='jwt', asymmetric_jwt=True)
         data = json.loads(response.content.decode('utf-8'))
         access_token = data['access_token']
         assert response.status_code == 200
@@ -398,7 +398,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         Test JWT token is returned
         """
         mock_is_request_from_mobile_app.return_value = True
-        self._test_jwt_access_token('dot_app', token_type='jwt', grant_type='password')
+        self._test_jwt_access_token('dot_app', token_type='jwt', grant_type='password', asymmetric_jwt=True)
 
 
 @ddt.ddt
@@ -546,7 +546,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         client = getattr(self, client_attr)
         self.oauth_client = client
         self._setup_provider_response(success=True)
-        response = self._post_request(self.user, client, token_type='jwt')
+        response = self._post_request(self.user, client, token_type='jwt', asymmetric_jwt=True)
         data = json.loads(response.content.decode('utf-8'))
         access_token = data['access_token']
         assert response.status_code == 200
@@ -563,7 +563,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         Test JWT token is returned
         """
         mock_is_request_from_mobile_app.return_value = True
-        self._test_jwt_access_token(client_attr, token_type='jwt', grant_type='password')
+        self._test_jwt_access_token(client_attr, token_type='jwt', grant_type='password', asymmetric_jwt=True)
 
 
 # pylint: disable=abstract-method

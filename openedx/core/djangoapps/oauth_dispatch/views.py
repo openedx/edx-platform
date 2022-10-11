@@ -107,6 +107,7 @@ class AccessTokenView(_DispatchingView):
         token_type = _get_token_type(request)
         is_jwt_disabled = False
 
+        # Temporarily add control to disable jwt on mobile if needed
         if is_request_from_mobile_app(request):
             is_jwt_disabled = DISABLE_JWT_FOR_MOBILE.is_enabled()
 
@@ -146,6 +147,7 @@ class AccessTokenExchangeView(_DispatchingView):
         token_type = _get_token_type(request)
         is_jwt_disabled = False
 
+        # Temporarily add control to disable jwt on mobile if needed
         if is_request_from_mobile_app(request):
             is_jwt_disabled = DISABLE_JWT_FOR_MOBILE.is_enabled()
 
