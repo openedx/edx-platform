@@ -219,5 +219,4 @@ class VideoFields:
         display_name=_("Thumbnail"),
         scope=Scope.settings,
         default="",
-        disabled=True
     )
