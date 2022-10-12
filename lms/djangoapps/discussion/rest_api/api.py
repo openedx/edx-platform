@@ -892,7 +892,7 @@ def get_learner_active_thread_list(request, course_key, query_params):
     request: The django request objects used for build_absolute_uri
     course_key: The key of the course
     query_params: Parameters to fetch data from comments service. It must contain
-                        user_id, course_id, page, per_page, group_id
+                        user_id, course_id, page, per_page, group_id, count_flagged
 
     Returns:
 
