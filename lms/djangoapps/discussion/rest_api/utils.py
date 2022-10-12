@@ -159,3 +159,17 @@ def get_moderator_users_list(course_id):
         for user in role.users.all()
     ]
     return moderator_user_ids
+
+
+def to_bool(value):
+    """
+    Returns bool(False) if input string is 0 or false,
+    returns bool(True) if input string is 1 or true
+    else returns None
+    """
+    value = str(value).lower()
+    if value in ['0', 'false']:
+        return False
+    elif value in ['1', 'true']:
+        return True
+    return None

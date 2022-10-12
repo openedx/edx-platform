@@ -36,6 +36,7 @@ from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuth
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
+from .utils import to_bool
 from ..rest_api.api import (
     create_comment,
     create_thread,
@@ -593,7 +594,7 @@ class LearnerThreadView(APIView):
         course_key = CourseKey.from_string(course_id)
         page_num = request.GET.get('page', 1)
         threads_per_page = request.GET.get('page_size', 10)
-        count_flagged = request.GET.get('count_flagged', False)
+        count_flagged = to_bool(request.GET.get('count_flagged', False))
         discussion_id = None
         username = request.GET.get('username', None)
         user = get_object_or_404(User, username=username)

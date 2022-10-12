@@ -975,6 +975,9 @@ def get_learner_active_thread_list(request, course_key, query_params):
     course = _get_course(course_key, request.user)
     context = get_context(course, request)
 
+    if query_params.get('count_flagged') and not context["has_moderation_privilege"]:
+        raise PermissionDenied("`count_flagged` can only be set by users with moderator access or higher.")
+
     group_id = query_params.get('group_id', None)
     user_id = query_params.get('user_id', None)
     if user_id is None:
