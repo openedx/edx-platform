@@ -309,13 +309,17 @@ def get_social_share_settings():
 
     utm_sources = get_encoded_course_sharing_utm_params()
 
+    default_brand = "edX.org"
+
     return {
         "facebook": {
             "is_enabled": share_settings.get("DASHBOARD_FACEBOOK", False),
+            "brand": share_settings.get("FACEBOOK_BRAND", default_brand),
             "utm_params": utm_sources.get("facebook"),
         },
         "twitter": {
             "is_enabled": share_settings.get("DASHBOARD_TWITTER", False),
+            "brand": share_settings.get("TWITTER_BRAND", default_brand),
             "utm_params": utm_sources.get("twitter"),
         },
     }

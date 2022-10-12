@@ -43,6 +43,7 @@ class SocialMediaSiteSettingsSerializer(serializers.Serializer):
     """Social media sharing config for a particular website"""
 
     isEnabled = serializers.BooleanField(source="is_enabled")
+    socialBrand = serializers.CharField(source="brand")
     utmParams = serializers.CharField(source="utm_params")
 
 
