@@ -19,7 +19,7 @@ from oauth2_provider import models as dot_models
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
-from openedx.core.djangoapps.oauth_dispatch import DISABLE_JWT_FOR_MOBILE
+from openedx.core.djangoapps.oauth_dispatch.toggles import DISABLE_JWT_FOR_MOBILE
 
 from . import mixins
 
