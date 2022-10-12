@@ -362,9 +362,8 @@ django-splash==1.2.1
     # via -r requirements/edx/base.in
 django-statici18n==2.3.1
     # via -r requirements/edx/base.in
-django-storages==1.8
+django-storages==1.13.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edxval
 django-user-tasks==3.0.0

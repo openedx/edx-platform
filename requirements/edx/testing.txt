@@ -447,9 +447,8 @@ django-splash==1.2.1
     # via -r requirements/edx/base.txt
 django-statici18n==2.3.1
     # via -r requirements/edx/base.txt
-django-storages==1.8
+django-storages==1.13.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edxval
 django-user-tasks==3.0.0
@@ -678,7 +677,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==15.0.0
+faker==15.1.0
     # via factory-boy
 fastapi==0.85.0
     # via pact-python
