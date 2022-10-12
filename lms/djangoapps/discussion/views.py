@@ -202,6 +202,8 @@ def use_bulk_ops(view_func):
     @wraps(view_func)
     def wrapped_view(request, course_id, *args, **kwargs):
         course_key = CourseKey.from_string(course_id)
+        if course_key.deprecated:
+            raise Http404
         with modulestore().bulk_operations(course_key):
             return view_func(request, course_key, *args, **kwargs)
     return wrapped_view
