@@ -7,9 +7,14 @@
 // It should mirror main-rtl w/ the exception of bi-app references.
 
 @import '../sass/vendor/bi-app/bi-app-ltr';
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins';
+// ----- Before BD-39 -----
+// @import 'bootstrap/scss/functions';
+// @import 'bootstrap/scss/variables';
+// @import 'bootstrap/scss/mixins';
+// ----- After BD-39 -----
+// Paragon SASS Framework
+@import 'paragon';
+// -----------------------
 
 // Load the shared build
 @import 'build';

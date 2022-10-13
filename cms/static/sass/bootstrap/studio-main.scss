@@ -7,10 +7,10 @@
 
 // ----- Before BD-39 -----
 // Bootstrap
-@import 'bootstrap/scss/bootstrap';
+// @import 'bootstrap/scss/bootstrap';
 // ----- After BD-39 -----
 // Paragon SASS framework
-// @import '../paragon';
+@import '../paragon';
 // -----------------------
 
 // Legacy support

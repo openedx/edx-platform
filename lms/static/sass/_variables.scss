@@ -5,5 +5,6 @@ $text-width-readability-max: 1080px;
 // LMS-only colors
 $audit-mode-color: rgb(74, 74, 74) !default;
 $honor-mode-color: theme-color("primary") !default;
-$verified-mode-color: theme-color("purchase") !default;
+$verified-mode-color: theme-color("success") !default;
 $professional-certificate-color: #9a1f60 !default;
+$pink: pink !default;

@@ -3,27 +3,34 @@
 // Theme-specific variables
 @import 'lms/theme/variables';
 
-// Core Bootstrap functions, variables and mixins
+// ----- Before BD-39 -----
+// // Core Bootstrap functions, variables and mixins
+// @import 'bootstrap/variables';
+// @import 'bootstrap/scss/functions';
+// @import 'bootstrap/scss/variables';
+// @import 'bootstrap/scss/mixins/background-variant';
+// @import 'bootstrap/scss/mixins/box-shadow';
+// @import 'bootstrap/scss/mixins/breakpoints';
+// @import 'bootstrap/scss/mixins/float';
+// @import 'bootstrap/scss/mixins/grid';
+// @import 'bootstrap/scss/mixins/hover';
+// @import 'bootstrap/scss/mixins/reset-text';
+// @import 'bootstrap/scss/mixins/screen-reader';
+// @import 'bootstrap/scss/mixins/text-truncate';
+// @import 'bootstrap/scss/mixins/text-emphasis';
+// @import 'bootstrap/scss/mixins/text-hide';
+// @import 'bootstrap/scss/mixins/visibility';
+// @import 'bootstrap/scss/utilities';
+// ----- After BD-39 -----
+// Legacy variables that augmented Bootstrap
 @import 'bootstrap/variables';
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins/background-variant';
-@import 'bootstrap/scss/mixins/box-shadow';
-@import 'bootstrap/scss/mixins/breakpoints';
-@import 'bootstrap/scss/mixins/float';
-@import 'bootstrap/scss/mixins/grid';
-@import 'bootstrap/scss/mixins/hover';
-@import 'bootstrap/scss/mixins/reset-text';
-@import 'bootstrap/scss/mixins/screen-reader';
-@import 'bootstrap/scss/mixins/text-truncate';
-@import 'bootstrap/scss/mixins/text-emphasis';
-@import 'bootstrap/scss/mixins/text-hide';
-@import 'bootstrap/scss/mixins/visibility';
-@import 'bootstrap/scss/utilities';
 
+// Paragon SASS Framework
+@import '../paragon';
+// -----------------------
 
 // Bootstrap components
-@import 'bootstrap/scss/popover';
+// @import 'bootstrap/scss/popover';
 
 // LMS-specific variables
 @import '../variables';
