@@ -3,7 +3,6 @@
 'use strict';
 
 var Merge = require('webpack-merge');
-var path = require('path');
 var webpack = require('webpack');
 var _ = require('underscore');
 
@@ -24,39 +23,6 @@ module.exports = _.values(Merge.smart(commonConfig, {
                 'process.env.JS_ENV_EXTRA_CONFIG': process.env.JS_ENV_EXTRA_CONFIG
             })
         ],
-        module: {
-            rules: [
-                {
-                    test: /.scss$/,
-                    include: [
-                        /paragon/,
-                        /font-awesome/
-                    ],
-                    use: [
-                        'style-loader',
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                sourceMap: true,
-                                modules: true,
-                                localIdentName: '[name]__[local]'
-                            }
-                        },
-                        {
-                            loader: 'sass-loader',
-                            options: {
-                                data: '$base-rem-size: 0.625; @import "paragon-reset";',
-                                includePaths: [
-                                    path.join(__dirname, './node_modules/@edx/paragon/src/utils'),
-                                    path.join(__dirname, './node_modules/')
-                                ],
-                                sourceMap: true
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
         watchOptions: {
             ignored: [/node_modules/, /\.git/]
         }
