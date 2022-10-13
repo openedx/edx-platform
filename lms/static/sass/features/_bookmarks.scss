@@ -103,11 +103,11 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
 }
 
 .bookmarks-empty-header {
-  @extend %t-title5;
+  @extend %t-title5 !optional;
 
   margin-bottom: ($baseline/2);
 }
 
 .bookmarks-empty-detail {
-  @extend %t-copy-sub1;
+  @extend %t-copy-sub1 !optional;
 }

@@ -29,7 +29,7 @@
 }
 
 @mixin discussion-wmd-input {
-  @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+  @include border-radius($forum-border-radius $forum-border-radius 0 0);
 
   box-sizing: border-box;
   margin-top: 0;
@@ -44,7 +44,7 @@
 }
 
 @mixin discussion-wmd-preview-container {
-  @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
+  @include border-radius(0 0 $forum-border-radius $forum-border-radius);
 
   box-sizing: border-box;
   border: 1px solid $forum-color-border;

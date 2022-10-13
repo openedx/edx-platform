@@ -149,11 +149,6 @@
                 display: inline-block;
                 margin-bottom: ($baseline/2);
                 text-decoration: none;
-
-                // Responsive behavior
-                @include media-breakpoint-down(sm) {
-                  @extend %t-title4;
-                }
               }
             }
 
@@ -217,7 +212,6 @@
 
                 .wrapper-course-actions {
                   margin-top: $baseline;
-
                   flex-grow: 1;
                   flex-shrink: 0;
                 }
@@ -248,6 +242,7 @@
 
             @include media-breakpoint-down(xs) {
               margin-bottom: $baseline;
+
               @include padding-left($baseline/2);
 
               .wrapper-course-info-actions {
@@ -256,7 +251,7 @@
 
                 .wrapper-course-info-row {
                   .wrapper-course-actions {
-                    margin-top: 0px;
+                    margin-top: 0;
                   }
                 }
               }
@@ -460,6 +455,7 @@
             @extend %btn-pl-white-base;
 
             @include float(right);
+
             margin-top: $baseline;
 
             &.archived {
@@ -781,7 +777,7 @@
       padding-left: $baseline;
       padding-top: $baseline;
       padding-bottom: $baseline;
-      background-color: #F2F0EF;
+      background-color: #f2f0ef;
 
       .wrapper-tip {
         @include clearfix();
@@ -808,7 +804,7 @@
       .wrapper-extended {
         display: flex;
         flex-flow: column wrap;
-        color: #00262B;
+        color: #00262b;
 
         .wrapper-icon-message {
           width: 100%;
@@ -833,7 +829,7 @@
           }
 
           a.verified-info {
-            color: #00262B;
+            color: #00262b;
             text-decoration: underline;
           }
         }
@@ -1337,7 +1333,7 @@
     }
 
     .deco-arrow {
-      @include triangle(($baseline/2), $m-gray-d3, up);
+      @include edx-triangle(($baseline/2), $m-gray-d3, up);
 
       position: absolute;
 
@@ -1370,7 +1366,7 @@
     }
 
     .deco-arrow {
-      @include triangle(($baseline/2), $error-color, up);
+      @include edx-triangle(($baseline/2), $error-color, up);
     }
   }
 
@@ -1397,7 +1393,7 @@
     }
 
     .deco-arrow {
-      @include triangle(($baseline/2), $verified-color-lvl4, up);
+      @include edx-triangle(($baseline/2), $verified-color-lvl4, up);
     }
   }
 
@@ -1642,6 +1638,8 @@ a.fade-cover {
 
 #unenroll-modal {
   margin-top: -60px;
+  height: auto;
+  width: 480px;
 
   .modal-form-error {
     background: tint($red, 95%);

@@ -5,8 +5,13 @@
 // Studio theme variables
 @import 'cms/theme/variables';
 
+// ----- Before BD-39 -----
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+// ----- After BD-39 -----
+// Paragon SASS framework
+// @import '../paragon';
+// -----------------------
 
 // Legacy support
 @import 'legacy';

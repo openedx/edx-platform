@@ -115,7 +115,7 @@
 
 .forum-nav-refine-bar {
   @include clearfix();
-  @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+  @include border-radius($forum-border-radius $forum-border-radius 0 0);
 
   font-size: $forum-small-font-size;
   border-bottom: 1px solid $forum-color-border;
@@ -340,7 +340,7 @@
 
 .forum-nav-thread-comments-count {
   @extend %forum-nav-thread-wrapper-2-content;
-  @extend %t-weight4;
+  @extend %t-weight4 !optional;
 
   position: relative;
 

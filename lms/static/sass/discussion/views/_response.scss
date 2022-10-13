@@ -32,7 +32,7 @@
   .discussion-response {
     box-sizing: border-box;
 
-    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+    @include border-radius($forum-border-radius $forum-border-radius 0 0);
 
     padding: $baseline;
     background-color: $forum-color-background;
@@ -49,7 +49,7 @@
 
     // CASE: larger username for responses
     .username {
-      @extend %t-weight5;
+      @extend %t-weight5 !optional;
 
       font-size: $forum-base-font-size;
     }
@@ -98,7 +98,7 @@
 
   // CASE: banner - staff response
   .staff-banner {
-    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+    @include border-radius($forum-border-radius $forum-border-radius 0 0);
     @include left(0);
 
     position: absolute;
@@ -115,7 +115,7 @@
 
   // CASE: banner - community TA response
   .community-ta-banner {
-    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+    @include border-radius($forum-border-radius $forum-border-radius 0 0);
     @include left(0);
 
     position: absolute;
@@ -144,7 +144,7 @@
 .discussion .comments {
   @extend %ui-no-list;
 
-  @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
+  @include border-radius(0 0 $forum-border-radius $forum-border-radius);
 
   background: theme-color("lightest");
   box-shadow: 0 1px 3px -1px $shadow inset;

@@ -7,8 +7,13 @@ $static-path: '../..';
 // Theme-specific variables
 @import 'lms/theme/variables';
 
+// ----- Before BD-39 -----
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+// ----- After BD-39 -----
+// Paragon SASS Framework
+@import '../paragon';
+// -----------------------
 
 // Legacy support
 @import '../bootstrap/legacy';
