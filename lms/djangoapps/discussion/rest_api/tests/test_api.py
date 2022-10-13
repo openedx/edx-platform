@@ -443,7 +443,6 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 self.make_expected_tree("non-courseware-2", "B"),
             ],
         }
-        breakpoint()
         assert actual == expected
 
     def test_sort_key_doesnot_work(self):
