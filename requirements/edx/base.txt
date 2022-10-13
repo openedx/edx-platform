@@ -407,7 +407,7 @@ djangorestframework-xml==2.0.0
     # via edx-enterprise
 docopt==0.6.2
     # via -r requirements/edx/base.in
-docutils==0.19
+docutils==0.18.1
     # via botocore
 done-xblock==2.0.4
     # via -r requirements/edx/base.in

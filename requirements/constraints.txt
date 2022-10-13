@@ -96,3 +96,8 @@ pytz==2022.2.1
 # openedx-events>0.13.0 causes test failures due to breaking changes
 # These broken tests will be fixed in a separate PR
 openedx-events==0.13.0
+
+# docutils==0.18.1 fails with sphinxcontrib-openapi package
+# docutils==0.19 has removed the docutils.core.ErrorString which is required by the sphinxcontrib-openapi
+# This constraint can be removed once sphinxcontrib-openapi is updated to resolve this issue.
+docutils<0.19
