@@ -408,17 +408,17 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 "B": {"id": "non-courseware-2"},
             }
             self.store.update_item(self.course, self.user.id)
-            self.make_discussion_xblock("courseware-1", "A", "1")
-            self.make_discussion_xblock("courseware-2", "A", "2")
-            self.make_discussion_xblock("courseware-3", "B", "1")
-            self.make_discussion_xblock("courseware-4", "B", "2")
-            self.make_discussion_xblock("courseware-5", "C", "1")
+            self.make_discussion_xblock("courseware-1", "Week 1", "1")
+            self.make_discussion_xblock("courseware-2", "Week 1", "2")
+            self.make_discussion_xblock("courseware-3", "Week 10", "1")
+            self.make_discussion_xblock("courseware-4", "Week 10", "2")
+            self.make_discussion_xblock("courseware-5", "Week 9", "1")
         actual = self.get_course_topics()
         expected = {
             "courseware_topics": [
                 self.make_expected_tree(
                     None,
-                    "A",
+                    "Week 1",
                     [
                         self.make_expected_tree("courseware-1", "1"),
                         self.make_expected_tree("courseware-2", "2"),
@@ -426,16 +426,16 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 ),
                 self.make_expected_tree(
                     None,
-                    "B",
+                    "Week 9",
+                    [self.make_expected_tree("courseware-5", "1")]
+                ),
+                self.make_expected_tree(
+                    None,
+                    "Week 10",
                     [
                         self.make_expected_tree("courseware-3", "1"),
                         self.make_expected_tree("courseware-4", "2"),
                     ]
-                ),
-                self.make_expected_tree(
-                    None,
-                    "C",
-                    [self.make_expected_tree("courseware-5", "1")]
                 ),
             ],
             "non_courseware_topics": [
