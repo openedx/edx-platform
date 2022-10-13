@@ -407,10 +407,8 @@ djangorestframework-xml==2.0.0
     # via edx-enterprise
 docopt==0.6.2
     # via -r requirements/edx/base.in
-docutils==0.17.1
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   botocore
+docutils==0.19
+    # via botocore
 done-xblock==2.0.4
     # via -r requirements/edx/base.in
 drf-jwt==1.19.2
@@ -1011,7 +1009,7 @@ scipy==1.7.3
     #   openedx-calc
 semantic-version==2.10.0
     # via edx-drf-extensions
-shapely==1.8.4
+shapely==1.8.5
     # via -r requirements/edx/base.in
 simplejson==3.17.6
     # via
@@ -1082,7 +1080,7 @@ sqlparse==0.4.3
     #   django
 staff-graded-xblock==2.0.1
     # via -r requirements/edx/base.in
-stevedore==4.0.0
+stevedore==4.0.1
     # via
     #   -r requirements/edx/base.in
     #   -r requirements/edx/paver.txt

@@ -20,10 +20,8 @@ click==8.1.3
     #   code-annotations
 code-annotations==1.3.0
     # via -r requirements/edx/doc.in
-docutils==0.17.1
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   sphinx
+docutils==0.19
+    # via sphinx
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/doc.in
 gitdb==4.0.9
@@ -66,9 +64,8 @@ smmap==5.0.0
     # via gitdb
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==5.0.2
+sphinx==5.2.3
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.in
     #   edx-sphinx-theme
 sphinxcontrib-applehelp==1.0.2
@@ -83,7 +80,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-stevedore==4.0.0
+stevedore==4.0.1
     # via code-annotations
 text-unidecode==1.3
     # via python-slugify
