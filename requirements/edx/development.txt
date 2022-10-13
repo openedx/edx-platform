@@ -878,7 +878,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==4.5.0
+lti-consumer-xblock==5.0.0
     # via -r requirements/edx/testing.txt
 lxml==4.9.1
     # via
