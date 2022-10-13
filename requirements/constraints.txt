@@ -60,11 +60,6 @@ py2neo<2022
 # pylint==2.14.0 is causing test failures
 pylint==2.13.9
 
-# Sphinx requires docutils<0.18. This pin can be removed once https://github.com/sphinx-doc/sphinx/issues/9777 is closed.
-docutils<0.18
-# Sphinx docs build fails with new version. Will be fixed in https://github.com/openedx/public-engineering/issues/161
-sphinx<5.1.0
-
 # scipy version 1.8 requires numpy>=1.17.3, we've pinned numpy to <1.17.0 in requirements/edx-sandbox/py38.in
 scipy<1.8.0
 

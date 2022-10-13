@@ -18,5 +18,5 @@ django-debug-toolbar                    # A set of panels that display debug inf
 edx-sphinx-theme                        # Documentation theme
 mypy                                    # static type checking
 pywatchman                              # More efficient checking for runserver reload trigger events
-sphinxcontrib-openapi[markdown]==0.6.0  # OpenAPI (fka Swagger) spec renderer for Sphinx; pinned because 0.70 requires Python >=3.6
+sphinxcontrib-openapi[markdown]         # OpenAPI (fka Swagger) spec renderer for Sphinx; pinned because 0.70 requires Python >=3.6
 vulture                                 # Detects possible dead/unused code, used in scripts/find-dead-code.sh
