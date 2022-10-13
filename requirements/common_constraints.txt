@@ -30,3 +30,8 @@ setuptools<60
 
 # django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
 django-simple-history==3.0.0
+
+# libsass avoid duplicate selectors and throws errors when compiling Sass files on 3.6.5.
+# This constraint is needed to be able to build for edx-themes.
+# see https://github.com/sass/libsass/commit/8f1a5d90f7e04487e893e701f8636634b6b7da77
+libsass==0.20.0

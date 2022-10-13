@@ -833,7 +833,7 @@ levenshtein==0.20.5
     # via
     #   -r requirements/edx/base.txt
     #   python-levenshtein
-libsass==0.10.0
+libsass==0.20.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2

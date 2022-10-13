@@ -667,7 +667,7 @@ learner-pathway-progress==1.3.3
     # via -r requirements/edx/base.in
 levenshtein==0.20.5
     # via python-levenshtein
-libsass==0.10.0
+libsass==0.20.0
     # via
     #   -r requirements/edx/paver.txt
     #   ora2
