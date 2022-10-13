@@ -4,8 +4,8 @@ Discussion API internal interface
 from __future__ import annotations
 
 import itertools
+import re
 from collections import defaultdict
-
 from enum import Enum
 from typing import Dict, Iterable, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
@@ -22,12 +22,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.response import Response
 from rest_framework.request import Request
-
-from xmodule.course_module import CourseBlock
-from xmodule.modulestore.django import modulestore
-from xmodule.tabs import CourseTabList
+from rest_framework.response import Response
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
@@ -41,48 +37,53 @@ from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.course import (
     get_course_commentable_counts,
-    get_course_user_stats,
+    get_course_user_stats
 )
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
-from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError, \
-    CommentClient500Error
+from openedx.core.djangoapps.django_comment_common.comment_client.utils import (
+    CommentClient500Error,
+    CommentClientRequestError
+)
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
     CourseDiscussionSettings,
-    Role,
+    Role
 )
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
     comment_edited,
+    comment_flagged,
     comment_voted,
     thread_created,
     thread_deleted,
     thread_edited,
-    thread_voted,
     thread_flagged,
-    comment_flagged,
+    thread_voted
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
-from ..config.waffle import ENABLE_LEARNERS_STATS
+from xmodule.course_module import CourseBlock
+from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTabList
 
+from ..config.waffle import ENABLE_LEARNERS_STATS
 from ..django_comment_client.base.views import (
     track_comment_created_event,
     track_comment_deleted_event,
     track_thread_created_event,
     track_thread_deleted_event,
     track_thread_viewed_event,
-    track_voted_event,
+    track_voted_event
 )
 from ..django_comment_client.utils import (
     get_group_id_for_user,
     get_user_role_names,
     has_discussion_privileges,
-    is_commentable_divided,
+    is_commentable_divided
 )
 from ..toggles import ENABLE_DISCUSSION_MODERATION_REASON_CODES
 from .exceptions import CommentNotFoundError, DiscussionBlackOutException, DiscussionDisabledError, ThreadNotFoundError
@@ -92,7 +93,7 @@ from .permissions import (
     can_delete,
     get_editable_fields,
     get_initializable_comment_fields,
-    get_initializable_thread_fields,
+    get_initializable_thread_fields
 )
 from .serializers import (
     CommentSerializer,
@@ -101,14 +102,14 @@ from .serializers import (
     ThreadSerializer,
     TopicOrdering,
     UserStatsSerializer,
-    get_context,
+    get_context
 )
-
 from .utils import (
-    discussion_open_for_user,
-    get_usernames_from_search_string,
     add_stats_for_users_with_no_discussion_content,
-    set_attribute, get_usernames_for_course,
+    discussion_open_for_user,
+    get_usernames_for_course,
+    get_usernames_from_search_string,
+    set_attribute
 )
 
 User = get_user_model()
@@ -383,7 +384,23 @@ def get_courseware_topics(
     for xblock in discussion_xblocks:
         xblocks_by_category[xblock.discussion_category].append(xblock)
 
-    for category in xblocks_by_category.keys():
+    def sort_categories(category_list):
+        """
+        Sorts the given iterable containing alphanumeric correctly.
+        Required arguments:
+        category_list -- list of categories.
+        """
+        def convert(text):
+            if text.isdigit():
+                return int(text)
+            return text
+
+        def alphanum_key(key):
+            return [convert(c) for c in re.split('([0-9]+)', key)]
+
+        return sorted(category_list, key=alphanum_key)
+
+    for category in sort_categories(xblocks_by_category.keys()):
         children = []
         for xblock in xblocks_by_category[category]:
             if not topic_ids or xblock.discussion_id in topic_ids:
