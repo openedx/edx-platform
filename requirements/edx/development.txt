@@ -512,9 +512,8 @@ djangorestframework-xml==2.0.0
     #   edx-enterprise
 docopt==0.6.2
     # via -r requirements/edx/testing.txt
-docutils==0.17.1
+docutils==0.18.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   botocore
     #   m2r
@@ -701,7 +700,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==15.0.0
+faker==15.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -1392,7 +1391,7 @@ semantic-version==2.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-drf-extensions
-shapely==1.8.4
+shapely==1.8.5
     # via -r requirements/edx/testing.txt
 simplejson==3.17.6
     # via
@@ -1475,11 +1474,11 @@ soupsieve==2.3.2.post1
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
-sphinx==5.0.2
+sphinx==5.2.3
     # via
-    #   -c requirements/edx/../constraints.txt
     #   edx-sphinx-theme
     #   sphinxcontrib-httpdomain
+    #   sphinxcontrib-openapi
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
@@ -1490,7 +1489,7 @@ sphinxcontrib-httpdomain==1.8.0
     # via sphinxcontrib-openapi
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-openapi[markdown]==0.6.0
+sphinxcontrib-openapi[markdown]==0.7.0
     # via -r requirements/edx/development.in
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
@@ -1508,7 +1507,7 @@ starlette==0.20.4
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
-stevedore==4.0.0
+stevedore==4.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   code-annotations
