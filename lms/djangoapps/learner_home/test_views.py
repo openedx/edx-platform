@@ -2,7 +2,7 @@
 
 from contextlib import contextmanager
 import json
-from unittest import mock, TestCase
+from unittest import mock
 from unittest.mock import Mock, patch
 from urllib.parse import urlencode
 from uuid import uuid4
@@ -11,6 +11,7 @@ import ddt
 from django.conf import settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.test import TestCase, override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase
@@ -22,8 +23,9 @@ from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
 )
+from common.djangoapps.util.course import get_encoded_course_sharing_utm_params
 from lms.djangoapps.bulk_email.models import Optout
-from lms.djangoapps.learner_home.test_utils import create_test_enrollment
+from lms.djangoapps.learner_home.test_utils import create_test_enrollment, random_string
 from lms.djangoapps.learner_home.views import (
     get_course_overviews_for_pseudo_sessions,
     get_course_programs,
@@ -34,6 +36,8 @@ from lms.djangoapps.learner_home.views import (
     get_suggested_courses,
     get_user_account_confirmation_info,
     get_entitlements,
+    get_social_share_settings,
+    get_course_share_urls,
 )
 from lms.djangoapps.learner_home.test_serializers import random_url
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -420,6 +424,69 @@ class TestGetEnterpriseCustomer(TestCase):
             assert result is mock_get_from_session.return_value
 
 
+class TestGetSocialShareSettings(TestCase):
+    """ Tests for get_social_share_settings """
+
+    def test_get_social_share_settings(self):
+        share_settings = {
+            "DASHBOARD_FACEBOOK": True,
+            "FACEBOOK_BRAND": random_string(),
+            "DASHBOARD_TWITTER": True,
+            "TWITTER_BRAND": random_string(),
+        }
+
+        utm_sources = get_encoded_course_sharing_utm_params()
+        with override_settings(SOCIAL_SHARING_SETTINGS=share_settings):
+            social_share_settings = get_social_share_settings()
+
+        assert social_share_settings == {
+            "facebook": {
+                "is_enabled": True,
+                "brand": share_settings["FACEBOOK_BRAND"],
+                "utm_params": utm_sources.get("facebook")
+            },
+            "twitter": {
+                "is_enabled": True,
+                "brand": share_settings["TWITTER_BRAND"],
+                "utm_params": utm_sources.get("twitter")
+            }
+        }
+
+    @patch('lms.djangoapps.learner_home.views.get_encoded_course_sharing_utm_params')
+    def test_social_share_settings__empty(self, mock_get_utm_params):
+        share_settings = {}
+        mock_get_utm_params.return_value = {}
+
+        with override_settings(SOCIAL_SHARING_SETTINGS=share_settings):
+            social_share_settings = get_social_share_settings()
+
+        assert social_share_settings == {
+            "facebook": {
+                "is_enabled": False,
+                "brand": "edX.org",
+                "utm_params": None
+            },
+            "twitter": {
+                "is_enabled": False,
+                "brand": "edX.org",
+                "utm_params": None
+            }
+        }
+
+
+class TestGetCourseShareUrls(TestCase):
+    """ Tests for get_course_share_urls """
+
+    @patch('lms.djangoapps.learner_home.views.get_link_for_about_page')
+    def test_get_course_share_urls(self, mock_about_page_link):
+        enrollments = CourseEnrollmentFactory.create_batch(3)
+        course_share_urls = get_course_share_urls(enrollments)
+        assert course_share_urls == {
+            course_enrollment.course_id: mock_about_page_link(course_enrollment.course)
+            for course_enrollment in enrollments
+        }
+
+
 class BaseTestDashboardView(SharedModuleStoreTestCase, APITestCase):
     """Base class for test setup"""
 
@@ -498,6 +565,7 @@ class TestDashboardView(BaseTestDashboardView):
                 "enterpriseDashboard",
                 "platformSettings",
                 "courses",
+                "socialShareSettings",
                 "suggestedCourses",
             ]
         )

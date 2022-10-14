@@ -43,6 +43,8 @@ from lms.djangoapps.learner_home.serializers import (
     ProgramsSerializer,
     LearnerDashboardSerializer,
     RelatedProgramSerializer,
+    SocialMediaSiteSettingsSerializer,
+    SocialShareSettingsSerializer,
     SuggestedCourseSerializer,
     UnfulfilledEntitlementSerializer,
 )
@@ -161,16 +163,26 @@ class TestCourseProviderSerializer(LearnerDashboardBaseTest):
 class TestCourseSerializer(LearnerDashboardBaseTest):
     """Tests for the CourseSerializer"""
 
+    def create_test_context(self, course_id):
+        return {
+            "course_share_urls": {
+                course_id: random_url()
+            }
+        }
+
     def test_happy_path(self):
         test_enrollment = self.create_test_enrollment()
+        course_id = test_enrollment.course_overview.id
+        test_context = self.create_test_context(course_id)
 
         input_data = test_enrollment.course_overview
-        output_data = CourseSerializer(input_data).data
+        output_data = CourseSerializer(input_data, context=test_context).data
 
         assert output_data == {
             "bannerImgSrc": test_enrollment.course_overview.banner_image_url,
             "courseName": test_enrollment.course_overview.display_name_with_default,
             "courseNumber": test_enrollment.course_overview.display_number_with_default,
+            "socialShareUrl": test_context['course_share_urls'][course_id]
         }
 
 
@@ -1095,6 +1107,54 @@ class TestEnterpriseDashboardSerializer(TestCase):
         )
 
 
+class TestSocialMediaSettingsSiteSerializer(TestCase):
+    """ Tests for the SocialMediaSiteSettingsSerializer """
+
+    @classmethod
+    def generate_test_social_media_settings(cls):
+        return {
+            "is_enabled": random_bool(),
+            "brand": random_string(),
+            "utm_params": random_string(),
+        }
+
+    def test_structure(self):
+        """Test that nothing breaks and the output fields look correct"""
+        input_data = self.generate_test_social_media_settings()
+
+        output_data = SocialMediaSiteSettingsSerializer(input_data).data
+
+        expected_keys = [
+            "isEnabled",
+            "socialBrand",
+            "utmParams",
+        ]
+        self.assertEqual(output_data.keys(), set(expected_keys))
+
+
+class TestSocialShareSettingsSerializer(TestCase):
+    """ Tests for the SocialShareSettingsSerializer """
+
+    @classmethod
+    def generate_test_social_share_settings(cls):
+        return {
+            "twitter": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings(),
+            "facebook": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings()
+        }
+
+    def test_structure(self):
+        """Test that nothing breaks and the output fields look correct"""
+        input_data = self.generate_test_social_share_settings()
+
+        output_data = SocialShareSettingsSerializer(input_data).data
+
+        expected_keys = [
+            "twitter",
+            "facebook"
+        ]
+        self.assertEqual(output_data.keys(), set(expected_keys))
+
+
 class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
     """High-level tests for Learner Dashboard serialization"""
 
@@ -1186,6 +1246,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             "platformSettings": None,
             "enrollments": [],
             "unfulfilledEntitlements": [],
+            "socialShareSettings": None,
             "suggestedCourses": [],
         }
         output_data = LearnerDashboardSerializer(input_data).data
@@ -1197,6 +1258,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
                 "enterpriseDashboard": None,
                 "platformSettings": None,
                 "courses": [],
+                "socialShareSettings": None,
                 "suggestedCourses": [],
             },
         )
@@ -1216,6 +1278,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             "platformSettings": None,
             "enrollments": enrollments,
             "unfulfilledEntitlements": [],
+            "socialShareSettings": None,
             "suggestedCourses": [],
         }
 
@@ -1243,6 +1306,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             "platformSettings": None,
             "enrollments": enrollments,
             "unfulfilledEntitlements": unfulfilled_entitlements,
+            "socialShareSettings": None,
             "suggestedCourses": [],
         }
 
@@ -1277,6 +1341,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             "platformSettings": None,
             "enrollments": [],
             "unfulfilledEntitlements": [],
+            "socialShareSettings": None,
             "suggestedCourses": suggested_courses,
         }
         output_data = LearnerDashboardSerializer(input_data).data
@@ -1287,6 +1352,9 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
     @mock.patch(
         "lms.djangoapps.learner_home.serializers.SuggestedCourseSerializer.to_representation"
+    )
+    @mock.patch(
+        "lms.djangoapps.learner_home.serializers.SocialShareSettingsSerializer.to_representation"
     )
     @mock.patch(
         "lms.djangoapps.learner_home.serializers.UnfulfilledEntitlementSerializer.data"
@@ -1310,6 +1378,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         mock_platform_settings_serializer,
         mock_learner_enrollment_serializer,
         mock_entitlement_serializer,
+        mock_social_settings_serializer,
         mock_suggestions_serializer,
     ):
         mock_email_confirmation_serializer.return_value = (
@@ -1325,6 +1394,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             mock_learner_enrollment_serializer
         )
         mock_entitlement_serializer.return_value = mock_entitlement_serializer
+        mock_social_settings_serializer.return_value = mock_social_settings_serializer
         mock_suggestions_serializer.return_value = mock_suggestions_serializer
 
         input_data = {
@@ -1333,6 +1403,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             "platformSettings": {},
             "enrollments": [{}],
             "unfulfilledEntitlements": [{}],
+            "socialShareSettings": {},
             "suggestedCourses": [{}],
         }
         output_data = LearnerDashboardSerializer(input_data).data
@@ -1347,6 +1418,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
                     mock_learner_enrollment_serializer,
                     mock_entitlement_serializer,
                 ],
+                "socialShareSettings": mock_social_settings_serializer,
                 "suggestedCourses": [mock_suggestions_serializer],
             },
         )
