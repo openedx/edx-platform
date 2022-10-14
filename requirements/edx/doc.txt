@@ -21,7 +21,9 @@ click==8.1.3
 code-annotations==1.3.0
     # via -r requirements/edx/doc.in
 docutils==0.18.1
-    # via sphinx
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   sphinx
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/doc.in
 gitdb==4.0.9
