@@ -120,7 +120,7 @@ class AwardBoosterBadgesSerializer(serializers.Serializer):
             students = Student.objects.filter(gen_user__user__pk__in=users)
             teacher = Teacher.objects.get(gen_user__user=request.user)
             journal_posts = [JournalPost(student=student, teacher=teacher,
-                                         type=JournalTypes.TEACHER_FEEDBACK,
+                                         journal_type=JournalTypes.TEACHER_FEEDBACK,
                                          description=feedback)
                              for student in students]
             JournalPost.objects.bulk_create(journal_posts)

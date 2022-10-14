@@ -55,6 +55,15 @@ class Character(models.Model):
     def __str__(self):
         return self.name
 
+    def get_state(self, progress):
+        if 25 <= progress < 50:
+            return self.running
+        elif 50 <= progress < 75:
+            return self.crouching
+        elif 75 <= progress <= 100:
+            return self.jumping
+        return self.standing
+
 
 class TempUser(TimeStampedModel):
     """
