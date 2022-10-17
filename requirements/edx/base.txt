@@ -47,6 +47,7 @@ attrs==22.1.0
     #   blockstore
     #   edx-ace
     #   jsonschema
+    #   lti-consumer-xblock
     #   openedx-events
 babel==2.10.3
     # via
@@ -154,6 +155,7 @@ cryptography==36.0.2
     # via
     #   -r requirements/edx/base.in
     #   django-fernet-fields
+    #   djfernet
     #   edx-enterprise
     #   jwcrypto
     #   optimizely-sdk
@@ -283,7 +285,6 @@ django-fernet-fields==0.6
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
-    #   edxval
 django-filter==22.1
     # via
     #   -r requirements/edx/base.in
@@ -405,10 +406,14 @@ djangorestframework==3.12.4
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
+djfernet==0.8.1
+    # via edxval
 docopt==0.6.2
     # via -r requirements/edx/base.in
 docutils==0.18.1
-    # via botocore
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   botocore
 done-xblock==2.0.4
     # via -r requirements/edx/base.in
 drf-jwt==1.19.2
@@ -483,7 +488,7 @@ edx-enterprise==3.57.2
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   learner-pathway-progress
-edx-event-bus-kafka==1.1.0
+edx-event-bus-kafka==1.2.0
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.9.1
     # via ora2
@@ -550,10 +555,8 @@ edx-when==2.3.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
-edxval==2.0.3
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+edxval==2.2.0
+    # via -r requirements/edx/base.in
 elasticsearch==7.13.4
     # via
     #   -c requirements/edx/../common_constraints.txt
@@ -1009,7 +1012,7 @@ scipy==1.7.3
     #   openedx-calc
 semantic-version==2.10.0
     # via edx-drf-extensions
-shapely==1.8.5
+shapely==1.8.5.post1
     # via -r requirements/edx/base.in
 simplejson==3.17.6
     # via
