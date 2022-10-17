@@ -5259,3 +5259,7 @@ URLS_2U_LOBS = {
     'bachelors_degree': 'https://www.edx.org/bachelors',
     'boot_camps': 'https://www.edx.org/boot-camps',
 }
+
+
+# Latest version of django-history tables adds indexing on history_date field. It can be disable using this flag.
+SIMPLE_HISTORY_DATE_INDEX = False

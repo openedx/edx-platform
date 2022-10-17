@@ -2698,3 +2698,6 @@ INACTIVE_USER_LOGIN = True
 
 # Redirect URL for inactive user. If not set, user will be redirected to /login after the login itself (loop)
 INACTIVE_USER_URL = f'http://{CMS_BASE}'
+
+# Latest version of django-history tables adds indexing on history_date field. It can be disable using this flag.
+SIMPLE_HISTORY_DATE_INDEX = False
