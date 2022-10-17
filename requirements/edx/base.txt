@@ -349,9 +349,8 @@ django-sekizai==4.0.0
     #   django-wiki
 django-ses==3.2.0
     # via -r requirements/edx/base.in
-django-simple-history==3.0.0
+django-simple-history==3.1.1
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-name-affirmation
@@ -666,7 +665,7 @@ lazy==1.5
     #   ora2
 learner-pathway-progress==1.3.3
     # via -r requirements/edx/base.in
-levenshtein==0.20.5
+levenshtein==0.20.6
     # via python-levenshtein
 libsass==0.10.0
     # via
@@ -906,7 +905,7 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-levenshtein==0.20.5
+python-levenshtein==0.20.6
     # via -r requirements/edx/base.in
 python-memcached==1.59
     # via -r requirements/edx/paver.txt
@@ -1108,7 +1107,7 @@ tinycss2==1.1.1
     # via bleach
 tqdm==4.64.1
     # via nltk
-types-cryptography==3.3.23
+types-cryptography==3.3.23.1
     # via pyjwt
 typing-extensions==4.4.0
     # via
