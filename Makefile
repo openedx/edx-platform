@@ -121,7 +121,7 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 	@# This is a temporary solution to override the real common_constraints.txt
 	@# In edx-lint, until the pyjwt constraint in edx-lint has been removed.
 	@# See BOM-2721 for more details.
-	sed 's/Django<2.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	sed '/^django-simple-history==/d' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 
 	@ export REBUILD='--rebuild'; \
