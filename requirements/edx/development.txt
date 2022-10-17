@@ -12,6 +12,8 @@
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
     # via -r requirements/edx/testing.txt
+-e git+https://github.com/openedx/RateXBlock.git@2.0.1#egg=rate-xblock
+    # via -r requirements/edx/testing.txt
 -e git+https://github.com/openedx/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
     # via -r requirements/edx/testing.txt
 acid-xblock==0.2.1
@@ -70,7 +72,6 @@ attrs==22.1.0
     #   blockstore
     #   edx-ace
     #   jsonschema
-    #   lti-consumer-xblock
     #   openedx-events
     #   pytest
 babel==2.10.3
@@ -83,10 +84,6 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   analytics-python
-backports-zoneinfo==0.2.1
-    # via
-    #   -r requirements/edx/testing.txt
-    #   icalendar
 beautifulsoup4==4.11.1
     # via
     #   -r requirements/edx/testing.txt
@@ -95,7 +92,7 @@ billiard==3.6.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   celery
-bleach==5.0.1
+bleach[css]==5.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   django-wiki
@@ -517,7 +514,6 @@ docopt==0.6.2
     # via -r requirements/edx/testing.txt
 docutils==0.18.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   botocore
     #   m2r
@@ -602,7 +598,7 @@ edx-enterprise==3.57.2
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   learner-pathway-progress
-edx-event-bus-kafka==1.2.0
+edx-event-bus-kafka==1.1.0
     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.9.1
     # via
@@ -704,11 +700,11 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==15.1.1
+faker==15.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.85.1
+fastapi==0.85.0
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -762,7 +758,7 @@ html5lib==1.1
     #   ora2
 httpretty==1.1.4
     # via -r requirements/edx/testing.txt
-icalendar==5.0.0
+icalendar==4.1.0
     # via -r requirements/edx/testing.txt
 idna==3.4
     # via
@@ -869,7 +865,7 @@ lazy-object-proxy==1.7.1
     #   astroid
 learner-pathway-progress==1.3.3
     # via -r requirements/edx/testing.txt
-levenshtein==0.20.6
+levenshtein==0.20.5
     # via
     #   -r requirements/edx/testing.txt
     #   python-levenshtein
@@ -1261,7 +1257,7 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-levenshtein==0.20.6
+python-levenshtein==0.20.5
     # via -r requirements/edx/testing.txt
 python-memcached==1.59
     # via -r requirements/edx/testing.txt
@@ -1395,7 +1391,7 @@ semantic-version==2.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-drf-extensions
-shapely==1.8.5.post1
+shapely==1.8.5
     # via -r requirements/edx/testing.txt
 simplejson==3.17.6
     # via
@@ -1478,7 +1474,7 @@ soupsieve==2.3.2.post1
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
-sphinx==5.3.0
+sphinx==5.2.3
     # via
     #   edx-sphinx-theme
     #   sphinxcontrib-httpdomain
@@ -1539,6 +1535,10 @@ text-unidecode==1.3
     # via
     #   -r requirements/edx/testing.txt
     #   python-slugify
+tinycss2==1.1.1
+    # via
+    #   -r requirements/edx/testing.txt
+    #   bleach
 toml==0.10.2
     # via vulture
 tomli==2.0.1
@@ -1562,7 +1562,7 @@ tqdm==4.64.1
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
-types-cryptography==3.3.23.1
+types-cryptography==3.3.23
     # via
     #   -r requirements/edx/testing.txt
     #   pyjwt
@@ -1639,6 +1639,7 @@ webencodings==0.5.1
     #   -r requirements/edx/testing.txt
     #   bleach
     #   html5lib
+    #   tinycss2
 webob==1.8.7
     # via
     #   -r requirements/edx/testing.txt
@@ -1664,6 +1665,7 @@ xblock==1.6.1
     #   edx-when
     #   lti-consumer-xblock
     #   ora2
+    #   rate-xblock
     #   staff-graded-xblock
     #   xblock-drag-and-drop-v2
     #   xblock-google-drive
