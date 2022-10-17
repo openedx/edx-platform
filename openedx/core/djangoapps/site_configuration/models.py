@@ -103,7 +103,6 @@ class SiteConfiguration(models.Model):
 
         return self._api_adapter
 
-    @beeline.traced('site_config.get_value')
     def get_value(self, name, default=None):
         """
         Return Configuration value for the key specified as name argument.
@@ -117,7 +116,6 @@ class SiteConfiguration(models.Model):
         Returns:
             Configuration value for the given key or returns `None` if configuration is not enabled.
         """
-        beeline.add_context_field('value_name', name)
         if self.enabled:
             if self.tahoe_config_modifier:
                 name, default = self.tahoe_config_modifier.normalize_get_value_params(name, default)
@@ -128,10 +126,8 @@ class SiteConfiguration(models.Model):
             try:
                 if self.api_adapter:
                     # Tahoe: Use `SiteConfigAdapter` if available.
-                    beeline.add_context_field('value_source', 'site_config_service')
                     return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_SETTING, name, default)
                 else:
-                    beeline.add_context_field('value_source', 'django_model')
                     return self.site_values.get(name, default) if self.site_values else default
             except AttributeError as error:
                 logger.exception(u'Invalid JSON data. \n [%s]', error)
