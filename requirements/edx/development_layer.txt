@@ -69,7 +69,7 @@ importlib-metadata==5.0.0
     #   -c requirements/edx/base_layer.txt
     #   -c requirements/edx/testing_layer.txt
     #   sphinx
-importlib-resources==5.9.0
+importlib-resources==5.10.0
     # via
     #   -c requirements/edx/base_layer.txt
     #   jsonschema
@@ -188,7 +188,7 @@ tomli==2.0.1
     #   -c requirements/edx/pip-tools.txt
     #   -c requirements/edx/testing_layer.txt
     #   mypy
-typing-extensions==4.3.0
+typing-extensions==4.4.0
     # via
     #   -c requirements/edx/base_layer.txt
     #   -c requirements/edx/testing_layer.txt
@@ -201,7 +201,7 @@ urllib3==1.26.12
     #   requests
 vulture==2.6
     # via -r requirements/edx/development_layer.in
-zipp==3.8.1
+zipp==3.9.0
     # via
     #   -c requirements/edx/base_layer.txt
     #   -c requirements/edx/testing_layer.txt

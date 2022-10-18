@@ -61,7 +61,9 @@ cssselect==1.1.0
     #   -r requirements/edx/testing_layer.in
     #   pyquery
 ddt==1.6.0
-    # via -r requirements/edx/testing_layer.in
+    # via
+    #   -c requirements/edx/base_layer.txt
+    #   -r requirements/edx/testing_layer.in
 dill==0.3.5.1
     # via pylint
 distlib==0.3.6
@@ -71,7 +73,7 @@ django==3.2.16
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/base_layer.txt
     #   edx-i18n-tools
-edx-i18n-tools==0.9.1
+edx-i18n-tools==0.9.2
     # via
     #   -c requirements/edx/base_layer.txt
     #   -r requirements/edx/testing_layer.in
@@ -81,9 +83,9 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing_layer.in
-faker==15.0.0
+faker==15.1.1
     # via factory-boy
-fastapi==0.85.0
+fastapi==0.85.1
     # via pact-python
 filelock==3.8.0
     # via
@@ -290,7 +292,7 @@ sqlparse==0.4.3
     #   django
 starlette==0.20.4
     # via fastapi
-stevedore==4.0.0
+stevedore==4.0.1
     # via
     #   -c requirements/edx/base_layer.txt
     #   -c requirements/edx/paver.txt
@@ -318,7 +320,7 @@ tox-battery==0.6.1
     # via -r requirements/edx/testing_layer.in
 tox-run-before==0.1
     # via -r requirements/edx/testing_layer.in
-typing-extensions==4.3.0
+typing-extensions==4.4.0
     # via
     #   -c requirements/edx/base_layer.txt
     #   astroid
@@ -343,7 +345,7 @@ wrapt==1.14.1
     #   -c requirements/edx/base_layer.txt
     #   -c requirements/edx/paver.txt
     #   astroid
-zipp==3.8.1
+zipp==3.9.0
     # via
     #   -c requirements/edx/base_layer.txt
     #   importlib-metadata
