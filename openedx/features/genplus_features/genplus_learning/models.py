@@ -207,3 +207,11 @@ class UnitBlockCompletion(models.Model):
     is_complete = models.BooleanField(default=False)
     completion_date = models.DateTimeField(blank=True, null=True)
     progress = models.FloatField(validators=[validate_percent])
+
+    @property
+    def lesson_name(self):
+        return modulestore().get_item(self.usage_key).display_name
+
+    @property
+    def course_name(self):
+        return modulestore().get_course(self.course_key).display_name

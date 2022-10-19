@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
 
-def get_generic_serializer(model_arg, depth_arg=1):
+def get_generic_serializer(model_args, depth_arg=1):
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
-            model = model_arg
-            fields = '__all__'
+            model = model_args['name']
+            fields = model_args['fields']
             depth = depth_arg
 
     return GenericSerializer
