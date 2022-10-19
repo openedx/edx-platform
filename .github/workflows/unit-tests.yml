@@ -42,7 +42,7 @@ jobs:
         run: sudo chown runner:runner -R .*
 
       - name: checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.5.0
 
       # This gives Mongo several chances to start. We started getting flakiness
       # around 2022-02-15 wherein the start command would sometimes exit with:
@@ -87,7 +87,7 @@ jobs:
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         # uses: re-actors/alls-green@v1.2.1
-        uses: re-actors/alls-green@13b4244b312e8a314951e03958a2f91519a6a3c9
+        uses: re-actors/alls-green@v1.2.2
         with:
           jobs: ${{ toJSON(needs) }}
 
@@ -97,9 +97,9 @@ jobs:
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.5.0
       - name: collect pytest warnings files
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3.0.0
         with:
           name: pytest-warnings-json
           path: test_root/log
@@ -113,7 +113,7 @@ jobs:
 
       - name: save warning report
         if: success()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: pytest-warning-report-html
           path: |

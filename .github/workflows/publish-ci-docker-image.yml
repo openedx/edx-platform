@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.5.0
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
           aws-access-key-id: ${{ secrets.TOOLS_EDX_ECR_USER_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.TOOLS_EDX_ECR_USER_AWS_SECRET_ACCESS_KEY }}
@@ -22,7 +22,7 @@ jobs:
 
       - name: Log in to ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v1.5.2
 
       - name: Build, tag, and push image to Amazon ECR
         env:

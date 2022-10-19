@@ -19,15 +19,15 @@ jobs:
 
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v2.5.0
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4.3.0
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Setup Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3.5.1
       with:
         node-version: ${{ matrix.node-version }}
 
@@ -41,7 +41,7 @@ jobs:
 
     - name: Cache pip dependencies
       id: cache-dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3.0.11
       with:
         path: ${{ steps.pip-cache-dir.outputs.dir }}
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
