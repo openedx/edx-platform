@@ -156,18 +156,11 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
     except InvalidKeyError as e:
         raise Http404 from e
 
-    logging.info("handler_name: {handler_name}")
 
     # To support sandboxed XBlocks, custom frontends, and other use cases, we
     # authenticate requests using a secure token in the URL. see
     # openedx.core.djangoapps.xblock.utils.get_secure_hash_for_xblock_handler
     # for details and rationale.
-    #
-    # Addendum:
-    # TNL 101-62 studio write permission is also checked before the token can be validated for editing content.
-
-    if handler_name == 'studio_submit_edits' and not has_studio_write_access(request.user, usage_key.course_key):
-        raise PermissionDenied("No studio write Permissions")
 
     if not validate_secure_token_for_xblock_handler(user_id, usage_key_str, secure_token):
         raise PermissionDenied("Invalid/expired auth token.")
