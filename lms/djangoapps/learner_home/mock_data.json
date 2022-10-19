@@ -49,7 +49,8 @@
             "course": {
                 "courseName": "Course Name 0",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number0"
+                "courseNumber": "course-number0",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -124,7 +125,8 @@
             "course": {
                 "courseName": "Course Name 1",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number1"
+                "courseNumber": "course-number1",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -187,7 +189,8 @@
             "course": {
                 "courseName": "Course Name 2",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number2"
+                "courseNumber": "course-number2",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -242,7 +245,8 @@
             "course": {
                 "courseName": "Course Name 3",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number3"
+                "courseNumber": "course-number3",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -317,7 +321,8 @@
             "course": {
                 "courseName": "Course Name 4",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number4"
+                "courseNumber": "course-number4",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -380,7 +385,8 @@
             "course": {
                 "courseName": "Course Name 5",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number5"
+                "courseNumber": "course-number5",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -435,7 +441,8 @@
             "course": {
                 "courseName": "Course Name 6",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number6"
+                "courseNumber": "course-number6",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -510,7 +517,8 @@
             "course": {
                 "courseName": "Course Name 7",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number7"
+                "courseNumber": "course-number7",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -573,7 +581,8 @@
             "course": {
                 "courseName": "Course Name 8",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number8"
+                "courseNumber": "course-number8",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -628,7 +637,8 @@
             "course": {
                 "courseName": "Course Name 9",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number9"
+                "courseNumber": "course-number9",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -706,7 +716,8 @@
             "course": {
                 "courseName": "Course Name 10",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number10"
+                "courseNumber": "course-number10",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -772,7 +783,8 @@
             "course": {
                 "courseName": "Course Name 11",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number11"
+                "courseNumber": "course-number11",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -834,7 +846,8 @@
             "course": {
                 "courseName": "Course Name 12",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number12"
+                "courseNumber": "course-number12",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -917,7 +930,8 @@
             "course": {
                 "courseName": "Course Name 13",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number13"
+                "courseNumber": "course-number13",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -980,7 +994,8 @@
             "course": {
                 "courseName": "Course Name 14",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number14"
+                "courseNumber": "course-number14",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -1035,7 +1050,8 @@
             "course": {
                 "courseName": "Course Name 15",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number15"
+                "courseNumber": "course-number15",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -1110,7 +1126,8 @@
             "course": {
                 "courseName": "Course Name 16",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number16"
+                "courseNumber": "course-number16",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -1173,7 +1190,8 @@
             "course": {
                 "courseName": "Course Name 17",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number17"
+                "courseNumber": "course-number17",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -1228,7 +1246,8 @@
             "course": {
                 "courseName": "Course Name 18",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number18"
+                "courseNumber": "course-number18",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -1303,7 +1322,8 @@
             "course": {
                 "courseName": "Course Name 19",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number19"
+                "courseNumber": "course-number19",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -1366,7 +1386,8 @@
             "course": {
                 "courseName": "Course Name 20",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number20"
+                "courseNumber": "course-number20",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -1421,7 +1442,8 @@
             "course": {
                 "courseName": "Course Name 21",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number21"
+                "courseNumber": "course-number21",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -1496,7 +1518,8 @@
             "course": {
                 "courseName": "Course Name 22",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number22"
+                "courseNumber": "course-number22",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -1559,7 +1582,8 @@
             "course": {
                 "courseName": "Course Name 23",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number23"
+                "courseNumber": "course-number23",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -1648,7 +1672,8 @@
             "course": {
                 "courseName": "Course Name 24",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number24"
+                "courseNumber": "course-number24",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -1753,7 +1778,8 @@
             "course": {
                 "courseName": "Course Name 25",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number25"
+                "courseNumber": "course-number25",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -1850,7 +1876,8 @@
             "course": {
                 "courseName": "Course Name 26",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number26"
+                "courseNumber": "course-number26",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -1939,7 +1966,8 @@
             "course": {
                 "courseName": "Course Name 27",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number27"
+                "courseNumber": "course-number27",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -2022,7 +2050,8 @@
             "course": {
                 "courseName": "Course Name 28",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number28"
+                "courseNumber": "course-number28",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -2093,7 +2122,8 @@
             "course": {
                 "courseName": "Course Name 29",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number29"
+                "courseNumber": "course-number29",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -2156,7 +2186,8 @@
             "course": {
                 "courseName": "Course Name 30",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number30"
+                "courseNumber": "course-number30",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -2239,7 +2270,8 @@
             "course": {
                 "courseName": "Course Name 31",
                 "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
-                "courseNumber": "course-number31"
+                "courseNumber": "course-number31",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -2318,7 +2350,8 @@
             "course": {
                 "courseNumber": "course-number100",
                 "courseName": "Course Name 100",
-                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -2407,7 +2440,8 @@
             "course": {
                 "courseNumber": "course-number101",
                 "courseName": "Course Name 101",
-                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -2484,7 +2518,8 @@
             "course": {
                 "courseNumber": "course-number102",
                 "courseName": "Course Name 102",
-                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": []
@@ -2527,7 +2562,8 @@
             "course": {
                 "courseNumber": "course-number103",
                 "courseName": "Course Name 103",
-                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
+                "socialShareUrl": "edx.com/courses/my-course-url/marketing/about"
             },
             "programs": {
                 "relatedPrograms": [
@@ -2566,6 +2602,16 @@
         "supportEmail": "support@example.com",
         "billingEmail": "billing@email.com",
         "courseSearchUrl": "edx.com/course-search"
+    },
+    "socialShareSettings": {
+        "facebook": {
+            "isEnabled": true,
+            "utmParams": "utm_medium=social&utm_campaign=social-sharing-db&utm_source=facebook"
+        },
+        "twitter": {
+            "isEnabled": true,
+            "utmParams": "utm_medium=social&utm_campaign=social-sharing-db&utm_source=twitter"
+        }
     },
     "suggestedCourses": [
         {
