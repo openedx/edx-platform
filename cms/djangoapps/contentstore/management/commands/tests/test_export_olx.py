@@ -74,7 +74,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         self.assertIn(f"{dirname}/assets/assets.xml", names)
         self.assertIn(f"{dirname}/policies", names)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_export_course(self, store_type):
         test_course_key = self.create_dummy_course(store_type)
         tmp_dir = path(mkdtemp())
@@ -82,21 +82,4 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         filename = tmp_dir / 'test.tar.gz'
         call_command('export_olx', '--output', filename, str(test_course_key))
         with tarfile.open(filename) as tar_file:
-            self.check_export_file(tar_file, test_course_key)
-
-    # There is a bug in the underlying management/base code that tries to make
-    # all manageent command output be unicode.  This management command
-    # outputs the binary tar file data and so breaks in python3.  In python2
-    # the code is happy to pass bytes back and forth and in later versions of
-    # django this is fixed.  Howevere it's not possible to get this test to
-    # pass in Python3 and django 1.11
-    @unittest.skip("Bug in django 1.11 prevents this from working in python3.  Re-enable after django 2.x upgrade.")
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_export_course_stdout(self, store_type):
-        test_course_key = self.create_dummy_course(store_type)
-        out = StringIO()
-        call_command('export_olx', str(test_course_key), stdout=out)
-        out.seek(0)
-        output = out.read()
-        with tarfile.open(fileobj=StringIO(output)) as tar_file:
             self.check_export_file(tar_file, test_course_key)

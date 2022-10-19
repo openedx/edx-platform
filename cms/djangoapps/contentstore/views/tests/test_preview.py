@@ -149,7 +149,7 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
             response = client.post(url)
             self.assertEqual(response.status_code, 200)
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_block_branch_not_changed_by_preview_handler(self, default_store):
         """
         Tests preview_handler should not update blocks being previewed

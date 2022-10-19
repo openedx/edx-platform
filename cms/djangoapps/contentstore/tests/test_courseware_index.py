@@ -129,7 +129,7 @@ class MixedWithOptionsTestCase(ModuleStoreTestCase):
 class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
 
-    WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    WORKS_WITH_STORES = (ModuleStoreEnum.Type.split,)
     ENABLED_SIGNALS = ['course_deleted']
 
     def setUp(self):
@@ -522,7 +522,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
 class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     """ Tests to excerise deleting items from a course """
 
-    WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    WORKS_WITH_STORES = [ModuleStoreEnum.Type.split]
 
     def _clean_course_id(self):
         """
@@ -718,7 +718,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
 
     # libraries work only with split, so do library indexer
-    WORKS_WITH_STORES = (ModuleStoreEnum.Type.split, )
+    WORKS_WITH_STORES = [ModuleStoreEnum.Type.split]
 
     def setUp(self):
         super().setUp()

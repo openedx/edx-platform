@@ -114,7 +114,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(len(course_orgs), 1)
         self.assertEqual(course_orgs[0]['short_name'], self.source_course_key.org)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_newly_created_course_has_web_certs_enabled(self, store):
         """
         Tests newly created course has web certs enabled by default.
@@ -132,7 +132,7 @@ class TestCourseListing(ModuleStoreTestCase):
             course = self.store.get_course(new_course_key)
             self.assertTrue(course.cert_html_view_enabled)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_course_creation_for_unknown_organization_relaxed(self, store):
         """
         Tests that when ORGANIZATIONS_AUTOCREATE is True,
@@ -156,7 +156,7 @@ class TestCourseListing(ModuleStoreTestCase):
             self.assertEqual(len(course_orgs), 1)
             self.assertEqual(course_orgs[0]['short_name'], 'orgX')
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     @override_settings(ORGANIZATIONS_AUTOCREATE=False)
     def test_course_creation_for_unknown_organization_strict(self, store):
         """
@@ -201,7 +201,7 @@ class TestCourseListing(ModuleStoreTestCase):
             self.assertEqual(course_orgs[0]['short_name'], 'orgX')
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_course_creation_when_user_not_in_org(self, store):
         """
         Tests course creation when user doesn't have the required role.
@@ -216,7 +216,7 @@ class TestCourseListing(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 403)
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_course_creation_when_user_in_org_with_creator_role(self, store):
         """
         Tests course creation with user having the organization content creation role.
@@ -237,7 +237,7 @@ class TestCourseListing(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     @mock.patch(
         'cms.djangoapps.course_creators.admin.render_to_string',
         mock.Mock(side_effect=mock_render_to_string, autospec=True)
@@ -264,7 +264,7 @@ class TestCourseListing(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     @mock.patch(
         'cms.djangoapps.course_creators.admin.render_to_string',
         mock.Mock(side_effect=mock_render_to_string, autospec=True)
@@ -293,7 +293,7 @@ class TestCourseListing(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     @mock.patch(
         'cms.djangoapps.course_creators.admin.render_to_string',
         mock.Mock(side_effect=mock_render_to_string, autospec=True)

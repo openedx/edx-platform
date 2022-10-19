@@ -1205,7 +1205,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.course_data['run'] = 'run.name'
         self.assert_created_course()
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_course_with_different_cases(self, default_store):
         """
         Tests that course can not be created with different case using an AJAX request to
@@ -1358,7 +1358,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
         self.assert_course_creation_failed(self.duplicate_course_error)
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_create_course_case_change(self, default_store):
         """Test new course creation - error path due to case insensitive name equality"""
         self.course_data['number'] = '99x'
@@ -1677,7 +1677,7 @@ class ContentStoreTest(ContentStoreTestCase):
         # make sure we found the item (e.g. it didn't error while loading)
         self.assertTrue(did_load_item)
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_forum_id_generation(self, default_store):
         """
         Test that a discussion item, even if it doesn't set its discussion_id,

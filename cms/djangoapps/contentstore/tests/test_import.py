@@ -175,58 +175,11 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         print(f"course tabs = {course.tabs}")
         self.assertEqual(course.tabs[1]['name'], 'Syllabus')
 
-    def test_import_performance_mongo(self):
-        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-
-        # we try to refresh the inheritance tree for each update_item in the import
-        with check_exact_number_of_calls(store, 'refresh_cached_metadata_inheritance_tree', 28):
-
-            # _get_cached_metadata_inheritance_tree should be called once
-            with check_exact_number_of_calls(store, '_get_cached_metadata_inheritance_tree', 1):
-
-                # with bulk-edit in progress, the inheritance tree should be recomputed only at the end of the import
-                # NOTE: On Jenkins, with memcache enabled, the number of calls here is 1.
-                #       Locally, without memcache, the number of calls is 1 (publish no longer counted)
-                with check_number_of_calls(store, '_compute_metadata_inheritance_tree', 1):
-                    self.load_test_import_course(create_if_not_present=False, module_store=store)
-
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_reimport(self, default_ms_type):
         with modulestore().default_store(default_ms_type):
             __, __, course = self.load_test_import_course(create_if_not_present=True)
             self.load_test_import_course(target_id=course.id)
-
-    def test_rewrite_reference_list(self):
-        # This test fails with split modulestore (the HTML component is not in "different_course_id" namespace).
-        # More investigation needs to be done.
-        module_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-        target_id = module_store.make_course_key('testX', 'conditional_copy', 'copy_run')
-        import_course_from_xml(
-            module_store,
-            self.user.id,
-            TEST_DATA_DIR,
-            ['conditional'],
-            target_id=target_id
-        )
-        conditional_module = module_store.get_item(
-            target_id.make_usage_key('conditional', 'condone')
-        )
-        self.assertIsNotNone(conditional_module)
-        different_course_id = module_store.make_course_key('edX', 'different_course', None)
-        self.assertListEqual(
-            [
-                target_id.make_usage_key('problem', 'choiceprob'),
-                different_course_id.make_usage_key('html', 'for_testing_import_rewrites')
-            ],
-            conditional_module.sources_list
-        )
-        self.assertListEqual(
-            [
-                target_id.make_usage_key('html', 'congrats'),
-                target_id.make_usage_key('html', 'secret_page')
-            ],
-            conditional_module.show_tag_list
-        )
 
     def test_rewrite_reference_value_dict_published(self):
         """
@@ -272,7 +225,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
         self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_video_components_present_while_import(self, store):
         """
         Test that video components with same edx_video_id are present while re-importing

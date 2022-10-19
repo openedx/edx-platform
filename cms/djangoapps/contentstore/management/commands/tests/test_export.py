@@ -45,7 +45,7 @@ class TestCourseExport(ModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, self.temp_dir_1)
         self.addCleanup(shutil.rmtree, self.temp_dir_2)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_export_course_with_directory_name(self, store):
         """
         Create a new course try exporting in a path specified

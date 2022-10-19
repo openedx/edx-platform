@@ -483,7 +483,7 @@ class GetItemTest(ItemTest):
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_delete_static_page(self, store):
         course = CourseFactory.create(default_store=store)
         # Add static tab
@@ -918,7 +918,7 @@ class TestMoveItem(ItemTest):
         self.assertIn(source_usage_key, target_parent.children)
         self.assertNotIn(source_usage_key, source_parent.children)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_move_component(self, store_type):
         """
         Test move component with different xblock types.
@@ -1255,7 +1255,7 @@ class TestMoveItem(ItemTest):
             insert_at
         )
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_move_and_discard_changes(self, store_type):
         """
         Verifies that discard changes operation brings moved component back to source location and removes the component
@@ -1308,8 +1308,8 @@ class TestMoveItem(ItemTest):
         self.assertIn(self.html_usage_key, source_parent.children)
         self.assertNotIn(self.html_usage_key, target_parent.children)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_move_item_not_found(self, store_type=ModuleStoreEnum.Type.mongo):
+    @ddt.data(ModuleStoreEnum.Type.split)
+    def test_move_item_not_found(self, store_type):
         """
         Test that an item not found exception raised when an item is not found when getting the item.
 
@@ -2565,7 +2565,6 @@ class TestXBlockInfo(ItemTest):
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 3, 3),
-        (ModuleStoreEnum.Type.mongo, 5, 7),
     )
     @ddt.unpack
     def test_xblock_outline_handler_mongo_calls(self, store_type, chapter_queries, chapter_queries_1):
@@ -2703,7 +2702,7 @@ class TestXBlockInfo(ItemTest):
         )
         self.validate_component_xblock_info(xblock_info)
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_validate_start_date(self, store_type):
         """
         Validate if start-date year is less than 1900 reset the date to DEFAULT_START_DATE.
@@ -3185,7 +3184,7 @@ class TestXBlockPublishingInfo(ItemTest):
         xblock_info = self._get_xblock_info(empty_chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.unscheduled)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_chapter_self_paced_default_start_date(self, store_type):
         course = CourseFactory.create(default_store=store_type)
         course.self_paced = True
@@ -3408,7 +3407,7 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_SUBSECTION_PATH)
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_UNIT_PATH)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_self_paced_item_visibility_state(self, store_type):
         """
         Test that in self-paced course, item has `live` visibility state.
