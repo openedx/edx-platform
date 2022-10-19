@@ -85,7 +85,7 @@ def set_unit_and_block_completions(sender, instance, created, **kwargs):
 # capture activity on lesson completion
 @receiver(post_save, sender=UnitBlockCompletion)
 def create_activity_on_lesson_completion(sender, instance, created, **kwargs):
-    if instance.is_completed:
+    if instance.is_complete:
         Activity.objects.create(
             actor=instance.user.gen_user.student,
             type=ActivityTypes.LESSON_COMPLETION,
