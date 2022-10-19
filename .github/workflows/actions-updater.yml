@@ -1,0 +1,23 @@
+
+name: GitHub Actions Version Updater
+
+# Controls when the action will run.
+on:
+  # temporary trigger
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Automatically run on every Sunday
+    - cron:  '0 0 * * 0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run GitHub Actions Version Updater
+        uses: saadmk11/github-actions-version-updater@v0.5.6
+        with:
+          token: ${{ secrets.REQUIREMENTS_BOT_GITHUB_TOKEN }}
