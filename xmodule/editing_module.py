@@ -98,18 +98,6 @@ class TabsEditingDescriptor(TabsEditingMixin, MakoModuleDescriptor):  # lint-amn
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class MetadataOnlyEditingDescriptor(EditingDescriptor):  # lint-amnesty, pylint: disable=abstract-method
-    """
-    Module which only provides an editing interface for the metadata, it does
-    not expose a UI for editing the module data
-    """
-
-    js = {'js': [resource_string(__name__, 'js/src/raw/edit/metadata-only.js')]}
-    js_module_name = "MetadataOnlyEditingDescriptor"
-
-    mako_template = "widgets/metadata-only-edit.html"
-
-
 class JSONEditingDescriptor(EditingDescriptor):  # lint-amnesty, pylint: disable=abstract-method
     """
     Module that provides a raw editing view of its data as XML. It does not perform
