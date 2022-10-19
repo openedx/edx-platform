@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-18 20:43+0000\n"
+"POT-Creation-Date: 2022-10-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -4027,7 +4027,7 @@ msgstr "Görev için celery kimliği."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The date and time when the task was created."
-msgstr ""
+msgstr "Görevin oluşturulduğu tarih ve saat."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6866,7 +6866,7 @@ msgstr "ders Kimliği"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "ID of the imported course."
-msgstr ""
+msgstr "İçe aktarılan dersin kimliği."
 
 #. Translators: 'Open edX' is a trademark, please keep this untranslated
 #: openedx/core/djangoapps/content_libraries/models.py
@@ -11068,6 +11068,8 @@ msgid ""
 "Enter Javascript resource URLs you want to be loaded globally throughout the"
 " course pages."
 msgstr ""
+"Ders sayfalarının tamamında yüklenmesini istediğiniz JavaScript kaynak "
+"URL'lerini girin."
 
 #: xmodule/course_module.py
 msgid "Course-wide Custom CSS"
@@ -11078,6 +11080,8 @@ msgid ""
 "Enter CSS resource URLs you want to be loaded globally throughout the course"
 " pages."
 msgstr ""
+"Ders sayfalarının tamamında yüklenmesini istediğiniz CSS kaynak URL'lerini "
+"girin."
 
 #: xmodule/course_module.py cms/templates/certificates.html
 #: cms/templates/group_configurations.html cms/templates/settings.html
@@ -12455,6 +12459,14 @@ msgstr "Videoya öğrenciler tarafından erişilip erişilemeyeceğini belirtin.
 #: xmodule/video_module/video_xfields.py
 msgid "Public Access"
 msgstr "Genel Erişim"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Add a specific thumbnail for learners to see before playing the video."
+msgstr ""
+
+#: xmodule/video_module/video_xfields.py
+msgid "Thumbnail"
+msgstr ""
 
 #: xmodule/word_cloud_module.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
@@ -17275,29 +17287,6 @@ msgstr "Tüm Tartışmalar"
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Takip Ettiğim Gönderiler"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Welcome to the new discussions experience. Please share your feedback."
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "View legacy experience"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid ""
-"You are currently using the old discussions experience that will be "
-"deprecated soon. If you are facing any issues with the new experience, "
-"please share using the feedback button."
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Switch to new experience"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Share feedback"
-msgstr ""
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
