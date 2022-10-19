@@ -67,7 +67,6 @@ attrs==22.1.0
     #   jsonschema
     #   lti-consumer-xblock
     #   openedx-events
-    #   outcome
     #   pytest
 babel==2.10.3
     # via
@@ -584,7 +583,7 @@ edx-enterprise==3.57.3
     #   learner-pathway-progress
 edx-event-bus-kafka==1.2.0
     # via -r requirements/edx/base.txt
-edx-i18n-tools==0.9.1
+edx-i18n-tools==0.9.2
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
@@ -1547,7 +1546,6 @@ xblock==1.6.1
     #   edx-when
     #   lti-consumer-xblock
     #   ora2
-    #   rate-xblock
     #   staff-graded-xblock
     #   xblock-drag-and-drop-v2
     #   xblock-google-drive
