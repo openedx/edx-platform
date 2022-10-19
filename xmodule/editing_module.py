@@ -96,15 +96,3 @@ class TabsEditingDescriptor(TabsEditingMixin, MakoModuleDescriptor):  # lint-amn
     settings tab in your module descriptor.
     """
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-class JSONEditingDescriptor(EditingDescriptor):  # lint-amnesty, pylint: disable=abstract-method
-    """
-    Module that provides a raw editing view of its data as XML. It does not perform
-    any validation of its definition
-    """
-
-    css = {'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')]}
-
-    js = {'js': [resource_string(__name__, 'js/src/raw/edit/json.js')]}
-    js_module_name = "JSONEditingDescriptor"
