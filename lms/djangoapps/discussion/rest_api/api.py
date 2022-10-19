@@ -309,7 +309,11 @@ def get_course(request, course_key):
     course_config = DiscussionsConfiguration.get(course_key)
     EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
     CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
-
+    has_moderation_privileges = bool(user_roles & {
+            FORUM_ROLE_ADMINISTRATOR,
+            FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_COMMUNITY_TA,
+        } or request.user.is_staff),
     return {
         "id": str(course_key),
         "blackouts": [
@@ -327,11 +331,7 @@ def get_course(request, course_key):
         "allow_anonymous": course.allow_anonymous,
         "allow_anonymous_to_peers": course.allow_anonymous_to_peers,
         "user_roles": user_roles,
-        "has_moderation_privileges": bool(user_roles & {
-            FORUM_ROLE_ADMINISTRATOR,
-            FORUM_ROLE_MODERATOR,
-            FORUM_ROLE_COMMUNITY_TA,
-        }),
+        "has_moderation_privileges": has_moderation_privileges,
         "is_group_ta": bool(user_roles & {FORUM_ROLE_GROUP_MODERATOR}),
         "is_user_admin": request.user.is_staff,
         "provider": course_config.provider_type,
