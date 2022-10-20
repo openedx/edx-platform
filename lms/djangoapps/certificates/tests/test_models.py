@@ -41,7 +41,7 @@ from openedx.features.name_affirmation_api.utils import get_name_affirmation_ser
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
-ENROLLMENT_METHOD = 'common.djangoapps.student.models.student.CourseEnrollment.enrollment_mode_for_user'
+ENROLLMENT_METHOD = 'common.djangoapps.student.models.course_enrollment.CourseEnrollment.enrollment_mode_for_user'
 PROFILE_METHOD = 'common.djangoapps.student.models_api.get_name'
 
 FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()

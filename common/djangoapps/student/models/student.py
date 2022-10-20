@@ -11,122 +11,58 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 
+import crum
 import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
 import uuid  # lint-amnesty, pylint: disable=wrong-import-order
-from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable=wrong-import-order
-from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
-from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
-from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
-from urllib.parse import unquote, urlencode, urljoin
-
-import crum
+from common.djangoapps.student.models.course_enrollment import (
+    ALLOWEDTOENROLL_TO_ENROLLED,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    ManualEnrollmentAudit,
+    segment
+)
+from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from config_models.models import ConfigurationModel
+from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import IntegrityError, models
-from django.db.models import Count, Index, Q
+from django.db.models import Q
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 from django_countries.fields import CountryField
 from edx_django_utils import monitoring
-from edx_django_utils.cache import RequestCache, TieredCache, get_cache_key
-from eventtracking import tracker
+from edx_django_utils.cache import RequestCache
+from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
+from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.courseware.toggles import streak_celebration_is_active
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
-from opaque_keys.edx.keys import CourseKey
-from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
-from openedx_events.learning.signals import (
-    COURSE_ENROLLMENT_CHANGED,
-    COURSE_ENROLLMENT_CREATED,
-    COURSE_UNENROLLMENT_COMPLETED,
-)
-from openedx_filters.learning.filters import CourseEnrollmentStarted, CourseUnenrollmentStarted
-from pytz import UTC, timezone
-from requests.exceptions import HTTPError, RequestException
-from simple_history.models import HistoricalRecords
-from user_util import user_util
-
-import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
-from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
-from common.djangoapps.track import contexts, segment
-from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
-from common.djangoapps.util.query import use_read_replica_if_available
-from lms.djangoapps.certificates.data import CertificateStatuses
-from lms.djangoapps.courseware.models import (
-    CourseDynamicUpgradeDeadlineConfiguration,
-    DynamicUpgradeDeadlineConfiguration,
-    OrgDynamicUpgradeDeadlineConfiguration,
-)
-from lms.djangoapps.courseware.toggles import streak_celebration_is_active
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.enrollments.api import (
-    _default_course_mode,
-    get_enrollment_attributes,
-    set_enrollment_attributes,
-)
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from openedx.core.toggles import ENTRANCE_EXAMS
+from pytz import UTC, timezone
+from urllib.parse import unquote, urlencode
+from user_util import user_util
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
 
-
-# ENROLL signal used for free enrollment only
-class EnrollStatusChange:
-    """
-    Possible event types for ENROLL_STATUS_CHANGE signal
-    """
-    # enroll for a course
-    enroll = 'enroll'
-    # unenroll for a course
-    unenroll = 'unenroll'
-    # add an upgrade to cart
-    upgrade_start = 'upgrade_start'
-    # complete an upgrade purchase
-    upgrade_complete = 'upgrade_complete'
-    # add a paid course to the cart
-    paid_start = 'paid_start'
-    # complete a paid course purchase
-    paid_complete = 'paid_complete'
-
-UNENROLLED_TO_ALLOWEDTOENROLL = 'from unenrolled to allowed to enroll'
-ALLOWEDTOENROLL_TO_ENROLLED = 'from allowed to enroll to enrolled'
-ENROLLED_TO_ENROLLED = 'from enrolled to enrolled'
-ENROLLED_TO_UNENROLLED = 'from enrolled to unenrolled'
-UNENROLLED_TO_ENROLLED = 'from unenrolled to enrolled'
-ALLOWEDTOENROLL_TO_UNENROLLED = 'from allowed to enroll to enrolled'
-UNENROLLED_TO_UNENROLLED = 'from unenrolled to unenrolled'
-DEFAULT_TRANSITION_STATE = 'N/A'
-SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE = 30
-
-TRANSITION_STATES = (
-    (UNENROLLED_TO_ALLOWEDTOENROLL, UNENROLLED_TO_ALLOWEDTOENROLL),
-    (ALLOWEDTOENROLL_TO_ENROLLED, ALLOWEDTOENROLL_TO_ENROLLED),
-    (ENROLLED_TO_ENROLLED, ENROLLED_TO_ENROLLED),
-    (ENROLLED_TO_UNENROLLED, ENROLLED_TO_UNENROLLED),
-    (UNENROLLED_TO_ENROLLED, UNENROLLED_TO_ENROLLED),
-    (ALLOWEDTOENROLL_TO_UNENROLLED, ALLOWEDTOENROLL_TO_UNENROLLED),
-    (UNENROLLED_TO_UNENROLLED, UNENROLLED_TO_UNENROLLED),
-    (DEFAULT_TRANSITION_STATE, DEFAULT_TRANSITION_STATE)
-)
 IS_MARKETABLE = 'is_marketable'
 
 
@@ -996,11 +932,6 @@ class PendingSecondaryEmailChange(DeletableByUserValue, models.Model):
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
 
-EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
-EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
-EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
-
-
 class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts.
@@ -1100,6 +1031,7 @@ class LoginFailures(models.Model):
         verbose_name_plural = 'Login Failures'
 
 
+<<<<<<< HEAD
 class CourseEnrollmentException(Exception):
     pass
 
@@ -2570,6 +2502,8 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
         return CourseEnrollmentAllowed.objects.filter(course_id=course_id, user__isnull=True)
 
 
+=======
+>>>>>>> 8564d37409 (feat: TNL-10136 Tease course enrollment from student model)
 @total_ordering
 class CourseAccessRole(models.Model):
     """
@@ -3039,113 +2973,6 @@ class SocialLink(models.Model):
     social_link = models.CharField(max_length=100, blank=True)
 
 
-class CourseEnrollmentAttribute(models.Model):
-    """
-    Provide additional information about the user's enrollment.
-
-    .. no_pii: This stores key/value pairs, of which there is no full list, but the ones currently in use are not PII
-    """
-    enrollment = models.ForeignKey(CourseEnrollment, related_name="attributes", on_delete=models.CASCADE)
-    namespace = models.CharField(
-        max_length=255,
-        help_text=_("Namespace of enrollment attribute")
-    )
-    name = models.CharField(
-        max_length=255,
-        help_text=_("Name of the enrollment attribute")
-    )
-    value = models.CharField(
-        max_length=255,
-        help_text=_("Value of the enrollment attribute")
-    )
-
-    def __str__(self):
-        """Unicode representation of the attribute. """
-        return "{namespace}:{name}, {value}".format(
-            namespace=self.namespace,
-            name=self.name,
-            value=self.value,
-        )
-
-    @classmethod
-    def add_enrollment_attr(cls, enrollment, data_list):
-        """
-        Delete all the enrollment attributes for the given enrollment and
-        add new attributes.
-
-        Args:
-            enrollment (CourseEnrollment): 'CourseEnrollment' for which attribute is to be added
-            data_list: list of dictionaries containing data to save
-        """
-        cls.objects.filter(enrollment=enrollment).delete()
-        attributes = [
-            cls(enrollment=enrollment, namespace=data['namespace'], name=data['name'], value=data['value'])
-            for data in data_list
-        ]
-        cls.objects.bulk_create(attributes)
-
-    @classmethod
-    def get_enrollment_attributes(cls, enrollment):
-        """Retrieve list of all enrollment attributes.
-
-        Args:
-            enrollment(CourseEnrollment): 'CourseEnrollment' for which list is to retrieve
-
-        Returns: list
-
-        Example:
-        >>> CourseEnrollmentAttribute.get_enrollment_attributes(CourseEnrollment)
-        [
-            {
-                "namespace": "credit",
-                "name": "provider_id",
-                "value": "hogwarts",
-            },
-        ]
-        """
-        return [
-            {
-                "namespace": attribute.namespace,
-                "name": attribute.name,
-                "value": attribute.value,
-            }
-            for attribute in cls.objects.filter(enrollment=enrollment)
-        ]
-
-
-class EnrollmentRefundConfiguration(ConfigurationModel):
-    """
-    Configuration for course enrollment refunds.
-
-    .. no_pii:
-    """
-
-    # TODO: Django 1.8 introduces a DurationField
-    # (https://docs.djangoproject.com/en/1.8/ref/models/fields/#durationfield)
-    # for storing timedeltas which uses MySQL's bigint for backing
-    # storage. After we've completed the Django upgrade we should be
-    # able to replace this field with a DurationField named
-    # `refund_window` without having to run a migration or change
-    # other code.
-    refund_window_microseconds = models.BigIntegerField(
-        default=1209600000000,
-        help_text=_(
-            "The window of time after enrolling during which users can be granted"
-            " a refund, represented in microseconds. The default is 14 days."
-        )
-    )
-
-    @property
-    def refund_window(self):
-        """Return the configured refund window as a `datetime.timedelta`."""
-        return timedelta(microseconds=self.refund_window_microseconds)
-
-    @refund_window.setter
-    def refund_window(self, refund_window):
-        """Set the current refund window to the given timedelta."""
-        self.refund_window_microseconds = int(refund_window.total_seconds() * 1000000)
-
-
 class RegistrationCookieConfiguration(ConfigurationModel):
     """
     Configuration for registration cookies.
@@ -3168,30 +2995,6 @@ class RegistrationCookieConfiguration(ConfigurationModel):
             utm_name=self.utm_cookie_name,
             affiliate_name=self.affiliate_cookie_name
         )
-
-
-class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: disable=empty-docstring
-    """
-
-    """
-    csv_file = models.FileField(
-        validators=[FileExtensionValidator(allowed_extensions=['csv'])],
-        help_text=_("It expect that the data will be provided in a csv file format with \
-                    first row being the header and columns will be as follows: \
-                    user_id, username, email, course_id, is_verified, verification_date")
-    )
-
-
-class BulkChangeEnrollmentConfiguration(ConfigurationModel):
-    """
-    config model for the bulk_change_enrollment_csv command
-    """
-    csv_file = models.FileField(
-        validators=[FileExtensionValidator(allowed_extensions=['csv'])],
-        help_text=_("It expect that the data will be provided in a csv file format with \
-                    first row being the header and columns will be as follows: \
-                    course_id, username, mode")
-    )
 
 
 class UserAttribute(TimeStampedModel):
@@ -3464,79 +3267,6 @@ class UserCelebration(TimeStampedModel):
         cls._update_streak(celebration, last_day_of_streak, streak_length)
 
         return streak_length_to_celebrate
-
-
-class CourseEnrollmentCelebration(TimeStampedModel):
-    """
-    Keeps track of how we've celebrated a user's course progress.
-
-    An example of a celebration is a dialog that pops up after you complete your first section
-    in a course saying "good job!". Just some positive feedback like that. (This specific example is
-    controlled by the celebrated_first_section field below.)
-
-    In general, if a row does not exist for an enrollment, we don't want to show any celebrations.
-    We don't want to suddenly inject celebrations in the middle of a course, because they
-    might not make contextual sense and it's an inconsistent experience. The helper methods below
-    (starting with "should_") can help by looking up values with appropriate fallbacks.
-
-    See the create_course_enrollment_celebration signal handler for how these get created.
-
-    .. no_pii:
-    """
-    enrollment = models.OneToOneField(CourseEnrollment, models.CASCADE, related_name='celebration')
-    celebrate_first_section = models.BooleanField(default=False)
-    celebrate_weekly_goal = models.BooleanField(default=False)
-
-    def __str__(self):
-        return (
-            '[CourseEnrollmentCelebration] course: {}; user: {}'
-        ).format(self.enrollment.course.id, self.enrollment.user.username)
-
-    @staticmethod
-    def should_celebrate_first_section(enrollment):
-        """
-        Returns the celebration value for first_section with appropriate fallback if it doesn't exist.
-
-        The frontend will use this result and additional information calculated to actually determine
-        if the first section celebration will render. In other words, the value returned here is
-        NOT the final value used.
-        """
-        if not enrollment:
-            return False
-        try:
-            return enrollment.celebration.celebrate_first_section
-        except CourseEnrollmentCelebration.DoesNotExist:
-            return False
-
-    @staticmethod
-    def should_celebrate_weekly_goal(enrollment):
-        """
-        Returns the celebration value for weekly_goal with appropriate fallback if it doesn't exist.
-
-        The frontend will use this result directly to determine if the weekly goal celebration
-        should be rendered. The value returned here IS the final value used.
-        """
-        # Avoiding circular import
-        from lms.djangoapps.course_goals.models import CourseGoal, UserActivity
-        try:
-            if not enrollment or not enrollment.celebration.celebrate_weekly_goal:
-                return False
-        except CourseEnrollmentCelebration.DoesNotExist:
-            return False
-
-        try:
-            goal = CourseGoal.objects.get(user=enrollment.user, course_key=enrollment.course.id)
-            if not goal.days_per_week:
-                return False
-
-            today = date.today()
-            monday_date = today - timedelta(days=today.weekday())
-            week_activity_count = UserActivity.objects.filter(
-                user=enrollment.user, course_key=enrollment.course.id, date__gte=monday_date,
-            ).count()
-            return week_activity_count == goal.days_per_week
-        except CourseGoal.DoesNotExist:
-            return False
 
 
 class UserPasswordToggleHistory(TimeStampedModel):
