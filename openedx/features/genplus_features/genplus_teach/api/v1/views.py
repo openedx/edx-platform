@@ -213,23 +213,25 @@ class PortfolioViewSet(GenzMixin, viewsets.ViewSetMixin, FlatMultipleModelAPIVie
         return queryset
 
     def get_querylist(self):
-            teacher = Teacher.objects.get(gen_user=self.gen_user)
-            reflection_answers = ReflectionAnswer.objects.filter(teacher=teacher)
-            portfolio_entries = PortfolioEntry.objects.filter(teacher=teacher)
-            return [
-                {
-                    'queryset': reflection_answers,
-                    'serializer_class': get_generic_serializer(ReflectionAnswer, depth_arg=2),
-                    'label': 'reflection_answer',
-                    'filter_fn': self._reflection_answer_filter
-                },
-                {
-                    'queryset': portfolio_entries,
-                    'serializer_class': get_generic_serializer(PortfolioEntry, depth_arg=2),
-                    'label': 'portfolio_entry',
-                    'filter_fn': self._portfolio_entry_filter
-                }
-            ]
+        teacher = Teacher.objects.get(gen_user=self.gen_user)
+        reflection_answers = ReflectionAnswer.objects.filter(teacher=teacher)
+        portfolio_entries = PortfolioEntry.objects.filter(teacher=teacher)
+        return [
+            {
+                'queryset': reflection_answers,
+                'serializer_class': get_generic_serializer({'name': ReflectionAnswer, 'fields': '__all__'},
+                                                           depth_arg=2),
+                'label': 'reflection_answer',
+                'filter_fn': self._reflection_answer_filter
+            },
+            {
+                'queryset': portfolio_entries,
+                'serializer_class': get_generic_serializer({'name': PortfolioEntry, 'fields': '__all__'},
+                                                           depth_arg=2),
+                'label': 'portfolio_entry',
+                'filter_fn': self._portfolio_entry_filter
+            }
+        ]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -257,7 +259,7 @@ class PortfolioUpdateAPIView(GenzMixin, generics.UpdateAPIView):
 class QuoteViewSet(viewsets.ViewSet):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsTeacher]
-    serializer_class = get_generic_serializer(Quote)
+    serializer_class = get_generic_serializer({'name': Quote, 'fields': '__all__'}, )
 
     # @method_decorator(cache_page(60))
     @action(detail=True, methods=['get'])
