@@ -65,8 +65,7 @@
 #     tight-loop work in progress.
 #
 #   * Alphabetize dependencies by DIST-NAME.
-git+https://github.com/openedx/blockstore.git@1.2.5#egg=blockstore==1.2.5
-git+https://github.com/openedx/codejail.git@3.3.0#egg=edx-codejail==3.3.0
+git+https://github.com/openedx/blockstore.git@1.2.5#egg=blockstore==1.2.5  # See blockstore comment below.
 git+https://github.com/openedx/codejail.git@3.1.3#egg=codejail==3.1.3
 git+https://github.com/openedx/django-require.git@f4f01e4e959adc6210873ae99e7f2c3741afbf35#egg=django-require==1.0.12
 git+https://github.com/openedx/django-wiki.git@1.1.1#egg=django-wiki
