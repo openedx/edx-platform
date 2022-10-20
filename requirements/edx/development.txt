@@ -192,8 +192,6 @@ code-annotations==1.3.0
     #   edx-enterprise
     #   edx-lint
     #   edx-toggles
-codejail @ git+https://github.com/openedx/codejail.git@3.1.3
-    # via -r requirements/edx/testing.txt
 codejail-includes==1.0.0
     # via -r requirements/edx/testing.txt
 contextlib2==21.6.0
@@ -1411,7 +1409,6 @@ six==1.16.0
     #   bok-choy
     #   chem
     #   click-repl
-    #   codejail
     #   codejail-includes
     #   crowdsourcehinter-xblock
     #   edx-ace
