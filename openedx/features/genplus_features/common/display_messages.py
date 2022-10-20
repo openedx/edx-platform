@@ -14,6 +14,7 @@ class SuccessMessages:
     ARTICLE_RATED = "Thanks for the rating."
     BADGE_AWARDED = 'Feedback/badges have been awarded successfully.'
     REFLECTION_ADDED = "Reflection Submitted."
+    PORTFOLIO_ENTRY_ADDED = "Entry added to portfolio successfully."
 
 
 class ErrorMessages:

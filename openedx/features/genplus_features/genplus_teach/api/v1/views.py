@@ -3,21 +3,25 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.db.models import F
+from django.db.models import Q
 from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, FavoriteArticle, ReflectionAnswer, Reflection, ArticleViewLog
+from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, FavoriteArticle, ReflectionAnswer, Reflection, \
+    ArticleViewLog, PortfolioEntry, Quote
 from openedx.features.genplus_features.genplus.api.v1.mixins import GenzMixin
 from openedx.features.genplus_features.genplus.models import Teacher, Skill
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from .serializers import ArticleSerializer, FavoriteArticleSerializer, ArticleRatingSerializer, ReflectionAnswerSerializer,\
-    PortfolioSerializer, ArticleViewLogSerializer, GtcsSerializer, MediaTypeSerializer
+    ArticleViewLogSerializer, GtcsSerializer, MediaTypeSerializer, PortfolioEntrySerializer
 from openedx.features.genplus_features.genplus.api.v1.serializers import SkillSerializer
+from openedx.features.genplus_features.common.utils import get_generic_serializer
+from .pagination import PortfolioPagination
 from .filters import ArticleFilter
+from drf_multiple_model.views import FlatMultipleModelAPIView
 
 
 class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
@@ -111,39 +115,37 @@ class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
         )
         return Response(SuccessMessages.ARTICLE_RATED, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['get'])
+    def featured(self, request):
+        """
+        featured article
+        """
+        article = get_object_or_404(Article, is_featured=True)
+        serializer = self.serializer_class(article, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class ReflectionAnswerViewSet(viewsets.ViewSet, GenzMixin):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsTeacher]
     serializer_class = ReflectionAnswerSerializer
-    portfolio_serializer_class = PortfolioSerializer
 
     @action(detail=True, methods=['put'])
-    def answer(self, request, article_id=None):
+    def answer(self, request, reflection_id=None):
         """
         answer the reflection
         """
-        article = get_object_or_404(Article, pk=article_id)
+        reflection = get_object_or_404(Reflection, pk=reflection_id)
         teacher = Teacher.objects.get(gen_user=self.gen_user)
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         ReflectionAnswer.objects.update_or_create(
-            article=article, teacher=teacher,
+            reflection=reflection, teacher=teacher,
             defaults={"answer": serializer.data.get('answer')}
         )
         return Response(SuccessMessages.REFLECTION_ADDED, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['get'])
-    def portfolio(self, request):
-        """
-        teacher portfolio
-        """
-        teacher = Teacher.objects.get(gen_user=self.gen_user)
-        qs = ReflectionAnswer.objects.filter(teacher=teacher)
-        serializer = self.portfolio_serializer_class(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ArticleViewLogViewSet(viewsets.ViewSet, GenzMixin):
@@ -176,6 +178,94 @@ class ArticleViewLogViewSet(viewsets.ViewSet, GenzMixin):
                 **serializer.data
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PortfolioViewSet(GenzMixin, viewsets.ViewSetMixin, FlatMultipleModelAPIView):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsTeacher]
+    sorting_fields = ['-created', ]
+    sort_descending = True
+    pagination_class = PortfolioPagination
+    serializer_class = PortfolioEntrySerializer
+
+    def _reflection_answer_filter(self, queryset, request, *args, **kwargs):
+        query_params = self.request.query_params
+        skill = query_params.get('skill')
+        gtcs = query_params.get('gtcs')
+        search = query_params.get('search', '')
+        if skill:
+            queryset = queryset.filter(reflection__article__skills__in=[skill, ])
+        if gtcs:
+            queryset = queryset.filter(reflection__article__gtcs__in=[gtcs, ])
+        queryset = queryset.filter(Q(answer__icontains=search) | Q(reflection__article__title__icontains=search))
+        return queryset
+
+    def _portfolio_entry_filter(self, queryset, request, *args, **kwargs):
+        query_params = self.request.query_params
+        skill = query_params.get('skill')
+        gtcs = query_params.get('gtcs')
+        search = query_params.get('search', '')
+        if skill:
+            queryset = queryset.filter(skill=skill)
+        if gtcs:
+            queryset = queryset.filter(gtcs=gtcs)
+        queryset = queryset.filter(Q(title__icontains=search) | Q(description__icontains=search))
+        return queryset
+
+    def get_querylist(self):
+            teacher = Teacher.objects.get(gen_user=self.gen_user)
+            reflection_answers = ReflectionAnswer.objects.filter(teacher=teacher)
+            portfolio_entries = PortfolioEntry.objects.filter(teacher=teacher)
+            return [
+                {
+                    'queryset': reflection_answers,
+                    'serializer_class': get_generic_serializer(ReflectionAnswer, depth_arg=2),
+                    'label': 'reflection_answer',
+                    'filter_fn': self._reflection_answer_filter
+                },
+                {
+                    'queryset': portfolio_entries,
+                    'serializer_class': get_generic_serializer(PortfolioEntry, depth_arg=2),
+                    'label': 'portfolio_entry',
+                    'filter_fn': self._portfolio_entry_filter
+                }
+            ]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(SuccessMessages.PORTFOLIO_ENTRY_ADDED, status=status.HTTP_200_OK)
+
+    def get_serializer_context(self):
+        teacher = Teacher.objects.get(gen_user=self.gen_user)
+        context = super(PortfolioViewSet, self).get_serializer_context()
+        context.update({"teacher": teacher})
+        return context
+
+
+class PortfolioUpdateAPIView(GenzMixin, generics.UpdateAPIView):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsTeacher]
+    serializer_class = PortfolioEntrySerializer
+
+    def get_queryset(self):
+        teacher = Teacher.objects.get(gen_user=self.gen_user)
+        return PortfolioEntry.objects.filter(teacher=teacher)
+
+
+class QuoteViewSet(viewsets.ViewSet):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsTeacher]
+    serializer_class = get_generic_serializer(Quote)
+
+    # @method_decorator(cache_page(60))
+    @action(detail=True, methods=['get'])
+    def list(self, request, *args, **kwargs):
+        """ Quote of the week """
+        quote = get_object_or_404(Quote, is_current=True)
+        serializer = self.serializer_class(quote)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class FiltersViewSet(viewsets.ViewSet):

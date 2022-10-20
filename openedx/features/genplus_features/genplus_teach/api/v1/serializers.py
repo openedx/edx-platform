@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, Reflection, ReflectionAnswer, ArticleViewLog
+from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, Reflection, \
+    ReflectionAnswer, ArticleViewLog, PortfolioEntry
 from openedx.features.genplus_features.genplus.api.v1.serializers import SkillSerializer
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 
@@ -37,9 +38,18 @@ class MediaTypeSerializer(serializers.ModelSerializer):
 
 
 class ReflectionSerializer(serializers.ModelSerializer):
+    answer = serializers.SerializerMethodField('get_answer')
+
+    def get_answer(self, instance):
+        teacher = self.context.get('teacher')
+        try:
+            return instance.answers.get(teacher=teacher).answer
+        except ReflectionAnswer.DoesNotExist:
+            return
+
     class Meta:
         model = Reflection
-        fields = '__all__'
+        fields = ('id', 'title', 'answer')
 
 
 class ReflectionAnswerSerializer(serializers.ModelSerializer):
@@ -69,7 +79,6 @@ class ArticleSerializer(DynamicFieldsModelSerializer):
     is_completed = serializers.SerializerMethodField('get_is_completed')
     is_rated = serializers.SerializerMethodField('get_is_rated')
     rating = serializers.SerializerMethodField('get_rating')
-    answer = serializers.SerializerMethodField('get_answer')
 
     def get_is_completed(self, instance):
         teacher = self.context.get('teacher')
@@ -87,19 +96,14 @@ class ArticleSerializer(DynamicFieldsModelSerializer):
             return
 
     def get_reflections(self, instance):
-        return ReflectionSerializer(instance.reflections.all(), many=True).data
-
-    def get_answer(self, instance):
         teacher = self.context.get('teacher')
-        try:
-            return instance.reflections_answers.get(teacher=teacher).answer
-        except ReflectionAnswer.DoesNotExist:
-            return
+        return ReflectionSerializer(instance.reflections.all(),
+                                    many=True, context={'teacher': teacher}).data
 
     class Meta:
         model = Article
         fields = ('id', 'title', 'cover', 'skills', 'gtcs', 'media_types', 'time', 'summary',
-                  'content', 'author', 'is_completed', 'is_rated', 'rating', 'reflections', 'answer', 'created')
+                  'content', 'author', 'is_completed', 'is_rated', 'rating', 'reflections', 'created')
 
 
 class FavoriteArticleSerializer(serializers.Serializer):
@@ -119,3 +123,11 @@ class ArticleViewLogSerializer(serializers.ModelSerializer):
         fields = ('count', 'engagement')
 
 
+class PortfolioEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PortfolioEntry
+        fields = '__all__'
+
+    def perform_create(self, serializer):
+        teacher = self.context.get('teacher')
+        serializer.save(teacher=teacher)

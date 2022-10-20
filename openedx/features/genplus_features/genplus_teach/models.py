@@ -39,6 +39,7 @@ class Article(TimeStampedModel):
     author = models.CharField(max_length=1024, help_text='Add name of the author')
     time = models.PositiveIntegerField(default=0, help_text='Time required to read/watch/listen the article')
     is_draft = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -53,7 +54,10 @@ class Article(TimeStampedModel):
         return avg_rating if avg_rating else 0
 
     def is_completed(self, teacher):
-        return self.reflections_answers.filter(article=self, teacher=teacher).exists()
+        reflections = self.reflections
+        answers = ReflectionAnswer.objects.filter(reflection_id__in=reflections.values_list('id', flat=True),
+                                                  teacher=teacher)
+        return reflections.count() == answers.count()
 
     def is_rated(self, teacher):
         return ArticleRating.objects.filter(article=self,
@@ -66,6 +70,9 @@ class Article(TimeStampedModel):
         read_time = self.get_read_time(self.title, self.content)
         watch_time = self.get_video_time(self.content)
         self.time = self.time + read_time + watch_time
+        if self.is_featured:
+            # marking the other article as non-featured
+            Article.objects.filter(is_featured=True).update(is_featured=False)
         super().save(**kwargs)
 
     @staticmethod
@@ -105,12 +112,12 @@ class Reflection(TimeStampedModel):
 
 
 class ReflectionAnswer(TimeStampedModel):
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='reflections_answers')
+    reflection = models.ForeignKey(Reflection, on_delete=models.CASCADE, related_name='answers')
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     answer = models.TextField()
 
     class Meta:
-        unique_together = ('article', 'teacher')
+        unique_together = ('reflection', 'teacher')
 
 
 class FavoriteArticle(models.Model):
@@ -150,3 +157,27 @@ class ArticleViewLog(TimeStampedModel):
             self.article.title,
             self.engagement
         )
+
+
+class PortfolioEntry(TimeStampedModel):
+    title = models.CharField(max_length=1024)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='portfolio_entries')
+    skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True)
+    gtcs = models.ForeignKey(Gtcs, on_delete=models.SET_NULL, null=True)
+    description = models.TextField()
+
+
+class Quote(TimeStampedModel):
+    banner = models.ImageField(upload_to='quote_banners')
+    text = models.TextField()
+    author = models.CharField(max_length=1024)
+    is_current = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.text
+
+    def save(self, **kwargs):
+        if self.is_current:
+            # marking the other quote's current false
+            Quote.objects.filter(is_current=True).update(is_current=False)
+        super().save(**kwargs)
