@@ -5,7 +5,7 @@ import logging
 
 from xblock.fields import Scope, String
 
-from xmodule.mako_module import MakoModuleDescriptor, MakoTemplateBlockBase
+from xmodule.mako_module import MakoTemplateBlockBase
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +47,10 @@ class EditingMixin(EditingFields, MakoTemplateBlockBase):
 
 class TabsEditingMixin(EditingFields, MakoTemplateBlockBase):
     """
-    Common code between TabsEditingDescriptor and XBlocks converted from XModules.
+    Module that provides a raw editing view of its data and children.  It does not
+    perform any validation on its definition---just passes it along to the browser.
+
+    This class is intended to be used as a mixin.
     """
 
     mako_template = "widgets/tabs-aggregator.html"
@@ -62,17 +65,3 @@ class TabsEditingMixin(EditingFields, MakoTemplateBlockBase):
             'data': self.data,
         })
         return _context
-
-
-class TabsEditingDescriptor(TabsEditingMixin, MakoModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method
-    """
-    Module that provides a raw editing view of its data and children.  It does not
-    perform any validation on its definition---just passes it along to the browser.
-
-    This class is intended to be used as a mixin.
-
-    Engine (module_edit.js) wants for metadata editor
-    template to be always loaded, so don't forget to include
-    settings tab in your module descriptor.
-    """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
