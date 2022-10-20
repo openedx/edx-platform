@@ -46,10 +46,6 @@ class EditingMixin(EditingFields, MakoTemplateBlockBase):
         return _context
 
 
-class EditingDescriptor(EditingMixin, MakoModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method
-    pass
-
-
 class TabsEditingMixin(EditingFields, MakoTemplateBlockBase):
     """
     Common code between TabsEditingDescriptor and XBlocks converted from XModules.
