@@ -29,6 +29,10 @@ def _clear_request_cache(**kwargs):
     """
     Once a celery task completes, clear the request cache to
     prevent memory leaks.
+
+    When the celery task is eagerly, it is executed locally
+    while sharing the thread and its request cache with the
+    active Django Request. In that case, do not clear the cache.
     """
     if getattr(settings, 'CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION', True) and not getattr(settings, 'CELERY_ALWAYS_EAGER', False):
         RequestCache.clear_all_namespaces()
