@@ -30,7 +30,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
-GET_USER_ENROLLMENT_MODE = "common.djangoapps.student.models.student.CourseEnrollment.enrollment_mode_for_user"
+GET_USER_ENROLLMENT_MODE =\
+    "common.djangoapps.student.models.course_enrollment.CourseEnrollment.enrollment_mode_for_user"
 
 
 @ddt.ddt

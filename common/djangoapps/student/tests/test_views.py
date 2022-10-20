@@ -54,6 +54,9 @@ ONE_WEEK_AGO = now() - timedelta(weeks=1)
 THREE_YEARS_FROM_NOW = now() + timedelta(days=(365 * 3))
 THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
 
+# Name of the method to mock for having a course be refundable or not
+REFUNDABLE_METHOD_NAME = 'common.djangoapps.student.models.course_enrollment.CourseEnrollment.refundable'
+
 # Name of the method to mock for Content Type Gating.
 GATING_METHOD_NAME = 'openedx.features.content_type_gating.models.ContentTypeGatingConfig.enabled_for_enrollment'
 
@@ -150,13 +153,13 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
 
     def test_course_run_refund_status_successful(self):
         """ Assert that view:course_run_refund_status returns correct Json for successful refund call."""
-        with patch('common.djangoapps.student.models.student.CourseEnrollment.refundable', return_value=True):
+        with patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.refundable', return_value=True):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
         assert json.loads(response.content.decode('utf-8')) == {'course_refundable_status': True}
         assert response.status_code == 200
 
-        with patch('common.djangoapps.student.models.student.CourseEnrollment.refundable', return_value=False):
+        with patch(REFUNDABLE_METHOD_NAME, return_value=False):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
         assert json.loads(response.content.decode('utf-8')) == {'course_refundable_status': False}

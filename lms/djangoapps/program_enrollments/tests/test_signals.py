@@ -378,7 +378,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         program_enrollment = self._create_waiting_program_enrollment()
         self._create_waiting_course_enrollments(program_enrollment)
 
-        with mock.patch('common.djangoapps.student.models.student.CourseEnrollment.enroll') as enrollMock:
+        with mock.patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.enroll') as enrollMock:
             enrollMock.side_effect = CourseEnrollmentException('something has gone wrong')
             with pytest.raises(CourseEnrollmentException):
                 UserSocialAuth.objects.create(

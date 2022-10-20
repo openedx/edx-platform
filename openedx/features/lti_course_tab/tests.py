@@ -45,7 +45,7 @@ class DiscussionLtiCourseTabTestCase(TabTestCase):
         )
 
     @ddt.data(True, False)
-    @patch('common.djangoapps.student.models.student.CourseEnrollment.is_enrolled', Mock(return_value=True))
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_enrolled', Mock(return_value=True))
     def test_pii_params_on_discussion_lti_tab(self, discussion_config_enabled):
         self.discussion_config.enabled = discussion_config_enabled
         self.discussion_config.save()
