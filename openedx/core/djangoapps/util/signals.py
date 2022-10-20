@@ -30,5 +30,5 @@ def _clear_request_cache(**kwargs):
     Once a celery task completes, clear the request cache to
     prevent memory leaks.
     """
-    if getattr(settings, 'CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION', True):
+    if getattr(settings, 'CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION', True) and not getattr(settings, 'CELERY_ALWAYS_EAGER', False):
         RequestCache.clear_all_namespaces()
