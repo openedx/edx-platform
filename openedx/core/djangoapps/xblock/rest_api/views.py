@@ -156,7 +156,6 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
     except InvalidKeyError as e:
         raise Http404 from e
 
-
     # To support sandboxed XBlocks, custom frontends, and other use cases, we
     # authenticate requests using a secure token in the URL. see
     # openedx.core.djangoapps.xblock.utils.get_secure_hash_for_xblock_handler
