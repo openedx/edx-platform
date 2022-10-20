@@ -1,7 +1,7 @@
 """
 Integration helpers for SiteConfig Client adapter.
 """
-
+import beeline
 import logging
 from uuid import UUID
 
@@ -29,22 +29,25 @@ log = logging.getLogger(__name__)
 # TODO: Move these helpers into the `site_config_client.openedx.api` module
 
 
+@beeline.traced('site_config_client_helpers.is_enabled_for_site')
 def is_enabled_for_site(site):
     """
     Checks if the SiteConfiguration client is enabled for a specific organization.
     """
     from django.conf import settings  # Local import to avoid AppRegistryNotReady error
 
-    if site.id == settings.SITE_ID:
-        # Disable the SiteConfig service on main site.
-        return False
+    is_enabled = False
+    if site.id != settings.SITE_ID:  # Disable the SiteConfig service on main site.
+        try:
+            uuid = tahoe_sites.api.get_uuid_by_site(site)
+        except ObjectDoesNotExist:
+            # Act as if disabled in case of malformed data
+            is_enabled = False
+        else:
+            is_enabled = is_feature_enabled_for_site(uuid)
 
-    try:
-        uuid = tahoe_sites.api.get_uuid_by_site(site)
-    except ObjectDoesNotExist:
-        # Return sane result in case of malformed data
-        return False
-    return is_feature_enabled_for_site(uuid)
+    beeline.add_trace_field('site_config.enabled', is_enabled)
+    return is_enabled
 
 
 def enable_for_site(site, note=''):
