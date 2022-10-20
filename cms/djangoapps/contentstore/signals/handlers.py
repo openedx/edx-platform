@@ -84,7 +84,6 @@ def create_catalog_data_for_signal(course_key: CourseKey) -> Optional[CourseCata
     store = modulestore()
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         course = store.get_course(course_key)
-
         return CourseCatalogData(
             course_key=course_key.for_branch(None),  # Shouldn't be necessary, but just in case...
             name=course.display_name,
@@ -95,7 +94,6 @@ def create_catalog_data_for_signal(course_key: CourseKey) -> Optional[CourseCata
                 enrollment_start=course.enrollment_start,
                 enrollment_end=course.enrollment_end,
             ),
-            effort=CourseDetails.fetch_about_attribute(course_key, 'effort'),
             hidden=course.catalog_visibility in ['about', 'none'] or course_key.deprecated,
             invitation_only=course.invitation_only,
         )
