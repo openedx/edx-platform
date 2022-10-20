@@ -28,20 +28,6 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
                 'name': "Test_css",
                 'template': "tabs/codemirror-edit.html",
                 'current': True,
-                'css': {
-                    'scss': [
-                        resource_string(
-                            __name__,
-                            'test_files/test_tabseditingdescriptor.scss'
-                        )
-                    ],
-                    'css': [
-                        resource_string(
-                            __name__,
-                            'test_files/test_tabseditingdescriptor.css'
-                        )
-                    ]
-                }
             },
             {
                 'name': "Subtitles",
@@ -61,16 +47,6 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
                                                  'category', 'name')),
             field_data=DictFieldData({}),
         )
-
-    def test_get_css(self):
-        """test get_css"""
-        css = self.descriptor.get_css()
-        current_dir = os.path.dirname(__file__)
-        test_css_file = os.path.join(current_dir, 'test_files/test_tabseditingdescriptor.scss')
-        with open(test_css_file) as new_css:
-            added_css = new_css.read()
-        assert css['scss'].pop().decode('utf-8') == added_css
-        assert css['css'].pop().decode('utf-8') == added_css
 
     def test_get_context(self):
         """"test get_context"""

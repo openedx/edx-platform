@@ -3,7 +3,6 @@
 
 import logging
 
-from pkg_resources import resource_string
 from xblock.fields import Scope, String
 
 from xmodule.mako_module import MakoModuleDescriptor, MakoTemplateBlockBase
@@ -52,9 +51,6 @@ class TabsEditingMixin(EditingFields, MakoTemplateBlockBase):
     """
 
     mako_template = "widgets/tabs-aggregator.html"
-    css = {'scss': [resource_string(__name__, 'css/tabs/tabs.scss')]}
-    js = {'js': [resource_string(
-        __name__, 'js/src/tabs/tabs-aggregator.js')]}
     js_module_name = "TabsEditingDescriptor"
     tabs = []
 
@@ -66,18 +62,6 @@ class TabsEditingMixin(EditingFields, MakoTemplateBlockBase):
             'data': self.data,
         })
         return _context
-
-    @classmethod
-    def get_css(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
-        # load every tab's css
-        for tab in cls.tabs:
-            tab_styles = tab.get('css', {})
-            for css_type, css_content in tab_styles.items():
-                if css_type in cls.css:
-                    cls.css[css_type].extend(css_content)
-                else:
-                    cls.css[css_type] = css_content
-        return cls.css
 
 
 class TabsEditingDescriptor(TabsEditingMixin, MakoModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method
