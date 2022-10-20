@@ -356,7 +356,7 @@ def get_retired_email_by_email(email):
     return user_util.get_retired_email(email, settings.RETIRED_USER_SALTS, settings.RETIRED_EMAIL_FMT)
 
 
-def _get_all_retired_usernames_by_username(username):
+def get_all_retired_usernames_by_username(username):
     """
     Returns a generator of "retired usernames", one hashed with each
     configured salt. Used for finding out if the given username has
@@ -365,22 +365,13 @@ def _get_all_retired_usernames_by_username(username):
     return user_util.get_all_retired_usernames(username, settings.RETIRED_USER_SALTS, settings.RETIRED_USERNAME_FMT)
 
 
-def _get_all_retired_emails_by_email(email):
-    """
-    Returns a generator of "retired emails", one hashed with each
-    configured salt. Used for finding out if the given email has
-    ever been used and retired.
-    """
-    return user_util.get_all_retired_emails(email, settings.RETIRED_USER_SALTS, settings.RETIRED_EMAIL_FMT)
-
-
 def get_potentially_retired_user_by_username(username):
     """
     Attempt to return a User object based on the username, or if it
     does not exist, then any hashed username salted with the historical
     salts.
     """
-    locally_hashed_usernames = list(_get_all_retired_usernames_by_username(username))
+    locally_hashed_usernames = list(get_all_retired_usernames_by_username(username))
     locally_hashed_usernames.append(username)
     potential_users = User.objects.filter(username__in=locally_hashed_usernames)
 
@@ -425,7 +416,7 @@ def get_potentially_retired_user_by_username_and_hash(username, hashed_username)
       does not exist, the any hashed username salted with the historical
       salts.
     """
-    locally_hashed_usernames = list(_get_all_retired_usernames_by_username(username))
+    locally_hashed_usernames = list(get_all_retired_usernames_by_username(username))
 
     if hashed_username not in locally_hashed_usernames:
         raise Exception('Mismatched hashed_username, bad salt?')
