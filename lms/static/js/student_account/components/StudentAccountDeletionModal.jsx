@@ -2,7 +2,7 @@
 /* eslint-disable react/no-danger */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal, Icon, InputText, StatusAlert } from '@edx/paragon-new';
+import { Button, Modal, Icon, InputText, StatusAlert } from '@edx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 import { deactivate } from '../AccountsClient';

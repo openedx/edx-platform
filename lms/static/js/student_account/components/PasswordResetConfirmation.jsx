@@ -4,7 +4,7 @@ import 'whatwg-fetch';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, StatusAlert } from '@edx/paragon-new';
+import { Button, StatusAlert } from '@edx/paragon';
 
 import PasswordResetInput from './PasswordResetInput';
 

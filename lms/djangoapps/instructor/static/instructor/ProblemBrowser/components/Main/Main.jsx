@@ -1,5 +1,5 @@
 /* global gettext */
-import { Button, Icon } from '@edx/paragon-new';
+import { Button, Icon } from '@edx/paragon';
 import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';

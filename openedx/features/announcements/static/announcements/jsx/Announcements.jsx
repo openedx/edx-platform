@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { Button } from '@edx/paragon-new';
+import { Button } from '@edx/paragon';
 import $ from 'jquery';
 
 

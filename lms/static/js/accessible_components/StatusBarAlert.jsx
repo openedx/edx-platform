@@ -4,7 +4,7 @@ Wrapper for React/Paragon accessible status bar
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { StatusAlert } from '@edx/paragon-new';
+import { StatusAlert } from '@edx/paragon';
 
 export class StatusAlertRenderer {
   constructor(message, selector, afterselector) {
