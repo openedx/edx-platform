@@ -298,7 +298,7 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 #################### Event bus backend ########################
 EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
 EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
-EVENT_BUS_TOPIC_PREFIX = 'dev'
+EVENT_BUS_TOPIC_PREFIX = 'dev-2'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################
