@@ -50,5 +50,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(dump_gtcs, migrations.RunPython.noop),
+        migrations.RunPython(dump_gtcs),
     ]
