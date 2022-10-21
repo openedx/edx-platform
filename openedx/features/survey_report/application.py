@@ -6,7 +6,8 @@ from openedx.features.survey_report.queries import (
     currently_learners,
     genarated_certificates,
     get_unique_courses_offered,
-    learners_registered
+    learners_registered,
+    course_enrollments
 )
 
 
@@ -16,3 +17,4 @@ def generate_report() -> None:
     learners = currently_learners()
     registered = learners_registered()
     certificates = genarated_certificates()
+    enrollments = course_enrollments()
