@@ -5259,3 +5259,10 @@ URLS_2U_LOBS = {
     'bachelors_degree': 'https://www.edx.org/bachelors',
     'boot_camps': 'https://www.edx.org/boot-camps',
 }
+
+
+############## PLOTLY ##############
+
+ENTERPRISE_PLOTLY_SECRET = "I am a secret"
+
+############## PLOTLY ##############
