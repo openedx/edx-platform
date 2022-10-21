@@ -8,7 +8,7 @@ import logging
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
-from xmodule.studio_editable import StudioEditableModule
+from xmodule.studio_editable import StudioEditableBlock
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +87,7 @@ class LibraryRoot(XBlock):
             child_context['show_preview'] = self.show_children_previews
             child_context['can_edit_visibility'] = False
             child = self.runtime.get_block(child_key)
-            child_view_name = StudioEditableModule.get_preview_view_name(child)
+            child_view_name = StudioEditableBlock.get_preview_view_name(child)
 
             if str(child.location) == force_render:
                 child_context['show_preview'] = True
