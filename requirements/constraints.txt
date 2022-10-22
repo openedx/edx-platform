@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.57.2
+edx-enterprise==3.58.0
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -45,11 +45,6 @@ python3-saml<1.10.0
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
-
-# Release 2.1.0 pulls declares `pact-python` as a base requirement, even though it should be
-# a testing requirement. Installing it would cause a bunch of new tool packages to become base
-# requirements of edx-platform. Pinning temporarily until this is resolved in edx-val.
-edxval<2.1
 
 # At the time of writing this comment, we do not know whether py2neo>=2022
 # will support our currently-deployed Neo4j version (3.5).

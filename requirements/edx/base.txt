@@ -12,8 +12,6 @@
     # via -r requirements/edx/github.in
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
     # via -r requirements/edx/github.in
--e git+https://github.com/openedx/RateXBlock.git@2.0.1#egg=rate-xblock
-    # via -r requirements/edx/github.in
 -e git+https://github.com/openedx/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
     # via -r requirements/edx/github.in
 acid-xblock==0.2.1
@@ -47,6 +45,7 @@ attrs==22.1.0
     #   blockstore
     #   edx-ace
     #   jsonschema
+    #   lti-consumer-xblock
     #   openedx-events
 babel==2.10.3
     # via
@@ -154,6 +153,7 @@ cryptography==36.0.2
     # via
     #   -r requirements/edx/base.in
     #   django-fernet-fields
+    #   djfernet
     #   edx-enterprise
     #   jwcrypto
     #   optimizely-sdk
@@ -283,7 +283,6 @@ django-fernet-fields==0.6
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
-    #   edxval
 django-filter==22.1
     # via
     #   -r requirements/edx/base.in
@@ -405,10 +404,14 @@ djangorestframework==3.12.4
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
+djfernet==0.8.1
+    # via edxval
 docopt==0.6.2
     # via -r requirements/edx/base.in
 docutils==0.18.1
-    # via botocore
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   botocore
 done-xblock==2.0.4
     # via -r requirements/edx/base.in
 drf-jwt==1.19.2
@@ -478,14 +481,14 @@ edx-drf-extensions==8.3.1
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.57.2
+edx-enterprise==3.58.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   learner-pathway-progress
-edx-event-bus-kafka==1.1.0
+edx-event-bus-kafka==1.2.0
     # via -r requirements/edx/base.in
-edx-i18n-tools==0.9.1
+edx-i18n-tools==0.9.2
     # via ora2
 edx-milestones==0.4.0
     # via -r requirements/edx/base.in
@@ -550,10 +553,8 @@ edx-when==2.3.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
-edxval==2.0.3
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+edxval==2.2.0
+    # via -r requirements/edx/base.in
 elasticsearch==7.13.4
     # via
     #   -c requirements/edx/../common_constraints.txt
@@ -671,7 +672,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==5.0.0
+lti-consumer-xblock==5.0.1
     # via -r requirements/edx/base.in
 lxml==4.9.1
     # via
@@ -1009,7 +1010,7 @@ scipy==1.7.3
     #   openedx-calc
 semantic-version==2.10.0
     # via edx-drf-extensions
-shapely==1.8.5
+shapely==1.8.5.post1
     # via -r requirements/edx/base.in
 simplejson==3.17.6
     # via
@@ -1174,7 +1175,6 @@ xblock==1.6.1
     #   edx-when
     #   lti-consumer-xblock
     #   ora2
-    #   rate-xblock
     #   staff-graded-xblock
     #   xblock-drag-and-drop-v2
     #   xblock-google-drive
