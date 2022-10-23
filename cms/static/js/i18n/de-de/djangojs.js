@@ -1144,7 +1144,7 @@
     "No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.": "Es wird keine \u00dcberpr\u00fcfung der Richtlinienschl\u00fcssel oder Wertepaare durchgef\u00fchrt. Wenn Sie Schwierigkeiten haben, \u00fcberpr\u00fcfen Sie Ihre Formatierung.",
     "Nonbreaking space": "Gesch\u00fctztes Leerzeichen",
     "Noncommercial": "Nicht-kommerziell",
-    "None": "Kein Schulabschluss",
+    "None": "kein",
     "Noon": "Mittag",
     "Not Currently Available": "Momentan nicht verf\u00fcgbar",
     "Not Graded": "Unbenotet",

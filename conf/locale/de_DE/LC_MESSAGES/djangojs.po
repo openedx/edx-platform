@@ -37,7 +37,7 @@
 # Ron Lucke <lucke@elan-ev.de>, 2014
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013-2014
-# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2021
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2022
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/).
@@ -272,13 +272,9 @@ msgstr "Datei auswählen"
 msgid "OK"
 msgstr "OK"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: cms/static/js/views/course_video_settings.js xmodule/js/src/html/edit.js
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "None"
-msgstr "Kein Schulabschluss"
+msgstr "kein"
 
 #: cms/static/js/views/course_video_settings.js
 #: cms/static/js/views/metadata.js
