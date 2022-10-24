@@ -34,19 +34,20 @@ from pyquery import PyQuery  # lint-amnesty, pylint: disable=wrong-import-order
 from web_fragments.fragment import Fragment  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.completable import CompletableXBlockMixin  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.core import XBlock, XBlockAside  # lint-amnesty, pylint: disable=wrong-import-order
+from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import FieldData  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.fields import ScopeIds  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong-import-order
 
-from capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
-from capa.xqueue_interface import XQueueInterface
+from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
+from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import ProblemBlock
 from xmodule.contentstore.django import contentstore
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.lti_module import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_AMNESTY_MODULESTORE,
     ModuleStoreTestCase,
@@ -55,6 +56,7 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.services import RebindUserServiceError
 from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps import static_replace
@@ -63,6 +65,8 @@ from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
+from lms.djangoapps.badges.tests.factories import BadgeClassFactory
+from lms.djangoapps.badges.tests.test_models import get_image
 from lms.djangoapps.courseware import module_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
@@ -90,11 +94,34 @@ from common.djangoapps.xblock_django.models import XBlockConfiguration
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
-@XBlock.needs("field-data")
-@XBlock.needs("i18n")
-@XBlock.needs("fs")
-@XBlock.needs("user")
-@XBlock.needs("bookmarks")
+@XBlock.needs('fs')
+@XBlock.needs('field-data')
+@XBlock.needs('mako')
+@XBlock.needs('user')
+@XBlock.needs('verification')
+@XBlock.needs('proctoring')
+@XBlock.needs('milestones')
+@XBlock.needs('credit')
+@XBlock.needs('bookmarks')
+@XBlock.needs('gating')
+@XBlock.needs('grade_utils')
+@XBlock.needs('user_state')
+@XBlock.needs('content_type_gating')
+@XBlock.needs('cache')
+@XBlock.needs('sandbox')
+@XBlock.needs('xqueue')
+@XBlock.needs('replace_urls')
+@XBlock.needs('rebind_user')
+@XBlock.needs('completion')
+@XBlock.needs('i18n')
+@XBlock.needs('library_tools')
+@XBlock.needs('partitions')
+@XBlock.needs('settings')
+@XBlock.needs('user_tags')
+@XBlock.needs('badging')
+@XBlock.needs('teams')
+@XBlock.needs('teams_configuration')
+@XBlock.needs('call_to_action')
 class PureXBlock(XBlock):
     """
     Pure XBlock to use in tests.
@@ -2175,10 +2202,10 @@ class TestRebindModule(TestSubmittingProblems):
         user2 = UserFactory()
         user2.id = 2
         with self.assertRaisesRegex(
-            render.LmsModuleRenderError,
+            RebindUserServiceError,
             "rebind_noauth_module_to_user can only be called from a module bound to an anonymous user"
         ):
-            assert module.system.rebind_noauth_module_to_user(module, user2)
+            assert module.runtime.service(module, 'rebind_user').rebind_noauth_module_to_user(module, user2)
 
     def test_rebind_noauth_module_to_user_anonymous(self):
         """
@@ -2188,7 +2215,7 @@ class TestRebindModule(TestSubmittingProblems):
         module = self.get_module_for_user(self.anon_user)
         user2 = UserFactory()
         user2.id = 2
-        module.system.rebind_noauth_module_to_user(module, user2)
+        module.runtime.service(module, 'rebind_user').rebind_noauth_module_to_user(module, user2)
         assert module
         assert module.system.anonymous_student_id == anonymous_id_for_user(user2, self.course.id)
         assert module.scope_ids.user_id == user2.id
@@ -2231,12 +2258,25 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
         mock_track_function.return_value.assert_called_once_with(event_type, event)
 
 
-@ddt.ddt
-class LMSXBlockServiceBindingTest(SharedModuleStoreTestCase):
+class LMSXBlockServiceMixin(SharedModuleStoreTestCase):
     """
-    Tests that the LMS Module System (XBlock Runtime) provides an expected set of services.
+    Helper class that initializes the LmsModuleSystem.
     """
+    def _prepare_runtime(self):
+        """
+        Instantiate the LmsModuleSystem.
+        """
+        self.runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.request_token,
+            course=self.course
+        )
 
+    @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     def setUp(self):
         """
         Set up the user and other fields that will be used to instantiate the runtime.
@@ -2247,46 +2287,168 @@ class LMSXBlockServiceBindingTest(SharedModuleStoreTestCase):
         self.student_data = Mock()
         self.track_function = Mock()
         self.request_token = Mock()
+        self.descriptor = ItemFactory(category="pure", parent=self.course)
+        self._prepare_runtime()
 
-    @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
-    @ddt.data("user", "i18n", "fs", "field-data", "bookmarks")
+
+@ddt.ddt
+class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
+    """
+    Tests that the LMS Module System (XBlock Runtime) provides an expected set of services.
+    """
+
+    @ddt.data(
+        'fs',
+        'field-data',
+        'mako',
+        'user',
+        'verification',
+        'proctoring',
+        'milestones',
+        'credit',
+        'bookmarks',
+        'gating',
+        'grade_utils',
+        'user_state',
+        'content_type_gating',
+        'cache',
+        'sandbox',
+        'xqueue',
+        'replace_urls',
+        'rebind_user',
+        'completion',
+        'i18n',
+        'library_tools',
+        'partitions',
+        'settings',
+        'user_tags',
+        'teams',
+        'teams_configuration',
+        'call_to_action',
+    )
     def test_expected_services_exist(self, expected_service):
         """
         Tests that the 'user', 'i18n', and 'fs' services are provided by the LMS runtime.
         """
-        descriptor = ItemFactory(category="pure", parent=self.course)
-        runtime, _ = render.get_module_system_for_user(
-            self.user,
-            self.student_data,
-            descriptor,
-            self.course.id,
-            self.track_function,
-            self.request_token,
-            course=self.course
-        )
-        service = runtime.service(descriptor, expected_service)
+        service = self.runtime.service(self.descriptor, expected_service)
         assert service is not None
 
-    @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     def test_beta_tester_fields_added(self):
         """
         Tests that the beta tester fields are set on LMS runtime.
         """
-        descriptor = ItemFactory(category="pure", parent=self.course)
-        descriptor.days_early_for_beta = 5
-        runtime, _ = render.get_module_system_for_user(
-            self.user,
-            self.student_data,
-            descriptor,
-            self.course.id,
-            self.track_function,
-            self.request_token,
-            course=self.course
-        )
+        self.descriptor.days_early_for_beta = 5
+        self._prepare_runtime()
 
         # pylint: disable=no-member
-        assert not runtime.user_is_beta_tester
-        assert runtime.days_early_for_beta == 5
+        assert not self.runtime.user_is_beta_tester
+        assert self.runtime.days_early_for_beta == 5
+
+    def test_get_set_tag(self):
+        """
+        Tests the user service interface.
+        """
+        scope = 'course'
+        key = 'key1'
+
+        # test for when we haven't set the tag yet
+        tag = self.runtime.service(self.descriptor, 'user_tags').get_tag(scope, key)
+        assert tag is None
+
+        # set the tag
+        set_value = 'value'
+        self.runtime.service(self.descriptor, 'user_tags').set_tag(scope, key, set_value)
+        tag = self.runtime.service(self.descriptor, 'user_tags').get_tag(scope, key)
+
+        assert tag == set_value
+
+        # Try to set tag in wrong scope
+        with pytest.raises(ValueError):
+            self.runtime.service(self.descriptor, 'user_tags').set_tag('fake_scope', key, set_value)
+
+        # Try to get tag in wrong scope
+        with pytest.raises(ValueError):
+            self.runtime.service(self.descriptor, 'user_tags').get_tag('fake_scope', key)
+
+
+@ddt.ddt
+class TestBadgingService(LMSXBlockServiceMixin):
+    """Test the badging service interface"""
+
+    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
+    def test_service_rendered(self):
+        self._prepare_runtime()
+        assert self.runtime.service(self.descriptor, 'badging')
+
+    def test_no_service_rendered(self):
+        with pytest.raises(NoSuchServiceError):
+            self.runtime.service(self.descriptor, 'badging')
+
+    @ddt.data(True, False)
+    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
+    def test_course_badges_toggle(self, toggle):
+        self.course = CourseFactory.create(metadata={'issue_badges': toggle})
+        self._prepare_runtime()
+        assert self.runtime.service(self.descriptor, 'badging').course_badges_enabled is toggle
+
+    @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
+    def test_get_badge_class(self):
+        self._prepare_runtime()
+        badge_service = self.runtime.service(self.descriptor, 'badging')
+        premade_badge_class = BadgeClassFactory.create()
+        # Ignore additional parameters. This class already exists.
+        # We should get back the first class we created, rather than a new one.
+        with get_image('good') as image_handle:
+            badge_class = badge_service.get_badge_class(
+                slug='test_slug', issuing_component='test_component', description='Attempted override',
+                criteria='test', display_name='Testola', image_file_handle=image_handle
+            )
+        # These defaults are set on the factory.
+        assert badge_class.criteria == 'https://example.com/syllabus'
+        assert badge_class.display_name == 'Test Badge'
+        assert badge_class.description == "Yay! It's a test badge."
+        # File name won't always be the same.
+        assert badge_class.image.path == premade_badge_class.image.path
+
+
+class TestI18nService(LMSXBlockServiceMixin):
+    """ Test ModuleI18nService """
+
+    def test_module_i18n_lms_service(self):
+        """
+        Test: module i18n service in LMS
+        """
+        i18n_service = self.runtime.service(self.descriptor, 'i18n')
+        assert i18n_service is not None
+        assert isinstance(i18n_service, ModuleI18nService)
+
+    def test_no_service_exception_with_none_declaration_(self):
+        """
+        Test: NoSuchServiceError should be raised block declaration returns none
+        """
+        self.descriptor.service_declaration = Mock(return_value=None)
+        with pytest.raises(NoSuchServiceError):
+            self.runtime.service(self.descriptor, 'i18n')
+
+    def test_no_service_exception_(self):
+        """
+        Test: NoSuchServiceError should be raised if i18n service is none.
+        """
+        self.runtime._services['i18n'] = None  # pylint: disable=protected-access
+        with pytest.raises(NoSuchServiceError):
+            self.runtime.service(self.descriptor, 'i18n')
+
+    def test_i18n_service_callable(self):
+        """
+        Test: _services dict should contain the callable i18n service in LMS.
+        """
+        assert callable(self.runtime._services.get('i18n'))  # pylint: disable=protected-access
+
+    def test_i18n_service_not_callable(self):
+        """
+        Test: i18n service should not be callable in LMS after initialization.
+        """
+        assert not callable(self.runtime.service(self.descriptor, 'i18n'))
 
 
 class PureXBlockWithChildren(PureXBlock):
@@ -2705,15 +2867,22 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     def test_replace_urls(self):
         html = '<a href="/static/id">'
         assert self.runtime.replace_urls(html) == \
-            static_replace.replace_static_urls(html, course_id=self.runtime.course_id)
+            static_replace.replace_static_urls(html, course_id=self.course.id)
 
     def test_replace_course_urls(self):
         html = '<a href="/course/id">'
         assert self.runtime.replace_course_urls(html) == \
-            static_replace.replace_course_urls(html, course_key=self.runtime.course_id)
+            static_replace.replace_course_urls(html, course_key=self.course.id)
 
     def test_replace_jump_to_id_urls(self):
         html = '<a href="/jump_to_id/id">'
-        jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': str(self.runtime.course_id), 'module_id': ''})
+        jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': str(self.course.id), 'module_id': ''})
         assert self.runtime.replace_jump_to_id_urls(html) == \
-            static_replace.replace_jump_to_id_urls(html, self.runtime.course_id, jump_to_id_base_url)
+            static_replace.replace_jump_to_id_urls(html, self.course.id, jump_to_id_base_url)
+
+    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
+    def test_course_id(self):
+        descriptor = ItemFactory(category="pure", parent=self.course)
+
+        block = render.get_module(self.user, Mock(), descriptor.location, None)
+        assert str(block.runtime.course_id) == self.COURSE_ID

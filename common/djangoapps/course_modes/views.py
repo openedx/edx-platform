@@ -55,7 +55,7 @@ LOG = logging.getLogger(__name__)
 # .. toggle_creation_date: 2021-8-23
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REV-2133
-# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
 VALUE_PROP_TRACK_SELECTION_FLAG = WaffleFlag('course_modes.use_new_track_selection', __name__)
 
 
@@ -324,11 +324,11 @@ class ChooseModeView(View):
             # been configured.  However, alternative enrollment workflows have been introduced into the
             # system, such as third-party discovery.  These workflows result in learners arriving
             # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
-            CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
+            CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT, request=request)
             return self._redirect_to_course_or_dashboard(course, course_key, user)
 
         if requested_mode == 'honor':
-            CourseEnrollment.enroll(user, course_key, mode=requested_mode)
+            CourseEnrollment.enroll(user, course_key, mode=requested_mode, request=request)
             return self._redirect_to_course_or_dashboard(course, course_key, user)
 
         mode_info = allowed_modes[requested_mode]

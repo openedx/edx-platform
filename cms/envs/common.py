@@ -225,7 +225,7 @@ FEATURES = {
     #   Open edX Studio. Set to False if you want to disable the editing of the course short description.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-02-13
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2334
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2334
     'EDITABLE_SHORT_DESCRIPTION': True,
 
     # Hide any Personally Identifiable Information from application logs
@@ -272,7 +272,7 @@ FEATURES = {
     #    Studio can be used as an LTI 1.3 tool by external LTI platforms.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-08-17
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/27411
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/27411
     'ENABLE_CONTENT_LIBRARIES_LTI_TOOL': False,
 
     # Milestones application flag
@@ -304,7 +304,7 @@ FEATURES = {
     #   the studio home page.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-02-13
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6965
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6965
     'ALLOW_COURSE_RERUNS': True,
 
     # Certificates Web/HTML Views
@@ -380,7 +380,7 @@ FEATURES = {
     #   page else Mobile Course Available UI Flag will be available on Studio side.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-14
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/23073
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/23073
     'DISABLE_MOBILE_COURSE_AVAILABLE': False,
 
     # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
@@ -390,7 +390,7 @@ FEATURES = {
     #   default because enabling allows a method to bypass password policy.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
-    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
+    # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/21616'
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
     ### ORA Feature Flags ###
@@ -404,7 +404,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_ALL_FILE_URLS': False,
 
     # .. toggle_name: FEATURES['ENABLE_ORA_USER_STATE_UPLOAD_DATA']
@@ -416,7 +416,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
 
     # .. toggle_name: FEATURES['DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO']
@@ -430,7 +430,7 @@ FEATURES = {
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-06-12
     # .. toggle_target_removal_date: 2021-04-01
-    # .. toggle_warnings: This can be removed once support is removed for deprecated
+    # .. toggle_warning: This can be removed once support is removed for deprecated
     #   course keys.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
@@ -443,7 +443,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-06-20
     # .. toggle_target_removal_date: 2020-12-31
     # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
-    # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
+    # .. toggle_warning: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
     #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
     'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
 
@@ -456,7 +456,7 @@ FEATURES = {
     #   otherwise the course creation functionality will work as it should.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-12-02
-    # .. toggle_warnings: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
+    # .. toggle_warning: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
     'DISABLE_COURSE_CREATION': False,
 
     # Can be turned off to disable the help link in the navbar
@@ -466,7 +466,7 @@ FEATURES = {
     # .. toggle_description: When True, a help link is displayed on the main navbar. Set False to hide it.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-03-05
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/26106
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26106
     'ENABLE_HELP_LINK': True,
 
     # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
@@ -500,8 +500,8 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-03-22
     # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28268
-    # .. toggle_warnings: For consistency in user-experience, keep the value in sync with the setting of the same name
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/28268
+    # .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
     #   in the LMS and CMS.
     'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
 
@@ -512,7 +512,7 @@ FEATURES = {
     #   This also hides the "Unenroll" button on the Learner Dashboard.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-10-11
-    # .. toggle_warnings: For consistency in user experience, keep the value in sync with the setting of the same name
+    # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
     #   in the LMS and CMS.
     # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
     'DISABLE_UNENROLLMENT': False,
@@ -606,8 +606,6 @@ SOCIAL_SHARING_SETTINGS = {
     'DASHBOARD_TWITTER': False
 }
 
-SOCIAL_MEDIA_FOOTER_URLS = {}
-
 # This is just a placeholder image.
 # Site operators can customize this with their organization's image.
 FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
@@ -636,6 +634,10 @@ DJFS = {
 }
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
+
+######################## OPTIMIZELY ###########################
+OPTIMIZELY_PROJECT_ID = None
+OPTIMIZELY_FULLSTACK_SDK_KEY = None
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
@@ -1073,7 +1075,7 @@ DEFAULT_HASHING_ALGORITHM = 'sha1'
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
-    # from https://github.com/edx/codejail/blob/master/codejail/django_integration.py#L24, '' should be same as None
+    # from https://github.com/openedx/codejail/blob/master/codejail/django_integration.py#L24, '' should be same as None
     'python_bin': '/edx/app/edxapp/venvs/edxapp-sandbox/bin/python',
     # User to run as in the sandbox.
     'user': 'sandbox',
@@ -1112,10 +1114,10 @@ COURSES_WITH_UNSAFE_CODE = []
 # Cojail REST service
 ENABLE_CODEJAIL_REST_SERVICE = False
 # .. setting_name: CODE_JAIL_REST_SERVICE_REMOTE_EXEC
-# .. setting_default: 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+# .. setting_default: 'xmodule.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
 # .. setting_description: Set the python package.module.function that is reponsible of
 #   calling the remote service in charge of jailed code execution
-CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'xmodule.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
 # .. setting_name: CODE_JAIL_REST_SERVICE_HOST
 # .. setting_default: 'http://127.0.0.1:8550'
 # .. setting_description: Set the codejail remote service host
@@ -1293,14 +1295,14 @@ PIPELINE['STYLESHEETS'] = {
     'style-vendor-tinymce-content': {
         'source_filenames': [
             'css/tinymce-studio-content-fonts.css',
-            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
+            'js/vendor/tinymce/js/tinymce/skins/ui/studio-tmce5/content.min.css',
             'css/tinymce-studio-content.css'
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-content.css',
     },
     'style-vendor-tinymce-skin': {
         'source_filenames': [
-            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+            'js/vendor/tinymce/js/tinymce/skins/ui/studio-tmce5/skin.min.css'
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
@@ -1652,17 +1654,11 @@ INSTALLED_APPS = [
     # Course action state
     'common.djangoapps.course_action_state',
 
-    # Additional problem types
-    'edx_jsme',    # Molecular Structure
-
     'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig',
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
 
     # edx-milestones service
     'milestones',
-
-    # Self-paced course configuration
-    'openedx.core.djangoapps.self_paced',
 
     # Coursegraph
     'cms.djangoapps.coursegraph.apps.CoursegraphConfig',
@@ -1762,7 +1758,7 @@ INSTALLED_APPS = [
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
-    # Database-backed Organizations App (http://github.com/edx/edx-organizations)
+    # Database-backed Organizations App (http://github.com/openedx/edx-organizations)
     'organizations',
 
     # User and group management via edx-django-utils
@@ -1909,7 +1905,7 @@ OPTIONAL_APPS = (
     # edxval
     ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
-    # Enterprise App (http://github.com/edx/edx-enterprise)
+    # Enterprise App (http://github.com/openedx/edx-enterprise)
     ('enterprise', None),
     ('consent', None),
     ('integrated_channels.integrated_channel', None),
@@ -1977,6 +1973,17 @@ ADVANCED_PROBLEM_TYPES = [
     },
     {
         'component': 'staffgradedxblock',
+        'boilerplate_name': None
+    }
+]
+
+LIBRARY_BLOCK_TYPES = [
+    {
+        'component': 'library_sourced',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'library_content',
         'boilerplate_name': None
     }
 ]
@@ -2131,6 +2138,16 @@ DEFAULT_SITE_THEME = None
 # .. toggle_creation_date: 2016-06-30
 ENABLE_COMPREHENSIVE_THEMING = False
 
+# .. setting_name: CUSTOM_RESOURCE_TEMPLATES_DIRECTORY
+# .. setting_default: None
+# .. setting_description: Path to an existing directory of YAML files containing
+#    html content to be used with the subclasses of xmodule.x_module.ResourceTemplates.
+#    Default example templates can be found in xmodule/templates/html.
+#    Note that the extension used is ".yaml" and not ".yml".
+#    See xmodule.x_module.ResourceTemplates for usage.
+#   "CUSTOM_RESOURCE_TEMPLATES_DIRECTORY" : null
+CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
+
 ############################ Global Database Configuration #####################
 
 DATABASE_ROUTERS = [
@@ -2269,11 +2286,6 @@ DEFAULT_MOBILE_AVAILABLE = False
 # How long to cache OpenAPI schemas and UI, in seconds.
 OPENAPI_CACHE_TIMEOUT = 0
 
-################# Mobile URLS ##########################
-
-# These are URLs to the app store for mobile.
-MOBILE_STORE_URLS = {}
-
 ############################# Persistent Grades ####################################
 
 # Queue to use for updating persistent grades
@@ -2282,10 +2294,13 @@ RECALCULATE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 # Queue to use for updating grades due to grading policy change
 POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
 
+# Queue to use for individual learner course regrades
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = 'edx.lms.core.default'
+
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
 
 # Rate limit for regrading tasks that a grading policy change can kick off
-POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
+POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 
 ############## Settings for CourseGraph ############################
 
@@ -2398,6 +2413,9 @@ ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
 
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
+
+EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+EXAMS_SERVICE_USERNAME = 'edx_exams_worker'
 
 FINANCIAL_REPORTS = {
     'STORAGE_TYPE': 'localfs',
@@ -2578,7 +2596,7 @@ EDXAPP_PARSE_KEYS = {}
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-12-02
 # .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
+# .. toggle_warning: This url can be removed once it no longer has any real traffic.
 # .. toggle_tickets: ARCH-1253
 DISABLE_DEPRECATED_SIGNIN_URL = False
 
@@ -2589,7 +2607,7 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-12-02
 # .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
+# .. toggle_warning: This url can be removed once it no longer has any real traffic.
 # .. toggle_tickets: ARCH-1253
 DISABLE_DEPRECATED_SIGNUP_URL = False
 
@@ -2635,7 +2653,7 @@ VERIFY_STUDENT = {
 #   the orgs referenced in Studio content, then leave it enabled.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-11-02
-# .. toggle_tickets: https://github.com/edx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
+# .. toggle_tickets: https://github.com/openedx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
 ORGANIZATIONS_AUTOCREATE = True
 
 ################# Settings for brand logos. #################
@@ -2666,3 +2684,17 @@ TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
 COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"
+
+# keys for  big blue button live provider
+COURSE_LIVE_GLOBAL_CREDENTIALS = {}
+
+PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
+
+######################## Registration ########################
+
+# Social-core setting that allows inactive users to be able to
+# log in. The only case it's used is when user registering a new account through the LMS.
+INACTIVE_USER_LOGIN = True
+
+# Redirect URL for inactive user. If not set, user will be redirected to /login after the login itself (loop)
+INACTIVE_USER_URL = f'http://{CMS_BASE}'

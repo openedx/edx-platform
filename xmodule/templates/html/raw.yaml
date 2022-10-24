@@ -1,0 +1,9 @@
+---
+metadata:
+    display_name: Raw HTML
+    editor: raw
+data: |
+      <p>This is a Raw HTML editor that saves your HTML exactly as you enter it.
+      This means that even malformed HTML tags will be saved and rendered as-is.
+      There is no way to switch between Raw and Visual Text editor types, so be
+      sure this is the editor you should be using!</p>

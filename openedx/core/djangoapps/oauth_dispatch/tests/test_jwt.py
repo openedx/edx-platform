@@ -22,7 +22,7 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         self.user = UserFactory()
         self.default_scopes = ['email', 'profile']
 
-    def _create_client(self, oauth_adapter, client_restricted):
+    def _create_client(self, oauth_adapter, client_restricted, grant_type=None):
         """
         Creates and returns an OAuth client using the given oauth_adapter.
         Configures the client as a RestrictedApplication if client_restricted is
@@ -33,16 +33,15 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
             user=self.user,
             redirect_uri='',
             client_id='public-client-id',
+            grant_type=grant_type or '',
         )
         if client_restricted:
             RestrictedApplication.objects.create(application=client)
         return client
 
-    def _create_jwt_for_token(
-        self, oauth_adapter, use_asymmetric_key, client_restricted=False,
-    ):
-        """ Creates and returns the jwt returned by jwt_api.create_jwt_from_token. """
-        client = self._create_client(oauth_adapter, client_restricted)
+    def _get_token_dict(self, client_restricted, oauth_adapter, grant_type=None):
+        """ Creates and returns an (opaque) access token dict """
+        client = self._create_client(oauth_adapter, client_restricted, grant_type=grant_type)
         expires_in = 60 * 60
         expires = now() + timedelta(seconds=expires_in)
         token_dict = dict(
@@ -50,6 +49,13 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
             expires_in=expires_in,
             scope=' '.join(self.default_scopes)
         )
+        return token_dict
+
+    def _create_jwt_for_token(
+        self, oauth_adapter, use_asymmetric_key, client_restricted=False,
+    ):
+        """ Creates and returns the jwt returned by jwt_api.create_jwt_from_token. """
+        token_dict = self._get_token_dict(client_restricted, oauth_adapter)
         return jwt_api.create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=use_asymmetric_key)
 
     def _assert_jwt_is_valid(self, jwt_token, should_be_asymmetric_key):
@@ -84,8 +90,33 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
             jwt_token, self.user, self.default_scopes, expires_in=expected_expires_in,
         )
 
+    def test_create_jwt_token_dict_for_default_expire_seconds(self):
+        oauth_adapter = DOTAdapter()
+        token_dict = self._get_token_dict(client_restricted=False, oauth_adapter=oauth_adapter)
+        jwt_token_dict = jwt_api.create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=False)
+        expected_expires_in = 60 * 60
+        self.assert_valid_jwt_access_token(
+            jwt_token_dict["access_token"], self.user, self.default_scopes, expires_in=expected_expires_in,
+        )
+        assert jwt_token_dict["token_type"] == "JWT"
+        assert jwt_token_dict["expires_in"] == expected_expires_in
+        assert jwt_token_dict["scope"] == token_dict["scope"]
+
+    def test_create_jwt_token_dict_for_overridden_expire_seconds(self):
+        oauth_adapter = DOTAdapter()
+        expected_expires_in = 60
+        with override_settings(JWT_ACCESS_TOKEN_EXPIRE_SECONDS=expected_expires_in):
+            token_dict = self._get_token_dict(client_restricted=False, oauth_adapter=oauth_adapter)
+            jwt_token_dict = jwt_api.create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=False)
+        self.assert_valid_jwt_access_token(
+            jwt_token_dict["access_token"], self.user, self.default_scopes, expires_in=expected_expires_in,
+        )
+        assert jwt_token_dict["token_type"] == "JWT"
+        assert jwt_token_dict["expires_in"] == expected_expires_in
+        assert jwt_token_dict["scope"] == token_dict["scope"]
+
     @ddt.data((True, False))
-    def test_dot_create_jwt_for_token(self, client_restricted):
+    def test_create_jwt_for_client_restricted(self, client_restricted):
         jwt_token = self._create_jwt_for_token(
             DOTAdapter(),
             use_asymmetric_key=None,
@@ -133,3 +164,33 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         assert jwt_payload['scopes'] == self.default_scopes
         assert jwt_scopes_payload['scopes'] == scopes
         assert jwt_scopes_payload['user_id'] == self.user.id
+
+    def test_password_grant_type(self):
+        oauth_adapter = DOTAdapter()
+        token_dict = self._get_token_dict(client_restricted=False, oauth_adapter=oauth_adapter, grant_type='password')
+        jwt_token_dict = jwt_api.create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=False)
+
+        self.assert_valid_jwt_access_token(
+            jwt_token_dict["access_token"], self.user, self.default_scopes,
+            grant_type='password',
+        )
+
+    def test_None_grant_type(self):
+        oauth_adapter = DOTAdapter()
+        token_dict = self._get_token_dict(client_restricted=False, oauth_adapter=oauth_adapter, grant_type=None)
+        jwt_token_dict = jwt_api.create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=False)
+
+        self.assert_valid_jwt_access_token(
+            jwt_token_dict["access_token"], self.user, self.default_scopes,
+            grant_type='',
+        )
+
+    def test_random_str_grant_type(self):
+        oauth_adapter = DOTAdapter()
+        token_dict = self._get_token_dict(client_restricted=False, oauth_adapter=oauth_adapter, grant_type='test rand')
+        jwt_token_dict = jwt_api.create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=False)
+
+        self.assert_valid_jwt_access_token(
+            jwt_token_dict["access_token"], self.user, self.default_scopes,
+            grant_type='test rand',
+        )

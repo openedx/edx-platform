@@ -3,7 +3,6 @@
 # Core
 common/djangoapps/student/
 common/djangoapps/third_party_auth/
-common/lib/xmodule/xmodule/
 lms/djangoapps/course_api/blocks
 lms/djangoapps/courseware/
 lms/djangoapps/grades/
@@ -15,11 +14,9 @@ openedx/core/djangoapps/oauth_dispatch
 openedx/core/djangoapps/user_api/
 openedx/core/djangoapps/user_authn/
 openedx/features/course_experience/
+xmodule/
 
 # Core Extensions
-common/lib/xmodule/xmodule/capa_module.py
-common/lib/xmodule/xmodule/html_module.py
-common/lib/xmodule/xmodule/video_module
 lms/djangoapps/discussion/
 lms/djangoapps/edxnotes
 
@@ -35,6 +32,7 @@ common/djangoapps/enrollment/              @edx/platform-discovery
 lms/djangoapps/commerce/                   @edx/rev-team
 lms/djangoapps/experiments/                @edx/rev-team
 lms/djangoapps/learner_dashboard/          @edx/platform-discovery
+lms/djangoapps/learner_home/               @edx/content-aurora
 openedx/features/content_type_gating/      @edx/rev-team
 openedx/features/course_duration_limits/   @edx/rev-team
 openedx/features/discounts/                @edx/rev-team

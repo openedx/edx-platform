@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from django.core.cache import cache
 from django.urls import reverse_lazy
+from enterprise.models import EnterpriseCourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
@@ -209,3 +210,95 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
             'in_progress': 0,
             'not_started': 1
         }
+
+    @with_site_configuration(configuration={'COURSE_CATALOG_API_URL': 'foo'})
+    def test_program_empty_list_if_no_enterprise_enrollments(self):
+        """
+        Verify API returns empty response if no enterprise enrollments exists for a learner.
+        """
+        # delete all enterprise course enrollments for the user
+        EnterpriseCourseEnrollment.objects.filter(
+            enterprise_customer_user__user_id=self.user.id
+        ).delete()
+
+        cache.set(
+            SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site.domain),
+            [self.program_uuid],
+            None
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
+
+
+class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
+    """Unit tests for the course recommendations on dashboard page."""
+
+    password = 'test'
+    url = reverse_lazy('learner_dashboard:v0:courses')
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=self.password)
+        self.recommended_courses = ['MITx+6.00.1x', 'IBM+PY0101EN', 'HarvardX+CS50P', 'UQx+IELTSx', 'HarvardX+CS50x',
+                                    'Harvard+CS50z', 'BabsonX+EPS03x', 'TUMx+QPLS2x', 'NYUx+FCS.NET.1', 'MichinX+101x']
+        self.course_data = {
+            'course_key': 'MITx+6.00.1x',
+            'title': 'Introduction to Computer Science and Programming Using Python',
+            'owners': [{'logo_image_url': 'https://prod-discovery.edx-cdn.org/organization/logos/2a73d2ce-c34a-4e08'
+                                          '-822383bca9d2f01d-2cc8854c6fee.png'}],
+            'marketing_url': 'https://www.edx.org/course/introduction-to-computer-science-and-programming-7'
+        }
+
+    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations')
+    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_course_data')
+    def test_no_recommendations_from_amplitude(self, mocked_get_course_data,
+                                               mocked_get_personalized_course_recommendations):
+        """
+        Verify API returns 400 if no course recommendations from amplitude.
+        """
+        mocked_get_personalized_course_recommendations.return_value = [False, []]
+        mocked_get_course_data.return_value = self.course_data
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, None)
+
+    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations')
+    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_course_data')
+    def test_get_course_recommendations(self, mocked_get_course_data,
+                                        mocked_get_personalized_course_recommendations):
+        """
+        Verify API returns course recommendations.
+        """
+        mocked_get_personalized_course_recommendations.return_value = [False, self.recommended_courses]
+        mocked_get_course_data.return_value = self.course_data
+        expected_recommendations = 5
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get('is_personalized_recommendation'), True)
+        self.assertEqual(len(response.data.get('courses')), expected_recommendations)
+
+    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations')
+    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_course_data')
+    def test_get_enrollable_course_recommendations(self, mocked_get_course_data,
+                                                   mocked_get_personalized_course_recommendations):
+        """
+        Verify API returns course recommendations for courses in which user is not enrolled.
+        """
+        mocked_get_personalized_course_recommendations.return_value = [False, self.recommended_courses]
+        mocked_get_course_data.return_value = self.course_data
+        course_keys = ['course-v1:IBM+PY0101EN+Run_0', 'course-v1:UQx+IELTSx+Run_0', 'course-v1:MITx+6.00.1x+Run_0',
+                       'course-v1:HarvardX+CS50P+Run_0', 'course-v1:Harvard+CS50z+Run_0', 'course-v1:TUMx+QPLS2x+Run_0']
+        expected_recommendations = 4
+        # enrolling in 6 courses
+        for course_key in course_keys:
+            CourseEnrollmentFactory(course_id=course_key, user=self.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get('is_personalized_recommendation'), True)
+        self.assertEqual(len(response.data.get('courses')), expected_recommendations)

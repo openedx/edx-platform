@@ -16,6 +16,18 @@ class CanDeactivateUser(permissions.BasePermission):
         return request.user.has_perm('student.can_deactivate_users')
 
 
+class CanCancelUserRetirement(permissions.BasePermission):
+    """
+    Grants access to cancel retirement if the requesting user is a superuser,
+    or has the explicit permission to cancel retirement of a User account.
+    """
+
+    def has_permission(self, request, view):
+        return request.user.is_superuser or (
+            request.user.is_staff and request.user.has_perm('user_api.change_userretirementstatus')
+        )
+
+
 class CanRetireUser(permissions.BasePermission):
     """
     Grants access to the various retirement API endpoints if the requesting user is

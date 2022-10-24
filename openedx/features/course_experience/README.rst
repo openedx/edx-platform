@@ -59,4 +59,4 @@ The course experience consists of a number of views:
 A number of the features in the course experience are controlled via Waffle
 flags. For documentation, see `Waffle flag definitions`_.
 
-.. _Waffle flag definitions: https://github.com/edx/edx-platform/blob/master/openedx/features/course_experience/__init__.py
+.. _Waffle flag definitions: https://github.com/openedx/edx-platform/blob/master/openedx/features/course_experience/__init__.py

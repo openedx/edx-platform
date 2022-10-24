@@ -65,7 +65,7 @@ Decisions
 
    c. We do not want to make a synchronous call from the Ecommerce backend to the LMS every time the basket 
       page is loaded. See this decision record link for more information: 
-      https://github.com/edx/Ecommerce/blob/master/docs/decisions/0002-no-synchronous-calls.rst  However, 
+      https://github.com/openedx/Ecommerce/blob/master/docs/decisions/0002-no-synchronous-calls.rst  However, 
       we are happy to make an ajax call from the front-end.
       The basket page needs this information for two reasons: 1) So that the correct price is shown to the user,
       and the user is informed that they are recieving a discount. 2) So that the correct price is charged to 

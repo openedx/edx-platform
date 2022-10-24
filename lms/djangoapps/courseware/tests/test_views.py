@@ -12,7 +12,6 @@ from urllib.parse import quote, urlencode
 from uuid import uuid4
 
 import ddt
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
 from django.conf import settings
@@ -23,7 +22,7 @@ from django.test import RequestFactory, TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
-from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
@@ -31,6 +30,7 @@ from rest_framework import status
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
+from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
@@ -75,7 +75,6 @@ from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expirat
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -91,7 +90,6 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     DISABLE_COURSE_OUTLINE_PAGE_FLAG,
-    DISABLE_UNIFIED_COURSE_TAB_FLAG,
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.course_experience.url_helpers import (
@@ -339,8 +337,10 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     """
     NUM_PROBLEMS = 20
 
-    def test_index_query_counts(self):
+    @patch('common.djangoapps.student.helpers.get_course_dates_for_email')
+    def test_index_query_counts(self, mock_course_dates_for_email):
         # TODO: decrease query count as part of REVO-28
+        mock_course_dates_for_email.return_value = []
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -350,6 +350,20 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 vertical = ItemFactory.create(category='vertical', parent_location=section.location)
                 for _ in range(self.NUM_PROBLEMS):
                     ItemFactory.create(category='problem', parent_location=vertical.location)
+
+        course_run = CourseRunFactory.create(key=course.id)
+        course_run['title'] = course.display_name
+        course_run['short_description'] = None
+        course_run['marketing_url'] = 'www.edx.org'
+        course_run['pacing_type'] = 'self_paced'
+        course_run['banner_image_url'] = ''
+        course_run['min_effort'] = 1
+        course_run['enrollment_count'] = 12345
+
+        patch_course_data = patch('openedx.core.djangoapps.catalog.api.get_course_run_details')
+        course_data = patch_course_data.start()
+        course_data.return_value = course_run
+        self.addCleanup(patch_course_data.stop)
 
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, course.id)
@@ -1022,19 +1036,6 @@ class ViewsTestCase(BaseViewsTestCase):
             response = self.client.get(url)
             self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
 
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
-    def test_bypass_course_info(self):
-        course_id = str(self.course_key)
-
-        response = self.client.get(reverse('info', args=[course_id]))
-        assert response.status_code == 200
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
-        assert response.status_code == 200
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER='foo')
-        assert response.status_code == 200
-
 
 # Patching 'lms.djangoapps.courseware.views.views.get_programs' would be ideal,
 # but for some unknown reason that patch doesn't seem to be applied.
@@ -1441,7 +1442,6 @@ class ProgressPageTests(ProgressPageBaseTests):
             user=self.user,
             course_id=self.course.id,
             status=CertificateStatuses.downloadable,
-            download_url="http://www.example.com/certificate.pdf",
             mode='honor'
         )
 
@@ -1492,34 +1492,6 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "Your certificate is available")
             self.assertContains(resp, "earned a certificate for this course.")
 
-    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
-    def test_view_certificate_link_hidden(self):
-        """
-        If certificate web view is disabled then certificate web view button should not appear for user who certificate
-        is available/generated
-        """
-        GeneratedCertificateFactory.create(
-            user=self.user,
-            course_id=self.course.id,
-            status=CertificateStatuses.downloadable,
-            download_url="http://www.example.com/certificate.pdf",
-            mode='honor'
-        )
-
-        # Enable the feature, but do not enable it for this course
-        CertificateGenerationConfiguration(enabled=True).save()
-
-        # Enable certificate generation for this course
-        certs_api.set_cert_generation_enabled(self.course.id, True)
-
-        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
-            course_grade = mock_create.return_value
-            course_grade.passed = True
-            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
-
-            resp = self._get_progress_page()
-            self.assertContains(resp, "Download Your Certificate")
-
     @ddt.data(
         (True, 52),
         (False, 52),
@@ -1533,27 +1505,19 @@ class ProgressPageTests(ProgressPageBaseTests):
         with self.assertNumQueries(query_count, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST), check_mongo_calls(2):
             self._get_progress_page()
 
-    @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
-    @ddt.data(
-        (False, 60, 42),
-        (True, 52, 36)
-    )
-    @ddt.unpack
-    def test_progress_queries(self, enable_waffle, initial, subsequent):
+    def test_progress_queries(self):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
-        with override_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
+        with self.assertNumQueries(
+            52, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+        ), check_mongo_calls(2):
+            self._get_progress_page()
+
+        for _ in range(2):
             with self.assertNumQueries(
-                initial, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+                36, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
             ), check_mongo_calls(2):
                 self._get_progress_page()
-
-            # subsequent accesses to the progress page require fewer queries.
-            for _ in range(2):
-                with self.assertNumQueries(
-                    subsequent, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
-                ), check_mongo_calls(2):
-                    self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ENABLE_CERTIFICATES_IDV_REQUIREMENT': True})
     @ddt.data(
@@ -1599,9 +1563,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify that for html certs if certificate is marked as invalidated than
         re-generate button should not appear on progress page.
         """
-        generated_certificate = self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "honor"
-        )
+        generated_certificate = self.generate_certificate("honor")
 
         # Course certificate configurations
         certificates = [
@@ -1636,9 +1598,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         Verify that view certificate appears for an allowlisted user
         """
-        generated_certificate = self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "honor"
-        )
+        generated_certificate = self.generate_certificate("honor")
 
         # Course certificate configurations
         certificates = [
@@ -1670,24 +1630,6 @@ class ProgressPageTests(ProgressPageBaseTests):
 
             resp = self._get_progress_page()
             self.assertContains(resp, "View Certificate")
-            self.assert_invalidate_certificate(generated_certificate)
-
-    def test_page_with_invalidated_certificate_with_pdf(self):
-        """
-        Verify that for pdf certs if certificate is marked as invalidated than
-        re-generate button should not appear on progress page.
-        """
-        generated_certificate = self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "honor"
-        )
-
-        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
-            course_grade = mock_create.return_value
-            course_grade.passed = True
-            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
-
-            resp = self._get_progress_page()
-            self.assertContains(resp, 'Download Your Certificate')
             self.assert_invalidate_certificate(generated_certificate)
 
     @ddt.data(
@@ -1780,9 +1722,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         Verify that invalidated cert data is returned if cert is invalidated.
         """
-        generated_certificate = self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "honor"
-        )
+        generated_certificate = self.generate_certificate("honor")
 
         CertificateInvalidationFactory.create(
             generated_certificate=generated_certificate,
@@ -1800,9 +1740,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify that downloadable cert data is returned if cert is downloadable even
         when DISABLE_HONOR_CERTIFICATES feature flag is turned ON.
         """
-        self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "honor"
-        )
+        self.generate_certificate("honor")
         response = views.get_cert_data(
             self.user, self.course, CourseMode.HONOR, MagicMock(passed=True)
         )
@@ -1814,9 +1752,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         Verify that generating cert data is returned if cert is generating.
         """
-        self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "honor"
-        )
+        self.generate_certificate("honor")
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_generating=True)):
             response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
@@ -1828,9 +1764,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         Verify that unverified cert data is returned if cert is unverified.
         """
-        self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "honor"
-        )
+        self.generate_certificate("honor")
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_unverified=True)):
             response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
@@ -1842,9 +1776,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         Verify that requested cert data is returned if cert is to be requested.
         """
-        self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "honor"
-        )
+        self.generate_certificate("honor")
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status()):
             response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
@@ -1856,9 +1788,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         Verify that earned but not available cert data is returned if cert has been earned, but isn't available.
         """
-        self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "verified"
-        )
+        self.generate_certificate("verified")
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(earned_but_not_available=True)):
             response = views.get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
@@ -1904,16 +1834,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertContains(resp, 'Your certificate has been invalidated')
         self.assertContains(resp, 'Please contact your course team if you have any questions.')
         self.assertNotContains(resp, 'View my Certificate')
-        self.assertNotContains(resp, 'Download my Certificate')
 
-    def generate_certificate(self, url, mode):
+    def generate_certificate(self, mode):
         """ Dry method to generate certificate. """
 
         generated_certificate = GeneratedCertificateFactory.create(
             user=self.user,
             course_id=self.course.id,
             status=CertificateStatuses.downloadable,
-            download_url=url,
             mode=mode
         )
         CertificateGenerationConfiguration(enabled=True).save()
@@ -1921,7 +1849,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         return generated_certificate
 
     def mock_certificate_downloadable_status(
-            self, is_downloadable=False, is_generating=False, is_unverified=False, uuid=None, download_url=None,
+            self, is_downloadable=False, is_generating=False, is_unverified=False, uuid=None,
             earned_but_not_available=None,
     ):
         """Dry method to mock certificate downloadable status response."""
@@ -1929,8 +1857,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             'is_downloadable': is_downloadable,
             'is_generating': is_generating,
             'is_unverified': is_unverified,
-            'download_url': uuid,
-            'uuid': download_url,
+            'uuid': uuid,
             'earned_but_not_available': earned_but_not_available,
         }
 
@@ -2287,7 +2214,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     def test_user_with_passing_grade(self, mock_is_course_passed):  # lint-amnesty, pylint: disable=unused-argument
         # If user has above passing grading then json will return cert generating message and
         # status valid code
-        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
+        with patch('xmodule.capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
             mock_send_to_queue.return_value = (0, "Successfully queued")
 
             resp = self.client.post(self.url)

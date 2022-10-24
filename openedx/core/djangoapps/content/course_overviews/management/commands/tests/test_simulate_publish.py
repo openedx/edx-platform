@@ -30,12 +30,10 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         """
         super().setUpClass()
         cls.command = Command()
-        # org.0/course_0/Run_0
-        cls.course_key_1 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo).id
         # course-v1:org.1+course_1+Run_1
-        cls.course_key_2 = CourseFactory.create(default_store=ModuleStoreEnum.Type.split).id
+        cls.course_key_1 = CourseFactory.create(default_store=ModuleStoreEnum.Type.split).id
         # course-v1:org.2+course_2+Run_2
-        cls.course_key_3 = CourseFactory.create(default_store=ModuleStoreEnum.Type.split).id
+        cls.course_key_2 = CourseFactory.create(default_store=ModuleStoreEnum.Type.split).id
 
     def setUp(self):
         """
@@ -108,12 +106,11 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         """Test sending only to specific courses."""
         self.command.handle(
             **self.options(
-                courses=[str(self.course_key_1), str(self.course_key_2)]
+                courses=[str(self.course_key_1)]
             )
         )
         assert self.course_key_1 in self.received_1
-        assert self.course_key_2 in self.received_1
-        assert self.course_key_3 not in self.received_1
+        assert self.course_key_2 not in self.received_1
         assert self.received_1 == self.received_2
 
     def test_specific_receivers(self):
@@ -125,7 +122,6 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         )
         assert self.course_key_1 in self.received_1
         assert self.course_key_2 in self.received_1
-        assert self.course_key_3 in self.received_1
         assert not self.received_2
 
     def test_course_overviews(self):
@@ -139,7 +135,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
                 ]
             )
         )
-        assert CourseOverview.objects.all().count() == 3
+        assert CourseOverview.objects.all().count() == 2
         assert not self.received_1
         assert not self.received_2
 

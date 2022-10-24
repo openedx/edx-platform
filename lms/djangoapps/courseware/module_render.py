@@ -7,10 +7,12 @@ import json
 import logging
 import textwrap
 from collections import OrderedDict
+
 from functools import partial
 
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
+from completion.services import CompletionService
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
@@ -22,7 +24,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
-from edx_django_utils.cache import RequestCache
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE, RequestCache
 from edx_django_utils.monitoring import set_custom_attributes_for_course_key, set_monitoring_transaction_name
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
@@ -39,16 +41,22 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
+from lms.djangoapps.badges.service import BadgingService
+from lms.djangoapps.badges.utils import badges_enabled
+from lms.djangoapps.teams.services import TeamsService
+from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import modulestore
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.partitions.partitions_service import PartitionService
 from xmodule.util.sandboxing import SandboxService
+from xmodule.services import RebindUserService, SettingsService, TeamsConfigurationService
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
-from capa.xqueue_interface import XQueueService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.capa.xqueue_interface import XQueueService  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
 from lms.djangoapps.courseware.masquerade import (
@@ -63,8 +71,7 @@ from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
 from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, UserTagsService
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
@@ -483,12 +490,12 @@ def get_module_system_for_user(
             student_data=student_data,
             course_id=course_id,
             track_function=track_function,
+            request_token=request_token,
             position=position,
             wrap_xmodule_display=wrap_xmodule_display,
             grade_bucket_type=grade_bucket_type,
             static_asset_path=static_asset_path,
             user_location=user_location,
-            request_token=request_token,
             course=course,
             will_recheck_access=will_recheck_access,
         )
@@ -608,65 +615,20 @@ def get_module_system_for_user(
                     completion=1.0,
                 )
 
-    def rebind_noauth_module_to_user(module, real_user):
-        """
-        A function that allows a module to get re-bound to a real user if it was previously bound to an AnonymousUser.
-
-        Will only work within a module bound to an AnonymousUser, e.g. one that's instantiated by the noauth_handler.
-
-        Arguments:
-            module (any xblock type):  the module to rebind
-            real_user (django.contrib.auth.models.User):  the user to bind to
-
-        Returns:
-            nothing (but the side effect is that module is re-bound to real_user)
-        """
-        if user.is_authenticated:
-            err_msg = ("rebind_noauth_module_to_user can only be called from a module bound to "
-                       "an anonymous user")
-            log.error(err_msg)
-            raise LmsModuleRenderError(err_msg)
-
-        field_data_cache_real_user = FieldDataCache.cache_for_descriptor_descendents(
-            course_id,
-            real_user,
-            module,
-            asides=XBlockAsidesConfig.possible_asides(),
-        )
-        student_data_real_user = KvsFieldData(DjangoKeyValueStore(field_data_cache_real_user))
-
-        (inner_system, inner_student_data) = get_module_system_for_user(
-            user=real_user,
-            student_data=student_data_real_user,  # These have implicit user bindings, rest of args considered not to
-            descriptor=module,
-            course_id=course_id,
-            track_function=track_function,
-            position=position,
-            wrap_xmodule_display=wrap_xmodule_display,
-            grade_bucket_type=grade_bucket_type,
-            static_asset_path=static_asset_path,
-            user_location=user_location,
-            request_token=request_token,
-            course=course,
-            will_recheck_access=will_recheck_access,
-        )
-
-        module.bind_for_student(
-            inner_system,
-            real_user.id,
-            [
-                partial(DateLookupFieldData, course_id=course_id, user=user),
-                partial(OverrideFieldData.wrap, real_user, course),
-                partial(LmsFieldData, student_data=inner_student_data),
-            ],
-        )
-
-        module.scope_ids = (
-            module.scope_ids._replace(user_id=real_user.id)
-        )
-        # now bind the module to the new ModuleSystem instance and vice-versa
-        module.runtime = inner_system
-        inner_system.xmodule_instance = module
+    # Rebind module service to deal with noauth modules getting attached to users
+    rebind_user_service = RebindUserService(
+        user,
+        course_id,
+        get_module_system_for_user,
+        track_function=track_function,
+        position=position,
+        wrap_xmodule_display=wrap_xmodule_display,
+        grade_bucket_type=grade_bucket_type,
+        static_asset_path=static_asset_path,
+        user_location=user_location,
+        request_token=request_token,
+        will_recheck_access=will_recheck_access,
+    )
 
     # Build a list of wrapping functions that will be applied in order
     # to the Fragment content coming out of the xblocks that are about to be rendered.
@@ -724,16 +686,12 @@ def get_module_system_for_user(
     field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
     field_data = LmsFieldData(field_data, student_data)
 
+    store = modulestore()
+
     system = LmsModuleSystem(
         track_function=track_function,
-        static_url=settings.STATIC_URL,
         get_module=inner_get_module,
-        user=user,
-        debug=settings.DEBUG,
-        hostname=settings.SITE_NAME,
-        node_path=settings.NODE_PATH,
         publish=publish,
-        course_id=course_id,
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
@@ -754,10 +712,22 @@ def get_module_system_for_user(
             'cache': CacheService(cache),
             'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
             'xqueue': xqueue_service,
-            'replace_urls': replace_url_service
+            'replace_urls': replace_url_service,
+            'rebind_user': rebind_user_service,
+            'completion': CompletionService(user=user, context_key=course_id)
+            if user and user.is_authenticated
+            else None,
+            'i18n': ModuleI18nService,
+            'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
+            'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
+            'settings': SettingsService(),
+            'user_tags': UserTagsService(user=user, course_id=course_id),
+            'badging': BadgingService(course_id=course_id, modulestore=store) if badges_enabled() else None,
+            'teams': TeamsService(),
+            'teams_configuration': TeamsConfigurationService(),
+            'call_to_action': CallToActionService(),
         },
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
-        rebind_noauth_module_to_user=rebind_noauth_module_to_user,
         request_token=request_token,
     )
 
@@ -775,12 +745,6 @@ def get_module_system_for_user(
     system.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
     system.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
     system.set('days_early_for_beta', descriptor.days_early_for_beta)
-
-    # make an ErrorBlock -- assuming that the descriptor's system is ok
-    if has_access(user, 'staff', descriptor.location, course_id):
-        system.error_descriptor_class = ErrorBlock
-    else:
-        system.error_descriptor_class = NonStaffErrorBlock
 
     return system, field_data
 
@@ -966,7 +930,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
 
     # We are reusing DRF logic to provide support for JWT and Oauth2. We abandoned the idea of using DRF view here
     # to avoid introducing backwards-incompatible changes.
-    # You can see https://github.com/edx/XBlock/pull/383 for more details.
+    # You can see https://github.com/openedx/XBlock/pull/383 for more details.
     else:
         authentication_classes = (JwtAuthentication, BearerAuthenticationAllowInactiveUser)
         authenticators = [auth() for auth in authentication_classes]

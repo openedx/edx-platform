@@ -20,9 +20,7 @@ root = Path('../..').abspath()
 # can be successfully imported
 sys.path.insert(0, root)
 sys.path.append(root / "docs/guides")
-sys.path.append(root / "common/lib/capa")
-sys.path.append(root / "common/lib/safe_lxml")
-sys.path.append(root / "common/lib/xmodule")
+
 
 # Use a settings module that allows all LMS and Studio code to be imported
 # without errors.  If running sphinx-apidoc, we already set a different
@@ -222,11 +220,9 @@ autodoc_mock_imports = [
 # the generated *.rst files
 modules = {
     'cms': 'cms',
-    'common/lib/capa/capa': 'common/lib/capa',
-    'common/lib/safe_lxml/safe_lxml': 'common/lib/safe_lxml',
-    'common/lib/xmodule/xmodule': 'common/lib/xmodule',
     'lms': 'lms',
     'openedx': 'openedx',
+    'xmodule': 'xmodule',
 }
 
 

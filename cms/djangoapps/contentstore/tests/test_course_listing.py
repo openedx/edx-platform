@@ -185,6 +185,7 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # Fetch accessible courses list & verify their count
         courses_list_by_staff, __ = get_courses_accessible_to_user(self.request)
+
         self.assertEqual(len(list(courses_list_by_staff)), TOTAL_COURSES_COUNT)
 
         # Verify fetched accessible courses list is a list of CourseSummery instances
@@ -194,7 +195,7 @@ class TestCourseListing(ModuleStoreTestCase):
         with check_mongo_calls(mongo_calls):
             list(_accessible_courses_summary_iter(self.request))
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_get_course_list_with_invalid_course_location(self, store):
         """
         Test getting courses with invalid course location (course deleted from modulestore).
@@ -315,30 +316,41 @@ class TestCourseListing(ModuleStoreTestCase):
         all of them.
         """
         org_course_one = self.store.make_course_key('AwesomeOrg', 'Course1', 'RunBabyRun')
-        CourseFactory.create(
+        course_1 = CourseFactory.create(
             org=org_course_one.org,
             number=org_course_one.course,
             run=org_course_one.run
         )
+        CourseOverviewFactory.create(id=course_1.id, org='AwesomeOrg')
 
         org_course_two = self.store.make_course_key('AwesomeOrg', 'Course2', 'RunBabyRun')
-        CourseFactory.create(
+        course_2 = CourseFactory.create(
             org=org_course_two.org,
             number=org_course_two.course,
             run=org_course_two.run
         )
+        CourseOverviewFactory.create(id=course_2.id, org='AwesomeOrg')
 
         # Two types of org-wide roles have edit permissions: staff and instructor.  We test both
         role.add_users(self.user)
 
-        with self.assertRaises(AccessListFallback):
-            _accessible_courses_list_from_groups(self.request)
         courses_list, __ = get_courses_accessible_to_user(self.request)
 
         # Verify fetched accessible courses list is a list of CourseSummery instances and test expacted
         # course count is returned
         self.assertEqual(len(list(courses_list)), 2)
         self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_list))
+
+    @ddt.data(OrgStaffRole(), OrgInstructorRole())
+    def test_course_listing_org_permissions_exception(self, role):
+        """
+        Create roles with no course_id neither org to make sure AccessListFallback is raised for
+        platform-wide permissions
+        """
+        role.add_users(self.user)
+
+        with self.assertRaises(AccessListFallback):
+            _accessible_courses_list_from_groups(self.request)
 
     def test_course_listing_with_actions_in_progress(self):
         sourse_course_key = CourseLocator('source-Org', 'source-Course', 'source-Run')

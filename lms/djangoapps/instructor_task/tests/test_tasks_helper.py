@@ -24,7 +24,7 @@ from freezegun import freeze_time
 from pytz import UTC
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -1783,8 +1783,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     def test_grade_report(self, persistent_grades_enabled):
         self.submit_student_answer(self.student.username, 'Problem1', ['Option 1'])
 
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'), \
-             patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': persistent_grades_enabled}):
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
@@ -2488,7 +2487,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = current_task
-            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+            with patch('xmodule.capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
                 mock_queue.return_value = (0, "Successfully queued")
                 result = generate_students_certificates(
                     None, None, self.course.id, task_input, 'certificates generated'

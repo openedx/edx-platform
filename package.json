@@ -1,7 +1,7 @@
 {
   "name": "edx",
   "version": "0.1.0",
-  "repository": "https://github.com/edx/edx-platform",
+  "repository": "https://github.com/openedx/edx-platform",
   "dependencies": {
     "@babel/core": "7.17.8",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
@@ -83,7 +83,7 @@
     "enzyme-adapter-react-16": "1.1.1",
     "eslint-import-resolver-webpack": "0.8.4",
     "jasmine-core": "2.6.4",
-    "jasmine-jquery": "git+https://github.com/velesin/jasmine-jquery.git#ebad463d592d3fea00c69f26ea18a930e09c7b58",
+    "jasmine-jquery": "git+https://git@github.com/velesin/jasmine-jquery.git#ebad463d592d3fea00c69f26ea18a930e09c7b58",
     "jest": "26.0.0",
     "jest-enzyme": "6.0.2",
     "karma": "0.13.22",

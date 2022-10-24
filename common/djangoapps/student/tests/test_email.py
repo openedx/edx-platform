@@ -15,6 +15,7 @@ from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
+from testfixtures import LogCapture
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context
@@ -187,6 +188,30 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
                             inactive_user_view(request)
                             assert user.is_active
                             assert email.called is False, 'method should not have been called'
+
+    @patch('common.djangoapps.student.views.management.send_activation_email.delay')
+    def test_activation_email_exception(self, mock_task):
+        """
+        Test that if an exception occurs within send_activation_email, it is logged
+        and not raised.
+        """
+        mock_task.side_effect = Exception('BOOM!')
+        inactive_user = UserFactory(is_active=False)
+        Registration().register(inactive_user)
+        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL)
+        request.user = inactive_user
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
+            with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
+                with LogCapture() as logger:
+                    inactive_user_view(request)
+                    assert mock_task.called is True, 'method should have been called'
+                    logger.check_present(
+                        (
+                            'edx.student',
+                            'ERROR',
+                            f'Activation email task failed for user {inactive_user.id}.'
+                        )
+                    )
 
     @patch('common.djangoapps.student.views.management.compose_activation_email')
     def test_send_email_to_inactive_user(self, email):
@@ -562,6 +587,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'CONTACT': '/help/contact-us'})
+    @patch('common.djangoapps.student.signals.signals.USER_EMAIL_CHANGED.send')
     @ddt.data(
         ('plain_text', False),
         ('plain_text', True),
@@ -569,9 +595,10 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         ('html', True)
     )
     @ddt.unpack
-    def test_successful_email_change(self, test_body_type, test_marketing_enabled):
+    def test_successful_email_change(self, test_body_type, test_marketing_enabled, mock_email_change_signal):
         with patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': test_marketing_enabled}):
             self.assertChangeEmailSent(test_body_type)
+            assert mock_email_change_signal.called
 
         meta = json.loads(UserProfile.objects.get(user=self.user).meta)
         assert 'old_emails' in meta

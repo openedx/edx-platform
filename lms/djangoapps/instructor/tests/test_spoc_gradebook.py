@@ -3,7 +3,7 @@ Tests of the instructor dashboard spoc gradebook
 """
 from django.urls import reverse
 
-from capa.tests.response_xml_factory import StringResponseXMLFactory
+from xmodule.capa.tests.response_xml_factory import StringResponseXMLFactory
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
@@ -58,7 +58,6 @@ class TestGradebook(SharedModuleStoreTestCase):
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
         self.users = [UserFactory.create() for _ in range(USER_COUNT)]
-
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 

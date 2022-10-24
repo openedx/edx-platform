@@ -15,7 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from openedx.core.djangoapps.util.ip import USE_LEGACY_IP
+from openedx.core.djangoapps.util.legacy_ip import USE_LEGACY_IP
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from ..models import IPFilter, RestrictedCourse

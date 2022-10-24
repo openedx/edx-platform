@@ -4,18 +4,16 @@ Code to implement backwards compatibility
 # pylint: disable=no-member
 
 import warnings
-
 from django.conf import settings
 from django.core.cache import cache
 from django.template import TemplateDoesNotExist
 from django.utils.functional import cached_property
 from fs.memoryfs import MemoryFS
 
-from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-
-from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.edxmako.shortcuts import render_to_string
+from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.student.models import anonymous_id_for_user
+from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
 
 class RuntimeShim:
@@ -90,20 +88,12 @@ class RuntimeShim:
     def can_execute_unsafe_code(self):
         """
         Determine if capa problems in this context/course are allowed to run
-        unsafe code. See common/lib/xmodule/xmodule/util/sandboxing.py
+        unsafe code. See xmodule/util/sandboxing.py
 
         Seems only to be used by capa.
         """
         # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
         return False  # Change this if/when we need to support unsafe courses in the new runtime.
-
-    @property
-    def DEBUG(self):
-        """
-        Should DEBUG mode (?) be used? This flag is only read by capa.
-        """
-        # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
-        return False
 
     def get_python_lib_zip(self):
         """
@@ -145,23 +135,15 @@ class RuntimeShim:
         )
         return self.resources_fs
 
-    @property
-    def node_path(self):
-        """
-        Get the path to Node.js
-
-        Seems only to be used by capa. Remove this if capa can be refactored.
-        """
-        # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
-        return getattr(settings, 'NODE_PATH', None)  # Only defined in the LMS
-
     def render_template(self, template_name, dictionary, namespace='main'):
         """
         Render a mako template
         """
         warnings.warn(
             "Use of runtime.render_template is deprecated. "
-            "Use xblockutils.resources.ResourceLoader.render_mako_template or a JavaScript-based template instead.",
+            "For template files included with your XBlock (which is preferable), use "
+            "xblockutils.resources.ResourceLoader.render_mako_template to render them, or use a JavaScript-based "
+            "template instead. For template files that are part of the LMS/Studio, use the 'mako' XBlock service.",
             DeprecationWarning, stacklevel=2,
         )
         try:
@@ -251,10 +233,12 @@ class RuntimeShim:
     def STATIC_URL(self):
         """
         Get the django STATIC_URL path.
-
-        Seems only to be used by capa. Remove this if capa can be refactored.
+        Deprecated in favor of the settings.STATIC_URL configuration.
         """
-        # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
+        warnings.warn(
+            'runtime.STATIC_URL is deprecated. Please use settings.STATIC_URL instead.',
+            DeprecationWarning, stacklevel=3,
+        )
         static_url = settings.STATIC_URL
         if static_url.startswith('/') and not static_url.startswith('//'):
             # This is not a full URL - should start with https:// to support loading assets from an iframe sandbox

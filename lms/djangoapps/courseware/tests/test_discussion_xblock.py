@@ -16,7 +16,7 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
-from xblock_discussion import DiscussionXBlock, loader
+from xmodule.discussion_block import DiscussionXBlock, loader
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
@@ -24,6 +24,7 @@ from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
 from lms.djangoapps.course_api.blocks.tests.helpers import deserialize_usage_key
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
@@ -161,7 +162,10 @@ class TestViews(TestDiscussionXBlock):
         assert fragment.content == self.template_canary
         self.render_template.assert_called_once_with(
             'discussion/_discussion_inline_studio.html',
-            {'discussion_id': self.discussion_id}
+            {
+                'discussion_id': self.discussion_id,
+                'is_visible': True,
+            }
         )
 
     @ddt.data(
@@ -374,6 +378,32 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             assert block_data['display_name'] == (self.store.get_item(block_key).display_name or '')
             assert block_data['student_view_data'] == {'topic_id': self.discussion_id}
 
+    def test_discussion_xblock_visibility(self):
+        """
+        Tests that the discussion xblock is hidden when discussion provider is openedx
+        """
+        # Enable new OPEN_EDX provider for this course
+        course_key = self.course.location.course_key
+        DiscussionsConfiguration.objects.create(
+            context_key=course_key,
+            enabled=True,
+            provider_type=Provider.OPEN_EDX,
+        )
+
+        discussion_xblock = get_module_for_descriptor_internal(
+            user=self.user,
+            descriptor=self.discussion,
+            student_data=mock.Mock(name='student_data'),
+            course_id=self.course.id,
+            track_function=mock.Mock(name='track_function'),
+            request_token='request_token',
+        )
+
+        fragment = discussion_xblock.render('student_view')
+        html = fragment.content
+        assert 'data-user-create-comment="false"' not in html
+        assert 'data-user-create-subcomment="false"' not in html
+
 
 class TestXBlockQueryLoad(SharedModuleStoreTestCase):
     """
@@ -400,12 +430,14 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
                 discussion_target='Target Discussion',
             ))
 
-        # 4 queries are required to do first discussion xblock render:
+        # 6 queries are required to do first discussion xblock render:
         # * split_modulestore_django_splitmodulestorecourseindex x2
-        # * waffle_utils_waffleorgoverridemodel
+        # * waffle_flag.discussions.enable_new_structure_discussions
+        # * lms_xblock_xblockasidesconfig
         # * django_comment_client_role
+        # * DiscussionsConfiguration
 
-        num_queries = 4
+        num_queries = 6
 
         for discussion in discussions:
             discussion_xblock = get_module_for_descriptor_internal(
@@ -421,7 +453,9 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
 
             # Permissions are cached, so no queries required for subsequent renders
 
-            num_queries = 0
+            # query to check for provider_type
+            # query to check waffle flag discussions.enable_new_structure_discussions
+            num_queries = 2
 
             html = fragment.content
             assert 'data-user-create-comment="false"' in html

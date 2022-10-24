@@ -12,7 +12,7 @@ from edxval.api import ValInternalError
 from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.keys import CourseKey
 
-from capa.responsetypes import LoncapaProblemError
+from xmodule.capa.responsetypes import LoncapaProblemError
 from openedx.core.djangoapps.content.block_structure import api
 from openedx.core.djangoapps.content.block_structure.config import enable_storage_backing_for_cache_in_request
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order

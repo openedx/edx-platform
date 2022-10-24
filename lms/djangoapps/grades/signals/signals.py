@@ -111,3 +111,12 @@ SUBSECTION_OVERRIDE_CHANGED = Signal()
 #         'user_id',  # User object id
 #     ]
 COURSE_GRADE_PASSED_FIRST_TIME = Signal()
+COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY = Signal()
+
+# This Signal indicates that a segment event has fired for user who has passed a course for the first time
+# providing_args=[
+#     'user_id',  # User object id
+#     'course_id',  # Course object id
+#     'event_properties',  # Segment event properties that will be needed for follow up event
+# ]
+SCHEDULE_FOLLOW_UP_SEGMENT_EVENT_FOR_COURSE_PASSED_FIRST_TIME = Signal()

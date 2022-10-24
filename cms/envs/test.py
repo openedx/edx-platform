@@ -362,3 +362,9 @@ PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
 #################### Network configuration ####################
 # Tests are not behind any proxies
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
+COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
+    "KEY": "***",
+    "SECRET": "***",
+    "URL": "***",
+}

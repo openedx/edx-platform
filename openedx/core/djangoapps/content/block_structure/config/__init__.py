@@ -16,12 +16,12 @@ from .models import BlockStructureConfiguration
 # .. toggle_description: When enabled, the block structure cache is invalidated when changes to
 #   courses are published. If `block_structure.storage_backing_for_cache` is active, all block
 #   structures related to the published course are also cleared from storage.
-# .. toggle_warnings: This switch will likely be deprecated and removed.
+# .. toggle_warning: This switch will likely be deprecated and removed.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2017-02-23
 # .. toggle_target_removal_date: 2017-05-23
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/14358,
-#   https://github.com/edx/edx-platform/pull/14571,
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14358,
+#   https://github.com/openedx/edx-platform/pull/14571,
 #   https://openedx.atlassian.net/browse/DEPR-144
 INVALIDATE_CACHE_ON_PUBLISH = WaffleSwitch(
     "block_structure.invalidate_cache_on_publish", __name__
@@ -34,15 +34,15 @@ INVALIDATE_CACHE_ON_PUBLISH = WaffleSwitch(
 #   like a database, which provides an additional backup for cache misses, instead having them
 #   regenerated. The regenration of block structures is a time consuming process. Therefore,
 #   enabling this switch is recommended for Production.
-# .. toggle_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and
+# .. toggle_warning: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and
 #   `BLOCK_STRUCTURES_SETTINGS['STORAGE_KWARGS']`.
 #   This switch will likely be deprecated and removed.
 #   The annotation will be updated with the DEPR ticket once that process has started.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2017-02-23
 # .. toggle_target_removal_date: 2017-05-23
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/14512,
-#   https://github.com/edx/edx-platform/pull/14770,
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14512,
+#   https://github.com/openedx/edx-platform/pull/14770,
 #   https://openedx.atlassian.net/browse/DEPR-145
 STORAGE_BACKING_FOR_CACHE = WaffleSwitch(
     "block_structure.storage_backing_for_cache", __name__
@@ -54,13 +54,13 @@ STORAGE_BACKING_FOR_CACHE = WaffleSwitch(
 # .. toggle_description: Raises an error if the requested block structure does not exist in block
 #   structure store, or if it is outdated. Block structure store refers to both cache and storage,
 #   if enabled.
-# .. toggle_warnings: This switch will likely be deprecated and removed.
+# .. toggle_warning: This switch will likely be deprecated and removed.
 #   The annotation will be updated with the DEPR ticket once that process has started.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2017-02-23
 # .. toggle_target_removal_date: 2017-05-23
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/14512,
-#   https://github.com/edx/edx-platform/pull/14770,
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14512,
+#   https://github.com/openedx/edx-platform/pull/14770,
 #   https://openedx.atlassian.net/browse/DEPR-143
 RAISE_ERROR_WHEN_NOT_FOUND = WaffleSwitch(
     "block_structure.raise_error_when_not_found", __name__

@@ -5,7 +5,7 @@ ConfigurationModel for the mobile_api djangoapp.
 
 from config_models.models import ConfigurationModel
 from django.db import models
-
+from model_utils.models import TimeStampedModel
 
 from . import utils
 from .mobile_platform import PLATFORM_CLASSES
@@ -101,3 +101,39 @@ class IgnoreMobileAvailableFlagConfig(ConfigurationModel):
 
     class Meta:
         app_label = "mobile_api"
+
+
+class MobileConfig(TimeStampedModel):
+    """
+    Mobile configs to add through admin panel. Config values can be added dynamically.
+
+    .. no_pii:
+    """
+    name = models.CharField(max_length=255)
+    value = models.CharField(max_length=255)
+
+    class Meta:
+        app_label = "mobile_api"
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_structured_configs(cls):
+        """
+        Add config values in the following manner:
+            - If flag name starts with `iap_`, add value to configs['iap_configs']
+            - Else add values to configs{}
+        """
+        configs = MobileConfig.objects.all().values('name', 'value')
+        structured_configs = {"iap_configs": {}}
+        for config in configs:
+            name = config.get('name')
+            value = config.get('value')
+
+            if name.startswith('iap_'):
+                structured_configs['iap_configs'][name] = value
+            else:
+                structured_configs[name] = value
+
+        return structured_configs

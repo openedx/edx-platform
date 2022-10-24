@@ -15,7 +15,7 @@ _WAFFLE_NAMESPACE = 'user_authn'
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-11-20
 # .. toggle_target_removal_date: 2020-01-31
-# .. toggle_warnings: Requires THIRD_PARTY_AUTH_ONLY_DOMAIN to also be set.
+# .. toggle_warning: Requires THIRD_PARTY_AUTH_ONLY_DOMAIN to also be set.
 # .. toggle_tickets: ENT-2461
 ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY = WaffleSwitch(
     f'{_WAFFLE_NAMESPACE}.enable_login_using_thirdparty_auth_only', __name__

@@ -1424,7 +1424,6 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         self.initialize_block(data=sample_xml)
         self.video = self.item_descriptor
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
-        self.video.runtime.course_id = MagicMock()
 
     def setup_val_video(self, associate_course_in_val=False):
         """
@@ -1527,7 +1526,6 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         self.initialize_block(data=sample_xml)
         self.video = self.item_descriptor
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
-        self.video.runtime.course_id = MagicMock()
         result = self.get_result()
         self.verify_result_with_youtube_url(result)
 
@@ -1595,7 +1593,6 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
     def setUp(self):
         super().setUp()
         self.descriptor.runtime.handler_url = MagicMock()
-        self.descriptor.runtime.course_id = MagicMock()
         self.temp_dir = mkdtemp()
         file_system = OSFS(self.temp_dir)
         self.file_system = file_system.makedir(EXPORT_IMPORT_COURSE_DIR, recreate=True)
@@ -1693,10 +1690,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         assert [transcript_file_name] == self.file_system.listdir(EXPORT_IMPORT_STATIC_DIR)
 
         # Also verify the content of created transcript file.
-        expected_transcript_content = File(open(expected_transcript_path)).read()
-        transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language_code)
-
-        assert transcript['content'].decode('utf-8') == expected_transcript_content
+        with open(expected_transcript_path) as transcript_path:
+            expected_transcript_content = File(transcript_path).read()
+            transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language_code)
+            assert transcript['content'].decode('utf-8') == expected_transcript_content
 
     @ddt.data(
         (['en', 'da'], 'test_sub', ''),
@@ -1754,10 +1751,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
                 combine(self.temp_dir, EXPORT_IMPORT_COURSE_DIR),
                 combine(EXPORT_IMPORT_STATIC_DIR, expected_transcripts[language])
             )
-            expected_transcript_content = File(open(expected_transcript_path)).read()
-            transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language)
-
-            assert transcript['content'].decode('utf-8') == expected_transcript_content
+            with open(expected_transcript_path) as transcript_path:
+                expected_transcript_content = File(transcript_path).read()
+                transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language)
+                assert transcript['content'].decode('utf-8') == expected_transcript_content
 
     def test_export_val_data_not_found(self):
         """

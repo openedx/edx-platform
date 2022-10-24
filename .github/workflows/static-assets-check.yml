@@ -1,0 +1,67 @@
+name: static assets check for lms and cms
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  static_assets_check:
+    name: static-assets-check
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        python-version: [ 3.8 ]
+        node-version: [ 16 ]
+        npm-version: [ 8.5.x ]
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Setup npm
+      run: npm i -g npm@${{ matrix.npm-version }}
+
+    - name: Get pip cache dir
+      id: pip-cache-dir
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+
+    - name: Cache pip dependencies
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+
+    - name: Install Required Python Dependencies
+      run: |
+        make base-requirements
+
+    - name: Initiate Mongo DB Service
+      run: sudo systemctl start mongod
+
+    - name: Add node_modules bin to $Path
+      run: echo $GITHUB_WORKSPACE/node_modules/.bin >> $GITHUB_PATH
+
+    - name: Run Static Assets Check
+      env:
+        LMS_CFG: lms/envs/bok_choy.yml
+        CMS_CFG: cms/envs/bok_choy.yml
+
+      run: |
+        paver update_assets lms
+        paver update_assets cms

@@ -411,10 +411,16 @@ def _check_user_auth_flow(site, user):
         if user_domain == allowed_domain and not AllowedAuthUser.objects.filter(site=site, email=user.email).exists():
             if not should_redirect_to_authn_microfrontend():
                 msg = _create_message(site, None, allowed_domain)
-            else:
-                root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
-                msg = _create_message(site, root_url, allowed_domain)
-            raise AuthFailedError(msg)
+                raise AuthFailedError(msg)
+
+            raise AuthFailedError(
+                error_code='allowed-domain-login-error',
+                context={
+                    'allowed_domain': allowed_domain,
+                    'provider': site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER'),
+                    'tpa_hint': site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_HINT'),
+                }
+            )
 
 
 @login_required
@@ -483,7 +489,7 @@ def enterprise_selection_page(request, user, next_url):
 @ensure_csrf_cookie
 @require_http_methods(['POST'])
 @ratelimit(
-    key='openedx.core.djangoapps.util.ratelimit.request_post_email',
+    key='openedx.core.djangoapps.util.ratelimit.request_post_email_or_username',
     rate=settings.LOGISTRATION_PER_EMAIL_RATELIMIT_RATE,
     method='POST',
 )  # lint-amnesty, pylint: disable=too-many-statements
@@ -526,7 +532,7 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
     _parse_analytics_param_for_course_id(request)
 
     third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
-    first_party_auth_requested = bool(request.POST.get('email')) or bool(request.POST.get('password'))
+    first_party_auth_requested = any(bool(request.POST.get(p)) for p in ['email', 'email_or_username', 'password'])
     is_user_third_party_authenticated = False
 
     set_custom_attribute('login_user_course_id', request.POST.get('course_id'))

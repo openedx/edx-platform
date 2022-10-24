@@ -20,7 +20,7 @@ In the LMS, the following technologies can be used to access course content and 
 * `Modulestore`_ - Contains all course related data, including course metadata, course blocks, and student module data. `Course Overviews`_ and `Course Blocks`_ are performant read-optimized versions of subsets of data in the Modulestore.
 
 .. _edX DDD Ubiquitous Language: https://openedx.atlassian.net/wiki/spaces/AC/pages/188032048/edX+DDD+Ubiquitous+Language
-.. _Course Overviews: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/content/course_overviews/__init__.py
+.. _Course Overviews: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/content/course_overviews/__init__.py
 .. _Course Blocks: https://openedx.atlassian.net/wiki/display/EDUCATOR/Course+Blocks
 .. _Modulestore: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/modulestores/index.html
 
@@ -54,16 +54,16 @@ If you need to combine user data with `Course Blocks`_ data, load the users's da
 
 **Example**: See `example loading the student module data`_ in the course outline feature.
 
-.. _example use of course overviews: https://github.com/edx/edx-platform/blob/f81c21902eb0e8d026612b052557142ce1527153/openedx/features/course_experience/views/course_outline.py#L26
-.. _example of using course blocks: https://github.com/edx/edx-platform/blob/f81c21902eb0e8d026612b052557142ce1527153/openedx/features/course_experience/utils.py#L65-L72
-.. _example loading the student module data: https://github.com/edx/edx-platform/blob/f81c21902eb0e8d026612b052557142ce1527153/openedx/features/course_experience/utils.py#L49
+.. _example use of course overviews: https://github.com/openedx/edx-platform/blob/f81c21902eb0e8d026612b052557142ce1527153/openedx/features/course_experience/views/course_outline.py#L26
+.. _example of using course blocks: https://github.com/openedx/edx-platform/blob/f81c21902eb0e8d026612b052557142ce1527153/openedx/features/course_experience/utils.py#L65-L72
+.. _example loading the student module data: https://github.com/openedx/edx-platform/blob/f81c21902eb0e8d026612b052557142ce1527153/openedx/features/course_experience/utils.py#L49
 
 Tech Debt
 =========
 
 At this time, `LMS courseware rendering`_ still uses the `Modulestore`_ instead of `Course Blocks`_. This is technical debt that needs to be addressed, so we can have a fuller separation between the storage systems.
 
-.. _LMS courseware rendering: https://github.com/edx/edx-platform/blob/67008cec68806b77631e8c40ede98ace8a83ce4f/lms/djangoapps/courseware/module_render.py#L291
+.. _LMS courseware rendering: https://github.com/openedx/edx-platform/blob/67008cec68806b77631e8c40ede98ace8a83ce4f/lms/djangoapps/courseware/module_render.py#L291
 
 Consequences
 ============

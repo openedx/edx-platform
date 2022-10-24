@@ -102,7 +102,7 @@ class ImageFactory(ImageFactoryBase):
     """
     For constructing dicts mirroring the catalog's serialized representation of ImageFields.
 
-    See https://github.com/edx/course-discovery/blob/master/course_discovery/apps/api/fields.py.
+    See https://github.com/openedx/course-discovery/blob/master/course_discovery/apps/api/fields.py.
     """
     description = factory.Faker('sentence')
     src = factory.Faker('image_url')
@@ -112,7 +112,7 @@ class StdImageFactory(ImageFactoryBase):
     """
     For constructing dicts mirroring the catalog's serialized representation of StdImageFields.
 
-    See https://github.com/edx/course-discovery/blob/master/course_discovery/apps/api/fields.py.
+    See https://github.com/openedx/course-discovery/blob/master/course_discovery/apps/api/fields.py.
     """
     url = factory.Faker('image_url')
 

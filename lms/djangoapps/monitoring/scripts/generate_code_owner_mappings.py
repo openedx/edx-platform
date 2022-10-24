@@ -34,6 +34,7 @@ EDX_REPO_APPS = {
     'eventtracking': 'https://github.com/openedx/event-tracking',
     'help_tokens': 'https://github.com/openedx/help-tokens',
     'integrated_channels': 'https://github.com/openedx/edx-enterprise',
+    'learner_pathway_progress': 'https://github.com/edx/learner-pathway-progress',
     'lti_consumer': 'https://github.com/openedx/xblock-lti-consumer',
     'notices': 'https://github.com/edx/platform-plugin-notices',
     'organizations': 'https://github.com/openedx/edx-organizations',

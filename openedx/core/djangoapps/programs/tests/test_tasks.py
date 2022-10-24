@@ -18,7 +18,8 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 from edx_rest_api_client.auth import SuppliedJwtAuth
 from requests.exceptions import HTTPError
-from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
+from testfixtures import LogCapture
+from xmodule.data import CertificatesDisplayBehaviors
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -953,11 +954,9 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
 
 @skip_unless_lms
 @override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
-@mock.patch(TASKS_MODULE + '.get_credentials_api_client')
 class UpdateCredentialsCourseCertificateConfigurationAvailableDateTestCase(TestCase):
     """
-    Tests for the update_credentials_course_certificate_configuration_available_date
-    function
+    Tests for the update_credentials_course_certificate_configuration_available_date function
     """
     def setUp(self):
         super().setUp()
@@ -970,8 +969,7 @@ class UpdateCredentialsCourseCertificateConfigurationAvailableDateTestCase(TestC
         self.course_id = self.course.id
         self.credentials_worker = UserFactory(username='test-service-username')
 
-    # pylint: disable=W0613
-    def test_update_course_cert_available_date(self, mock_client):
+    def test_update_course_cert_available_date(self):
         with mock.patch(TASKS_MODULE + '.post_course_certificate_configuration') as update_posted:
             tasks.update_credentials_course_certificate_configuration_available_date(
                 self.course_id,
@@ -979,8 +977,7 @@ class UpdateCredentialsCourseCertificateConfigurationAvailableDateTestCase(TestC
             )
             update_posted.assert_called_once()
 
-    # pylint: disable=W0613
-    def test_course_with_two_paid_modes(self, mock_client):
+    def test_course_with_two_paid_modes(self):
         CourseModeFactory.create(course_id=self.course.id, mode_slug='professional')
         with mock.patch(TASKS_MODULE + '.post_course_certificate_configuration') as update_posted:
             tasks.update_credentials_course_certificate_configuration_available_date(
@@ -995,8 +992,8 @@ class PostCourseCertificateConfigurationTestCase(TestCase):
     """
     Test the post_course_certificate_configuration function
     """
-
-    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUp(self):
+        super().setUp()
         self.certificate = {
             'mode': 'verified',
             'course_id': 'testCourse',
@@ -1029,3 +1026,173 @@ class PostCourseCertificateConfigurationTestCase(TestCase):
         }
         last_request_body = httpretty.last_request().body.decode('utf-8')
         assert json.loads(last_request_body) == expected_body
+
+
+@skip_unless_lms
+class UpdateCertificateVisibleDatesOnCourseUpdateTestCase(CredentialsApiConfigMixin, TestCase):
+    """
+    Tests for the `update_certificate_visible_date_on_course_update` task.
+    """
+    def setUp(self):
+        super().setUp()
+        self.credentials_api_config = self.create_credentials_config(enabled=False)
+        # setup course
+        self.course = CourseOverviewFactory.create()
+        # setup users
+        self.student1 = UserFactory.create(username='test-student1')
+        self.student2 = UserFactory.create(username='test-student2')
+        self.student3 = UserFactory.create(username='test-student3')
+        # award certificates to users in course we created
+        self.certificate_student1 = GeneratedCertificateFactory.create(
+            user=self.student1,
+            mode='verified',
+            course_id=self.course.id,
+            status='downloadable'
+        )
+        self.certificate_student2 = GeneratedCertificateFactory.create(
+            user=self.student2,
+            mode='verified',
+            course_id=self.course.id,
+            status='downloadable'
+        )
+        self.certificate_student3 = GeneratedCertificateFactory.create(
+            user=self.student3,
+            mode='verified',
+            course_id=self.course.id,
+            status='downloadable'
+        )
+
+    def tearDown(self):
+        super().tearDown()
+        self.credentials_api_config = self.create_credentials_config(enabled=False)
+
+    def test_update_visible_dates_but_credentials_config_disabled(self):
+        """
+        This test verifies the behavior of the `update_certificate_visible_date_on_course_update` task when the
+        CredentialsApiConfig is disabled.
+
+        If the system is configured to _not_ use the Credentials IDA, we should expect this task to eventually throw an
+        exception when the max number of retries has reached.
+        """
+        with pytest.raises(MaxRetriesExceededError):
+            tasks.update_certificate_visible_date_on_course_update(self.course.id)  # pylint: disable=no-value-for-parameter
+
+    def test_update_visible_dates(self):
+        """
+        Happy path test.
+
+        This test verifies the behavior of the `update_certificate_visible_date_on_course_update` task. This test
+        verifies attempts by the system to queue a number of `award_course_certificate` tasks to ensure the
+        `visible_date` attribute is updated on all eligible course certificates.
+        """
+        # enable the CredentialsApiConfig to issue certificates using the Credentials service
+        self.credentials_api_config.enabled = True
+        self.credentials_api_config.enable_learner_issuance = True
+
+        with mock.patch(f"{TASKS_MODULE}.award_course_certificate.delay") as award_course_cert:
+            tasks.update_certificate_visible_date_on_course_update(self.course.id)  # pylint: disable=no-value-for-parameter
+
+        assert award_course_cert.call_count == 3
+
+
+@skip_unless_lms
+class UpdateCertificateAvailableDateOnCourseUpdateTestCase(CredentialsApiConfigMixin, TestCase):
+    """
+    Tests for the `update_certificate_available_date_on_course_update` task.
+    """
+    def setUp(self):
+        super().setUp()
+        self.credentials_api_config = self.create_credentials_config(enabled=False)
+
+    def tearDown(self):
+        super().tearDown()
+        self.credentials_api_config = self.create_credentials_config(enabled=False)
+
+    def test_update_certificate_available_date_but_credentials_config_disabled(self):
+        """
+        This test verifies the behavior of the `UpdateCertificateAvailableDateOnCourseUpdateTestCase` task when the
+        CredentialsApiConfig is disabled.
+
+        If the system is configured to _not_ use the Credentials IDA, we should expect this task to eventually throw an
+        exception when the max number of retries has reached.
+        """
+        course = CourseOverviewFactory.create()
+
+        with pytest.raises(MaxRetriesExceededError):
+            tasks.update_certificate_available_date_on_course_update(course.id)  # pylint: disable=no-value-for-parameter
+
+    def test_update_certificate_available_date_with_self_paced_course(self):
+        """
+        Happy path test.
+
+        This test verifies that we are queueing a `update_credentials_course_certificate_configuration_available_date`
+        task with the expected arguments when removing a "certificate available date" from a course cert config in
+        Credentials.
+        """
+        self.credentials_api_config.enabled = True
+        self.credentials_api_config.enable_learner_issuance = True
+
+        course = CourseOverviewFactory.create(
+            self_paced=True,
+            certificate_available_date=None
+        )
+
+        with mock.patch(
+            f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay"
+        ) as update_credentials_course_cert_config:
+            tasks.update_certificate_available_date_on_course_update(course.id)  # pylint: disable=no-value-for-parameter
+
+        update_credentials_course_cert_config.assert_called_once_with(str(course.id), None)
+
+    def test_update_certificate_available_date_with_instructor_paced_course(self):
+        """
+        Happy path test.
+
+        This test verifies that we are queueing a `update_credentials_course_certificate_configuration_available_date`
+        task with the expected arguments when updating a "certificate available date" from a course cert config in
+        Credentials.
+        """
+        self.credentials_api_config.enabled = True
+        self.credentials_api_config.enable_learner_issuance = True
+
+        available_date = datetime.now(pytz.UTC) + timedelta(days=1)
+
+        course = CourseOverviewFactory.create(
+            self_paced=False,
+            certificate_available_date=available_date,
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE
+        )
+
+        with mock.patch(
+            f"{TASKS_MODULE}.update_credentials_course_certificate_configuration_available_date.delay"
+        ) as update_credentials_course_cert_config:
+            tasks.update_certificate_available_date_on_course_update(course.id)  # pylint: disable=no-value-for-parameter
+
+        update_credentials_course_cert_config.assert_called_once_with(str(course.id), str(available_date))
+
+    def test_update_certificate_available_date_with_expect_no_update(self):
+        """
+        This test verifies that we do _not_ queue a task to update the course certificate configuration in Credentials
+        if the course-run does not meet the required criteria.
+        """
+        self.credentials_api_config.enabled = True
+        self.credentials_api_config.enable_learner_issuance = True
+
+        available_date = datetime.now(pytz.UTC) + timedelta(days=1)
+
+        course = CourseOverviewFactory.create(
+            self_paced=False,
+            certificate_available_date=available_date,
+            certificates_display_behavior=CertificatesDisplayBehaviors.EARLY_NO_INFO
+        )
+
+        expected_message = (
+            f"Skipping update of the `certificate_available_date` for course {course.id} in the Credentials service. "
+            "This course-run does not meet the required criteria for an update."
+        )
+
+        with LogCapture(level=logging.WARNING) as log_capture:
+            tasks.update_certificate_available_date_on_course_update(course.id)  # pylint: disable=no-value-for-parameter
+
+        assert len(log_capture.records) == 1
+        assert log_capture.records[0].getMessage() == expected_message

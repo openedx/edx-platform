@@ -14,6 +14,8 @@ from copy import deepcopy
 from functools import partial
 from logging import getLogger
 
+from xmodule.block_metadata_utils import get_datetime_field
+
 from openedx.core.lib.graph_traversals import traverse_post_order, traverse_topologically
 
 from .exceptions import TransformerException
@@ -464,7 +466,7 @@ class BlockStructureBlockData(BlockStructure):
                 not found.
         """
         block_data = self._block_data_map.get(usage_key)
-        return getattr(block_data, field_name, default) if block_data else default
+        return get_datetime_field(block_data, field_name, default) if block_data else default
 
     def override_xblock_field(self, usage_key, field_name, override_data):
         """
@@ -554,7 +556,7 @@ class BlockStructureBlockData(BlockStructure):
             transformer_data = self.get_transformer_block_data(usage_key, transformer)
         except KeyError:
             return default
-        return getattr(transformer_data, key, default)
+        return get_datetime_field(transformer_data, key, default)
 
     def set_transformer_block_field(self, usage_key, transformer, key, value):
         """

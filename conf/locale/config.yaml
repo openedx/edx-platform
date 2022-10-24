@@ -129,7 +129,6 @@ ignore_dirs:
     - src/codejail
     - src/django-wiki
     - src/done-xblock
-    - src/edx-jsme
     - src/parse-rest
     - src/geoip2
     - src/pystache-custom

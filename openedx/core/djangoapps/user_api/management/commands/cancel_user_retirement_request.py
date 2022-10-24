@@ -9,9 +9,8 @@ import logging
 
 from django.core.management.base import BaseCommand, CommandError
 
+from openedx.core.djangoapps.user_api.accounts.utils import handle_retirement_cancellation
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
-
-from edx_django_utils.user import generate_password  # lint-amnesty, pylint: disable=wrong-import-order
 
 LOGGER = logging.getLogger(__name__)
 
@@ -50,13 +49,6 @@ class Command(BaseCommand):
                 )
             )
 
-        # Load the user record using the retired email address -and- change the email address back.
-        retirement_status.user.email = email_address
-        retirement_status.user.set_password(generate_password(length=25))
-        retirement_status.user.save()
-
-        # Delete the user retirement status record.
-        # No need to delete the accompanying "permanent" retirement request record - it gets done via Django signal.
-        retirement_status.delete()
+        handle_retirement_cancellation(retirement_status, email_address)
 
         print(f"Successfully cancelled retirement request for user with email address '{email_address}'.")

@@ -79,6 +79,7 @@ def perform_request(method, url, data_or_params=None, raw=False,
         metric_tags.append('result:success')
 
     if 200 < status_code < 500:  # lint-amnesty, pylint: disable=no-else-raise
+        log.info(f'Investigation Log: CommentClientRequestError for request with {method} and params {params}')
         raise CommentClientRequestError(response.text, response.status_code)
     # Heroku returns a 503 when an application is in maintenance mode
     elif status_code == 503:

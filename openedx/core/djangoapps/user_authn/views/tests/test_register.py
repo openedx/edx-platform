@@ -17,6 +17,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
 from social_django.models import Partial, UserSocialAuth
+from testfixtures import LogCapture
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -24,16 +25,15 @@ from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
     AUTHN_EMAIL_CONFLICT_MSG,
+    AUTHN_EMAIL_INVALID_MSG,
     AUTHN_USERNAME_CONFLICT_MSG,
     EMAIL_BAD_LENGTH_MSG,
-    EMAIL_CONFLICT_MSG,
-    EMAIL_INVALID_MSG,
     EMAIL_MAX_LENGTH,
     EMAIL_MIN_LENGTH,
     NAME_MAX_LENGTH,
     REQUIRED_FIELD_CONFIRM_EMAIL_MSG,
+    REQUIRED_FIELD_COUNTRY_MSG,
     USERNAME_BAD_LENGTH_MSG,
-    USERNAME_CONFLICT_MSG,
     USERNAME_INVALID_CHARS_ASCII,
     USERNAME_INVALID_CHARS_UNICODE,
     USERNAME_MAX_LENGTH,
@@ -90,7 +90,7 @@ class RegistrationViewValidationErrorTest(
     YEAR_OF_BIRTH = "1998"
     ADDRESS = "123 Fake Street"
     CITY = "Springfield"
-    COUNTRY = "us"
+    COUNTRY = "US"
     GOALS = "Learn all the things!"
 
     @classmethod
@@ -157,12 +157,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email"
             }
@@ -204,12 +199,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "username": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
-                    ).format(
-                        self.USERNAME
-                    )
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-username"
             }
@@ -242,12 +232,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email"
             }
@@ -284,12 +269,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        account_recovery.secondary_email
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email"
             }
@@ -343,12 +323,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email"
             }
@@ -382,12 +357,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "username": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
-                    ).format(
-                        self.USERNAME
-                    )
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-username"
             }
@@ -421,26 +391,16 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "username": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
-                    ).format(
-                        self.USERNAME
-                    )
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email-username"
             }
         )
 
-    def test_duplicate_email_username_error_with_is_authn_check(self):
+    def test_duplicate_email_username_error(self):
         # Register the first user
         response = self.client.post(self.url, {
             "email": self.EMAIL,
@@ -453,11 +413,11 @@ class RegistrationViewValidationErrorTest(
 
         # Try to create a second user with the same username and email
         response = self.client.post(self.url, {
-            "is_authn_mfe": True,
             "email": self.EMAIL,
             "name": "Someone Else",
             "username": self.USERNAME,
             "password": self.PASSWORD,
+            "country": self.COUNTRY,
             "honor_code": "true",
         })
 
@@ -472,9 +432,31 @@ class RegistrationViewValidationErrorTest(
                     "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "email": [{
-                    "user_message": AUTHN_EMAIL_CONFLICT_MSG
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email-username"
+            }
+        )
+
+    def test_invalid_country_code_error(self):
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "country": "Invalid country code",
+            "honor_code": "true",
+        })
+
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertHttpBadRequest(response)
+        self.assertDictEqual(
+            response_json,
+            {
+                "country": [{
+                    "user_message": REQUIRED_FIELD_COUNTRY_MSG,
+                }],
+                "error_code": "invalid-country"
             }
         )
 
@@ -836,7 +818,7 @@ class RegistrationViewTestV1(
                     "options": country_options,
                     "instructions": "The country or region where you live.",
                     "errorMessages": {
-                        "required": "Select your country or region of residence."
+                        "required": "Select your country or region of residence"
                     },
                 }
             )
@@ -862,7 +844,7 @@ class RegistrationViewTestV1(
                     {"value": "other", "name": "Other education", "default": False},
                 ],
                 "errorMessages": {
-                    "required": "Select the highest level of education you have completed."
+                    "required": "Select the highest level of education you have completed"
                 }
             }
         )
@@ -891,7 +873,7 @@ class RegistrationViewTestV1(
                     {"value": "other", "name": "Other education TRANSLATED", "default": False},
                 ],
                 "errorMessages": {
-                    "required": "Select the highest level of education you have completed."
+                    "required": "Select the highest level of education you have completed"
                 }
             }
         )
@@ -989,7 +971,7 @@ class RegistrationViewTestV1(
                 "required": True,
                 "label": "Profession",
                 "errorMessages": {
-                    "required": "Enter your profession."
+                    "required": "Enter your profession"
                 }
             }
         )
@@ -1009,7 +991,7 @@ class RegistrationViewTestV1(
                 "label": "Profession",
                 "options": self.PROFESSION_OPTIONS,
                 "errorMessages": {
-                    "required": "Select your profession."
+                    "required": "Select your profession"
                 },
             }
         )
@@ -1023,7 +1005,7 @@ class RegistrationViewTestV1(
                 "required": True,
                 "label": "Specialty",
                 "errorMessages": {
-                    "required": "Enter your specialty."
+                    "required": "Enter your specialty"
                 }
             }
         )
@@ -1043,7 +1025,7 @@ class RegistrationViewTestV1(
                 "label": "Specialty",
                 "options": self.SPECIALTY_OPTIONS,
                 "errorMessages": {
-                    "required": "Select your specialty."
+                    "required": "Select your specialty"
                 },
             }
         )
@@ -1057,7 +1039,7 @@ class RegistrationViewTestV1(
                 "required": False,
                 "label": "Mailing address",
                 "errorMessages": {
-                    "required": "Enter your mailing address."
+                    "required": "Enter your mailing address"
                 }
             }
         )
@@ -1073,7 +1055,7 @@ class RegistrationViewTestV1(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "errorMessages": {
-                    "required": "Tell us your goals."
+                    "required": "Tell us your goals"
                 }
             }
         )
@@ -1087,7 +1069,7 @@ class RegistrationViewTestV1(
                 "required": False,
                 "label": "City",
                 "errorMessages": {
-                    "required": "Enter your city."
+                    "required": "Enter your city"
                 }
             }
         )
@@ -1130,7 +1112,7 @@ class RegistrationViewTestV1(
                 "required": True,
                 "options": country_options,
                 "errorMessages": {
-                    "required": "Select your country or region of residence."
+                    "required": "Select your country or region of residence"
                 },
             }
         )
@@ -1607,7 +1589,6 @@ class RegistrationViewTestV1(
         response = self.client.post(self.url, data)
         self.assertHttpBadRequest(response)
 
-    @override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"})
     @ddt.data("email", "name", "username", "password", "country")
     def test_register_missing_required_field(self, missing_field):
         data = {
@@ -1623,6 +1604,55 @@ class RegistrationViewTestV1(
         # Send a request missing a field
         response = self.client.post(self.url, data)
         self.assertHttpBadRequest(response)
+
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"})
+    def test_register_missing_country_required_field(self):
+        data = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "country": self.COUNTRY,
+        }
+        del data['country']
+
+        response = self.client.post(self.url, data)
+        response_json = json.loads(response.content.decode('utf-8'))
+
+        self.assertHttpBadRequest(response)
+        self.assertDictEqual(
+            response_json,
+            {
+                "country": [{
+                    "user_message": REQUIRED_FIELD_COUNTRY_MSG,
+                }],
+                "error_code": "invalid-country"
+            }
+        )
+
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"})
+    def test_register_invalid_country_required_field(self):
+        data = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "country": "Invalid country code",
+        }
+
+        response = self.client.post(self.url, data)
+        response_json = json.loads(response.content.decode('utf-8'))
+
+        self.assertHttpBadRequest(response)
+        self.assertDictEqual(
+            response_json,
+            {
+                "country": [{
+                    "user_message": REQUIRED_FIELD_COUNTRY_MSG,
+                }],
+                "error_code": "invalid-country"
+            }
+        )
 
     def test_register_duplicate_email(self):
         # Register the first user
@@ -1650,12 +1680,7 @@ class RegistrationViewTestV1(
             response_json,
             {
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email"
             }
@@ -1689,12 +1714,7 @@ class RegistrationViewTestV1(
             response_json,
             {
                 "username": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
-                    ).format(
-                        self.USERNAME
-                    )
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-username"
             }
@@ -1728,20 +1748,10 @@ class RegistrationViewTestV1(
             response_json,
             {
                 "username": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
-                    ).format(
-                        self.USERNAME
-                    )
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email-username"
             }
@@ -2193,7 +2203,7 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
                 "required": True,
                 "label": "Confirm Email",
                 "errorMessages": {
-                    "required": "The email addresses do not match.",
+                    "required": "The email addresses do not match",
                 }
             }
         )
@@ -2285,6 +2295,37 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         )
         self._assert_redirect_url(response, expected_redirect)
 
+    @mock.patch('openedx.core.djangoapps.user_authn.views.register._record_is_marketable_attribute')
+    def test_logs_for_error_when_setting_is_marketable_attribute(self, set_is_marketable_attr):
+        """
+        Test that if some error occurs while setting is_marketable attribute, error
+        is logged and that it doesn't affect the user registration workflow.
+        """
+        set_is_marketable_attr.side_effect = Exception('BOOM!')
+        post_params = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        }
+
+        with LogCapture() as logger:
+            response = self.client.post(
+                self.url,
+                post_params,
+                HTTP_ACCEPT='*/*',
+            )
+            logger.check_present(
+                (
+                    'edx.student',
+                    'ERROR',
+                    'Error while setting is_marketable attribute.'
+                )
+            )
+
+            assert response.status_code == 200
+
 
 @httpretty.activate
 @ddt.ddt
@@ -2339,8 +2380,12 @@ class ThirdPartyRegistrationTestMixin(
         assert response.status_code == 409
         errors = json.loads(response.content.decode('utf-8'))
         for conflict_attribute in ["username", "email"]:
+            if conflict_attribute == 'username':
+                error_message = AUTHN_USERNAME_CONFLICT_MSG
+            else:
+                error_message = AUTHN_EMAIL_CONFLICT_MSG
             assert conflict_attribute in errors
-            assert "belongs to an existing account" in errors[conflict_attribute][0]["user_message"]
+            assert error_message == errors[conflict_attribute][0]["user_message"]
 
     def _assert_access_token_error(self, response, expected_error_message, error_code):
         """Assert that the given response was an error for the access_token field with the given error message."""
@@ -2633,13 +2678,9 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             },
             {
                 # pylint: disable=no-member
-                "username": USERNAME_CONFLICT_MSG.format(
-                    username=user.username
-                ) if username == user.username else '',
+                "username": AUTHN_USERNAME_CONFLICT_MSG if username == user.username else '',
                 # pylint: disable=no-member
-                "email": EMAIL_CONFLICT_MSG.format(
-                    email_address=user.email
-                ) if email == user.email else ''
+                "email": AUTHN_EMAIL_CONFLICT_MSG if email == user.email else ''
             },
             validate_suggestions
         )
@@ -2652,11 +2693,10 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
         )
 
     def test_email_generically_invalid_validation_decision(self):
-        email = 'email'
         self.assertValidationDecision(
-            {'email': email},
+            {'email': 'email'},
             # pylint: disable=no-member
-            {'email': EMAIL_INVALID_MSG.format(email=email)}
+            {'email': AUTHN_EMAIL_INVALID_MSG}
         )
 
     def test_confirm_email_matches_email(self):

@@ -1,18 +1,15 @@
 """ Tests for student signal receivers. """
 
 from unittest import skipUnless
+from unittest.mock import patch
+
+from django.conf import settings
 from edx_toggles.toggles.testutils import override_waffle_flag
+
+from common.djangoapps.student.models import CourseEnrollmentCelebration, PendingNameChange, UserProfile
+from common.djangoapps.student.signals.signals import USER_EMAIL_CHANGED
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
 from lms.djangoapps.courseware.toggles import COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES
-from common.djangoapps.student.models import (
-    CourseEnrollmentCelebration,
-    PendingNameChange,
-    UserProfile
-)
-from common.djangoapps.student.tests.factories import (
-    CourseEnrollmentFactory,
-    UserFactory,
-    UserProfileFactory
-)
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -73,3 +70,15 @@ class ReceiversTest(SharedModuleStoreTestCase):
         assert PendingNameChange.objects.count() == 0
         profile = UserProfile.objects.get(user=user)
         assert profile.name == new_name
+
+    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @patch('common.djangoapps.student.signals.receivers.get_braze_client')
+    def test_listen_for_user_email_changed(self, mock_get_braze_client):
+        """
+        Ensure that USER_EMAIL_CHANGED signal triggers correct calls to get_braze_client.
+        """
+        user = UserFactory(email='email@test.com', username='jdoe')
+
+        USER_EMAIL_CHANGED.send(sender=None, user=user)
+
+        assert mock_get_braze_client.called

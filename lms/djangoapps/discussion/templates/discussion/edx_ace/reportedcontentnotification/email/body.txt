@@ -2,7 +2,7 @@
 
 {% block content %}
 {% blocktrans trimmed %}
-    {{ course_name }} {{ course_id }} Reported content awaits review
+    {{ course_name }}: Reported content awaits review
 {% endblocktrans %}
 
 
@@ -10,8 +10,9 @@
                     padding: 1px 1px 1px 15px;
                     margin: 20px 20px 30px 30px;
                     color: rgba(0,0,0,.75);">
-    <b> You are receiving this email because the following {{ content_type }} was reported for review </b>
-    {{ comment_body }}
+    <h3> <b> You are receiving this email because the following {{ content_type }} was reported for review </b> </h3>
+    <h3> <b> Post Title: {{ title }} </b> </h3>
+    {{ content_body }}
 </div>
 
 <a href="{{ post_link }}"> {% trans "Go to Discussion" %} </a>

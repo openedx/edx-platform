@@ -1,18 +1,26 @@
 """
 Emits course grade events.
 """
+from logging import getLogger
+
 from crum import get_current_user
+from django.conf import settings
 from eventtracking import tracker
 
-from common.djangoapps.track import contexts
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.track import contexts, segment
 from common.djangoapps.track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,
     get_event_transaction_type,
     set_event_transaction_type
 )
-
+from lms.djangoapps.grades.signals.signals import SCHEDULE_FOLLOW_UP_SEGMENT_EVENT_FOR_COURSE_PASSED_FIRST_TIME
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.enterprise_support.context import get_enterprise_event_context
+
+log = getLogger(__name__)
 
 COURSE_GRADE_CALCULATED = 'edx.grades.course.grade_calculated'
 GRADES_OVERRIDE_EVENT_TYPE = 'edx.grades.problem.score_overridden'
@@ -200,3 +208,53 @@ def course_grade_now_failed(user, course_id):
                 'event_transaction_type': str(get_event_transaction_type())
             }
         )
+
+
+def fire_segment_event_on_course_grade_passed_first_time(user_id, course_locator):
+    """
+    Fire a segment event `edx.course.grade.passed.first_time` with the desired data.
+
+    * Event should be only fired for learners enrolled in paid enrollment modes.
+    """
+    event_name = 'edx.course.learner.passed.first_time'
+    courserun_key = str(course_locator)
+    courserun_org = course_locator.org
+    paid_enrollment_modes = (
+        CourseMode.MASTERS,
+        CourseMode.VERIFIED,
+        CourseMode.CREDIT_MODE,
+        CourseMode.PROFESSIONAL,
+        CourseMode.NO_ID_PROFESSIONAL_MODE,
+    )
+
+    try:
+        enrollment = CourseEnrollment.objects.get(
+            user_id=user_id,
+            course_id=courserun_key,
+            mode__in=paid_enrollment_modes
+        )
+    except CourseEnrollment.DoesNotExist:
+        return
+
+    try:
+        courserun_display_name = CourseOverview.objects.values_list('display_name', flat=True).get(id=courserun_key)
+    except CourseOverview.DoesNotExist:
+        return
+
+    event_properties = {
+        'LMS_ENROLLMENT_ID': enrollment.id,
+        'COURSE_TITLE': courserun_display_name,
+        'COURSE_ORG_NAME': courserun_org,
+    }
+    if getattr(settings, 'OUTCOME_SURVEYS_EVENTS_ENABLED', False):
+        segment.track(user_id, event_name, event_properties)
+
+        # fire signal so that a follow up event can be scheduled in outcome_surveys app
+        SCHEDULE_FOLLOW_UP_SEGMENT_EVENT_FOR_COURSE_PASSED_FIRST_TIME.send(
+            sender=None,
+            user_id=user_id,
+            course_id=course_locator,
+            event_properties=event_properties
+        )
+
+    log.info("Segment event fired for passed learners. Event: [{}], Data: [{}]".format(event_name, event_properties))

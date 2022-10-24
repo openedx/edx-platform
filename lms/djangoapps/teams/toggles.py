@@ -17,7 +17,7 @@ TEAM_SUBMISSIONS_FLAG = "team_submissions"
 # .. toggle_creation_date: 2020-03-03
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-# .. toggle_warnings: This temporary feature toggle does not have a target removal date. This can be overridden by a
+# .. toggle_warning: This temporary feature toggle does not have a target removal date. This can be overridden by a
 #      course waffle flags or a waffle switch with identical name.
 # TODO: this should be moved to edx/edx-ora2
 TEAM_SUBMISSIONS_FEATURE = SettingDictToggle(
@@ -35,7 +35,7 @@ def are_team_submissions_enabled(course_key):
         return True
 
     # TODO: this behaviour differs from edx-ora2, where the WaffleSwitch overrides the setting.
-    # https://github.com/edx/edx-ora2/blob/ac502d8301cb987c9885aaefbaeddaf456c13fb9/openassessment/xblock/config_mixin.py#L96
+    # https://github.com/openedx/edx-ora2/blob/ac502d8301cb987c9885aaefbaeddaf456c13fb9/openassessment/xblock/config_mixin.py#L96
 
     if TEAM_SUBMISSIONS_FEATURE.is_enabled():
         return True

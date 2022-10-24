@@ -95,7 +95,8 @@ def generate_username_suggestions(name):
                 {'min': 0, 'max': 9},
                 {'min': 10, 'max': 99},
                 {'min': 100, 'max': 999},
-                {'min': 1000, 'max': 99999},
+                {'min': 1000, 'max': 9999},
+                {'min': 10000, 'max': 99999},
             ]
             for int_range in int_ranges:
                 for _ in range(10):

@@ -231,16 +231,22 @@ add_plugins(__name__, ProjectType.CMS, SettingsType.DEVSTACK)
 OPENAPI_CACHE_TIMEOUT = 0
 
 #####################################################################
+# set replica set of contentstore to none as we haven't setup any for cms in devstack
+CONTENTSTORE['DOC_STORE_CONFIG']['replicaSet'] = None
+
+#####################################################################
+# set replica sets of moduelstore to none as we haven't setup any for cms in devstack
+for store in MODULESTORE['default']['OPTIONS']['stores']:
+    if 'DOC_STORE_CONFIG' in store and 'replicaSet' in store['DOC_STORE_CONFIG']:
+        store['DOC_STORE_CONFIG']['replicaSet'] = None
+
+
+#####################################################################
 # Lastly, run any migrations, if needed.
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
-
-###############################################################################
-# See if the developer has any local overrides.
-if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
-    from .private import *  # pylint: disable=import-error,wildcard-import
 
 ############# CORS headers for cross-domain requests #################
 FEATURES['ENABLE_CORS_HEADERS'] = True
@@ -284,3 +290,18 @@ SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
 #################### Network configuration ####################
 # Devstack is directly exposed to the caller
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
+#################### Credentials Settings ####################
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
+CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
+
+#################### Event bus backend ########################
+EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
+EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
+EVENT_BUS_TOPIC_PREFIX = 'dev'
+
+################# New settings must go ABOVE this line #################
+########################################################################
+# See if the developer has any local overrides.
+if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
+    from .private import *  # pylint: disable=import-error,wildcard-import

@@ -6,6 +6,7 @@ import json
 import logging
 import pytz
 
+import dateutil
 from celery.states import REVOKED
 from django.db import transaction
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -14,9 +15,8 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 
 from lms.djangoapps.bulk_email.api import update_course_email
-from lms.djangoapps.instructor_task.api import convert_schedule_to_utc_from_local
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
-from lms.djangoapps.instructor_task.models import InstructorTaskSchedule, SCHEDULED
+from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule, SCHEDULED
 from lms.djangoapps.instructor_task.rest_api.v1.exceptions import TaskUpdateException
 from lms.djangoapps.instructor_task.rest_api.v1.serializers import ScheduledBulkEmailSerializer
 from lms.djangoapps.instructor_task.rest_api.v1.permissions import CanViewOrModifyScheduledBulkCourseEmailTasks
@@ -106,6 +106,7 @@ class ModifyScheduledBulkEmailInstructorTask(generics.DestroyAPIView, generics.U
         # update the task's status to REVOKED and then delete the task schedule instance
         log.info(f"Revoking instructor task with id '{task.id}' for course '{task.course_id}'")
         task.task_state = REVOKED
+        task.task_output = InstructorTask.create_output_for_revoked()
         task.save()
         schedule.delete()
 
@@ -126,10 +127,9 @@ class ModifyScheduledBulkEmailInstructorTask(generics.DestroyAPIView, generics.U
 
             with transaction.atomic():
                 if schedule:
-                    browser_timezone = request.data.get("browser_timezone", None)
-                    schedule_utc = convert_schedule_to_utc_from_local(schedule, browser_timezone, request.user)
-                    self._verify_valid_schedule(schedule_id, schedule_utc)
-                    task_schedule.task_due = schedule_utc
+                    schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
+                    self._verify_valid_schedule(schedule_id, schedule_dt)
+                    task_schedule.task_due = schedule_dt
                     task_schedule.save()
                 if email_data:
                     email_id = email_data.get("id")

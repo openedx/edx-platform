@@ -2,6 +2,8 @@
 Settings for ace_common app.
 """
 
+ACE_ROUTING_KEY = 'edx.lms.core.default'
+
 
 def plugin_settings(settings):  # lint-amnesty, pylint: disable=missing-function-docstring, missing-module-docstring
     settings.ACE_ENABLED_CHANNELS = [
@@ -17,6 +19,6 @@ def plugin_settings(settings):  # lint-amnesty, pylint: disable=missing-function
     settings.ACE_CHANNEL_DEFAULT_EMAIL = 'django_email'
     settings.ACE_CHANNEL_TRANSACTIONAL_EMAIL = 'django_email'
 
-    settings.ACE_ROUTING_KEY = 'edx.core.low'
+    settings.ACE_ROUTING_KEY = ACE_ROUTING_KEY
 
     settings.FEATURES['test_django_plugin'] = True

@@ -118,8 +118,8 @@ Related DEPR (edX deprecation process) tickets:
 * `Remove PDF view code`_
 
 .. _Enable Course Certificates: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/enable_certificates.html
-.. _Deprecate web certificate setting: https://github.com/edx/edx-platform/pull/17285
-.. _Disable PDF certificate generation: https://github.com/edx/edx-platform/pull/19833
+.. _Deprecate web certificate setting: https://github.com/openedx/edx-platform/pull/17285
+.. _Disable PDF certificate generation: https://github.com/openedx/edx-platform/pull/19833
 .. _Set Up Certificates in Studio: https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/set_up_course/studio_add_course_information/studio_creating_certificates.html
 .. _Remove PDF generation code: https://openedx.atlassian.net/browse/DEPR-155
 .. _Remove PDF view code: https://openedx.atlassian.net/browse/DEPR-157

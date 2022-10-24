@@ -484,6 +484,10 @@ ECOMMERCE_PUBLIC_URL_ROOT = None
 ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
 
+########################## ENTERPRISE LEARNER PORTAL ##############################
+ENTERPRISE_LEARNER_PORTAL_NETLOC = 'example.com:8734'
+ENTERPRISE_LEARNER_PORTAL_BASE_URL = 'http://' + ENTERPRISE_LEARNER_PORTAL_NETLOC
+
 ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
@@ -590,6 +594,8 @@ AUTHN_MICROFRONTEND_URL = "http://authn-mfe"
 AUTHN_MICROFRONTEND_DOMAIN = "authn-mfe"
 LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
+LEARNER_HOME_MICROFRONTEND_URL = "http://learner-home-mfe"
+ORA_GRADING_MICROFRONTEND_URL = "http://ora-grading-mfe"
 
 ########################## limiting dashboard courses ######################
 
@@ -606,6 +612,9 @@ PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
 # Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+############## Exams CONFIGURATION SETTINGS ####################
+EXAMS_SERVICE_URL = 'http://exams.example.com/api/v1'
 
 ############### Settings for Django Rate limit #####################
 
@@ -636,3 +645,29 @@ SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
 #################### Network configuration ####################
 # Tests are not behind any proxies
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
+
+COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
+    "KEY": "***",
+    "SECRET": "***",
+    "URL": "***",
+}
+
+################## MFE API ####################
+ENABLE_MFE_CONFIG_API = True
+MFE_CONFIG = {
+    "BASE_URL": "https://name_of_mfe.example.com",
+    "LANGUAGE_PREFERENCE_COOKIE_NAME": "example-language-preference",
+    "LOGO_URL": "https://courses.example.com/logo.png"
+}
+
+MFE_CONFIG_OVERRIDES = {
+    "mymfe": {
+        "LANGUAGE_PREFERENCE_COOKIE_NAME": "mymfe-language-preference",
+        "LOGO_URL": "https://courses.example.com/mymfe-logo.png",
+    },
+    "yourmfe": {
+        "LANGUAGE_PREFERENCE_COOKIE_NAME": "yourmfe-language-preference",
+        "LOGO_URL": "https://courses.example.com/yourmfe-logo.png",
+    },
+}

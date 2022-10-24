@@ -18,6 +18,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.plugins import get_plugins_view_context
 from edx_toggles.toggles import WaffleFlag
+from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import DashboardRenderStarted
 from pytz import UTC
@@ -29,6 +30,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_st
 from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.learner_home.waffle import should_redirect_to_learner_home_mfe
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
@@ -50,6 +52,8 @@ from openedx.features.enterprise_support.api import (
     get_dashboard_consent_notification,
     get_enterprise_learner_portal_context,
 )
+from openedx.features.enterprise_support.utils import is_enterprise_learner
+from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from common.djangoapps.student.models import (
@@ -268,6 +272,7 @@ def complete_course_mode_info(course_id, enrollment, modes=None):
         if modes['verified'].expiration_datetime:
             today = datetime.datetime.now(UTC).date()
             mode_info['days_for_upsell'] = (modes['verified'].expiration_datetime.date() - today).days
+            mode_info['expiration_datetime'] = modes['verified'].expiration_datetime.date()
 
     return mode_info
 
@@ -513,6 +518,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     user = request.user
     if not UserProfile.objects.filter(user=user).exists():
         return redirect(reverse('account_settings'))
+
+    enable_learner_home_mfe = should_redirect_to_learner_home_mfe()
+    if enable_learner_home_mfe:
+        return redirect(settings.LEARNER_HOME_MICROFRONTEND_URL)
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 
@@ -764,17 +773,21 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
 
     show_account_activation_popup = request.COOKIES.get(settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME, None)
 
-    fbe_status_list = []
+    enrollments_fbe_is_on = []
     for enrollment in course_enrollments:
         course_key = CourseKey.from_string(str(enrollment.course_id))
         gated_content = ContentTypeGatingConfig.enabled_for_enrollment(
-            user=request.user,
+            user=user,
             course_key=course_key
         )
-        duration = get_user_course_duration(enrollment.user, enrollment.course)
-        deadline = duration and get_user_course_expiration_date(request.user, enrollment.course)
-        fbe_is_on = bool(deadline and gated_content)
-        fbe_status_list.append(fbe_is_on)
+        duration = get_user_course_duration(user, enrollment.course)
+        deadline = duration and get_user_course_expiration_date(user, enrollment.course)
+        fbe_is_on = deadline and gated_content
+        if fbe_is_on:
+            enrollments_fbe_is_on.append(course_key)
+
+    ip_address = get_client_ip(request)[0]
+    country_code = country_code_from_ip(ip_address).upper()
 
     context = {
         'urls': urls,
@@ -822,7 +835,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'display_sidebar_account_activation_message': not(user.is_active or hide_dashboard_courses_until_activated),
         'display_dashboard_courses': (user.is_active or not hide_dashboard_courses_until_activated),
         'empty_dashboard_message': empty_dashboard_message,
-        'fbe_status_list': fbe_status_list,
+        'enrollments_fbe_is_on': enrollments_fbe_is_on,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
         'show_load_all_courses_link': show_load_all_courses_link(user, course_limit, course_enrollments),
@@ -830,6 +843,9 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)
         'disable_unenrollment': disable_unenrollment,
+        'country_code': country_code,
+        # TODO: clean when experiment(Merchandise 2U LOBs - Dashboard) would be stop. [VAN-1097]
+        'is_enterprise_user': is_enterprise_learner(user),
     }
 
     # Include enterprise learner portal metadata and messaging

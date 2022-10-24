@@ -51,7 +51,9 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.students_who_may_enroll = list(self.users) + [UserFactory() for _ in range(5)]
         for student in self.students_who_may_enroll:
             CourseEnrollmentAllowed.objects.create(
-                email=student.email, course_id=self.course_key
+                email=student.email,
+                course_id=self.course_key,
+                user=student if student in self.users else None,
             )
 
     @ddt.data(
