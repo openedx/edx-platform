@@ -34,7 +34,7 @@ aniso8601==9.0.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-tincan-py35
-anyio==3.6.1
+anyio==3.6.2
     # via starlette
 appdirs==1.4.4
     # via
@@ -67,6 +67,7 @@ attrs==22.1.0
     #   jsonschema
     #   lti-consumer-xblock
     #   openedx-events
+    #   outcome
     #   pytest
 babel==2.10.3
     # via
@@ -77,6 +78,10 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
+backports-zoneinfo==0.2.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   icalendar
 beautifulsoup4==4.11.1
     # via
     #   -r requirements/edx/base.txt
@@ -231,7 +236,6 @@ ddt==1.6.0
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
-    #   xblock-drag-and-drop-v2
     #   xblock-poll
 defusedxml==0.7.1
     # via
@@ -249,7 +253,7 @@ deprecated==1.2.13
     #   redis
 diff-cover==7.0.1
     # via -r requirements/edx/coverage.txt
-dill==0.3.5.1
+dill==0.3.6
     # via pylint
 distlib==0.3.6
     # via virtualenv
@@ -680,7 +684,7 @@ factory-boy==3.2.1
     # via -r requirements/edx/testing.in
 faker==15.1.1
     # via factory-boy
-fastapi==0.85.0
+fastapi==0.85.1
     # via pact-python
 fastavro==1.6.1
     # via
@@ -730,7 +734,7 @@ html5lib==1.1
     #   ora2
 httpretty==1.1.4
     # via -r requirements/edx/testing.in
-icalendar==4.1.0
+icalendar==5.0.1
     # via -r requirements/edx/base.txt
 idna==3.4
     # via
@@ -829,7 +833,7 @@ lazy-object-proxy==1.7.1
     # via astroid
 learner-pathway-progress==1.3.3
     # via -r requirements/edx/base.txt
-levenshtein==0.20.5
+levenshtein==0.20.7
     # via
     #   -r requirements/edx/base.txt
     #   python-levenshtein
@@ -892,7 +896,6 @@ mccabe==0.7.0
 mock==4.0.3
     # via
     #   -r requirements/edx/base.txt
-    #   xblock-drag-and-drop-v2
     #   xblock-poll
 mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
     # via -r requirements/edx/base.txt
@@ -988,7 +991,7 @@ path-py==12.5.0
     #   staff-graded-xblock
 paver==1.3.4
     # via -r requirements/edx/base.txt
-pbr==5.10.0
+pbr==5.11.0
     # via
     #   -r requirements/edx/base.txt
     #   stevedore
@@ -1022,7 +1025,7 @@ prompt-toolkit==3.0.31
     # via
     #   -r requirements/edx/base.txt
     #   click-repl
-psutil==5.9.2
+psutil==5.9.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1071,7 +1074,7 @@ pyjwkest==1.4.2
     #   -r requirements/edx/base.txt
     #   edx-drf-extensions
     #   lti-consumer-xblock
-pyjwt[crypto]==2.5.0
+pyjwt[crypto]==2.6.0
     # via
     #   -r requirements/edx/base.txt
     #   drf-jwt
@@ -1188,7 +1191,7 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-levenshtein==0.20.5
+python-levenshtein==0.20.7
     # via -r requirements/edx/base.txt
 python-memcached==1.59
     # via -r requirements/edx/base.txt
@@ -1287,7 +1290,7 @@ ruamel-yaml==0.17.21
     # via
     #   -r requirements/edx/base.txt
     #   drf-yasg
-ruamel-yaml-clib==0.2.6
+ruamel-yaml-clib==0.2.7
     # via
     #   -r requirements/edx/base.txt
     #   ruamel-yaml
@@ -1404,7 +1407,7 @@ staff-graded-xblock==2.0.1
     # via -r requirements/edx/base.txt
 starlette==0.20.4
     # via fastapi
-stevedore==4.0.1
+stevedore==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
@@ -1453,10 +1456,6 @@ tqdm==4.64.1
     # via
     #   -r requirements/edx/base.txt
     #   nltk
-types-cryptography==3.3.23
-    # via
-    #   -r requirements/edx/base.txt
-    #   pyjwt
 typing-extensions==4.4.0
     # via
     #   -r requirements/edx/base.txt
@@ -1490,7 +1489,7 @@ urllib3==1.26.12
     #   tableauserverclient
 user-util==1.0.0
     # via -r requirements/edx/base.txt
-uvicorn==0.18.3
+uvicorn==0.19.0
     # via pact-python
 vine==5.0.0
     # via
@@ -1550,7 +1549,7 @@ xblock==1.6.1
     #   xblock-google-drive
     #   xblock-poll
     #   xblock-utils
-xblock-drag-and-drop-v2 @ git+https://github.com/openedx/xblock-drag-and-drop-v2@v2.3.5
+xblock-drag-and-drop-v2==2.5.0
     # via -r requirements/edx/base.txt
 xblock-poll @ git+https://github.com/open-craft/xblock-poll@v1.12.0
     # via -r requirements/edx/base.txt
@@ -1572,7 +1571,7 @@ yarl==1.8.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-zipp==3.9.0
+zipp==3.10.0
     # via
     #   -r requirements/edx/base.txt
     #   importlib-metadata
