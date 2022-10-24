@@ -34,6 +34,7 @@ from organizations import models as org_models
 from organizations.models import OrganizationCourse
 
 from organizations.models import Organization
+
 from tahoe_sites.api import (
     add_user_to_organization,
     create_tahoe_site_by_link,
@@ -542,6 +543,8 @@ def remove_course_creator_role(users):
 
 @beeline.traced(name="delete_site")
 def delete_site(site):
+    from third_party_auth.models import SAMLConfiguration  # local import to avoid import-time errors
+
     print('Deleting SiteConfiguration of', site)
     site.configuration.delete()
 
@@ -553,6 +556,11 @@ def delete_site(site):
     print('Deleting users of', site)
     users = tahoe_sites.api.get_users_of_organization(organization, without_inactive_users=False)
     remove_course_creator_role(users)
+
+    # Prepare removing users by avoiding on_delete=models.PROTECT error
+    # SAMLConfiguration will be deleted with `site.delete()`
+    SAMLConfiguration.objects.filter(changed_by__in=users).update(changed_by=None)
+
     users.delete()
 
     print('Deleting courses of', site)
