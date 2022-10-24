@@ -518,8 +518,14 @@ def delete_organization_courses(organization):
     for course in get_organization_courses({'id': organization.id}):
         course_keys.append(course['course_id'])
 
-    for model_class, field_name in get_models_using_course_key():
-        print('Deleting models of', model_class.__name__, 'with field', field_name)
+    model_classes = get_models_using_course_key()
+
+    print('Deleting course related models:', ', '.join([
+        '{model}.{field}'.format(model=model_class.__name__, field=field_name)
+        for model_class, field_name in model_classes
+    ]))
+
+    for model_class, field_name in model_classes:
         objects_to_delete = model_class.objects.filter(**{
             '{field_name}__in'.format(field_name=field_name): course_keys,
         })
