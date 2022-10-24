@@ -64,6 +64,13 @@ def plugin_settings(settings):
             tpa_admin_app_name,
         ]
 
+    settings.INSTALLED_APPS += [
+        'user_tasks',  # Release upgrade note: This line can be removed if it causes errors,
+                       #                       but the `remove_site` must be tested afterwards
+                       # `user_tasks` is a CMS-only app, but adding it in LMS to fix an error with `remove_site` command
+                       # `user_tasks` helps to manage of user-triggered async tasks (course import/export, etc.)
+    ]
+
     settings.CORS_ORIGIN_ALLOW_ALL = True
 
     settings.CORS_ALLOW_HEADERS = (
