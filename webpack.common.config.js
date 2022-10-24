@@ -130,7 +130,7 @@ module.exports = Merge.smart({
 
         plugins: [
             new webpack.NoEmitOnErrorsPlugin(),
-            new webpack.NamedModulesPlugin(),
+            // new webpack.NamedModulesPlugin(),
             new BundleTracker({
                 path: process.env.STATIC_ROOT_CMS,
                 filename: 'webpack-stats.json'
@@ -160,19 +160,32 @@ module.exports = Merge.smart({
             // recommended workaround, as this plugin is just an optimization. But
             // because of this, we really don't want to get too fancy with how we
             // invoke this plugin until we can upgrade karma-webpack.
-            new webpack.optimize.CommonsChunkPlugin({
-                // If the value below changes, update the render_bundle call in
-                // common/djangoapps/pipeline_mako/templates/static_content.html
-                name: 'commons',
-                filename: 'commons.js',
-                minChunks: 10
-            }),
+            // new webpack.optimize.CommonsChunkPlugin({
+            //     // If the value below changes, update the render_bundle call in
+            //     // common/djangoapps/pipeline_mako/templates/static_content.html
+            //     name: 'commons',
+            //     filename: 'commons.js',
+            //     minChunks: 10
+            // }),
 
             new CopyPlugin([
                 { from: "node_modules/react/umd/react.production.min.js", to: path.resolve(__dirname, 'common/static/common/js/vendor/react.min.js')},
                 { from: "node_modules/react-dom/umd/react-dom.production.min.js", to: path.resolve(__dirname, 'common/static/common/js/vendor/react-dom.min.js')},
             ], {}),
         ],
+
+        optimization: {
+            moduleIds: 'named',
+            splitChunks: {
+                cacheGroups: {
+                    commons: {
+                        name: 'commons',
+                        test: 'commons.js',
+                        minChunks: 10,
+                    },
+                },
+            },
+        },
 
         module: {
             noParse: [
@@ -462,7 +475,9 @@ module.exports = Merge.smart({
             underscore: '_',
             URI: 'URI',
             XBlockToXModuleShim: 'XBlockToXModuleShim',
-            XModule: 'XModule'
+            XModule: 'XModule',
+            react: 'React',
+            'react-dom': 'ReactDOM',
         },
 
         watchOptions: {

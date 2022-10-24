@@ -1,5 +1,5 @@
 /* global jest,test,describe,expect */
-import { Button } from '@edx/paragon';
+import { Button } from '@edx/paragon-new';
 import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
 import { Provider } from 'react-redux';
 import { shallow } from 'enzyme';

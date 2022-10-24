@@ -7,7 +7,7 @@
 
     var OldExceptionFormatter = jasmineRequire.ExceptionFormatter(),
         oldExceptionFormatter = new OldExceptionFormatter(),
-        MAX_STACK_TRACE_LINES = 10;
+        MAX_STACK_TRACE_LINES = 50;
 
     jasmineRequire.ExceptionFormatter = function() {
         function ExceptionFormatter() {
