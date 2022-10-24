@@ -2,6 +2,8 @@
 Contains the logic to manage survey report model.
 """
 
+from django.conf import settings
+
 from openedx.features.survey_report.queries import (
     get_unique_courses_offered,
     get_currently_learners,
@@ -20,11 +22,15 @@ def generate_report() -> None:
     registered = get_learners_registered()
     certificates = get_generated_certificates()
     enrollments = get_course_enrollments()
+    extra_data = settings.SURVEY_REPORT_EXTRA_DATA
 
-    SurveyReport(
+    survey_report = SurveyReport(
         courses_offered=courses_offered,
         learners=learners,
-        learners_registered=registered,
+        registered_learners=registered,
         generated_certificates=certificates,
-        enrollments=enrollments
+        enrollments=enrollments,
+        extra_data=extra_data,
     )
+
+    survey_report.save()
