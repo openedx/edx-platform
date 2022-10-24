@@ -50,7 +50,7 @@ def get_generated_certificates() -> int:
     return PersistentCourseGrade.objects.filter(passed_timestamp__isnull=False).count()
 
 def get_course_enrollments() -> int:
-    """"
+    """
     Get total number of enrollments from users that aren't staff.
     """
     return CourseEnrollment.objects.filter(user__is_superuser=False, user__is_staff=False).count()
