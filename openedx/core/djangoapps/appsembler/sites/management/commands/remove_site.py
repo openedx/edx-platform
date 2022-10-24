@@ -1,4 +1,6 @@
-from django.core.management.base import BaseCommand, CommandError
+import traceback
+
+from django.core.management.base import BaseCommand
 from django.contrib.sites.models import Site
 from django.db import transaction
 
@@ -14,11 +16,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'domain',
-            help='The domain of the organization to be deleted.',
-            type=str,
-        )
-        parser.add_argument(
             '--commit',
             default=False,
             dest='commit',
@@ -26,33 +23,42 @@ class Command(BaseCommand):
             action='store_true',
         )
 
+        parser.add_argument(
+            'domain',
+            help='The domain of the organization to be deleted.',
+            nargs='+',
+            type=str,
+        )
+
     def handle(self, *args, **options):
-        organization_domain = options['domain']
+        domains = options['domain']
 
-        self.stdout.write('Removing "%s" in progress...' % organization_domain)
-        site = self._get_site(organization_domain)
+        for domain in domains:
+            self.stdout.write('Removing "%s" in progress...' % domain)
 
-        with transaction.atomic():
-            delete_site(site)
+            try:
+                site = Site.objects.filter(domain=domain).first()
+                if not site:
+                    self.stderr.write(self.style.ERROR('Cannot find "{domain}"'.format(domain=domain)))
+                    continue
 
-            if not options['commit']:
-                transaction.set_rollback(True)
+                with transaction.atomic():
+                    delete_site(site)
 
-        self.stdout.write(self.style.SUCCESS(
-            '{message} removed site "{domain}"'.format(
-                message='Successfully' if options['commit'] else 'Dry run',
-                domain=organization_domain,
-            )
-        ))
-
-    def _get_site(self, domain):
-        """
-        Locates the site to be deleted and return its instance.
-
-        :param domain: The domain of the site to be returned.
-        :return: Returns the site object that has the given domain.
-        """
-        try:
-            return Site.objects.get(domain=domain)
-        except Site.DoesNotExist:
-            raise CommandError('Cannot find "%s" in Sites!' % domain)
+                    if not options['commit']:
+                        transaction.set_rollback(True)
+            except Exception:  # noqa
+                self.stderr.write(self.style.ERROR(
+                    'Failed to remove site "{domain}" error: \n {error}'.format(
+                        domain=domain,
+                        error=traceback.format_exc(),
+                    )
+                ))
+                traceback.format_exc()
+            else:
+                self.stdout.write(self.style.SUCCESS(
+                    '{message} removed site "{domain}"'.format(
+                        message='Successfully' if options['commit'] else 'Dry run',
+                        domain=domain,
+                    )
+                ))
