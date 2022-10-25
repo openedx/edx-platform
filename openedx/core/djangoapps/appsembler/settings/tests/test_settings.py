@@ -23,6 +23,7 @@ def fake_production_settings(settings):
     settings.AUTH_TOKENS = {}
     settings.CELERY_QUEUES = {}
     settings.ALTERNATE_QUEUE_ENVS = []
+    settings.INSTALLED_APPS = settings.INSTALLED_APPS.copy()  # Prevent polluting the original list
     settings.FEATURES = settings.FEATURES.copy()  # Prevent polluting other tests.
     settings.ENV_TOKENS = {
         'LMS_BASE': 'fake-lms-base',
