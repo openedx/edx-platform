@@ -5,7 +5,6 @@ Helper methods for Studio views.
 import urllib
 from uuid import uuid4
 
-from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import UsageKey
@@ -134,7 +133,7 @@ def xblock_type_display_name(xblock, default_display_name=None):
         return _('Subsection')
     elif category == 'vertical':
         return _('Unit')
-    component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
+    component_class = XBlock.load_class(category)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
         return _(component_class.display_name.default)  # lint-amnesty, pylint: disable=translation-of-non-string
     else:
