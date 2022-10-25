@@ -166,7 +166,7 @@ from openedx.core.djangolib.js_utils import (
                   % if can_create_organizations:
                     <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
                   % else:
-                    <select style="padding: 10px" class="new-library-org" id="new-library-org" name="new-library-org" required aria-describedby="tip-new-library-org tip-error-new-library-org">
+                    <select class="new-library-org" id="new-library-org" name="new-library-org" required aria-describedby="tip-new-library-org tip-error-new-library-org">
                       % for org in allowed_organizations:
                         <option value="${org}">${org}</option>
                       % endfor
