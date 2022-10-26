@@ -2,9 +2,8 @@
 Survey Report models.
 """
 
-from jsonfield import JSONField
-
 from django.db import models
+from jsonfield import JSONField
 
 
 class SurveyReport(models.Model):
