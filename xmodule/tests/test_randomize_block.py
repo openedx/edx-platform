@@ -8,7 +8,7 @@ from lxml import etree
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
-from xmodule.randomize_module import RandomizeBlock
+from xmodule.randomize_block import RandomizeBlock
 from xmodule.tests import get_test_system
 
 from .test_course_module import DummySystem as TestImportSystem

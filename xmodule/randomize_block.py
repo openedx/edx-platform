@@ -81,7 +81,7 @@ class RandomizeBlock(
         child = self.get_children()[self.choice]
 
         if self.choice is not None:
-            log.debug("children of randomize module (should be only 1): %s", child)
+            log.debug("children of randomize block (should be only 1): %s", child)
 
         return child
 
