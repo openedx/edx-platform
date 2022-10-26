@@ -115,7 +115,7 @@ from django.urls import reverse
         </div>
       </div>
     %endif
-  
+
   %if proctoring_errors:
     <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
       <div class="alert announcement has-actions">
@@ -179,6 +179,13 @@ from django.urls import reverse
                     <li class="nav-item">
                         <a href="${reindex_link}" class="button button-reindex" data-category="reindex" title="${_('Reindex current course')}">
                             <span class="icon-arrow-right" aria-hidden="true"></span>${_('Reindex')}
+                        </a>
+                    </li>
+                %endif
+                %if update_lessons_link:
+                    <li class="nav-item">
+                        <a href="${update_lessons_link}" class="button button-update-lessons" data-category="update-lessons" title="${_('Update Lessons')}">
+                            <span class="icon-arrow-right" aria-hidden="true"></span>${_('Update Lessons')}
                         </a>
                     </li>
                 %endif

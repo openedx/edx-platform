@@ -81,16 +81,21 @@ class ProgramSerializer(serializers.ModelSerializer):
 class ClassLessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassLesson
-        fields = ('id', 'display_name', 'is_locked', 'lms_url')
+        fields = ('id', 'order', 'display_name', 'is_locked', 'lms_url')
 
 
 class ClassUnitSerializer(serializers.ModelSerializer):
-    class_lessons = ClassLessonSerializer(many=True, read_only=True)
+    class_lessons = serializers.SerializerMethodField()
     display_name = serializers.CharField(source="unit.display_name")
 
     class Meta:
         model = ClassUnit
         fields = ('id', 'display_name', 'is_locked', 'class_lessons',)
+
+    def get_class_lessons(self, obj):
+        queryset = obj.class_lessons.all().order_by('order')
+        serializer = ClassLessonSerializer(queryset, many=True, read_only=True)
+        return serializer.data
 
 
 class ClassStudentSerializer(serializers.ModelSerializer):
