@@ -1,4 +1,4 @@
-"""Poll module is ungraded xmodule used by students to
+"""Poll block is ungraded xmodule used by students to
 to do set of polls.
 
 On the client side we show:
@@ -46,7 +46,7 @@ class PollBlock(
     ResourceTemplates,
     XModuleMixin,
 ):  # pylint: disable=abstract-method
-    """Poll Module"""
+    """Poll Block"""
     # Name of poll to use in links to this poll
     display_name = String(
         help=_("The display name for this component."),

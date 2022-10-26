@@ -25,7 +25,7 @@ from xmodule.conditional_block import ConditionalBlock
 from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.library_content_block import LibraryContentBlock
 from xmodule.lti_block import LTIBlock
-from xmodule.poll_module import PollBlock
+from xmodule.poll_block import PollBlock
 from xmodule.seq_module import SequenceBlock
 from xmodule.split_test_module import SplitTestBlock
 from xmodule.template_module import CustomTagBlock
