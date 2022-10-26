@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 LH_DEBUG = True
 
 
-def timed(func):
+def exec_time_logged(func):
     """Wrap the function and return result and execution time"""
 
     # IF debugging is on, log function run lengths
