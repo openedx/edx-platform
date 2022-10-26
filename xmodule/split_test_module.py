@@ -24,7 +24,7 @@ from xmodule.seq_block import ProctoringFields, SequenceMixin
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.xml_module import XmlMixin
+from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,

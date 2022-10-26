@@ -32,7 +32,7 @@ from xmodule.x_module import (
     XModuleMixin,
     XModuleToXBlockMixin,
 )
-from xmodule.xml_module import XmlMixin, name_to_pathname
+from xmodule.xml_block import XmlMixin, name_to_pathname
 
 log = logging.getLogger("edx.courseware")
 

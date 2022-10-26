@@ -30,7 +30,7 @@ from xmodule.x_module import (
     XModuleMixin,
     XModuleToXBlockMixin,
 )
-from xmodule.xml_module import XmlMixin
+from xmodule.xml_block import XmlMixin
 
 
 log = logging.getLogger(__name__)

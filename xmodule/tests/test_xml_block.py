@@ -20,7 +20,7 @@ from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml.factories import CourseFactory, ProblemFactory, SequenceFactory
 from xmodule.x_module import XModuleMixin
-from xmodule.xml_module import XmlMixin, deserialize_field, serialize_field
+from xmodule.xml_block import XmlMixin, deserialize_field, serialize_field
 
 
 class CrazyJsonString(String):

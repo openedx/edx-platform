@@ -9,7 +9,7 @@ from web_fragments.fragment import Fragment
 from xblock.fields import Integer, Scope
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.seq_block import SequenceMixin
-from xmodule.xml_module import XmlMixin
+from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,

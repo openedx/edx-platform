@@ -18,7 +18,7 @@ from xblock.fields import Boolean, Dict, Integer, List, Scope, String
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.xml_module import XmlMixin
+from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,

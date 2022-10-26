@@ -18,7 +18,7 @@ from xmodule.x_module import (
     XModuleMixin,
     XModuleToXBlockMixin,
 )
-from xmodule.xml_module import XmlMixin
+from xmodule.xml_block import XmlMixin
 
 from openedx.core.djangolib.markup import Text
 

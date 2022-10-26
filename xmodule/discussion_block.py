@@ -18,7 +18,7 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_utils import get_css_dependencies, get_js_dependencies
-from xmodule.xml_module import XmlMixin
+from xmodule.xml_block import XmlMixin
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name

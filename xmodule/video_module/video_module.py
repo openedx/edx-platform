@@ -48,7 +48,7 @@ from xmodule.x_module import (
     HTMLSnippet, ResourceTemplates, shim_xmodule_js,
     XModuleMixin, XModuleToXBlockMixin,
 )
-from xmodule.xml_module import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
+from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 
 from .bumper_utils import bumperize
 from .transcripts_utils import (

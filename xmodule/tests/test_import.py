@@ -22,7 +22,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin, compute_inherited_
 from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
-from xmodule.xml_module import is_pointer_tag
+from xmodule.xml_block import is_pointer_tag
 
 ORG = 'test_org'
 COURSE = 'test_course'

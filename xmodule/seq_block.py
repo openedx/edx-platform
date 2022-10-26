@@ -40,7 +40,7 @@ from .fields import Date
 from .mako_block import MakoTemplateBlockBase
 from .progress import Progress
 from .x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW
-from .xml_module import XmlMixin
+from .xml_block import XmlMixin
 
 
 log = logging.getLogger(__name__)

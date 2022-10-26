@@ -5,7 +5,7 @@ The Hidden XBlock.
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xmodule.raw_block import RawMixin
-from xmodule.xml_module import XmlMixin
+from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     XModuleMixin,
     XModuleToXBlockMixin,

@@ -45,7 +45,7 @@ from xmodule.x_module import (
     XModuleToXBlockMixin,
     shim_xmodule_js
 )
-from xmodule.xml_module import XmlMixin
+from xmodule.xml_block import XmlMixin
 from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
     ATTR_KEY_USER_IS_STAFF,
