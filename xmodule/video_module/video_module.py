@@ -35,7 +35,7 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTU
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
-from xmodule.editing_module import EditingMixin
+from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata

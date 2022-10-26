@@ -77,7 +77,7 @@ from xblock.fields import Boolean, Float
 from xmodule.mako_module import MakoTemplateBlockBase
 
 from openedx.core.djangolib.markup import HTML, Text
-from xmodule.editing_module import EditingMixin
+from xmodule.editing_block import EditingMixin
 
 from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,

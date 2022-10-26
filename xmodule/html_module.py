@@ -19,7 +19,7 @@ from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
 from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from xmodule.contentstore.content import StaticContent
-from xmodule.editing_module import EditingMixin
+from xmodule.editing_block import EditingMixin
 from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children

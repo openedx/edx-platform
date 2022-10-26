@@ -32,7 +32,7 @@ from xmodule.capa.inputtypes import Status
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from xmodule.capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xmodule.contentstore.django import contentstore
-from xmodule.editing_module import EditingMixin
+from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_module import RawMixin
