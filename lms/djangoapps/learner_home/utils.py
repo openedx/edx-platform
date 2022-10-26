@@ -21,7 +21,7 @@ def exec_time_logged(func):
         # Display lists / sets as their lengths instead of actual items
         debug_args = []
         for arg in args:
-            if isinstance(arg, list) or isinstance(arg, set):
+            if isinstance(arg, (list, set)):
                 debug_args.append(f"<list: (len {len(arg)})>")
             else:
                 debug_args.append(arg)
