@@ -547,7 +547,7 @@ class ProblemBlock(
         try:
             tree = etree.XML(self.data)
         except etree.XMLSyntaxError:
-            log.error(f'Error parsing problem types from xml for capa module {self.display_name}')
+            log.error(f'Error parsing problem types from xml for capa block {self.display_name}')
             return None  # short-term fix to prevent errors (TNL-5057). Will be more properly addressed in TNL-4525.
         registered_tags = responsetypes.registry.registered_tags()
         return {node.tag for node in tree.iter() if node.tag in registered_tags}
@@ -638,7 +638,7 @@ class ProblemBlock(
                 problem_text=self.data,
                 id=self.location.html_id(),
                 capa_system=capa_system,
-                capa_module=self,
+                capa_block=self,
                 state={},
                 seed=1,
                 minimal_init=True,
@@ -708,7 +708,7 @@ class ProblemBlock(
                     id=self.location.html_id(),
                     capa_system=capa_system,
                     # We choose to run without a fully initialized CapaModule
-                    capa_module=None,
+                    capa_block=None,
                     state={
                         'done': user_state.state.get('done'),
                         'correct_map': user_state.state.get('correct_map'),
@@ -849,7 +849,7 @@ class ProblemBlock(
             state=state,
             seed=self.get_seed(),
             capa_system=capa_system,
-            capa_module=self,  # njp
+            capa_block=self,  # njp
         )
 
     def get_state_for_lcp(self):
@@ -1070,7 +1070,7 @@ class ProblemBlock(
 
         if self.debug:
             msg = HTML(
-                '[courseware.capa.capa_module] '
+                '[courseware.capa.capa_block] '
                 'Failed to generate HTML for problem {url}'
             ).format(
                 url=str(self.location)
@@ -1786,7 +1786,7 @@ class ProblemBlock(
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
             if self.debug:
                 log.warning(
-                    "StudentInputError in capa_module:problem_check",
+                    "StudentInputError in capa_block:problem_check",
                     exc_info=True
                 )
 
@@ -2174,7 +2174,7 @@ class ProblemBlock(
             self.update_correctness()
             calculated_score = self.calculate_score()
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:  # lint-amnesty, pylint: disable=unused-variable
-            log.warning("Input error in capa_module:problem_rescore", exc_info=True)
+            log.warning("Input error in capa_block:problem_rescore", exc_info=True)
             event_info['failure'] = 'input_error'
             self.publish_unmasked('problem_rescore_fail', event_info)
             raise

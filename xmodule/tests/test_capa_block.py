@@ -33,10 +33,10 @@ from xmodule.capa import responsetypes
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from xmodule.capa.xqueue_interface import XQueueInterface
-from xmodule.capa_module import ComplexEncoder, ProblemBlock
+from xmodule.capa_block import ComplexEncoder, ProblemBlock
 from xmodule.tests import DATA_DIR
 
-from ..capa_module import RANDOMIZATION, SHOWANSWER
+from ..capa_block import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
 
 
@@ -218,7 +218,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     def test_get_score(self):
         """
         Tests the internals of get_score. In keeping with the ScorableXBlock spec,
-        Capa modules store their score independently of the LCP internals, so it must
+        Capa blocks store their score independently of the LCP internals, so it must
         be explicitly updated.
         """
         student_answers = {'1_2_1': 'abcd'}
@@ -705,7 +705,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # what the input is, by patching CorrectMap.is_correct()
         # Also simulate rendering the HTML
         with patch('xmodule.capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
-            with patch('xmodule.capa_module.ProblemBlock.get_problem_html') as mock_html:
+            with patch('xmodule.capa_block.ProblemBlock.get_problem_html') as mock_html:
                 mock_is_correct.return_value = True
                 mock_html.return_value = "Test HTML"
 
@@ -749,7 +749,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Problem closed -- cannot submit
         # Simulate that ProblemBlock.closed() always returns True
-        with patch('xmodule.capa_module.ProblemBlock.closed') as mock_closed:
+        with patch('xmodule.capa_block.ProblemBlock.closed') as mock_closed:
             mock_closed.return_value = True
             with pytest.raises(xmodule.exceptions.NotFoundError):
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
@@ -902,7 +902,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
     def test_submit_problem_error(self):
 
-        # Try each exception that capa_module should handle
+        # Try each exception that capa_block should handle
         exception_classes = [StudentInputError,
                              LoncapaProblemError,
                              ResponseError]
@@ -929,7 +929,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
     def test_submit_problem_error_with_codejail_exception(self):
 
-        # Try each exception that capa_module should handle
+        # Try each exception that capa_block should handle
         exception_classes = [StudentInputError,
                              LoncapaProblemError,
                              ResponseError]
@@ -999,7 +999,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
     def test_submit_problem_error_nonascii(self):
 
-        # Try each exception that capa_module should handle
+        # Try each exception that capa_block should handle
         exception_classes = [StudentInputError,
                              LoncapaProblemError,
                              ResponseError]
@@ -1026,7 +1026,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
     def test_submit_problem_error_with_staff_user(self):
 
-        # Try each exception that capa module should handle
+        # Try each exception that capa block should handle
         for exception_class in [StudentInputError,
                                 LoncapaProblemError,
                                 ResponseError]:
@@ -1088,7 +1088,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module.choose_new_seed = Mock(wraps=module.choose_new_seed)
 
         # Stub out HTML rendering
-        with patch('xmodule.capa_module.ProblemBlock.get_problem_html') as mock_html:
+        with patch('xmodule.capa_block.ProblemBlock.get_problem_html') as mock_html:
             mock_html.return_value = "<div>Test HTML</div>"
 
             # Reset the problem
@@ -1110,7 +1110,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS)
 
         # Simulate that the problem is closed
-        with patch('xmodule.capa_module.ProblemBlock.closed') as mock_closed:
+        with patch('xmodule.capa_block.ProblemBlock.closed') as mock_closed:
             mock_closed.return_value = True
 
             # Try to reset the problem
@@ -1302,7 +1302,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module = CapaFactory.create(done=False)
 
         # Simulate that the problem is closed
-        with patch('xmodule.capa_module.ProblemBlock.closed') as mock_closed:
+        with patch('xmodule.capa_block.ProblemBlock.closed') as mock_closed:
             mock_closed.return_value = True
 
             # Try to save the problem
@@ -1931,8 +1931,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert 0 <= module.seed < 1000
             i -= 1
 
-    @patch('xmodule.capa_module.log')
-    @patch('xmodule.capa_module.Progress')
+    @patch('xmodule.capa_block.log')
+    @patch('xmodule.capa_block.Progress')
     def test_get_progress_error(self, mock_progress, mock_log):
         """
         Check that an exception given in `Progress` produces a `log.exception` call.
@@ -1945,7 +1945,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             mock_log.exception.assert_called_once_with('Got bad progress')
             mock_log.reset_mock()
 
-    @patch('xmodule.capa_module.Progress')
+    @patch('xmodule.capa_block.Progress')
     def test_get_progress_no_error_if_weight_zero(self, mock_progress):
         """
         Check that if the weight is 0 get_progress does not try to create a Progress object.
@@ -1957,7 +1957,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert progress is None
         assert not mock_progress.called
 
-    @patch('xmodule.capa_module.Progress')
+    @patch('xmodule.capa_block.Progress')
     def test_get_progress_calculate_progress_fraction(self, mock_progress):
         """
         Check that score and total are calculated correctly for the progress fraction.
@@ -3266,7 +3266,7 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
     def test_generate_report_data_report_loncapa_error(self):
         #Test to make sure reports continue despite loncappa errors, and write them into the report.
         descriptor = self._get_descriptor()
-        with patch('xmodule.capa_module.LoncapaProblem') as mock_LoncapaProblem:
+        with patch('xmodule.capa_block.LoncapaProblem') as mock_LoncapaProblem:
             mock_LoncapaProblem.side_effect = LoncapaProblemError
             report_data = list(descriptor.generate_report_data(
                 self._mock_user_state_generator(

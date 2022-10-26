@@ -22,7 +22,7 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
-from xmodule.capa_module import ProblemBlock
+from xmodule.capa_block import ProblemBlock
 
 from .test_course_module import DummySystem as TestImportSystem
 

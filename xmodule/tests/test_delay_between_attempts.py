@@ -1,9 +1,9 @@
 """
 Tests the logic of problems with a delay between attempt submissions.
 
-Note that this test file is based off of test_capa_module.py and as
+Note that this test file is based off of test_capa_block.py and as
 such, uses the same CapaFactory problem setup to test the functionality
-of the submit_problem method of a capa module when the "delay between quiz
+of the submit_problem method of a capa block when the "delay between quiz
 submissions" setting is set to different values
 """
 
@@ -21,7 +21,7 @@ from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
 import xmodule
-from xmodule.capa_module import ProblemBlock
+from xmodule.capa_block import ProblemBlock
 
 from . import get_test_system
 
@@ -30,7 +30,7 @@ class CapaFactoryWithDelay:
     """
     Create problem modules class, specialized for delay_between_attempts
     test cases. This factory seems different enough from the one in
-    test_capa_module that unifying them is unattractive.
+    test_capa_block that unifying them is unattractive.
     Removed the unused optional arguments.
     """
 

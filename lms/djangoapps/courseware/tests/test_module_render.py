@@ -42,7 +42,7 @@ from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong
 
 from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
 from xmodule.capa.xqueue_interface import XQueueInterface
-from xmodule.capa_module import ProblemBlock
+from xmodule.capa_block import ProblemBlock
 from xmodule.contentstore.django import contentstore
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.lti_module import LTIBlock

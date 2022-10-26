@@ -24,7 +24,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locations import CourseLocator
 from path import Path as path
-from xmodule.capa_module import ProblemBlock
+from xmodule.capa_block import ProblemBlock
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.utils import empty_asset_trashcan, restore_asset_from_trashcan
@@ -1518,7 +1518,7 @@ class ContentStoreTest(ContentStoreTestCase):
         retarget = str(course.id.make_usage_key('chapter', 'REPLACE')).replace('REPLACE', r'([0-9]|[a-f]){3,}')
         self.assertRegex(data['locator'], retarget)
 
-    def test_capa_module(self):
+    def test_capa_block(self):
         """Test that a problem treats markdown specially."""
         course = CourseFactory.create()
 
