@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from cms.djangoapps.contentstore.views.course import get_course_and_check_access
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
-from xmodule.course_module import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order

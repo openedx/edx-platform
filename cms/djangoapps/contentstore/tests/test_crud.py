@@ -3,7 +3,7 @@
 
 from xmodule import templates
 from xmodule.capa_block import ProblemBlock
-from xmodule.course_module import CourseBlock
+from xmodule.course_block import CourseBlock
 from xmodule.html_module import HtmlBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError

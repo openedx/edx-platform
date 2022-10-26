@@ -28,7 +28,7 @@ from xmodule.capa_block import ProblemBlock
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.utils import empty_asset_trashcan, restore_asset_from_trashcan
-from xmodule.course_module import CourseBlock, Textbook
+from xmodule.course_block import CourseBlock, Textbook
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -302,7 +302,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
             self.assertTrue(filesystem.exists(item.location.block_id + filename_suffix))
 
-    @mock.patch('xmodule.course_module.requests.get')
+    @mock.patch('xmodule.course_block.requests.get')
     def test_export_course_roundtrip(self, mock_get):
         mock_get.return_value.text = dedent("""
             <?xml version="1.0"?><table_of_contents>
@@ -912,7 +912,7 @@ class MiscCourseTests(ContentStoreTestCase):
         num_drafts = self._get_draft_counts(course)
         self.assertEqual(num_drafts, 1)
 
-    @mock.patch('xmodule.course_module.requests.get')
+    @mock.patch('xmodule.course_block.requests.get')
     def test_import_textbook_as_content_element(self, mock_get):
         mock_get.return_value.text = dedent("""
             <?xml version="1.0"?><table_of_contents>

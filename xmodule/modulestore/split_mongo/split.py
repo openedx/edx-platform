@@ -79,7 +79,7 @@ from xblock.core import XBlock
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 
 from xmodule.assetstore import AssetMetadata
-from xmodule.course_module import CourseSummary
+from xmodule.course_block import CourseSummary
 from xmodule.error_module import ErrorBlock
 from xmodule.errortracker import null_error_tracker
 from xmodule.library_content_module import LibrarySummary

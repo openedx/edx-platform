@@ -21,7 +21,7 @@ from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlock
 
-from xmodule.course_module import Textbook
+from xmodule.course_block import Textbook
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mixed import strip_key
 from xmodule.modulestore.tests.sample_courses import TOY_BLOCK_INFO_TREE, default_block_info_tree

@@ -35,7 +35,7 @@ from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope, S
 from xblock.runtime import KvsFieldData
 
 from xmodule.assetstore import AssetMetadata, CourseAssetsFromStorage
-from xmodule.course_module import CourseSummary
+from xmodule.course_block import CourseSummary
 from xmodule.error_module import ErrorBlock
 from xmodule.errortracker import exc_info_to_str, null_error_tracker
 from xmodule.exceptions import HeartbeatFailure

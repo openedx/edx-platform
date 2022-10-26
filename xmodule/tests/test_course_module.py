@@ -17,7 +17,7 @@ from pytz import utc
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
-import xmodule.course_module
+import xmodule.course_block
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.exceptions import InvalidProctoringProvider
@@ -35,7 +35,7 @@ _NEXT_WEEK = _TODAY + timedelta(days=7)
 class CourseFieldsTestCase(unittest.TestCase):
 
     def test_default_start_date(self):
-        assert xmodule.course_module.CourseFields.start.default == datetime(2030, 1, 1, tzinfo=utc)
+        assert xmodule.course_block.CourseFields.start.default == datetime(2030, 1, 1, tzinfo=utc)
 
 
 class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
@@ -158,7 +158,7 @@ class CourseSummaryHasEnded(unittest.TestCase):
     def test_course_end(self):
         test_course = get_dummy_course("2012-01-01T12:00")
         bad_end_date = parser.parse("2012-02-21 10:28:45")
-        summary = xmodule.course_module.CourseSummary(test_course.id, end=bad_end_date)
+        summary = xmodule.course_block.CourseSummary(test_course.id, end=bad_end_date)
         assert summary.has_ended()
 
 
@@ -225,8 +225,8 @@ class IsNewCourseTestCase(unittest.TestCase):
         ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011', False, 'Nov 01, 2011 at 12:00 UTC'),
         ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012', False, 'Spring 2012'),
         ('2012-12-02T12:00', 'November, 2011', 'November, 2011', False, 'November, 2011'),
-        (xmodule.course_module.CourseFields.start.default, None, 'TBD', True, 'TBD'),
-        (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False, 'January 2014'),
+        (xmodule.course_block.CourseFields.start.default, None, 'TBD', True, 'TBD'),
+        (xmodule.course_block.CourseFields.start.default, 'January 2014', 'January 2014', False, 'January 2014'),
     ]
 
     def test_start_date_is_default(self):
@@ -492,7 +492,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
         Initialize dummy testing course.
         """
         super().setUp()
-        self.proctoring_provider = xmodule.course_module.ProctoringProvider()
+        self.proctoring_provider = xmodule.course_block.ProctoringProvider()
 
     def test_from_json_with_platform_default(self):
         """
@@ -519,7 +519,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
         throws a ValueError with the correct error message.
         """
         provider = 'invalid-provider'
-        allowed_proctoring_providers = xmodule.course_module.get_available_providers()
+        allowed_proctoring_providers = xmodule.course_block.get_available_providers()
 
         FEATURES_WITH_PROCTORED_EXAMS = settings.FEATURES.copy()
         FEATURES_WITH_PROCTORED_EXAMS['ENABLE_PROCTORED_EXAMS'] = proctored_exams_setting_enabled

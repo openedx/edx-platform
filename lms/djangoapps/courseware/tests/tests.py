@@ -124,7 +124,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.setup_user()
         self.toy_course_key = ToyCourseFactory.create().id
 
-    @mock.patch('xmodule.course_module.requests.get')
+    @mock.patch('xmodule.course_block.requests.get')
     def test_toy_textbooks_loads(self, mock_get):
         mock_get.return_value.text = dedent("""
             <?xml version="1.0"?><table_of_contents>
