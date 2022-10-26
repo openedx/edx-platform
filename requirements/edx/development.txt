@@ -1220,7 +1220,6 @@ pytest==7.2.0
     #   pytest-attrib
     #   pytest-cov
     #   pytest-django
-    #   pytest-forked
     #   pytest-json-report
     #   pytest-metadata
     #   pytest-randomly
@@ -1231,10 +1230,6 @@ pytest-cov==4.0.0
     # via -r requirements/edx/testing.txt
 pytest-django==4.5.2
     # via -r requirements/edx/testing.txt
-pytest-forked==1.4.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   pytest-xdist
 pytest-json-report==1.5.0
     # via -r requirements/edx/testing.txt
 pytest-metadata==1.8.0
@@ -1243,7 +1238,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.12.0
     # via -r requirements/edx/testing.txt
-pytest-xdist[psutil]==2.5.0
+pytest-xdist[psutil]==3.0.2
     # via -r requirements/edx/testing.txt
 python-dateutil==2.8.2
     # via
@@ -1559,7 +1554,7 @@ tomlkit==0.11.5
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
-tox==3.26.0
+tox==3.27.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox-battery
@@ -1613,7 +1608,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.16.5
+virtualenv==20.16.6
     # via
     #   -r requirements/edx/testing.txt
     #   tox
