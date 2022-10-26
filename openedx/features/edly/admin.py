@@ -4,7 +4,12 @@ Django Admin pages for Edly.
 
 from django.contrib import admin
 
-from openedx.features.edly.models import EdlyOrganization, EdlySubOrganization, EdlyUserProfile
+from openedx.features.edly.models import (
+    EdlyOrganization,
+    EdlySubOrganization,
+    EdlyUserProfile,
+    StudentCourseProgress,
+)
 
 
 class EdlySubOrganizationAdmin(admin.ModelAdmin):
@@ -72,6 +77,15 @@ class EdlyUserProfileAdmin(admin.ModelAdmin):
         return ', '.join(obj.edly_sub_organizations.values_list('slug', flat=True))
 
 
+class StudentCourseProgressAdmin(admin.ModelAdmin):
+    """
+    Admin interface for the "StudentCourseProgress" object.
+    """
+    list_display = ['student', 'course_id', 'completed_block', 'completion_date']
+    search_fields = ['course_id', 'student__username', 'student__email']
+
+
+admin.site.register(StudentCourseProgress, StudentCourseProgressAdmin)
 admin.site.register(EdlyOrganization, EdlyOrganizationAdmin)
 admin.site.register(EdlySubOrganization, EdlySubOrganizationAdmin)
 admin.site.register(EdlyUserProfile, EdlyUserProfileAdmin)
