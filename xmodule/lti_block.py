@@ -713,7 +713,7 @@ class LTIBlock(
             # https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
             # Stubbing headers for now:
             log.info(
-                "LTI module %s in course %s does not have oauth parameters correctly configured.",
+                "LTI block %s in course %s does not have oauth parameters correctly configured.",
                 self.location,
                 self.location.course_key,
             )

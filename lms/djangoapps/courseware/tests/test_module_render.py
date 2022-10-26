@@ -45,7 +45,7 @@ from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ProblemBlock
 from xmodule.contentstore.django import contentstore
 from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
-from xmodule.lti_module import LTIBlock
+from xmodule.lti_block import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.modulestore.tests.django_utils import (

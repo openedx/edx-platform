@@ -14,7 +14,7 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockAside
 
 from xmodule.contentstore.django import contentstore
-from xmodule.lti_module import LTIBlock
+from xmodule.lti_block import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
