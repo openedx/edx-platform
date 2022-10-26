@@ -73,7 +73,7 @@ user_partition_values = UserPartitionValues()
 
 
 class SplitTestFields:
-    """Fields needed for split test module"""
+    """Fields needed for split test block"""
     has_children = True
 
     # Default value used for user_partition_id
@@ -242,13 +242,13 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             child_descriptor = self.get_child_descriptor_by_location(child_location)
         else:
             # Oops.  Config error.
-            log.debug("configuration error in split test module: invalid group_id %r (not one of %r).  Showing error", str_group_id, list(self.group_id_to_child.keys()))  # lint-amnesty, pylint: disable=line-too-long
+            log.debug("configuration error in split test block: invalid group_id %r (not one of %r).  Showing error", str_group_id, list(self.group_id_to_child.keys()))  # lint-amnesty, pylint: disable=line-too-long
 
         if child_descriptor is None:
             # Peak confusion is great.  Now that we set child_descriptor,
             # get_children() should return a list with one element--the
             # xmodule for the child
-            log.debug("configuration error in split test module: no such child")
+            log.debug("configuration error in split test block: no such child")
             return []
 
         return [child_descriptor]
@@ -264,7 +264,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
     def _staff_view(self, context):
         """
-        Render the staff view for a split test module.
+        Render the staff view for a split test block.
         """
         fragment = Fragment()
         active_contents = []
@@ -613,7 +613,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
     def validate_split_test(self):
         """
-        Returns a StudioValidation object describing the current state of the split_test_module
+        Returns a StudioValidation object describing the current state of the split_test_block
         (not including superclass validation messages).
         """
         _ = self.runtime.service(self, "i18n").ugettext

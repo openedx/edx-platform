@@ -91,7 +91,7 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
             # single way to get the children assigned for a partcular user. Some blocks define the
             # child descriptors method, but others don't and with blocks like Randomized Content
             # (Library Content), the get_children method returns all children and not just assigned
-            # children. So this is our way around situations like that. See also Split Test Module
+            # children. So this is our way around situations like that. See also Split Test Block
             # for another use case where user state has to be taken into account via get_child_descriptors
             block_children = ((hasattr(block, 'get_child_descriptors') and block.get_child_descriptors())
                               or (hasattr(block, 'get_children') and block.get_children())

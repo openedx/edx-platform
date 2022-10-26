@@ -218,7 +218,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         """
         self._verify_split_test_import(
             'split_test_copy',
-            'split_test_module',
+            'split_test_block',
             'split1',
             {"0": 'sample_0', "2": 'sample_2'},
         )
@@ -229,7 +229,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         """
         self._verify_split_test_import(
             'split_test_copy_with_draft',
-            'split_test_module_draft',
+            'split_test_block_draft',
             'fb34c21fe64941999eaead421a8711b8',
             {"0": '9f0941d021414798836ef140fb5f6841', "1": '0faf29473cf1497baa33fcc828b179cd'},
         )
@@ -245,16 +245,16 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_id=target_id,
             create_if_not_present=True
         )
-        split_test_module = module_store.get_item(
+        split_test_block = module_store.get_item(
             target_id.make_usage_key('split_test', split_test_name)
         )
-        self.assertIsNotNone(split_test_module)
+        self.assertIsNotNone(split_test_block)
 
         remapped_verticals = {
             key: target_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.items()
         }
 
-        self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)
+        self.assertEqual(remapped_verticals, split_test_block.group_id_to_child)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_video_components_present_while_import(self, store):
