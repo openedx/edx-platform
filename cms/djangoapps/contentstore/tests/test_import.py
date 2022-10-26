@@ -192,24 +192,24 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             ['conditional'],
             target_id=target_id
         )
-        conditional_module = module_store.get_item(
+        conditional_block = module_store.get_item(
             target_id.make_usage_key('conditional', 'condone')
         )
-        self.assertIsNotNone(conditional_module)
+        self.assertIsNotNone(conditional_block)
         different_course_id = module_store.make_course_key('edX', 'different_course', None)
         self.assertListEqual(
             [
                 target_id.make_usage_key('problem', 'choiceprob'),
                 different_course_id.make_usage_key('html', 'for_testing_import_rewrites')
             ],
-            conditional_module.sources_list
+            conditional_block.sources_list
         )
         self.assertListEqual(
             [
                 target_id.make_usage_key('html', 'congrats'),
                 target_id.make_usage_key('html', 'secret_page')
             ],
-            conditional_module.show_tag_list
+            conditional_block.show_tag_list
         )
 
     def test_rewrite_reference_value_dict_published(self):

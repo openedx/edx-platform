@@ -1410,14 +1410,14 @@ class ProblemBlock(
         Problem can be completely wrong.
         Pressing RESET button makes this function to return False.
         """
-        # used by conditional module
+        # used by conditional block
         return self.lcp.done
 
     def is_attempted(self):
         """
         Has the problem been attempted?
 
-        used by conditional module
+        used by conditional block
         """
         return self.attempts > 0
 

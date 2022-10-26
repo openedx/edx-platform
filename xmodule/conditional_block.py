@@ -102,7 +102,7 @@ class ConditionalBlock(
     sources_list = ReferenceList(
         display_name=_("Source Components"),
         help=_("The component location IDs of all source components that are used to determine whether a learner is "
-               "shown the content of this conditional module. Copy the component location ID of a component from its "
+               "shown the content of this conditional block. Copy the component location ID of a component from its "
                "Settings dialog in Studio."),
         scope=Scope.content
     )
@@ -110,7 +110,7 @@ class ConditionalBlock(
     conditional_attr = String(
         display_name=_("Conditional Attribute"),
         help=_("The attribute of the source components that determines whether a learner is shown the content of this "
-               "conditional module."),
+               "conditional block."),
         scope=Scope.content,
         default='correct',
         values=lambda: [{'display_name': xml_attr, 'value': xml_attr}
@@ -120,7 +120,7 @@ class ConditionalBlock(
     conditional_value = String(
         display_name=_("Conditional Value"),
         help=_("The value that the conditional attribute of the source components must match before a learner is shown "
-               "the content of this conditional module."),
+               "the content of this conditional block."),
         scope=Scope.content,
         default='True'
     )
@@ -128,7 +128,7 @@ class ConditionalBlock(
     conditional_message = String(
         display_name=_("Blocked Content Message"),
         help=_("The message that is shown to learners when not all conditions are met to show the content of this "
-               "conditional module. Include {link} in the text of your message to give learners a direct link to "
+               "conditional block. Include {link} in the text of your message to give learners a direct link to "
                "required units. For example, 'You must complete {link} before you can access this unit'."),
         scope=Scope.content,
         default=_('You must complete {link} before you can access this unit.')
@@ -219,7 +219,7 @@ class ConditionalBlock(
                     if module is not None:
                         # We do not want to log when module is None, and it is when requester
                         # does not have access to the requested required module.
-                        log.warning('Error in conditional module: \
+                        log.warning('Error in conditional block: \
                             required module {module} has no {module_attr}'.format(module=module, module_attr=attr_name))
                     return False
 
@@ -284,7 +284,7 @@ class ConditionalBlock(
         if not self.is_condition_satisfied():
             context = {'module': self,
                        'message': self.conditional_message}
-            html = self.runtime.service(self, 'mako').render_template('conditional_module.html', context)
+            html = self.runtime.service(self, 'mako').render_template('conditional_block.html', context)
             return json.dumps({'fragments': [{'content': html}], 'message': bool(self.conditional_message)})
 
         fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_display_items()]
