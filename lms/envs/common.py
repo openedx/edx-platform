@@ -3146,6 +3146,9 @@ GENPLUS_INSTALLED_APPS = [
     # genplus badges app
     'openedx.features.genplus_features.genplus_badges',
 
+    # genplus assessments app
+    'openedx.features.genplus_features.genplus_assessments',
+
     # installed third party apps
     'tinymce',
     'adminsortable2',
