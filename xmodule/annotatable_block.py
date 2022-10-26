@@ -11,7 +11,7 @@ from xblock.fields import Scope, String
 
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.editing_block import EditingMixin
-from xmodule.raw_module import RawMixin
+from xmodule.raw_block import RawMixin
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.xml_module import XmlMixin
 from xmodule.x_module import (

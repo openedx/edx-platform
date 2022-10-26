@@ -39,7 +39,7 @@ from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
-from xmodule.raw_module import EmptyDataRawMixin
+from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.video_module import manage_video_subtitles_save

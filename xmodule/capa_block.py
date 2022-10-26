@@ -35,7 +35,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
-from xmodule.raw_module import RawMixin
+from xmodule.raw_block import RawMixin
 from xmodule.util.sandboxing import SandboxService
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (

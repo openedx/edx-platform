@@ -84,7 +84,7 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_USER_ROLE,
 )
 from xmodule.lti_2_util import LTI20BlockMixin, LTIError
-from xmodule.raw_module import EmptyDataRawMixin
+from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.xml_module import XmlMixin
 from xmodule.x_module import (
