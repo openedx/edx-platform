@@ -672,9 +672,14 @@ def course_index(request, course_key):
             raise Http404
         lms_link = get_lms_link_for_item(course_module.location)
         reindex_link = None
+        update_lessons_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
             if GlobalStaff().has_user(request.user):
                 reindex_link = "/course/{course_id}/search_reindex".format(course_id=str(course_key))
+
+        if GlobalStaff().has_user(request.user):
+            update_lessons_link = "/genplus/learning/course/{course_id}/update_lessons".format(course_id=str(course_key))
+
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
         locator_to_show = request.GET.get('show', None)
@@ -718,6 +723,7 @@ def course_index(request, course_key):
             'course_release_date': course_release_date,
             'settings_url': settings_url,
             'reindex_link': reindex_link,
+            'update_lessons_link': update_lessons_link,
             'deprecated_blocks_info': deprecated_blocks_info,
             'notification_dismiss_url': reverse_course_url(
                 'course_notifications_handler',

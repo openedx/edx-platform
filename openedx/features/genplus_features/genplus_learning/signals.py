@@ -13,7 +13,6 @@ from openedx.features.genplus_features.genplus_learning.models import (
 )
 from openedx.features.genplus_features.genplus_learning.access import allow_access
 from openedx.features.genplus_features.genplus_learning.roles import ProgramInstructorRole
-from openedx.features.genplus_features.genplus_learning.utils import update_class_lessons
 log = logging.getLogger(__name__)
 
 
@@ -32,11 +31,6 @@ def _create_class_unit_and_lessons(gen_class):
         ]
 
     ClassLesson.objects.bulk_create(class_lessons, ignore_conflicts=True)
-
-
-@receiver(SignalHandler.course_published)
-def _listen_for_course_publish(sender, course_key, **kwargs):
-    update_class_lessons(course_key)
 
 
 @receiver(pre_save, sender=Class)

@@ -48,6 +48,9 @@ define([
                 $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function() {
                     $('.wrapper-alert-announcement').removeClass('is-shown').addClass('is-hidden');
                 }));
+                this.$('.button.button-update-lessons').click(function(event) {
+                    self.handleUpdateLessonsEvent(event);
+                });
             },
 
             setCollapseExpandVisibility: function() {
@@ -155,6 +158,16 @@ define([
                     }, this);
                 }
             },
+            handleUpdateLessonsEvent: function(event) {
+                var self = this;
+                event.preventDefault();
+                var $target = $(event.currentTarget);
+                $target.css('cursor', 'wait');
+                this.updateLessons($target.attr('href'))
+                    .done(function(data) { self.onUpdateLessonsSuccess(data); })
+                    .fail(function(data) { self.onUpdateLessonsError(data); })
+                    .always(function() { $target.css('cursor', 'pointer'); });
+            },
 
             handleReIndexEvent: function(event) {
                 var self = this;
@@ -175,6 +188,32 @@ define([
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json'
                 });
+            },
+
+            updateLessons: function(update_lessons_url) {
+                return $.ajax({
+                    url: update_lessons_url,
+                    method: 'GET',
+                    global: false,
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json'
+                });
+            },
+
+            onUpdateLessonsSuccess: function(data) {
+                var msg = new AlertView.Announcement({
+                    title: gettext('Update lessons structure'),
+                    message: data.user_message
+                });
+                msg.show();
+            },
+
+            onUpdateLessonsError: function(data) {
+                var msg = new NoteView.Error({
+                    title: gettext('Update Error'),
+                    message: data.user_message
+                });
+                msg.show();
             },
 
             onIndexSuccess: function(data) {
