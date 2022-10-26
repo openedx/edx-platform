@@ -591,7 +591,7 @@ class LibraryContentBlock(
 
     def validate(self):
         """
-        Validates the state of this Library Content Module Instance. This
+        Validates the state of this Library Content Block Instance. This
         is the override of the general XBlock method, and it will also ask
         its superclass to validate.
         """
@@ -733,7 +733,7 @@ class LibraryContentBlock(
         return definition, children
 
     def definition_to_xml(self, resource_fs):
-        """ Exports Library Content Module to XML """
+        """ Exports Library Content Block to XML """
         xml_object = etree.Element('library_content')
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)

@@ -14,7 +14,7 @@ from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 from rest_framework import status
 
-from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
+from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory

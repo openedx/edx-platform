@@ -15,7 +15,7 @@ from openedx.core.djangoapps.xblock.api import load_block
 from openedx.core.lib import blockstore_api
 from common.djangoapps.student.auth import has_studio_write_access
 from xmodule.capa_block import ProblemBlock
-from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
+from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

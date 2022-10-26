@@ -82,7 +82,7 @@ from xmodule.assetstore import AssetMetadata
 from xmodule.course_block import CourseSummary
 from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import null_error_tracker
-from xmodule.library_content_module import LibrarySummary
+from xmodule.library_content_block import LibrarySummary
 from xmodule.modulestore import (
     BlockData,
     BulkOperationsMixin,
