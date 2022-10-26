@@ -118,14 +118,14 @@ MODULESTORE:
         OPTIONS:
           collection: modulestore
           db: test
-          default_class: xmodule.hidden_module.HiddenDescriptor
+          default_class: xmodule.hidden_block.HiddenDescriptor
           fs_root: '** OVERRIDDEN **'
           host: [edx.devstack.mongo]
           port: 27017
           render_template: common.djangoapps.edxmako.shortcuts.render_to_string
       - ENGINE: xmodule.modulestore.xml.XMLModuleStore
         NAME: xml
-        OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_module.HiddenDescriptor}
+        OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_block.HiddenDescriptor}
 PASSWORD_RESET_SUPPORT_LINK: https://support.example.com/password-reset-help.html
 REGISTRATION_EXTENSION_FORM: openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm
 REGISTRATION_EXTRA_FIELDS: {city: hidden, country: required, gender: optional, goals: optional,

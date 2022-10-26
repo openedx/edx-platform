@@ -342,7 +342,7 @@ class XmlModulestoreBuilder(StoreBuilderBase):
         modulestore = XMLModuleStore(
             DATA_DIR,
             course_ids=course_ids,
-            default_class='xmodule.hidden_module.HiddenDescriptor',
+            default_class='xmodule.hidden_block.HiddenDescriptor',
             xblock_mixins=XBLOCK_MIXINS,
         )
 
