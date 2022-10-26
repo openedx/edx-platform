@@ -1,5 +1,5 @@
 """
-Template module
+Template block
 """
 
 from string import Template
@@ -111,9 +111,9 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
         # cdodge: look up the template as a module
         template_loc = self.location.replace(category='custom_tag_template', name=template_name)
 
-        template_module = system.load_item(template_loc)
-        template_module_data = template_module.data
-        template = Template(template_module_data)
+        template_block = system.load_item(template_loc)
+        template_block_data = template_block.data
+        template = Template(template_block_data)
         return template.safe_substitute(params)
 
     @property

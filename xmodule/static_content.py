@@ -28,7 +28,7 @@ from xmodule.lti_block import LTIBlock
 from xmodule.poll_block import PollBlock
 from xmodule.seq_block import SequenceBlock
 from xmodule.split_test_module import SplitTestBlock
-from xmodule.template_module import CustomTagBlock
+from xmodule.template_block import CustomTagBlock
 from xmodule.word_cloud_module import WordCloudBlock
 from xmodule.x_module import HTMLSnippet
 
