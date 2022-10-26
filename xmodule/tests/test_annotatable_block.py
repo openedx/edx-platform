@@ -8,7 +8,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.annotatable_module import AnnotatableBlock
+from xmodule.annotatable_block import AnnotatableBlock
 
 from . import get_test_system
 

@@ -7,7 +7,7 @@ from setuptools import setup
 XBLOCKS = [
     "about = xmodule.html_module:AboutBlock",
     "book = xmodule.template_module:TranslateCustomTagBlock",
-    "annotatable = xmodule.annotatable_module:AnnotatableBlock",
+    "annotatable = xmodule.annotatable_block:AnnotatableBlock",
     "chapter = xmodule.seq_module:SectionBlock",
     "conditional = xmodule.conditional_module:ConditionalBlock",
     "course = xmodule.course_module:CourseBlock",
