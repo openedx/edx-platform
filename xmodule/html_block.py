@@ -210,7 +210,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         add in a base path to our c4x content addressing scheme
         """
         _context = EditingMixin.get_context(self)
-        # Add some specific HTML rendering context when editing HTML modules where we pass
+        # Add some specific HTML rendering context when editing HTML blocks where we pass
         # the root /c4x/ url for assets. This allows client-side substitutions to occur.
         _context.update({
             'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location.course_key),

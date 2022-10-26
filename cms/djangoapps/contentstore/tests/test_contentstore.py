@@ -283,14 +283,14 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         # first check a static asset link
         course_key = self.store.make_course_key('edX', 'toy', 'run')
-        html_module_location = course_key.make_usage_key('html', 'nonportable')
-        html_module = self.store.get_item(html_module_location)
-        self.assertIn('/static/foo.jpg', html_module.data)
+        html_block_location = course_key.make_usage_key('html', 'nonportable')
+        html_block = self.store.get_item(html_block_location)
+        self.assertIn('/static/foo.jpg', html_block.data)
 
         # then check a intra courseware link
-        html_module_location = course_key.make_usage_key('html', 'nonportable_link')
-        html_module = self.store.get_item(html_module_location)
-        self.assertIn('/jump_to_id/nonportable_link', html_module.data)
+        html_block_location = course_key.make_usage_key('html', 'nonportable_link')
+        html_block = self.store.get_item(html_block_location)
+        self.assertIn('/jump_to_id/nonportable_link', html_block.data)
 
     def verify_content_existence(self, store, root_dir, course_id, dirname, category_name, filename_suffix=''):  # lint-amnesty, pylint: disable=missing-function-docstring
         filesystem = OSFS(root_dir / 'test_export')
@@ -525,12 +525,12 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         import_course_from_xml(self.store, self.user.id, root_dir, create_if_not_present=True)
 
         # get the sample HTML with styling information
-        html_module = self.store.get_item(course_id.make_usage_key('html', 'with_styling'))
-        self.assertIn('<p style="font:italic bold 72px/30px Georgia, serif; color: red; ">', html_module.data)
+        html_block = self.store.get_item(course_id.make_usage_key('html', 'with_styling'))
+        self.assertIn('<p style="font:italic bold 72px/30px Georgia, serif; color: red; ">', html_block.data)
 
         # get the sample HTML with just a simple <img> tag information
-        html_module = self.store.get_item(course_id.make_usage_key('html', 'just_img'))
-        self.assertIn('<img src="/static/foo_bar.jpg" />', html_module.data)
+        html_block = self.store.get_item(course_id.make_usage_key('html', 'just_img'))
+        self.assertIn('<img src="/static/foo_bar.jpg" />', html_block.data)
 
     def test_export_course_without_content_store(self):
         # Create toy course

@@ -209,15 +209,15 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             self.chapter_2 = ItemFactory.create(category="chapter", parent_location=self.course.location)
             self.sequential = ItemFactory.create(category="sequential", parent_location=self.chapter.location)
             self.vertical = ItemFactory.create(category="vertical", parent_location=self.sequential.location)
-            self.html_module_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
-            self.html_module_2 = ItemFactory.create(category="html", parent_location=self.vertical.location)
+            self.html_block_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
+            self.html_block_2 = ItemFactory.create(category="html", parent_location=self.vertical.location)
             self.vertical_with_container = ItemFactory.create(
                 category='vertical', parent_location=self.sequential.location
             )
             self.child_container = ItemFactory.create(
                 category='split_test', parent_location=self.vertical_with_container.location)
             self.child_vertical = ItemFactory.create(category='vertical', parent_location=self.child_container.location)
-            self.child_html_module = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
+            self.child_html_block = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
 
             # Read again so that children lists are accurate
             self.course = self.store.get_item(self.course.location)
@@ -229,7 +229,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             self.vertical_with_container = self.store.get_item(self.vertical_with_container.location)
             self.child_container = self.store.get_item(self.child_container.location)
             self.child_vertical = self.store.get_item(self.child_vertical.location)
-            self.child_html_module = self.store.get_item(self.child_html_module.location)
+            self.child_html_block = self.store.get_item(self.child_html_block.location)
 
             self.user = UserFactory()
             self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
@@ -320,13 +320,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     {
                         "quote": "quote text",
                         "text": "text",
-                        "usage_id": str(self.html_module_1.location),
+                        "usage_id": str(self.html_block_1.location),
                         "updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
                     },
                     {
                         "quote": "quote text",
                         "text": "text",
-                        "usage_id": str(self.html_module_2.location),
+                        "usage_id": str(self.html_block_2.location),
                         "updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
                     }
                 ]
@@ -363,7 +363,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                             "display_name": self.vertical.display_name_with_default,
                             "location": str(self.vertical.location),
                         },
-                        "usage_id": str(self.html_module_2.location),
+                        "usage_id": str(self.html_block_2.location),
                         "updated": "Nov 19, 2014 at 08:06 UTC",
                     },
                     {
@@ -387,7 +387,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                             "display_name": self.vertical.display_name_with_default,
                             "location": str(self.vertical.location),
                         },
-                        "usage_id": str(self.html_module_1.location),
+                        "usage_id": str(self.html_block_1.location),
                         "updated": "Nov 19, 2014 at 08:05 UTC",
                     },
                 ]
@@ -425,13 +425,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 {
                     "quote": "quote text",
                     "text": "text",
-                    "usage_id": str(self.html_module_1.location),
+                    "usage_id": str(self.html_block_1.location),
                     "updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
                 },
                 {
                     "quote": "quote text",
                     "text": "text",
-                    "usage_id": str(self.html_module_2.location),
+                    "usage_id": str(self.html_block_2.location),
                     "updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
                 }
             ]
@@ -467,7 +467,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                             "display_name": self.vertical.display_name_with_default,
                             "location": str(self.vertical.location),
                         },
-                        "usage_id": str(self.html_module_2.location),
+                        "usage_id": str(self.html_block_2.location),
                         "updated": "Nov 19, 2014 at 08:06 UTC",
                     },
                     {
@@ -491,7 +491,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                             "display_name": self.vertical.display_name_with_default,
                             "location": str(self.vertical.location),
                         },
-                        "usage_id": str(self.html_module_1.location),
+                        "usage_id": str(self.html_block_1.location),
                         "updated": "Nov 19, 2014 at 08:05 UTC",
                     },
                 ]
@@ -552,7 +552,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             {
                 "quote": "quote text",
                 "text": "text",
-                "usage_id": str(self.html_module_1.location),
+                "usage_id": str(self.html_block_1.location),
                 "updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat()
             },
             {
@@ -583,7 +583,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     "display_name": self.vertical.display_name_with_default,
                     "location": str(self.vertical.location),
                 },
-                "usage_id": str(self.html_module_1.location),
+                "usage_id": str(self.html_block_1.location),
                 "updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
             }]) == len(helpers.preprocess_collection(self.user, self.course, initial_collection))
 
@@ -595,18 +595,18 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             {
                 "quote": "quote text",
                 "text": "text",
-                "usage_id": str(self.html_module_1.location),
+                "usage_id": str(self.html_block_1.location),
                 "updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
             },
             {
                 "quote": "quote text",
                 "text": "text",
-                "usage_id": str(self.html_module_2.location),
+                "usage_id": str(self.html_block_2.location),
                 "updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
             },
         ]
-        self.html_module_2.visible_to_staff_only = True
-        self.store.update_item(self.html_module_2, self.user.id)
+        self.html_block_2.visible_to_staff_only = True
+        self.store.update_item(self.html_block_2, self.user.id)
         assert len(
             [{
                 "quote": "quote text",
@@ -627,7 +627,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     "display_name": self.vertical.display_name_with_default,
                     "location": str(self.vertical.location),
                 },
-                "usage_id": str(self.html_module_1.location),
+                "usage_id": str(self.html_block_1.location),
                 "updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
             }]) == len(helpers.preprocess_collection(self.user, self.course, initial_collection))
 
@@ -644,7 +644,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         initial_collection = [{
             "quote": "quote text",
             "text": "text",
-            "usage_id": str(self.html_module_1.location),
+            "usage_id": str(self.html_block_1.location),
             "updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
         }]
 
@@ -659,13 +659,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             {
                 "quote": "quote text1",
                 "text": "text1",
-                "usage_id": str(self.html_module_1.location),
+                "usage_id": str(self.html_block_1.location),
                 "updated": datetime(2016, 1, 26, 8, 5, 16, 00000).isoformat(),
             },
             {
                 "quote": "quote text2",
                 "text": "text2",
-                "usage_id": str(self.html_module_2.location),
+                "usage_id": str(self.html_block_2.location),
                 "updated": datetime(2016, 1, 26, 9, 6, 17, 00000).isoformat(),
             },
         ]
@@ -683,7 +683,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     },
                     'text': 'text1',
                     'quote': 'quote text1',
-                    'usage_id': str(self.html_module_1.location),
+                    'usage_id': str(self.html_block_1.location),
                     'updated': datetime(2016, 1, 26, 8, 5, 16)
                 },
                 {
@@ -696,7 +696,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     },
                     'text': 'text2',
                     'quote': 'quote text2',
-                    'usage_id': str(self.html_module_2.location),
+                    'usage_id': str(self.html_block_2.location),
                     'updated': datetime(2016, 1, 26, 9, 6, 17)
                 }
             ]) == len(helpers.preprocess_collection(self.user, self.course, initial_collection))
@@ -720,10 +720,10 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                "display_name": self.html_module_1.display_name_with_default,
-                "location": str(self.html_module_1.location),
+                "display_name": self.html_block_1.display_name_with_default,
+                "location": str(self.html_block_1.location),
             },
-            helpers.get_module_context(self.course, self.html_module_1)
+            helpers.get_module_context(self.course, self.html_block_1)
         )
 
     def test_get_module_context_chapter(self):

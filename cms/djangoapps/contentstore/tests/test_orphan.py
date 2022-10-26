@@ -56,7 +56,7 @@ class TestOrphanBase(CourseTestCase):
         orphan_vertical.children.append(multi_parent_html.location)
         self.store.update_item(orphan_vertical, self.user.id)
 
-        # create an orphaned html module
+        # create an orphaned html block
         orphan_html = self.store.create_item(self.user.id, course.id, 'html', "OrphanHtml")
         self.store.publish(orphan_html.location, self.user.id)
 

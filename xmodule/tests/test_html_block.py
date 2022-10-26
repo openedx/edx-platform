@@ -10,7 +10,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.html_module import CourseInfoBlock, HtmlBlock
+from xmodule.html_block import CourseInfoBlock, HtmlBlock
 
 from ..x_module import PUBLIC_VIEW, STUDENT_VIEW
 from . import get_test_descriptor_system, get_test_system
@@ -146,7 +146,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
     Make sure that HtmlBlock can format data for indexing as expected.
     """
 
-    def test_index_dictionary_simple_html_module(self):
+    def test_index_dictionary_simple_html_block(self):
         sample_xml = '''
             <html>
                 <p>Hello World!</p>
@@ -156,7 +156,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
         assert descriptor.index_dictionary() ==\
                {'content': {'html_content': ' Hello World! ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
-    def test_index_dictionary_cdata_html_module(self):
+    def test_index_dictionary_cdata_html_block(self):
         sample_xml_cdata = '''
             <html>
                 <p>This has CDATA in it.</p>
@@ -167,7 +167,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
         assert descriptor.index_dictionary() ==\
                {'content': {'html_content': ' This has CDATA in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
-    def test_index_dictionary_multiple_spaces_html_module(self):
+    def test_index_dictionary_multiple_spaces_html_block(self):
         sample_xml_tab_spaces = '''
             <html>
                 <p>     Text has spaces :)  </p>
@@ -177,7 +177,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
         assert descriptor.index_dictionary() ==\
                {'content': {'html_content': ' Text has spaces :) ', 'display_name': 'Text'}, 'content_type': 'Text'}
 
-    def test_index_dictionary_html_module_with_comment(self):
+    def test_index_dictionary_html_block_with_comment(self):
         sample_xml_comment = '''
             <html>
                 <p>This has HTML comment in it.</p>
@@ -187,7 +187,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=sample_xml_comment)
         assert descriptor.index_dictionary() == {'content': {'html_content': ' This has HTML comment in it. ', 'display_name': 'Text'}, 'content_type': 'Text'}  # pylint: disable=line-too-long
 
-    def test_index_dictionary_html_module_with_both_comments_and_cdata(self):
+    def test_index_dictionary_html_block_with_both_comments_and_cdata(self):
         sample_xml_mix_comment_cdata = '''
             <html>
                 <!-- Beginning of the html -->
@@ -202,7 +202,7 @@ class HtmlBlockIndexingTestCase(unittest.TestCase):
                {'content': {'html_content': ' This has HTML comment in it. HTML end. ',
                             'display_name': 'Text'}, 'content_type': 'Text'}
 
-    def test_index_dictionary_html_module_with_script_and_style_tags(self):
+    def test_index_dictionary_html_block_with_script_and_style_tags(self):
         sample_xml_style_script_tags = '''
             <html>
                 <style>p {color: green;}</style>

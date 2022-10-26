@@ -22,7 +22,7 @@ from path import Path as path
 from xmodule.annotatable_block import AnnotatableBlock
 from xmodule.capa_block import ProblemBlock
 from xmodule.conditional_block import ConditionalBlock
-from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.library_content_module import LibraryContentBlock
 from xmodule.lti_module import LTIBlock
 from xmodule.poll_module import PollBlock

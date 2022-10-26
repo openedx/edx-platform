@@ -202,7 +202,7 @@ class XmlMixin:
         """
         Load a descriptor definition from the specified xml_object.
         Subclasses should not need to override this except in special
-        cases (e.g. html module)
+        cases (e.g. html block)
 
         Args:
             xml_object: an lxml.etree._Element containing the definition to load

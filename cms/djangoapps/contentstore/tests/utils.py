@@ -192,15 +192,15 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         content_store.set_attr(self.LOCKED_ASSET_KEY, 'locked', True)
 
         # create a non-portable link - should be rewritten in new courses
-        html_module = self.store.get_item(course_id.make_usage_key('html', 'nonportable'))
-        new_data = html_module.data = html_module.data.replace(
+        html_block = self.store.get_item(course_id.make_usage_key('html', 'nonportable'))
+        new_data = html_block.data = html_block.data.replace(
             '/static/',
             f'/c4x/{course_id.org}/{course_id.course}/asset/'
         )
-        self.store.update_item(html_module, self.user.id)
+        self.store.update_item(html_block, self.user.id)
 
-        html_module = self.store.get_item(html_module.location)
-        self.assertEqual(new_data, html_module.data)
+        html_block = self.store.get_item(html_block.location)
+        self.assertEqual(new_data, html_block.data)
 
         return course_id
 
@@ -272,8 +272,8 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         self.assertAssetsEqual(self.LOCKED_ASSET_KEY, self.LOCKED_ASSET_KEY.course_key, course_id)
 
         # verify non-portable links are rewritten
-        html_module = self.store.get_item(course_id.make_usage_key('html', 'nonportable'))
-        self.assertIn('/static/foo.jpg', html_module.data)
+        html_block = self.store.get_item(course_id.make_usage_key('html', 'nonportable'))
+        self.assertIn('/static/foo.jpg', html_block.data)
 
         return course
 

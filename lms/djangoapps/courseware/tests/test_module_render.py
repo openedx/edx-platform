@@ -44,7 +44,7 @@ from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory  # 
 from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ProblemBlock
 from xmodule.contentstore.django import contentstore
-from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.lti_module import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import ModuleI18nService, modulestore
