@@ -29,7 +29,7 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_module.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     GetTranscriptsFromYouTubeException,
     Transcript,
     TranscriptsGenerationException,
@@ -124,9 +124,9 @@ def save_video_transcript(edx_video_id, input_format, transcript_content, langua
     return result
 
 
-def validate_video_module(request, locator):
+def validate_video_block(request, locator):
     """
-    Validates video module given its locator and request. Also, checks
+    Validates video block given its locator and request. Also, checks
     if requesting user has course authoring access.
 
     Arguments:
@@ -175,7 +175,7 @@ def validate_transcript_upload_data(request):
         error = _('Video ID is required.')
 
     if not error:
-        error, video = validate_video_module(request, video_locator)
+        error, video = validate_video_block(request, video_locator)
         if not error:
             validated_data.update({
                 'video': video,
@@ -250,7 +250,7 @@ def download_transcripts(request):
 
     Raises Http404 if unsuccessful.
     """
-    error, video = validate_video_module(request, locator=request.GET.get('locator'))
+    error, video = validate_video_block(request, locator=request.GET.get('locator'))
     if error:
         raise Http404
 
@@ -491,7 +491,7 @@ def validate_transcripts_request(request, include_yt=False, include_html5=False)
     if not data:
         error = _('Incoming video data is empty.')
     else:
-        error, video = validate_video_module(request, locator=data.get('locator'))
+        error, video = validate_video_block(request, locator=data.get('locator'))
         if not error:
             validated_data.update({'video': video})
 

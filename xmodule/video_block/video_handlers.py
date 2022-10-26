@@ -1,7 +1,7 @@
 """
-Handlers for video module.
+Handlers for video block.
 
-StudentViewHandlers are handlers for video module instance.
+StudentViewHandlers are handlers for video block instance.
 StudioViewHandlers are handlers for video descriptor instance.
 """
 
@@ -56,7 +56,7 @@ def to_boolean(value):
 
 class VideoStudentViewHandlers:
     """
-    Handlers for video module instance.
+    Handlers for video block instance.
     """
     global_speed = None
     transcript_language = None

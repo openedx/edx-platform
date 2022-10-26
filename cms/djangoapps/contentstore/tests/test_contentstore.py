@@ -38,7 +38,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 from xmodule.seq_block import SequenceBlock
-from xmodule.video_module import VideoBlock
+from xmodule.video_block import VideoBlock
 
 from cms.djangoapps.contentstore.config import waffle
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
@@ -403,7 +403,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_if_not_present=True)
         course_id = self.store.make_course_key('edX', 'toy', '2012_Fall')
 
-        # create a new video module and add it as a child to a vertical
+        # create a new video block and add it as a child to a vertical
         # this re-creates a bug whereby since the video template doesn't have
         # anything in 'data' field, the export was blowing up
         verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})

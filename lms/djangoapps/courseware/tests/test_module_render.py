@@ -57,7 +57,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.services import RebindUserServiceError
-from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps import static_replace
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported

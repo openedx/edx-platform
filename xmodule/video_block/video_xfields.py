@@ -1,5 +1,5 @@
 """  # lint-amnesty, pylint: disable=cyclic-import
-XFields for video module.
+XFields for video block.
 """
 
 
@@ -29,7 +29,7 @@ class VideoFields:
         default=datetime.timedelta(seconds=0)
     )
     # TODO: This should be moved to Scope.content, but this will
-    # require data migration to support the old video module.
+    # require data migration to support the old video block.
     youtube_id_1_0 = String(
         help=_("Optional, for older browsers: the YouTube ID for the normal speed video."),
         display_name=_("YouTube ID"),
@@ -112,7 +112,7 @@ class VideoFields:
         default=False
     )
     # `sub` is deprecated field and should not be used in future. Now, transcripts are primarily handled in VAL and
-    # backward compatibility for the video modules already using this field has been ensured.
+    # backward compatibility for the video blocks already using this field has been ensured.
     sub = String(
         help=_("The default transcript for the video, from the Default Timed Transcript field on the Basic tab. "
                "This transcript should be in English. You don't have to change this setting."),

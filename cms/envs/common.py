@@ -1578,7 +1578,7 @@ INSTALLED_APPS = [
     # Monitor the status of services
     'openedx.core.djangoapps.service_status',
 
-    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    # Video block configs (This will be moved to Video once it becomes an XBlock)
     'openedx.core.djangoapps.video_config',
 
     # edX Video Pipeline integration

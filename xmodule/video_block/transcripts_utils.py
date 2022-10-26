@@ -121,7 +121,7 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
 
     Args:
     `subs_id`: str, subtitles id
-    `item`: video module instance
+    `item`: video block instance
     `language`: two chars str ('uk'), language of translation of transcripts
 
     Returns: location of saved subtitles.
@@ -410,7 +410,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
 
     If value of `sub` field of `new_item` is cleared, transcripts should be removed.
 
-    `item` is video module instance with updated values of fields,
+    `item` is video block instance with updated values of fields,
     but actually have not been saved to store yet.
 
     `old_metadata` contains old values of XFields.
@@ -846,7 +846,7 @@ class VideoTranscriptsMixin:
 
     def get_default_transcript_language(self, transcripts):
         """
-        Returns the default transcript language for this video module.
+        Returns the default transcript language for this video block.
 
         Args:
             transcripts (dict): A dict with all transcripts and a sub.

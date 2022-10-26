@@ -1,5 +1,5 @@
 """Video is ungraded Xmodule for support video content.
-It's new improved video module, which support additional feature:
+It's new improved video block, which support additional feature:
 - Can play non-YouTube video sources via in-browser HTML5 video player.
 - YouTube defaults to HTML5 mode from the start.
 - Speed changes in both YouTube and non-YouTube videos happen via
@@ -42,7 +42,7 @@ from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metada
 from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.video_module import manage_video_subtitles_save
+from xmodule.video_block import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
     HTMLSnippet, ResourceTemplates, shim_xmodule_js,
@@ -1121,7 +1121,7 @@ class VideoBlock(
                 except edxval_api.ValVideoNotFoundError:
                     pass
 
-        # Fall back to other video URLs in the video module if not found in VAL
+        # Fall back to other video URLs in the video block if not found in VAL
         if not encoded_videos:
             if all_sources:
                 encoded_videos["fallback"] = {

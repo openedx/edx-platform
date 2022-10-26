@@ -554,7 +554,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         check_xblock_fields()
         check_mongo_fields()
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_export_course_image(self):
         """
         Test to make sure that we have a course image in the contentstore,
@@ -572,7 +572,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         assert path(root_dir / 'test_export/static/images/course_image.jpg').isfile()
         assert path(root_dir / 'test_export/static/images_course_image.jpg').isfile()
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_export_course_image_nondefault(self):
         """
         Make sure that if a non-default image path is specified that we
@@ -587,7 +587,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         assert path(root_dir / 'test_export/static/just_a_test.jpg').isfile()
         assert not path(root_dir / 'test_export/static/images/course_image.jpg').isfile()
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_course_without_image(self):
         """
         Make sure we elegantly passover our code when there isn't a static
