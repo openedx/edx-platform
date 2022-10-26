@@ -37,7 +37,7 @@ XBLOCKS = [
     "videoalpha = xmodule.video_module:VideoBlock",
     "videodev = xmodule.template_block:TranslateCustomTagBlock",
     "word_cloud = xmodule.word_cloud_block:WordCloudBlock",
-    "wrapper = xmodule.wrapper_module:WrapperBlock",
+    "wrapper = xmodule.wrapper_block:WrapperBlock",
 ]
 XBLOCKS_ASIDES = [
     'tagging_aside = cms.lib.xblock.tagging:StructuredTagsAside',
