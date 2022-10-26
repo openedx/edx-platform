@@ -813,7 +813,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             reindex_course_and_check_access(self.course.id, self.user)
 
-    @mock.patch('xmodule.seq_module.SequenceBlock.index_dictionary')
+    @mock.patch('xmodule.seq_block.SequenceBlock.index_dictionary')
     def test_reindex_seq_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for sequence
@@ -923,7 +923,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
-    @mock.patch('xmodule.seq_module.SequenceBlock.index_dictionary')
+    @mock.patch('xmodule.seq_block.SequenceBlock.index_dictionary')
     def test_indexing_seq_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for sequence

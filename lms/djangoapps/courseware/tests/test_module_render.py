@@ -920,7 +920,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         assert not mock_score_signal.called
 
     @ddt.data(
-        # See seq_module.py for the definition of these handlers
+        # See seq_block.py for the definition of these handlers
         ('get_completion', True),  # has the 'will_recheck_access' attribute set to True
         ('goto_position', False),  # does not set it
     )

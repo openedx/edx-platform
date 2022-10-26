@@ -9,7 +9,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.seq_module import SequenceBlock
+from xmodule.seq_block import SequenceBlock
 
 
 class TemplateTests(ModuleStoreTestCase):

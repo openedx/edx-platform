@@ -37,7 +37,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
-from xmodule.seq_module import SequenceBlock
+from xmodule.seq_block import SequenceBlock
 from xmodule.video_module import VideoBlock
 
 from cms.djangoapps.contentstore.config import waffle

@@ -615,7 +615,7 @@ class SequenceBlock(
             parent_block_id = self.get_parent().scope_ids.usage_id.block_id
             params['chapter_completion_aggregator_url'] = '/'.join(
                 [settings.COMPLETION_AGGREGATOR_URL, str(self.scope_ids.usage_id.context_key), parent_block_id]) + '/'
-        fragment.add_content(self.runtime.service(self, 'mako').render_template("seq_module.html", params))
+        fragment.add_content(self.runtime.service(self, 'mako').render_template("seq_block.html", params))
 
         self._capture_full_seq_item_metrics(display_items)
         self._capture_current_unit_metrics(display_items)

@@ -16,7 +16,7 @@ from xblock.fields import Boolean, Scope
 from openedx_filters.learning.filters import VerticalBlockChildRenderStarted
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.progress import Progress
-from xmodule.seq_module import SequenceFields
+from xmodule.seq_block import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.misc import is_xblock_an_assignment
 from xmodule.util.xmodule_django import add_webpack_to_fragment

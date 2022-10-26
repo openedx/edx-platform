@@ -26,7 +26,7 @@ from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTab
 from xmodule.library_content_block import LibraryContentBlock
 from xmodule.lti_block import LTIBlock
 from xmodule.poll_block import PollBlock
-from xmodule.seq_module import SequenceBlock
+from xmodule.seq_block import SequenceBlock
 from xmodule.split_test_module import SplitTestBlock
 from xmodule.template_module import CustomTagBlock
 from xmodule.word_cloud_module import WordCloudBlock

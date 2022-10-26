@@ -183,7 +183,7 @@ class ModelsTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-cl
 
     def test_load_class(self):
         vc = XBlock.load_class('sequential')
-        vc_str = "<class 'xmodule.seq_module.SequenceBlock'>"
+        vc_str = "<class 'xmodule.seq_block.SequenceBlock'>"
         assert str(vc) == vc_str
 
 

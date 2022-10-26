@@ -15,7 +15,7 @@ from xmodule.course_block import CourseBlock
 from xmodule.fields import Date, RelativeTime, Timedelta
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin, InheritingFieldData
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
-from xmodule.seq_module import SequenceBlock
+from xmodule.seq_block import SequenceBlock
 from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml.factories import CourseFactory, ProblemFactory, SequenceFactory
