@@ -37,7 +37,7 @@ from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID, ATTR_KEY
 
 from .exceptions import NotFoundError
 from .fields import Date
-from .mako_module import MakoTemplateBlockBase
+from .mako_block import MakoTemplateBlockBase
 from .progress import Progress
 from .x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW
 from .xml_module import XmlMixin

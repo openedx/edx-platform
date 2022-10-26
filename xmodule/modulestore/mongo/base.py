@@ -39,7 +39,7 @@ from xmodule.course_block import CourseSummary
 from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import exc_info_to_str, null_error_tracker
 from xmodule.exceptions import HeartbeatFailure
-from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore import BulkOperationsMixin, ModuleStoreEnum, ModuleStoreWriteBase
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin

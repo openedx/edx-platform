@@ -12,7 +12,7 @@ from xblock.runtime import KeyValueStore, KvsFieldData
 from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import exc_info_to_str
 from xmodule.library_tools import LibraryToolsService
-from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin, inheriting_field_data

@@ -74,7 +74,7 @@ from webob import Response
 from web_fragments.fragment import Fragment
 from xblock.core import List, Scope, String, XBlock
 from xblock.fields import Boolean, Float
-from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.mako_block import MakoTemplateBlockBase
 
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.editing_block import EditingMixin

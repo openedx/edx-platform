@@ -15,7 +15,7 @@ from xblock.core import XBlock
 from xblock.fields import ReferenceList, Scope, String
 
 from openedx.core.djangolib.markup import HTML, Text
-from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.seq_module import SequenceMixin
 from xmodule.studio_editable import StudioEditableBlock

@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.fields import Integer, Scope
-from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.seq_module import SequenceMixin
 from xmodule.xml_module import XmlMixin
 from xmodule.x_module import (

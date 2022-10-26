@@ -14,7 +14,7 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.fields import Boolean, Scope
 from openedx_filters.learning.filters import VerticalBlockChildRenderStarted
-from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock

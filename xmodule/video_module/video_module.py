@@ -37,7 +37,7 @@ from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
-from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_module import EmptyDataRawMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage

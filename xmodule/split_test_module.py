@@ -17,7 +17,7 @@ from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Integer, ReferenceValueDict, Scope, String
-from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.progress import Progress
 from xmodule.seq_module import ProctoringFields, SequenceMixin

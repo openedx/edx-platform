@@ -5,7 +5,7 @@ import logging
 
 from xblock.fields import Scope, String
 
-from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.mako_block import MakoTemplateBlockBase
 
 log = logging.getLogger(__name__)
 
