@@ -2,9 +2,44 @@
 
 import logging
 import requests
+from time import time
+
 from django.conf import settings
 
 log = logging.getLogger(__name__)
+LH_DEBUG = True
+
+
+def timed(func):
+    """Wrap the function and return result and execution time"""
+
+    # IF debugging is on, log function run lengths
+    if LH_DEBUG:
+
+        def wrap_func(*args, **kwargs):
+            # Time the function operation
+            t1 = time()
+            result = func(*args, **kwargs)
+            t2 = time()
+
+            # Display lists / sets as their lengths instead of actual items
+            debug_args = []
+            for arg in args:
+                if isinstance(arg, list) or isinstance(arg, set):
+                    debug_args.append(f"<list: (len {len(arg)})>")
+                else:
+                    debug_args.append(arg)
+
+            # Log the output
+            log.info(f"{func.__name__!r} args:{debug_args} completed in {(t2-t1):.4f}s")
+
+            return result
+
+        return wrap_func
+
+    # If debugging is off, don't do any logging
+    else:
+        return func
 
 
 def get_personalized_course_recommendations(user_id):

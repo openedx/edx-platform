@@ -2,6 +2,8 @@
 Views for the learner dashboard.
 """
 import logging
+from time import time
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import MultipleObjectsReturned
@@ -42,7 +44,10 @@ from lms.djangoapps.courseware.access_utils import (
     check_course_open_for_learner,
 )
 from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
-from lms.djangoapps.learner_home.utils import get_personalized_course_recommendations
+from lms.djangoapps.learner_home.utils import (
+    get_personalized_course_recommendations,
+    timed,
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
@@ -56,6 +61,7 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
+@timed
 def get_platform_settings():
     """Get settings used for platform level connections: emails, url routes, etc."""
 
@@ -66,6 +72,7 @@ def get_platform_settings():
     }
 
 
+@timed
 def get_user_account_confirmation_info(user):
     """Determine if a user needs to verify their account and related URL info"""
 
@@ -84,6 +91,7 @@ def get_user_account_confirmation_info(user):
     return email_confirmation
 
 
+@timed
 def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
     """Get enrollments and enrollment course modes for user"""
 
@@ -123,6 +131,7 @@ def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
     return course_enrollments, course_mode_info
 
 
+@timed
 def get_entitlements(user, org_allow_list, org_block_list):
     """Get entitlements for the user"""
     (
@@ -148,6 +157,7 @@ def get_entitlements(user, org_allow_list, org_block_list):
     )
 
 
+@timed
 def get_course_overviews_for_pseudo_sessions(unfulfilled_entitlement_pseudo_sessions):
     """
     Get course overviews for entitlement pseudo sessions. This is required for
@@ -185,6 +195,7 @@ def get_email_settings_info(user, course_enrollments):
     return show_email_settings_for, course_optouts
 
 
+@timed
 def get_enterprise_customer(user, request, is_masquerading):
     """
     If we are not masquerading, try to load the enterprise learner from session data, falling back to the db.
@@ -197,6 +208,7 @@ def get_enterprise_customer(user, request, is_masquerading):
         return enterprise_customer_from_session_or_learner_data(request)
 
 
+@timed
 def get_ecommerce_payment_page(user):
     """Determine the ecommerce payment page URL if enabled for this user"""
     ecommerce_service = EcommerceService()
@@ -207,12 +219,25 @@ def get_ecommerce_payment_page(user):
     )
 
 
+@timed
 def get_cert_statuses(user, course_enrollments):
     """Get cert status by course for user enrollments"""
     return {
         enrollment.course_id: cert_info(user, enrollment)
         for enrollment in course_enrollments
     }
+
+
+@timed
+def get_org_block_and_allow_lists():
+    """Proxy for get_org_black_and_whitelist_for_site to allow for modification / profiling"""
+    return get_org_black_and_whitelist_for_site()
+
+
+@timed
+def get_resume_urls_for_course_enrollments(user, course_enrollments):
+    """Proxy for get_resume_urls_for_enrollments to allow for modification / profiling"""
+    return get_resume_urls_for_enrollments(user, course_enrollments)
 
 
 def _get_courses_with_unmet_prerequisites(user, course_enrollments):
@@ -235,6 +260,7 @@ def _get_courses_with_unmet_prerequisites(user, course_enrollments):
     return get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
 
+@timed
 def check_course_access(user, course_enrollments):
     """
     Wrapper for checks surrounding user ability to view courseware
@@ -271,6 +297,7 @@ def check_course_access(user, course_enrollments):
     return course_access_dict
 
 
+@timed
 def get_course_programs(user, course_enrollments, site):
     """
     Get programs related to the courses the user is enrolled in.
@@ -287,6 +314,7 @@ def get_course_programs(user, course_enrollments, site):
     return meter.invert_programs()
 
 
+@timed
 def get_suggested_courses():
     """
     Currently just returns general recommendations from settings
@@ -300,6 +328,7 @@ def get_suggested_courses():
     )
 
 
+@timed
 def get_social_share_settings():
     """Config around social media sharing campaigns"""
 
@@ -325,6 +354,7 @@ def get_social_share_settings():
     }
 
 
+@timed
 def get_course_share_urls(course_enrollments):
     """Get course URLs for sharing on social media"""
     return {
@@ -370,8 +400,6 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         """
         Load information required for displaying the learner home
         """
-        logger.info(f"Fetching platform-level data for {user.username}")
-
         # Determine if user needs to confirm email account
         email_confirmation = get_user_account_confirmation_info(user)
 
@@ -384,12 +412,8 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Get platform-level settings
         platform_settings = get_platform_settings()
 
-        logger.info(f"Finished fetching platform-level data for {user.username}")
-
         # Get the org whitelist or the org blacklist for the current site
-        site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
-
-        logger.info(f"Fetching entitlements for {user.username}")
+        site_org_whitelist, site_org_blacklist = get_org_block_and_allow_lists()
 
         # Get entitlements and course overviews for serializing
         (
@@ -402,16 +426,10 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             unfulfilled_entitlement_pseudo_sessions
         )
 
-        logger.info(f"Finished fetching entitlements for {user.username}")
-        logger.info(f"Fetching enrollments for {user.username}")
-
         # Get enrollments
         course_enrollments, course_mode_info = get_enrollments(
             user, site_org_whitelist, site_org_blacklist
         )
-
-        logger.info(f"Finished fetching enrollments for {user.username}")
-        logger.info(f"Fetching supporting info for {user.username}")
 
         # Get email opt-outs for student
         show_email_settings_for, course_optouts = get_email_settings_info(
@@ -431,15 +449,15 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         ecommerce_payment_page = get_ecommerce_payment_page(user)
 
         # Gather urls for course card resume buttons.
-        resume_button_urls = get_resume_urls_for_enrollments(user, course_enrollments)
+        resume_button_urls = get_resume_urls_for_course_enrollments(
+            user, course_enrollments
+        )
 
         # Get suggested courses
         suggested_courses = get_suggested_courses().get("courses", [])
 
         # Get social media sharing config
         course_share_urls = get_course_share_urls(course_enrollments)
-
-        logger.info(f"Finished fetching supporting info for {user.username}")
 
         learner_dash_data = {
             "emailConfirmation": email_confirmation,
@@ -467,13 +485,16 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "programs": programs,
         }
 
-        logger.info(f"Serializing home info for {user.username}")
+        t1 = time()
 
         response_data = LearnerDashboardSerializer(
             learner_dash_data, context=context
         ).data
 
-        logger.info(f"Finished serializing home info for {user.username}")
+        t2 = time()
+        logger.info(
+            f"Finished serializing home info for {user.username} in {(t2-t1):.4f}s"
+        )
 
         return Response(response_data)
 
