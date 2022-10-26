@@ -303,7 +303,7 @@ def inherit_metadata(descriptor, inherited_data):
     """
     try:
         descriptor.xblock_kvs.inherited_settings = inherited_data
-    except AttributeError:  # the kvs doesn't have inherited_settings probably b/c it's an error module
+    except AttributeError:  # the kvs doesn't have inherited_settings probably b/c it's an error block
         pass
 
 

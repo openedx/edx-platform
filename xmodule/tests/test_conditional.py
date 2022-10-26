@@ -14,7 +14,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.conditional_block import ConditionalBlock
-from xmodule.error_module import ErrorBlock
+from xmodule.error_block import ErrorBlock
 from xmodule.modulestore.xml import CourseLocationManager, ImportSystem, XMLModuleStore
 from xmodule.tests import DATA_DIR, get_test_descriptor_system, get_test_system
 from xmodule.tests.xml import XModuleXmlImportTest

@@ -80,7 +80,7 @@ from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 
 from xmodule.assetstore import AssetMetadata
 from xmodule.course_block import CourseSummary
-from xmodule.error_module import ErrorBlock
+from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import null_error_tracker
 from xmodule.library_content_module import LibrarySummary
 from xmodule.modulestore import (

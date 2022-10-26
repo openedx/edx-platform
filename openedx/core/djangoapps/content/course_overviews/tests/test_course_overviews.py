@@ -33,7 +33,7 @@ from xmodule.course_block import (  # lint-amnesty, pylint: disable=wrong-import
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
-from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order

@@ -62,7 +62,7 @@ from common.djangoapps.util.milestones_helpers import (
     is_prerequisite_courses_enabled
 )
 from xmodule.course_block import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)

@@ -78,7 +78,7 @@ from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseBlock, DEFAULT_START_DATE, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import EdxJSONEncoder  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order

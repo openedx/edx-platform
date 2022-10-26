@@ -23,7 +23,7 @@ from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore
 
 from common.djangoapps.util.monitoring import monitor_import_failure
-from xmodule.error_module import ErrorBlock
+from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import exc_info_to_str, make_error_tracker
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum, ModuleStoreReadBase

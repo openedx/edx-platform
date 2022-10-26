@@ -7,7 +7,7 @@ import unittest
 
 from opaque_keys.edx.locator import CourseLocator
 
-from xmodule.error_module import ErrorBlock
+from xmodule.error_block import ErrorBlock
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests import get_test_system
 from xmodule.x_module import STUDENT_VIEW

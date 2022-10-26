@@ -113,7 +113,7 @@ class ErrorBlock(
         })
         return system.construct_xblock_from_class(
             cls,
-            # The error module doesn't use scoped data, and thus doesn't need
+            # The error block doesn't use scoped data, and thus doesn't need
             # real scope keys
             ScopeIds(None, 'error', location, location),
             field_data,
