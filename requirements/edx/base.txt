@@ -10,8 +10,6 @@
     # via -r requirements/edx/github.in
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
     # via -r requirements/edx/github.in
--e git+https://github.com/openedx/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
-    # via -r requirements/edx/github.in
 acid-xblock==0.2.1
     # via -r requirements/edx/base.in
 aiohttp==3.8.3
@@ -1177,6 +1175,8 @@ xblock==1.6.1
     #   xblock-poll
     #   xblock-utils
 xblock-drag-and-drop-v2==2.5.0
+    # via -r requirements/edx/base.in
+xblock-google-drive==0.3.0
     # via -r requirements/edx/base.in
 xblock-poll @ git+https://github.com/open-craft/xblock-poll@v1.12.0
     # via -r requirements/edx/github.in
