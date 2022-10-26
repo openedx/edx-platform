@@ -12,8 +12,6 @@
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
     # via -r requirements/edx/testing.txt
--e git+https://github.com/openedx/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
-    # via -r requirements/edx/testing.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/testing.txt
 aiohttp==3.8.3
@@ -699,6 +697,10 @@ event-tracking==2.1.0
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
     #   edx-search
+exceptiongroup==1.0.0rc9
+    # via
+    #   -r requirements/edx/testing.txt
+    #   pytest
 execnet==1.9.0
     # via
     #   -r requirements/edx/testing.txt
@@ -967,7 +969,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
-newrelic==8.2.1
+newrelic==8.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
@@ -1091,7 +1093,6 @@ psutil==5.9.3
 py==1.11.0
     # via
     #   -r requirements/edx/testing.txt
-    #   pytest
     #   pytest-forked
     #   tox
 py2neo==2021.2.3
@@ -1213,7 +1214,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/testing.txt
     #   edxval
-pytest==7.1.3
+pytest==7.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint-pytest
@@ -1318,7 +1319,7 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/testing.txt
-rapidfuzz==2.11.1
+rapidfuzz==2.12.0
     # via
     #   -r requirements/edx/testing.txt
     #   levenshtein
@@ -1670,6 +1671,8 @@ xblock==1.6.1
     #   xblock-poll
     #   xblock-utils
 xblock-drag-and-drop-v2==2.5.0
+    # via -r requirements/edx/testing.txt
+xblock-google-drive==0.3.0
     # via -r requirements/edx/testing.txt
 xblock-poll @ git+https://github.com/open-craft/xblock-poll@v1.12.0
     # via -r requirements/edx/testing.txt
