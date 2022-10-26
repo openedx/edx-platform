@@ -4,6 +4,10 @@ from django.utils.decorators import method_decorator
 from django.db import IntegrityError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.conf import settings
+
 from rest_framework import generics, status, views, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.pagination import PageNumberPagination
@@ -33,7 +37,8 @@ from .serializers import (
     JournalListSerializer,
     StudentPostSerializer,
     TeacherFeedbackSerializer,
-    SkillSerializer
+    SkillSerializer,
+    ContactSerailizer,
 )
 from .permissions import IsStudent, IsTeacher, IsStudentOrTeacher, IsGenUser
 from .mixins import GenzMixin
@@ -317,3 +322,28 @@ class SkillViewSet(GenzMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Skill.objects.all()
     pagination_class = None
     ordering = ['name']
+
+
+class ContactAPIView(views.APIView):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsTeacher]
+
+    def post(self, request, *args, **kwargs):
+        serializer = ContactSerailizer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.validated_data
+            email = data.get('email')
+            subject = data.get('subject')
+
+            plain_message = get_template('genplus/contact_us_email.txt')
+            html_message  = get_template('genplus/contact_us_email.html')
+            text_content = plain_message.render(data)
+            html_content = html_message.render(data)
+
+            msg = EmailMultiAlternatives(subject, text_content, email, [settings.CONTACT_EMAIL])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
+            return Response({"success": "Sent"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)

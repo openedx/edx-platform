@@ -135,3 +135,12 @@ class TeacherFeedbackSerializer(serializers.ModelSerializer):
         model = JournalPost
         fields = ('teacher', 'student', 'title', 'description', 'journal_type')
         extra_kwargs = {'teacher': {'required': True, 'allow_null': False}}
+
+
+class ContactSerailizer(serializers.Serializer):
+    name = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    school = serializers.CharField(required=True)
+    datetime = serializers.DateTimeField(required=False)
+    subject = serializers.CharField(required=True)
+    message = serializers.CharField(required=True)

@@ -11,6 +11,7 @@ from .views import (
     ClassViewSet,
     JournalViewSet,
     SkillViewSet,
+    ContactAPIView
 )
 
 app_name = 'genplus_api_v1'
@@ -23,6 +24,7 @@ router.register('skills', SkillViewSet, basename='skills')
 
 urlpatterns = [
     url(r'^userinfo/$', UserInfo.as_view()),
+    url(r'^contact-us/$', ContactAPIView.as_view()),
     url(r'^characters/select/(?P<pk>\d+)/$', CharacterViewSet.as_view({"put": "select_character"})),
     url(r'^classes/(?P<pk>\w+)/add_class/$', ClassViewSet.as_view({"put": "add_my_class"})),
     path('', include(router.urls)),
