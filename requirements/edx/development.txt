@@ -49,7 +49,7 @@ asn1crypto==1.5.1
     #   -r requirements/edx/testing.txt
     #   oscrypto
     #   snowflake-connector-python
-astroid==2.11.7
+astroid==2.12.10
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -1150,9 +1150,8 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/testing.txt
     #   olxcleaner
-pylint==2.13.9
+pylint==2.15.3
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-lint
     #   pylint-celery
@@ -1555,6 +1554,10 @@ tox==3.27.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox-battery
+tomlkit==0.11.5
+    # via
+    #   -r requirements/edx/testing.txt
+    #   pylint
 tox-battery==0.6.1
     # via -r requirements/edx/testing.txt
 tqdm==4.64.1

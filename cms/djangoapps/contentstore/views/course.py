@@ -1206,10 +1206,10 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
                 # exclude current course from the list of available courses
-                courses = (course for course in courses if course.id != course_key)
+                courses = [course for course in courses if course.id != course_key]
                 if courses:
                     courses, __ = _process_courses_list(courses, in_process_course_actions)
-                settings_context.update({'possible_pre_requisite_courses': list(courses)})
+                settings_context.update({'possible_pre_requisite_courses': courses})
 
             if credit_eligibility_enabled:
                 if is_credit_course(course_key):
