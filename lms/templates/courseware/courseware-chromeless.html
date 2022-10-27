@@ -133,20 +133,31 @@ ${HTML(fragment.foot_html())}
         if (!isLoadEvent && newWidth === lastWidth && newHeight === lastHeight) {
             // Monitor when any anchor tag is clicked, it is checked to make sure
             // it is referencing an element's id or name (not an external website). If
-            // the href attribute is an id or name, the location of the selected focus
-            // element is sent through its offset attribute. The offset will
-            // allow the page to scroll to the location of the focus element so
-            // that it is at the top of the page. Unique ids and names are
-            // required for proper scrolling.
+            // the href attribute is an id or name, the page will scroll the id or name.
             $('a').on("click", function(event){
-              if ($(this).attr('href')[0] === "#") {
+              if ($(this).attr('href')[0] === '#') {
                 var targetId = $(this).attr('href');
-                var targetName = $(this).attr('href').slice(1);
-                // Checks if the target uses an id or name to focus and gets offset.
-                var targetOffset = $(targetId).offset() || $(document.getElementsByName(targetName)[0]).offset();
-                if (targetOffset) {
+                // Checks if the href attribute is auto scrolling video transcripts.
+                // The scroll behavior for transcript scrolling requires the viewport
+                // to stay in relatively the same position so viewing of the video
+                // is not disrupted.
+                if ($(this).attr('class') === 'transcript-start'||$(this).attr('class') === 'transcript-end') {
                   event.preventDefault();
-                  window.parent.postMessage({"offset": targetOffset.top}, document.referrer);
+                  $(targetId)[0].scrollIntoView({
+                    block: 'nearest',
+                  });
+                } else {
+                  var targetName = $(this).attr('href').slice(1);
+                  // Checks if the target uses an id or name.
+                  var target = $(targetId)[0] || document.getElementsByName(targetName)[0];
+                  // The scroll behavior fro all other types of href's will scroll
+                  // the target to the top of the page
+                  if (target) {
+                    event.preventDefault();
+                    target.scrollIntoView({
+                      block: 'start',
+                    });
+                  }
                 }
               }
             })

@@ -33,6 +33,7 @@ from xmodule.modulestore.django import SignalHandler, modulestore  # lint-amnest
 from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     ModuleStoreTestCase,
     TEST_DATA_MONGO_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -868,6 +869,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
     """
     CREATE_USER = True
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()

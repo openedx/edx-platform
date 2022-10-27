@@ -27,7 +27,6 @@ from common.djangoapps.util.module_utils import yield_dynamic_descriptor_descend
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
-from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
@@ -84,7 +83,6 @@ def create_catalog_data_for_signal(course_key: CourseKey) -> Optional[CourseCata
     store = modulestore()
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         course = store.get_course(course_key)
-
         return CourseCatalogData(
             course_key=course_key.for_branch(None),  # Shouldn't be necessary, but just in case...
             name=course.display_name,
@@ -95,7 +93,6 @@ def create_catalog_data_for_signal(course_key: CourseKey) -> Optional[CourseCata
                 enrollment_start=course.enrollment_start,
                 enrollment_end=course.enrollment_end,
             ),
-            effort=CourseDetails.fetch_about_attribute(course_key, 'effort'),
             hidden=course.catalog_visibility in ['about', 'none'] or course_key.deprecated,
             invitation_only=course.invitation_only,
         )

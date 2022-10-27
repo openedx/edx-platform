@@ -5,6 +5,10 @@ import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import MultipleObjectsReturned
+from common.djangoapps.util.course import (
+    get_encoded_course_sharing_utm_params,
+    get_link_for_about_page,
+)
 from edx_django_utils import monitoring as monitoring_utils
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied, NotFound
@@ -296,6 +300,39 @@ def get_suggested_courses():
     )
 
 
+def get_social_share_settings():
+    """Config around social media sharing campaigns"""
+
+    share_settings = configuration_helpers.get_value(
+        "SOCIAL_SHARING_SETTINGS", getattr(settings, "SOCIAL_SHARING_SETTINGS", {})
+    )
+
+    utm_sources = get_encoded_course_sharing_utm_params()
+
+    default_brand = "edX.org"
+
+    return {
+        "facebook": {
+            "is_enabled": share_settings.get("DASHBOARD_FACEBOOK", False),
+            "brand": share_settings.get("FACEBOOK_BRAND", default_brand),
+            "utm_params": utm_sources.get("facebook"),
+        },
+        "twitter": {
+            "is_enabled": share_settings.get("DASHBOARD_TWITTER", False),
+            "brand": share_settings.get("TWITTER_BRAND", default_brand),
+            "utm_params": utm_sources.get("twitter"),
+        },
+    }
+
+
+def get_course_share_urls(course_enrollments):
+    """Get course URLs for sharing on social media"""
+    return {
+        course_enrollment.course_id: get_link_for_about_page(course_enrollment.course)
+        for course_enrollment in course_enrollments
+    }
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -333,14 +370,26 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         """
         Load information required for displaying the learner home
         """
+        logger.info(f"Fetching platform-level data for {user.username}")
+
         # Determine if user needs to confirm email account
         email_confirmation = get_user_account_confirmation_info(user)
 
         # Gather info for enterprise dashboard
         enterprise_customer = get_enterprise_customer(user, self.request, is_masquerade)
 
+        # Get site-wide social sharing config
+        social_share_settings = get_social_share_settings()
+
+        # Get platform-level settings
+        platform_settings = get_platform_settings()
+
+        logger.info(f"Finished fetching platform-level data for {user.username}")
+
         # Get the org whitelist or the org blacklist for the current site
         site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
+
+        logger.info(f"Fetching entitlements for {user.username}")
 
         # Get entitlements and course overviews for serializing
         (
@@ -353,10 +402,16 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             unfulfilled_entitlement_pseudo_sessions
         )
 
+        logger.info(f"Finished fetching entitlements for {user.username}")
+        logger.info(f"Fetching enrollments for {user.username}")
+
         # Get enrollments
         course_enrollments, course_mode_info = get_enrollments(
             user, site_org_whitelist, site_org_blacklist
         )
+
+        logger.info(f"Finished fetching enrollments for {user.username}")
+        logger.info(f"Fetching supporting info for {user.username}")
 
         # Get email opt-outs for student
         show_email_settings_for, course_optouts = get_email_settings_info(
@@ -381,12 +436,18 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Get suggested courses
         suggested_courses = get_suggested_courses().get("courses", [])
 
+        # Get social media sharing config
+        course_share_urls = get_course_share_urls(course_enrollments)
+
+        logger.info(f"Finished fetching supporting info for {user.username}")
+
         learner_dash_data = {
             "emailConfirmation": email_confirmation,
             "enterpriseDashboard": enterprise_customer,
-            "platformSettings": get_platform_settings(),
+            "platformSettings": platform_settings,
             "enrollments": course_enrollments,
             "unfulfilledEntitlements": unfulfilled_entitlements,
+            "socialShareSettings": social_share_settings,
             "suggestedCourses": suggested_courses,
         }
 
@@ -397,6 +458,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "course_optouts": course_optouts,
             "course_access_checks": course_access_checks,
             "resume_course_urls": resume_button_urls,
+            "course_share_urls": course_share_urls,
             "show_email_settings_for": show_email_settings_for,
             "fulfilled_entitlements": fulfilled_entitlements_by_course_key,
             "course_entitlement_available_sessions": course_entitlement_available_sessions,
@@ -405,9 +467,14 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "programs": programs,
         }
 
+        logger.info(f"Serializing home info for {user.username}")
+
         response_data = LearnerDashboardSerializer(
             learner_dash_data, context=context
         ).data
+
+        logger.info(f"Finished serializing home info for {user.username}")
+
         return Response(response_data)
 
 

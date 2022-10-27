@@ -14,7 +14,7 @@ from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_isdir, resource_string, resource_filename
+from pkg_resources import resource_isdir, resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
@@ -215,39 +215,11 @@ class HTMLSnippet:
     html snippet, along with associated javascript and css
     """
 
-    js = {}
-    js_module_name = None
-
     preview_view_js = {}
     studio_view_js = {}
 
-    css = {}
     preview_view_css = {}
     studio_view_css = {}
-
-    @classmethod
-    def get_javascript(cls):
-        """
-        Return a dictionary containing some of the following keys:
-
-            coffee: A list of coffeescript fragments that should be compiled and
-                    placed on the page
-
-            js: A list of javascript fragments that should be included on the
-            page
-
-        All of these will be loaded onto the page in the CMS
-        """
-        # cdodge: We've moved the xmodule.coffee script from an outside directory into the xmodule area of common
-        # this means we need to make sure that all xmodules include this dependency which had been previously implicitly
-        # fulfilled in a different area of code
-        coffee = cls.js.setdefault('coffee', [])  # lint-amnesty, pylint: disable=unused-variable
-        js = cls.js.setdefault('js', [])  # lint-amnesty, pylint: disable=unused-variable
-
-        # Added xmodule.js separately to enforce 000 prefix for this only.
-        cls.js.setdefault('xmodule_js', resource_string(__name__, 'js/src/xmodule.js'))
-
-        return cls.js
 
     @classmethod
     def get_preview_view_js(cls):
@@ -264,22 +236,6 @@ class HTMLSnippet:
     @classmethod
     def get_studio_view_js_bundle_name(cls):
         return cls.__name__ + 'Studio'
-
-    @classmethod
-    def get_css(cls):
-        """
-        Return a dictionary containing some of the following keys:
-
-            css: A list of css fragments that should be applied to the html
-                 contents of the snippet
-
-            sass: A list of sass fragments that should be applied to the html
-                  contents of the snippet
-
-            scss: A list of scss fragments that should be applied to the html
-                  contents of the snippet
-        """
-        return cls.css
 
     @classmethod
     def get_preview_view_css(cls):

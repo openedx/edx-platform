@@ -31,7 +31,7 @@
 # ℳarco ℇrmini <marco.ermini@gmail.com>, 2014
 # marcore <mrc.re@tiscali.it>, 2014
 # Matt Tuchfarber <mtuchfarber@edx.org>, 2021
-# Mauri Macera, 2021
+# 20bdf6b5822f7ccbe16f09a657dbe357_e29decb, 2021
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2013
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2013
 # marcore <mrc.re@tiscali.it>, 2014-2015
@@ -62,7 +62,7 @@
 # ℳarco ℇrmini <marco.ermini@gmail.com>, 2014
 # marcore <mrc.re@tiscali.it>, 2014
 # marziotta <marzia.neri@gmail.com>, 2014
-# Mauri Macera, 2021
+# 20bdf6b5822f7ccbe16f09a657dbe357_e29decb, 2021
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2013
 # marcore <mrc.re@tiscali.it>, 2014-2015
 # Pietro Lombardo <pietrolombardo1979@gmail.com>, 2014
@@ -90,7 +90,7 @@
 # 04d576a65812d0fea671136aba4b73ba_d8a218d <ab142ce9a1bdb1fb9d86bf942d5aca84_263701>, 2015
 # Domenico Casanica <domenico.casanica@sistinf.it>, 2021
 # Ilaria Botti <ilabotti@gmail.com>, 2022
-# Mauri Macera, 2021
+# 20bdf6b5822f7ccbe16f09a657dbe357_e29decb, 2021
 # Pietro Lombardo <pietrolombardo1979@gmail.com>, 2014-2015
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2021-2022
 # Thimoty Barbieri <thimoty@thimoty.it>, 2015
@@ -104,7 +104,7 @@
 # 04d576a65812d0fea671136aba4b73ba_d8a218d <ab142ce9a1bdb1fb9d86bf942d5aca84_263701>, 2015
 # Domenico Casanica <domenico.casanica@sistinf.it>, 2021
 # Ilaria Botti <ilabotti@gmail.com>, 2022
-# Mauri Macera, 2021
+# 20bdf6b5822f7ccbe16f09a657dbe357_e29decb, 2021
 # Nicola Cois <nicolacois@hotmail.com>, 2014
 # Pietro Lombardo <pietrolombardo1979@gmail.com>, 2014-2016
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2021
@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-18 20:42+0000\n"
+"POT-Creation-Date: 2022-10-16 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2022\n"
 "Language-Team: Italian (Italy) (http://www.transifex.com/open-edx/edx-platform/language/it_IT/)\n"

@@ -39,6 +39,21 @@ class PlatformSettingsSerializer(serializers.Serializer):
     courseSearchUrl = serializers.URLField()
 
 
+class SocialMediaSiteSettingsSerializer(serializers.Serializer):
+    """Social media sharing config for a particular website"""
+
+    isEnabled = serializers.BooleanField(source="is_enabled")
+    socialBrand = serializers.CharField(source="brand")
+    utmParams = serializers.CharField(source="utm_params")
+
+
+class SocialShareSettingsSerializer(serializers.Serializer):
+    """Serializer for social media sharing config"""
+
+    facebook = SocialMediaSiteSettingsSerializer()
+    twitter = SocialMediaSiteSettingsSerializer()
+
+
 class CourseProviderSerializer(serializers.Serializer):
     """Info about a course provider (institution/business) from a CourseOverview"""
 
@@ -51,6 +66,10 @@ class CourseSerializer(serializers.Serializer):
     bannerImgSrc = serializers.URLField(source="image_urls.small")
     courseName = serializers.CharField(source="display_name_with_default")
     courseNumber = serializers.CharField(source="display_number_with_default")
+    socialShareUrl = serializers.SerializerMethodField()
+
+    def get_socialShareUrl(self, instance):
+        return self.context.get("course_share_urls", {}).get(instance.id)
 
 
 class CourseRunSerializer(serializers.Serializer):
@@ -454,15 +473,6 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         "isEnrolled": False,
     }
 
-    class _PseudoSessionCourseSerializer(serializers.Serializer):
-        """
-        'Private' Serializer for the 'course' key data. This data comes from the pseudo session
-        """
-
-        bannerImgSrc = serializers.URLField(source="image.src", default=None)
-        courseName = serializers.CharField(source="title")
-        courseNumber = serializers.CharField(source="key")
-
     # These fields contain all real data and will be serialized
     entitlement = EntitlementSerializer(source="*")
     course = serializers.SerializerMethodField()
@@ -475,27 +485,25 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
     certificate = LiteralField(None)
     enrollment = LiteralField(STATIC_ENTITLEMENT_ENROLLMENT_DATA)
 
-    def get_course(self, instance):
+    def _get_course_overview(self, instance):
+        """Look up course provider from CourseOverview matching the pseudo session"""
         pseudo_session = self.context["unfulfilled_entitlement_pseudo_sessions"].get(
             str(instance.uuid)
         )
-        return UnfulfilledEntitlementSerializer._PseudoSessionCourseSerializer(
-            pseudo_session
-        ).data
-
-    def get_courseProvider(self, entitlement):
-        """Look up course provider from CourseOverview matching the pseudo session"""
-        pseudo_session = self.context["unfulfilled_entitlement_pseudo_sessions"].get(
-            str(entitlement.uuid)
-        )
-        course_overview = None
-
         if pseudo_session:
             course_key = CourseKey.from_string(pseudo_session["key"])
-            course_overview = self.context.get("pseudo_session_course_overviews").get(
+            return self.context.get("pseudo_session_course_overviews").get(
                 course_key
             )
 
+    def get_course(self, instance):
+        """ Serialize course info from a course overview """
+        course_overview = self._get_course_overview(instance)
+        return CourseSerializer(course_overview, context=self.context).data
+
+    def get_courseProvider(self, instance):
+        """ Serialize course provider info from a course overview """
+        course_overview = self._get_course_overview(instance)
         return CourseProviderSerializer(course_overview, allow_null=True).data
 
     def get_programs(self, instance):
@@ -546,6 +554,7 @@ class LearnerDashboardSerializer(serializers.Serializer):
     enterpriseDashboard = EnterpriseDashboardSerializer(allow_null=True)
     platformSettings = PlatformSettingsSerializer()
     courses = serializers.SerializerMethodField()
+    socialShareSettings = SocialShareSettingsSerializer()
     suggestedCourses = serializers.ListField(
         child=SuggestedCourseSerializer(), allow_empty=True
     )

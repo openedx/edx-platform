@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-10-09 20:35+0000\n"
-"PO-Revision-Date: 2022-10-09 20:35:07.478495\n"
+"POT-Creation-Date: 2022-10-24 14:17+0000\n"
+"PO-Revision-Date: 2022-10-24 14:17:18.640616\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -12417,6 +12417,15 @@ msgstr "Sdǝɔᴉɟʎ ʍɥǝʇɥǝɹ ʇɥǝ ʌᴉdǝø ɔɐn bǝ ɐɔɔǝssǝd d
 msgid "Public Access"
 msgstr "Ᵽnblᴉɔ Ⱥɔɔǝss"
 
+#: xmodule/video_module/video_xfields.py
+msgid "Add a specific thumbnail for learners to see before playing the video."
+msgstr ""
+"Ⱥdd ɐ sdǝɔᴉɟᴉɔ ʇɥnɯbnɐᴉl ɟøɹ lǝɐɹnǝɹs ʇø sǝǝ bǝɟøɹǝ dlɐʎᴉnƃ ʇɥǝ ʌᴉdǝø."
+
+#: xmodule/video_module/video_xfields.py
+msgid "Thumbnail"
+msgstr "Ŧɥnɯbnɐᴉl"
+
 #: xmodule/word_cloud_module.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
@@ -17416,33 +17425,6 @@ msgstr "Ⱥll Đᴉsɔnssᴉøns"
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Ᵽøsʇs Ɨ'ɯ Følløʍᴉnƃ"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Welcome to the new discussions experience. Please share your feedback."
-msgstr ""
-"Wǝlɔøɯǝ ʇø ʇɥǝ nǝʍ dᴉsɔnssᴉøns ǝxdǝɹᴉǝnɔǝ. Ᵽlǝɐsǝ sɥɐɹǝ ʎønɹ ɟǝǝdbɐɔʞ."
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "View legacy experience"
-msgstr "Vᴉǝʍ lǝƃɐɔʎ ǝxdǝɹᴉǝnɔǝ"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid ""
-"You are currently using the old discussions experience that will be "
-"deprecated soon. If you are facing any issues with the new experience, "
-"please share using the feedback button."
-msgstr ""
-"Ɏøn ɐɹǝ ɔnɹɹǝnʇlʎ nsᴉnƃ ʇɥǝ øld dᴉsɔnssᴉøns ǝxdǝɹᴉǝnɔǝ ʇɥɐʇ ʍᴉll bǝ "
-"dǝdɹǝɔɐʇǝd søøn. Ɨɟ ʎøn ɐɹǝ ɟɐɔᴉnƃ ɐnʎ ᴉssnǝs ʍᴉʇɥ ʇɥǝ nǝʍ ǝxdǝɹᴉǝnɔǝ, "
-"dlǝɐsǝ sɥɐɹǝ nsᴉnƃ ʇɥǝ ɟǝǝdbɐɔʞ bnʇʇøn."
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Switch to new experience"
-msgstr "Sʍᴉʇɔɥ ʇø nǝʍ ǝxdǝɹᴉǝnɔǝ"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Share feedback"
-msgstr "Sɥɐɹǝ ɟǝǝdbɐɔʞ"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html

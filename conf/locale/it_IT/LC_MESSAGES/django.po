@@ -18,7 +18,7 @@
 # Jessica Amoruso <jessica.amoruso123@gmail.com>, 2021
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2017
 # Lorenzo Uscem <loryuscem@hotmail.com>, 2015
-# Mauri Macera, 2021
+# 20bdf6b5822f7ccbe16f09a657dbe357_e29decb, 2021
 # maurimonti <maurimonti@msn.com>, 2014
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2013
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2013
@@ -65,7 +65,7 @@
 # 1a9dfdd8031024850de476b3ae8c1409_e7121ec, 2014
 # Jessica Amoruso <jessica.amoruso123@gmail.com>, 2021
 # kathjal, 2013
-# Mauri Macera, 2021
+# 20bdf6b5822f7ccbe16f09a657dbe357_e29decb, 2021
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2013
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2013
 # marcore <mrc.re@tiscali.it>, 2014
@@ -90,7 +90,7 @@
 # gianmarco <gianmarco.bonavolonta@tlc.uniroma3.it>, 2014
 # de446acfe3933e9efb9fb802ff0b00c1_8cdef0a, 2014
 # kathjal, 2013
-# Mauri Macera, 2021
+# 20bdf6b5822f7ccbe16f09a657dbe357_e29decb, 2021
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2013
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2014
 # Pietro Lombardo <pietrolombardo1979@gmail.com>, 2014-2015
@@ -127,7 +127,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-18 20:43+0000\n"
+"POT-Creation-Date: 2022-10-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2021\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/open-edx/teams/6205/it_IT/)\n"
@@ -12972,6 +12972,14 @@ msgstr "Specifica se gli studenti possono accedere pubblicamente al video."
 msgid "Public Access"
 msgstr "Accesso pubblico"
 
+#: xmodule/video_module/video_xfields.py
+msgid "Add a specific thumbnail for learners to see before playing the video."
+msgstr ""
+
+#: xmodule/video_module/video_xfields.py
+msgid "Thumbnail"
+msgstr ""
+
 #: xmodule/word_cloud_module.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
@@ -18088,34 +18096,6 @@ msgstr "Tutte le discussioni"
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Post che sto seguendo "
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Welcome to the new discussions experience. Please share your feedback."
-msgstr ""
-"Benvenuto nella nuova esperienza di discussione. Per favore condividi il tuo"
-" feedback."
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "View legacy experience"
-msgstr "Visualizza l&#39;esperienza legacy"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid ""
-"You are currently using the old discussions experience that will be "
-"deprecated soon. If you are facing any issues with the new experience, "
-"please share using the feedback button."
-msgstr ""
-"Al momento stai utilizzando la vecchia esperienza di discussione che verrà "
-"presto ritirata. Se riscontri problemi con la nuova esperienza, condividi "
-"utilizzando il pulsante di feedback."
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Switch to new experience"
-msgstr "Passa a una nuova esperienza"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Share feedback"
-msgstr "Condividi feedback"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html

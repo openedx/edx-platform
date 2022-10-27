@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-10-02 20:48+0000\n"
+"POT-Creation-Date: 2022-10-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Mongolian (https://www.transifex.com/open-edx/teams/6205/mn/)\n"
@@ -11175,6 +11175,14 @@ msgstr ""
 msgid "Public Access"
 msgstr ""
 
+#: xmodule/video_module/video_xfields.py
+msgid "Add a specific thumbnail for learners to see before playing the video."
+msgstr ""
+
+#: xmodule/video_module/video_xfields.py
+msgid "Thumbnail"
+msgstr ""
+
 #: lms/templates/annotatable.html lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
 msgstr "Заавар"
@@ -15606,29 +15614,6 @@ msgstr "Бүх хэлэлцүүлэг"
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Миний дагаж байгаа бичлэгүүд"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Welcome to the new discussions experience. Please share your feedback."
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "View legacy experience"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid ""
-"You are currently using the old discussions experience that will be "
-"deprecated soon. If you are facing any issues with the new experience, "
-"please share using the feedback button."
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Switch to new experience"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Share feedback"
-msgstr ""
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
