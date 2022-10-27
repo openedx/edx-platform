@@ -130,10 +130,7 @@ class CourseRunSerializer(serializers.Serializer):
             return f"{ecommerce_payment_page}?sku={verified_sku}"
 
     def get_resumeUrl(self, instance):
-        resumeUrl = self.context.get("resume_course_urls", {}).get(instance.course_id)
-
-        # Return None if missing or empty string
-        return resumeUrl if bool(resumeUrl) else None
+        return self.context.get("resume_course_urls", {}).get(instance.course_id)
 
 
 class CoursewareAccessSerializer(serializers.Serializer):
@@ -492,17 +489,15 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         )
         if pseudo_session:
             course_key = CourseKey.from_string(pseudo_session["key"])
-            return self.context.get("pseudo_session_course_overviews").get(
-                course_key
-            )
+            return self.context.get("pseudo_session_course_overviews").get(course_key)
 
     def get_course(self, instance):
-        """ Serialize course info from a course overview """
+        """Serialize course info from a course overview"""
         course_overview = self._get_course_overview(instance)
         return CourseSerializer(course_overview, context=self.context).data
 
     def get_courseProvider(self, instance):
-        """ Serialize course provider info from a course overview """
+        """Serialize course provider info from a course overview"""
         course_overview = self._get_course_overview(instance)
         return CourseProviderSerializer(course_overview, allow_null=True).data
 
