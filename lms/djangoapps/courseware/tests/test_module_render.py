@@ -2067,8 +2067,11 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
         """
         original_usage_key = UsageKey.from_string('block-v1:A+B+C+type@problem+block@abcd1234')
         original_usage_version = ObjectId()
-        mock_get_original_usage = lambda _, key: (original_usage_key, original_usage_version)
-        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_block_original_usage', mock_get_original_usage):
+
+        def _mock_get_original_usage(_, __):
+            return original_usage_key, original_usage_version
+
+        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_block_original_usage', _mock_get_original_usage):
             module_info = self.handle_callback_and_get_module_info(mock_tracker)
             assert 'original_usage_key' in module_info
             assert module_info['original_usage_key'] == str(original_usage_key)

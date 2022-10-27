@@ -83,7 +83,7 @@ class TestCourseListing(ModuleStoreTestCase):
         Reverse the setup
         """
         self.client.logout()
-        ModuleStoreTestCase.tearDown(self)
+        ModuleStoreTestCase.tearDown(self)  # pylint: disable=non-parent-method-called
 
     def test_rerun(self):
         """

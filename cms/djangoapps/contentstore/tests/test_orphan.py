@@ -104,7 +104,7 @@ class TestOrphan(TestOrphanBase):
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 5, 3),
-        (ModuleStoreEnum.Type.mongo, 34, 12),
+        (ModuleStoreEnum.Type.mongo, 34, 11),
     )
     @ddt.unpack
     def test_delete_orphans(self, default_store, max_mongo_calls, min_mongo_calls):

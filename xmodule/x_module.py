@@ -86,9 +86,11 @@ DEFAULT_PUBLIC_VIEW_MESSAGE = (
     'Sign in or register, and enroll in this course to view it.'
 )
 
+
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
-_ = lambda text: text
+def _(text):
+    return text
 
 
 class OpaqueKeyReader(IdReader):
@@ -1800,7 +1802,7 @@ class CombinedSystem:
 
         """
         context = context or {}
-        return self.__getattr__('render')(block, view_name, context)
+        return self.__getattr__('render')(block, view_name, context)  # pylint: disable=unnecessary-dunder-call
 
     def service(self, block, service_name):
         """Return a service, or None.

@@ -39,8 +39,6 @@ class TestCatalogInfoSignal(ModuleStoreTestCase):
                 end=None,
                 enrollment_start=None,
                 enrollment_end=None),
-            short_description=None,
-            effort=None,
             hidden=False,
             invitation_only=False
         )

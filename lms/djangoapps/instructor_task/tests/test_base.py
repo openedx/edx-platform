@@ -377,15 +377,13 @@ class TestReportMixin:
         """
         csv data may contain numeric values that are converted to strings, and fractional
         numbers can be imprecise (e.g. 1 / 6 is sometimes '0.16666666666666666' and other times
-        '0.166666666667').  This function mutates the provided input (sorry) and returns
-        a new dictionary that contains only the numerically-valued items from it, rounded
-        to four decimal places.
+        '0.166666666667'). This function returns a new dictionary that contains only the
+        numerically-valued items from it, rounded to four decimal places.
         """
         extracted = {}
         for key in list(dictionary):
             try:
-                float(dictionary[key])
-                extracted[key] = round(float(dictionary.pop(key)), 4)
+                extracted[key] = round(float(dictionary[key]), 4)
             except ValueError:
                 pass
         return extracted

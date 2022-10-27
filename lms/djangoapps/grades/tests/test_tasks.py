@@ -153,8 +153,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             assert mock_block_structure_create.call_count == 1
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 41, True),
-        (ModuleStoreEnum.Type.mongo, 1, 41, False),
+        (ModuleStoreEnum.Type.mongo, 2, 41, True),
+        (ModuleStoreEnum.Type.mongo, 2, 41, False),
         (ModuleStoreEnum.Type.split, 2, 41, True),
         (ModuleStoreEnum.Type.split, 2, 41, False),
     )
@@ -167,7 +167,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 41),
+        (ModuleStoreEnum.Type.mongo, 2, 41),
         (ModuleStoreEnum.Type.split, 2, 41),
     )
     @ddt.unpack
@@ -213,7 +213,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 41),
+        (ModuleStoreEnum.Type.mongo, 2, 41),
         (ModuleStoreEnum.Type.split, 2, 41),
     )
     @ddt.unpack
