@@ -21,6 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -2830,7 +2831,8 @@ class UpdateThreadTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_abuse_flagged(self, old_flagged, new_flagged):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_abuse_flagged(self, old_flagged, new_flagged, mock_emit):
         """
         Test attempts to edit the "abuse_flagged" field.
 
@@ -2857,12 +2859,33 @@ class UpdateThreadTest(
             assert httpretty.last_request().method == 'PUT'
             assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
 
+            expected_event_name = 'edx.forum.thread.reported' if new_flagged else 'edx.forum.thread.unreported'
+            expected_event_data = {
+                'body': 'Original body',
+                'id': 'test_thread',
+                'content_type': 'Post',
+                'commentable_id': 'original_topic',
+                'url': '',
+                'user_course_roles': [],
+                'user_forums_roles': [FORUM_ROLE_STUDENT],
+                'target_username': self.user.username,
+                'title_truncated': False,
+                'title': 'Original Title',
+            }
+            if not new_flagged:
+                expected_event_data['reported_status_cleared'] = False
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
+
     @ddt.data(
         (False, True),
         (True, True),
     )
     @ddt.unpack
-    def test_thread_un_abuse_flag_for_moderator_role(self, is_author, remove_all):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_thread_un_abuse_flag_for_moderator_role(self, is_author, remove_all, mock_emit):
         """
         Test un-abuse flag for moderator role.
 
@@ -2882,6 +2905,25 @@ class UpdateThreadTest(
         if remove_all:
             query_params.update({'all': ['True']})
         assert parsed_body(httpretty.last_request()) == query_params
+
+        expected_event_name = 'edx.forum.thread.unreported'
+        expected_event_data = {
+            'body': 'Original body',
+            'id': 'test_thread',
+            'content_type': 'Post',
+            'commentable_id': 'original_topic',
+            'url': '',
+            'user_course_roles': [],
+            'user_forums_roles': [FORUM_ROLE_STUDENT, FORUM_ROLE_ADMINISTRATOR],
+            'target_username': self.user.username,
+            'title_truncated': False,
+            'title': 'Original Title',
+            'reported_status_cleared': False,
+        }
+
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
 
     def test_invalid_field(self):
         self.register_thread()
@@ -3356,7 +3398,8 @@ class UpdateCommentTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_abuse_flagged(self, old_flagged, new_flagged):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_abuse_flagged(self, old_flagged, new_flagged, mock_emit):
         """
         Test attempts to edit the "abuse_flagged" field.
 
@@ -3383,12 +3426,31 @@ class UpdateCommentTest(
             assert httpretty.last_request().method == 'PUT'
             assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
 
+            expected_event_name = 'edx.forum.response.reported' if new_flagged else 'edx.forum.response.unreported'
+            expected_event_data = {
+                'body': 'Original body',
+                'id': 'test_comment',
+                'content_type': 'Response',
+                'commentable_id': 'dummy',
+                'url': '',
+                'user_course_roles': [],
+                'user_forums_roles': [FORUM_ROLE_STUDENT],
+                'target_username': self.user.username,
+            }
+            if not new_flagged:
+                expected_event_data['reported_status_cleared'] = False
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
+
     @ddt.data(
         (False, True),
         (True, True),
     )
     @ddt.unpack
-    def test_comment_un_abuse_flag_for_moderator_role(self, is_author, remove_all):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_comment_un_abuse_flag_for_moderator_role(self, is_author, remove_all, mock_emit):
         """
         Test un-abuse flag for moderator role.
 
@@ -3408,6 +3470,23 @@ class UpdateCommentTest(
         if remove_all:
             query_params.update({'all': ['True']})
         assert parsed_body(httpretty.last_request()) == query_params
+
+        expected_event_name = 'edx.forum.response.unreported'
+        expected_event_data = {
+            'body': 'Original body',
+            'id': 'test_comment',
+            'content_type': 'Response',
+            'commentable_id': 'dummy',
+            'url': '',
+            'user_course_roles': [],
+            'user_forums_roles': [FORUM_ROLE_STUDENT, FORUM_ROLE_ADMINISTRATOR],
+            'target_username': self.user.username,
+            'reported_status_cleared': False,
+        }
+
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
 
     @ddt.data(
         FORUM_ROLE_ADMINISTRATOR,
