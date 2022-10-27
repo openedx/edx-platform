@@ -245,9 +245,20 @@ module.exports = Merge.smart({
                 {
                     test: /\.(js|jsx)$/,
                     include: [
-                        /paragon/
+                        /paragon/,
+                        /paragon-new/,
                     ],
-                    use: 'babel-loader'
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                ['@babel/preset-env', {
+                                    targets: 'defaults',
+                                }],
+                                '@babel/preset-react',
+                            ],
+                        },
+                    }
                 },
                 {
                     test: path.resolve(__dirname, 'common/static/js/src/ajax_prefix.js'),

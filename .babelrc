@@ -2,6 +2,7 @@
     "plugins": [
       "@babel/transform-object-assign",
       "@babel/plugin-proposal-object-rest-spread",
+      "@babel/plugin-proposal-optional-chaining"
     ],
     "presets": [
       "@babel/react",
