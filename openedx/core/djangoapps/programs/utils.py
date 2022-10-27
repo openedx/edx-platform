@@ -392,7 +392,7 @@ class ProgramProgressMeter:
                         certificate
                     )
                     earliest_course_run_date = min(
-                        [date for date in [available_date, earliest_course_run_date] if date]
+                        date for date in [available_date, earliest_course_run_date] if date
                     )
 
             # If we're missing a cert for a course, the program isn't completed and we should just bail now
@@ -400,7 +400,7 @@ class ProgramProgressMeter:
                 return None
 
             # Keep the catalog course date if it's the latest one
-            program_available_date = max([date for date in [earliest_course_run_date, program_available_date] if date])
+            program_available_date = max(date for date in [earliest_course_run_date, program_available_date] if date)
 
         return program_available_date
 
