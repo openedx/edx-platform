@@ -6,6 +6,8 @@
 #
 -e git+https://github.com/openedx/blockstore.git@1.2.4#egg=blockstore==1.2.4
     # via -r requirements/edx/base.txt
+-e git+https://github.com/openedx/codejail.git@3.1.3#egg=codejail==3.1.3
+    # via -r requirements/edx/base.txt
 -e git+https://github.com/openedx/django-wiki.git@1.1.1#egg=django-wiki
     # via -r requirements/edx/base.txt
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
@@ -539,8 +541,6 @@ edx-celeryutils==1.2.1
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
     #   super-csv
-edx-codejail==3.3.1
-    # via -r requirements/edx/base.txt
 edx-completion==4.2.0
     # via -r requirements/edx/base.txt
 edx-django-release-util==1.2.0
@@ -1151,6 +1151,7 @@ pytest==7.2.0
     #   pytest-attrib
     #   pytest-cov
     #   pytest-django
+    #   pytest-forked
     #   pytest-json-report
     #   pytest-metadata
     #   pytest-randomly
@@ -1161,6 +1162,8 @@ pytest-cov==4.0.0
     # via -r requirements/edx/testing.in
 pytest-django==4.5.2
     # via -r requirements/edx/testing.in
+pytest-forked==1.4.0
+    # via pytest-xdist
 pytest-json-report==1.5.0
     # via -r requirements/edx/testing.in
 pytest-metadata==1.8.0
@@ -1169,7 +1172,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.12.0
     # via -r requirements/edx/testing.in
-pytest-xdist[psutil]==3.0.2
+pytest-xdist[psutil]==2.5.0
     # via -r requirements/edx/testing.in
 python-dateutil==2.8.2
     # via
@@ -1334,12 +1337,12 @@ six==1.16.0
     #   bok-choy
     #   chem
     #   click-repl
+    #   codejail
     #   codejail-includes
     #   crowdsourcehinter-xblock
     #   edx-ace
     #   edx-auth-backends
     #   edx-ccx-keys
-    #   edx-codejail
     #   edx-django-release-util
     #   edx-drf-extensions
     #   edx-lint
@@ -1441,12 +1444,12 @@ tomli==2.0.1
     #   pylint
     #   pytest
     #   tox
-tox==3.27.0
+tomlkit==0.11.5
+    # via pylint
+tox==3.26.0
     # via
     #   -r requirements/edx/testing.in
     #   tox-battery
-tomlkit==0.11.5
-    # via pylint
 tox-battery==0.6.1
     # via -r requirements/edx/testing.in
 tqdm==4.64.1
@@ -1494,7 +1497,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.16.6
+virtualenv==20.16.5
     # via tox
 voluptuous==0.13.1
     # via
