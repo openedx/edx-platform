@@ -8,6 +8,7 @@ from unittest.mock import Mock, PropertyMock, patch
 
 import ddt
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -2199,6 +2200,15 @@ class TestComponentHandler(TestCase):
 
         self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                          status_code)
+
+    def test_submit_studio_edits_checks_author_permission(self):
+        with self.assertRaises(PermissionDenied):
+            with patch(
+                'common.djangoapps.student.auth.has_course_author_access',
+                return_value=False
+            ) as mocked_has_course_author_access:
+                component_handler(self.request, self.usage_key_string, 'submit_studio_edits')
+                assert mocked_has_course_author_access.called is True
 
     @ddt.data((True, True), (False, False),)
     @ddt.unpack
