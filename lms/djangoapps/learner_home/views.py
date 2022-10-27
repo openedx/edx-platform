@@ -29,7 +29,7 @@ from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import marketing_link
-from common.djangoapps.student.helpers import cert_info, get_resume_urls_for_enrollments
+from common.djangoapps.student.helpers import cert_info
 from common.djangoapps.student.models import (
     CourseEnrollment,
     get_user_by_username_or_email,
