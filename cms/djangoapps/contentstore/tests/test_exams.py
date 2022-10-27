@@ -11,7 +11,7 @@ from pytz import UTC
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
@@ -23,7 +23,7 @@ class TestExamService(ModuleStoreTestCase):
     """
     Test for syncing exams to the exam service
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """
@@ -68,6 +68,7 @@ class TestExamService(ModuleStoreTestCase):
         When a course is published it will register all exams sections with the exams service
         """
         default_time_limit_minutes = 10
+        due_date = datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1)
 
         sequence = ItemFactory.create(
             parent=self.chapter,
@@ -76,9 +77,9 @@ class TestExamService(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=default_time_limit_minutes,
-            is_proctored_exam=is_proctored_exam,
+            is_proctored_enabled=is_proctored_exam,
             is_practice_exam=is_practice_exam,
-            due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1),
+            due=due_date,
             hide_after_due=True,
             is_onboarding_exam=is_onboarding_exam,
         )
@@ -88,7 +89,7 @@ class TestExamService(ModuleStoreTestCase):
             'content_id': str(sequence.location),
             'exam_name': sequence.display_name,
             'time_limit_mins': sequence.default_time_limit_minutes,
-            'due_date': sequence.due,
+            'due_date': due_date,
             'exam_type': expected_type,
             'is_active': True,
             'hide_after_due': True,
@@ -117,7 +118,7 @@ class TestExamService(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_exam=True,
+            is_proctored_enabled=True,
             hide_after_due=False,
         )
         self.store.delete_item(self.chapter.location, self.user.id)
@@ -137,7 +138,7 @@ class TestExamService(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_exam=True,
+            is_proctored_enabled=True,
             hide_after_due=False,
         )
 
@@ -154,7 +155,7 @@ class TestExamService(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=60,
-            is_proctored_exam=False,
+            is_proctored_enabled=False,
             is_practice_exam=False,
             due=datetime.now(UTC) + timedelta(minutes=60),
             hide_after_due=True,
