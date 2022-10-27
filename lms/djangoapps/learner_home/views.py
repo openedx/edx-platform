@@ -8,6 +8,7 @@ from time import time
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import MultipleObjectsReturned
+from django.urls import reverse
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from common.djangoapps.util.course import (
