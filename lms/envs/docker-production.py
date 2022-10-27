@@ -2,6 +2,7 @@
 Specific overrides to the base prod settings for a docker production deployment.
 """
 
+from logging.handlers import SysLogHandler
 import platform
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -48,12 +49,24 @@ def get_docker_logger_config(log_dir='/var/tmp',
                 'formatter': 'standard',
                 'stream': sys.stdout,
             },
+            'tracking': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.SysLogHandler',
+                'address': ('localhost', 5140),
+                'facility': SysLogHandler.LOG_LOCAL1,
+                'formatter': 'raw',
+            }
         },
         'loggers': {
             'django': {
                 'handlers': handlers,
                 'propagate': True,
                 'level': 'INFO'
+            },
+            'tracking': {
+                'handlers': ['tracking'],
+                'level': 'DEBUG',
+                'propagate': False,
             },
             'requests': {
                 'handlers': handlers,
