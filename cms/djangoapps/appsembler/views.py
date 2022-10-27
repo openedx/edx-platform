@@ -9,6 +9,9 @@ See the LoginView class docstring for details on this class
 import logging
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LogoutView as DjangoLogoutView
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import HttpResponseServerError
 from django.shortcuts import redirect
@@ -18,7 +21,11 @@ from django.utils.translation import ugettext as _
 from django.views import View
 from django.views.decorators.clickjacking import xframe_options_deny
 from django.views.decorators.csrf import csrf_protect
-from tahoe_sites.api import deprecated_get_admin_users_queryset_by_email
+from tahoe_sites.api import (
+    deprecated_get_admin_users_queryset_by_email,
+    get_organization_for_user,
+    get_site_by_organization,
+)
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
@@ -274,3 +281,39 @@ class LoginView(View):
     def render_login_page_with_error(self, error_code):
         return render_login_page(
             login_error_message=self.error_messages[error_code])
+
+
+def get_logout_redirect_url(request):
+    """
+    Return logout redirect url using the site related to the given user if possible.
+    Otherwise, return settings.LOGOUT_REDIRECT_URL
+
+    :return: logout redirect url or settings.LOGOUT_REDIRECT_URL
+    """
+    user = getattr(request, 'user', None)
+    if not user or not user.is_authenticated:
+        return reverse(settings.LOGOUT_REDIRECT_URL)
+
+    try:
+        organization = get_organization_for_user(user=user)
+    except ObjectDoesNotExist:
+        return reverse(settings.LOGOUT_REDIRECT_URL)
+    site = get_site_by_organization(organization=organization)
+
+    return '{protocol}://{site_domain}/logout'.format(
+        protocol='https' if request.is_secure() else 'http',
+        site_domain=site.domain
+    )
+
+
+class StudioLogoutView(View):
+    """
+    Studio Logout View
+    """
+    @method_decorator(csrf_protect)
+    @method_decorator(login_required)
+    def get(self, request):
+        """
+        Perform logout from studio, and redirect to LMS home page
+        """
+        return DjangoLogoutView.as_view(next_page=get_logout_redirect_url(request))(request)
