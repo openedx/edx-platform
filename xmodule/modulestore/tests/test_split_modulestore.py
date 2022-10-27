@@ -1308,9 +1308,9 @@ class TestItemCrud(SplitModuleTest):
                 )
 
             # add new child to old parent in continued (leave off version_guid)
-            course_module_locator = new_course.location.version_agnostic()
+            course_block_locator = new_course.location.version_agnostic()
             new_ele = modulestore().create_child(
-                user, course_module_locator, 'chapter',
+                user, course_block_locator, 'chapter',
                 fields={'display_name': 'chapter 4'},
             )
             assert new_ele.update_version != course_block_update_version

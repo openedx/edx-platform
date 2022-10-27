@@ -348,7 +348,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         # check for policy.json
         self.assertTrue(filesystem.exists('policy.json'))
 
-        # compare what's on disk to what we have in the course module
+        # compare what's on disk to what we have in the course block
         with filesystem.open('policy.json', 'r') as course_policy:
             on_disk = loads(course_policy.read())
             self.assertIn('course/2012_Fall', on_disk)
@@ -1195,8 +1195,8 @@ class ContentStoreTest(ContentStoreTestCase):
         """Test new course creation and verify default language"""
         test_course_data = self.assert_created_course()
         course_id = _get_course_id(self.store, test_course_data)
-        course_module = self.store.get_course(course_id)
-        self.assertEqual(course_module.language, 'hr')
+        course_block = self.store.get_course(course_id)
+        self.assertEqual(course_block.language, 'hr')
 
     def test_create_course_with_dots(self):
         """Test new course creation with dots in the name"""
@@ -1617,12 +1617,12 @@ class ContentStoreTest(ContentStoreTestCase):
         #
 
         # first check PDF textbooks, to make sure the url paths got updated
-        course_module = self.store.get_course(target_id)
+        course_block = self.store.get_course(target_id)
 
-        self.assertEqual(len(course_module.pdf_textbooks), 1)
-        self.assertEqual(len(course_module.pdf_textbooks[0]["chapters"]), 2)
-        self.assertEqual(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/static/Chapter1.pdf')
-        self.assertEqual(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/static/Chapter2.pdf')
+        self.assertEqual(len(course_block.pdf_textbooks), 1)
+        self.assertEqual(len(course_block.pdf_textbooks[0]["chapters"]), 2)
+        self.assertEqual(course_block.pdf_textbooks[0]["chapters"][0]["url"], '/static/Chapter1.pdf')
+        self.assertEqual(course_block.pdf_textbooks[0]["chapters"][1]["url"], '/static/Chapter2.pdf')
 
     def test_import_into_new_course_id_wiki_slug_renamespacing(self):
         # If reimporting into the same course do not change the wiki_slug.
@@ -1634,14 +1634,14 @@ class ContentStoreTest(ContentStoreTestCase):
             'run': target_id.run
         }
         _create_course(self, target_id, course_data)
-        course_module = self.store.get_course(target_id)
-        course_module.wiki_slug = 'toy'
-        course_module.save()
+        course_block = self.store.get_course(target_id)
+        course_block.wiki_slug = 'toy'
+        course_block.save()
 
         # Import a course with wiki_slug == location.course
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], target_id=target_id)
-        course_module = self.store.get_course(target_id)
-        self.assertEqual(course_module.wiki_slug, 'toy')
+        course_block = self.store.get_course(target_id)
+        self.assertEqual(course_block.wiki_slug, 'toy')
 
         # But change the wiki_slug if it is a different course.
         target_id = self.store.make_course_key('MITx', '111', '2013_Spring')
@@ -1655,13 +1655,13 @@ class ContentStoreTest(ContentStoreTestCase):
 
         # Import a course with wiki_slug == location.course
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], target_id=target_id)
-        course_module = self.store.get_course(target_id)
-        self.assertEqual(course_module.wiki_slug, 'MITx.111.2013_Spring')
+        course_block = self.store.get_course(target_id)
+        self.assertEqual(course_block.wiki_slug, 'MITx.111.2013_Spring')
 
         # Now try importing a course with wiki_slug == '{0}.{1}.{2}'.format(location.org, location.course, location.run)
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['two_toys'], target_id=target_id)
-        course_module = self.store.get_course(target_id)
-        self.assertEqual(course_module.wiki_slug, 'MITx.111.2013_Spring')
+        course_block = self.store.get_course(target_id)
+        self.assertEqual(course_block.wiki_slug, 'MITx.111.2013_Spring')
 
     def test_import_metadata_with_attempts_empty_string(self):
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['simple'], create_if_not_present=True)
@@ -1797,8 +1797,8 @@ class ContentStoreTest(ContentStoreTestCase):
 
         course_key = _get_course_id(self.store, self.course_data)
         _create_course(self, course_key, self.course_data)
-        course_module = self.store.get_course(course_key)
-        self.assertEqual(course_module.wiki_slug, 'MITx.111.2013_Spring')
+        course_block = self.store.get_course(course_key)
+        self.assertEqual(course_block.wiki_slug, 'MITx.111.2013_Spring')
 
     def test_course_handler_with_invalid_course_key_string(self):
         """Test viewing the course overview page with invalid course id"""

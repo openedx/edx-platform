@@ -168,10 +168,10 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
         with self.store.bulk_operations(self.course_key):
             self._create_chapter(highlights=['Test highlight'])
 
-        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course module .* not found'):
+        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course block .* not found'):
             get_week_highlights(self.user, self.course_key, 1)
 
         yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
         today = datetime.datetime.utcnow()
-        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course module .* not found'):
+        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course block .* not found'):
             get_next_section_highlights(self.user, self.course_key, yesterday, today.date())

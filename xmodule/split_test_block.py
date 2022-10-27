@@ -712,9 +712,9 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'get_course'), \
             "modulestore has to be available"
 
-        course_module = self.system.modulestore.get_course(self.location.course_key)
+        course_block = self.system.modulestore.get_course(self.location.course_key)
         group_configuration_url = None
-        if 'split_test' in course_module.advanced_modules:
+        if 'split_test' in course_block.advanced_modules:
             user_partition = self.get_selected_partition()
             if user_partition:
                 group_configuration_url = "{url}#{configuration_id}".format(

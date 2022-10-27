@@ -979,7 +979,7 @@ def _delete_item(usage_key, user):
     store = modulestore()
 
     with store.bulk_operations(usage_key.course_key):
-        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course block, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if usage_key.block_type == 'static_tab':
@@ -1105,7 +1105,7 @@ def _get_gating_info(course, xblock):
     info = {}
     if xblock.category == 'sequential' and course.enable_subsection_gating:
         if not hasattr(course, 'gating_prerequisites'):
-            # Cache gating prerequisites on course module so that we are not
+            # Cache gating prerequisites on course block so that we are not
             # hitting the database for every xblock in the course
             course.gating_prerequisites = gating_api.get_prerequisites(course.id)
         info["is_prereq"] = gating_api.is_prerequisite(course.id, xblock.location)

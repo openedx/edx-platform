@@ -1,4 +1,4 @@
-"""Tests the course modules and their functions"""
+"""Tests the course blocks and their functions"""
 
 
 import itertools

@@ -408,7 +408,7 @@ def get_internal_endpoint(path=""):
     return get_endpoint(settings.EDXNOTES_INTERNAL_API, path)
 
 
-def get_course_position(course_module):
+def get_course_position(course_block):
     """
     Return the user's current place in the course.
 
@@ -418,14 +418,14 @@ def get_course_position(course_module):
     If there is no current position in the course or chapter, then selects
     the first child.
     """
-    urlargs = {'course_id': str(course_module.id)}
-    chapter = get_current_child(course_module, min_depth=1)
+    urlargs = {'course_id': str(course_block.id)}
+    chapter = get_current_child(course_block, min_depth=1)
     if chapter is None:
         log.debug("No chapter found when loading current position in course")
         return None
 
     urlargs['chapter'] = chapter.url_name
-    if course_module.position is not None:
+    if course_block.position is not None:
         return {
             'display_name': Text(chapter.display_name_with_default),
             'url': reverse('courseware_chapter', kwargs=urlargs),

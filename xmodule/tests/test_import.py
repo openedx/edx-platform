@@ -288,7 +288,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         # pylint: disable=protected-access
         assert original_unwrapped is not descriptor._unwrapped_field_data
         compute_inherited_metadata(descriptor)
-        # Check the course module, since it has inheritance
+        # Check the course block, since it has inheritance
         descriptor = descriptor.get_children()[0]
         self.course_descriptor_inheritance_check(descriptor, from_date_string, unicorn_color)
 

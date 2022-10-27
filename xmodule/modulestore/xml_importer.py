@@ -342,7 +342,7 @@ class ImportManager:
         # No matter what do_import_static is, import "static_import" directory.
         # This is needed because the "about" pages (eg "overview") are
         # loaded via load_extra_content, and do not inherit the lms
-        # metadata from the course module, and thus do not get
+        # metadata from the course block, and thus do not get
         # "static_content_store" properly defined. Static content
         # referenced in those extra pages thus need to come through the
         # c4x:// contentstore, unfortunately. Tell users to copy that
@@ -411,8 +411,8 @@ class ImportManager:
         if self.verbose:
             log.debug("Scanning %s for courselike module...", courselike_key)
 
-        # Quick scan to get course module as we need some info from there.
-        # Also we need to make sure that the course module is committed
+        # Quick scan to get course block as we need some info from there.
+        # Also we need to make sure that the course block is committed
         # first into the store
         course_data_path = path(self.data_dir) / source_courselike.data_dir
 
@@ -589,7 +589,7 @@ class CourseImportManager(ImportManager):
         from the temporary modulestore.
         """
         source_course = self.xml_module_store.get_course(courselike_key)
-        # STEP 1: find and import course module
+        # STEP 1: find and import course block
         course, course_data_path = self.import_courselike(
             runtime, courselike_key, dest_id, source_course,
         )

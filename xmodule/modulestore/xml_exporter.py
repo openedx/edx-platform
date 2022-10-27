@@ -325,7 +325,7 @@ class LibraryExportManager(ExportManager):
 
     def post_process(self, root, export_fs):
         """
-        Because Libraries are XBlocks, they aren't exported in the same way Course Modules
+        Because Libraries are XBlocks, they aren't exported in the same way Course Blocks
         are, but instead use the standard XBlock serializers. Accordingly, we need to
         create our own index file to act as the equivalent to the root course.xml file,
         called library.xml.

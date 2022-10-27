@@ -152,17 +152,17 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     NOTE: assumes that if we got this far, user has access to course.  Returns
     None if this is not the case.
 
-    field_data_cache must include data from the course module and 2 levels of its descendants
+    field_data_cache must include data from the course blocks and 2 levels of its descendants
     '''
     with modulestore().bulk_operations(course.id):
-        course_module = get_module_for_descriptor(
+        course_block = get_module_for_descriptor(
             user, request, course, field_data_cache, course.id, course=course
         )
-        if course_module is None:
+        if course_block is None:
             return None, None, None
 
         toc_chapters = []
-        chapters = course_module.get_display_items()
+        chapters = course_block.get_display_items()
 
         # Check for content which needs to be completed
         # before the rest of the content is made available

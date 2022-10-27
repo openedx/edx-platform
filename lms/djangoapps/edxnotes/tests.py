@@ -816,25 +816,25 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Returns `None` if no chapter found.
         """
-        mock_course_module = MagicMock()
-        mock_course_module.position = 3
-        mock_course_module.get_display_items.return_value = []
-        assert helpers.get_course_position(mock_course_module) is None
+        mock_course_block = MagicMock()
+        mock_course_block.position = 3
+        mock_course_block.get_display_items.return_value = []
+        assert helpers.get_course_position(mock_course_block) is None
 
     def test_get_course_position_to_chapter(self):
         """
         Returns a position that leads to COURSE/CHAPTER if this isn't the users's
         first time.
         """
-        mock_course_module = MagicMock(id=self.course.id, position=3)
+        mock_course_block = MagicMock(id=self.course.id, position=3)
 
         mock_chapter = MagicMock()
         mock_chapter.url_name = 'chapter_url_name'
         mock_chapter.display_name_with_default = 'Test Chapter Display Name'
 
-        mock_course_module.get_display_items.return_value = [mock_chapter]
+        mock_course_block.get_display_items.return_value = [mock_chapter]
 
-        assert helpers.get_course_position(mock_course_module) == {
+        assert helpers.get_course_position(mock_course_block) == {
             'display_name': 'Test Chapter Display Name',
             'url': f'/courses/{self.course.id}/courseware/chapter_url_name/',
         }
@@ -843,20 +843,20 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Returns `None` if no section found.
         """
-        mock_course_module = MagicMock(id=self.course.id, position=None)
-        mock_course_module.get_display_items.return_value = [MagicMock()]
-        assert helpers.get_course_position(mock_course_module) is None
+        mock_course_block = MagicMock(id=self.course.id, position=None)
+        mock_course_block.get_display_items.return_value = [MagicMock()]
+        assert helpers.get_course_position(mock_course_block) is None
 
     def test_get_course_position_to_section(self):
         """
         Returns a position that leads to COURSE/CHAPTER/SECTION if this is the
         user's first time.
         """
-        mock_course_module = MagicMock(id=self.course.id, position=None)
+        mock_course_block = MagicMock(id=self.course.id, position=None)
 
         mock_chapter = MagicMock()
         mock_chapter.url_name = 'chapter_url_name'
-        mock_course_module.get_display_items.return_value = [mock_chapter]
+        mock_course_block.get_display_items.return_value = [mock_chapter]
 
         mock_section = MagicMock()
         mock_section.url_name = 'section_url_name'
@@ -865,7 +865,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         mock_chapter.get_display_items.return_value = [mock_section]
         mock_section.get_display_items.return_value = [MagicMock()]
 
-        assert helpers.get_course_position(mock_course_module) == {
+        assert helpers.get_course_position(mock_course_block) == {
             'display_name': 'Test Section Display Name',
             'url': f'/courses/{self.course.id}/courseware/chapter_url_name/section_url_name/',
         }
@@ -956,9 +956,9 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         self.get_token_url = reverse("get_token", args=[str(self.course.id)])  # lint-amnesty, pylint: disable=no-member
         self.visibility_url = reverse("edxnotes_visibility", args=[str(self.course.id)])  # lint-amnesty, pylint: disable=no-member
 
-    def _get_course_module(self):
+    def _get_course_block(self):
         """
-        Returns the course module.
+        Returns the course block.
         """
         field_data_cache = FieldDataCache([self.course], self.course.id, self.user)  # lint-amnesty, pylint: disable=no-member
         return get_module_for_descriptor(
@@ -1099,8 +1099,8 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
             content_type="application/json",
         )
         assert response.status_code == 200
-        course_module = self._get_course_module()
-        assert not course_module.edxnotes_visibility
+        course_block = self._get_course_block()
+        assert not course_block.edxnotes_visibility
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_visibility_if_feature_is_disabled(self):

@@ -11,7 +11,7 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.randomize_block import RandomizeBlock
 from xmodule.tests import get_test_system
 
-from .test_course_module import DummySystem as TestImportSystem
+from .test_course_block import DummySystem as TestImportSystem
 
 
 class RandomizeBlockTest(MixedSplitTestCase):

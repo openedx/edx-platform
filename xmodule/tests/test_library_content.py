@@ -24,7 +24,7 @@ from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
 from xmodule.capa_block import ProblemBlock
 
-from .test_course_module import DummySystem as TestImportSystem
+from .test_course_block import DummySystem as TestImportSystem
 
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
@@ -54,7 +54,7 @@ class LibraryContentTest(MixedSplitTestCase):
             source_library_id=str(self.library.location.library_key)
         )
 
-    def _bind_course_module(self, module):
+    def _bind_course_block(self, module):
         """
         Bind a module (part of self.course) so we can access student-specific data.
         """
@@ -219,7 +219,7 @@ class LibraryContentBlockTestMixin:
         """
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
         # Make sure the runtime knows that the block's children vary per-user:
         assert self.lc_block.has_dynamic_children()
 
@@ -360,7 +360,7 @@ class LibraryContentBlockTestMixin:
 
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
 
         # Eventually, we should see every child block selected
         while len(blocks_seen) != len(self.lib_blocks):
@@ -475,7 +475,7 @@ class TestLibraryContentRender(LibraryContentTest):
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == len(self.lib_blocks)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
         rendered = self.lc_block.render(AUTHOR_VIEW, {'root_xblock': self.lc_block})
         assert 'Hello world from block 1' in rendered.content
 
@@ -484,7 +484,7 @@ class TestLibraryContentRender(LibraryContentTest):
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == len(self.lib_blocks)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
         rendered = self.lc_block.render(AUTHOR_VIEW, {})
         assert '' == rendered.content
         # content should be empty
@@ -502,7 +502,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.publisher = Mock()
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
         self.lc_block.xmodule_runtime.publish = self.publisher
 
     def _assert_event_was_published(self, event_type):
@@ -556,7 +556,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.store.publish(self.course.location, self.user_id)
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
             self.lc_block = self.store.get_item(self.lc_block.location)
-            self._bind_course_module(self.lc_block)
+            self._bind_course_block(self.lc_block)
             self.lc_block.xmodule_runtime.publish = self.publisher
             self.test_assigned_event()
 
@@ -575,7 +575,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
 
         # Reload lc_block and set it up for a student:
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
         self.lc_block.xmodule_runtime.publish = self.publisher
 
         # Get the keys of each of our blocks, as they appear in the course:

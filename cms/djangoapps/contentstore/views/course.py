@@ -149,13 +149,13 @@ class AccessListFallback(Exception):
 
 def get_course_and_check_access(course_key, user, depth=0):
     """
-    Function used to calculate and return the locator and course module
+    Function used to calculate and return the locator and course block
     for the view functions in this file.
     """
     if not has_studio_read_access(user, course_key):
         raise PermissionDenied()
-    course_module = modulestore().get_course(course_key, depth=depth)
-    return course_module
+    course_block = modulestore().get_course(course_key, depth=depth)
+    return course_block
 
 
 def reindex_course_and_check_access(course_key, user):
@@ -285,8 +285,8 @@ def course_handler(request, course_key_string=None):
             if request.method == 'GET':
                 course_key = CourseKey.from_string(course_key_string)
                 with modulestore().bulk_operations(course_key):
-                    course_module = get_course_and_check_access(course_key, request.user, depth=None)
-                    return JsonResponse(_course_outline_json(request, course_module))
+                    course_block = get_course_and_check_access(course_key, request.user, depth=None)
+                    return JsonResponse(_course_outline_json(request, course_block))
             elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
                 return _create_or_rerun_course(request)
             elif not has_studio_write_access(request.user, CourseKey.from_string(course_key_string)):
@@ -322,11 +322,11 @@ def course_rerun_handler(request, course_key_string):
         raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_module = get_course_and_check_access(course_key, request.user, depth=3)
+        course_block = get_course_and_check_access(course_key, request.user, depth=3)
         if request.method == 'GET':
             return render_to_response('course-create-rerun.html', {
                 'source_course_key': course_key,
-                'display_name': course_module.display_name,
+                'display_name': course_block.display_name,
                 'user': request.user,
                 'course_creator_status': _get_course_creator_status(request.user),
                 'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
@@ -362,16 +362,16 @@ def course_search_index_handler(request, course_key_string):
         }), content_type=content_type, status=200)
 
 
-def _course_outline_json(request, course_module):
+def _course_outline_json(request, course_block):
     """
-    Returns a JSON representation of the course module and recursively all of its children.
+    Returns a JSON representation of the course block and recursively all of its children.
     """
     is_concise = request.GET.get('format') == 'concise'
     include_children_predicate = lambda xblock: not xblock.category == 'vertical'
     if is_concise:
         include_children_predicate = lambda xblock: xblock.has_children
     return create_xblock_info(
-        course_module,
+        course_block,
         include_child_info=True,
         course_outline=False if is_concise else True,  # lint-amnesty, pylint: disable=simplifiable-if-expression
         include_children_predicate=include_children_predicate,
@@ -640,12 +640,12 @@ def _get_rerun_link_for_item(course_key):
     return reverse_course_url('course_rerun_handler', course_key)
 
 
-def _deprecated_blocks_info(course_module, deprecated_block_types):
+def _deprecated_blocks_info(course_block, deprecated_block_types):
     """
     Returns deprecation information about `deprecated_block_types`
 
     Arguments:
-        course_module (CourseBlock): course object
+        course_block (CourseBlock): course object
         deprecated_block_types (list): list of deprecated blocks types
 
     Returns:
@@ -656,14 +656,14 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
     """
     data = {
         'deprecated_enabled_block_types': [
-            block_type for block_type in course_module.advanced_modules if block_type in deprecated_block_types
+            block_type for block_type in course_block.advanced_modules if block_type in deprecated_block_types
         ],
         'blocks': [],
-        'advance_settings_url': reverse_course_url('advanced_settings_handler', course_module.id)
+        'advance_settings_url': reverse_course_url('advanced_settings_handler', course_block.id)
     }
 
     deprecated_blocks = modulestore().get_items(
-        course_module.id,
+        course_block.id,
         qualifiers={
             'category': re.compile('^' + '$|^'.join(deprecated_block_types) + '$')
         }
@@ -689,21 +689,21 @@ def course_index(request, course_key):
     # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
     # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
     with modulestore().bulk_operations(course_key):
-        course_module = get_course_and_check_access(course_key, request.user, depth=None)
-        if not course_module:
+        course_block = get_course_and_check_access(course_key, request.user, depth=None)
+        if not course_block:
             raise Http404
-        lms_link = get_lms_link_for_item(course_module.location)
+        lms_link = get_lms_link_for_item(course_block.location)
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
             if GlobalStaff().has_user(request.user):
                 reindex_link = f"/course/{str(course_key)}/search_reindex"
-        sections = course_module.get_children()
-        course_structure = _course_outline_json(request, course_module)
+        sections = course_block.get_children()
+        course_structure = _course_outline_json(request, course_block)
         locator_to_show = request.GET.get('show', None)
 
         course_release_date = (
-            get_default_time_display(course_module.start)
-            if course_module.start != DEFAULT_START_DATE
+            get_default_time_display(course_block.start)
+            if course_block.start != DEFAULT_START_DATE
             else _("Set Date")
         )
 
@@ -715,16 +715,16 @@ def course_index(request, course_key):
             current_action = None
 
         deprecated_block_names = [block.name for block in deprecated_xblocks()]
-        deprecated_blocks_info = _deprecated_blocks_info(course_module, deprecated_block_names)
+        deprecated_blocks_info = _deprecated_blocks_info(course_block, deprecated_block_names)
 
         frontend_app_publisher_url = configuration_helpers.get_value_for_org(
-            course_module.location.org,
+            course_block.location.org,
             'FRONTEND_APP_PUBLISHER_URL',
             settings.FEATURES.get('FRONTEND_APP_PUBLISHER_URL', False)
         )
         # gather any errors in the currently stored proctoring settings.
-        advanced_dict = CourseMetadata.fetch(course_module)
-        proctoring_errors = CourseMetadata.validate_proctoring_settings(course_module, advanced_dict, request.user)
+        advanced_dict = CourseMetadata.fetch(course_block)
+        proctoring_errors = CourseMetadata.validate_proctoring_settings(course_block, advanced_dict, request.user)
 
         configuration = DiscussionsConfiguration.get(course_key)
         provider = configuration.provider_type
@@ -733,7 +733,7 @@ def course_index(request, course_key):
 
         return render_to_response('course_outline.html', {
             'language_code': request.LANGUAGE_CODE,
-            'context_course': course_module,
+            'context_course': course_block,
             'lms_link': lms_link,
             'sections': sections,
             'course_structure': course_structure,
@@ -751,8 +751,8 @@ def course_index(request, course_key):
                 },
             ) if current_action else None,
             'frontend_app_publisher_url': frontend_app_publisher_url,
-            'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
-            'advance_settings_url': reverse_course_url('advanced_settings_handler', course_module.id),
+            'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
+            'advance_settings_url': reverse_course_url('advanced_settings_handler', course_block.id),
             'proctoring_errors': proctoring_errors,
         })
 
@@ -1068,17 +1068,17 @@ def course_info_handler(request, course_key_string):
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     with modulestore().bulk_operations(course_key):
-        course_module = get_course_and_check_access(course_key, request.user)
-        if not course_module:
+        course_block = get_course_and_check_access(course_key, request.user)
+        if not course_block:
             raise Http404
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             return render_to_response(
                 'course_info.html',
                 {
-                    'context_course': course_module,
+                    'context_course': course_block,
                     'updates_url': reverse_course_url('course_info_update_handler', course_key),
                     'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
-                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id),
+                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_block.id),
                 }
             )
         else:
@@ -1153,24 +1153,24 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
     course_key = CourseKey.from_string(course_key_string)
     credit_eligibility_enabled = settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY', False)
     with modulestore().bulk_operations(course_key):
-        course_module = get_course_and_check_access(course_key, request.user)
+        course_block = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             upload_asset_url = reverse_course_url('assets_handler', course_key)
 
             # see if the ORG of this course can be attributed to a defined configuration . In that case, the
             # course about page should be editable in Studio
             publisher_enabled = configuration_helpers.get_value_for_org(
-                course_module.location.org,
+                course_block.location.org,
                 'ENABLE_PUBLISHER',
                 settings.FEATURES.get('ENABLE_PUBLISHER', False)
             )
             marketing_enabled = configuration_helpers.get_value_for_org(
-                course_module.location.org,
+                course_block.location.org,
                 'ENABLE_MKTG_SITE',
                 settings.FEATURES.get('ENABLE_MKTG_SITE', False)
             )
             enable_extended_course_details = configuration_helpers.get_value_for_org(
-                course_module.location.org,
+                course_block.location.org,
                 'ENABLE_EXTENDED_COURSE_DETAILS',
                 settings.FEATURES.get('ENABLE_EXTENDED_COURSE_DETAILS', False)
             )
@@ -1178,7 +1178,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
             about_page_editable = not publisher_enabled
             enrollment_end_editable = GlobalStaff().has_user(request.user) or not publisher_enabled
             short_description_editable = configuration_helpers.get_value_for_org(
-                course_module.location.org,
+                course_block.location.org,
                 'EDITABLE_SHORT_DESCRIPTION',
                 settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
             )
@@ -1188,12 +1188,12 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
             upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
                                 verified_mode.expiration_datetime.isoformat())
             settings_context = {
-                'context_course': course_module,
+                'context_course': course_block,
                 'course_locator': course_key,
-                'lms_link_for_about_page': get_link_for_about_page(course_module),
-                'course_image_url': course_image_url(course_module, 'course_image'),
-                'banner_image_url': course_image_url(course_module, 'banner_image'),
-                'video_thumbnail_image_url': course_image_url(course_module, 'video_thumbnail_image'),
+                'lms_link_for_about_page': get_link_for_about_page(course_block),
+                'course_image_url': course_image_url(course_block, 'course_image'),
+                'banner_image_url': course_image_url(course_block, 'banner_image'),
+                'video_thumbnail_image_url': course_image_url(course_block, 'video_thumbnail_image'),
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
                 'marketing_enabled': marketing_enabled,
@@ -1210,7 +1210,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                 'is_entrance_exams_enabled': core_toggles.ENTRANCE_EXAMS.is_enabled(),
                 'enable_extended_course_details': enable_extended_course_details,
                 'upgrade_deadline': upgrade_deadline,
-                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
+                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
@@ -1232,7 +1232,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
 
                     # if 'minimum_grade_credit' of a course is not set or 0 then
                     # show warning message to course author.
-                    show_min_grade_warning = False if course_module.minimum_grade_credit > 0 else True  # lint-amnesty, pylint: disable=simplifiable-if-expression
+                    show_min_grade_warning = False if course_block.minimum_grade_credit > 0 else True  # lint-amnesty, pylint: disable=simplifiable-if-expression
                     settings_context.update(
                         {
                             'is_credit_course': True,
@@ -1278,7 +1278,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                 # We have to be careful that we're only executing the following logic if we actually
                 # need to create or delete an entrance exam from the specified course
                 if core_toggles.ENTRANCE_EXAMS.is_enabled():
-                    course_entrance_exam_present = course_module.entrance_exam_enabled
+                    course_entrance_exam_present = course_block.entrance_exam_enabled
                     entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
                     ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
                     # If the entrance exam box on the settings screen has been checked...
@@ -1328,17 +1328,17 @@ def grading_handler(request, course_key_string, grader_index=None):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_module = get_course_and_check_access(course_key, request.user)
+        course_block = get_course_and_check_access(course_key, request.user)
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             course_details = CourseGradingModel.fetch(course_key)
             return render_to_response('settings_graders.html', {
-                'context_course': course_module,
+                'context_course': course_block,
                 'course_locator': course_key,
                 'course_details': course_details,
                 'grading_url': reverse_course_url('grading_handler', course_key),
                 'is_credit_course': is_credit_course(course_key),
-                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
+                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
@@ -1371,7 +1371,7 @@ def grading_handler(request, course_key_string, grader_index=None):
                 return JsonResponse()
 
 
-def _refresh_course_tabs(user: User, course_module: CourseBlock):
+def _refresh_course_tabs(user: User, course_block: CourseBlock):
     """
     Automatically adds/removes tabs if changes to the course require them.
 
@@ -1392,19 +1392,19 @@ def _refresh_course_tabs(user: User, course_module: CourseBlock):
         elif not tab_enabled and has_tab:
             tabs.remove(tab_panel)
 
-    course_tabs = copy.copy(course_module.tabs)
+    course_tabs = copy.copy(course_block.tabs)
 
     # Additionally update any tabs that are provided by non-dynamic course views
     for tab_type in CourseTabPluginManager.get_tab_types():
         if not tab_type.is_dynamic and tab_type.is_default:
-            tab_enabled = tab_type.is_enabled(course_module, user=user)
+            tab_enabled = tab_type.is_enabled(course_block, user=user)
             update_tab(course_tabs, tab_type, tab_enabled)
 
     CourseTabList.validate_tabs(course_tabs)
 
     # Save the tabs into the course if they have been changed
-    if course_tabs != course_module.tabs:
-        course_module.tabs = course_tabs
+    if course_tabs != course_block.tabs:
+        course_block.tabs = course_tabs
 
 
 @login_required
@@ -1423,42 +1423,42 @@ def advanced_settings_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_module = get_course_and_check_access(course_key, request.user)
+        course_block = get_course_and_check_access(course_key, request.user)
 
-        advanced_dict = CourseMetadata.fetch(course_module)
+        advanced_dict = CourseMetadata.fetch(course_block)
         if settings.FEATURES.get('DISABLE_MOBILE_COURSE_AVAILABLE', False):
             advanced_dict.get('mobile_available')['deprecated'] = True
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             publisher_enabled = configuration_helpers.get_value_for_org(
-                course_module.location.org,
+                course_block.location.org,
                 'ENABLE_PUBLISHER',
                 settings.FEATURES.get('ENABLE_PUBLISHER', False)
             )
             # gather any errors in the currently stored proctoring settings.
-            proctoring_errors = CourseMetadata.validate_proctoring_settings(course_module, advanced_dict, request.user)
+            proctoring_errors = CourseMetadata.validate_proctoring_settings(course_block, advanced_dict, request.user)
 
             return render_to_response('settings_advanced.html', {
-                'context_course': course_module,
+                'context_course': course_block,
                 'advanced_dict': advanced_dict,
                 'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
                 'publisher_enabled': publisher_enabled,
-                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
+                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
                 'proctoring_errors': proctoring_errors,
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
-                return JsonResponse(CourseMetadata.fetch(course_module))
+                return JsonResponse(CourseMetadata.fetch(course_block))
             else:
                 try:
                     return JsonResponse(
-                        update_course_advanced_settings(course_module, request.json, request.user)
+                        update_course_advanced_settings(course_block, request.json, request.user)
                     )
                 except ValidationError as err:
                     return JsonResponseBadRequest(err.detail)
 
 
-def update_course_advanced_settings(course_module: CourseBlock, data: Dict, user: User) -> Dict:
+def update_course_advanced_settings(course_block: CourseBlock, data: Dict, user: User) -> Dict:
     """
     Helper function to update course advanced settings from API data.
 
@@ -1466,7 +1466,7 @@ def update_course_advanced_settings(course_module: CourseBlock, data: Dict, user
     it to the course advanced settings.
 
     Args:
-        course_module (CourseBlock): The course run object on which to operate.
+        course_block (CourseBlock): The course run object on which to operate.
         data (Dict): JSON data as found the ``request.data``
         user (User): The user performing the operation
 
@@ -1474,10 +1474,10 @@ def update_course_advanced_settings(course_module: CourseBlock, data: Dict, user
         Dict: The updated data after applying changes based on supplied data.
     """
     try:
-        # validate data formats and update the course module.
+        # validate data formats and update the course block.
         # Note: don't update mongo yet, but wait until after any tabs are changed
         is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
-            course_module,
+            course_block,
             data,
             user=user,
         )
@@ -1487,7 +1487,7 @@ def update_course_advanced_settings(course_module: CourseBlock, data: Dict, user
 
         try:
             # update the course tabs if required by any setting changes
-            _refresh_course_tabs(user, course_module)
+            _refresh_course_tabs(user, course_block)
         except InvalidTabsException as err:
             log.exception(str(err))
             response_message = [
@@ -1499,7 +1499,7 @@ def update_course_advanced_settings(course_module: CourseBlock, data: Dict, user
             raise ValidationError(response_message) from err
 
         # now update mongo
-        modulestore().update_item(course_module, user.id)
+        modulestore().update_item(course_block, user.id)
 
         return updated_data
 
@@ -1665,8 +1665,8 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course_module = get_course_and_check_access(course_key, request.user)
-        matching_id = [tb for tb in course_module.pdf_textbooks
+        course_block = get_course_and_check_access(course_key, request.user)
+        matching_id = [tb for tb in course_block.pdf_textbooks
                        if str(tb.get("id")) == str(textbook_id)]
         if matching_id:
             textbook = matching_id[0]
@@ -1684,23 +1684,23 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
                 return JsonResponse({"error": str(err)}, status=400)
             new_textbook["id"] = textbook_id
             if textbook:
-                i = course_module.pdf_textbooks.index(textbook)
-                new_textbooks = course_module.pdf_textbooks[0:i]
+                i = course_block.pdf_textbooks.index(textbook)
+                new_textbooks = course_block.pdf_textbooks[0:i]
                 new_textbooks.append(new_textbook)
-                new_textbooks.extend(course_module.pdf_textbooks[i + 1:])
-                course_module.pdf_textbooks = new_textbooks
+                new_textbooks.extend(course_block.pdf_textbooks[i + 1:])
+                course_block.pdf_textbooks = new_textbooks
             else:
-                course_module.pdf_textbooks.append(new_textbook)
-            store.update_item(course_module, request.user.id)
+                course_block.pdf_textbooks.append(new_textbook)
+            store.update_item(course_block, request.user.id)
             return JsonResponse(new_textbook, status=201)
         elif request.method == 'DELETE':
             if not textbook:
                 return JsonResponse(status=404)
-            i = course_module.pdf_textbooks.index(textbook)
-            remaining_textbooks = course_module.pdf_textbooks[0:i]
-            remaining_textbooks.extend(course_module.pdf_textbooks[i + 1:])
-            course_module.pdf_textbooks = remaining_textbooks
-            store.update_item(course_module, request.user.id)
+            i = course_block.pdf_textbooks.index(textbook)
+            remaining_textbooks = course_block.pdf_textbooks[0:i]
+            remaining_textbooks.extend(course_block.pdf_textbooks[i + 1:])
+            course_block.pdf_textbooks = remaining_textbooks
+            store.update_item(course_block, request.user.id)
             return JsonResponse()
 
 

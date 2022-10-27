@@ -1,5 +1,5 @@
 """
-Django module container for classes and operations related to the "Course Module" content type
+Django module container for classes and operations related to the "Course Block" content type
 """
 
 
@@ -131,7 +131,7 @@ class Textbook:  # lint-amnesty, pylint: disable=missing-class-docstring
         toc_url = self.book_url + 'toc.xml'
 
         # cdodge: I've added this caching of TOC because in Mongo-backed instances (but not Filesystem stores)
-        # course modules have a very short lifespan and are constantly being created and torn down.
+        # course blocks have a very short lifespan and are constantly being created and torn down.
         # Since this module in the __init__() method does a synchronous call to AWS to get the TOC
         # this is causing a big performance problem. So let's be a bit smarter about this and cache
         # each fetch and store in-mem for 10 minutes.

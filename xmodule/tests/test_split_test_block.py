@@ -19,7 +19,7 @@ from xmodule.split_test_block import (
     user_partition_values,
 )
 from xmodule.tests import get_test_system
-from xmodule.tests.test_course_module import DummySystem as TestImportSystem
+from xmodule.tests.test_course_block import DummySystem as TestImportSystem
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
 from xmodule.validation import StudioValidationMessage

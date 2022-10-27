@@ -108,7 +108,7 @@ def has_access(user, action, obj, course_key=None):
     - visible_to_staff_only for modules
     - DISABLE_START_DATES
     - different access for instructor, staff, course staff, and students.
-    - mobile_available flag for course modules
+    - mobile_available flag for course blocks
 
     user: a Django user object. May be anonymous. If none is passed,
                     anonymous is assumed

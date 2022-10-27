@@ -850,7 +850,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
 
 class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
     """
-    Tests indexing of content groups on course modules using split modulestore.
+    Tests indexing of content groups on course blocks using split modulestore.
     """
     CREATE_USER = True
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME

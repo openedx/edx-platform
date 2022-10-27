@@ -57,7 +57,7 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
         return
 
     # This logic has been copied over from openedx/core/djangoapps/schedules/content_highlights.py
-    # in the _get_course_module function.
+    # in the _get_course_block function.
     # I'm not sure if this is an anti-pattern or not, so if you can avoid re-copying this, please do.
     # We are using it here because we ran into issues with the User service being undefined when we
     # encountered a split_test xblock.

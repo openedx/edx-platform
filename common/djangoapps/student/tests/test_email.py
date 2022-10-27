@@ -284,8 +284,8 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
         """
         Provide a tuple of string[]s that should be (in, not_in) the email
         """
-        course_module = modulestore().get_course(self.course.id)
-        proctoring_provider = capwords(course_module.proctoring_provider.replace('_', ' '))
+        course_block = modulestore().get_course(self.course.id)
+        proctoring_provider = capwords(course_block.proctoring_provider.replace('_', ' '))
         fragments = [
             (
                 "You are enrolled in {} at {}. This course contains proctored exams.".format(

@@ -419,7 +419,7 @@ class ItemFactory(XModuleFactory):
                 module.submission_end = submission_end
             store.update_item(module, user_id)
 
-            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course block, so
             # if we add one then we need to also add it to the policy information (i.e. metadata)
             # we should remove this once we can break this reference from the course to static tabs
             if category == 'static_tab':

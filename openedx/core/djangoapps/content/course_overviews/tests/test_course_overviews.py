@@ -161,7 +161,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         time_field_accessor = lambda object, field_name: get_seconds_since_epoch(getattr(object, field_name))
 
         # The course about fields are accessed through the CourseDetail
-        # class for the course module, and stored as attributes on the
+        # class for the course block, and stored as attributes on the
         # CourseOverview objects.
         course_about_accessor = lambda object, field_name: CourseDetails.fetch_about_attribute(object.id, field_name)
 

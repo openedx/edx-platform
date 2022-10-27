@@ -103,7 +103,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
     @override_settings(COURSE_ABOUT_VISIBILITY_PERMISSION="see_about_page")
     def test_visible_about_page_settings(self):
         """
-        Verify that the About Page honors the permission settings in the course module
+        Verify that the About Page honors the permission settings in the course block
         """
         url = reverse('about_course', args=[str(self.course_with_about.id)])
         resp = self.client.get(url)

@@ -92,8 +92,8 @@ class ProctoredExamSettingsView(APIView):
     def get(self, request, course_id):
         """ GET handler """
         with modulestore().bulk_operations(CourseKey.from_string(course_id)):
-            course_module = self._get_and_validate_course_access(request.user, course_id)
-            course_metadata = CourseMetadata().fetch_all(course_module)
+            course_block = self._get_and_validate_course_access(request.user, course_id)
+            course_metadata = CourseMetadata().fetch_all(course_block)
             proctored_exam_settings = self._get_proctored_exam_setting_values(course_metadata)
 
             data = {}
@@ -123,8 +123,8 @@ class ProctoredExamSettingsView(APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         with modulestore().bulk_operations(CourseKey.from_string(course_id)):
-            course_module = self._get_and_validate_course_access(request.user, course_id)
-            course_metadata = CourseMetadata().fetch_all(course_module)
+            course_block = self._get_and_validate_course_access(request.user, course_id)
+            course_metadata = CourseMetadata().fetch_all(course_block)
 
             models_to_update = {}
             for setting_key, value in exam_config.data.items():
@@ -133,9 +133,9 @@ class ProctoredExamSettingsView(APIView):
                     models_to_update[setting_key] = copy.deepcopy(model)
                     models_to_update[setting_key]['value'] = value
 
-            # validate data formats and update the course module object
+            # validate data formats and update the course block object
             is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
-                course_module,
+                course_block,
                 models_to_update,
                 user=request.user,
             )
@@ -148,7 +148,7 @@ class ProctoredExamSettingsView(APIView):
                 )
 
             # save to mongo
-            modulestore().update_item(course_module, request.user.id)
+            modulestore().update_item(course_block, request.user.id)
 
             # merge updated settings with all existing settings.
             # do this because fields that could not be modified are excluded from the result
@@ -171,14 +171,14 @@ class ProctoredExamSettingsView(APIView):
         """
         Check if course_id exists and is accessible by the user.
 
-        Returns a course_module object
+        Returns a course_block object
         """
         course_key = CourseKey.from_string(course_id)
-        course_module = get_course_and_check_access(course_key, user)
+        course_block = get_course_and_check_access(course_key, user)
 
-        if not course_module:
+        if not course_block:
             raise NotFound(
                 f'Course with course_id {course_id} does not exist.'
             )
 
-        return course_module
+        return course_block

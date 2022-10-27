@@ -106,7 +106,7 @@ def update_tabs_handler(course_item: CourseBlock, tabs_data: Dict, user: User) -
     Helper to handle updates to course tabs based on API data.
 
     Args:
-        course_item (CourseBlock): Course module whose tabs need to be updated
+        course_item (CourseBlock): Course block whose tabs need to be updated
         tabs_data (Dict): JSON formatted data for updating or reordering tabs.
         user (User): The user performing the operation.
     """
