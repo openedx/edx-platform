@@ -15,6 +15,10 @@ from common.djangoapps.util.course import (
     get_link_for_about_page,
 )
 from edx_django_utils import monitoring as monitoring_utils
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import (
+    SessionAuthenticationAllowInactiveUser,
+)
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.permissions import IsAuthenticated
@@ -22,12 +26,13 @@ from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
 
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from common.djangoapps.student.helpers import cert_info, get_resume_urls_for_enrollments
-from common.djangoapps.student.models import CourseEnrollment, get_user_by_username_or_email
+from common.djangoapps.student.models import (
+    CourseEnrollment,
+    get_user_by_username_or_email,
+)
 from common.djangoapps.student.toggles import should_show_amplitude_recommendations
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
