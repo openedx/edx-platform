@@ -1,12 +1,15 @@
 """
 Views for the learner dashboard.
 """
+from collections import OrderedDict
 import logging
 from time import time
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import MultipleObjectsReturned
+from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_block
 from common.djangoapps.util.course import (
     get_encoded_course_sharing_utm_params,
     get_link_for_about_page,
@@ -236,8 +239,25 @@ def get_org_block_and_allow_lists():
 
 @exec_time_logged
 def get_resume_urls_for_course_enrollments(user, course_enrollments):
-    """Proxy for get_resume_urls_for_enrollments to allow for modification / profiling"""
-    return get_resume_urls_for_enrollments(user, course_enrollments)
+    """
+    Modeled off of get_resume_urls_for_enrollments but removes check for actual presence of block
+    in course structure for better performance.
+    """
+    resume_course_urls = OrderedDict()
+    for enrollment in course_enrollments:
+        url_to_block = None
+        try:
+            block_key = get_key_to_last_completed_block(user, enrollment.course_id)
+            if block_key:
+                url_to_block = reverse(
+                    "jump_to",
+                    kwargs={"course_id": enrollment.course_id, "location": block_key},
+                )
+        except UnavailableCompletionData:
+            # This is acceptable, the user hasn't started the course so jump URL will be None
+            pass
+        resume_course_urls[enrollment.course_id] = url_to_block
+    return resume_course_urls
 
 
 def _get_courses_with_unmet_prerequisites(user, course_enrollments):
