@@ -23,8 +23,8 @@ class AuthFailedError(Exception):
         """ Returns a dict representation of the error. """
         resp = {'success': False}
         for attr in ('value', 'redirect', 'redirect_url', 'error_code', 'context'):
-            if self.__getattribute__(attr):
-                resp[attr] = self.__getattribute__(attr)
+            if getattr(self, attr):
+                resp[attr] = getattr(self, attr)
 
         return resp
 

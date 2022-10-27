@@ -47,7 +47,7 @@ asn1crypto==1.5.1
     #   -r requirements/edx/base.txt
     #   oscrypto
     #   snowflake-connector-python
-astroid==2.11.7
+astroid==2.12.10
     # via
     #   pylint
     #   pylint-celery
@@ -1088,9 +1088,8 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/base.txt
     #   olxcleaner
-pylint==2.13.9
+pylint==2.15.3
     # via
-    #   -c requirements/edx/../constraints.txt
     #   edx-lint
     #   pylint-celery
     #   pylint-django
@@ -1445,6 +1444,8 @@ tomli==2.0.1
     #   pylint
     #   pytest
     #   tox
+tomlkit==0.11.5
+    # via pylint
 tox==3.26.0
     # via
     #   -r requirements/edx/testing.in

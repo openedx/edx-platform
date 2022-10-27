@@ -726,8 +726,8 @@ class ChoiceResponse(LoncapaResponse):
         edc_max_grade = len(all_choices)
         edc_current_grade = 0
 
-        good_answers = sum([1 for answer in student_answer if answer in self.correct_choices])
-        good_non_answers = sum([1 for blank in student_non_answers if blank in self.incorrect_choices])
+        good_answers = sum(1 for answer in student_answer if answer in self.correct_choices)
+        good_non_answers = sum(1 for blank in student_non_answers if blank in self.incorrect_choices)
         edc_current_grade = good_answers + good_non_answers
 
         return_grade = round_away_from_zero(self.get_max_score() * float(edc_current_grade) / float(edc_max_grade), 2)
@@ -759,8 +759,8 @@ class ChoiceResponse(LoncapaResponse):
 
         halves_error_count = 0
 
-        incorrect_answers = sum([1 for answer in student_answer if answer in self.incorrect_choices])
-        missed_answers = sum([1 for blank in student_non_answers if blank in self.correct_choices])
+        incorrect_answers = sum(1 for answer in student_answer if answer in self.incorrect_choices)
+        missed_answers = sum(1 for blank in student_non_answers if blank in self.correct_choices)
         halves_error_count = incorrect_answers + missed_answers
 
         if halves_error_count == 0:
