@@ -14,11 +14,12 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 # .. toggle_creation_date: 2022-10-11
 # .. toggle_tickets: AU-879
 ENABLE_LEARNER_HOME_MFE = WaffleFlag(
-    'learner_home_mfe.enabled',
+    "learner_home_mfe.enabled",
     __name__,
 )
 
 
 def should_redirect_to_learner_home_mfe():
-    return configuration_helpers.get_value('ENABLE_LEARNER_HOME_MFE',
-                                           ENABLE_LEARNER_HOME_MFE.is_enabled())
+    return configuration_helpers.get_value(
+        "ENABLE_LEARNER_HOME_MFE", ENABLE_LEARNER_HOME_MFE.is_enabled()
+    )
