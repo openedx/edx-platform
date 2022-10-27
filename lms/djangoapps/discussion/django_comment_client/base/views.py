@@ -263,6 +263,92 @@ def track_comment_deleted_event(request, course, comment):
     track_forum_event(request, event_name, course, comment, event_data)
 
 
+def track_thread_reported_event(request, course, thread):
+    """
+    Send analytics event for a reported thread.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='reported')
+    event_data = {
+        'body': thread.body[:TRACKING_MAX_FORUM_BODY],
+        'content_type': 'Post',
+        'commentable_id': thread.get('commentable_id', ''),
+    }
+    if hasattr(thread, 'username'):
+        event_data['target_username'] = thread.get('username', '')
+    add_truncated_title_to_event_data(event_data, thread.get('title', ''))
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_comment_reported_event(request, course, comment):
+    """
+    Send analytics event for a reported response or comment.
+    """
+    obj_type = 'comment' if comment.get('parent_id') else 'response'
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='reported')
+    event_data = {
+        'body': comment.body[:TRACKING_MAX_FORUM_BODY],
+        'commentable_id': comment.get('commentable_id', ''),
+        'content_type': obj_type.capitalize(),
+    }
+    if hasattr(comment, 'username'):
+        event_data['target_username'] = comment.get('username', '')
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
+def track_thread_unreported_event(request, course, thread):
+    """
+    Send analytics event for a unreported thread.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='unreported')
+    event_data = {
+        'body': thread.body[:TRACKING_MAX_FORUM_BODY],
+        'content_type': 'Post',
+        'commentable_id': thread.get('commentable_id', ''),
+        'reported_status_cleared': not bool(thread.get('abuse_flaggers', [])),
+    }
+    if hasattr(thread, 'username'):
+        event_data['target_username'] = thread.get('username', '')
+    add_truncated_title_to_event_data(event_data, thread.get('title', ''))
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_comment_unreported_event(request, course, comment):
+    """
+    Send analytics event for a unreported response or comment.
+    """
+    obj_type = 'comment' if comment.get('parent_id') else 'response'
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='unreported')
+    event_data = {
+        'body': comment.body[:TRACKING_MAX_FORUM_BODY],
+        'commentable_id': comment.get('commentable_id', ''),
+        'content_type': obj_type.capitalize(),
+        'reported_status_cleared': not bool(comment.get('abuse_flaggers', [])),
+    }
+    if hasattr(comment, 'username'):
+        event_data['target_username'] = comment.get('username', '')
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
+def track_discussion_reported_event(request, course, cc_content):
+    """
+    Helper method for discussion reported events.
+    """
+    if cc_content.type == 'thread':
+        track_thread_reported_event(request, course, cc_content)
+    else:
+        track_comment_reported_event(request, course, cc_content)
+
+
+def track_discussion_unreported_event(request, course, cc_content):
+    """
+    Helper method for discussion unreported events.
+    """
+    if cc_content.type == 'thread':
+        track_thread_unreported_event(request, course, cc_content)
+    else:
+        track_comment_unreported_event(request, course, cc_content)
+
+
 def permitted(func):
     """
     View decorator to verify the user is authorized to access this endpoint.
