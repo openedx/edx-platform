@@ -217,12 +217,12 @@ class TestCourseRunSerializer(LearnerDashboardBaseTest):
         input_context = self.create_test_context(input_data.course.id)
 
         # ... where a user hasn't started
-        input_context["resume_course_urls"][input_data.course.id] = ""
+        input_context["resume_course_urls"][input_data.course.id] = None
 
         # When I serialize
         output_data = CourseRunSerializer(input_data, context=input_context).data
 
-        # Then the resumeUrl is None
+        # Then the resumeUrl is None, which is allowed
         self.assertIsNone(output_data["resumeUrl"])
 
 
