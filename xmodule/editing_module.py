@@ -43,25 +43,3 @@ class EditingMixin(EditingFields, MakoTemplateBlockBase):
         # Add our specific template information (the raw data body)
         _context.update({'data': self.data})
         return _context
-
-
-class TabsEditingMixin(EditingFields, MakoTemplateBlockBase):
-    """
-    Module that provides a raw editing view of its data and children.  It does not
-    perform any validation on its definition---just passes it along to the browser.
-
-    This class is intended to be used as a mixin.
-    """
-
-    mako_template = "widgets/tabs-aggregator.html"
-    js_module_name = "TabsEditingDescriptor"
-    tabs = []
-
-    def get_context(self):
-        _context = MakoTemplateBlockBase.get_context(self)
-        _context.update({
-            'tabs': self.tabs,
-            'html_id': self.location.html_id(),  # element_id
-            'data': self.data,
-        })
-        return _context
