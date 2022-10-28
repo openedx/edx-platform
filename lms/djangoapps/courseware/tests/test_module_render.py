@@ -49,7 +49,7 @@ from xmodule.lti_module import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_AMNESTY_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
     upload_file_to_course,
@@ -1588,13 +1588,12 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.course.static_asset_path = ""
 
     @override_settings(DEFAULT_COURSE_ABOUT_IMAGE_URL='test.png')
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_course_image_for_split_course(self, store):
+    def test_course_image_for_split_course(self):
         """
         for split courses if course_image is empty then course_image_url will be
         the default image url defined in settings
         """
-        self.course = CourseFactory.create(default_store=store)
+        self.course = CourseFactory.create()
         self.course.course_image = ''
 
         url = course_image_url(self.course)
@@ -1684,7 +1683,7 @@ class DetachedXBlock(XBlock):
 @patch('lms.djangoapps.courseware.module_render.has_access', Mock(return_value=True, autospec=True))
 class TestStaffDebugInfo(SharedModuleStoreTestCase):
     """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -2597,26 +2596,22 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         super().setUp()
         XBlockConfiguration(name='video', enabled=False).save()
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_get_item(self, default_ms):
-        with self.store.default_store(default_ms):
-            course = CourseFactory()
-            self._verify_descriptor('video', course, 'HiddenDescriptorWithMixins')
+    def test_get_item(self):
+        course = CourseFactory()
+        self._verify_descriptor('video', course, 'HiddenDescriptorWithMixins')
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_dynamic_updates(self, default_ms):
+    def test_dynamic_updates(self):
         """Tests that the list of disabled xblocks can dynamically update."""
-        with self.store.default_store(default_ms):
-            course = CourseFactory()
-            item_usage_id = self._verify_descriptor('problem', course, 'ProblemBlockWithMixins')
-            XBlockConfiguration(name='problem', enabled=False).save()
+        course = CourseFactory()
+        item_usage_id = self._verify_descriptor('problem', course, 'ProblemBlockWithMixins')
+        XBlockConfiguration(name='problem', enabled=False).save()
 
-            # First verify that the cached value is used until there is a new request cache.
-            self._verify_descriptor('problem', course, 'ProblemBlockWithMixins', item_usage_id)
+        # First verify that the cached value is used until there is a new request cache.
+        self._verify_descriptor('problem', course, 'ProblemBlockWithMixins', item_usage_id)
 
-            # Now simulate a new request cache.
-            self.store.request_cache.data.clear()
-            self._verify_descriptor('problem', course, 'HiddenDescriptorWithMixins', item_usage_id)
+        # Now simulate a new request cache.
+        self.store.request_cache.data.clear()
+        self._verify_descriptor('problem', course, 'HiddenDescriptorWithMixins', item_usage_id)
 
     def _verify_descriptor(self, category, course, descriptor, item_id=None):
         """
@@ -2639,8 +2634,8 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     """
     Tests that the deprecated attributes in the LMS Module System (XBlock Runtime) return the expected values.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
-    COURSE_ID = 'edX/LmsModuleShimTest/2021_Fall'
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    COURSE_ID = 'course-v1:edX+LmsModuleShimTest+2021_Fall'
     PYTHON_LIB_FILENAME = 'test_python_lib.zip'
     PYTHON_LIB_SOURCE_FILE = './common/test/data/uploads/python_lib.zip'
 
@@ -2650,7 +2645,9 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         Set up the course and descriptor used to instantiate the runtime.
         """
         super().setUpClass()
-        org, number, run = cls.COURSE_ID.split('/')
+        org = 'edX'
+        number = 'LmsModuleShimTest'
+        run = '2021_Fall'
         cls.course = CourseFactory.create(org=org, number=number, run=run)
         cls.descriptor = ItemFactory(category="vertical", parent=cls.course)
         cls.problem_descriptor = ItemFactory(category="problem", parent=cls.course)
@@ -2794,8 +2791,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         assert xqueue['interface'].url == 'http://sandbox-xqueue.edx.org'
         assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
         assert xqueue['waittime'] == 5
-        callback_url = ('http://localhost:8000/courses/edX/LmsModuleShimTest/2021_Fall/xqueue/232/'
-                        + str(self.descriptor.location))
+        callback_url = f'http://localhost:8000/courses/{self.course.id}/xqueue/232/{self.descriptor.location}'
         assert xqueue['construct_callback']() == f'{callback_url}/score_update'
         assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'
 
@@ -2826,15 +2822,15 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         assert xqueue['interface'].url == 'http://xqueue.url'
         assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
         assert xqueue['waittime'] == 15
-        callback_url = f'http://alt.url/courses/edX/LmsModuleShimTest/2021_Fall/xqueue/232/{self.descriptor.location}'
+        callback_url = f'http://alt.url/courses/{self.course.id}/xqueue/232/{self.descriptor.location}'
         assert xqueue['construct_callback']() == f'{callback_url}/score_update'
         assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'
 
-    @override_settings(COURSES_WITH_UNSAFE_CODE=[COURSE_ID])
+    @override_settings(COURSES_WITH_UNSAFE_CODE=[r'course-v1:edX\+LmsModuleShimTest\+2021_Fall'])
     def test_can_execute_unsafe_code_when_allowed(self):
         assert self.runtime.can_execute_unsafe_code()
 
-    @override_settings(COURSES_WITH_UNSAFE_CODE=['edX/full/2012_Fall'])
+    @override_settings(COURSES_WITH_UNSAFE_CODE=[r'course-v1:edX\+full\+2021_Fall'])
     def test_cannot_execute_unsafe_code_when_disallowed(self):
         assert not self.runtime.can_execute_unsafe_code()
 
@@ -2880,6 +2876,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         assert self.runtime.replace_jump_to_id_urls(html) == \
             static_replace.replace_jump_to_id_urls(html, self.course.id, jump_to_id_base_url)
 
+    @XBlock.register_temp_plugin(PureXBlock, 'pure')
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
     def test_course_id(self):
         descriptor = ItemFactory(category="pure", parent=self.course)
