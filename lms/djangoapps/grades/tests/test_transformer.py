@@ -367,12 +367,6 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             max_score=0,
         )
 
-    def test_course_version_not_collected_in_old_mongo(self):
-        with self.store.default_store(ModuleStoreEnum.Type.mongo):
-            blocks = self.build_course_with_problems()
-        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
-        assert block_structure.get_xblock_field(blocks['course'].location, 'course_version') is None
-
     def test_course_version_collected_in_split(self):
         blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
@@ -430,7 +424,6 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 2, 2),
-        (ModuleStoreEnum.Type.mongo, 22, 15),
     )
     @ddt.unpack
     def test_modulestore_performance(self, store_type, max_mongo_calls, min_mongo_calls):

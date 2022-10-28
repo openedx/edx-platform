@@ -143,7 +143,6 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url.split('?')[0] == expected_url
 
     @ddt.data(
-        (False, ModuleStoreEnum.Type.mongo),
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -167,9 +166,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url == expected_redirect_url
 
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_sequence(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_sequence(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -195,9 +193,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url == expected_redirect_url
 
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_module(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_module(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -251,9 +248,8 @@ class TestJumpTo(ModuleStoreTestCase):
     # The new courseware experience does not support this sort of course structure;
     # it assumes a simple course->chapter->sequence->unit->component tree.
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_nested_module(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_nested_module(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -275,7 +271,6 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
     @ddt.data(
-        (False, ModuleStoreEnum.Type.mongo),
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -290,8 +285,6 @@ class TestJumpTo(ModuleStoreTestCase):
 
     @set_preview_mode(True)
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, False, '1'),
-        (ModuleStoreEnum.Type.mongo, True, '2'),
         (ModuleStoreEnum.Type.split, False, '1'),
         (ModuleStoreEnum.Type.split, True, '2'),
     )
@@ -1348,15 +1341,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Assert that valid 'student_id' returns 200 status
         self._get_student_progress_page()
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_unenrolled_student_progress_for_credit_course(self, default_store):
+    def test_unenrolled_student_progress_for_credit_course(self):
         """
          Test that student progress page does not break while checking for an unenrolled student.
          Scenario: When instructor checks the progress of a student who is not enrolled in credit course.
          It should return 200 response.
         """
         # Create a new course, a user which will not be enrolled in course, admin user for staff access
-        course = CourseFactory.create(default_store=default_store)
+        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         admin = AdminFactory.create()
         assert self.client.login(username=admin.username, password='test')
 

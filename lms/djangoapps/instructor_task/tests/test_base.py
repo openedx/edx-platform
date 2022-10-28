@@ -21,7 +21,7 @@ from opaque_keys.edx.locations import Location
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -37,7 +37,7 @@ from openedx.core.lib.url_utils import quote_slashes
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
-TEST_COURSE_KEY = CourseKey.from_string('/'.join([TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME]))
+TEST_COURSE_KEY = CourseKey.from_string(f'course-v1:{TEST_COURSE_ORG}+{TEST_COURSE_NUMBER}+{TEST_COURSE_NAME}')
 TEST_CHAPTER_NAME = "Section"
 TEST_SECTION_NAME = "Subsection"
 
@@ -108,7 +108,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     Base test class for InstructorTask-related tests that require
     the setup of a course.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     course = None
     current_user = None
 
@@ -273,10 +273,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
             # Note that this is a capa-specific convention.  The form is a version of the problem's
             # URL, modified so that it can be easily stored in html, prepended with "input-" and
             # appended with a sequence identifier for the particular response the input goes to.
-            course_key = self.course.id
-            return 'input_i4x-{}-{}-problem-{}_{}'.format(
-                course_key.org.replace('.', '_'),
-                course_key.course.replace('.', '_'),
+            return 'input_{}_{}'.format(
                 problem_url_name,
                 response_id
             )
