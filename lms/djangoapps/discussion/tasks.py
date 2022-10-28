@@ -115,7 +115,6 @@ def send_ace_message_for_reported_content(context):  # lint-amnesty, pylint: dis
             )
             log.info(f'Sending forum reported content email notification with context {message_context}')
             ace.send(message)
-            # TODO: add tracking for reported content email
 
 
 def _track_notification_sent(message, context):
