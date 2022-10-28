@@ -38,7 +38,7 @@ class ReturnGroup1PartitionScheme:
     def get_group_for_user(cls, course_key, user, user_partition, assign=True):  # pylint: disable=unused-argument
         """
         The previous "allow" definition for verification was defined as 1, so return that.
-        Details at https://github.com/edx/edx-platform/pull/14913/files#diff-feff1466ec4d1b8c38894310d8342a80
+        Details at https://github.com/openedx/edx-platform/pull/14913/files#diff-feff1466ec4d1b8c38894310d8342a80
         """
         return user_partition.get_group(1)
 

@@ -7,6 +7,9 @@
             <span class="icon fa fa-comment"/>
             ${_("To view live discussions, click Preview or View Live in Unit Settings.")}<br />
             ${_("Discussion ID: {discussion_id}").format(discussion_id=discussion_id)}
+            % if not is_visible:
+            <br /><b>${_('The discussion block is disabled for this course as it is not using a compatible discussion provider.')}</b>
+            % endif
         </span>
     </p>
 </div>

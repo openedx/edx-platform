@@ -6,6 +6,9 @@ The following are currently implemented:
     2. LoginWithAccessTokenView:
        1st party (open-edx) OAuth 2.0 access token -> session cookie
 """
+import logging
+
+import jwt
 import django.contrib.auth as auth
 import social_django.utils as social_utils
 from django.conf import settings
@@ -13,6 +16,12 @@ from django.contrib.auth import login
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from edx_rest_framework_extensions.auth.jwt.authentication import (
+    JwtAuthentication,
+    get_decoded_jwt_from_auth,
+    is_jwt_authenticated,
+)
+from edx_rest_framework_extensions.auth.jwt.decoder import get_asymmetric_only_jwt_decode_handler
 from oauth2_provider import models as dot_models
 from oauth2_provider.views.base import TokenView as DOTAccessTokenView
 from rest_framework import permissions
@@ -25,6 +34,9 @@ from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+
+
+logger = logging.getLogger(__name__)
 
 
 class AccessTokenExchangeBase(APIView):
@@ -106,7 +118,7 @@ class LoginWithAccessTokenView(APIView):
     """
     View for exchanging an access token for session cookies
     """
-    authentication_classes = (BearerAuthenticationAllowInactiveUser,)
+    authentication_classes = (BearerAuthenticationAllowInactiveUser, JwtAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     @staticmethod
@@ -120,16 +132,52 @@ class LoginWithAccessTokenView(APIView):
                 return backend_path
 
     @staticmethod
-    def _is_grant_password(access_token):
+    def _ensure_access_token_has_password_grant(request):
         """
-        Check if the access token provided is DOT based and has password type grant.
+        Ensures the access token provided has password type grant.
         """
-        token_query = dot_models.AccessToken.objects.select_related('user')
-        dot_token = token_query.filter(token=access_token).first()
-        if dot_token and dot_token.application.authorization_grant_type == dot_models.Application.GRANT_PASSWORD:
-            return True
+        if is_jwt_authenticated(request):
+            jwt_payload = get_decoded_jwt_from_auth(request)
+            if jwt_payload['grant_type'] == dot_models.Application.GRANT_PASSWORD:
+                return
+        else:
+            token_query = dot_models.AccessToken.objects.select_related('user')
+            dot_token = token_query.filter(token=request.auth).first()
+            if dot_token and dot_token.application.authorization_grant_type == dot_models.Application.GRANT_PASSWORD:
+                return
 
-        return False
+        raise AuthenticationFailed({
+            'error_code': 'non_supported_token',
+            'developer_message': 'Only access tokens with grant type password are supported.'
+        })
+
+    @staticmethod
+    def _ensure_jwt_is_asymmetric(request):
+        """
+        Ensures the provided jwt token is asymmetric.
+        """
+        if is_jwt_authenticated(request):
+            try:
+                get_asymmetric_only_jwt_decode_handler(request.auth)
+            except jwt.InvalidTokenError as symmetric_jwt_error:
+                error_msg = {
+                    'error_code': 'non_asymmetric_token',
+                    'developer_message': 'Only asymmetric jwt are supported.'
+                }
+                raise AuthenticationFailed(error_msg) from symmetric_jwt_error
+
+    @staticmethod
+    def _ensure_user_is_not_disabled(request):
+        """
+        Ensures the user requesting for session cookies is not disabled.
+        """
+        if not request.user.has_usable_password():
+            logger.info('Session creation failed because user account %s was disabled', request.user.id)
+            error_msg = {
+                'error_code': 'account_disabled',
+                'developer_message': 'User account is disabled.'
+            }
+            raise AuthenticationFailed(error_msg)
 
     @method_decorator(csrf_exempt)
     def post(self, request):
@@ -145,11 +193,9 @@ class LoginWithAccessTokenView(APIView):
         if not hasattr(request.user, 'backend'):
             request.user.backend = self._get_path_of_arbitrary_backend_for_user(request.user)
 
-        if not self._is_grant_password(request.auth):
-            raise AuthenticationFailed({
-                'error_code': 'non_supported_token',
-                'developer_message': 'Only support DOT type access token with grant type password. '
-            })
+        self._ensure_user_is_not_disabled(request)
+        self._ensure_access_token_has_password_grant(request)
+        self._ensure_jwt_is_asymmetric(request)
 
         login(request, request.user)  # login generates and stores the user's cookies in the session
         response = HttpResponse(status=204)  # cookies stored in the session are returned with the response

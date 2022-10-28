@@ -1,7 +1,7 @@
 """
 Exam Settings View Tests
 """
-
+from unittest import SkipTest
 from unittest.mock import patch
 
 import ddt
@@ -104,6 +104,10 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         self.course.enable_proctored_exams = True
         self.save_course()
 
+        # course_handler raise 404 for old mongo course
+        if self.course.id.deprecated:
+            raise SkipTest("course_handler raise 404 for old mongo course")
+
         url = reverse_course_url(page_handler, self.course.id)
         resp = self.client.get(url, HTTP_ACCEPT='text/html')
         alert_text = self._get_exam_settings_alert_text(resp.content)
@@ -139,6 +143,9 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         self.course.enable_proctored_exams = True
         self.save_course()
 
+        # course_handler raise 404 for old mongo course
+        if self.course.id.deprecated and page_handler == 'course_handler':
+            raise SkipTest("course_handler raise 404 for old mongo course")
         url = reverse_course_url(page_handler, self.course.id)
         resp = self.client.get(url, HTTP_ACCEPT='text/html')
         alert_text = self._get_exam_settings_alert_text(resp.content)
@@ -163,6 +170,9 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         """
         Alert should not be visible if no proctored exam setting error exists
         """
+        # course_handler raise 404 for old mongo course
+        if self.course.id.deprecated and page_handler == 'course_handler':
+            raise SkipTest("course_handler raise 404 for old mongo course")
         url = reverse_course_url(page_handler, self.course.id)
         resp = self.client.get(url, HTTP_ACCEPT='text/html')
         parsed_html = lxml.html.fromstring(resp.content)

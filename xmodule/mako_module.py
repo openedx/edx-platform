@@ -41,6 +41,8 @@ class MakoTemplateBlockBase:
     """
     # pylint: disable=no-member
 
+    js_module_name = None
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if getattr(self.runtime, 'render_template', None) is None:

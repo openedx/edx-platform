@@ -4,7 +4,12 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 
 
 from django.conf import settings
+from django.urls import reverse
 from django.utils.translation import gettext_noop
+
+
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from xmodule.tabs import TabFragmentViewMixin
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
@@ -35,3 +40,12 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
         if DiscussionLtiCourseTab.is_enabled(course, user):
             return False
         return utils.is_discussion_enabled(course.id)
+
+    @property
+    def link_func(self):
+        def _link_func(course, reverse_func):
+            if ENABLE_DISCUSSIONS_MFE.is_enabled(course.id):
+                return get_discussions_mfe_url(course_key=course.id)
+            return reverse('forum_form_discussion', args=[str(course.id)])
+
+        return _link_func

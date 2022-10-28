@@ -174,7 +174,7 @@ class AccessTokenExchangeForm(forms.Form):
             raise OAuthValidationError(
                 {
                     # invalid_client isn't really the right code, but this mirrors
-                    # https://github.com/edx/django-oauth2-provider/blob/edx/provider/oauth2/forms.py#L331
+                    # https://github.com/openedx/django-oauth2-provider/blob/edx/provider/oauth2/forms.py#L331
                     "error": "invalid_client",
                     "error_description": f"{client_id} is not a public client",
                 }

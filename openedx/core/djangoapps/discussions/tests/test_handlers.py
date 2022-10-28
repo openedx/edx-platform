@@ -18,6 +18,7 @@ class UpdateCourseDiscussionsConfigTestCase(TestCase):
     """
     Tests for the discussion config update handler.
     """
+
     def setUp(self) -> None:
         super().setUp()
         self.course_key = CourseKey.from_string("course-v1:test+test+test")
@@ -39,6 +40,11 @@ class UpdateCourseDiscussionsConfigTestCase(TestCase):
             yield DiscussionTopicContext(
                 title=f"Unit {idx}",
                 usage_key=self.course_key.make_usage_key("vertical", f"unit-{idx}"),
+                context={
+                    "section": f"Section {idx}",
+                    "subsection": f"Subsection {idx}",
+                    "unit": f"Unit {idx}",
+                },
             )
 
     def test_configuration_for_new_course(self):
@@ -96,6 +102,11 @@ class UpdateCourseDiscussionsConfigTestCase(TestCase):
         assert existing_topic_link.provider_id == "openedx"
         assert existing_topic_link.external_id == str(existing_external_id)
         assert existing_topic_link.enabled_in_context
+        assert existing_topic_link.context == {
+            "section": "Section 2",
+            "subsection": "Subsection 2",
+            "unit": "Unit 2",
+        }
 
     @patch.dict(
         "openedx.core.djangoapps.discussions.models.AVAILABLE_PROVIDER_MAP",
@@ -156,8 +167,27 @@ class UpdateCourseDiscussionsConfigTestCase(TestCase):
             provider_id="openedx",
             external_id=existing_external_id,
             enabled_in_context=True,
+            context={
+                "section": "Section 10",
+                "subsection": "Subsection 10",
+                "unit": "Unit 10",
+            },
+        )
+        existing_topic_link_2 = DiscussionTopicLink.objects.create(
+            context_key=self.course_key,
+            usage_key=existing_usage_key,
+            title="Unit 11",
+            provider_id="openedx",
+            external_id=existing_external_id,
+            enabled_in_context=True,
         )
         update_course_discussion_config(config_data)
         existing_topic_link.refresh_from_db()
+        existing_topic_link_2.refresh_from_db()
         # If the unit has an existing link but is disabled or removed
         assert not existing_topic_link.enabled_in_context
+        assert not existing_topic_link_2.enabled_in_context
+        # If a unit has been removed, its title will be updated to clarify where it used to be in the course.
+        assert existing_topic_link.title == "Section 10|Subsection 10|Unit 10"
+        # If there is no stored context, then continue using the Unit name.
+        assert existing_topic_link_2.title == "Unit 11"

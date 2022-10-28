@@ -22,6 +22,7 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
                     url: this.model.get('url'),
                     external_url: this.model.get('external_url'),
                     portable_url: this.model.get('portable_url'),
+                    static_full_url: this.model.get('static_full_url'),
                     asset_type: this.model.get_extension(),
                     uniqueId: uniqueId
                 };

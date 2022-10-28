@@ -29,7 +29,7 @@ class SettingsType():
     values (in addition to ProjectType) to declare explicitly which settings
     (in the specified project) they are extending.
 
-    See https://github.com/edx/edx-platform/master/lms/envs/docs/README.rst for
+    See https://github.com/openedx/edx-platform/master/lms/envs/docs/README.rst for
     further information on each Settings Type.
     """
 

@@ -7,7 +7,10 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import TransformerRegistryTestMixin
-from openedx.core.djangoapps.discussions.models import DEFAULT_PROVIDER_TYPE, DiscussionTopicLink
+from openedx.core.djangoapps.discussions.models import (
+    DiscussionTopicLink,
+    get_default_provider_type,
+)
 from openedx.core.djangoapps.discussions.transformers import DiscussionsTopicLinkTransformer
 
 
@@ -39,7 +42,7 @@ class DiscussionsTopicLinkTransformerTestCase(TransformerRegistryTestMixin, Modu
             context_key=self.course.id,
             usage_key=self.discussable_unit.location,
             title=self.discussable_unit.display_name,
-            provider_id=DEFAULT_PROVIDER_TYPE,
+            provider_id=get_default_provider_type(),
             external_id=self.test_topic_id,
         )
         self.non_discussable_unit = ItemFactory.create(

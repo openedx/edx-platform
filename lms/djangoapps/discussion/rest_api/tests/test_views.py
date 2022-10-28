@@ -520,7 +520,8 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "provider": "legacy",
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
-                "user_is_privileged": False,
+                "has_moderation_privileges": False,
+                "is_group_ta": False,
                 'is_user_admin': False,
                 "user_roles": ["Student"],
                 'learners_tab_enabled': False,
@@ -928,7 +929,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "unread_comment_count": 3,
             "voted": True,
             "author": self.author.username,
-            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
             "abuse_flagged_count": None,
         })]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
@@ -1303,7 +1304,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'rendered_body': '<p>Edited body</p>',
             'preview_body': 'Edited body',
             'editable_fields': [
-                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
                 'title', 'topic_id', 'type', 'voted'
             ],
             'created_at': 'Test Created Date',
@@ -1356,7 +1357,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'read': True,
             'closed': True,
             'abuse_flagged': value,
-            'editable_fields': ['abuse_flagged', 'read'],
+            'editable_fields': ['abuse_flagged', 'copy_link', 'read'],
             'comment_count': 1, 'unread_comment_count': 0
         })
 
@@ -1387,7 +1388,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'comment_count': 1,
             'read': True,
             'editable_fields': [
-                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
                 'title', 'topic_id', 'type', 'voted'
             ],
             'response_count': 2
@@ -1414,7 +1415,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'comment_count': 1,
             'can_delete': False,
             'read': True,
-            'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
+            'editable_fields': ['abuse_flagged', 'copy_link', 'following', 'read', 'voted'],
             'response_count': 2
         })
 
@@ -1492,7 +1493,7 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             {
                 "key": "editable_fields",
                 "value": [
-                    'abuse_flagged', 'anonymous', 'following', 'raw_body',
+                    'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body',
                     'read', 'title', 'topic_id', 'type', 'voted'
                 ]
             },

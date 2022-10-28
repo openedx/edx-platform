@@ -26,10 +26,10 @@ The rest of the functionality would be similar to how the current LTI 1.1 provid
 .. _LTI NRPS: https://www.imsglobal.org/spec/lti-nrps/v2p0
 .. _pylti1.3: https://github.com/dmitry-viskov/pylti1.3
 .. _@dmitry-viskov: https://github.com/dmitry-viskov
-.. _earlier PR: https://github.com/edx/edx-platform/pull/21435
+.. _earlier PR: https://github.com/openedx/edx-platform/pull/21435
 .. _PyPi package: https://pypi.org/project/PyLTI1p3/
 .. _my-learning-analytics: https://github.com/tl-its-umich-edu/my-learning-analytics
-.. _NimbleWise (source): https://github.com/edx/edx-platform/pull/21435#issuecomment-664674601
+.. _NimbleWise (source): https://github.com/openedx/edx-platform/pull/21435#issuecomment-664674601
 
 
 Consequences

@@ -19,9 +19,14 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
-from lms.djangoapps.discussion.toggles import ENABLE_NEW_STRUCTURE_DISCUSSIONS
+from ..config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 
-from ..models import AVAILABLE_PROVIDER_MAP, DEFAULT_CONFIG_ENABLED, DEFAULT_PROVIDER_TYPE, Provider
+from ..models import (
+    AVAILABLE_PROVIDER_MAP,
+    DEFAULT_CONFIG_ENABLED,
+    Provider,
+    get_default_provider_type,
+)
 
 DATA_LEGACY_COHORTS = {
     'divided_inline_discussions': [],
@@ -233,10 +238,9 @@ class CourseDiscussionRoleAuthorizedTests(ApiTest):
         assert response.status_code == status.HTTP_200_OK
 
 
-@ddt.ddt
-class DataTest(AuthorizedApiTest):
+class DataTestMixin:
     """
-    Check API-data correctness
+    Mixin for common test methods for testing API responses.
     """
 
     def get(self):
@@ -260,7 +264,7 @@ class DataTest(AuthorizedApiTest):
         data = response.json()
         assert response.status_code == self.expected_response_code
         assert data['enabled'] == DEFAULT_CONFIG_ENABLED
-        assert data['provider_type'] == DEFAULT_PROVIDER_TYPE
+        assert data['provider_type'] == get_default_provider_type()
         assert data['providers']['available']['legacy'] == AVAILABLE_PROVIDER_MAP['legacy']
         assert not [
             name for name, spec in data['providers']['available'].items()
@@ -298,6 +302,49 @@ class DataTest(AuthorizedApiTest):
         assert response
         assert response.status_code == self.expected_response_code
         return response.json()
+
+
+@ddt.ddt
+class ProviderDataTest(CourseInstructorAuthorizedTest, DataTestMixin):
+    """
+    Tests for provider data when user is not global admin.
+    """
+
+    @ddt.data(
+        # If the legacy provider is selected always show the legacy provider,
+        # and only show the new one if the toggle is enabled
+        (Provider.LEGACY, [Provider.LEGACY], Provider.OPEN_EDX, False),
+        (Provider.LEGACY, [Provider.LEGACY, Provider.OPEN_EDX], 'dummy', True),
+        # If the new provider is selected show the legacy provider only
+        # if the new discussions toggle is disabled
+        (Provider.OPEN_EDX, [Provider.OPEN_EDX, Provider.LEGACY], 'dummy', False),
+        (Provider.OPEN_EDX, [Provider.OPEN_EDX], Provider.LEGACY, True),
+        # If some other provider is selected show only legacy provider if the toggle is false
+        # and only the new provider if the toggle is enabled
+        (Provider.PIAZZA, [Provider.LEGACY], Provider.OPEN_EDX, False),
+        (Provider.PIAZZA, [Provider.OPEN_EDX], Provider.LEGACY, True),
+    )
+    @ddt.unpack
+    def test_available_providers(
+        self, current_provider, visible_providers, hidden_provider, new_structure_enabled
+    ):
+        """
+        Tests that providers available depending on the course.
+        """
+        self._configure_lti_discussion_provider(provider=current_provider)
+        with override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, new_structure_enabled):
+            response = self._get()
+            data = response.json()
+            for visible_provider in visible_providers:
+                assert visible_provider in data['providers']['available'].keys()
+            assert hidden_provider not in data['providers']['available'].keys()
+
+
+@ddt.ddt
+class DataTest(AuthorizedApiTest, DataTestMixin):
+    """
+    Check API-data correctness
+    """
 
     def test_get_non_configured_provider_for_course(self):
         """
@@ -367,34 +414,21 @@ class DataTest(AuthorizedApiTest):
         # directly in the model should be stored here.
         assert course.discussions_settings['piazza'] == {'custom_field': 'custom_value'}
 
-    @ddt.data(
-        # If the legacy provider is selected show the legacy provider only
-        # and hide the new provider even if the mfe is enabled
-        (Provider.LEGACY, [Provider.LEGACY], Provider.OPEN_EDX, False),
-        (Provider.LEGACY, [Provider.LEGACY], Provider.OPEN_EDX, True),
-        # If the new provider is selected show the new provider only
-        # and hide the legacy provider even if the mfe is disabled
-        (Provider.OPEN_EDX, [Provider.OPEN_EDX], Provider.LEGACY, False),
-        (Provider.OPEN_EDX, [Provider.OPEN_EDX], Provider.LEGACY, True),
-        # If some other provider is selected show the new provider
-        # if the mfe is enabled
-        (Provider.PIAZZA, [Provider.LEGACY], Provider.OPEN_EDX, False),
-        (Provider.PIAZZA, [Provider.OPEN_EDX, Provider.LEGACY], 'dummy', True),
-    )
+    @ddt.data(*itertools.product(
+        (Provider.LEGACY, Provider.OPEN_EDX, Provider.PIAZZA),
+        (True, False)
+    ))
     @ddt.unpack
-    def test_available_providers_legacy(
-        self, current_provider, visible_providers, hidden_provider, new_structure_enabled
-    ):
-        """
-        Tests that providers available depending on the course.
-        """
+    def test_available_providers_staff(self, current_provider, new_structure_enabled):
         self._configure_lti_discussion_provider(provider=current_provider)
         with override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, new_structure_enabled):
             response = self._get()
             data = response.json()
+            visible_providers = [Provider.OPEN_EDX, Provider.LEGACY]
+            if not new_structure_enabled:
+                visible_providers = [Provider.LEGACY]
             for visible_provider in visible_providers:
                 assert visible_provider in data['providers']['available'].keys()
-            assert hidden_provider not in data['providers']['available'].keys()
 
     @ddt.data(
         {'enabled': 3},

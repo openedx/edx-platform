@@ -118,6 +118,9 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         log.error("Unable to find course with course key %s while loading the Instructor Dashboard.", course_id)
         return HttpResponseServerError()
 
+    if course_key.deprecated:
+        raise Http404
+
     course = get_course_by_id(course_key, depth=None)
 
     access = {

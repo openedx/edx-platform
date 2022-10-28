@@ -12,7 +12,7 @@ from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-or
 from django.conf import settings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.data import CertificatesDisplayBehaviors
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from openedx.core.djangoapps.models.course_details import ABOUT_ATTRIBUTES, CourseDetails
@@ -25,7 +25,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
     """
     Tests the first course settings page (course dates, overview, etc.).
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
@@ -35,7 +35,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         details = CourseDetails.fetch(self.course.id)
         assert details.org == self.course.location.org, 'Org not copied into'
         assert details.course_id == self.course.location.course, 'Course_id not copied into'
-        assert details.run == self.course.location.block_id, 'Course name not copied into'
+        assert details.run == self.course.location.run, 'Course run not copied into'
         assert details.course_image_name == self.course.course_image
         assert details.start_date.tzinfo is not None
         assert details.end_date is None, ('end date somehow initialized ' + str(details.end_date))
@@ -116,7 +116,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
                    jsondetails.instructor_info
 
     def test_toggle_pacing_during_course_run(self):
-        self.course.start = datetime.datetime.now()
+        self.course.start = datetime.datetime.now(UTC)
         self.store.update_item(self.course, self.user.id)
 
         details = CourseDetails.fetch(self.course.id)

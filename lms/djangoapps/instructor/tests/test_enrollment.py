@@ -438,8 +438,10 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             module_state_key=msk,
             state=original_state
         )
-        # lambda to reload the module state from the database
-        module = lambda: StudentModule.objects.get(student=self.user, course_id=self.course_key, module_state_key=msk)
+
+        def module():
+            return StudentModule.objects.get(student=self.user, course_id=self.course_key, module_state_key=msk)
+
         assert json.loads(module().state)['attempts'] == 32
         reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user)
         assert json.loads(module().state)['attempts'] == 0

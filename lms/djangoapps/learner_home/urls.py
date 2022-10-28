@@ -1,6 +1,6 @@
 """Learner home URL routing configuration"""
 
-from django.urls import path
+from django.urls import re_path
 
 from lms.djangoapps.learner_home import mock_views, views
 
@@ -8,6 +8,13 @@ app_name = "learner_home"
 
 # Learner Dashboard Routing
 urlpatterns = [
-    path("home/", views.dashboard_view, name="dashboard_view"),
-    path("mock/home/", mock_views.dashboard_view),
+    re_path(r"^init/?", views.InitializeView.as_view(), name="initialize"),
+    re_path(
+        r"^mock/init/?", mock_views.InitializeView.as_view(), name="mock_initialize"
+    ),
+    re_path(
+        r"^recommendation/courses/$",
+        views.CourseRecommendationApiView.as_view(),
+        name="courses",
+    ),
 ]

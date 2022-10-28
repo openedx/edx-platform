@@ -9,6 +9,7 @@ from eventtracking import tracker as eventtracker
 from ipware.ip import get_client_ip
 
 from common.djangoapps.track import contexts, shim, tracker
+from lms.djangoapps.utils import OptimizelyClient
 
 
 def _get_request_header(request, header_name, default=''):
@@ -96,6 +97,17 @@ def user_track(request):
 
     with eventtracker.get_tracker().context('edx.course.browser', context_override):
         eventtracker.emit(name=name, data=data)
+
+    # TODO: VAN-1052: This event is added to track the KPIs for A/B experiment.
+    #  Remove it after the experiment has been paused.
+    if (
+        name == 'edx.course.home.resume_course.clicked' and
+        data.get('event_type') == 'start' and
+        request.user
+    ):
+        optimizely_client = OptimizelyClient.get_optimizely_client()
+        if optimizely_client:
+            optimizely_client.track('course_started', str(request.user.id))
 
     return HttpResponse('success')
 

@@ -22,7 +22,7 @@ from django.test import RequestFactory, TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
-from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
@@ -75,7 +75,6 @@ from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expirat
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -144,7 +143,6 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url.split('?')[0] == expected_url
 
     @ddt.data(
-        (False, ModuleStoreEnum.Type.mongo),
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -168,9 +166,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url == expected_redirect_url
 
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_sequence(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_sequence(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -196,9 +193,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url == expected_redirect_url
 
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_module(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_module(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -252,9 +248,8 @@ class TestJumpTo(ModuleStoreTestCase):
     # The new courseware experience does not support this sort of course structure;
     # it assumes a simple course->chapter->sequence->unit->component tree.
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_nested_module(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_nested_module(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -276,7 +271,6 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
     @ddt.data(
-        (False, ModuleStoreEnum.Type.mongo),
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -291,8 +285,6 @@ class TestJumpTo(ModuleStoreTestCase):
 
     @set_preview_mode(True)
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, False, '1'),
-        (ModuleStoreEnum.Type.mongo, True, '2'),
         (ModuleStoreEnum.Type.split, False, '1'),
         (ModuleStoreEnum.Type.split, True, '2'),
     )
@@ -338,8 +330,10 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     """
     NUM_PROBLEMS = 20
 
-    def test_index_query_counts(self):
+    @patch('common.djangoapps.student.helpers.get_course_dates_for_email')
+    def test_index_query_counts(self, mock_course_dates_for_email):
         # TODO: decrease query count as part of REVO-28
+        mock_course_dates_for_email.return_value = []
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -349,6 +343,20 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 vertical = ItemFactory.create(category='vertical', parent_location=section.location)
                 for _ in range(self.NUM_PROBLEMS):
                     ItemFactory.create(category='problem', parent_location=vertical.location)
+
+        course_run = CourseRunFactory.create(key=course.id)
+        course_run['title'] = course.display_name
+        course_run['short_description'] = None
+        course_run['marketing_url'] = 'www.edx.org'
+        course_run['pacing_type'] = 'self_paced'
+        course_run['banner_image_url'] = ''
+        course_run['min_effort'] = 1
+        course_run['enrollment_count'] = 12345
+
+        patch_course_data = patch('openedx.core.djangoapps.catalog.api.get_course_run_details')
+        course_data = patch_course_data.start()
+        course_data.return_value = course_run
+        self.addCleanup(patch_course_data.stop)
 
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, course.id)
@@ -1333,15 +1341,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Assert that valid 'student_id' returns 200 status
         self._get_student_progress_page()
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_unenrolled_student_progress_for_credit_course(self, default_store):
+    def test_unenrolled_student_progress_for_credit_course(self):
         """
          Test that student progress page does not break while checking for an unenrolled student.
          Scenario: When instructor checks the progress of a student who is not enrolled in credit course.
          It should return 200 response.
         """
         # Create a new course, a user which will not be enrolled in course, admin user for staff access
-        course = CourseFactory.create(default_store=default_store)
+        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         admin = AdminFactory.create()
         assert self.client.login(username=admin.username, password='test')
 
@@ -1490,27 +1497,19 @@ class ProgressPageTests(ProgressPageBaseTests):
         with self.assertNumQueries(query_count, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST), check_mongo_calls(2):
             self._get_progress_page()
 
-    @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
-    @ddt.data(
-        (False, 60, 42),
-        (True, 52, 36)
-    )
-    @ddt.unpack
-    def test_progress_queries(self, enable_waffle, initial, subsequent):
+    def test_progress_queries(self):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
-        with override_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
+        with self.assertNumQueries(
+            52, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+        ), check_mongo_calls(2):
+            self._get_progress_page()
+
+        for _ in range(2):
             with self.assertNumQueries(
-                initial, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+                36, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
             ), check_mongo_calls(2):
                 self._get_progress_page()
-
-            # subsequent accesses to the progress page require fewer queries.
-            for _ in range(2):
-                with self.assertNumQueries(
-                    subsequent, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
-                ), check_mongo_calls(2):
-                    self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ENABLE_CERTIFICATES_IDV_REQUIREMENT': True})
     @ddt.data(

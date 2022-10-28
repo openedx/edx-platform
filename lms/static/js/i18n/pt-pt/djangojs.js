@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = (n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
+    const v = (n != 1);
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -24,6 +24,8 @@
     "\n            Do not close this window before you finish your exam. if you close this window, your proctoring session ends, and you will not successfully complete the proctored exam.\n          ": "\n            N\u00e3o feche esta janela antes de terminar o seu exame. se fechar esta janela, a sua sess\u00e3o de supervis\u00e3o termina, e n\u00e3o concluir\u00e1 com sucesso o exame supervisionado.\n          ",
     "\n            Return to the %(platform_name)s course window to start your exam. When you have finished your exam and\n            have marked it as complete, you can close this window to end the proctoring session\n            and upload your proctoring session data for review.\n          ": "\n            Volte \u00e0 janela do curso %(platform_name)s course window to start your exam. para iniciar o exame. Quando terminar o exame e \n            o marcar como completo, pode fechar esta janela para encerrar a sess\u00e3o de supervis\u00e3o\n            e carregar seus dados de sess\u00e3o de supervis\u00e3o para revis\u00e3o.\n          ",
     "\n          You will be guided through steps to set up online proctoring software and verify your identity.\n        ": "\n          Ser\u00e1 guiado atrav\u00e9s de passos para estabelecer um programa de supervis\u00e3o online e verificar a sua identidade.\n        ",
+    "\n        A system error has occurred with your proctored exam. Please reach out to \n        <a href=\"%(link_urls.contact_us)s\" target=\"_blank\">%(platform_name)s Support</a> for \n        assistance, and return to the exam once you receive further instructions.\n      ": "\n        Ocorreu um erro de sistema com o seu exame supervisionado. Por favor contacte o \n        <a href=\"%(link_urls.contact_us)s\" target=\"_blank\">Suporte %(platform_name)s</a> para \n        assist\u00eancia, e volte ao exame assim que receber mais instru\u00e7\u00f5es.\n      ",
+    "\n        A system error has occurred with your proctored exam. Please reach out to your course \n        team at <a href=\"mailto:%(proctoring_escalation_email)s\">%(proctoring_escalation_email)s</a> \n        for assistance, and return to the exam once you receive further instructions.\n      ": "\n        Ocorreu um erro de sistema com o seu exame supervisionado. Por favor, contacte o seu a equipa \n        de curso em <a href=\"mailto:%(proctoring_escalation_email)s\">%(proctoring_escalation_email)s</a> \n        para assist\u00eancia, e volte ao exame assim que receber mais instru\u00e7\u00f5es.\n      ",
     "\n        About Proctored Exams\n        ": "\n        Sobre os Exames Supervisionados\n        ",
     "\n        Are you sure you want to take this exam without proctoring?\n      ": "\n        Tem certeza que quer fazer este exame sem supervis\u00e3o?\n      ",
     "\n        Create your onboarding profile for faster access in the future\n      ": "\n        Crie o seu perfil de admiss\u00e3o para um acesso mais r\u00e1pido no futuro\n      ",
@@ -32,19 +34,25 @@
     "\n        Get familiar with proctoring for real exams later in the course. This practice exam has no impact\n        on your grade in the course.\n      ": "\n        Informe-se sobre a supervis\u00e3o de exames para avalia\u00e7\u00e3o mais tarde no curso. Este exame pr\u00e1tico n\u00e3o tem qualquer impacto\n        sobre a sua nota no curso.\n      ",
     "\n        Hello %(username)s,\n    ": "\n        Ol\u00e1 %(username)s,\n    ",
     "\n        I am ready to start this timed exam.\n      ": "\n       Estou pronto para come\u00e7ar este exame cronometrado.\n      ",
+    "\n        If you take this exam without proctoring, you will not be eligible for course credit or the MicroMasters credential if either applies to this course.\n      ": "\n        Se fizer este exame sem supervis\u00e3o, n\u00e3o ser\u00e1 qualificado para o cr\u00e9dito do curso ou para a inscri\u00e7\u00e3o de MicroMasters se qualquer um dos dois se aplicar a este curso.\n      ",
     "\n        No, I want to continue working.\n      ": "\n        N\u00e3o, quero continuar a trabalhar.\n      ",
     "\n        No, I'd like to continue working\n      ": "\n        N\u00e3o, eu gostaria de continuar a trabalhar.\n      ",
     "\n        Once your profile has been reviewed, you will receive an email with review results. The email will come from\n        <a href=\"mailto:%(learner_notification_from_email)s\">%(learner_notification_from_email)s</a>.\n        Make sure this email has been added to your inbox filter.\n      ": "\n        Assim que o seu perfil tiver sido revisto, receber\u00e1 um e-mail com os resultados da revis\u00e3o. O e-mail do remetente ser\u00e1\n        <a href=\"mailto:%(learner_notification_from_email)s\">%(learner_notification_from_email)s</a>.\n        Certifique-se de que este e-mail foi adicionado ao filtro da sua caixa de entrada.\n      ",
     "\n        Please contact\n        <a href=\"mailto:%(integration_specific_email)s\">%(integration_specific_email)s</a>\n        if you have questions.\n      ": "\n        Por favor contacte\n        <a href=\"mailto:%(integration_specific_email)s\">%(integration_specific_email)s</a>\n        se tiver quest\u00f5es\n      ",
+    "\n        Practice exams do not affect your grade.\n        You have completed this practice exam and can continue with your course work.\n      ": "\n        Os exames pr\u00e1ticos n\u00e3o influenciam a sua nota.\n        J\u00e1 concluiu este exame pr\u00e1tico e pode continuar com o seu trabalho de curso.\n      ",
     "\n        Practice taking a proctored test\n      ": "\n        Pratique realizando um teste com supervis\u00e3o\n      ",
     "\n        The result will be visible after <strong id=\"wait_deadline\"> Loading... </strong>\n    ": "\n        O resultado ficar\u00e1 vis\u00edvel ap\u00f3s <strong id=\"wait_deadline\"> Carregando... </strong>\n    ",
     "\n        There was a problem with your practice proctoring session\n      ": "\n        Houve um problema com a sua sess\u00e3o pr\u00e1ctica de supervis\u00e3o\n      ",
     "\n        To appeal your proctored exam results, please reach out with any relevant information\n        about your exam at \n        <a href=\"%(contact_url)s\">\n            %(contact_url_text)s\n        </a>.\n    ": "\n        Para recorrer dos resultados do seu exame com supervis\u00e3o, por favor contacte com qualquer informa\u00e7\u00e3o relevante\n        sobre o seu exame em \n        <a href=\"%(contact_url)s\">\n            %(contact_url_text)s\n        </a>.\n    ",
     "\n        Try a proctored exam\n      ": "\n        Tente um exame supervisionado\n      ",
+    "\n        You have submitted this practice proctored exam\n      ": "\n        Submeteu este exame pr\u00e1tico supervisionado\n      ",
+    "\n        You will be guided through steps to set up online proctoring software and verify your identity.</br>\n      ": "\n        Ser\u00e1 orientado atrav\u00e9s de etapas para configurar um software de supervis\u00e3o online e verificar a sua identidade.</br>\n      ",
     "\n        Your proctored exam \"%(exam_name)s\" in\n        <a href=\"%(course_url)s\">%(course_name)s</a> was reviewed and the\n        course team has identified one or more violations of the proctored exam rules. Examples\n        of issues that may result in a rules violation include browsing\n        the internet, blurry or missing photo identification, using a phone,\n        or getting help from another person. As a result of the identified issue(s),\n        you did not successfully meet the proctored exam requirements.\n    ": "\n        O seu exame com supervis\u00e3o \"%(exam_name)s\" em\n        <a href=\"%(course_url)s\">%(course_name)s</a> foi revisto e\n        a equipa do curso identificou uma ou mais viola\u00e7\u00f5es das regras do exame supervisionado. Exemplos\n        de quest\u00f5es que podem resultar numa viola\u00e7\u00e3o das regras incluem a navega\u00e7\u00e3o\na internet, a identifica\u00e7\u00e3o por fotografia desfocada ou em falta, utilizando um telefone,\n        ou obter ajuda de outra pessoa. Como resultado da quest\u00e3o identificada(s),\n        n\u00e3o cumpriu com \u00eaxito os requisitos do exame supervisionado.\n    ",
     "\n        Your proctored exam \"%(exam_name)s\" in\n        <a href=\"%(course_url)s\">%(course_name)s</a> was reviewed and you\n        met all proctoring requirements.\n    ": "\n        O seu exame supervisionado \"%(exam_name)s\" em\n        <a href=\"%(course_url)s\">%(course_name)s</a> foi revisto e voc\u00ea\n        satisfez todos os requisitos de supervis\u00e3o.\n    ",
     "\n        Your proctored exam \"%(exam_name)s\" in\n        <a href=\"%(course_url)s\">%(course_name)s</a> was submitted\n        successfully and will now be reviewed to ensure all exam\n        rules were followed. You should receive an email with your exam\n        status within 5 business days.\n    ": "\n        O seu exame supervisionado \"%(exam_name)s\" em\n        <a href=\"%(course_url)s\">%(course_name)s</a> foi submetido\n        com sucesso e ser\u00e1 agora revisto para assegurar todos os exames\nas regras foram seguidas. Dever\u00e1 receber um e-mail com o seu exame\n        estado dentro de 5 dias \u00fateis.\n    ",
+    "\n        Your proctoring session ended before you completed this practice exam.\n        You can retry this practice exam if you had problems setting up the online proctoring software.\n      ": "\n        A sua sess\u00e3o de supervis\u00e3o terminou antes de completar este exame pr\u00e1tico.\n        Pode tentar novamente este exame pr\u00e1tico se tiver problemas na instala\u00e7\u00e3o do software de supervis\u00e3o online.\n      ",
     "\n      After you submit your exam, your exam will be graded.\n    ": "\nDepois de submeter o seu exame, o seu exame ser\u00e1 classificado.",
+    "\n      Alternatively, you can end your exam.\n    ": "\n      Em alternativa, pode terminar o seu exame.\n    ",
     "\n      Are you sure that you want to submit your timed exam?\n    ": "\n      Tem a certeza de que deseja submeter o seu exame cronometrado?\n    ",
     "\n      Are you sure you want to end your proctored exam?\n    ": "\n      Tem certeza que quer terminar o seu exame supervisionado?\n    ",
     "\n      Because the due date has passed, you are no longer able to take this exam.\n    ": "\n      Porque a data limite j\u00e1 passou, j\u00e1 n\u00e3o pode fazer este exame.\n    ",
@@ -61,6 +69,7 @@
     "\n      Proctoring for this course is provided via %(provider_name)s.  Onboarding review, including identity verification, can take 2+ business days.\n    ": "\n      A supervis\u00e3o para este curso \u00e9 fornecida atrav\u00e9s de%(provider_name)s.  A revis\u00e3o da admiss\u00e3o, incluindo a verifica\u00e7\u00e3o de identidade, pode demorar mais de 2 dias \u00fateis.\n    ",
     "\n      The due date for this exam has passed\n    ": "\n      A data limite deste exame j\u00e1 passou\n    ",
     "\n      This exam is proctored\n    ": "\n      Este exame \u00e9 supervisionado\n    ",
+    "\n      To be eligible for credit or the program credential associated with this course, you must pass the proctoring review for this exam.\n\n    ": "\n      Para ser eleito para o cr\u00e9dito ou para a inscri\u00e7\u00e3o no programa associado a este curso, deve passar na revis\u00e3o de supervis\u00e3o para este exame.\n\n    ",
     "\n      To view your exam questions and responses, select <strong>View my exam</strong>. The exam's review status is shown in the left navigation pane.\n    ": "\n      Para ver suas perguntas e respostas do exame, seleccione <strong>Ver o meu exame</strong>. O estado de revis\u00e3o do exame \u00e9 mostrado no painel de navega\u00e7\u00e3o esquerdo\n    ",
     "\n      Why this is important to you:\n    ": "\n      Porque \u00e9 que isto \u00e9 importante para si:\n    ",
     "\n      Yes, submit my timed exam.\n    ": "\n      Sim, submeter o meu exame cronometrado.\n    ",
@@ -83,7 +92,6 @@
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": " A partir deste momento, deve seguir o <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">regras de supervisi\u00e3o online</a> para passar na revis\u00e3o de supervis\u00e3o para o seu exame.   ",
     " Member": [
       " Membro",
-      " Membros",
       " Membros"
     ],
     " Your Proctoring Session Has Started ": "A Sua Sess\u00e3o De Supervis\u00e3o J\u00e1 Come\u00e7ou",
@@ -111,7 +119,6 @@
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)s coment\u00e1rios (%(unread_comments_count)s coment\u00e1rios por ler) %(span_close)s",
     "%(errorCount)s error found in form.": [
       "%(errorCount)s erro encontrado no formul\u00e1rio.",
-      "%(errorCount)s erros encontrados no formul\u00e1rio.",
       "%(errorCount)s erros encontrados no formul\u00e1rio."
     ],
     "%(field)s can only contain up to %(count)d characters.": "%(field)s pode conter apenas at\u00e9%(count)d caracteres.",
@@ -120,43 +127,35 @@
     "%(programName)s Home Page.": "%(programName)s - P\u00e1gina Inicial.",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s selecionado",
-      "%(sel)s de %(cnt)s selecionados",
-      ""
+      "%(sel)s de %(cnt)s selecionados"
     ],
     "%(type)s Component Template Menu": "%(type)s Menu de Modelo de Componente",
     "%(value)s hour": [
       "%(value)s hora",
-      "%(value)s horas",
       "%(value)s horas"
     ],
     "%(value)s minute": [
       "%(value)s minuto",
-      "%(value)s minutos",
       "%(value)s minutos"
     ],
     "%(value)s second": [
       "%(value)s segundo",
-      "%(value)s segundos",
       "%(value)s segundos"
     ],
     "%d day": [
       "%d dia",
-      "%d dias",
       "%d dias"
     ],
     "%d minute": [
       "%d minuto",
-      "%d minutos",
       "%d minutos"
     ],
     "%d month": [
       "%d m\u00eas",
-      "%d meses",
       "%d meses"
     ],
     "%d year": [
       "%d ano",
-      "%d anos",
       "%d anos"
     ],
     "%s ago": "%s atr\u00e1s",
@@ -174,7 +173,6 @@
     "(Staff)": "(Equipa)",
     "(contains %(student_count)s student)": [
       "(cont\u00e9m %(student_count)s estudante)",
-      "(cont\u00e9m %(student_count)s estudantes)",
       "(cont\u00e9m %(student_count)s estudantes)"
     ],
     "(optional)": "(opcional)",
@@ -532,7 +530,6 @@
     "Contains staff only content": "Cont\u00e9m apenas conte\u00fado da equipa",
     "Contains {count} group": [
       "Cont\u00e9m {count} grupo",
-      "Cont\u00e9m {count} grupos.",
       "Cont\u00e9m {count} grupos."
     ],
     "Content Group ID": "ID do Grupo de Conte\u00fado",
@@ -540,6 +537,7 @@
     "Content-Specific Discussion Topics": "T\u00f3picos de Debate Espec\u00edficos do Conte\u00fado",
     "Continue Exam Without Proctoring": "Continuar o Exame Sem Supervis\u00e3o",
     "Continue to my practice exam": "Continue para o meu exame de pr\u00e1tica",
+    "Continue to my proctored exam.": "Continuar para o meu exame supervisionado.",
     "Continue to onboarding": "Continuar para admiss\u00e3o",
     "Copy": "Copiar",
     "Copy Component Location": "Localiza\u00e7\u00e3o do componente da c\u00f3pia",
@@ -565,7 +563,6 @@
     "Country or Region of Residence": "Pa\u00eds ou Regi\u00e3o de Resid\u00eancia",
     "Course": [
       "Curso",
-      "Cursos",
       "Cursos"
     ],
     "Course Content": "Conte\u00fado do Curso",
@@ -1118,7 +1115,6 @@
     "Load next {numResponses} responses": "Carregar pr\u00f3ximas {numResponses} respostas",
     "Load next {num_items} result": [
       "Carregar o pr\u00f3ximo {num_items} resultado",
-      "Carregar os pr\u00f3ximos {num_items} resultados",
       "Carregar os pr\u00f3ximos {num_items} resultados"
     ],
     "Loading": "Carregando",
@@ -1238,13 +1234,11 @@
     "Note: Learners can be in only one cohort. Adding learners to this group overrides any previous group assignment.": "Nota: os estudantes apenas podem pertencer a um grupo. Adicionar alunos a este grupo sobrep\u00f5e-se a qualquer atribui\u00e7\u00e3o de grupo anterior.",
     "Note: You are %s hour ahead of server time.": [
       "Nota: O seu fuso hor\u00e1rio est\u00e1 %s hora adiantado em rela\u00e7\u00e3o ao servidor.",
-      "Nota: O seu fuso hor\u00e1rio est\u00e1 %s horas adiantado em rela\u00e7\u00e3o ao servidor.",
-      ""
+      "Nota: O seu fuso hor\u00e1rio est\u00e1 %s horas adiantado em rela\u00e7\u00e3o ao servidor."
     ],
     "Note: You are %s hour behind server time.": [
       "Nota: O use fuso hor\u00e1rio est\u00e1 %s hora atrasado em rela\u00e7\u00e3o ao servidor.",
-      "Nota: O use fuso hor\u00e1rio est\u00e1 %s horas atrasado em rela\u00e7\u00e3o ao servidor.",
-      ""
+      "Nota: O use fuso hor\u00e1rio est\u00e1 %s horas atrasado em rela\u00e7\u00e3o ao servidor."
     ],
     "Noted in:": "Anotado em:",
     "Notes": "Notas",
@@ -1274,7 +1268,6 @@
     "Once you complete one of the program requirements you have a program record. This record is marked complete once you meet all program requirements. A program record can be used to continue your learning journey and demonstrate your learning to others.": "Uma vez que complete um dos requisitos do programa, tem um registo do programa. Este registo \u00e9 marcado como completo uma vez cumpridos todos os requisitos do programa. Um registo do programa pode ser utilizado para continuar o seu percurso de aprendizagem e demonstrar o que aprendeu aos outros",
     "Once your account is deleted, you cannot use it to take courses on the {platformName} app, {siteName}, or any other site hosted by {platformName}.": "Uma vez apagada a sua conta, n\u00e3o pode us\u00e1-la para fazer cursos na aplica\u00e7\u00e3o {platformName}, {siteName} ou qualquer outro site hospedado por {platformName}.",
     "One or more rescheduling tasks failed.": "Ocorreu erro no reagendamento de uma ou mais tarefas.",
-    "Only ": "Apenas ",
     "Only <%- fileTypes %> files can be uploaded. Please select a file ending in <%- (fileExtensions) %> to upload.": "Apenas os ficheiros <%- fileTypes %> podem ser enviados . Por favor, selecione um ficheiro que termine em <%- (fileExtensions) %> para enviar.",
     "Only properly formatted .csv files will be accepted.": "Apenas ficheiros .csv formatados corretamente ser\u00e3o aceites.",
     "Only the parent course staff of a CCX can create content groups.": "Apenas os respons\u00e1veis pela cria\u00e7\u00e3o do curso de CCX podem criar grupos de conte\u00fado.",
@@ -1443,6 +1436,7 @@
     "Read more": "Ler mais",
     "Ready To Start": "Pronto Para Come\u00e7ar",
     "Ready To Submit": "Pronto Para Submeter",
+    "Ready to Resume": "Pronto a Retomar",
     "Reason": "Raz\u00e3o",
     "Reason field should not be left blank.": "O campo Motivo n\u00e3o deve ser deixado em branco.",
     "Reason for change:": "Motivo da altera\u00e7\u00e3o:",
@@ -1504,6 +1498,7 @@
     "Restore enrollment code": "Recuperar o c\u00f3digo de inscri\u00e7\u00e3o",
     "Restore last draft": "Repor \u00faltimo projecto",
     "Restrict access to:": "Restringir o acesso a:",
+    "Resumed": "Retomado",
     "Retake Photo": "Voltar a Tirar a Fotografia",
     "Retake Your Photos": "Regressar \u00e0s Suas Fotografias",
     "Retrieving enrollment status...": "Obtendo estado da matricula...",
@@ -1596,7 +1591,6 @@
     "Show Annotations": "Mostrar Anota\u00e7\u00f5es",
     "Show Comment (%(num_comments)s)": [
       "Mostrar coment\u00e1rio (%(num_comments)s)",
-      "Mostrar Coment\u00e1rios (%(num_comments)s)",
       "Mostrar Coment\u00e1rios (%(num_comments)s)"
     ],
     "Show Deprecated Settings": "Mostrar Defini\u00e7\u00f5es Descontinuadas",
@@ -1616,7 +1610,6 @@
     "Showing all responses": "Mostrar todas as respostas",
     "Showing first response": [
       "A apresentar a primeira resposta",
-      "A mostar as primeiras {numResponses} respostas",
       "A mostar as primeiras {numResponses} respostas"
     ],
     "Showing results for \"{searchString}\"": "Mostrar resultados para \"{searchString}\"",
@@ -1859,7 +1852,6 @@
     "There was an error retrieving preview results for this catalog. Please check that your query is correct and try again.": "Ocorreu um erro ao tentar recuperar os resultados de visualiza\u00e7\u00e3o deste cat\u00e1logo. Por favor, verifique se a sua pesquisa est\u00e1 correta e tente novamente.",
     "There was an error when trying to add learners:": [
       "Ocorreu um erro na tentativa de adicionar estudantes:",
-      "{numErrors} estudantes n\u00e3o puderam ser adicionados a este grupo:",
       "{numErrors} estudantes n\u00e3o puderam ser adicionados a este grupo:"
     ],
     "There was an error while importing the new course to our database.": "Ocorreu um erro durante a importa\u00e7\u00e3o do novo curso para a nossa base de dados.",
@@ -2103,7 +2095,6 @@
     "Used": "Utilizado",
     "Used in {count} location": [
       "Usado em {count} local",
-      "Utilizado em {count} locais",
       "Utilizado em {count} locais"
     ],
     "User Email": "Email do Utilizador",
@@ -2156,7 +2147,6 @@
     "View {span_start} {team_name} {span_end}": "Ver {span_start} {team_name} {span_end}",
     "Viewing %s course": [
       "A visualizar %s curso",
-      "A visualizar %s cursos",
       "A visualizar %s cursos"
     ],
     "Visibility": "Visibilidade",
@@ -2310,7 +2300,6 @@
     "Your entire face fits inside the frame.": "O rosto inteiro est\u00e1 dentro dos limites.",
     "Your export has failed.": "Falha na exporta\u00e7\u00e3o.",
     "Your face is well-lit.": "O rosto est\u00e1 bem iluminado.",
-    "Your file ": "O seu ficheiro ",
     "Your file '{file}' has been uploaded. Allow a few minutes for processing.": "O seu ficheiro '{file}' foi carregado. Aguarde uns minutos para concluir o processamento.",
     "Your file could not be uploaded": "N\u00e3o foi poss\u00edvel enviar o seu ficheiro",
     "Your file has been deleted.": "O seu ficheiro foi eliminado.",
@@ -2349,7 +2338,6 @@
     "a timed exam": "um exame cronometrado",
     "about %d hour": [
       "cerca de %d hora",
-      "cerca de %d horas",
       "cerca de %d horas"
     ],
     "about a minute": "cerca de um minuto",
@@ -2438,7 +2426,6 @@
     "text_word_{uniqueId} title_word_{uniqueId}": "texto_palavra_{uniqueId} t\u00edtulo_palavra_{uniqueId}",
     "there is currently {numVotes} vote": [
       "existe atualmente {numVotes} voto",
-      "existem atualmente {numVotes} votos",
       "existem atualmente {numVotes} votos"
     ],
     "title_word_{uniqueId}": "t\u00edtulo_palavra_{uniqueId}",
@@ -2465,12 +2452,10 @@
     "{download_link_start}Download this image (right-click or option-click, save as){link_end} and then {upload_link_start}upload{link_end} it to your backpack.": "{download_link_start} Transfira esta imagem (clique com o bot\u00e3o direito do rato, ou bot\u00e3o de op\u00e7\u00f5es, e use op\u00e7\u00e3o salvar como){link_end} e, em seguida, {upload_link_start}carregue-a{link_end}- para a sua mochila.",
     "{earned}/{possible} point (graded)": [
       "{earned}/{possible} ponto (classificado)",
-      "{earned}/{possible} pontos (classificado)",
       "{earned}/{possible} pontos (classificado)"
     ],
     "{earned}/{possible} point (ungraded)": [
       "{earned}/{possible} ponto (n\u00e3o classificado)",
-      "{earned}/{possible} pontos (n\u00e3o classificado)",
       "{earned}/{possible} pontos (n\u00e3o classificado)"
     ],
     "{email}": "{email}",
@@ -2484,37 +2469,30 @@
     "{minutes} {unit}": "{minutes} {unit}",
     "{numMoved} learner was moved from {prevCohort}": [
       "{numMoved} estudante foi movido de {prevCohort}",
-      "{numMoved} estudantes foram transferidos de {prevCohort}",
       "{numMoved} estudantes foram transferidos de {prevCohort}"
     ],
     "{numPreassigned} learner was pre-assigned for this cohort. This learner will automatically be added to the cohort when they enroll in the course.": [
       "{numPreassigned} estudante foi previamente designado para esta coorte. Este estudante ser\u00e1 automaticamente adicionado na coorte quando ingressar no curso.",
-      "{numPreassigned} estudantes foram previamente designados para este grupo. Estes estudantes ser\u00e3o automaticamente adicionados ao grupo quando ingressarem no curso.",
       "{numPreassigned} estudantes foram previamente designados para este grupo. Estes estudantes ser\u00e3o automaticamente adicionados ao grupo quando ingressarem no curso."
     ],
     "{numPresent} learner was already in the cohort": [
       "{numPresent} estudante j\u00e1 estava na coorte",
-      "estudantes{numPresent} estudantes j\u00e1 fazem parte do grupo",
       "estudantes{numPresent} estudantes j\u00e1 fazem parte do grupo"
     ],
     "{numResponses} other response": [
       "{numResponses} outra resposta",
-      "{numResponses} outras respostas",
       "{numResponses} outras respostas"
     ],
     "{numResponses} response": [
       "{numResponses} resposta",
-      "{numResponses} respostas",
       "{numResponses} respostas"
     ],
     "{numUsersAdded} learner has been added to this cohort. ": [
       "{numUsersAdded} estudante foi adicionado a esta coorte. ",
-      "{numUsersAdded} estudantes foram adicionados a este grupo.",
       "{numUsersAdded} estudantes foram adicionados a este grupo."
     ],
     "{numVotes} Vote": [
       "{numVotes} Voto",
-      "{numVotes} Votos",
       "{numVotes} Votos"
     ],
     "{num_of_hours} hour": "{num_of_hours} hora",
@@ -2523,22 +2501,18 @@
     "{num_of_minutes} minutes": "{num_of_minutes} minutos",
     "{num_points} point possible (graded)": [
       "{num_points} ponto poss\u00edvel (classificado)",
-      "{num_points} pontos poss\u00edveis (classificado)",
       "{num_points} pontos poss\u00edveis (classificado)"
     ],
     "{num_points} point possible (graded, results hidden)": [
       "{num_points} ponto poss\u00edvel (classificado, resultados ocultos)",
-      "{num_points} pontos poss\u00edveis (classificado, resultados ocultados)",
       "{num_points} pontos poss\u00edveis (classificado, resultados ocultados)"
     ],
     "{num_points} point possible (ungraded)": [
       "{num_points} ponto poss\u00edvel (n\u00e3o classificado)",
-      "{num_points} pontos poss\u00edveis (n\u00e3o classificado)",
       "{num_points} pontos poss\u00edveis (n\u00e3o classificado)"
     ],
     "{num_points} point possible (ungraded, results hidden)": [
       "{num_points} ponto poss\u00edvel (n\u00e3o classificado, resultados ocultos)",
-      "{num_points} pontos poss\u00edveis (n\u00e3o classificado, resultados ocultos)",
       "{num_points} pontos poss\u00edveis (n\u00e3o classificado, resultados ocultos)"
     ],
     "{organization}\\'s logo": "Logo da {organization}",
@@ -2556,13 +2530,11 @@
     "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on {platformName}.{strongEnd}": "{strongStart} Aviso: O apagar da conta \u00e9 permanente. {strongEnd} Leia atentamente o texto antes de prosseguir. Esta \u00e9 uma a\u00e7\u00e3o irrevers\u00edvel, e {strongStart} n\u00e3o poder\u00e1 voltar a usar o mesmo e-mail em {platformName}. {strongEnd}",
     "{team_count} Team": [
       "{team_count} Equipa",
-      "{team_count} Equipas",
       "{team_count} Equipas"
     ],
     "{totalItems} total": " total {totalItems}",
     "{total_results} result found for \"{search_term}\"": [
       "{total_results} resultado encontrado para \"{search_term}\"",
-      "{total_results} resultados encontrados para \"{search_term}\"",
       "{total_results} resultados encontrados para \"{search_term}\""
     ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",

@@ -66,7 +66,7 @@ from .video_xfields import VideoFields
 # edxval is a proper XBlock Runtime Service.
 #
 # Here's the deal: the VideoBlock should be able to take advantage of edx-val
-# (https://github.com/edx/edx-val) to figure out what URL to give for video
+# (https://github.com/openedx/edx-val) to figure out what URL to give for video
 # resources that have an edx_video_id specified. edx-val is a Django app, and
 # including it causes tests to fail because we run common/lib tests standalone
 # without Django dependencies. The alternatives seem to be:
@@ -371,7 +371,7 @@ class VideoBlock(
         poster = None
         if edxval_api and self.edx_video_id:
             poster = edxval_api.get_course_video_image_url(
-                course_id=self.runtime.course_id.for_branch(None),
+                course_id=self.scope_ids.usage_id.context_key.for_branch(None),
                 edx_video_id=self.edx_video_id.strip()
             )
 
@@ -741,12 +741,11 @@ class VideoBlock(
                 # (i.e. `self.transcripts`) on import and older open-releases (<= ginkgo),
                 # who do not have deprecated contentstore yet, can also import and use new-style
                 # transcripts into their openedX instances.
-
                 exported_metadata = edxval_api.export_to_xml(
                     video_id=edx_video_id,
                     resource_fs=resource_fs,
                     static_dir=EXPORT_IMPORT_STATIC_DIR,
-                    course_id=str(self.runtime.course_id.for_branch(None))
+                    course_id=self.scope_ids.usage_id.context_key.for_branch(None),
                 )
                 # Update xml with edxval metadata
                 xml.append(exported_metadata['xml'])
@@ -832,7 +831,7 @@ class VideoBlock(
         if self.edx_video_id and edxval_api:
 
             val_profiles = ['youtube', 'desktop_webm', 'desktop_mp4']
-            if HLSPlaybackEnabledFlag.feature_enabled(self.runtime.course_id.for_branch(None)):
+            if HLSPlaybackEnabledFlag.feature_enabled(self.scope_ids.usage_id.context_key.for_branch(None)):
                 val_profiles.append('hls')
 
             # Get video encodings for val profiles.

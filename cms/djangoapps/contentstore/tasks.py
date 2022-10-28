@@ -51,6 +51,8 @@ from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.monitoring import monitor_import_failure
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
+from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
+from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -119,6 +121,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         store = modulestore()
         with store.default_store('split'):
             store.clone_course(source_course_key, destination_course_key, user_id, fields=fields)
+        update_unit_discussion_state_from_discussion_blocks(destination_course_key, user_id)
 
         # set initial permissions for the user to access the course.
         initialize_permissions(destination_course_key, User.objects.get(id=user_id))
@@ -240,13 +243,17 @@ def update_special_exams_and_publish(course_key_str):
     on_course_publish expects that the edx-proctoring subsystem has been refreshed
     before being executed, so both functions are called here synchronously.
     """
-    from cms.djangoapps.contentstore.proctoring import register_special_exams
+    from cms.djangoapps.contentstore.exams import register_exams
+    from cms.djangoapps.contentstore.proctoring import register_special_exams as register_exams_legacy
     from openedx.core.djangoapps.credit.signals import on_course_publish
 
     course_key = CourseKey.from_string(course_key_str)
     LOGGER.info('Attempting to register exams for course %s', course_key_str)
+
+    # Call the appropriate handler for either the exams IDA or the edx-proctoring plugin
+    register_exams_handler = register_exams if exams_ida_enabled(course_key) else register_exams_legacy
     try:
-        register_special_exams(course_key)
+        register_exams_handler(course_key)
         LOGGER.info('Successfully registered exams for course %s', course_key_str)
     # pylint: disable=broad-except
     except Exception as exception:

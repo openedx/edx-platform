@@ -6,12 +6,14 @@ Milestones Transformer
 import logging
 
 from django.conf import settings
+from django.utils.translation import gettext as _
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 
 from common.djangoapps.student.models import EntranceExamConfiguration
 from common.djangoapps.util import milestones_helpers
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
+from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 
 log = logging.getLogger(__name__)
 
@@ -113,17 +115,14 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
         """
         For special exams, add the special exam information to the course blocks.
         """
-        special_exam_attempt_context = None
-        try:
-            # Calls into edx_proctoring subsystem to get relevant special exam information.
-            # This will return None, if (user, course_id, content_id) is not applicable.
-            special_exam_attempt_context = get_attempt_status_summary(
-                usage_info.user.id,
-                str(block_key.course_key),
-                str(block_key)
-            )
-        except ProctoredExamNotFoundException as ex:
-            log.exception(ex)
+        special_exam_attempt_context = self._generate_special_exam_attempt_context(
+            block_structure.get_xblock_field(block_key, 'is_practice_exam'),
+            block_structure.get_xblock_field(block_key, 'is_proctored_enabled'),
+            block_structure.get_xblock_field(block_key, 'is_timed_exam'),
+            usage_info.user.id,
+            block_key.course_key,
+            str(block_key)
+        )
 
         if special_exam_attempt_context:
             # This user has special exam context for this block so add it.
@@ -172,3 +171,43 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
             return True
 
         return False
+
+    def _generate_special_exam_attempt_context(self, is_practice_exam, is_proctored_enabled,
+                                               is_timed_exam, user_id, course_key, block_key):
+        """
+        Helper method which generates the special exam attempt context.
+        Either calls into proctoring or, if exams ida waffle flag on, then get internally.
+        Note: This method duplicates the method by the same name in:
+        openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+        For now, both methods exist to avoid importing from different directories. In the future,
+        we could potentially consolidate if there is a good common place to implement.
+        """
+        special_exam_attempt_context = None
+
+        # if exams waffle flag enabled, get exam type internally
+        if exams_ida_enabled(course_key):
+            # add short description based on exam type
+            if is_practice_exam:
+                exam_type = _('Practice Exam')
+            elif is_proctored_enabled:
+                exam_type = _('Proctored Exam')
+            elif is_timed_exam:
+                exam_type = _('Timed Exam')
+            else:  # sets a default, though considered impossible
+                log.info('Using default Exam value for exam type.')
+                exam_type = _('Exam')
+
+            summary = {'short_description': exam_type, }
+            special_exam_attempt_context = summary
+        else:
+            try:
+                # Calls into edx_proctoring subsystem to get relevant special exam information.
+                special_exam_attempt_context = get_attempt_status_summary(
+                    user_id,
+                    str(course_key),
+                    block_key
+                )
+            except ProctoredExamNotFoundException as ex:
+                log.exception(ex)
+
+        return special_exam_attempt_context

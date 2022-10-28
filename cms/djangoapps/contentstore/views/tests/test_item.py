@@ -8,6 +8,7 @@ from unittest.mock import Mock, PropertyMock, patch
 
 import ddt
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -166,35 +167,6 @@ class GetItemTest(ItemTest):
         if content_contains:
             self.assertContains(resp, content_contains, status_code=expected_code)
         return resp
-
-    @ddt.data(
-        (1, 17, 15, 16, 12),
-        (2, 17, 15, 16, 12),
-        (3, 17, 15, 16, 12),
-    )
-    @ddt.unpack
-    def test_get_query_count(self, branching_factor, chapter_queries, section_queries, unit_queries, problem_queries):
-        self.populate_course(branching_factor)
-        # Retrieve it
-        with check_mongo_calls(chapter_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['chapter'][-1]))
-        with check_mongo_calls(section_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['sequential'][-1]))
-        with check_mongo_calls(unit_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['vertical'][-1]))
-        with check_mongo_calls(problem_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
-
-    @ddt.data(
-        (1, 30),
-        (2, 32),
-        (3, 34),
-    )
-    @ddt.unpack
-    def test_container_get_query_count(self, branching_factor, unit_queries,):
-        self.populate_course(branching_factor)
-        with check_mongo_calls(unit_queries):
-            self.client.get(reverse_usage_url('xblock_container_handler', self.populated_usage_keys['vertical'][-1]))
 
     def test_get_vertical(self):
         # Add a vertical
@@ -2171,6 +2143,15 @@ class TestComponentHandler(TestCase):
         with self.assertRaises(Http404):
             component_handler(self.request, self.usage_key_string, 'invalid_handler')
 
+    def test_submit_studio_edits_checks_author_permission(self):
+        with self.assertRaises(PermissionDenied):
+            with patch(
+                'common.djangoapps.student.auth.has_course_author_access',
+                return_value=False
+            ) as mocked_has_course_author_access:
+                component_handler(self.request, self.usage_key_string, 'submit_studio_edits')
+                assert mocked_has_course_author_access.called is True
+
     @ddt.data('GET', 'POST', 'PUT', 'DELETE')
     def test_request_method(self, method):
 
@@ -2565,7 +2546,7 @@ class TestXBlockInfo(ItemTest):
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 3, 3),
-        (ModuleStoreEnum.Type.mongo, 5, 7),
+        (ModuleStoreEnum.Type.mongo, 8, 12),
     )
     @ddt.unpack
     def test_xblock_outline_handler_mongo_calls(self, store_type, chapter_queries, chapter_queries_1):

@@ -20,8 +20,8 @@ JSON-based API for post requests. It also only supports session-based auth. Whil
 this works well currently, for MFE consumption this is not ideal. The
 `advanced course settings`_ view is in a similar situation.
 
-.. _old-style functional view: https://github.com/edx/edx-platform/blob/49296005db7397e1a45e2864d93d39cf790a5fce/cms/djangoapps/contentstore/views/tabs.py#L27
-.. _advanced course settings: https://github.com/edx/edx-platform/blob/49296005db7397e1a45e2864d93d39cf790a5fce/cms/djangoapps/contentstore/views/course.py#L1367
+.. _old-style functional view: https://github.com/openedx/edx-platform/blob/49296005db7397e1a45e2864d93d39cf790a5fce/cms/djangoapps/contentstore/views/tabs.py#L27
+.. _advanced course settings: https://github.com/openedx/edx-platform/blob/49296005db7397e1a45e2864d93d39cf790a5fce/cms/djangoapps/contentstore/views/course.py#L1367
 
 To avoid disrupting the existing studio views that might still be needed for the next
 few releases, we need to maintain these existing views while also enabling MFEs to
@@ -61,4 +61,4 @@ not JSON.
 For the short-term though, these APIs will unblock progress on new MFE UX without
 without needing to write entirely new APIs.
 
-.. _Course Authoring MFE: https://github.com/edx/frontend-app-course-authoring/
+.. _Course Authoring MFE: https://github.com/openedx/frontend-app-course-authoring/

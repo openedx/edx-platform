@@ -6,6 +6,7 @@ This test file will test registration, login, activation, and session activity t
 import datetime
 import time
 from unittest import mock
+from urllib.parse import quote_plus
 
 from ddt import data, ddt, unpack
 from django.conf import settings
@@ -174,10 +175,11 @@ class AuthTestCase(ContentStoreTestCase):
         with mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": allow_account_creation}):
             response = self.client.get(reverse('homepage'))
             assertion_method = getattr(self, assertion_method_name)
+            login_url = quote_plus(f"http://testserver{settings.LOGIN_URL}")
             assertion_method(
                 response,
-                '<a class="action action-signup" href="{}/register?next=http%3A%2F%2Ftestserver%2F">Sign Up</a>'.format
-                (settings.LMS_ROOT_URL)
+                f'<a class="action action-signup" href="{settings.LMS_ROOT_URL}/register'
+                f'?next={login_url}">Sign Up</a>'
             )
             self.assertContains(
                 response,

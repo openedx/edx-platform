@@ -47,10 +47,10 @@ References
 ----------
 
 Model definition
-- https://github.com/edx/edx-platform/blob/a5ec801a2a91f928bf582ee9ba2092a5bfbe7d7e/openedx/core/djangoapps/external_user_ids/models.py#L17
+- https://github.com/openedx/edx-platform/blob/a5ec801a2a91f928bf582ee9ba2092a5bfbe7d7e/openedx/core/djangoapps/external_user_ids/models.py#L17
 
 Anonymous User ID Table
-- https://github.com/edx/edx-platform/blob/6ee2089077b76581e14f230f0c9224757dbdb652/common/djangoapps/student/models.py#L130-L140
+- https://github.com/openedx/edx-platform/blob/6ee2089077b76581e14f230f0c9224757dbdb652/common/djangoapps/student/models.py#L130-L140
 
 Some notes on why add a type table
 - https://www.itprotoday.com/sql-server/trouble-type-tables

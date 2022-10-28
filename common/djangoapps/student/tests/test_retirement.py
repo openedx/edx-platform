@@ -266,8 +266,8 @@ class TestRegisterRetiredUsername(TestCase):
     """
     # The returned message here varies depending on whether a ValidationError -or-
     # an AccountValidationError occurs.
-    INVALID_ACCT_ERR_MSG = ('An account with the Public Username', 'already exists.')
-    INVALID_ERR_MSG = ('It looks like', 'belongs to an existing account. Try again with a different username.')
+    INVALID_ACCT_ERR_MSG = "An account with the Public Username '{username}' already exists."
+    INVALID_ERR_MSG = "It looks like this username is already taken"
 
     def setUp(self):
         super().setUp()
@@ -281,7 +281,7 @@ class TestRegisterRetiredUsername(TestCase):
             'honor_code': 'true',
         }
 
-    def _validate_exiting_username_response(self, orig_username, response, start_msg=INVALID_ACCT_ERR_MSG[0], end_msg=INVALID_ACCT_ERR_MSG[1]):  # lint-amnesty, pylint: disable=line-too-long
+    def _validate_exiting_username_response(self, orig_username, response, error_message):
         """
         Validates a response stating that a username already exists -or- is invalid.
         """
@@ -289,9 +289,7 @@ class TestRegisterRetiredUsername(TestCase):
         obj = json.loads(response.content.decode('utf-8'))
 
         username_msg = obj['username'][0]['user_message']
-        assert username_msg.startswith(start_msg)
-        assert username_msg.endswith(end_msg)
-        assert orig_username in username_msg
+        assert username_msg == error_message
 
     def test_retired_username(self):
         """
@@ -307,7 +305,7 @@ class TestRegisterRetiredUsername(TestCase):
         # Attempt to create another account with the same username that's been retired.
         self.url_params['username'] = orig_username
         response = self.client.post(self.url, self.url_params)
-        self._validate_exiting_username_response(orig_username, response, self.INVALID_ERR_MSG[0], self.INVALID_ERR_MSG[1])  # lint-amnesty, pylint: disable=line-too-long
+        self._validate_exiting_username_response(orig_username, response, self.INVALID_ERR_MSG)
 
     def test_username_close_to_retired_format_active(self):
         """
@@ -315,6 +313,9 @@ class TestRegisterRetiredUsername(TestCase):
         """
         # Attempt to create an account with a username similar to the format of a retired username
         # which matches the RETIRED_USERNAME_PREFIX setting.
-        self.url_params['username'] = settings.RETIRED_USERNAME_PREFIX
+        username = settings.RETIRED_USERNAME_PREFIX
+        self.url_params['username'] = username
         response = self.client.post(self.url, self.url_params)
-        self._validate_exiting_username_response(settings.RETIRED_USERNAME_PREFIX, response)
+        self._validate_exiting_username_response(
+            username, response, self.INVALID_ACCT_ERR_MSG.format(username=username)
+        )

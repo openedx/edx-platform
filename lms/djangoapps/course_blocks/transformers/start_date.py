@@ -96,15 +96,16 @@ class StartDateTransformer(FilteringTransformerMixin, BlockStructureTransformer)
 
         now = datetime.now(UTC)
 
-        removal_condition = lambda block_key: not check_start_date(
-            usage_info.user,
-            block_structure.get_xblock_field(block_key, 'days_early_for_beta'),
-            self._get_merged_start_date(block_structure, block_key),
-            usage_info.course_key,
-            now=now,
-        )
+        def _removal_condition(block_key):
+            return not check_start_date(
+                usage_info.user,
+                block_structure.get_xblock_field(block_key, 'days_early_for_beta'),
+                self._get_merged_start_date(block_structure, block_key),
+                usage_info.course_key,
+                now=now
+            )
 
         if usage_info.include_has_scheduled_content:
-            self._check_has_scheduled_content(block_structure, removal_condition)
+            self._check_has_scheduled_content(block_structure, _removal_condition)
 
-        return [block_structure.create_removal_filter(removal_condition)]
+        return [block_structure.create_removal_filter(_removal_condition)]

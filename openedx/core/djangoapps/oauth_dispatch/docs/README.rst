@@ -27,10 +27,10 @@ Provider code
 
 * The JwtBuilder_ uses the pyjwkest_ library for implementation of `JSON Web Signature (JWS)`_ and other crypto to build and sign JWT tokens.
 
-.. _oauth_dispatch: https://github.com/edx/edx-platform/tree/master/openedx/core/djangoapps/oauth_dispatch
-.. _validator module: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/dot_overrides/validators.py
-.. _Access Token View: https://github.com/edx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/djangoapps/oauth_dispatch/views.py#L89
-.. _JwtBuilder: https://github.com/edx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/lib/token_utils.py#L15
+.. _oauth_dispatch: https://github.com/openedx/edx-platform/tree/master/openedx/core/djangoapps/oauth_dispatch
+.. _validator module: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/dot_overrides/validators.py
+.. _Access Token View: https://github.com/openedx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/djangoapps/oauth_dispatch/views.py#L89
+.. _JwtBuilder: https://github.com/openedx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/lib/token_utils.py#L15
 .. _pyjwkest: https://github.com/IdentityPython/pyjwkest
 .. _JSON Web Signature (JWS): https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41
 
@@ -47,4 +47,4 @@ Authentication by REST endpoints
 * Open edX REST endpoints that support JWTs as access tokens use JwtAuthentication_ as implemented by the edx-drf-extensions library.
 
 .. _Django Rest Framework (DRF): https://github.com/encode/django-rest-framework
-.. _JwtAuthentication: https://github.com/edx/edx-drf-extensions/blob/master/edx_rest_framework_extensions/auth/jwt/README.rst
+.. _JwtAuthentication: https://github.com/openedx/edx-drf-extensions/blob/master/edx_rest_framework_extensions/auth/jwt/README.rst

@@ -6,26 +6,48 @@ describe('HTMLEditingDescriptor', function() {
       loadFixtures('html-edit-visual.html');
       this.descriptor = new HTMLEditingDescriptor($('.test-component'));
     });
-    it('Returns data from Visual Editor if text has changed', function() {
+    it('Returns data from Visual Editor if text has changed', function(done) {
       const visualEditorStub =
         {getContent() { return 'from visual editor'; }};
       spyOn(this.descriptor, 'getVisualEditor').and.callFake(() => visualEditorStub);
-      const { data } = this.descriptor.save();
-      expect(data).toEqual('from visual editor');
+
+      // It takes a while for the TinyMCE V5.x to initialize, so let's wait until the
+      // starting_content becomes available before we test the save() method.
+      // Save referece to `this` on self to pass `descriptor` to `waintUntil` closure
+      var self = this;
+      jasmine.waitUntil(function() {
+        return !!self.descriptor.starting_content;
+      }, 10000).then(function() {
+        const { data } = self.descriptor.save();
+        expect(data).toEqual('from visual editor');
+      }).always(done);
     });
-    it('Returns data from Raw Editor if text has not changed', function() {
+    it('Returns data from Raw Editor if text has not changed', function(done) {
       const visualEditorStub =
-        {getContent() { return '<p>original visual text</p>'; }};
+        {getContent() { return 'original visual text' }};
       spyOn(this.descriptor, 'getVisualEditor').and.callFake(() => visualEditorStub);
-      const { data } = this.descriptor.save();
-      expect(data).toEqual('raw text');
+
+      var self = this;
+      jasmine.waitUntil(function() {
+        return !!self.descriptor.starting_content;
+      }, 10000).then(function() {
+        const { data } = self.descriptor.save();
+        expect(data).toEqual('raw text');
+      }).always(done);
     });
-    it('Performs link rewriting for static assets when saving', function() {
+    it('Performs link rewriting for static assets when saving', function(done) {
       const visualEditorStub =
         {getContent() { return 'from visual editor with /c4x/foo/bar/asset/image.jpg'; }};
       spyOn(this.descriptor, 'getVisualEditor').and.callFake(() => visualEditorStub);
-      const { data } = this.descriptor.save();
-      expect(data).toEqual('from visual editor with /static/image.jpg');
+
+      var self = this;
+      jasmine.waitUntil(function() {
+        return !!self.descriptor.starting_content;
+      }, 10000).then(function() {
+        const { data } = self.descriptor.save();
+        expect(data).toEqual('from visual editor with /static/image.jpg');
+      }).always(done);
+
     });
     it('When showing visual editor links are rewritten to c4x format', function() {
       const visualEditorStub = {

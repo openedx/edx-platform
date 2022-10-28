@@ -129,8 +129,8 @@ def get_handler_url(request, usage_key_str, handler_name):
 
 # We cannot use DRF for this endpoint because its Request object is incompatible
 # with the API expected by XBlock handlers.
-# See https://github.com/edx/edx-platform/pull/19253
-# and https://github.com/edx/XBlock/pull/383 for context.
+# See https://github.com/openedx/edx-platform/pull/19253
+# and https://github.com/openedx/XBlock/pull/383 for context.
 @csrf_exempt
 @xframe_options_exempt
 def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, suffix=None):

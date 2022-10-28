@@ -27,25 +27,17 @@ class CloneCourseTest(CourseTestCase):
     Unit tests for cloning a course
     """
     def test_clone_course(self):
-        """Tests cloning of a course as follows: XML -> Mongo (+ data) -> Mongo -> Split -> Split"""
-        # 1. import and populate test toy course
-        mongo_course1_id = self.import_and_populate_course()
-        mongo_course2_id = mongo_course1_id
+        """
+        Tests cloning of a course: Split -> Split
+        """
 
-        # 3. clone course (mongo -> split)
         with self.store.default_store(ModuleStoreEnum.Type.split):
-            split_course3_id = CourseLocator(
-                org="edx3", course="split3", run="2013_Fall"
-            )
-            self.store.clone_course(mongo_course2_id, split_course3_id, self.user.id)
-            self.assertCoursesEqual(mongo_course2_id, split_course3_id)
-
-            # 4. clone course (split -> split)
-            split_course4_id = CourseLocator(
+            split_course1_id = CourseFactory().id
+            split_course2_id = CourseLocator(
                 org="edx4", course="split4", run="2013_Fall"
             )
-            self.store.clone_course(split_course3_id, split_course4_id, self.user.id)
-            self.assertCoursesEqual(split_course3_id, split_course4_id)
+            self.store.clone_course(split_course1_id, split_course2_id, self.user.id)
+            self.assertCoursesEqual(split_course1_id, split_course2_id)
 
     def test_space_in_asset_name_for_rerun_course(self):
         """
@@ -99,16 +91,28 @@ class CloneCourseTest(CourseTestCase):
         """
         Unit tests for :meth: `contentstore.tasks.rerun_course`
         """
-        mongo_course1_id = self.import_and_populate_course()
+        org = 'edX'
+        course_number = 'CS101'
+        course_run = '2015_Q1'
+        display_name = 'rerun'
+        fields = {'display_name': display_name}
 
-        # rerun from mongo into split
+        # Create a course using split modulestore
+        split_course = CourseFactory.create(
+            org=org,
+            number=course_number,
+            run=course_run,
+            display_name=display_name,
+            default_store=ModuleStoreEnum.Type.split
+        )
+
         split_course3_id = CourseLocator(
             org="edx3", course="split3", run="rerun_test"
         )
         # Mark the action as initiated
         fields = {'display_name': 'rerun'}
-        CourseRerunState.objects.initiated(mongo_course1_id, split_course3_id, self.user, fields['display_name'])
-        result = rerun_course.delay(str(mongo_course1_id), str(split_course3_id), self.user.id,
+        CourseRerunState.objects.initiated(split_course.id, split_course3_id, self.user, fields['display_name'])
+        result = rerun_course.delay(str(split_course.id), str(split_course3_id), self.user.id,
                                     json.dumps(fields, cls=EdxJSONEncoder))
         self.assertEqual(result.get(), "succeeded")
         self.assertTrue(has_course_author_access(self.user, split_course3_id), "Didn't grant access")
@@ -116,7 +120,7 @@ class CloneCourseTest(CourseTestCase):
         self.assertEqual(rerun_state.state, CourseRerunUIStateManager.State.SUCCEEDED)
 
         # try creating rerunning again to same name and ensure it generates error
-        result = rerun_course.delay(str(mongo_course1_id), str(split_course3_id), self.user.id)
+        result = rerun_course.delay(str(split_course.id), str(split_course3_id), self.user.id)
         self.assertEqual(result.get(), "duplicate course")
         # the below will raise an exception if the record doesn't exist
         CourseRerunState.objects.find_first(

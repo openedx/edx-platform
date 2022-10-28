@@ -33,8 +33,8 @@ believe any decisions in this record will neither affect the current authenticat
 apps nor impact forward compatibility when/if mobile apps are consolidated to use a similar (if not the same)
 authentication mechanism as outlined here for web apps.
 
-.. _Use JWT as OAuth2 Tokens: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0003-use-jwt-as-oauth-tokens-remove-openid-connect.rst
-.. _Use Asymmetric JWTs: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
+.. _Use JWT as OAuth2 Tokens: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0003-use-jwt-as-oauth-tokens-remove-openid-connect.rst
+.. _Use Asymmetric JWTs: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
 .. _Decoupled Frontend Architecture: https://openedx.atlassian.net/wiki/spaces/FEDX/pages/790692200/Decoupled+Frontend+Architecture
 .. _microfrontend: https://micro-frontends.org/
 
@@ -92,8 +92,8 @@ Login -> Cookie -> API
 .. _JWT_AUTH_COOKIE: https://github.com/GetBlimp/django-rest-framework-jwt/blob/master/docs/index.md#jwt_auth_cookie
 .. _JSONWebTokenAuthentication: https://github.com/GetBlimp/django-rest-framework-jwt/blob/0a0bd402ec21fd6b9a5f715d114411836fbb2923/rest_framework_jwt/authentication.py#L71
 .. _automatically extracts the JWT from the cookie: https://github.com/GetBlimp/django-rest-framework-jwt/blob/0a0bd402ec21fd6b9a5f715d114411836fbb2923/rest_framework_jwt/authentication.py#L86-L87
-.. _JwtRedirectToLoginIfUnauthenticatedMiddleware: https://github.com/edx/edx-drf-extensions/blob/0351010f1836e4cebd6bdc757d477b2f56265b17/edx_rest_framework_extensions/auth/jwt/middleware.py#L76
-.. _LoginRedirectIfUnauthenticated: https://github.com/edx/edx-drf-extensions/blob/0351010f1836e4cebd6bdc757d477b2f56265b17/edx_rest_framework_extensions/permissions.py#L147
+.. _JwtRedirectToLoginIfUnauthenticatedMiddleware: https://github.com/openedx/edx-drf-extensions/blob/0351010f1836e4cebd6bdc757d477b2f56265b17/edx_rest_framework_extensions/auth/jwt/middleware.py#L76
+.. _LoginRedirectIfUnauthenticated: https://github.com/openedx/edx-drf-extensions/blob/0351010f1836e4cebd6bdc757d477b2f56265b17/edx_rest_framework_extensions/permissions.py#L147
 
 
 JWT Cookie Lifetime
@@ -124,7 +124,7 @@ JWT Cookie Lifetime
    which will remove them from the user's browser cookie jar. Thus, the user will be logged out of all the
    microfrontends.
 
-.. _`current open edX session cookies that may have no expiration`: https://github.com/edx/edx-platform/blob/92030ea15216a6641c83dd7bb38a9b65112bf31a/common/djangoapps/student/cookies.py#L25-L27
+.. _`current open edX session cookies that may have no expiration`: https://github.com/openedx/edx-platform/blob/92030ea15216a6641c83dd7bb38a9b65112bf31a/common/djangoapps/student/cookies.py#L25-L27
 .. _JWT blacklist: https://auth0.com/blog/blacklist-json-web-token-api-keys/
 .. _`JWT ID (jti)`: http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html#jtiDef
 
@@ -148,7 +148,7 @@ JWT Cookie Content
 .. _HTTP Cookie RFC standard: https://tools.ietf.org/html/rfc6265
 .. _up to 4096 bytes: https://tools.ietf.org/html/rfc6265#section-6.1
 .. _Modern browsers have treated this requirement as a maximum: http://browsercookielimits.squawky.net/
-.. _currently embedded in the JWT: https://github.com/edx/edx-platform/blob/92030ea15216a6641c83dd7bb38a9b65112bf31a/openedx/core/lib/token_utils.py#L13
+.. _currently embedded in the JWT: https://github.com/openedx/edx-platform/blob/92030ea15216a6641c83dd7bb38a9b65112bf31a/openedx/core/lib/token_utils.py#L13
 
 
 JWT Cookie Security
@@ -208,7 +208,7 @@ Consequences
 
 .. _at least 4096 bytes: http://browsercookielimits.squawky.net/
 .. _JWT sessionStorage and localStorage Security: https://stormpath. com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage#so-whats-the-difference
-.. _JS-accessible user-info cookie: https://github.com/edx/edx-platform/blob/70d1ca474012b89e4c7184d25499eb87b3135409/common/djangoapps/student/cookies.py#L151
+.. _JS-accessible user-info cookie: https://github.com/openedx/edx-platform/blob/70d1ca474012b89e4c7184d25499eb87b3135409/common/djangoapps/student/cookies.py#L151
 
 References
 ----------

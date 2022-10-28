@@ -59,6 +59,7 @@ from simple_history.models import HistoricalRecords
 from user_util import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from common.djangoapps.student.email_helpers import (
     generate_proctoring_requirements_email_context,
@@ -76,6 +77,7 @@ from lms.djangoapps.courseware.models import (
     OrgDynamicUpgradeDeadlineConfiguration,
 )
 from lms.djangoapps.courseware.toggles import streak_celebration_is_active
+from lms.djangoapps.utils import OptimizelyClient
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import (
@@ -1424,7 +1426,7 @@ class CourseEnrollment(models.Model):
         from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
         return not user.has_perm(ENROLL_IN_COURSE, course)
 
-    def update_enrollment(self, mode=None, is_active=None, skip_refund=False, enterprise_uuid=None):
+    def update_enrollment(self, mode=None, is_active=None, skip_refund=False, enterprise_uuid=None, request=None):
         """
         Updates an enrollment for a user in a class.  This includes options
         like changing the mode, toggling is_active True/False, etc.
@@ -1489,10 +1491,10 @@ class CourseEnrollment(models.Model):
 
         if activation_changed:
             if self.is_active:
-                self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED, enterprise_uuid=enterprise_uuid)
+                self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED, enterprise_uuid=enterprise_uuid, request=request)
             else:
                 UNENROLL_DONE.send(sender=None, course_enrollment=self, skip_refund=skip_refund)
-                self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
+                self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED, enterprise_uuid=enterprise_uuid, request=request)
                 self.send_signal(EnrollStatusChange.unenroll)
 
                 # .. event_implemented_name: COURSE_UNENROLLMENT_COMPLETED
@@ -1552,16 +1554,37 @@ class CourseEnrollment(models.Model):
                                   mode=mode, course_id=course_id,
                                   cost=cost, currency=currency)
 
-    def emit_event(self, event_name, enterprise_uuid=None):
+    def emit_event(self, event_name, enterprise_uuid=None, request=None):  # pylint: disable=too-many-statements
         """
         Emits an event to explicitly track course enrollment and unenrollment.
         """
+        from common.djangoapps.student.helpers import get_course_dates_for_email, get_instructors
+        from common.djangoapps.student.toggles import should_send_redesign_email
         from openedx.core.djangoapps.schedules.config import set_up_external_updates_for_enrollment
+        from openedx.core.djangoapps.catalog.api import get_course_run_details
+        from openedx.core.djangoapps.catalog.utils import get_owners_for_course, get_course_uuid_for_course
+        from openedx.features.course_experience import ENABLE_COURSE_GOALS
+        from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+        from openedx.features.enterprise_support.utils import is_enterprise_learner
+
+        optimizely_client = OptimizelyClient.get_optimizely_client()
+
+        segment_properties = {
+            'category': 'conversion',
+            'label': str(self.course_id),
+            'org': self.course_id.org,
+            'course': self.course_id.course,
+            'run': self.course_id.run,
+            'mode': self.mode,
+        }
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
             if enterprise_uuid:
                 context["enterprise_uuid"] = enterprise_uuid
+                context["enterprise_enrollment"] = True
+                segment_properties["enterprise_uuid"] = enterprise_uuid
+                segment_properties["enterprise_enrollment"] = True
             assert isinstance(self.course_id, CourseKey)
             data = {
                 'user_id': self.user.id,
@@ -1571,14 +1594,6 @@ class CourseEnrollment(models.Model):
             if enterprise_uuid and 'username' not in context:
                 data['username'] = self.user.username
 
-            segment_properties = {
-                'category': 'conversion',
-                'label': str(self.course_id),
-                'org': self.course_id.org,
-                'course': self.course_id.course,
-                'run': self.course_id.run,
-                'mode': self.mode,
-            }
             # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties`
             # section of the event payload into the `traits` section so that they can be received.
             # This is a temporary fix until we implement this behavior outside of the LMS.
@@ -1591,6 +1606,64 @@ class CourseEnrollment(models.Model):
             segment_traits['email'] = self.user.email
 
             if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
+                studio_request = settings.ROOT_URLCONF == 'cms.urls'
+                extra_segment_properties = {
+                    'studio_request': studio_request
+                }
+                exception_raised = False
+                if not studio_request and should_send_redesign_email():
+                    if not request:
+                        request = crum.get_current_request()
+
+                    marketing_root_url = settings.MKTG_URLS.get('ROOT')
+                    course_run_fields = [
+                        'key', 'title', 'short_description', 'marketing_url', 'pacing_type', 'min_effort',
+                        'max_effort', 'weeks_to_complete', 'enrollment_count', 'image', 'staff',
+                    ]
+                    owners, course_run, course_dates_list = None, None, []
+                    try:
+                        course_dates_list = get_course_dates_for_email(self.user, self.course.id, request)
+                        course_uuid = get_course_uuid_for_course(str(self.course_id))
+                        owners = get_owners_for_course(course_uuid=course_uuid)
+                        course_run = get_course_run_details(str(self.course_id), course_run_fields)
+                    except Exception:   # pylint: disable=broad-except
+                        exception_raised = True
+                        log.exception(
+                            'Unable to send extra properties for %s event, user %s and course %s',
+                            event_name,
+                            self.user.id,
+                            self.course_id,
+                        )
+
+                    if course_run:
+                        instructors = get_instructors(course_run, marketing_root_url)
+                        extra_segment_properties.update({
+                            'instructors': instructors,
+                            'instructors_count': 'even' if len(instructors) % 2 == 0 else 'odd',
+                            'pacing_type': course_run.get('pacing_type'),
+                            'min_effort': course_run.get('min_effort'),
+                            'max_effort': course_run.get('max_effort'),
+                            'weeks_to_complete': course_run.get('weeks_to_complete'),
+                            'learners_count': '{:,}'.format(course_run.get('enrollment_count')),
+                            'course_title': course_run.get('title'),
+                            'short_description': course_run.get('short_description'),
+                            'marketing_url': course_run.get('marketing_url'),
+                            'banner_image_url': course_run.get('image').get('src') if course_run.get('image') else ''
+                        })
+                    price = CourseMode.min_course_price_for_currency(course_id=str(self.course_id), currency='USD')
+                    extra_segment_properties.update({
+                        'goals_enabled': ENABLE_COURSE_GOALS.is_enabled(self.course_id),
+                        'course_date_blocks': course_dates_list,
+                        'partner_image_url': owners[0].get('logo_image_url') if owners else '',
+                        'learner_name': self.user.profile.name,
+                        'course_run_key': str(self.course_id),
+                        'course_price': price,
+                        'lms_base_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+                        'learning_base_url': configuration_helpers.get_value('LEARNING_MICROFRONTEND_URL',
+                                                                             settings.LEARNING_MICROFRONTEND_URL)
+                    })
+                segment_properties.update(extra_segment_properties)
+                segment_properties['exception_raised'] = exception_raised
                 segment_properties['email'] = self.user.email
                 # This next property is for an experiment, see method's comments for more information
                 segment_properties['external_course_updates'] = set_up_external_updates_for_enrollment(self.user,
@@ -1602,6 +1675,26 @@ class CourseEnrollment(models.Model):
                 is_personalized_recommendation = is_personalized_recommendation_for_user(course_key)
                 if is_personalized_recommendation is not None:
                     segment_properties['is_personalized_recommendation'] = is_personalized_recommendation
+
+                # TODO: VAN-1052 - This is Optimizely's A/B experimentation block to test welcome email redesign.
+                #  Remove this temporary block after pausing the experiment.
+                optimizely_experiment_variation = None
+                if optimizely_client and not studio_request:
+                    optimizely_experiment_variation = optimizely_client.activate(
+                        'welcome_email_redesign_experiment',
+                        str(self.user.id),
+                        {
+                            'lang_preference': get_user_preference(self.user, LANGUAGE_KEY),
+                            'is_enterprise_user': is_enterprise_learner(self.user),
+                        }
+                    )
+                    optimizely_client.track('welcome_email_sent', str(self.user.id))
+                    if exception_raised and optimizely_experiment_variation == 'redesign_email_enabled':
+                        optimizely_client.track('welcome_email_not_sent', str(self.user.id))
+
+                # Set this property to True only if the welcome email redesign Optimizely experiment is running
+                # and user_id falls in required variation.
+                segment_properties['redesign_email'] = optimizely_experiment_variation == 'redesign_email_enabled'
 
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
@@ -1617,7 +1710,8 @@ class CourseEnrollment(models.Model):
                 )
 
     @classmethod
-    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False, enterprise_uuid=None):
+    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False,
+               enterprise_uuid=None, request=None):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -1712,7 +1806,7 @@ class CourseEnrollment(models.Model):
 
         # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
-        enrollment.update_enrollment(is_active=True, mode=mode, enterprise_uuid=enterprise_uuid)
+        enrollment.update_enrollment(is_active=True, mode=mode, enterprise_uuid=enterprise_uuid, request=request)
         enrollment.send_signal(EnrollStatusChange.enroll)
 
         # .. event_implemented_name: COURSE_ENROLLMENT_CREATED
