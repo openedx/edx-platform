@@ -4,14 +4,22 @@ Helper module for Tahoe Identity Provider package.
  - https://github.com/appsembler/tahoe-idp/
 """
 
+import re
+from urllib import parse
 from collections import OrderedDict
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.utils.http import urlencode
 
 from site_config_client.openedx import api as config_client_api
 
-from tahoe_sites.api import is_active_admin_on_organization, get_organization_for_user
+from organizations.models import Organization
+from tahoe_sites.api import (
+    is_active_admin_on_organization,
+    get_organization_for_user,
+    get_site_by_organization,
+)
 import third_party_auth
 from third_party_auth.pipeline import running as pipeline_running
 
@@ -33,6 +41,20 @@ from .constants import (
 )
 
 from .course_roles import TahoeCourseAuthorRole
+
+ALLOWED_KEY_CHAR = r'[\w\-~.:%]'
+KEY_PARTS = '(?P<org_short_name>{ALLOWED_KEY_CHAR}+)\\+(?P<course>{ALLOWED_KEY_CHAR}+)\\+(?P<run>{ALLOWED_KEY_CHAR}+)' \
+    .format(ALLOWED_KEY_CHAR=ALLOWED_KEY_CHAR)
+VALID_SEPARATOR = '[/@&\\-\\?\\+]'
+VALID_LOCATOR = '(\\bcourse|\\bblock)-v1:{KEY_PARTS}'.format(KEY_PARTS=KEY_PARTS)
+VALID_PRE_KEY = '(.*{VALID_SEPARATOR})|({VALID_SEPARATOR})'.format(VALID_SEPARATOR=VALID_SEPARATOR)
+VALID_POST_KEY = '({VALID_SEPARATOR}.*|({VALID_SEPARATOR}))'.format(VALID_SEPARATOR=VALID_SEPARATOR)
+VALID_URL = '(?P<pre_key>{VALID_PRE_KEY})?(?P<course_id>{VALID_LOCATOR})(?P<post_key>{VALID_POST_KEY})?'.format(
+    VALID_LOCATOR=VALID_LOCATOR,
+    VALID_PRE_KEY=VALID_PRE_KEY,
+    VALID_POST_KEY=VALID_POST_KEY,
+)
+URL_WITH_LOCATOR_REGEX = re.compile(VALID_URL, re.UNICODE)
 
 
 def is_tahoe_idp_enabled():
@@ -185,3 +207,52 @@ def is_studio_login_form_overridden():
     if settings.FEATURES.get('TAHOE_IDP_STUDIO_LOGIN_FORM_OVERRIDE', None):
         return True
     return False
+
+
+def extract_organization_from_url(url):
+    """
+    Extracts the organization from the given url
+
+    :param url: source uri to extract the course_id from
+    :return: organization if found, None otherwise
+    """
+    url = url or ''
+    organization = None
+
+    match = re.search(URL_WITH_LOCATOR_REGEX, url)
+    if match:
+        try:
+            organization = Organization.objects.get(
+                short_name=match.group('org_short_name')
+            )
+        except ObjectDoesNotExist:
+            pass
+    return organization
+
+
+def get_redirect_to_lms_login_url(request):
+    """
+    Get organization site from course id if found in (next) argument of (request.get_full_path()). Then return
+    the appropriate URL for to studio Magic Link authentication.
+
+    :param request: full path from the request to be processed
+    :return: redirect url if a valid course key found, otherwise return empty string
+    """
+    if not (request and request.GET.get('next')):
+        return ''
+
+    next_url = request.GET['next']
+    organization = extract_organization_from_url(next_url)
+
+    if organization:
+        site = get_site_by_organization(organization=organization)
+
+        protocol = 'https' if request.is_secure() else 'http'
+        redirect_url = '{protocol}://{site_domain}/studio/?next={quoted_next}'.format(
+            protocol=protocol,
+            site_domain=site.domain,
+            quoted_next=parse.quote_plus(next_url),
+        )
+        return redirect_url
+
+    return ''

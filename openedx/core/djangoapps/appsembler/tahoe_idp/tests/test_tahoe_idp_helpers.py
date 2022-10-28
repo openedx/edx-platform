@@ -2,8 +2,10 @@
 Tests for `tahoe_idp.helpers`.
 """
 from unittest.mock import patch, Mock
+from urllib import parse
 
 from django.conf import settings
+from django.test import RequestFactory
 import pytest
 
 from organizations.tests.factories import OrganizationFactory
@@ -36,6 +38,17 @@ def user_with_org():
     learner = UserFactory.create()
     tahoe_sites_apis.add_user_to_organization(learner, organization, is_admin=False)
     return learner, organization
+
+
+@pytest.fixture
+def valid_request():
+    """
+    :return: a request that can be used in our tests here
+    """
+    request = RequestFactory()
+    request.GET = {}
+    request.is_secure = Mock(return_value=False)
+    return request
 
 
 @pytest.mark.parametrize('global_flags,site_flags,should_be_enabled,message', [
@@ -232,3 +245,96 @@ def test_is_studio_login_form_overridden_flag_available(flag_value, expected_res
     """
     with patch.dict('django.conf.settings.FEATURES', {'TAHOE_IDP_STUDIO_LOGIN_FORM_OVERRIDE': flag_value}):
         assert helpers.is_studio_login_form_overridden() is expected_result
+
+
+@pytest.mark.parametrize('url', [
+    'course-v1:ninja_org+course+2022',
+    '/course-v1:ninja_org+course+2022',
+    'bla_bla_bla/course-v1:ninja_org+course+2022/',
+    'course-v1:ninja_org+course+2022/bla_bla_bla',
+    'bla_bla_bla/course-v1:ninja_org+course+2022/bla_bla_bla',
+    'bla_bla_bla/course-v1:ninja_org+course+2022/bla_bla_bla-v1:ninja_org+course+2022',
+    'bla_bla_bla/course-v1:ninja_org+course+2022/bla_bla_bla/course-v1:ninja_org+course+2022',
+    'bla_bla_bla/course-v1:unexpected_other_org+course+2022/bla_bla_bla/course-v1:ninja_org+course+2022/bla_bla_bla',
+])
+@pytest.mark.django_db
+def test_extract_organization_from_url_success(url):
+    """
+    Verify that extract_organization_from_url returns the expected organization or None according to the given URL
+    """
+    organization = OrganizationFactory.create(short_name='ninja_org', name='ninja_org_long_name')
+    assert helpers.extract_organization_from_url(url) == organization
+    url = url.replace('course-v1', 'block-v1')
+    assert helpers.extract_organization_from_url(url) == organization
+
+
+@pytest.mark.parametrize('url', [
+    'course-v1:ninja_org+course+',
+    'course-v1:ninja_org+course',
+    'course-v2:ninja_org+course+2022',
+    'courses-v1:ninja_org+course+2022',
+    'asdasdcourse-v1:ninja_org+course+2022',
+    'asdasdcourse-v1:ninja_org+course+2022asdasdad',
+    'bla_bla_bla/course-v1:ninja_org+course+2022/bla_bla_bla/course-v1:unexpected_other_org+course+2022/bla_bla_bla',
+])
+@pytest.mark.django_db
+def test_extract_organization_from_url_not_found(url):
+    """
+    Verify that extract_organization_from_url returns the expected organization or None according to the given URL
+    """
+    # just to verify that the function doesn't return (None) because of a missing organization
+    OrganizationFactory.create(short_name='ninja_org', name='ninja_org_long_name')
+
+    assert helpers.extract_organization_from_url(url) is None
+
+
+def test_get_redirect_to_lms_login_url_no_request():
+    """
+    Verify that get_redirect_to_lms_login_url will return empty string if no request is provided
+    """
+    assert helpers.get_redirect_to_lms_login_url(None) == ''
+
+
+@pytest.mark.django_db
+def test_get_redirect_to_lms_login_url_no_next(valid_request):
+    """
+    Verify that get_redirect_to_lms_login_url will return empty string if no request is provided
+    """
+    assert helpers.get_redirect_to_lms_login_url(valid_request) == ''
+
+
+@pytest.mark.django_db
+def test_get_redirect_to_lms_login_url_next_with_no_course(valid_request):
+    """
+    Verify that get_redirect_to_lms_login_url will return empty string if no request is provided
+    """
+    valid_request.GET['next'] = 'bla_bla'
+    assert helpers.get_redirect_to_lms_login_url(valid_request) == ''
+
+
+@pytest.mark.django_db
+def test_get_redirect_to_lms_login_url_next_with_invalid_course(valid_request):
+    """
+    Verify that get_redirect_to_lms_login_url will return empty string if no request is provided
+    """
+    valid_request.GET['next'] = 'course/course-v1:ORG+DoesNotExist'
+    assert helpers.get_redirect_to_lms_login_url(valid_request) == ''
+
+
+@pytest.mark.django_db
+def test_get_redirect_to_lms_login_url_next_with_valid_course(valid_request, user_with_org):
+    """
+    Verify that get_redirect_to_lms_login_url will return the expected URL is a valid course_id is provided
+    """
+    _, organization = user_with_org
+    site = tahoe_sites_apis.get_site_by_organization(organization=organization)
+
+    next_url = 'container/block-v1:{org}+course+run'.format(org=organization.short_name)
+    encoded_next = parse.quote_plus(next_url)
+    expected_url = 'http://{site_domain}/studio/?next={encoded_next}'.format(
+        site_domain=site.domain,
+        encoded_next=encoded_next
+    )
+
+    valid_request.GET['next'] = next_url
+    assert helpers.get_redirect_to_lms_login_url(valid_request) == expected_url
