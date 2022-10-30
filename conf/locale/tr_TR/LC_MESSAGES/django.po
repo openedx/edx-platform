@@ -3257,7 +3257,7 @@ msgid ""
 "Maintain exam integrity by enabling a proctoring solution for your course"
 msgstr ""
 
-#: lms/djangoapps/courseware/plugins.py
+#: lms/djangoapps/courseware/plugins.py cms/templates/edit-tabs.html
 msgid "Custom pages"
 msgstr "Özel yapılmış sayfalar"
 
@@ -8712,6 +8712,7 @@ msgid "{header_open}{title}{header_close}"
 msgstr "{header_open}{title}{header_close}"
 
 #: openedx/core/djangoapps/util/user_messages.py
+#: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
 msgstr "İptal"
 
@@ -12752,7 +12753,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Tab type"
-msgstr ""
+msgstr "Sekme türü"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Default name for the tab displayed to users"
@@ -15443,7 +15444,7 @@ msgstr "{org} {course} dersi e-postaları aboneliğinizi sona erdirmediniz."
 
 #: lms/templates/bulk_email/unsubscribe_success.html
 msgid "{link_start}Return to {platform_name}{link_end}"
-msgstr ""
+msgstr "{link_start}{platform_name} platformuna geri dön{link_end}"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -16187,7 +16188,7 @@ msgstr ""
 
 #: lms/templates/course_modes/fbe.html
 msgid "{link_start}Learn more{link_end} about course access"
-msgstr ""
+msgstr "Derse erişim hakkında {link_start}daha fazla bilgi{link_end}"
 
 #: lms/templates/course_modes/fbe.html lms/templates/course_modes/unfbe.html
 msgid ""
@@ -18137,11 +18138,11 @@ msgstr "Yüksek Lisans Derecesi"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Unpaid Bootcamp"
-msgstr ""
+msgstr "Ödenmemiş Bootcamp"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Paid Bootcamp"
-msgstr ""
+msgstr "Ödenmiş Bootcamp"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -19007,7 +19008,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "new experience"
-msgstr ""
+msgstr "yeni deneyim"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send to:"
@@ -21025,7 +21026,7 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Course Outline"
-msgstr ""
+msgstr "Ders Taslağı"
 
 #: cms/templates/course_outline.html
 msgid ""
@@ -21049,7 +21050,7 @@ msgstr ""
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html
 msgid "Warning"
-msgstr ""
+msgstr "Uyarı"
 
 #: cms/templates/course_outline.html
 msgid "This course uses features that are no longer supported."
@@ -21255,15 +21256,15 @@ msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "Show this page"
-msgstr ""
+msgstr "Bu sayfayı göster"
 
 #: cms/templates/edit-tabs.html
 msgid "Show/hide page"
-msgstr ""
+msgstr "Sayfayı göster/gizle"
 
 #: cms/templates/edit-tabs.html
 msgid "This page cannot be reordered"
-msgstr ""
+msgstr "Bu sayfa yeniden sıralanamaz"
 
 #: cms/templates/edit-tabs.html
 msgid "You can add additional custom pages to your course."
@@ -21275,7 +21276,7 @@ msgstr "Yeni Bir Sayfa Ekle"
 
 #: cms/templates/edit-tabs.html
 msgid "What are pages?"
-msgstr ""
+msgstr "Sayfalar neye yarar?"
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -21283,6 +21284,9 @@ msgid ""
 "(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
 " custom pages that you create."
 msgstr ""
+"Sayfalar dersinizin üst kısmında yatay olarak sıralanmıştır. Varsayılan "
+"sayfaları (Anasayfa, Ders, Tartışma, Wiki ve İlerleme) ders kitapları ve "
+"oluşturduğunuz özel yapım sayfalar izlemektedir."
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -21290,16 +21294,21 @@ msgid ""
 "course content. For example, you can create pages for the grading policy, "
 "course slides, and a course calendar. "
 msgstr ""
+"Öğrencilere ek ders içeriği sunmak için özel yapım sayfalar oluşturabilir ve"
+" var olanları değiştirebilirsiniz. Örneğin, notlandırma yöntemi, ders "
+"slaytları ve ders takvimi gibi sayfaları bu şekilde oluşturabilirsiniz."
 
 #: cms/templates/edit-tabs.html
 msgid "How do pages look to students in my course?"
-msgstr ""
+msgstr "Dersimde sayfalar öğrencilere nasıl görünüyor?"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "Students see the default and custom pages at the top of your course and use "
 "these links to navigate."
 msgstr ""
+"Öğrenciler varsayılan ve özel yapım sayfaları dersin üst kısmında görür ve "
+"bu bağlantıları gezinti için kullanırlar."
 
 #: cms/templates/edit-tabs.html
 msgid "See an example"
@@ -21328,7 +21337,7 @@ msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "Pages in Your Course"
-msgstr ""
+msgstr "Dersinizdeki Sayfalar"
 
 #: cms/templates/edit-tabs.html
 msgid "Preview of Pages in your course"
@@ -21340,6 +21349,9 @@ msgid ""
 "Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
 " pages."
 msgstr ""
+"Dersinizin üst gezinti çubuğunda görünen sayfalar. Varsayılan sayfaları (Ana"
+" sayfa, Ders, Tartışma, Wiki ve İlerleme) ders kitapları ve özel yapım "
+"sayfalar izlemektedir."
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"
@@ -23112,7 +23124,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "End date of course"
-msgstr ""
+msgstr "Ders sonu tarihi"
 
 #: cms/templates/settings.html
 msgid "A date after the course end date"
@@ -23124,7 +23136,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Read more about this setting"
-msgstr ""
+msgstr "Bu ayar hakkında daha fazla bilgi edinin"
 
 #: cms/templates/settings.html
 msgid ""
@@ -24153,23 +24165,23 @@ msgstr "Etiket"
 
 #: cms/templates/widgets/sock.html
 msgid "Looking for help with {studio_name}?"
-msgstr ""
+msgstr "{studio_name} ile ilgili yardıma mı ihtiyacınız var?"
 
 #: cms/templates/widgets/sock.html
 msgid "Hide {studio_name} Help"
-msgstr ""
+msgstr "{studio_name} Yardım'ı Gizle"
 
 #: cms/templates/widgets/sock.html
 msgid "{studio_name} Documentation"
-msgstr ""
+msgstr "{studio_name} Belgelendirmesi"
 
 #: cms/templates/widgets/sock_links.html
 msgid "Access documentation on http://docs.edx.org"
-msgstr ""
+msgstr "http://docs.edx.org üzerinden belgelendirmelere erişin"
 
 #: cms/templates/widgets/sock_links.html
 msgid "edX Documentation"
-msgstr ""
+msgstr "edX Belgelendirmesi"
 
 #: cms/templates/widgets/sock_links.html
 msgid "Access the Open edX Portal"
@@ -24181,23 +24193,23 @@ msgstr "Open edX Portalı"
 
 #: cms/templates/widgets/sock_links.html
 msgid "Enroll in edX101: Overview of Creating an edX Course"
-msgstr ""
+msgstr "edX101 Kayıt: Bir edX Dersi Oluşturmaya Genel Bakış"
 
 #: cms/templates/widgets/sock_links.html
 msgid "Enroll in edX101"
-msgstr ""
+msgstr "edX101'e Kaydol"
 
 #: cms/templates/widgets/sock_links.html
 msgid "Enroll in StudioX: Creating a Course with edX Studio"
-msgstr ""
+msgstr "StudioX'e Kayıt: edX Studio ile Ders Oluşturma"
 
 #: cms/templates/widgets/sock_links.html
 msgid "Enroll in StudioX"
-msgstr ""
+msgstr "StudioX'e Kayıt Ol"
 
 #: cms/templates/widgets/sock_links.html
 msgid "Send an email to {email}"
-msgstr ""
+msgstr "{email} adresine e-posta gönder"
 
 #: cms/templates/widgets/user_dropdown.html
 msgid "Currently signed in as:"
