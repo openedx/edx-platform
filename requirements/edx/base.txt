@@ -479,7 +479,7 @@ edx-drf-extensions==8.3.1
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.58.3
+edx-enterprise==3.58.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
