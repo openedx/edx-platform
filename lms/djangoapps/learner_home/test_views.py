@@ -18,7 +18,6 @@ from rest_framework.test import APITestCase
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
-from common.djangoapps.student.toggles import ENABLE_AMPLITUDE_RECOMMENDATIONS
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
@@ -40,6 +39,7 @@ from lms.djangoapps.learner_home.views import (
     get_course_share_urls,
 )
 from lms.djangoapps.learner_home.test_serializers import random_url
+from lms.djangoapps.learner_home.waffle import ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseRunFactory as CatalogCourseRunFactory,
     ProgramFactory,
@@ -841,7 +841,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
             'marketing_url': 'https://www.marketing_url.com'
         }
 
-    @override_waffle_flag(ENABLE_AMPLITUDE_RECOMMENDATIONS, active=False)
+    @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=False)
     def test_waffle_flag_off(self):
         """
         Verify API returns 400 if waffle flag is off.
@@ -850,7 +850,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, None)
 
-    @override_waffle_flag(ENABLE_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch('lms.djangoapps.learner_home.views.get_personalized_course_recommendations')
     @mock.patch('lms.djangoapps.learner_home.views.get_course_data')
     def test_no_recommendations_from_amplitude(self, mocked_get_course_data,
@@ -865,7 +865,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, None)
 
-    @override_waffle_flag(ENABLE_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch('lms.djangoapps.learner_home.views.get_personalized_course_recommendations')
     @mock.patch('lms.djangoapps.learner_home.views.get_course_data')
     def test_get_course_recommendations(self, mocked_get_course_data,
@@ -882,7 +882,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.data.get('is_personalized_recommendation'), True)
         self.assertEqual(len(response.data.get('courses')), expected_recommendations_length)
 
-    @override_waffle_flag(ENABLE_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch('lms.djangoapps.learner_home.views.get_personalized_course_recommendations')
     @mock.patch('lms.djangoapps.learner_home.views.get_course_data')
     def test_get_enrollable_course_recommendations(self, mocked_get_course_data,
