@@ -64,8 +64,8 @@ def get_generated_certificates() -> int:
 
 def get_course_enrollments() -> int:
     """
-    Get total number of enrollments from users that aren't staff.
+    Get total number of enrollments from users that aren't staff. Course staff members will be included.
     """
-    return CourseEnrollment.objects.filter(user__is_superuser=False, user__is_staff=False)\
+    return CourseEnrollment.objects.filter(is_active=True, user__is_superuser=False, user__is_staff=False)\
         .using(read_replica_or_default())\
         .count()
