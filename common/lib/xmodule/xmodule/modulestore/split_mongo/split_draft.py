@@ -140,11 +140,14 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                         keys_to_check.extend(children)
         return new_keys
 
-    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, asides=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, asides=None, no_signals=False, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         old_descriptor_locn = descriptor.location
         descriptor.location = self._map_revision_to_branch(old_descriptor_locn)
         emit_signals = descriptor.location.branch == ModuleStoreEnum.BranchName.published \
             or descriptor.location.block_type in DIRECT_ONLY_CATEGORIES
+
+        if no_signals:
+            emit_signals = False
 
         with self.bulk_operations(descriptor.location.course_key, emit_signals=emit_signals):
             item = super().update_item(

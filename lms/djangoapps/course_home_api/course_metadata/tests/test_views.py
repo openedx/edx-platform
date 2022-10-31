@@ -41,7 +41,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert not response.data.get('is_staff')
-        # 'Course', and 'Progress' tabs
+        # 'Course' and 'Progress' tabs
         assert len(response.data.get('tabs', [])) == 3
 
     @ddt.data(True, False)
