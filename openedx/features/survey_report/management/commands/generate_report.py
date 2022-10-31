@@ -4,7 +4,7 @@ CLI command to generate survey report.
 
 from django.core.management.base import BaseCommand, CommandError
 
-from openedx.features.survey_report.application import generate_report
+from openedx.features.survey_report.api import generate_report
 
 
 class Command(BaseCommand):

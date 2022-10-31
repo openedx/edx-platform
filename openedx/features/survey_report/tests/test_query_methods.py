@@ -10,9 +10,9 @@ from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.features.survey_report.queries import (
     get_course_enrollments,
-    get_currently_learners,
+    get_active_learners_in_the_last_weeks,
     get_generated_certificates,
-    get_learners_registered,
+    get_registered_learners,
     get_unique_courses_offered
 )
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -69,13 +69,13 @@ class TestSurveyReportCommands(ModuleStoreTestCase):
         self.user2.save()
         with patch('openedx.features.survey_report.queries.datetime') as mock_datetime:
             mock_datetime.now.return_value = datetime.now()
-            assert get_currently_learners() == 2
+            assert get_active_learners_in_the_last_weeks(weeks=3) == 2
 
     def test_get_learners_registered(self):
         """
         Test that get_learners_registered returns the correct number of learners.
         """
-        assert get_learners_registered() == 7
+        assert get_registered_learners() == 7
 
     def test_get_generated_certificates(self):
         """
