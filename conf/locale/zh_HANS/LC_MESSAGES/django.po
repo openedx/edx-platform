@@ -2797,6 +2797,26 @@ msgid ""
 "this request, please visit the link(s) below."
 msgstr "{username} ({email}) 的退款要求已经建立。为了处理此请求，请访问以下联结(s) 。"
 
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Practice Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Proctored Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Timed Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Exam"
+msgstr ""
+
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
