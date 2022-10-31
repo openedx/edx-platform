@@ -12,14 +12,14 @@ class SurveyReport(models.Model):
 
     .. no_pii:
     """
-    courses_offered = models.IntegerField()
-    learners = models.IntegerField()
-    registered_learners = models.IntegerField()
-    enrollments = models.IntegerField()
-    generated_certificates = models.IntegerField()
+    courses_offered = models.BigIntegerField()
+    learners = models.BigIntegerField()
+    registered_learners = models.BigIntegerField()
+    enrollments = models.BigIntegerField()
+    generated_certificates = models.BigIntegerField()
     extra_data = JSONField(
         blank=True,
-        default={},
+        default=dict,
         help_text="Extra information for instance data",
     )
     request_details = models.CharField(max_length=255, null=True, blank=True)
