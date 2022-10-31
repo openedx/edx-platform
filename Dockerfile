@@ -78,6 +78,7 @@ RUN chown app:app /var/edx/edxapp
 
 USER app
 
+########### intermediate builder stage ###########
 FROM minimal-system as builder-production
 
 USER root
@@ -121,17 +122,32 @@ RUN npm set progress=false && npm install
 
 RUN pip install -e .
 
+# create static assets
+COPY --chown=app:app ./common/static ./common/static
+RUN mkdir test_root;
+
+ENV EDX_PLATFORM_SETTINGS='assets'
+ENV STATIC_ROOT_BASE='/edx/var/edxapp/staticfiles'
+ENV WEBPACK_CONFIG_PATH='webpack.dev.config.js'
+ENV JS_ENV_EXTRA_CONFIG={}
+RUN paver update_assets --settings="$EDX_PLATFORM_SETTINGS"
+
+########### intermediate dev stage ###########
 FROM builder-production as builder-development
 
 RUN pip install -r requirements/edx/development.txt
 
+########### base stage ###########
 FROM minimal-system as base
 
 COPY --from=builder-production /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
 COPY --from=builder-production /edx/app/edxapp/nodeenv /edx/app/edxapp/nodeenv
 COPY --from=builder-production /edx/app/edxapp/edx-platform/node_modules /edx/app/edxapp/edx-platform/node_modules
+COPY --from=builder-production /edx/var/edxapp/staticfiles /edx/var/edxapp/staticfiles
 
+########### production target ###########
 FROM base as production
+
 ENV EDX_PLATFORM_SETTINGS='docker-production'
 ENV SERVICE_VARIANT "${SERVICE_VARIANT}"
 ENV SERVICE_PORT "${SERVICE_PORT}"
@@ -145,19 +161,19 @@ CMD gunicorn \
     --access-logfile \
     - ${SERVICE_VARIANT}.wsgi:application
 
+########### development target ###########
 FROM base as development
 
 COPY --from=builder-development /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
 
 USER root
-
 RUN ln -s "$(pwd)/lms/envs/devstack-experimental.yml" "$LMS_CFG"
 RUN ln -s "$(pwd)/cms/envs/devstack-experimental.yml" "$CMS_CFG"
 RUN touch ../edxapp_env
 
 USER app
 
-ENV EDX_PLATFORM_SETTINGS='devstack_docker'
+ENV EDX_PLATFORM_SETTINGS='devstack'
 ENV SERVICE_VARIANT "${SERVICE_VARIANT}"
 ENV DJANGO_SETTINGS_MODULE="${SERVICE_VARIANT}.envs.$EDX_PLATFORM_SETTINGS"
 EXPOSE ${SERVICE_PORT}
