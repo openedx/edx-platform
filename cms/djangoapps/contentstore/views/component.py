@@ -538,12 +538,6 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     """
     usage_key = UsageKey.from_string(usage_key_string)
 
-    # Addendum:
-    # TNL 101-62 studio write permission is also checked for editing content.
-
-    if handler == 'submit_studio_edits' and not has_course_author_access(request.user, usage_key.course_key):
-        raise PermissionDenied("No studio write Permissions")
-
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
@@ -565,6 +559,13 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 
     # unintentional update to handle any side effects of handle call
     # could potentially be updating actual course data or simply caching its values
-    modulestore().update_item(descriptor, request.user.id, asides=asides)
+    # Addendum:
+    # TNL 101-62 studio write permission is also checked for editing content.
+
+    if has_course_author_access(request.user, usage_key.course_key):
+        modulestore().update_item(descriptor, request.user.id, asides=asides)
+    else:
+        #try to fail loudly
+        raise PermissionDenied("No studio write Permissions, no changes to course content made")
 
     return webob_to_django_response(resp)

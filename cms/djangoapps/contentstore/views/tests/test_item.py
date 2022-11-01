@@ -47,7 +47,7 @@ from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.views import item as item_module
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
     XBlockStudioConfiguration,
@@ -2116,6 +2116,7 @@ class TestComponentHandler(TestCase):
     def setUp(self):
         super().setUp()
 
+
         self.request_factory = RequestFactory()
 
         patcher = patch('cms.djangoapps.contentstore.views.component.modulestore')
@@ -2132,7 +2133,7 @@ class TestComponentHandler(TestCase):
         )
         self.usage_key_string = str(self.usage_key)
 
-        self.user = UserFactory()
+        self.user = StaffFactory(course_key=CourseLocator('dummy_org', 'dummy_course', 'dummy_run'))
 
         self.request = self.request_factory.get('/dummy-url')
         self.request.user = self.user
@@ -2144,13 +2145,9 @@ class TestComponentHandler(TestCase):
             component_handler(self.request, self.usage_key_string, 'invalid_handler')
 
     def test_submit_studio_edits_checks_author_permission(self):
+        self.request.user = UserFactory()
         with self.assertRaises(PermissionDenied):
-            with patch(
-                'common.djangoapps.student.auth.has_course_author_access',
-                return_value=False
-            ) as mocked_has_course_author_access:
-                component_handler(self.request, self.usage_key_string, 'submit_studio_edits')
-                assert mocked_has_course_author_access.called is True
+           component_handler(self.request, self.usage_key_string, 'submit_studio_edits')
 
     @ddt.data('GET', 'POST', 'PUT', 'DELETE')
     def test_request_method(self, method):
@@ -2184,6 +2181,7 @@ class TestComponentHandler(TestCase):
         """
         test get_aside_from_xblock called
         """
+
         def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
             """create dummy response"""
             return Response(status_code=200)
