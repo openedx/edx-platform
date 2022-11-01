@@ -58,7 +58,6 @@ from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
 from lms.djangoapps.learner_home.waffle import should_show_learner_home_amplitude_recommendations
 from lms.djangoapps.learner_home.utils import (
     get_personalized_course_recommendations,
-    exec_time_logged,
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -73,7 +72,6 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
-@exec_time_logged
 def get_platform_settings():
     """Get settings used for platform level connections: emails, url routes, etc."""
 
@@ -84,7 +82,6 @@ def get_platform_settings():
     }
 
 
-@exec_time_logged
 def get_user_account_confirmation_info(user):
     """Determine if a user needs to verify their account and related URL info"""
 
@@ -103,7 +100,6 @@ def get_user_account_confirmation_info(user):
     return email_confirmation
 
 
-@exec_time_logged
 def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
     """Get enrollments and enrollment course modes for user"""
 
@@ -143,7 +139,6 @@ def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
     return course_enrollments, course_mode_info
 
 
-@exec_time_logged
 def get_entitlements(user, org_allow_list, org_block_list):
     """Get entitlements for the user"""
     (
@@ -169,7 +164,6 @@ def get_entitlements(user, org_allow_list, org_block_list):
     )
 
 
-@exec_time_logged
 def get_course_overviews_for_pseudo_sessions(unfulfilled_entitlement_pseudo_sessions):
     """
     Get course overviews for entitlement pseudo sessions. This is required for
@@ -207,7 +201,6 @@ def get_email_settings_info(user, course_enrollments):
     return show_email_settings_for, course_optouts
 
 
-@exec_time_logged
 def get_enterprise_customer(user, request, is_masquerading):
     """
     If we are not masquerading, try to load the enterprise learner from session data, falling back to the db.
@@ -220,7 +213,6 @@ def get_enterprise_customer(user, request, is_masquerading):
         return enterprise_customer_from_session_or_learner_data(request)
 
 
-@exec_time_logged
 def get_ecommerce_payment_page(user):
     """Determine the ecommerce payment page URL if enabled for this user"""
     ecommerce_service = EcommerceService()
@@ -231,7 +223,6 @@ def get_ecommerce_payment_page(user):
     )
 
 
-@exec_time_logged
 def get_cert_statuses(user, course_enrollments):
     """Get cert status by course for user enrollments"""
     return {
@@ -240,13 +231,11 @@ def get_cert_statuses(user, course_enrollments):
     }
 
 
-@exec_time_logged
 def get_org_block_and_allow_lists():
     """Proxy for get_org_black_and_whitelist_for_site to allow for modification / profiling"""
     return get_org_black_and_whitelist_for_site()
 
 
-@exec_time_logged
 def get_resume_urls_for_course_enrollments(user, course_enrollments):
     """
     Modeled off of get_resume_urls_for_enrollments but removes check for actual presence of block
@@ -289,7 +278,6 @@ def _get_courses_with_unmet_prerequisites(user, course_enrollments):
     return get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
 
-@exec_time_logged
 def check_course_access(user, course_enrollments):
     """
     Wrapper for checks surrounding user ability to view courseware
@@ -326,7 +314,6 @@ def check_course_access(user, course_enrollments):
     return course_access_dict
 
 
-@exec_time_logged
 def get_course_programs(user, course_enrollments, site):
     """
     Get programs related to the courses the user is enrolled in.
@@ -343,7 +330,6 @@ def get_course_programs(user, course_enrollments, site):
     return meter.invert_programs()
 
 
-@exec_time_logged
 def get_suggested_courses():
     """
     Currently just returns general recommendations from settings
@@ -357,7 +343,6 @@ def get_suggested_courses():
     )
 
 
-@exec_time_logged
 def get_social_share_settings():
     """Config around social media sharing campaigns"""
 
@@ -383,7 +368,6 @@ def get_social_share_settings():
     }
 
 
-@exec_time_logged
 def get_course_share_urls(course_enrollments):
     """Get course URLs for sharing on social media"""
     return {
@@ -392,7 +376,6 @@ def get_course_share_urls(course_enrollments):
     }
 
 
-@exec_time_logged
 def get_audit_access_deadlines(user, course_enrollments):
     """
     Get audit access deadlines for each course enrollment
@@ -534,16 +517,9 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "programs": programs,
         }
 
-        t1 = time()
-
         response_data = LearnerDashboardSerializer(
             learner_dash_data, context=context
         ).data
-
-        t2 = time()
-        logger.info(
-            f"Finished serializing home info for {user.username} in {(t2-t1):.4f}s"
-        )
 
         return Response(response_data)
 
