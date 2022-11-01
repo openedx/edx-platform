@@ -6,8 +6,6 @@ import logging
 from time import time
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.core.exceptions import MultipleObjectsReturned
 from django.urls import reverse
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
@@ -24,7 +22,6 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.features.course_duration_limits.access import (
     get_user_course_expiration_date,
 )
-from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
@@ -33,10 +30,7 @@ from rest_framework.views import APIView
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from common.djangoapps.student.helpers import cert_info
-from common.djangoapps.student.models import (
-    CourseEnrollment,
-    get_user_by_username_or_email,
-)
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
     get_course_enrollments,
@@ -59,6 +53,7 @@ from lms.djangoapps.learner_home.waffle import (
     should_show_learner_home_amplitude_recommendations,
 )
 from lms.djangoapps.learner_home.utils import (
+    get_masquerade_user,
     get_personalized_course_recommendations,
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -71,7 +66,6 @@ from openedx.features.enterprise_support.api import (
 )
 
 logger = logging.getLogger(__name__)
-User = get_user_model()
 
 
 def get_platform_settings():
@@ -397,36 +391,15 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
-        if request.GET.get("user"):
-            if not request.user.is_staff:
-                logger.info(
-                    f"[Learner Home] {request.user.username} attempted to masquerade but is not staff"
-                )
-                raise PermissionDenied()
+        """Get masquerade user and proxy to init request"""
+        masquerade_user = get_masquerade_user(request)
 
-            masquerade_identifier = request.GET.get("user")
-            try:
-                masquerade_user = get_user_by_username_or_email(masquerade_identifier)
-            except User.DoesNotExist:
-                raise NotFound()  # pylint: disable=raise-missing-from
-            except MultipleObjectsReturned:
-                msg = (
-                    f"[Learner Home] {masquerade_identifier} could refer to multiple learners. "
-                    " Defaulting to username."
-                )
-                logger.info(msg)
-                masquerade_user = User.objects.get(username=masquerade_identifier)
-
-            success_msg = (
-                f"[Learner Home] {request.user.username} masquerades as "
-                f"{masquerade_user.username} - {masquerade_user.email}"
-            )
-            logger.info(success_msg)
-            return self._initialize(masquerade_user, True)
+        if masquerade_user:
+            return self._initialize(masquerade_user, is_masquerade=True)
         else:
-            return self._initialize(request.user, False)
+            return self._initialize(request.user)
 
-    def _initialize(self, user, is_masquerade):
+    def _initialize(self, user, is_masquerade=False):
         """
         Load information required for displaying the learner home
         """
