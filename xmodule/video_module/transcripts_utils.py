@@ -8,6 +8,7 @@ import copy
 import html
 import logging
 import os
+import re
 from functools import wraps
 
 import requests
@@ -153,6 +154,68 @@ def youtube_video_transcript_name(youtube_text_api):
     return None
 
 
+def get_transcript_link_from_youtube(youtube_id):
+    """
+    Get the link for YouTube transcript by parsing the source of the YouTube webpage.
+    Inside the webpage, the details of the transcripts are located in a JSON object.
+    After prettifying the object, it looks like:
+
+    "captions": {
+        "playerCaptionsTracklistRenderer": {
+            "captionTracks": [
+                {
+                    "baseUrl": "...",
+                    "name": {
+                        "simpleText": "(Japanese in local language)"
+                    },
+                    "vssId": ".ja",
+                    "languageCode": "ja",
+                    "isTranslatable": true
+                },
+                {
+                    "baseUrl": "...",
+                    "name": {
+                        "simpleText": "(French in local language)"
+                    },
+                    "vssId": ".fr",
+                    "languageCode": "fr",
+                    "isTranslatable": true
+                },
+                {
+                    "baseUrl": "...",
+                    "name": {
+                        "simpleText": "(English in local language)"
+                    },
+                    "vssId": ".en",
+                    "languageCode": "en",
+                    "isTranslatable": true
+                },
+                ...
+            ],
+            "audioTracks": [...]
+            "translationLanguages": ...
+        },
+        ...
+    }
+
+    So we use a regex to find the captionTracks JavaScript array, and then convert it
+    to a Python dict and return the link for en caption
+    """
+    youtube_url_base = settings.YOUTUBE['TRANSCRIPTS']['YOUTUBE_URL_BASE']
+    try:
+        youtube_html = requests.get(f"{youtube_url_base}{youtube_id}")
+        caption_re = settings.YOUTUBE['TRANSCRIPTS']['CAPTION_TRACKS_REGEX']
+        caption_matched = caption_re.search(youtube_html.content.decode("utf-8"))
+        if caption_matched:
+            caption_tracks = json.loads(f'[{caption_matched.group("caption_tracks")}]')
+            for caption in caption_tracks:
+                if caption["languageCode"] == "en":
+                    return caption["baseUrl"]
+        return None
+    except ConnectionError:
+        return None
+
+
 def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_name=''):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Gets transcripts from youtube for youtube_id.
@@ -166,15 +229,15 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
 
     utf8_parser = etree.XMLParser(encoding='utf-8')
 
-    youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
-    youtube_text_api['params']['v'] = youtube_id
-    # if the transcript name is not empty on youtube server we have to pass
-    # name param in url in order to get transcript
-    # example http://video.google.com/timedtext?lang=en&v={VideoId}&name={transcript_name}
-    youtube_transcript_name = youtube_video_transcript_name(youtube_text_api)
-    if youtube_transcript_name:
-        youtube_text_api['params']['name'] = youtube_transcript_name
-    data = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
+    transcript_link = get_transcript_link_from_youtube(youtube_id)
+
+    if not transcript_link:
+        msg = _("Can't get transcript link from Youtube for {youtube_id}.").format(
+            youtube_id=youtube_id,
+        )
+        raise GetTranscriptsFromYouTubeException(msg)
+
+    data = requests.get(transcript_link)
 
     if data.status_code != 200 or not data.text:
         msg = _("Can't receive transcripts from Youtube for {youtube_id}. Status code: {status_code}.").format(
