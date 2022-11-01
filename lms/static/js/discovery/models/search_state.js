@@ -11,7 +11,7 @@
         return Backbone.Model.extend({
 
             page: 0,
-            pageSize: 20,
+            pageSize: 100,  // Tahoe: fix a bug related to Course Access Groups - RED-3598
             searchTerm: '',
             terms: {},
             jqhxr: null,
