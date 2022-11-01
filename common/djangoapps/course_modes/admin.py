@@ -161,6 +161,7 @@ class CourseModeForm(forms.ModelForm):
             course = self.cleaned_data.get("course")
             verification_deadline = self.cleaned_data.get("verification_deadline")
             mode_slug = self.cleaned_data.get("mode_slug")
+            upgrade_deadline = self.cleaned_data.get("_expiration_datetime")
 
             # Since the verification deadline is stored in a separate model,
             # we need to handle saving this ourselves.
@@ -171,6 +172,7 @@ class CourseModeForm(forms.ModelForm):
                     course.id,
                     verification_deadline
                 )
+                self.expiration_datetime_is_explicit = True if upgrade_deadline is not None and upgrade_deadline != self._expiration_datetime else self.expiration_datetime_is_explicit
 
         return super().save(commit=commit)
 
@@ -189,6 +191,7 @@ class CourseModeAdmin(admin.ModelAdmin):
         'min_price',
         'currency',
         '_expiration_datetime',
+        'expiration_datetime_is_explicit',
         'verification_deadline',
         'sku',
         'bulk_sku'
