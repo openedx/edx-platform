@@ -138,9 +138,4 @@ class TeacherFeedbackSerializer(serializers.ModelSerializer):
 
 
 class ContactSerailizer(serializers.Serializer):
-    name = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
-    school = serializers.CharField(required=True)
-    datetime = serializers.DateTimeField(required=False)
-    subject = serializers.CharField(required=True)
     message = serializers.CharField(required=True)

@@ -330,20 +330,31 @@ class ContactAPIView(views.APIView):
 
     def post(self, request, *args, **kwargs):
         serializer = ContactSerailizer(data=request.data)
+
         if serializer.is_valid():
-            data = serializer.validated_data
-            email = data.get('email')
-            subject = data.get('subject')
+            subject = 'Missing Classes'
+            email = request.user.email
+            
+            data = {
+                'name': request.user.profile.name,
+                'school': request.user.gen_user.school.name,
+                'message': serializer.validated_data.get('message')
+            }
 
             plain_message = get_template('genplus/contact_us_email.txt')
             html_message  = get_template('genplus/contact_us_email.html')
             text_content = plain_message.render(data)
             html_content = html_message.render(data)
 
-            msg = EmailMultiAlternatives(subject, text_content, email, [settings.CONTACT_EMAIL])
+            msg = EmailMultiAlternatives(subject, text_content, settings.DEFAULT_FROM_EMAIL, [settings.CONTACT_EMAIL])
+            msg.cc = [email]
             msg.attach_alternative(html_content, "text/html")
-            msg.send()
+            
+            msg_status = msg.send(fail_silently=True)
 
-            return Response({"success": "Sent"}, status=status.HTTP_200_OK)
+            if (msg_status > 0):
+                return Response({"success": "Sent"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
