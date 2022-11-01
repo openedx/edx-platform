@@ -34,7 +34,7 @@ from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
-from lms.djangoapps.discussion.views import is_user_moderator
+from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -81,7 +81,9 @@ from ..django_comment_client.base.views import (
     track_thread_created_event,
     track_thread_deleted_event,
     track_thread_viewed_event,
-    track_voted_event
+    track_voted_event,
+    track_discussion_reported_event,
+    track_discussion_unreported_event,
 )
 from ..django_comment_client.utils import (
     get_group_id_for_user,
@@ -1196,7 +1198,7 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
             if field == "following":
                 _handle_following_field(form_value, context["cc_requester"], cc_content)
             elif field == "abuse_flagged":
-                _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content)
+                _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content, request)
             elif field == "voted":
                 _handle_voted_field(form_value, cc_content, api_content, request, context)
             elif field == "read":
@@ -1215,11 +1217,13 @@ def _handle_following_field(form_value, user, cc_content):
         user.unfollow(cc_content)
 
 
-def _handle_abuse_flagged_field(form_value, user, cc_content):
+def _handle_abuse_flagged_field(form_value, user, cc_content, request):
     """mark or unmark thread/comment as abused"""
     course_key = CourseKey.from_string(cc_content.course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     if form_value:
         cc_content.flagAbuse(user, cc_content)
+        track_discussion_reported_event(request, course, cc_content)
         if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and reported_content_email_notification_enabled(
                 course_key):
             if cc_content.type == 'thread':
@@ -1227,8 +1231,9 @@ def _handle_abuse_flagged_field(form_value, user, cc_content):
             else:
                 comment_flagged.send(sender='flag_abuse_for_comment', user=user, post=cc_content)
     else:
-        remove_all = bool(is_user_moderator(course_key, User.objects.get(id=user.id)))
+        remove_all = bool(is_privileged_user(course_key, User.objects.get(id=user.id)))
         cc_content.unFlagAbuse(user, cc_content, remove_all)
+        track_discussion_unreported_event(request, course, cc_content)
 
 
 def _handle_voted_field(form_value, cc_content, api_content, request, context):

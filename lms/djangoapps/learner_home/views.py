@@ -34,7 +34,6 @@ from common.djangoapps.student.models import (
     CourseEnrollment,
     get_user_by_username_or_email,
 )
-from common.djangoapps.student.toggles import should_show_amplitude_recommendations
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
     get_course_enrollments,
@@ -53,6 +52,7 @@ from lms.djangoapps.courseware.access_utils import (
     check_course_open_for_learner,
 )
 from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
+from lms.djangoapps.learner_home.waffle import should_show_learner_home_amplitude_recommendations
 from lms.djangoapps.learner_home.utils import (
     get_personalized_course_recommendations,
     exec_time_logged,
@@ -537,7 +537,7 @@ class CourseRecommendationApiView(APIView):
 
     def get(self, request):
         """ Retrieves course recommendations details of a user in a specified course. """
-        if not should_show_amplitude_recommendations():
+        if not should_show_learner_home_amplitude_recommendations():
             return Response(status=400)
 
         user_id = request.user.id
