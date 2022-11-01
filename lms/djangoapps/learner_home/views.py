@@ -21,6 +21,9 @@ from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
 from opaque_keys.edx.keys import CourseKey
+from openedx.features.course_duration_limits.access import (
+    get_user_course_expiration_date,
+)
 from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -389,6 +392,22 @@ def get_course_share_urls(course_enrollments):
     }
 
 
+@exec_time_logged
+def get_audit_access_deadlines(user, course_enrollments):
+    """
+    Get audit access deadlines for each course enrollment
+
+    Returns:
+    - Dict {course_id: <datetime or None>}
+    """
+    return {
+        course_enrollment.course_id: get_user_course_expiration_date(
+            user, course_enrollment.course
+        )
+        for course_enrollment in course_enrollments
+    }
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -457,6 +476,9 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             user, site_org_whitelist, site_org_blacklist
         )
 
+        # Get audit access deadlines
+        audit_access_deadlines = get_audit_access_deadlines(user, course_enrollments)
+
         # Get email opt-outs for student
         show_email_settings_for, course_optouts = get_email_settings_info(
             user, course_enrollments
@@ -496,6 +518,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         }
 
         context = {
+            "audit_access_deadlines": audit_access_deadlines,
             "ecommerce_payment_page": ecommerce_payment_page,
             "cert_statuses": cert_statuses,
             "course_mode_info": course_mode_info,

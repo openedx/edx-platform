@@ -321,9 +321,9 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
     def create_test_context(self, course):
         """Get a test context object"""
         return {
+            "audit_access_deadlines": {course.id: random_date},
             "course_mode_info": {
                 course.id: {
-                    "expiration_datetime": random_date(),
                     "show_upsell": True,
                 }
             },
