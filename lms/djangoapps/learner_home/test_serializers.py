@@ -6,10 +6,10 @@ from random import randint
 from unittest import mock
 from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase
-import ddt
 from opaque_keys.edx.keys import CourseKey
 
 

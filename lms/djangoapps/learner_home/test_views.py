@@ -24,7 +24,11 @@ from common.djangoapps.student.tests.factories import (
 )
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params
 from lms.djangoapps.bulk_email.models import Optout
-from lms.djangoapps.learner_home.test_utils import create_test_enrollment, random_string
+from lms.djangoapps.learner_home.test_utils import (
+    create_test_enrollment,
+    random_string,
+    random_url,
+)
 from lms.djangoapps.learner_home.views import (
     get_course_overviews_for_pseudo_sessions,
     get_course_programs,
@@ -38,11 +42,11 @@ from lms.djangoapps.learner_home.views import (
     get_social_share_settings,
     get_course_share_urls,
 )
-from lms.djangoapps.learner_home.test_serializers import random_url
 from lms.djangoapps.learner_home.waffle import (
     ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS,
 )
 from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseFactory as CatalogCourseFactory,
     CourseRunFactory as CatalogCourseRunFactory,
     ProgramFactory,
 )
@@ -50,9 +54,6 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.catalog.tests.factories import (
-    CourseFactory as CatalogCourseFactory,
-)
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,

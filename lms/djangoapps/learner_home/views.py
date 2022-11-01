@@ -3,25 +3,17 @@ Views for the learner dashboard.
 """
 from collections import OrderedDict
 import logging
-from time import time
 
 from django.conf import settings
 from django.urls import reverse
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from common.djangoapps.util.course import (
-    get_encoded_course_sharing_utm_params,
-    get_link_for_about_page,
-)
 from edx_django_utils import monitoring as monitoring_utils
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
 from opaque_keys.edx.keys import CourseKey
-from openedx.features.course_duration_limits.access import (
-    get_user_course_expiration_date,
-)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
@@ -34,10 +26,14 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
     get_course_enrollments,
-    get_org_black_and_whitelist_for_site,
     get_filtered_course_entitlements,
+    get_org_black_and_whitelist_for_site,
 )
 from common.djangoapps.track import segment
+from common.djangoapps.util.course import (
+    get_encoded_course_sharing_utm_params,
+    get_link_for_about_page,
+)
 from common.djangoapps.util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
 )
@@ -60,6 +56,9 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.catalog.utils import get_course_data
+from openedx.features.course_duration_limits.access import (
+    get_user_course_expiration_date,
+)
 from openedx.features.enterprise_support.api import (
     enterprise_customer_from_session_or_learner_data,
     get_enterprise_learner_data_from_db,
