@@ -39,7 +39,9 @@ from lms.djangoapps.learner_home.views import (
     get_course_share_urls,
 )
 from lms.djangoapps.learner_home.test_serializers import random_url
-from lms.djangoapps.learner_home.waffle import ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS
+from lms.djangoapps.learner_home.waffle import (
+    ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS,
+)
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseRunFactory as CatalogCourseRunFactory,
     ProgramFactory,
@@ -425,7 +427,7 @@ class TestGetEnterpriseCustomer(TestCase):
 
 
 class TestGetSocialShareSettings(TestCase):
-    """ Tests for get_social_share_settings """
+    """Tests for get_social_share_settings"""
 
     def test_get_social_share_settings(self):
         share_settings = {
@@ -443,16 +445,16 @@ class TestGetSocialShareSettings(TestCase):
             "facebook": {
                 "is_enabled": True,
                 "brand": share_settings["FACEBOOK_BRAND"],
-                "utm_params": utm_sources.get("facebook")
+                "utm_params": utm_sources.get("facebook"),
             },
             "twitter": {
                 "is_enabled": True,
                 "brand": share_settings["TWITTER_BRAND"],
-                "utm_params": utm_sources.get("twitter")
-            }
+                "utm_params": utm_sources.get("twitter"),
+            },
         }
 
-    @patch('lms.djangoapps.learner_home.views.get_encoded_course_sharing_utm_params')
+    @patch("lms.djangoapps.learner_home.views.get_encoded_course_sharing_utm_params")
     def test_social_share_settings__empty(self, mock_get_utm_params):
         share_settings = {}
         mock_get_utm_params.return_value = {}
@@ -461,23 +463,15 @@ class TestGetSocialShareSettings(TestCase):
             social_share_settings = get_social_share_settings()
 
         assert social_share_settings == {
-            "facebook": {
-                "is_enabled": False,
-                "brand": "edX.org",
-                "utm_params": None
-            },
-            "twitter": {
-                "is_enabled": False,
-                "brand": "edX.org",
-                "utm_params": None
-            }
+            "facebook": {"is_enabled": False, "brand": "edX.org", "utm_params": None},
+            "twitter": {"is_enabled": False, "brand": "edX.org", "utm_params": None},
         }
 
 
 class TestGetCourseShareUrls(TestCase):
-    """ Tests for get_course_share_urls """
+    """Tests for get_course_share_urls"""
 
-    @patch('lms.djangoapps.learner_home.views.get_link_for_about_page')
+    @patch("lms.djangoapps.learner_home.views.get_link_for_about_page")
     def test_get_course_share_urls(self, mock_about_page_link):
         enrollments = CourseEnrollmentFactory.create_batch(3)
         course_share_urls = get_course_share_urls(enrollments)
@@ -825,20 +819,30 @@ class TestDashboardMasquerade(BaseTestDashboardView):
 class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
     """Unit tests for the course recommendations on learner home page."""
 
-    password = 'test'
-    url = reverse_lazy('learner_home:courses')
+    password = "test"
+    url = reverse_lazy("learner_home:courses")
 
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
-        self.recommended_courses = ['MITx+6.00.1x', 'IBM+PY0101EN', 'HarvardX+CS50P', 'UQx+IELTSx', 'HarvardX+CS50x',
-                                    'Harvard+CS50z', 'BabsonX+EPS03x', 'TUMx+QPLS2x', 'NYUx+FCS.NET.1', 'MichinX+101x']
+        self.recommended_courses = [
+            "MITx+6.00.1x",
+            "IBM+PY0101EN",
+            "HarvardX+CS50P",
+            "UQx+IELTSx",
+            "HarvardX+CS50x",
+            "Harvard+CS50z",
+            "BabsonX+EPS03x",
+            "TUMx+QPLS2x",
+            "NYUx+FCS.NET.1",
+            "MichinX+101x",
+        ]
         self.course_data = {
-            'course_key': 'MITx+6.00.1x',
-            'title': 'Introduction to Computer Science and Programming Using Python',
-            'owners': [{'logo_image_url': 'https://www.logo_image_url.com'}],
-            'marketing_url': 'https://www.marketing_url.com'
+            "course_key": "MITx+6.00.1x",
+            "title": "Introduction to Computer Science and Programming Using Python",
+            "owners": [{"logo_image_url": "https://www.logo_image_url.com"}],
+            "marketing_url": "https://www.marketing_url.com",
         }
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=False)
@@ -851,10 +855,13 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.data, None)
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
-    @mock.patch('lms.djangoapps.learner_home.views.get_personalized_course_recommendations')
-    @mock.patch('lms.djangoapps.learner_home.views.get_course_data')
-    def test_no_recommendations_from_amplitude(self, mocked_get_course_data,
-                                               mocked_get_personalized_course_recommendations):
+    @mock.patch(
+        "lms.djangoapps.learner_home.views.get_personalized_course_recommendations"
+    )
+    @mock.patch("lms.djangoapps.learner_home.views.get_course_data")
+    def test_no_recommendations_from_amplitude(
+        self, mocked_get_course_data, mocked_get_personalized_course_recommendations
+    ):
         """
         Verify API returns 400 if no course recommendations from amplitude.
         """
@@ -866,34 +873,54 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.data, None)
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
-    @mock.patch('lms.djangoapps.learner_home.views.get_personalized_course_recommendations')
-    @mock.patch('lms.djangoapps.learner_home.views.get_course_data')
-    def test_get_course_recommendations(self, mocked_get_course_data,
-                                        mocked_get_personalized_course_recommendations):
+    @mock.patch(
+        "lms.djangoapps.learner_home.views.get_personalized_course_recommendations"
+    )
+    @mock.patch("lms.djangoapps.learner_home.views.get_course_data")
+    def test_get_course_recommendations(
+        self, mocked_get_course_data, mocked_get_personalized_course_recommendations
+    ):
         """
         Verify API returns course recommendations.
         """
-        mocked_get_personalized_course_recommendations.return_value = [False, self.recommended_courses]
+        mocked_get_personalized_course_recommendations.return_value = [
+            False,
+            self.recommended_courses,
+        ]
         mocked_get_course_data.return_value = self.course_data
         expected_recommendations_length = 5
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.get('is_personalized_recommendation'), True)
-        self.assertEqual(len(response.data.get('courses')), expected_recommendations_length)
+        self.assertEqual(response.data.get("is_personalized_recommendation"), True)
+        self.assertEqual(
+            len(response.data.get("courses")), expected_recommendations_length
+        )
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
-    @mock.patch('lms.djangoapps.learner_home.views.get_personalized_course_recommendations')
-    @mock.patch('lms.djangoapps.learner_home.views.get_course_data')
-    def test_get_enrollable_course_recommendations(self, mocked_get_course_data,
-                                                   mocked_get_personalized_course_recommendations):
+    @mock.patch(
+        "lms.djangoapps.learner_home.views.get_personalized_course_recommendations"
+    )
+    @mock.patch("lms.djangoapps.learner_home.views.get_course_data")
+    def test_get_enrollable_course_recommendations(
+        self, mocked_get_course_data, mocked_get_personalized_course_recommendations
+    ):
         """
         Verify API returns course recommendations for courses in which user is not enrolled.
         """
-        mocked_get_personalized_course_recommendations.return_value = [False, self.recommended_courses]
+        mocked_get_personalized_course_recommendations.return_value = [
+            False,
+            self.recommended_courses,
+        ]
         mocked_get_course_data.return_value = self.course_data
-        course_keys = ['course-v1:IBM+PY0101EN+Run_0', 'course-v1:UQx+IELTSx+Run_0', 'course-v1:MITx+6.00.1x+Run_0',
-                       'course-v1:HarvardX+CS50P+Run_0', 'course-v1:Harvard+CS50z+Run_0', 'course-v1:TUMx+QPLS2x+Run_0']
+        course_keys = [
+            "course-v1:IBM+PY0101EN+Run_0",
+            "course-v1:UQx+IELTSx+Run_0",
+            "course-v1:MITx+6.00.1x+Run_0",
+            "course-v1:HarvardX+CS50P+Run_0",
+            "course-v1:Harvard+CS50z+Run_0",
+            "course-v1:TUMx+QPLS2x+Run_0",
+        ]
         expected_recommendations = 4
         # enrolling in 6 courses
         for course_key in course_keys:
@@ -901,5 +928,5 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.get('is_personalized_recommendation'), True)
-        self.assertEqual(len(response.data.get('courses')), expected_recommendations)
+        self.assertEqual(response.data.get("is_personalized_recommendation"), True)
+        self.assertEqual(len(response.data.get("courses")), expected_recommendations)

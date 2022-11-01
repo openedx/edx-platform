@@ -164,11 +164,7 @@ class TestCourseSerializer(LearnerDashboardBaseTest):
     """Tests for the CourseSerializer"""
 
     def create_test_context(self, course_id):
-        return {
-            "course_share_urls": {
-                course_id: random_url()
-            }
-        }
+        return {"course_share_urls": {course_id: random_url()}}
 
     def test_happy_path(self):
         test_enrollment = self.create_test_enrollment()
@@ -182,7 +178,7 @@ class TestCourseSerializer(LearnerDashboardBaseTest):
             "bannerImgSrc": test_enrollment.course_overview.banner_image_url,
             "courseName": test_enrollment.course_overview.display_name_with_default,
             "courseNumber": test_enrollment.course_overview.display_number_with_default,
-            "socialShareUrl": test_context['course_share_urls'][course_id]
+            "socialShareUrl": test_context["course_share_urls"][course_id],
         }
 
 
@@ -907,9 +903,10 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
             output_data["enrollment"]
             == UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA
         )
-        assert output_data["course"] == CourseSerializer(
-            pseudo_session_course_overviews.popitem()[1]
-        ).data
+        assert (
+            output_data["course"]
+            == CourseSerializer(pseudo_session_course_overviews.popitem()[1]).data
+        )
         assert output_data["courseProvider"] is not None
         assert output_data["programs"] == {"relatedPrograms": []}
 
@@ -1078,7 +1075,7 @@ class TestEnterpriseDashboardSerializer(TestCase):
 
 
 class TestSocialMediaSettingsSiteSerializer(TestCase):
-    """ Tests for the SocialMediaSiteSettingsSerializer """
+    """Tests for the SocialMediaSiteSettingsSerializer"""
 
     @classmethod
     def generate_test_social_media_settings(cls):
@@ -1103,13 +1100,13 @@ class TestSocialMediaSettingsSiteSerializer(TestCase):
 
 
 class TestSocialShareSettingsSerializer(TestCase):
-    """ Tests for the SocialShareSettingsSerializer """
+    """Tests for the SocialShareSettingsSerializer"""
 
     @classmethod
     def generate_test_social_share_settings(cls):
         return {
             "twitter": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings(),
-            "facebook": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings()
+            "facebook": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings(),
         }
 
     def test_structure(self):
@@ -1118,10 +1115,7 @@ class TestSocialShareSettingsSerializer(TestCase):
 
         output_data = SocialShareSettingsSerializer(input_data).data
 
-        expected_keys = [
-            "twitter",
-            "facebook"
-        ]
+        expected_keys = ["twitter", "facebook"]
         self.assertEqual(output_data.keys(), set(expected_keys))
 
 
