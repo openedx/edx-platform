@@ -40,13 +40,18 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
     student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False, on_delete=models.DO_NOTHING)
 
     @receiver(post_save, sender=StudentModule)
-    def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
+    def save_history(sender, instance, *args, **kwargs):  # pylint: disable=no-self-argument, unused-argument
         """
         Checks the instance's module_type, and creates & saves a
         StudentModuleHistoryExtended entry if the module_type is one that
         we save.
         """
-        BaseStudentModuleHistory.save_history(sender, instance, StudentModuleHistoryExtended, "lms.djangoapps.coursewarehistoryextended.models.student_module_history_extended_map")
+        BaseStudentModuleHistory.save_history(
+            sender,
+            instance,
+            StudentModuleHistoryExtended,
+            "lms.djangoapps.coursewarehistoryextended.models.student_module_history_extended_map"
+        )
 
     @receiver(post_delete, sender=StudentModule)
     def delete_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument

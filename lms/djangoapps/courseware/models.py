@@ -234,7 +234,11 @@ class BaseStudentModuleHistory(models.Model):
 
         return history_entries
 
+    @staticmethod
     def save_history(sender, instance, history_model_cls, request_cache_key, **kwargs):
+        """
+        When a StudentModule instance is updated, save the changes in the corresponding activity history table
+        """
         if instance.module_type in history_model_cls.HISTORY_SAVING_TYPES:
             request_cache = RequestCache('studentmodulehistory')
             history_entry = None
@@ -247,7 +251,11 @@ class BaseStudentModuleHistory(models.Model):
                 try:
                     history_entry = history_model_cls.objects.get(id=smh_id)
                 except history_model_cls.DoesNotExist:
-                    log.error(f"Cached {history_model_cls.__name__} instance does not exist: {history_model_cls.__name__}({smh_id}) for StudentModuel({instance.id})")
+                    log.error(
+                        "Cached {} instance does not exist: {}({}) for StudentModuel({})".format(
+                            history_model_cls.__name__, history_model_cls.__name__, smh_id, instance.id
+                        )
+                    )
 
             # If not StudentModuleHistory has been created during this request yet, then create a new one
             if not history_entry:
@@ -255,10 +263,10 @@ class BaseStudentModuleHistory(models.Model):
 
             # Regardless of whether this is a new or existing StudentModuleHistory, set its values to match the current
             # state of the StudentModule record
-            history_entry.created=instance.modified
-            history_entry.state=instance.state
-            history_entry.grade=instance.grade
-            history_entry.max_grade=instance.max_grade
+            history_entry.created = instance.modified
+            history_entry.state = instance.state
+            history_entry.grade = instance.grade
+            history_entry.max_grade = instance.max_grade
             history_entry.save()
 
             # Update the RequestCache to map this StudentModule to the StudentModuleHistory for this request cycle
@@ -282,13 +290,18 @@ class StudentModuleHistory(BaseStudentModuleHistory):
     def __str__(self):
         return str(repr(self))
 
-    def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
+    def save_history(sender, instance, *args, **kwargs):  # pylint: disable=no-self-argument, unused-argument
         """
         Checks the instance's module_type, and creates & saves a
         StudentModuleHistory entry if the module_type is one that
         we save.
         """
-        BaseStudentModuleHistory.save_history(sender, instance, StudentModuleHistory, "lms.djangoapps.courseware.models.student_module_history_map")
+        BaseStudentModuleHistory.save_history(
+            sender,
+            instance,
+            StudentModuleHistory,
+            "lms.djangoapps.courseware.models.student_module_history_map"
+        )
 
     # When the extended studentmodulehistory table exists, don't save
     # duplicate history into courseware_studentmodulehistory, just retain
