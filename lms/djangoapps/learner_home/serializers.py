@@ -195,11 +195,7 @@ class EnrollmentSerializer(serializers.Serializer):
     isEnrolled = serializers.BooleanField(source="is_active")
 
     def get_accessExpirationDate(self, instance):
-        return (
-            self.context.get("course_mode_info", {})
-            .get(instance.course_id)
-            .get("expiration_datetime")
-        )
+        return self.context.get("audit_access_deadlines", {}).get(instance.course_id)
 
     def get_isAudit(self, enrollment):
         return enrollment.mode in CourseMode.AUDIT_MODES
