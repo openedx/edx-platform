@@ -175,7 +175,6 @@ class CourseModeForm(forms.ModelForm):
                     course.id,
                     verification_deadline
                 )
-                expiration_datetime_is_explicit = True if upgrade_deadline is not None and upgrade_deadline != self.instance._expiration_datetime else self.expiration_datetime_is_explicit
 
         return super().save(commit=commit)
 
