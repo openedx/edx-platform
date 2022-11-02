@@ -9,6 +9,7 @@ from django.urls import reverse
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from edx_django_utils import monitoring as monitoring_utils
+from edx_django_utils.monitoring import function_trace
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
@@ -67,6 +68,7 @@ from openedx.features.enterprise_support.api import (
 logger = logging.getLogger(__name__)
 
 
+@function_trace("get_platform_settings")
 def get_platform_settings():
     """Get settings used for platform level connections: emails, url routes, etc."""
 
@@ -77,6 +79,7 @@ def get_platform_settings():
     }
 
 
+@function_trace("get_user_account_confirmation_info")
 def get_user_account_confirmation_info(user):
     """Determine if a user needs to verify their account and related URL info"""
 
@@ -95,6 +98,7 @@ def get_user_account_confirmation_info(user):
     return email_confirmation
 
 
+@function_trace("get_enrollments")
 def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
     """Get enrollments and enrollment course modes for user"""
 
@@ -134,6 +138,7 @@ def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
     return course_enrollments, course_mode_info
 
 
+@function_trace("get_entitlements")
 def get_entitlements(user, org_allow_list, org_block_list):
     """Get entitlements for the user"""
     (
@@ -159,6 +164,7 @@ def get_entitlements(user, org_allow_list, org_block_list):
     )
 
 
+@function_trace("get_course_overviews_for_pseudo_sessions")
 def get_course_overviews_for_pseudo_sessions(unfulfilled_entitlement_pseudo_sessions):
     """
     Get course overviews for entitlement pseudo sessions. This is required for
@@ -177,6 +183,7 @@ def get_course_overviews_for_pseudo_sessions(unfulfilled_entitlement_pseudo_sess
     return CourseOverview.get_from_ids(course_ids)
 
 
+@function_trace("get_email_settings_info")
 def get_email_settings_info(user, course_enrollments):
     """
     Given a user and enrollments, determine which courses allow bulk email (show_email_settings_for)
@@ -196,6 +203,7 @@ def get_email_settings_info(user, course_enrollments):
     return show_email_settings_for, course_optouts
 
 
+@function_trace("get_enterprise_customer")
 def get_enterprise_customer(user, request, is_masquerading):
     """
     If we are not masquerading, try to load the enterprise learner from session data, falling back to the db.
@@ -208,6 +216,7 @@ def get_enterprise_customer(user, request, is_masquerading):
         return enterprise_customer_from_session_or_learner_data(request)
 
 
+@function_trace("get_ecommerce_payment_page")
 def get_ecommerce_payment_page(user):
     """Determine the ecommerce payment page URL if enabled for this user"""
     ecommerce_service = EcommerceService()
@@ -218,6 +227,7 @@ def get_ecommerce_payment_page(user):
     )
 
 
+@function_trace("get_cert_statuses")
 def get_cert_statuses(user, course_enrollments):
     """Get cert status by course for user enrollments"""
     return {
@@ -226,11 +236,13 @@ def get_cert_statuses(user, course_enrollments):
     }
 
 
+@function_trace("get_org_block_and_allow_lists")
 def get_org_block_and_allow_lists():
     """Proxy for get_org_black_and_whitelist_for_site to allow for modification / profiling"""
     return get_org_black_and_whitelist_for_site()
 
 
+@function_trace("get_resume_urls_for_course_enrollments")
 def get_resume_urls_for_course_enrollments(user, course_enrollments):
     """
     Modeled off of get_resume_urls_for_enrollments but removes check for actual presence of block
@@ -273,6 +285,7 @@ def _get_courses_with_unmet_prerequisites(user, course_enrollments):
     return get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
 
+@function_trace("check_course_access")
 def check_course_access(user, course_enrollments):
     """
     Wrapper for checks surrounding user ability to view courseware
@@ -309,6 +322,7 @@ def check_course_access(user, course_enrollments):
     return course_access_dict
 
 
+@function_trace("get_course_programs")
 def get_course_programs(user, course_enrollments, site):
     """
     Get programs related to the courses the user is enrolled in.
@@ -325,6 +339,7 @@ def get_course_programs(user, course_enrollments, site):
     return meter.invert_programs()
 
 
+@function_trace("get_suggested_courses")
 def get_suggested_courses():
     """
     Currently just returns general recommendations from settings
@@ -338,6 +353,7 @@ def get_suggested_courses():
     )
 
 
+@function_trace("get_social_share_settings")
 def get_social_share_settings():
     """Config around social media sharing campaigns"""
 
@@ -363,6 +379,7 @@ def get_social_share_settings():
     }
 
 
+@function_trace("get_course_share_urls")
 def get_course_share_urls(course_enrollments):
     """Get course URLs for sharing on social media"""
     return {
@@ -371,6 +388,7 @@ def get_course_share_urls(course_enrollments):
     }
 
 
+@function_trace("get_audit_access_deadlines")
 def get_audit_access_deadlines(user, course_enrollments):
     """
     Get audit access deadlines for each course enrollment
