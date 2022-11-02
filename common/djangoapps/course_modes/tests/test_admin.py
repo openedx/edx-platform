@@ -164,6 +164,14 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
             'For other modes, please set the enrollment end date in Studio.'
         ))
 
+    def test_validate_expiration_datetime_is_explicit_only_with_upgrade_deadline(self):
+        # Only allow the expiration_datetime_is_explicit to be True if the upgrade_deadline is
+        # defined with a date, otherwise cause a validation error.
+        form = self._admin_form("verified", upgrade_deadline=None)
+        self._assert_form_has_error(form, (
+            "An upgrade deadline must be specified when setting Expiration datetime is explicit to True."
+        ))
+
     @ddt.data("honor", "no-id-professional", "credit")
     def test_validate_verification_deadline_only_for_verified(self, course_mode):
         # Only the verified mode should have a verification deadline set.
@@ -204,6 +212,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
             "mode_slug": mode,
             "mode_display_name": mode,
             "_expiration_datetime": upgrade_deadline,
+            "expiration_datetime_is_explicit": True,
             "currency": "usd",
             "min_price": 10,
         }, instance=course_mode)
