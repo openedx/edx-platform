@@ -322,7 +322,6 @@ class EntitlementSerializer(serializers.Serializer):
     changeDeadline = serializers.SerializerMethodField()
     isExpired = serializers.SerializerMethodField()
     expirationDate = serializers.SerializerMethodField()
-    enrollmentUrl = serializers.SerializerMethodField()
 
     # DRF doesn't convert None to False so we must do this rather than a booleanfield:
     # https://github.com/encode/django-rest-framework/issues/2299
@@ -346,9 +345,6 @@ class EntitlementSerializer(serializers.Serializer):
 
     def get_changeDeadline(self, instance):
         return self.get_expirationDate(instance)
-
-    def get_enrollmentUrl(self, instance):
-        return reverse("entitlements_api:v1:enrollments", args=[str(instance.uuid)])
 
 
 class RelatedProgramSerializer(serializers.Serializer):

@@ -718,7 +718,6 @@ class TestEntitlementSerializer(TestCase):
             "isExpired": bool(entitlement.expired_at),
             "expirationDate": expected_expiration_date,
             "uuid": str(entitlement.uuid),
-            "enrollmentUrl": f"/api/entitlements/v1/entitlements/{entitlement.uuid}/enrollments",
         }
 
 
