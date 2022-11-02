@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
@@ -228,10 +229,14 @@ class EnrollmentSerializer(serializers.Serializer):
         )
 
     def get_isAuditAccessExpired(self, enrollment):
-        show_courseware_link = self.context.get("show_courseware_link", {}).get(
-            enrollment.course.id, {}
+        """Mirrors logic in "check_course_expired" but using pre-fetched expiration date"""
+        expiration_date = self.context.get("audit_access_deadlines", {}).get(
+            enrollment.course_id
         )
-        return show_courseware_link.get("error_code") == "audit_expired"
+
+        if expiration_date and timezone.now() > expiration_date:
+            return True
+        return False
 
     def get_isEmailEnabled(self, enrollment):
         return enrollment.course_id in self.context.get("show_email_settings_for", [])
