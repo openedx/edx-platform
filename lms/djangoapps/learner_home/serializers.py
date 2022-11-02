@@ -10,7 +10,6 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.helpers import user_has_passing_grade_in_course
 from openedx.features.course_experience import course_home_url
 from xmodule.data import CertificatesDisplayBehaviors
 
@@ -62,6 +61,8 @@ class CourseProviderSerializer(serializers.Serializer):
 
 class CourseSerializer(serializers.Serializer):
     """Course header information, derived from a CourseOverview"""
+
+    requires_context = True
 
     bannerImgSrc = serializers.URLField(source="image_urls.small")
     courseName = serializers.CharField(source="display_name_with_default")
@@ -139,6 +140,8 @@ class CoursewareAccessSerializer(serializers.Serializer):
     Mirrors logic in "show_courseware_links_for" from old dashboard.py
     """
 
+    requires_context = True
+
     hasUnmetPrerequisites = serializers.SerializerMethodField()
     isTooEarly = serializers.SerializerMethodField()
     isStaff = serializers.SerializerMethodField()
@@ -181,6 +184,8 @@ class EnrollmentSerializer(serializers.Serializer):
     - "show_email_settings_for" (dict): keyed by course ID with a boolean whether we
        show email settings.
     """
+
+    requires_context = True
 
     accessExpirationDate = serializers.SerializerMethodField()
     isAudit = serializers.SerializerMethodField()
@@ -238,14 +243,18 @@ class EnrollmentSerializer(serializers.Serializer):
 class GradeDataSerializer(serializers.Serializer):
     """Info about grades for this enrollment"""
 
+    requires_context = True
+
     isPassing = serializers.SerializerMethodField()
 
     def get_isPassing(self, enrollment):
-        return user_has_passing_grade_in_course(enrollment)
+        return self.context.get("grade_statuses", {}).get(enrollment.course_id, False)
 
 
 class CertificateSerializer(serializers.Serializer):
     """Certificate availability info"""
+
+    requires_context = True
 
     availableDate = serializers.SerializerMethodField()
     isRestricted = serializers.SerializerMethodField()

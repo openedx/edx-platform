@@ -6,10 +6,10 @@ from random import randint
 from unittest import mock
 from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase
-import ddt
 from opaque_keys.edx.keys import CourseKey
 
 
@@ -164,11 +164,7 @@ class TestCourseSerializer(LearnerDashboardBaseTest):
     """Tests for the CourseSerializer"""
 
     def create_test_context(self, course_id):
-        return {
-            "course_share_urls": {
-                course_id: random_url()
-            }
-        }
+        return {"course_share_urls": {course_id: random_url()}}
 
     def test_happy_path(self):
         test_enrollment = self.create_test_enrollment()
@@ -182,7 +178,7 @@ class TestCourseSerializer(LearnerDashboardBaseTest):
             "bannerImgSrc": test_enrollment.course_overview.banner_image_url,
             "courseName": test_enrollment.course_overview.display_name_with_default,
             "courseNumber": test_enrollment.course_overview.display_number_with_default,
-            "socialShareUrl": test_context['course_share_urls'][course_id]
+            "socialShareUrl": test_context["course_share_urls"][course_id],
         }
 
 
@@ -430,17 +426,18 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
 class TestGradeDataSerializer(LearnerDashboardBaseTest):
     """Tests for the GradeDataSerializer"""
 
-    @mock.patch(
-        "lms.djangoapps.learner_home.serializers.user_has_passing_grade_in_course"
-    )
+    def create_test_context(self, course, is_passing):
+        """Get a test context object"""
+        return {"grade_statuses": {course.id: is_passing}}
+
     @ddt.data(True, False, None)
-    def test_happy_path(self, is_passing, mock_get_grade_data):
+    def test_happy_path(self, is_passing):
         # Given a course where I am/not passing
         input_data = self.create_test_enrollment()
-        mock_get_grade_data.return_value = is_passing
+        input_context = self.create_test_context(input_data.course, is_passing)
 
         # When I serialize grade data
-        output_data = GradeDataSerializer(input_data).data
+        output_data = GradeDataSerializer(input_data, context=input_context).data
 
         # Then I get the correct data shape out
         self.assertDictEqual(
@@ -906,9 +903,10 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
             output_data["enrollment"]
             == UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA
         )
-        assert output_data["course"] == CourseSerializer(
-            pseudo_session_course_overviews.popitem()[1]
-        ).data
+        assert (
+            output_data["course"]
+            == CourseSerializer(pseudo_session_course_overviews.popitem()[1]).data
+        )
         assert output_data["courseProvider"] is not None
         assert output_data["programs"] == {"relatedPrograms": []}
 
@@ -1077,7 +1075,7 @@ class TestEnterpriseDashboardSerializer(TestCase):
 
 
 class TestSocialMediaSettingsSiteSerializer(TestCase):
-    """ Tests for the SocialMediaSiteSettingsSerializer """
+    """Tests for the SocialMediaSiteSettingsSerializer"""
 
     @classmethod
     def generate_test_social_media_settings(cls):
@@ -1102,13 +1100,13 @@ class TestSocialMediaSettingsSiteSerializer(TestCase):
 
 
 class TestSocialShareSettingsSerializer(TestCase):
-    """ Tests for the SocialShareSettingsSerializer """
+    """Tests for the SocialShareSettingsSerializer"""
 
     @classmethod
     def generate_test_social_share_settings(cls):
         return {
             "twitter": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings(),
-            "facebook": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings()
+            "facebook": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings(),
         }
 
     def test_structure(self):
@@ -1117,10 +1115,7 @@ class TestSocialShareSettingsSerializer(TestCase):
 
         output_data = SocialShareSettingsSerializer(input_data).data
 
-        expected_keys = [
-            "twitter",
-            "facebook"
-        ]
+        expected_keys = ["twitter", "facebook"]
         self.assertEqual(output_data.keys(), set(expected_keys))
 
 
