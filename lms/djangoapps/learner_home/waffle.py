@@ -4,6 +4,7 @@ waffle switches for the teams app.
 """
 
 from edx_toggles.toggles import WaffleFlag
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # Namespace for Learner Home MFE waffle flags.
