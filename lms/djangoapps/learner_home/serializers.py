@@ -62,6 +62,8 @@ class CourseProviderSerializer(serializers.Serializer):
 class CourseSerializer(serializers.Serializer):
     """Course header information, derived from a CourseOverview"""
 
+    requires_context = True
+
     bannerImgSrc = serializers.URLField(source="image_urls.small")
     courseName = serializers.CharField(source="display_name_with_default")
     courseNumber = serializers.CharField(source="display_number_with_default")
@@ -138,6 +140,8 @@ class CoursewareAccessSerializer(serializers.Serializer):
     Mirrors logic in "show_courseware_links_for" from old dashboard.py
     """
 
+    requires_context = True
+
     hasUnmetPrerequisites = serializers.SerializerMethodField()
     isTooEarly = serializers.SerializerMethodField()
     isStaff = serializers.SerializerMethodField()
@@ -180,6 +184,8 @@ class EnrollmentSerializer(serializers.Serializer):
     - "show_email_settings_for" (dict): keyed by course ID with a boolean whether we
        show email settings.
     """
+
+    requires_context = True
 
     accessExpirationDate = serializers.SerializerMethodField()
     isAudit = serializers.SerializerMethodField()
@@ -247,6 +253,8 @@ class GradeDataSerializer(serializers.Serializer):
 
 class CertificateSerializer(serializers.Serializer):
     """Certificate availability info"""
+
+    requires_context = True
 
     availableDate = serializers.SerializerMethodField()
     isRestricted = serializers.SerializerMethodField()
