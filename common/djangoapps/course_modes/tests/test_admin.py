@@ -167,7 +167,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
     def test_validate_expiration_datetime_is_explicit_only_with_upgrade_deadline(self):
         # Only allow the expiration_datetime_is_explicit to be True if the upgrade_deadline is
         # defined with a date, otherwise cause a validation error.
-        form = self._admin_form("verified", upgrade_deadline=None)
+        form = self._admin_form("verified", expiration_datetime_is_explicit=True)
         self._assert_form_has_error(form, (
             "An upgrade deadline must be specified when setting Expiration datetime is explicit to True."
         ))
@@ -201,7 +201,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
 
         return CourseModeForm(instance=course_mode)
 
-    def _admin_form(self, mode, upgrade_deadline=None):
+    def _admin_form(self, mode, upgrade_deadline=None, expiration_datetime_is_explicit=False):
         """Load the course mode admin form. """
         course_mode = CourseModeFactory.create(
             course_id=self.course.id,
@@ -212,7 +212,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
             "mode_slug": mode,
             "mode_display_name": mode,
             "_expiration_datetime": upgrade_deadline,
-            "expiration_datetime_is_explicit": True,
+            "expiration_datetime_is_explicit": expiration_datetime_is_explicit,
             "currency": "usd",
             "min_price": 10,
         }, instance=course_mode)
