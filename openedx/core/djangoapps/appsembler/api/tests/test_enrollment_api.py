@@ -16,6 +16,8 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 import ddt
 import mock
+from six import text_type
+from opaque_keys.edx.keys import CourseKey
 from tahoe_sites.api import update_admin_role_in_organization
 
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
@@ -41,7 +43,7 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     OrganizationFactory,
     OrganizationCourseFactory,
 )
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 
@@ -381,6 +383,73 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         message = 'Ensure enrollment is successful by username'
         assert 'invalidIdentifier' not in response.content.decode(), message
         assert CourseEnrollment.is_enrolled(registered_user, co.id), 'Enrollment is successful by username'
+
+    def test_enrollment_with_bad_course_id(self):
+        """
+        Sometimes, the API receives the course_key in the wrong letters-case
+        For example, (course-v1:org+name+number_number) instead of (course-v1:org+Name+Number_number)
+
+        This will still be evaluated correctly when we use (CourseOverview.get_from_id), but we must also ensure that
+        the API is creating the enrollment with the correct string. Because (CourseKey.from_string) cannot fix
+        wrong IDs saved in (CourseEnrollment.course_id)
+
+        The test is a bit complicated because django with SQLite cannot filter case-insensitive. Therefore, we have
+        to do some tricks with mocks to mimic MySQL behavior
+        """
+        # Prepare course for testing
+        course = CourseFactory.create()
+        course_overview = CourseOverviewFactory(id=course.id)
+        OrganizationCourseFactory(organization=self.my_site_org, course_id=text_type(course.id))
+        lowercase_key = CourseKey.from_string(text_type(course.id).lower())
+        registered_user = UserFactory()
+        create_organization_mapping(user=registered_user, organization=self.my_site_org)
+        payload = {
+            'action': 'enroll',
+            'auto_enroll': True,
+            'identifiers': [registered_user.username],
+            'email_learners': True,
+            'courses': [lowercase_key],
+        }
+
+        # Double check that course.id and lowercase_key are not identical
+        self.assertNotEqual(course.id, lowercase_key)
+        self.assertEqual(text_type(course.id).lower(), text_type(lowercase_key).lower())
+
+        # CourseOverview.get_from_id will find the course even if the given key has the wrong letters-case
+        # because MySQL can do that. But in SQLite tests, it will fail
+        self.assertEqual(CourseOverview.get_from_id(course.id), course_overview)
+        with self.assertRaises(CourseOverview.DoesNotExist):
+            # This will fail because of SQLite limitations https://www.sqlite.org/faq.html#q18
+            CourseOverview.get_from_id(lowercase_key)
+
+        # As a workaround, we can force (get_from_id) to return the course by mocking (load_from_module_store)
+        with mock.patch(
+            'openedx.core.djangoapps.content.course_overviews.models.CourseOverview.load_from_module_store',
+            return_value=course_overview,
+        ):
+            self.assertEqual(CourseOverview.get_from_id(lowercase_key), course_overview)
+
+        # For the same reasons described about (get_from_id), we must mock (get_site_for_course) and (get_course_by_id)
+        with mock.patch(
+            'openedx.core.djangoapps.content.course_overviews.models.CourseOverview.load_from_module_store',
+            return_value=course_overview,
+        ):
+            with mock.patch(
+                'openedx.core.djangoapps.appsembler.api.sites.get_site_for_course',
+                return_value=self.my_site
+            ):
+                with mock.patch(
+                    'openedx.core.djangoapps.appsembler.api.v1.views.get_course_by_id',
+                    return_value=course
+                ):
+                    response = self.call_enrollment_api('post', self.my_site, self.caller, {'data': payload})
+                    assert response.status_code == status.HTTP_201_CREATED, response.content
+                    assert 'invalidIdentifier' not in response.content.decode()
+
+        # Finally, use SQLite limitation to verify that enrollment was saved using the correct letters case regardless
+        # of the fact that we sent a wrong one to the API
+        assert CourseEnrollment.objects.filter(course_id=course.id).count() == 1
+        assert CourseEnrollment.objects.filter(course_id=lowercase_key).count() == 0
 
 
 @ddt.ddt

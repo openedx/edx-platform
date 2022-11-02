@@ -345,7 +345,15 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                     results = []
 
                     for course_id in serializer.data.get('courses'):
-                        course_key = as_course_key(course_id)
+                        try:
+                            # To avoid running into MongoDB vs. MySQL case sensitivity issues, and to avoid having
+                            # CourseEnrollment.course_id returning the ID with the wrong letters case; we convert
+                            # the key to the correct letter case one. RED-3540
+                            course_key = CourseOverview.get_from_id(course_id).id
+                        except CourseOverview.DoesNotExist:
+                            # We allow enrollments to non-existence courses!
+                            course_key = as_course_key(course_id)
+
                         # TODO: The two checks below deserve a refactor to make it clearer or a v2 API that works on a
                         #       single course and use `instructor/views/api.py:students_update_enrollment` directly.
                         # Ensuring the course is linked to an organization. It's somewhat a legacy code, keeping
