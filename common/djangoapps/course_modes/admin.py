@@ -115,6 +115,9 @@ class CourseModeForm(forms.ModelForm):
         """
         if self.cleaned_data.get("verification_deadline"):
             return self.cleaned_data.get("verification_deadline").replace(tzinfo=UTC)
+        
+    def clean_expiration_datetime_is_explicit(self):
+        return True if self.cleaned_data.get("_expiration_datetime") is not None and self.cleaned_data.get("_expiration_datetime") != self.instance._expiration_datetime else self.expiration_datetime_is_explicit
 
     def clean(self):
         """
@@ -172,7 +175,7 @@ class CourseModeForm(forms.ModelForm):
                     course.id,
                     verification_deadline
                 )
-                self.expiration_datetime_is_explicit = True if upgrade_deadline is not None and upgrade_deadline != self.instance._expiration_datetime else self.expiration_datetime_is_explicit
+                expiration_datetime_is_explicit = True if upgrade_deadline is not None and upgrade_deadline != self.instance._expiration_datetime else self.expiration_datetime_is_explicit
 
         return super().save(commit=commit)
 
