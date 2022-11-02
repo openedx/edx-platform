@@ -421,6 +421,12 @@ def get_user_grade_passing_statuses(course_enrollments):
     }
 
 
+@function_trace("serialize_learner_home_data")
+def serialize_learner_home_data(data, context):
+    """Wrapper for serialization so we can profile"""
+    return LearnerDashboardSerializer(data, context=context).data
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -530,9 +536,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "programs": programs,
         }
 
-        response_data = LearnerDashboardSerializer(
-            learner_dash_data, context=context
-        ).data
+        response_data = serialize_learner_home_data(learner_dash_data, context)
 
         return Response(response_data)
 
