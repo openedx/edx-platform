@@ -10,7 +10,6 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.helpers import user_has_passing_grade_in_course
 from openedx.features.course_experience import course_home_url
 from xmodule.data import CertificatesDisplayBehaviors
 
@@ -238,10 +237,12 @@ class EnrollmentSerializer(serializers.Serializer):
 class GradeDataSerializer(serializers.Serializer):
     """Info about grades for this enrollment"""
 
+    requires_context = True
+
     isPassing = serializers.SerializerMethodField()
 
     def get_isPassing(self, enrollment):
-        return user_has_passing_grade_in_course(enrollment)
+        return self.context.get("grade_statuses", {}).get(enrollment.course_id, False)
 
 
 class CertificateSerializer(serializers.Serializer):

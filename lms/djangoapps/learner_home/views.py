@@ -22,7 +22,10 @@ from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import marketing_link
-from common.djangoapps.student.helpers import cert_info
+from common.djangoapps.student.helpers import (
+    cert_info,
+    user_has_passing_grade_in_course,
+)
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
@@ -404,6 +407,20 @@ def get_audit_access_deadlines(user, course_enrollments):
     }
 
 
+@function_trace("get_user_grade_passing_statuses")
+def get_user_grade_passing_statuses(course_enrollments):
+    """
+    Get "passing" status for user in each course
+
+    Returns:
+    - Dict {course_id: <boolean (True = Passing grade, False = Failing grade)>}
+    """
+    return {
+        course_enrollment.course_id: user_has_passing_grade_in_course(course_enrollment)
+        for course_enrollment in course_enrollments
+    }
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -459,6 +476,9 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             user, course_enrollments
         )
 
+        # Get grade passing status by course
+        grade_statuses = get_user_grade_passing_statuses(course_enrollments)
+
         # Get cert status by course
         cert_statuses = get_cert_statuses(user, course_enrollments)
 
@@ -499,6 +519,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "course_mode_info": course_mode_info,
             "course_optouts": course_optouts,
             "course_access_checks": course_access_checks,
+            "grade_statuses": grade_statuses,
             "resume_course_urls": resume_button_urls,
             "course_share_urls": course_share_urls,
             "show_email_settings_for": show_email_settings_for,

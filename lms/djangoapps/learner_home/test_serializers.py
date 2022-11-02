@@ -426,17 +426,18 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
 class TestGradeDataSerializer(LearnerDashboardBaseTest):
     """Tests for the GradeDataSerializer"""
 
-    @mock.patch(
-        "lms.djangoapps.learner_home.serializers.user_has_passing_grade_in_course"
-    )
+    def create_test_context(self, course, is_passing):
+        """Get a test context object"""
+        return {"grade_statuses": {course.id: is_passing}}
+
     @ddt.data(True, False, None)
-    def test_happy_path(self, is_passing, mock_get_grade_data):
+    def test_happy_path(self, is_passing):
         # Given a course where I am/not passing
         input_data = self.create_test_enrollment()
-        mock_get_grade_data.return_value = is_passing
+        input_context = self.create_test_context(input_data.course, is_passing)
 
         # When I serialize grade data
-        output_data = GradeDataSerializer(input_data).data
+        output_data = GradeDataSerializer(input_data, context=input_context).data
 
         # Then I get the correct data shape out
         self.assertDictEqual(
