@@ -2132,9 +2132,7 @@ class TestComponentHandler(TestCase):
             CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name'
         )
         self.usage_key_string = str(self.usage_key)
-
         self.user = StaffFactory(course_key=CourseLocator('dummy_org', 'dummy_course', 'dummy_run'))
-
         self.request = self.request_factory.get('/dummy-url')
         self.request.user = self.user
 
@@ -2162,7 +2160,6 @@ class TestComponentHandler(TestCase):
         req_factory_method = getattr(self.request_factory, method.lower())
         request = req_factory_method('/dummy-url')
         request.user = self.user
-
         component_handler(request, self.usage_key_string, 'dummy_handler')
 
     @ddt.data(200, 404, 500)
