@@ -36,3 +36,7 @@ lms/djangoapps/learner_home/               @edx/content-aurora
 openedx/features/content_type_gating/      @edx/rev-team
 openedx/features/course_duration_limits/   @edx/rev-team
 openedx/features/discounts/                @edx/rev-team
+
+# Ping tCRIL On-call if someone uses the QuickStart
+# https://docs.openedx.org/en/latest/developers/quickstarts/first_openedx_pr.html
+lms/templates/dashboard.html               @openedx/tcril-oncall
