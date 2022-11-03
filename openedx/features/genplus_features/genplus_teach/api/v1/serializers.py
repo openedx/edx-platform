@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, Reflection, \
-    ReflectionAnswer, ArticleViewLog, PortfolioEntry
+    ReflectionAnswer, ArticleViewLog, PortfolioEntry, HelpGuideType, HelpGuide
 from openedx.features.genplus_features.genplus.api.v1.serializers import SkillSerializer
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
-
+from openedx.features.genplus_features.common.utils import get_generic_serializer
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """
@@ -131,3 +131,14 @@ class PortfolioEntrySerializer(serializers.ModelSerializer):
     def perform_create(self, serializer):
         teacher = self.context.get('teacher')
         serializer.save(teacher=teacher)
+
+
+HelpGuideSerializer = get_generic_serializer({'name': HelpGuide, 'fields': '__all__'},)
+
+
+class HelpGuideTypeSerializer(serializers.ModelSerializer):
+    help_guides = HelpGuideSerializer(source='helpguide_set', many=True, read_only=True)
+
+    class Meta:
+        model = HelpGuideType
+        fields = ('id', 'title', 'help_guides')

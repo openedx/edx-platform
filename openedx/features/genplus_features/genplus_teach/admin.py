@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Article, Reflection, ReflectionAnswer, ArticleRating, MediaType, Gtcs, ArticleViewLog, Quote
+from .models import Article, Reflection, ReflectionAnswer, ArticleRating, MediaType, Gtcs, ArticleViewLog,\
+    Quote, HelpGuideType, HelpGuide
 from django.urls import reverse
 from django.contrib import messages
 from django.utils.safestring import mark_safe
@@ -47,6 +48,10 @@ class QuoteAdmin(admin.ModelAdmin):
             messages.add_message(request, messages.SUCCESS, 'Marked as quote of the week.')
 
 
+class HelpGuideAdmin(admin.ModelAdmin):
+    filter_horizontal = ('media_types', )
+
+
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Reflection, ReflectionAdmin)
 admin.site.register(Quote, QuoteAdmin)
@@ -55,3 +60,5 @@ admin.site.register(ArticleRating)
 admin.site.register(Gtcs)
 admin.site.register(MediaType)
 admin.site.register(ArticleViewLog)
+admin.site.register(HelpGuideType)
+admin.site.register(HelpGuide, HelpGuideAdmin)

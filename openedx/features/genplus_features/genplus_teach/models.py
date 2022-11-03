@@ -181,3 +181,21 @@ class Quote(TimeStampedModel):
             # marking the other quote's current false
             Quote.objects.filter(is_current=True).update(is_current=False)
         super().save(**kwargs)
+
+
+class HelpGuideType(TimeStampedModel):
+    title = models.CharField(max_length=1024)
+
+    def __str__(self):
+        return self.title
+
+
+class HelpGuide(TimeStampedModel):
+    guide_type = models.ForeignKey(HelpGuideType, on_delete=models.CASCADE)
+    title = models.CharField(max_length=1024)
+    content = HTMLField()
+    media_types = models.ManyToManyField(MediaType, related_name='help_guides')
+    time = models.PositiveIntegerField(default=0, help_text='Time required to read/watch/listen the help-guide')
+
+    def __str__(self):
+        return self.title

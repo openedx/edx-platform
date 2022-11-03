@@ -16,7 +16,7 @@ from openedx.features.genplus_features.genplus.api.v1.mixins import GenzMixin
 from openedx.features.genplus_features.genplus.models import Teacher, Skill
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from .serializers import ArticleSerializer, FavoriteArticleSerializer, ArticleRatingSerializer, ReflectionAnswerSerializer,\
-    ArticleViewLogSerializer, GtcsSerializer, MediaTypeSerializer, PortfolioEntrySerializer
+    ArticleViewLogSerializer, GtcsSerializer, MediaTypeSerializer, PortfolioEntrySerializer, HelpGuideTypeSerializer
 from openedx.features.genplus_features.genplus.api.v1.serializers import SkillSerializer
 from openedx.features.genplus_features.common.utils import get_generic_serializer
 from .pagination import PortfolioPagination
@@ -286,3 +286,11 @@ class FiltersViewSet(viewsets.ViewSet):
             'media_types': media_type_serializer.data
         }
         return Response(data)
+
+
+class HelpGuideView(generics.ListAPIView):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsTeacher]
+    serializer_class = HelpGuideTypeSerializer
+    pagination_class = None
+    queryset = serializer_class.Meta.model.objects.all()
