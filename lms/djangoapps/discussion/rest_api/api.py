@@ -1003,8 +1003,14 @@ def get_learner_active_thread_list(request, course_key, query_params):
 
     group_id = query_params.get('group_id', None)
     user_id = query_params.get('user_id', None)
+    count_flagged = query_params.get('count_flagged', None)
     if user_id is None:
         return Response({'detail': 'Invalid user id'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if count_flagged and not context["has_moderation_privilege"]:
+        raise PermissionDenied("count_flagged can only be set by users with moderation roles.")
+    if "flagged" in query_params.keys() and not context["has_moderation_privilege"]:
+        raise PermissionDenied("Flagged filter is only available for moderators")
 
     if group_id is None:
         comment_client_user = comment_client.User(id=user_id, course_id=course_key)
