@@ -7,7 +7,7 @@ from django.conf import settings
 from openedx.features.survey_report.models import SurveyReport
 from openedx.features.survey_report.queries import (
     get_course_enrollments,
-    get_active_learners_in_the_last_weeks,
+    get_recently_active_users,
     get_generated_certificates,
     get_registered_learners,
     get_unique_courses_offered
@@ -17,7 +17,7 @@ from openedx.features.survey_report.queries import (
 def generate_report() -> None:
     """ Generate a report with relevant data."""
     courses_offered = get_unique_courses_offered()
-    learners = get_active_learners_in_the_last_weeks(weeks=3)
+    learners = get_recently_active_users(weeks=3)
     registered = get_registered_learners()
     certificates = get_generated_certificates()
     enrollments = get_course_enrollments()

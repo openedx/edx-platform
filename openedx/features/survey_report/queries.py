@@ -32,7 +32,7 @@ def get_unique_courses_offered() -> int:
         .count()
 
 
-def get_active_learners_in_the_last_weeks(weeks: int) -> int:
+def get_recently_active_users(weeks: int) -> int:
     """
     Get total number of users with last login in the last weeks.
 
