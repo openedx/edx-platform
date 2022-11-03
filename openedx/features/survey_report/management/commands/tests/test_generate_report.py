@@ -18,18 +18,18 @@ class GenerateReportTest(TestCase):
     @override_settings(SURVEY_REPORT_EXTRA_DATA={'extra_data': 'extra_data'})
     @mock.patch('openedx.features.survey_report.queries.get_course_enrollments')
     @mock.patch('openedx.features.survey_report.queries.get_generated_certificates')
-    @mock.patch('openedx.features.survey_report.queries.get_learners_registered')
-    @mock.patch('openedx.features.survey_report.queries.get_currently_learners')
+    @mock.patch('openedx.features.survey_report.queries.get_registered_learners')
+    @mock.patch('openedx.features.survey_report.queries.get_recently_active_users')
     @mock.patch('openedx.features.survey_report.queries.get_unique_courses_offered')
-    def test_generate_report(self, mock_get_unique_courses_offered, mock_get_currently_learners,
-                             mock_get_learners_registered, mock_get_generated_certificates,
+    def test_generate_report(self, mock_get_unique_courses_offered, mock_get_recently_active_users,
+                             mock_get_registered_learners, mock_get_generated_certificates,
                              mock_get_course_enrollments):
         """
         Test that generate_report command creates a survey report.
         """
         mock_get_unique_courses_offered.return_value = 1
-        mock_get_currently_learners.return_value = 2
-        mock_get_learners_registered.return_value = 3
+        mock_get_recently_active_users.return_value = 2
+        mock_get_registered_learners.return_value = 3
         mock_get_generated_certificates.return_value = 4
         mock_get_course_enrollments.return_value = 5
         out = StringIO()
