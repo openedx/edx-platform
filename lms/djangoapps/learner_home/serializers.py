@@ -176,9 +176,9 @@ class EnrollmentSerializer(serializers.Serializer):
     """
     Info about this particular enrollment.
     Derived from a CourseEnrollment with added context:
+    - "audit_access_deadlines" (dict): when audit access expires for user.
     - "ecommerce_payment_page" (url): ecommerce page, used to determine if we can upgrade.
     - "course_mode_info" (dict): keyed by course ID with the following values:
-        - "expiration_datetime" (int): when the verified mode will expire.
         - "show_upsell" (bool): whether or not we offer an upsell for this course.
         - "verified_sku" (uuid): ID for the verified mode for upgrade.
     - "show_courseware_link": keyed by course ID with added metadata.
@@ -234,9 +234,7 @@ class EnrollmentSerializer(serializers.Serializer):
             enrollment.course_id
         )
 
-        if expiration_date and timezone.now() > expiration_date:
-            return True
-        return False
+        return bool(expiration_date) and timezone.now() > expiration_date
 
     def get_isEmailEnabled(self, enrollment):
         return enrollment.course_id in self.context.get("show_email_settings_for", [])
