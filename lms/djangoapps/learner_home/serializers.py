@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
@@ -175,9 +176,9 @@ class EnrollmentSerializer(serializers.Serializer):
     """
     Info about this particular enrollment.
     Derived from a CourseEnrollment with added context:
+    - "audit_access_deadlines" (dict): when audit access expires for user.
     - "ecommerce_payment_page" (url): ecommerce page, used to determine if we can upgrade.
     - "course_mode_info" (dict): keyed by course ID with the following values:
-        - "expiration_datetime" (int): when the verified mode will expire.
         - "show_upsell" (bool): whether or not we offer an upsell for this course.
         - "verified_sku" (uuid): ID for the verified mode for upgrade.
     - "show_courseware_link": keyed by course ID with added metadata.
@@ -228,10 +229,12 @@ class EnrollmentSerializer(serializers.Serializer):
         )
 
     def get_isAuditAccessExpired(self, enrollment):
-        show_courseware_link = self.context.get("show_courseware_link", {}).get(
-            enrollment.course.id, {}
+        """Mirrors logic in "check_course_expired" but using pre-fetched expiration date"""
+        expiration_date = self.context.get("audit_access_deadlines", {}).get(
+            enrollment.course_id
         )
-        return show_courseware_link.get("error_code") == "audit_expired"
+
+        return bool(expiration_date) and timezone.now() > expiration_date
 
     def get_isEmailEnabled(self, enrollment):
         return enrollment.course_id in self.context.get("show_email_settings_for", [])
