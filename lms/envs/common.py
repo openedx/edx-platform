@@ -3339,6 +3339,13 @@ PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
 LOGIN_ISSUE_SUPPORT_LINK = ''
 
+# .. setting_name: SECURITY_PAGE_URL
+# .. setting_default: None
+# .. setting_description: A link to the site's security disclosure/reporting policy,
+#   to display in the site footer. This will only appear for sites using themes that
+#   use the links produced by ``lms.djangoapps.branding.api.get_footer``.
+SECURITY_PAGE_URL = None
+
 # Days before the expired date that we warn the user
 ENTITLEMENT_EXPIRED_ALERT_PERIOD = 90
 
