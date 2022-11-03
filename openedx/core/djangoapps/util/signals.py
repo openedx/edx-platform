@@ -34,5 +34,5 @@ def _clear_request_cache(**kwargs):
     while sharing the thread and its request cache with the
     active Django Request. In that case, do not clear the cache.
     """
-    if getattr(settings, 'CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION', True) and not getattr(settings, 'CELERY_ALWAYS_EAGER', False):
+    if getattr(settings, 'CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION', True):
         RequestCache.clear_all_namespaces()
