@@ -234,6 +234,7 @@ class PortfolioViewSet(GenzMixin, viewsets.ViewSetMixin, FlatMultipleModelAPIVie
         ]
 
     def create(self, request, *args, **kwargs):
+        request.data.update({'teacher': self.gen_user.teacher.id})
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
