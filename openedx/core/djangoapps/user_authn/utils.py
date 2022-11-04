@@ -19,6 +19,13 @@ from openedx.core.djangoapps.password_policy.hibp import PwnedPasswordsAPI
 from openedx.core.djangoapps.user_api.accounts import USERNAME_MAX_LENGTH
 
 
+def _remove_unsafe_bytes_from_url(url):
+    _UNSAFE_URL_BYTES_TO_REMOVE = ["\t", "\r", "\n"]
+    for byte in _UNSAFE_URL_BYTES_TO_REMOVE:
+        url = url.replace(byte, "")
+    return url
+
+
 def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, require_https):
     """
     Determine if the given redirect URL/path is safe for redirection.
@@ -41,6 +48,8 @@ def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, r
     login_redirect_whitelist = set(getattr(settings, 'LOGIN_REDIRECT_WHITELIST', []))
     login_redirect_whitelist.add(request_host)
 
+    redirect_to = _remove_unsafe_bytes_from_url(redirect_to)
+
     # Allow OAuth2 clients to redirect back to their site after logout.
     if dot_client_id:
         application = Application.objects.get(client_id=dot_client_id)
@@ -50,6 +59,7 @@ def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, r
     is_safe_url = http.is_safe_url(
         redirect_to, allowed_hosts=login_redirect_whitelist, require_https=require_https
     )
+
     return is_safe_url
 
 
