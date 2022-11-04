@@ -57,7 +57,7 @@ class TestSurveyReportCommands(ModuleStoreTestCase):
             mock_datetime.now.return_value = datetime.now()
             assert get_unique_courses_offered() == 1
 
-    def test_get_currently_learners(self):
+    def test_get_recently_active_users(self):
         """
         Test that get_currently_learners returns the correct number of learners.
         """
