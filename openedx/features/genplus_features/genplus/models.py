@@ -45,11 +45,13 @@ class Character(models.Model):
                                     help_text='Upload the image which will be seen by student on their dashboard')
     standing = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
                                 help_text='Provide standing position of character')
-    running = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
+    dance1 = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
                                help_text='Provide running position of character')
-    crouching = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
+    dance2 = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
                                  help_text='Provide crouching position of character')
-    jumping = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
+    dance3 = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
+                               help_text='Provide jumping position of character')
+    dance4 = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
                                help_text='Provide jumping position of character')
 
     def __str__(self):
@@ -57,12 +59,12 @@ class Character(models.Model):
 
     def get_state(self, progress):
         if 25 <= progress < 50:
-            return self.running
+            return self.dance2
         elif 50 <= progress < 75:
-            return self.crouching
+            return self.dance3
         elif 75 <= progress <= 100:
-            return self.jumping
-        return self.standing
+            return self.dance4
+        return self.dance1
 
 
 class TempUser(TimeStampedModel):
