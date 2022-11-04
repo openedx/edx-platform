@@ -88,6 +88,8 @@ class LogoutTests(TestCase):
 
     @ddt.data(
         ('https://www.amazon.org', 'edx.org'),
+        ('/%09/google.com/', 'edx.org'),
+        ('java%0D%0Ascript%0D%0A%3aalert(document.domain)', 'edx.org'),
     )
     @ddt.unpack
     def test_logout_redirect_failure(self, redirect_url, host):
