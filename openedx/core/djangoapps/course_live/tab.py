@@ -4,6 +4,8 @@ Configurations to render Course Live Tab
 from django.utils.translation import gettext_lazy
 from lti_consumer.models import LtiConfiguration
 
+
+from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from xmodule.course_module import CourseBlock
 from xmodule.tabs import TabFragmentViewMixin
 from lms.djangoapps.courseware.tabs import EnrolledTab
@@ -69,3 +71,17 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
             super().is_enabled(course, user) and
             CourseLiveConfiguration.is_enabled(course.id)
         )
+
+    def _get_pii_lti_parameters(self, course, request):
+        pii_config = super()._get_pii_lti_parameters(course, request)
+        provider_type = ''
+
+        course_live_configurations = CourseLiveConfiguration.get(course.id)
+        if course_live_configurations:
+            provider_type = course_live_configurations.provider_type
+
+        if provider_type == 'zoom' and (CourseStaffRole(course.id).has_user(request.user) or
+                                        CourseInstructorRole(course.id).has_user(request.user)):
+            pii_config['person_contact_email_primary'] = request.user.email
+
+        return pii_config
