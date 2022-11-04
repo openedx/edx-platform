@@ -823,6 +823,21 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
     password = "test"
     url = reverse_lazy("learner_home:courses")
 
+    GENERAL_RECOMMENDATIONS = [
+        {
+            "course_key": "HogwartsX+6.00.1x",
+            "logo_image_url": random_url(),
+            "marketing_url": random_url(),
+            "title": "Defense Against the Dark Arts",
+        },
+        {
+            "course_key": "MonstersX+SC101EN",
+            "logo_image_url": random_url(),
+            "marketing_url": random_url(),
+            "title": "Scaring 101",
+        },
+    ]
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
@@ -849,10 +864,10 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=False)
     def test_waffle_flag_off(self):
         """
-        Verify API returns 400 if waffle flag is off.
+        Verify API returns 404 if waffle flag is off.
         """
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
         self.assertEqual(response.data, None)
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
@@ -864,13 +879,25 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self, mocked_get_course_data, mocked_get_personalized_course_recommendations
     ):
         """
-        Verify API returns 400 if no course recommendations from amplitude.
+        Verify API returns 404 if no course recommendations from amplitude.
         """
         mocked_get_personalized_course_recommendations.return_value = [False, []]
         mocked_get_course_data.return_value = self.course_data
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, None)
+
+    @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @mock.patch(
+        "lms.djangoapps.learner_home.views.get_personalized_course_recommendations", Mock(side_effect=Exception)
+    )
+    def test_amplitude_api_unexpected_error(self):
+        """
+        Test that if the Amplitude API gives an unexpected error, 500 is returned.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 500)
         self.assertEqual(response.data, None)
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
@@ -897,6 +924,25 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(
             len(response.data.get("courses")), expected_recommendations_length
         )
+
+    @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
+    @mock.patch(
+        "lms.djangoapps.learner_home.views.get_personalized_course_recommendations"
+    )
+    def test_general_recommendations(self, mocked_get_personalized_course_recommendations):
+        """
+        Test that a user gets general recommendations for the control group.
+        """
+        mocked_get_personalized_course_recommendations.return_value = [
+            True,
+            self.recommended_courses,
+        ]
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get("is_personalized_recommendation"), False)
+        self.assertEqual(response.data.get("courses"), self.GENERAL_RECOMMENDATIONS)
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch(
