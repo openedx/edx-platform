@@ -61,14 +61,16 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
             lookup_key = topic_link.usage_key or topic_link.external_id
             topic_context = new_topic_map.pop(lookup_key, None)
             if topic_context is None:
+                log.info(f"[DEBUG INF-291] Unit was deleted or discussion disabled: {lookup_key}")
                 topic_link.enabled_in_context = False
                 try:
                     # If the section/subsection/unit a topic is in is deleted, add that context to title.
                     topic_link.title = "{section}|{subsection}|{unit}".format(**topic_link.context)
                 except KeyError:
-                    # It's possible the context is if the topic link was created before the context field was added.
+                    # It's possible the context is empty if the link was created before the context field was added.
                     pass
             else:
+                log.info(f"[DEBUG INF-291] Unit topic already exists, will be updated: {lookup_key}")
                 topic_link.enabled_in_context = True
                 topic_link.ordering = topic_context.ordering
                 topic_link.title = topic_context.title
@@ -77,6 +79,9 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
                 topic_link.context = topic_context.context
             topic_link.save()
         log.info(f"Creating new discussion topic links for {course_key}")
+
+        log.info(f"[DEBUG INF-291] Discovered new units with keys: {[str(key) for key in new_topic_map.keys()]}")
+        log.info(f"[DEBUG INF-291] New unit names: {[topic.title for topic in new_topic_map.values()]}")
 
         DiscussionTopicLink.objects.bulk_create([
             DiscussionTopicLink(

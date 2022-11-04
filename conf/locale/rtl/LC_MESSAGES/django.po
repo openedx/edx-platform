@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-10-24 14:17+0000\n"
-"PO-Revision-Date: 2022-10-24 14:17:18.640616\n"
+"POT-Creation-Date: 2022-10-31 15:58+0000\n"
+"PO-Revision-Date: 2022-10-31 15:58:40.518477\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2686,6 +2686,26 @@ msgid ""
 msgstr ""
 "Ⱥ ɹǝɟnnd ɹǝbnǝsʇ ɥɐs bǝǝn ᴉnᴉʇᴉɐʇǝd ɟøɹ {username} ({email}). Ŧø dɹøɔǝss "
 "ʇɥᴉs ɹǝbnǝsʇ, dlǝɐsǝ ʌᴉsᴉʇ ʇɥǝ lᴉnʞ(s) bǝløʍ."
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Practice Exam"
+msgstr "Ᵽɹɐɔʇᴉɔǝ Ɇxɐɯ"
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Proctored Exam"
+msgstr "Ᵽɹøɔʇøɹǝd Ɇxɐɯ"
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Timed Exam"
+msgstr "Ŧᴉɯǝd Ɇxɐɯ"
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Exam"
+msgstr "Ɇxɐɯ"
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""

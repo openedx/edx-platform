@@ -9,10 +9,9 @@ from unittest.mock import Mock, patch
 
 import ddt
 import pytest
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
-from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
@@ -50,11 +49,9 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
-from xmodule.tabs import CourseTabList
 
 
 class DictionaryTestCase(TestCase):
@@ -194,13 +191,11 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         utils.add_courseware_context([thread], self.course, self.user)
         assert '/' not in thread.get('courseware_title')
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 2), (ModuleStoreEnum.Type.split, 1))
-    @ddt.unpack
-    def test_get_accessible_discussion_xblocks(self, modulestore_type, expected_discussion_xblocks):
+    def test_get_accessible_discussion_xblocks(self):
         """
         Tests that the accessible discussion xblocks having no parents do not get fetched for split modulestore.
         """
-        course = CourseFactory.create(default_store=modulestore_type)
+        course = CourseFactory.create()
 
         # Create a discussion xblock.
         test_discussion = self.store.create_child(self.user.id, course.location, 'discussion', 'test_discussion')
@@ -220,7 +215,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         # Assert that the discussion xblock is an orphan.
         assert orphan in self.store.get_orphans(course.id)
 
-        assert len(get_accessible_discussion_xblocks(course, self.user)) == expected_discussion_xblocks
+        assert len(get_accessible_discussion_xblocks(course, self.user)) == 1
 
 
 class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
@@ -1185,7 +1180,7 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
     Test the is_commentable_divided function.
     """
 
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """

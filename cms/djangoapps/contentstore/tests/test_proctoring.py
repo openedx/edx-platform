@@ -11,7 +11,7 @@ from django.conf import settings
 from edx_proctoring.api import get_all_exams_for_course, get_review_policy_by_exam_id
 from pytz import UTC
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
@@ -24,7 +24,7 @@ class TestProctoredExams(ModuleStoreTestCase):
     """
     Tests for the publishing of proctored exams
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """
@@ -93,7 +93,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=default_time_limit_minutes,
-            is_proctored_exam=is_proctored_exam,
+            is_proctored_enabled=is_proctored_exam,
             is_practice_exam=is_practice_exam,
             due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1),
             exam_review_rules="allow_use_of_paper",
@@ -128,7 +128,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=default_time_limit_minutes,
-            is_proctored_exam=is_proctored_exam,
+            is_proctored_enabled=is_proctored_exam,
             is_practice_exam=is_practice_exam,
             due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1),
             exam_review_rules="allow_use_of_paper",
@@ -164,7 +164,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_exam=True,
+            is_proctored_enabled=True,
             hide_after_due=False,
             is_onboarding_exam=False,
         )
@@ -196,7 +196,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_exam=True,
+            is_proctored_enabled=True,
             hide_after_due=False,
         )
 
@@ -231,7 +231,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_exam=True,
+            is_proctored_enabled=True,
             hide_after_due=False,
         )
 
@@ -267,7 +267,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_exam=True,
+            is_proctored_enabled=True,
             exam_review_rules="allow_use_of_paper",
             hide_after_due=False,
         )
@@ -296,7 +296,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=60,
-            is_proctored_exam=False,
+            is_proctored_enabled=False,
             is_practice_exam=False,
             due=datetime.now(UTC) + timedelta(minutes=60),
             exam_review_rules="allow_use_of_paper",
@@ -325,7 +325,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_exam=True,
+            is_proctored_enabled=True,
             hide_after_due=False,
             is_onboarding_exam=False,
             exam_review_rules="allow_use_of_paper",
@@ -346,7 +346,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             graded=True,
             is_time_limited=True,
             default_time_limit_minutes=10,
-            is_proctored_exam=True,
+            is_proctored_enabled=True,
             hide_after_due=False,
             is_onboarding_exam=False,
             exam_review_rules="allow_use_of_paper",
