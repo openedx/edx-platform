@@ -1,0 +1,530 @@
+---
+metadata:
+    display_name: Gen+ Lesson Overview
+    editor: raw
+data: |
+    <!--
+      Left hand side Icons
+      <span class="icon ico-info"></span>
+      <span class="icon ico-write"></span>
+      <span class="icon ico-read"></span>
+      <span class="icon ico-play"></span>
+      <span class="icon ico-discuss"></span>
+      <span class="icon ico-do"></span>
+      <span class="icon ico-drag"></span>
+      <span class="icon ico-explain"></span>
+      <span class="icon ico-interact"></span>
+      <span class="icon ico-investigate"></span>
+      <span class="icon ico-listen"></span>
+      <span class="icon ico-plenary"></span>
+      <span class="icon ico-remember"></span>
+      <span class="icon ico-think"></span>
+      <span class="icon ico-wait"></span>
+      <span class="icon ico-watch"></span>
+    -->
+    <!--
+      Right hand side button Icons
+      <span class="icon ico-teacher"></span>
+      <span class="icon ico-single"></span>
+      <span class="icon ico-group"></span>
+      <span class="icon ico-pairs"></span>
+    -->
+    <div class="lesson-overview">
+      <div class="text-right">
+        <button class="btn-download-lesson-plan"><span class="ico-download"></span>Download Lesson Plan</button>
+      </div>
+      <div class="lesson-overview-header row no-gutters" style="background-image: url('https://dev.genplus.co.uk/asset-v1:genplus+GP310+2022_T1+type@asset+block@bg-organization.png');">
+        <div class="col-12 col-sm-6 col-lg-3">
+          <span class="title">Course</span>
+          <span class="text">Trailblazer</span>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <span class="title">Unit</span>
+          <span class="text">1 - Organisation</span>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <span class="title">Lesson</span>
+          <span class="text">1/4</span>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <span class="title">Theme</span>
+          <span class="text">Verbal Communication</span>
+        </div>
+      </div>
+      <div class="lesson-goals row">
+        <div class="col-12 col-sm-6">
+          <div class="card">
+            <h2>Learning Intentions</h2>
+            <p>I will...</p>
+            <ul>
+              <li>Explore the features of effective verbal communication.</li>
+              <li>Reflect on my own verbal communication skills</li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6">
+          <div class="card">
+            <h2>Success Criteria</h2>
+            <p>I can...</p>
+            <ul>
+              <li>Explain the meaning of verbal communication</li>
+              <li>Demonstrate my knowledge and understanding of verbal communication</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="activities-section">
+        <h2>Structure &amp; Activities</h2>
+        <div class="activities">
+
+          <!-- Activity Post Start -->
+          <div class="activity info">
+            <div class="head-info">
+              <span class="icon ico-info"></span>
+              <span class="title">Intro</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-teacher"></span>
+                <span class="text">Teacher</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity write">
+            <div class="head-info">
+              <span class="icon ico-write"></span>
+              <span class="title">Write</span>
+              <span class="time">8 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-single"></span>
+                <span class="text">Solo</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                30 second-story activity
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity read">
+            <div class="head-info">
+              <span class="icon ico-read"></span>
+              <span class="title">Read</span>
+              <span class="time">8 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-single"></span>
+                <span class="text">Solo</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                30 second-story activity
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity play">
+            <div class="head-info">
+              <span class="icon ico-play"></span>
+              <span class="title">Play</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-group"></span>
+                <span class="text">Group</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity discuss">
+            <div class="head-info">
+              <span class="icon ico-discuss"></span>
+              <span class="title">Discuss</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity do">
+            <div class="head-info">
+              <span class="icon ico-do"></span>
+              <span class="title">Do</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity drag">
+            <div class="head-info">
+              <span class="icon ico-drag"></span>
+              <span class="title">Drag</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity explain">
+            <div class="head-info">
+              <span class="icon ico-explain"></span>
+              <span class="title">Explain</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity interact">
+            <div class="head-info">
+              <span class="icon ico-interact"></span>
+              <span class="title">Interact</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity investigate">
+            <div class="head-info">
+              <span class="icon ico-investigate"></span>
+              <span class="title">Investigate</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity listen">
+            <div class="head-info">
+              <span class="icon ico-listen"></span>
+              <span class="title">Listen</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity plenary">
+            <div class="head-info">
+              <span class="icon ico-plenary"></span>
+              <span class="title">Plenary</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity remember">
+            <div class="head-info">
+              <span class="icon ico-remember"></span>
+              <span class="title">Remember</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity think">
+            <div class="head-info">
+              <span class="icon ico-think"></span>
+              <span class="title">Think</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity wait">
+            <div class="head-info">
+              <span class="icon ico-wait"></span>
+              <span class="title">Wait</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+          <!-- Activity Post Start -->
+          <div class="activity watch">
+            <div class="head-info">
+              <span class="icon ico-watch"></span>
+              <span class="title">Watch</span>
+              <span class="time">3 min</span>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <span class="icon ico-pairs"></span>
+                <span class="text">Pairs</span>
+              </button>
+            </div>
+            <div class="text-block">
+              <span class="opener collapsed">
+                <span class="fa fa-chevron-right" aria-hidden="true"></span>
+                Communication video
+              </span>
+              <div class="slide">
+                <ul>
+                  <li>Exploring key concepts</li>
+                  <li>Verbal communication, non-verbal and listening</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Activity Post End -->
+
+        </div>
+      </div>
+    </div>
