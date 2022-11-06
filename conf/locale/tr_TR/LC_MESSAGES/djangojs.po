@@ -108,7 +108,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-10-16 20:42+0000\n"
+"POT-Creation-Date: 2022-10-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2018,2020-2021\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -1618,6 +1618,8 @@ msgid ""
 "Could not find Certificate Exception in the allowlist. Please refresh the "
 "page and try again"
 msgstr ""
+"İzinli listesinde Sertifika İstisnası bulunamadı. Lütfen sayfayı yenileyin "
+"ve tekrar deneyin"
 
 #: lms/static/js/certificates/views/certificate_allowlist.js
 #: lms/static/js/certificates/views/certificate_allowlist_editor.js
@@ -3002,7 +3004,7 @@ msgstr "Ana panele git"
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Recommendations for you"
-msgstr ""
+msgstr "Sizin için tavsiyeler"
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "loading"
@@ -3013,6 +3015,8 @@ msgid ""
 "Browse recently launched courses and see what's new in your favorite "
 "subjects."
 msgstr ""
+"Yeni açılmış dersleri tarayın ve favori konularınız içinde yeni ne var "
+"görüntüleyin."
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Explore courses"
@@ -3020,17 +3024,19 @@ msgstr "Dersleri keşfet"
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid "More opportunities for you"
-msgstr ""
+msgstr "Sizin için daha fazla fırsat"
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid " to learn"
-msgstr ""
+msgstr " öğrenmeye dair"
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid ""
 "We've added 500+ learning opportunities to create one of the world's most "
 "comprehensive free-to-degree online learning platforms."
 msgstr ""
+"Dünyanın en kapsamlı ücretsiz çevrimiçi öğrenme platformlarından birini "
+"oluşturmak için 500'den fazla öğrenme fırsatı ekledik."
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
