@@ -1700,7 +1700,7 @@ def get_course_discussion_user_stats(
         order_by = order_by or UserOrdering.BY_FLAGS
     else:
         order_by = order_by or UserOrdering.BY_ACTIVITY
-        if order_by != UserOrdering.BY_ACTIVITY:
+        if order_by == UserOrdering.BY_FLAGS:
             raise ValidationError({"order_by": "Invalid value"})
 
     if not ENABLE_LEARNERS_STATS.is_enabled(course_key):
