@@ -33,7 +33,7 @@ SESSION_COOKIE_NAME = 'lms_sessionid'
 
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
-# When the celery task is eagerly, it is executed locally while sharing the
+# When the celery task is run eagerly, it is executed locally while sharing the
 # thread and its request cache with the active Django Request. In that case,
 # do not clear the cache.
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
