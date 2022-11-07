@@ -24,7 +24,7 @@ describe('HTMLEditingDescriptor', function() {
     });
     it('Returns data from Raw Editor if text has not changed', function(done) {
       const visualEditorStub =
-        {getContent() { return 'original visual text' }};
+        {getContent() { return '<p>original visual text</p>' }};
       spyOn(this.descriptor, 'getVisualEditor').and.callFake(() => visualEditorStub);
 
       var self = this;

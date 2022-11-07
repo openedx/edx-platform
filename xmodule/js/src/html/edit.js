@@ -1390,7 +1390,7 @@
       haven't dirtied the Editor. Store the raw content so we can compare it later.
        */
       this.starting_content = visualEditor.getContent({
-        format: "text",
+        format: "raw",
         no_events: 1
       });
       return visualEditor.focus();
@@ -1410,7 +1410,7 @@
       if (this.editor_choice === 'visual') {
         visualEditor = this.getVisualEditor();
         raw_content = visualEditor.getContent({
-          format: "text",
+          format: "raw",
           no_events: 1
         });
         if (this.starting_content !== raw_content) {
