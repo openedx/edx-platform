@@ -3115,9 +3115,11 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
     @ddt.data(
         ("moderator", "flagged", "flagged"),
         ("moderator", "activity", "activity"),
+        ("moderator", "recency", "recency"),
         ("moderator", None, "flagged"),
         ("user", None, "activity"),
         ("user", "activity", "activity"),
+        ("user", "recency", "recency"),
     )
     @ddt.unpack
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
