@@ -9,11 +9,11 @@ from django.db.models import Q
 from django.http import HttpResponseBadRequest
 from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status, viewsets
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -315,7 +315,10 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         - Unenroll
         - Switch Enrollment
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
     # TODO: ARCH-91
     # This view is excluded from Swagger doc generation because it
     # does not specify a serializer class.
