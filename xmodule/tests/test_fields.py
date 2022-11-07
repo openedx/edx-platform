@@ -7,7 +7,6 @@ import pytest
 from pytz import UTC
 
 from xmodule.fields import Date, RelativeTime, Timedelta
-from xmodule.timeinfo import TimeInfo
 
 
 class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -115,15 +114,6 @@ class TimedeltaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
     def test_to_json(self):
         assert '1 days 46799 seconds' ==\
                TimedeltaTest.delta.to_json(datetime.timedelta(days=1, hours=12, minutes=59, seconds=59))
-
-
-class TimeInfoTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    def test_time_info(self):
-        due_date = datetime.datetime(2000, 4, 14, 10, tzinfo=UTC)
-        grace_pd_string = '1 day 12 hours 59 minutes 59 seconds'
-        timeinfo = TimeInfo(due_date, grace_pd_string)
-        assert timeinfo.close_date == (due_date + Timedelta().from_json(grace_pd_string))
 
 
 class RelativeTimeTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

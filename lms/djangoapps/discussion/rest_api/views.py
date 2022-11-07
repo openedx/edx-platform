@@ -574,6 +574,15 @@ class LearnerThreadView(APIView):
 
         * count_flagged: If True, return the count of flagged comments for each thread.
         (can only be used by moderators or above)
+
+        * thread_type: The type of thread to filter None, "discussion" or "question".
+
+        * order_by: Sort order for threads "last_activity_at", "comment_count" or
+        "vote_count".
+
+        * status: Filter for threads "flagged", "unanswered", "unread".
+
+        * group_id: Filter threads w.r.t cohorts (Cohort ID).
     """
 
     authentication_classes = (
@@ -594,6 +603,15 @@ class LearnerThreadView(APIView):
         page_num = request.GET.get('page', 1)
         threads_per_page = request.GET.get('page_size', 10)
         count_flagged = request.GET.get('count_flagged', False)
+        thread_type = request.GET.get('thread_type')
+        order_by = request.GET.get('order_by')
+        order_by_mapping = {
+            "last_activity_at": "activity",
+            "comment_count": "comments",
+            "vote_count": "votes"
+        }
+        order_by = order_by_mapping.get(order_by, 'activity')
+        post_status = request.GET.get('status', None)
         discussion_id = None
         username = request.GET.get('username', None)
         user = get_object_or_404(User, username=username)
@@ -610,7 +628,17 @@ class LearnerThreadView(APIView):
             "user_id": user.id,
             "group_id": group_id,
             "count_flagged": count_flagged,
+            "thread_type": thread_type,
+            "sort_key": order_by,
         }
+        if post_status:
+            if post_status not in ['flagged', 'unanswered', 'unread', 'unresponded']:
+                raise ValidationError({
+                    "status": [
+                        f"Invalid value. '{post_status}' must be 'flagged', 'unanswered', 'unread' or 'unresponded"
+                    ]
+                })
+            query_params[post_status] = True
         return get_learner_active_thread_list(request, course_key, query_params)
 
 

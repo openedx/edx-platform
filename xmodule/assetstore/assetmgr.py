@@ -16,27 +16,6 @@ Note: Hotfix (PLAT-734) No asset calls find_asset_metadata, and directly accesse
 from xmodule.contentstore.django import contentstore
 
 
-class AssetException(Exception):
-    """
-    Base exception class for all exceptions related to assets.
-    """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-class AssetMetadataNotFound(AssetException):
-    """
-    Thrown when no asset metadata is present in the course modulestore for the particular asset requested.
-    """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-class AssetMetadataFoundTemporary(AssetException):
-    """
-    TEMPORARY: Thrown if asset metadata is actually found in the course modulestore.
-    """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
 class AssetManager:
     """
     Manager for saving/loading course assets.

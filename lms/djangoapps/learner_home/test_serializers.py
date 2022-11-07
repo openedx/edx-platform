@@ -1,6 +1,6 @@
 """Tests for serializers for the Learner Dashboard"""
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from itertools import product
 from random import randint
 from unittest import mock
@@ -325,7 +325,6 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
             },
             "course_optouts": [],
             "show_email_settings_for": [course.id],
-            "show_courseware_link": {course.id: {"has_access": True}},
             "resume_course_urls": {course.id: "some_url"},
             "ecommerce_payment_page": random_url(),
         }
@@ -346,23 +345,33 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
         for key in output:
             assert output[key] is not None
 
-    def test_audit_access_expired(self):
+    @ddt.data(
+        (None, False),  # No expiration date, allowed for non-audit, non-expired.
+        (datetime.max, False),  # Expiration in the far future. Shouldn't be expired.
+        (datetime.min, True),  # Expiration in the far past. Should be expired.
+    )
+    @ddt.unpack
+    def test_audit_access_expired(self, expiration_datetime, should_be_expired):
+        # Given an enrollment
         input_data = self.create_test_enrollment()
         input_context = self.create_test_context(input_data.course)
 
-        # Example audit expired context
+        # With/out an expiration date (made timezone aware, if it exists)
+        expiration_datetime = (
+            expiration_datetime.replace(tzinfo=timezone.utc)
+            if expiration_datetime
+            else None
+        )
         input_context.update(
             {
-                "show_courseware_link": {
-                    input_data.course.id: {"error_code": "audit_expired"}
-                },
+                "audit_access_deadlines": {input_data.course.id: expiration_datetime},
             }
         )
 
-        serializer = EnrollmentSerializer(input_data, context=input_context)
-        output = serializer.data
+        # When I serialize
+        output = EnrollmentSerializer(input_data, context=input_context).data
 
-        assert output["isAuditAccessExpired"] is True
+        self.assertEqual(output["isAuditAccessExpired"], should_be_expired)
 
     @ddt.data(
         (random_url(), True, uuid4(), True),
@@ -715,7 +724,6 @@ class TestEntitlementSerializer(TestCase):
             "isExpired": bool(entitlement.expired_at),
             "expirationDate": expected_expiration_date,
             "uuid": str(entitlement.uuid),
-            "enrollmentUrl": f"/api/entitlements/v1/entitlements/{entitlement.uuid}/enrollments",
         }
 
 

@@ -543,6 +543,8 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
 
 class CourseRecommendationApiView(APIView):
     """
+    API to get personalized recommendations from Amplitude.
+
     **Example Request**
 
     GET /api/learner_home/recommendation/courses/
@@ -555,12 +557,18 @@ class CourseRecommendationApiView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        """Retrieves course recommendations details of a user in a specified course."""
+        """
+        Retrieves course recommendations details.
+        """
         if not should_show_learner_home_amplitude_recommendations():
-            return Response(status=400)
+            return Response(status=404)
 
-        user_id = request.user.id
-        is_control, course_keys = get_personalized_course_recommendations(user_id)
+        try:
+            user_id = request.user.id
+            is_control, course_keys = get_personalized_course_recommendations(user_id)
+        except Exception as ex:  # pylint: disable=broad-except
+            logger.warning(f"Cannot get recommendations from Amplitude: {ex}")
+            return Response(status=500)
 
         # Emits an event to track student dashboard page visits.
         segment.track(
@@ -571,8 +579,17 @@ class CourseRecommendationApiView(APIView):
             },
         )
 
-        if is_control or not course_keys:
-            return Response(status=400)
+        if is_control:
+            return Response(
+                {
+                    "courses": settings.GENERAL_RECOMMENDATIONS,
+                    "is_personalized_recommendation": False,
+                },
+                status=200,
+            )
+
+        if not course_keys:
+            return Response(status=404)
 
         recommended_courses = []
         user_enrolled_course_keys = set()

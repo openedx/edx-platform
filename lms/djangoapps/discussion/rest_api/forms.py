@@ -24,6 +24,7 @@ from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiVa
 class UserOrdering(TextChoices):
     BY_ACTIVITY = 'activity'
     BY_FLAGS = 'flagged'
+    BY_RECENT_ACTIVITY = 'recency'
 
 
 class _PaginationForm(Form):
