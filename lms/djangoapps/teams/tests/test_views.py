@@ -104,7 +104,6 @@ class TestDashboard(SharedModuleStoreTestCase):
         response = self.client.get(self.teams_url)
         self.assertContains(response, "TeamsTabFactory", status_code=200)
 
-
     def test_inactive_user(self):
         """
         Verifies that an inactive user can still access the dashboard.
