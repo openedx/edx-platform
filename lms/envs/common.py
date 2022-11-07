@@ -4753,7 +4753,10 @@ EDX_BRAZE_API_SERVER = None
 AMPLITUDE_URL = ''
 AMPLITUDE_API_KEY = ''
 REC_ID = ''
+# Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
+
+GENERAL_RECOMMENDATIONS = []
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
