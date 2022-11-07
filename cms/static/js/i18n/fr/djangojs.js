@@ -477,6 +477,7 @@
     "Certificate Signatories": "Signataires du certificat",
     "Certificate Signatory Configuration": "Configuration des signataires du certificat",
     "Certificate Status:": "\u00c9tat du certificat\u00a0:",
+    "Certificate exceptions group selection": "S\u00e9lection des groupes d\u2019exceptions au certificat",
     "Certificate has been successfully invalidated for <%= user %>.": "Invalidation r\u00e9ussie du certificat pour <%= user %>.",
     "Certificate name is required.": "Le nom du certificat est requis.",
     "Certificate of <%= user %> has already been invalidated. Please check your spelling and retry.": "Le certificat de <%= user %> a d\u00e9j\u00e0 \u00e9t\u00e9 invalid\u00e9. Veuillez v\u00e9rifier votre saisie et r\u00e9essayer.",

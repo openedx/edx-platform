@@ -35,8 +35,9 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTU
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
-from xmodule.editing_module import EditingMixin, TabsEditingMixin
+from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError
+from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_module import EmptyDataRawMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
@@ -112,9 +113,8 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 @XBlock.needs('mako', 'user')
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
-        TabsEditingMixin, EmptyDataRawMixin, XmlMixin, EditingMixin,
-        XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
-        LicenseMixin):
+        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin, HTMLSnippet,
+        ResourceTemplates, XModuleMixin, LicenseMixin):
     """
     XML source example:
         <video show_captions="true"
@@ -145,6 +145,9 @@ class VideoBlock(
             'template': "tabs/metadata-edit-tab.html"
         }
     ]
+
+    mako_template = "widgets/tabs-aggregator.html"
+    js_module_name = "TabsEditingDescriptor"
 
     uses_xmodule_styles_setup = True
     requires_per_student_anonymous_id = True
@@ -793,7 +796,12 @@ class VideoBlock(
         """
         Extend context by data for transcript basic tab.
         """
-        _context = super().get_context()
+        _context = MakoTemplateBlockBase.get_context(self)
+        _context.update({
+            'tabs': self.tabs,
+            'html_id': self.location.html_id(),  # element_id
+            'data': self.data,
+        })
 
         metadata_fields = copy.deepcopy(self.editable_metadata_fields)
 

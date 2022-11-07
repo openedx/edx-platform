@@ -10,7 +10,7 @@ from pytz import utc
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from xmodule.seq_module import SequenceBlock  # lint-amnesty, pylint: disable=wrong-import-order
 
-from .utils import collect_merged_boolean_field
+from .utils import collect_merged_boolean_field, collect_merged_date_field
 
 MAXIMUM_DATE = utc.localize(datetime.max)
 
@@ -31,9 +31,10 @@ class HiddenContentTransformer(BlockStructureTransformer):
     IMPORTANT: Must be run _after_ the DateOverrideTransformer from edx-when
     in case the 'due' date on a block has been shifted for a user.
     """
-    WRITE_VERSION = 3
-    READ_VERSION = 3
+    WRITE_VERSION = 4
+    READ_VERSION = 4
     MERGED_HIDE_AFTER_DUE = 'merged_hide_after_due'
+    MERGED_END_DATE = 'merged_end_date'
 
     @classmethod
     def name(cls):
@@ -55,6 +56,16 @@ class HiddenContentTransformer(BlockStructureTransformer):
         )
 
     @classmethod
+    def _get_merged_end_date(cls, block_structure, block_key):
+        """
+        Returns the merged value for the end date for the block with
+        the given block_key in the given block_structure.
+        """
+        return block_structure.get_transformer_block_field(
+            block_key, cls, cls.MERGED_END_DATE
+        )
+
+    @classmethod
     def collect(cls, block_structure):
         """
         Collects any information that's necessary to execute this
@@ -66,8 +77,15 @@ class HiddenContentTransformer(BlockStructureTransformer):
             xblock_field_name='hide_after_due',
             merged_field_name=cls.MERGED_HIDE_AFTER_DUE,
         )
+        collect_merged_date_field(
+            block_structure,
+            transformer=cls,
+            xblock_field_name='end',
+            merged_field_name=cls.MERGED_END_DATE,
+            default_date=MAXIMUM_DATE
+        )
 
-        block_structure.request_xblock_fields('self_paced', 'end', 'due')
+        block_structure.request_xblock_fields('self_paced', 'due')
 
     def transform(self, usage_info, block_structure):
         # Users with staff access bypass the Visibility check.
@@ -84,7 +102,7 @@ class HiddenContentTransformer(BlockStructureTransformer):
         hide_after_due = self._get_merged_hide_after_due(block_structure, block_key)
         self_paced = block_structure[block_structure.root_block_usage_key].self_paced
         if self_paced:
-            hidden_date = block_structure[block_structure.root_block_usage_key].end
+            hidden_date = self._get_merged_end_date(block_structure, block_key)
         else:
             # Important Note:
             # A small subtlety of grabbing the due date here is that this transformer relies on the
