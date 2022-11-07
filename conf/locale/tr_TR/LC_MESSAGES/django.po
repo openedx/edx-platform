@@ -54,7 +54,7 @@
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2021
+# Ali Işıngör <ali@artistanbul.io>, 2017-2022
 # Ali Özcan <aliozcan@yandex.com>, 2014
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
@@ -904,6 +904,10 @@ msgid ""
 "forwarded directly to the login URL of the provider instead of being first "
 "prompted with a login dialog."
 msgstr ""
+"Bu seçenek etkinleştirilirse, bu sağlayıcı için \"TPA ipuçlarıyla verilen\" "
+"bir URL'yi (örneğin, `?tpa_hint=[sağlayıcı_adı]` ile biten bir URL) ziyaret "
+"eden kullanıcılar, ilk olarak sorulmak yerine doğrudan sağlayıcının oturum "
+"açma URL'sine yönlendirilecektir. bir oturum açma iletişim kutusu."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -2776,12 +2780,12 @@ msgstr ""
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
 msgid "Proctored Exam"
-msgstr ""
+msgstr "Gözetimli Sınav"
 
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
 msgid "Timed Exam"
-msgstr ""
+msgstr "Zamanlanmış Sınav"
 
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
@@ -2907,6 +2911,8 @@ msgid ""
 "Please contact your degree administrator or {platform_name} Support if you "
 "have questions."
 msgstr ""
+"Eğer herhangi bir sorunuz varsa lütfen akademik yöneticiniz ya da "
+"{platform_name} destek ekibiyle iletişime geçiniz."
 
 #: lms/djangoapps/course_home_api/outline/views.py
 #: lms/templates/courseware/course_about.html
@@ -3283,7 +3289,7 @@ msgstr "Özel yapılmış sayfalar"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide additional course content and resources with custom pages"
-msgstr ""
+msgstr "Ek ders içerikleri ve özel yapım sayfalara sahip kaynaklar oluşturun"
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
@@ -3426,6 +3432,8 @@ msgid ""
 "You must be enrolled in the course to see course content. "
 "{enroll_link_start}Enroll now{enroll_link_end}."
 msgstr ""
+"Ders içeriğini görmek için derse kaydolmalısınız.                           "
+"{enroll_link_start}Şimdi kaydol{enroll_link_end}."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "You must be enrolled in the course to see course content."
@@ -3526,6 +3534,9 @@ msgid ""
 "I allow {platform_name} to use the information provided in this application "
 "(except for financial information) for {platform_name} marketing purposes."
 msgstr ""
+"Bu başvuruda sağladığım bilgilerin (mali bilgiler hariç) {platform_name} "
+"platformunun pazarlanması amacıyla {platform_name} platformu tarafından "
+"kullanmasına izin veriyorum."
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -4407,7 +4418,7 @@ msgstr "0 gönderilen"
 #, python-brace-format
 msgid "{num_emails} sent"
 msgid_plural "{num_emails} sent"
-msgstr[0] ""
+msgstr[0] "{num_emails} e-posta gönderildi"
 msgstr[1] "{num_emails} e-posta gönderildi"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
@@ -6937,7 +6948,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "The LTI platform descriptive title for this resource."
-msgstr ""
+msgstr "Bu kaynak için LTI platform açıklayıcı başlığı"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "If AGS was enabled during launch, this should hold the lineitem ID."
@@ -10068,7 +10079,7 @@ msgstr "Koşullu"
 
 #: xmodule/conditional_module.py
 msgid "List of urls of children that are references to external modules"
-msgstr ""
+msgstr "Harici modüllere referans olan alt URL'lerin listesi"
 
 #: xmodule/conditional_module.py
 msgid "Source Components"
@@ -10461,6 +10472,10 @@ msgid ""
 "manage Custom Courses on {platform_name}. When false, Custom Courses cannot "
 "be created, but existing Custom Courses will be preserved."
 msgstr ""
+"Ders eğitmenlerine CCX Eğitmeni yetkilerini sağlar, ve eğitmenlere "
+"{platform_name} üzerindeki Özel Yapım Dersleri yönetmek için izin verir. "
+"False olduğunda, Özel Yapım Dersler oluşturulamaz, fakat mevcut Özel Yapım "
+"Dersler korunur."
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
 #. course content.
@@ -11362,7 +11377,7 @@ msgstr[1] ""
 #, python-brace-format
 msgid "but there is only {actual} matching problem."
 msgid_plural "but there are only {actual} matching problems."
-msgstr[0] ""
+msgstr[0] "fakat sadece {actual} eşleşen problem bulunmaktadır."
 msgstr[1] "fakat sadece {actual} eşleşen problem bulunmaktadır."
 
 #: xmodule/library_content_module.py
@@ -12487,7 +12502,7 @@ msgstr ""
 
 #: xmodule/video_module/video_xfields.py
 msgid "Thumbnail"
-msgstr ""
+msgstr "Küçük Resim"
 
 #: xmodule/word_cloud_module.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
@@ -14667,7 +14682,7 @@ msgstr "Zaman aşımına uğramış"
 
 #: lms/templates/vert_module.html
 msgid "Reset Problems"
-msgstr ""
+msgstr "Problemleri Sıfırla"
 
 #: lms/templates/video.html
 msgid "Loading video player"
@@ -15648,7 +15663,7 @@ msgstr "CCX'in ismi"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Create a new Custom Course for {platform_name}"
-msgstr ""
+msgstr "{platform_name} için yeni bir Özel Yapım Ders oluştur"
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
@@ -16063,6 +16078,8 @@ msgid ""
 "{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn."
 msgstr ""
+"{b_start}Kolayca Paylaşılabilir: {b_end}Sertifikayı CV'nize veya "
+"özgeçmişinize ekleyin, ya da LinkedIn'e yapıştırın."
 
 #: lms/templates/course_modes/choose.html
 msgid "Benefits of a Verified Certificate"
@@ -16080,6 +16097,8 @@ msgid ""
 "{b_start}Easily shareable:{b_end} Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
+"{b_start}Kolayca paylaşılabilir:{b_end} Sertifikayı CV'nize veya "
+"özgeçmişinize ekleyin, ya da LinkedIn'e yapıştırın"
 
 #: lms/templates/course_modes/choose.html
 msgid ""
@@ -16103,6 +16122,8 @@ msgid ""
 "{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
+"{b_start}Kolayca paylaşılabilir: {b_end} Sertifikayı CV'nize veya "
+"özgeçmişinize ekleyin, ya da LinkedIn'e yapıştırın"
 
 #: lms/templates/course_modes/choose.html
 msgid ""
@@ -16238,7 +16259,7 @@ msgstr ""
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Enroll In {course_name} | Upgrade Now"
-msgstr ""
+msgstr "{course_name} Dersine Kaydol | Hemen Yükselt"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Choose a path for your course in"
@@ -17288,6 +17309,8 @@ msgid ""
 "The discussion block is disabled for this course as it is not using a "
 "compatible discussion provider."
 msgstr ""
+"Bu ders için tartışma bloğu, uyumlu bir tartışma hizmet sağlayıcısı "
+"kullanmadığından devre dışı bırakıldı."
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"
@@ -17967,6 +17990,8 @@ msgid ""
 "This course is configured to generate PDF certificates and this certificate "
 "type is no longer supported. Example certificates cannot be generated."
 msgstr ""
+"Bu ders, PDF sertifikaları oluşturacak şekilde yapılandırılmıştır ve bu "
+"sertifika türü artık desteklenmemektedir. Örnek sertifikalar oluşturulamaz."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generate Example Certificates"
@@ -18769,6 +18794,11 @@ msgid ""
 "provided: cohort and course mode, in that order. These extra columns may be "
 "blank."
 msgstr ""
+"Bu derse kullanıcıları kaydetmek için içeriğindeki sütunları şu sırada "
+"içeren bir CSV dosyası oluşturun: e-posta, kullanıcı adı, isim ve ülke. Her "
+"satıra yalnızca bir öğrenci eklenmeli ve başlık, altbaşlık veya boş satır "
+"bulunmamalıdır. İsteğe bağlı olarak, şu sırayla ek sütunlar sağlanabilir: "
+"topluluk ve ders modu. Bu ekstra sütunlar boş olabilir."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Upload a CSV for bulk enrollment"
@@ -19024,7 +19054,7 @@ msgstr "CCX Eğitmeni Ekle"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "To use the email tool, visit the"
-msgstr ""
+msgstr "E-posta aracını kullanmak için, burayı ziyaret edin "
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "new experience"
