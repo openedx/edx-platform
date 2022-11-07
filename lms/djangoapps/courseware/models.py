@@ -255,12 +255,14 @@ class StudentModuleHistory(BaseStudentModuleHistory):
         we save.
         """
         if instance.module_type in StudentModuleHistory.HISTORY_SAVING_TYPES:
-            history_entry = StudentModuleHistory(student_module=instance,
-                                                 version=None,
-                                                 created=instance.modified,
-                                                 state=instance.state,
-                                                 grade=instance.grade,
-                                                 max_grade=instance.max_grade)
+            history_entry = StudentModuleHistory(
+                student_module=instance,
+                version=None,
+                created=instance.modified,
+                state=instance.state,
+                grade=instance.grade,
+                max_grade=instance.max_grade
+            )
             history_entry.save()
 
     # When the extended studentmodulehistory table exists, don't save
