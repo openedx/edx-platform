@@ -205,10 +205,6 @@ class AsideKeyGenerator(IdGenerator):
         raise NotImplementedError("Specific Modulestores must provide implementations of create_definition")
 
 
-def dummy_track(_event_type, _event):
-    pass
-
-
 class HTMLSnippet:
     """
     A base class defining an interface for an object that is able to present an
