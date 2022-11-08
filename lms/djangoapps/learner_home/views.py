@@ -48,7 +48,10 @@ from lms.djangoapps.courseware.access import administrative_accesses_to_course_f
 from lms.djangoapps.courseware.access_utils import (
     check_course_open_for_learner,
 )
-from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
+from lms.djangoapps.learner_home.serializers import (
+    CourseRecommendationSerializer,
+    LearnerDashboardSerializer,
+)
 from lms.djangoapps.learner_home.waffle import (
     should_show_learner_home_amplitude_recommendations,
 )
@@ -581,10 +584,12 @@ class CourseRecommendationApiView(APIView):
 
         if is_control:
             return Response(
-                {
-                    "courses": settings.GENERAL_RECOMMENDATIONS,
-                    "is_personalized_recommendation": False,
-                },
+                CourseRecommendationSerializer(
+                    {
+                        "courses": settings.GENERAL_RECOMMENDATIONS,
+                        "is_personalized_recommendation": False,
+                    }
+                ).data,
                 status=200,
             )
 
@@ -622,9 +627,11 @@ class CourseRecommendationApiView(APIView):
             {"count": len(recommended_courses)},
         )
         return Response(
-            {
-                "courses": recommended_courses,
-                "is_personalized_recommendation": not is_control,
-            },
+            CourseRecommendationSerializer(
+                {
+                    "courses": recommended_courses,
+                    "is_personalized_recommendation": not is_control,
+                }
+            ).data,
             status=200,
         )
