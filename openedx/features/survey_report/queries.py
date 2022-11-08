@@ -15,7 +15,8 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 def get_unique_courses_offered() -> int:
     """
-    Get total number of unique courses offered.
+    Get total number of unique course that started before today and have an open date,
+    or have not finished yet, whose number of enrollments is greater than 5.
     """
     return CourseOverview.objects.annotate(
         count=Subquery(
