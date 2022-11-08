@@ -150,7 +150,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
         with self.assertNumQueries(4, using='default'):
-            with self.assertNumQueries(1, using='student_module_history'):
+            with self.assertNumQueries(2, using='student_module_history'):
                 self.kvs.set(user_state_key('a_field'), 'new_value')
         assert 1 == StudentModule.objects.all().count()
         assert {'b_field': 'b_value', 'a_field': 'new_value'} == json.loads(StudentModule.objects.all()[0].state)
@@ -164,7 +164,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
         with self.assertNumQueries(4, using='default'):
-            with self.assertNumQueries(1, using='student_module_history'):
+            with self.assertNumQueries(2, using='student_module_history'):
                 self.kvs.set(user_state_key('not_a_field'), 'new_value')
         assert 1 == StudentModule.objects.all().count()
         assert {'b_field': 'b_value', 'a_field': 'a_value', 'not_a_field': 'new_value'} == json.loads(StudentModule.objects.all()[0].state)
@@ -178,7 +178,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
         with self.assertNumQueries(2, using='default'):
-            with self.assertNumQueries(1, using='student_module_history'):
+            with self.assertNumQueries(2, using='student_module_history'):
                 self.kvs.delete(user_state_key('a_field'))
         assert 1 == StudentModule.objects.all().count()
         self.assertRaises(KeyError, self.kvs.get, user_state_key('not_a_field'))
@@ -219,7 +219,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # DjangoXBlockUserStateClient has written to the StudentModule (such as
         # UserStateCache setting the score on the StudentModule).
         with self.assertNumQueries(4, using="default"):
-            with self.assertNumQueries(1, using="student_module_history"):
+            with self.assertNumQueries(2, using="student_module_history"):
                 self.kvs.set_many(kv_dict)
 
         for key in kv_dict:
@@ -276,7 +276,7 @@ class TestMissingStudentModule(TestCase):  # lint-amnesty, pylint: disable=missi
         # on the StudentModule).
         # Django 1.8 also has a number of other BEGIN and SAVESTATE queries.
         with self.assertNumQueries(4, using='default'):
-            with self.assertNumQueries(1, using='student_module_history'):
+            with self.assertNumQueries(2, using='student_module_history'):
                 self.kvs.set(user_state_key('a_field'), 'a_value')
 
         assert 1 == sum(len(cache) for cache in self.field_data_cache.cache.values())
