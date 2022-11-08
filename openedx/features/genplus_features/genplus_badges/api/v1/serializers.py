@@ -107,35 +107,27 @@ class AwardBoosterBadgesSerializer(serializers.Serializer):
 
         user_qs = User.objects.filter(pk__in=users)
         badge_qs = BoosterBadge.objects.filter(pk__in=badges)
-
-        awards = [BoosterBadgeAward(user=user,
-                                    badge=badge,
-                                    awarded_by=request.user,
-                                    feedback=feedback,
-                                    image_url=get_absolute_url(
-                                        request, badge.image))
-                                    for badge in badge_qs
-                                    for user in user_qs]
-        if feedback and users:
-            students = Student.objects.filter(gen_user__user__pk__in=users)
-            teacher = Teacher.objects.get(gen_user__user=request.user)
-            journal_posts = [JournalPost(student=student, teacher=teacher,
-                                         journal_type=JournalTypes.TEACHER_FEEDBACK,
-                                         description=feedback)
-                             for student in students]
-            JournalPost.objects.bulk_create(journal_posts)
-        return BoosterBadgeAward.objects.bulk_create(awards, ignore_conflicts=True)
+        instance = None
+        for badge in badge_qs:
+            for user in user_qs:
+                instance, created = BoosterBadgeAward.objects.update_or_create(user=user,
+                                                                               badge=badge,
+                                                                               awarded_by=request.user,
+                                                                               defaults={'feedback': feedback,
+                                                                                         'image_url': get_absolute_url(
+                                                                                             request, badge.image)},
+                                                                               )
+        return instance
 
     def validate(self, data):
-        feedback = data['feedback']
         users = data['user']
         badges = data['badge']
 
         if not users:
             raise serializers.ValidationError('Provide students to give feedback or award badges to.')
 
-        if users and not (feedback or badges):
-            raise serializers.ValidationError('Give feedback or award badges to provided students.')
+        if users and not badges:
+            raise serializers.ValidationError('Please select badges to award the provided students.')
 
         return data
 
