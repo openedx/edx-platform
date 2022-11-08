@@ -47,10 +47,6 @@ class RecommendationsPanel extends React.Component {
         return this.props.generalRecommendations;
       });
 
-    if (window.hj && coursesRecommendationData.courses.length) {
-      window.hj('event', 'van_1108_show_recommendations_survey');
-    }
-
     this.setState({
       isLoading: false,
       coursesList: coursesRecommendationData.courses,
