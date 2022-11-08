@@ -22,7 +22,7 @@ tomli==2.0.1
     # via
     #   build
     #   pep517
-wheel==0.37.1
+wheel==0.38.2
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:

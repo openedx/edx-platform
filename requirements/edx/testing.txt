@@ -210,7 +210,7 @@ coverage[toml]==6.5.0
     #   pytest-cov
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.txt
-cryptography==36.0.2
+cryptography==38.0.3
     # via
     #   -r requirements/edx/base.txt
     #   django-fernet-fields
@@ -583,7 +583,7 @@ edx-enterprise==3.58.7
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   learner-pathway-progress
-edx-event-bus-kafka==1.5.0
+edx-event-bus-kafka==1.6.0
     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.9.2
     # via
@@ -676,15 +676,15 @@ event-tracking==2.1.0
     #   -r requirements/edx/base.txt
     #   edx-proctoring
     #   edx-search
-exceptiongroup==1.0.0
+exceptiongroup==1.0.1
     # via pytest
 execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==15.1.3
+faker==15.3.1
     # via factory-boy
-fastapi==0.85.2
+fastapi==0.86.0
     # via pact-python
 fastavro==1.7.0
     # via
@@ -734,7 +734,7 @@ html5lib==1.1
     #   ora2
 httpretty==1.1.4
     # via -r requirements/edx/testing.in
-icalendar==5.0.1
+icalendar==5.0.2
     # via -r requirements/edx/base.txt
 idna==3.4
     # via
@@ -1006,7 +1006,7 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
-platformdirs==2.5.2
+platformdirs==2.5.3
     # via
     #   pylint
     #   virtualenv
@@ -1021,11 +1021,11 @@ polib==1.1.1
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
     #   edx-i18n-tools
-prompt-toolkit==3.0.31
+prompt-toolkit==3.0.32
     # via
     #   -r requirements/edx/base.txt
     #   click-repl
-psutil==5.9.3
+psutil==5.9.4
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1133,7 +1133,7 @@ pyparsing==3.0.9
     #   packaging
 pyquery==1.4.3
     # via -r requirements/edx/testing.in
-pyrsistent==0.19.1
+pyrsistent==0.19.2
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1239,7 +1239,7 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/base.txt
-rapidfuzz==2.13.0
+rapidfuzz==2.13.2
     # via
     #   -r requirements/edx/base.txt
     #   levenshtein
@@ -1368,7 +1368,7 @@ slumber==0.7.1
     #   edx-rest-api-client
 sniffio==1.3.0
     # via anyio
-snowflake-connector-python==2.8.0
+snowflake-connector-python==2.8.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1420,7 +1420,7 @@ tableauserverclient==0.23
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-testfixtures==7.0.2
+testfixtures==7.0.3
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
