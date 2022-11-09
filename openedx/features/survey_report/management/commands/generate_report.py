@@ -23,6 +23,6 @@ class Command(BaseCommand):
         try:
             generate_report()
         except Exception as error:
-            raise CommandError(f'An error has occurred while report was generating. {error}') from error
+            raise CommandError(f'An error has occurred while survey report was generating. {error}') from error
 
         self.stdout.write(self.style.SUCCESS('Survey report has been generated successfully.'))
