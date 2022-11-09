@@ -3,7 +3,6 @@ Test for survey report commands.
 """
 
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
@@ -15,7 +14,7 @@ from openedx.features.survey_report.queries import (
     get_registered_learners,
     get_unique_courses_offered
 )
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -31,9 +30,9 @@ class TestSurveyReportCommands(ModuleStoreTestCase):
         Setup for users and courses.
         """
         super().setUp()
-        self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # lint-amnesty, pylint: disable=protected-access
+        self.store = modulestore()  # lint-amnesty, pylint: disable=protected-access
         self.first_course = CourseFactory.create(
-            org="test", course="course1", display_name="run1", default_store=ModuleStoreEnum.Type.mongo
+            org="test", course="course1", display_name="run1"
         )
         self.user = UserFactory.create(username='test_user', email='test@example.com', password='password')
         self.user1 = UserFactory.create(username='test_user1', email='test1@example.com', password='password')
@@ -53,9 +52,7 @@ class TestSurveyReportCommands(ModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.user3, course_id=course_overview.id)
         CourseEnrollmentFactory.create(user=self.user4, course_id=course_overview.id)
         CourseEnrollmentFactory.create(user=self.user5, course_id=course_overview.id)
-        with patch('openedx.features.survey_report.queries.datetime') as mock_datetime:
-            mock_datetime.now.return_value = datetime.now()
-            assert get_unique_courses_offered() == 1
+        assert get_unique_courses_offered() == 1
 
     def test_get_recently_active_users(self):
         """
@@ -67,9 +64,7 @@ class TestSurveyReportCommands(ModuleStoreTestCase):
         self.user1.save()
         self.user2.last_login = datetime.now() - timedelta(weeks=4)
         self.user2.save()
-        with patch('openedx.features.survey_report.queries.datetime') as mock_datetime:
-            mock_datetime.now.return_value = datetime.now()
-            assert get_recently_active_users(weeks=3) == 2
+        assert get_recently_active_users(weeks=3) == 2
 
     def test_get_learners_registered(self):
         """
@@ -90,10 +85,7 @@ class TestSurveyReportCommands(ModuleStoreTestCase):
             "passed_timestamp": datetime.now(),
         }
         PersistentCourseGrade.update_or_create(**course_grade_params)
-
-        with patch('openedx.features.survey_report.queries.datetime') as mock_datetime:
-            mock_datetime.now.return_value = datetime.now()
-            assert get_generated_certificates() == 1
+        assert get_generated_certificates() == 1
 
     def test_get_course_enrollments(self):
         """
@@ -109,6 +101,4 @@ class TestSurveyReportCommands(ModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.user2, course_id=course_overview.id)
         CourseEnrollmentFactory.create(user=self.user3, course_id=course_overview.id)
         CourseEnrollmentFactory.create(user=self.user4, course_id=course_overview.id)
-        with patch('openedx.features.survey_report.queries.datetime') as mock_datetime:
-            mock_datetime.now.return_value = datetime.now()
-            assert get_course_enrollments() == 3
+        assert get_course_enrollments() == 3
