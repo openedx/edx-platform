@@ -1,6 +1,6 @@
 Survey Report
 --------------------
-This django app was created for the purpose of aggregated, anonymized data
+This Django app was created for the purpose of gathering aggregated, anonymized data
 about Open edX courses at scale, so that we can begin to track the growth
 and trends in Open edX usage over time, namely in the annual Open edX
 Impact Report.
