@@ -54,7 +54,6 @@
 # Python libraries to install directly from github
 
 # Third-party:
--e git+https://github.com/openedx/django-wiki.git@1.1.1#egg=django-wiki
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
 git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 
