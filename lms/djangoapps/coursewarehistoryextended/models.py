@@ -46,14 +46,11 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
         StudentModuleHistoryExtended entry if the module_type is one that
         we save.
         """
-        if instance.module_type in StudentModuleHistoryExtended.HISTORY_SAVING_TYPES:
-            history_entry = StudentModuleHistoryExtended(student_module=instance,
-                                                         version=None,
-                                                         created=instance.modified,
-                                                         state=instance.state,
-                                                         grade=instance.grade,
-                                                         max_grade=instance.max_grade)
-            history_entry.save()
+        BaseStudentModuleHistory.save_history_entry(
+            instance,
+            StudentModuleHistoryExtended,
+            "lms.djangoapps.coursewarehistoryextended.models.student_module_history_extended_map"
+        )
 
     @receiver(post_delete, sender=StudentModule)
     def delete_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument

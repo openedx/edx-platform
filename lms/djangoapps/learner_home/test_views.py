@@ -890,7 +890,8 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch(
-        "lms.djangoapps.learner_home.views.get_personalized_course_recommendations", Mock(side_effect=Exception)
+        "lms.djangoapps.learner_home.views.get_personalized_course_recommendations",
+        Mock(side_effect=Exception),
     )
     def test_amplitude_api_unexpected_error(self):
         """
@@ -920,9 +921,11 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.get("is_personalized_recommendation"), True)
+
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content.get("isPersonalizedRecommendation"), True)
         self.assertEqual(
-            len(response.data.get("courses")), expected_recommendations_length
+            len(response_content.get("courses")), expected_recommendations_length
         )
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
@@ -930,7 +933,9 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
     @mock.patch(
         "lms.djangoapps.learner_home.views.get_personalized_course_recommendations"
     )
-    def test_general_recommendations(self, mocked_get_personalized_course_recommendations):
+    def test_general_recommendations(
+        self, mocked_get_personalized_course_recommendations
+    ):
         """
         Test that a user gets general recommendations for the control group.
         """
@@ -941,8 +946,26 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.get("is_personalized_recommendation"), False)
-        self.assertEqual(response.data.get("courses"), self.GENERAL_RECOMMENDATIONS)
+
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content.get("isPersonalizedRecommendation"), False)
+        self.assertEqual(
+            response_content.get("courses"),
+            [
+                {
+                    "courseKey": self.GENERAL_RECOMMENDATIONS[0]["course_key"],
+                    "logoImageUrl": self.GENERAL_RECOMMENDATIONS[0]["logo_image_url"],
+                    "marketingUrl": self.GENERAL_RECOMMENDATIONS[0]["marketing_url"],
+                    "title": self.GENERAL_RECOMMENDATIONS[0]["title"],
+                },
+                {
+                    "courseKey": self.GENERAL_RECOMMENDATIONS[1]["course_key"],
+                    "logoImageUrl": self.GENERAL_RECOMMENDATIONS[1]["logo_image_url"],
+                    "marketingUrl": self.GENERAL_RECOMMENDATIONS[1]["marketing_url"],
+                    "title": self.GENERAL_RECOMMENDATIONS[1]["title"],
+                },
+            ],
+        )
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch(
@@ -975,5 +998,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.get("is_personalized_recommendation"), True)
-        self.assertEqual(len(response.data.get("courses")), expected_recommendations)
+
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content.get("isPersonalizedRecommendation"), True)
+        self.assertEqual(len(response_content.get("courses")), expected_recommendations)
