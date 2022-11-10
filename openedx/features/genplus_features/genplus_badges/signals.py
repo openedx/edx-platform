@@ -26,7 +26,7 @@ def create_program_badge(sender, user, course_key, **kwargs):
 def create_activity_on_badge_award(sender, instance, created, **kwargs):
     if created:
         Activity.objects.create(
-            actor=instance.user.gen_user.student,
+            actor=instance.awarded_by.gen_user.teacher,
             type=ActivityTypes.BADGE_AWARD,
             action_object=instance,
             target=instance.user.gen_user.student
