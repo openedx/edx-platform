@@ -37,6 +37,21 @@ from openedx.core.djangolib.markup import HTML
 log = logging.getLogger("edx.courseware")
 
 
+def should_update_student_module_modified_on_save():
+    """
+    Fixes RED-3616 to avoid updating StudentModule.modified after regrade or any celery automated updates.
+
+    The modified field is relied upon for Monthly Active Users calculations, so any celery task updates it would be
+    confused with leaner activity.
+
+    Hack: This duplicates the `common.djangoapps.track.shim:is_celery_worker` helper function, but hopefully we'll
+    be removing this soon enough that code duplication won't be a problem.
+    """
+    is_celery_worker = getattr(settings, 'IS_CELERY_WORKER', False)
+    is_hack_enabled = settings.FEATURES.get('TAHOE_STUDENT_MODULES_DISABLE_MODIFIED_IN_CELERY', True)
+    return not (is_celery_worker and is_hack_enabled)
+
+
 def chunks(items, chunk_size):
     """
     Yields the values from items in chunks of size chunk_size
@@ -119,7 +134,12 @@ class StudentModule(models.Model):
     done = models.CharField(max_length=8, choices=DONE_TYPES, default='na')
 
     created = models.DateTimeField(auto_now_add=True, db_index=True)
-    modified = models.DateTimeField(auto_now=True, db_index=True)
+
+    if should_update_student_module_modified_on_save():
+        modified = models.DateTimeField(auto_now=True, db_index=True)
+    else:
+        # Fixes RED-3616 to modified on celery.
+        modified = models.DateTimeField(auto_now_add=True, db_index=True)
 
     @classmethod
     def all_submitted_problems_read_only(cls, course_id):
