@@ -199,3 +199,18 @@ class HelpGuide(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+
+class AlertBarEntry(TimeStampedModel):
+    message = models.TextField()
+    link = models.URLField(max_length=1024)
+    is_current = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.message
+
+    def save(self, **kwargs):
+        if self.is_current:
+            # marking the other entry's current false
+            AlertBarEntry.objects.filter(is_current=True).update(is_current=False)
+        super().save(**kwargs)

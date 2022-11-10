@@ -10,13 +10,16 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, FavoriteArticle, ReflectionAnswer, Reflection, \
-    ArticleViewLog, PortfolioEntry, Quote
+from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, \
+    FavoriteArticle, ReflectionAnswer, Reflection, \
+    ArticleViewLog, PortfolioEntry, Quote, AlertBarEntry
 from openedx.features.genplus_features.genplus.api.v1.mixins import GenzMixin
 from openedx.features.genplus_features.genplus.models import Teacher, Skill
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
-from .serializers import ArticleSerializer, FavoriteArticleSerializer, ArticleRatingSerializer, ReflectionAnswerSerializer,\
-    ArticleViewLogSerializer, GtcsSerializer, MediaTypeSerializer, PortfolioEntrySerializer, HelpGuideTypeSerializer
+from .serializers import (ArticleSerializer, FavoriteArticleSerializer, ArticleRatingSerializer,
+                          ReflectionAnswerSerializer,ArticleViewLogSerializer, GtcsSerializer,
+                          MediaTypeSerializer, PortfolioEntrySerializer, HelpGuideTypeSerializer,
+                          AlertBarEntrySerializer, )
 from openedx.features.genplus_features.genplus.api.v1.serializers import SkillSerializer
 from openedx.features.genplus_features.common.utils import get_generic_serializer
 from .pagination import PortfolioPagination
@@ -295,3 +298,15 @@ class HelpGuideView(generics.ListAPIView):
     serializer_class = HelpGuideTypeSerializer
     pagination_class = None
     queryset = serializer_class.Meta.model.objects.all()
+
+
+class AlertBarEntryView(generics.ListAPIView):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsTeacher]
+    serializer_class = AlertBarEntrySerializer
+    pagination_class = None
+
+    def list(self, request, *args, **kwargs):
+        alert_bar = get_object_or_404(AlertBarEntry, is_current=True)
+        serializer = self.serializer_class(alert_bar)
+        return Response(serializer.data, status=status.HTTP_200_OK)
