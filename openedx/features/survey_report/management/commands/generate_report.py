@@ -15,7 +15,10 @@ class Command(BaseCommand):
 
     help = """
         This command will create a new survey report using some
-        models to get the total number oof courses offered, currently active learners,
+        models to get:
+        - Total number of courses offered
+        - Currently active learners
+        ...
         learners ever registered, and generated certificates.
         """
 
