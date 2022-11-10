@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Article, Reflection, ReflectionAnswer, ArticleRating, MediaType, Gtcs, ArticleViewLog,\
-    Quote, HelpGuideType, HelpGuide
+    Quote, HelpGuideType, HelpGuide, AlertBarEntry
 from django.urls import reverse
 from django.contrib import messages
 from django.utils.safestring import mark_safe
@@ -62,3 +62,4 @@ admin.site.register(MediaType)
 admin.site.register(ArticleViewLog)
 admin.site.register(HelpGuideType)
 admin.site.register(HelpGuide, HelpGuideAdmin)
+admin.site.register(AlertBarEntry)

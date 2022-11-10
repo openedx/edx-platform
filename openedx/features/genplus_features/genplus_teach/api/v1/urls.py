@@ -6,7 +6,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from .views import ArticleViewSet, ReflectionAnswerViewSet, ArticleViewLogViewSet, FiltersViewSet, \
-    PortfolioViewSet, PortfolioUpdateAPIView, QuoteViewSet, HelpGuideView
+    PortfolioViewSet, PortfolioUpdateAPIView, QuoteViewSet, HelpGuideView, AlertBarEntryView
 
 app_name = 'genplus_teach_api_v1'
 
@@ -19,6 +19,7 @@ urlpatterns = (
     url(r'^filters/', FiltersViewSet.as_view({"get": "list"})),
     url(r'^quote/', QuoteViewSet.as_view({"get": "list"})),
     url(r'^help-guides/', HelpGuideView.as_view()),
+    url(r'^alert-bar/', AlertBarEntryView.as_view()),
     url(r'^portfolio/(?P<pk>\d+)/', PortfolioUpdateAPIView.as_view()),
     url(r'^articles/(?P<pk>\d+)/add_favorite/', ArticleViewSet.as_view({"put": "add_favorite_article"})),
     url(r'^articles/(?P<pk>\d+)/rate/', ArticleViewSet.as_view({"put": "rate_article"})),

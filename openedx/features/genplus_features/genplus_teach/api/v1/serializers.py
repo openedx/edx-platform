@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, Reflection, \
-    ReflectionAnswer, ArticleViewLog, PortfolioEntry, HelpGuideType, HelpGuide
+    ReflectionAnswer, ArticleViewLog, PortfolioEntry, HelpGuideType, HelpGuide, AlertBarEntry
 from openedx.features.genplus_features.genplus.api.v1.serializers import SkillSerializer
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from openedx.features.genplus_features.common.utils import get_generic_serializer
@@ -142,3 +142,9 @@ class HelpGuideTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = HelpGuideType
         fields = ('id', 'title', 'help_guides')
+
+
+class AlertBarEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlertBarEntry
+        fields = ('id', 'message', 'link')
