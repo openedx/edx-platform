@@ -955,7 +955,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "per_page": ["10"],
         })
 
-    @ddt.data("unread", "unanswered")
+    @ddt.data("unread", "unanswered", "unresponded")
     def test_view_query(self, query):
         threads = [make_minimal_cs_thread()]
         self.register_get_user_response(self.user)
