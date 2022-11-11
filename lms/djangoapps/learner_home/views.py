@@ -572,12 +572,22 @@ class CourseRecommendationApiView(APIView):
         if not should_show_learner_home_amplitude_recommendations():
             return Response(status=404)
 
+        general_recommendations_response = Response(
+            CourseRecommendationSerializer(
+                {
+                    "courses": settings.GENERAL_RECOMMENDATIONS,
+                    "is_personalized_recommendation": False,
+                }
+            ).data,
+            status=200,
+        )
+
         try:
             user_id = request.user.id
             is_control, course_keys = get_personalized_course_recommendations(user_id)
         except Exception as ex:  # pylint: disable=broad-except
             logger.warning(f"Cannot get recommendations from Amplitude: {ex}")
-            return Response(status=500)
+            return general_recommendations_response
 
         # Emits an event to track student dashboard page visits.
         segment.track(
@@ -588,19 +598,8 @@ class CourseRecommendationApiView(APIView):
             },
         )
 
-        if is_control:
-            return Response(
-                CourseRecommendationSerializer(
-                    {
-                        "courses": settings.GENERAL_RECOMMENDATIONS,
-                        "is_personalized_recommendation": False,
-                    }
-                ).data,
-                status=200,
-            )
-
-        if not course_keys:
-            return Response(status=404)
+        if is_control or not course_keys:
+            return general_recommendations_response
 
         recommended_courses = []
         user_enrolled_course_keys = set()
