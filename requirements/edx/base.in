@@ -182,3 +182,4 @@ xblock-utils                        # Provides utilities used by the Discussion 
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 xblock-drag-and-drop-v2             # Drag and Drop XBlock
 xblock-google-drive                 # XBlock for google docs and calendar
+openedx-django-require

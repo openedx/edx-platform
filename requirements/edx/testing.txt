@@ -949,6 +949,8 @@ openedx-blockstore==1.2.6
     # via -r requirements/edx/base.txt
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
+openedx-django-require==2.0.0
+    # via -r requirements/edx/base.txt
 openedx-django-pyfs==3.2.1
     # via
     #   -r requirements/edx/base.txt
