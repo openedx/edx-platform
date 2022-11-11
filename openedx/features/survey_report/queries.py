@@ -15,6 +15,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 log = logging.getLogger(__name__)
 
+
 def get_unique_courses_offered() -> int:
     """
     Get total number of unique course that started before today and have an open date,
@@ -52,6 +53,7 @@ def get_recently_active_users(weeks: int) -> int:
     log.info("Getting total number of recently active users... DONE")
     return total
 
+
 def get_registered_learners() -> int:
     """
     Get total number of active learners registered.
@@ -63,6 +65,7 @@ def get_registered_learners() -> int:
     log.info("Getting the total number of ever registered learners... DONE")
     return total
 
+
 def get_generated_certificates() -> int:
     """
     Get total number of generated certificates.
@@ -73,6 +76,7 @@ def get_generated_certificates() -> int:
         .count()
     log.info("Getting the total number of generated certificates... DONE")
     return total
+
 
 def get_course_enrollments() -> int:
     """
