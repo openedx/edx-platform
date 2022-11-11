@@ -873,7 +873,7 @@ def get_thread_list(
     }
 
     if view:
-        if view in ["unread", "unanswered"]:
+        if view in ["unread", "unanswered", "unresponded"]:
             query_params[view] = "true"
         else:
             ValidationError({
