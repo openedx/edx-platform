@@ -15,11 +15,13 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 log = logging.getLogger(__name__)
 
+MIN_ENROLLS_ACTIVE_COURSE: int = 5
+
 
 def get_unique_courses_offered() -> int:
     """
     Get total number of unique course that started before today and have an open date,
-    or have not finished yet, whose number of enrollments is greater than 5.
+    or have not finished yet, whose number of enrollments is greater than MIN_ENROLLS_ACTIVE_COURSE.
     """
     log.info("Getting the total number of unique courses offered...")
     total = CourseOverview.objects.annotate(
@@ -30,7 +32,7 @@ def get_unique_courses_offered() -> int:
                             .annotate(count=Count('course_id'))
                             .values('count')
         ))\
-        .filter(count__gt=5)\
+        .filter(count__gt=MIN_ENROLLS_ACTIVE_COURSE)\
         .filter(start__lt=datetime.now())\
         .filter(Q(end__isnull=True) | Q(end__gt=datetime.now()))\
         .using(read_replica_or_default())\
