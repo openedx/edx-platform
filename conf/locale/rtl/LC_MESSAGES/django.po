@@ -51,7 +51,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/item.py xmodule/html_module.py
+#: cms/djangoapps/contentstore/views/item.py xmodule/html_block.py
 msgid "Text"
 msgstr "Ŧǝxʇ"
 
@@ -79,7 +79,7 @@ msgid "Video"
 msgstr "Vᴉdǝø"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Advanced"
 msgstr "Ⱥdʌɐnɔǝd"
 
@@ -95,19 +95,19 @@ msgid "Unit"
 msgstr "Ʉnᴉʇ"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "Ɇɯdʇʎ"
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 #, python-brace-format
 msgid "The following parameters are required: {missing}."
 msgstr "Ŧɥǝ ɟølløʍᴉnƃ dɐɹɐɯǝʇǝɹs ɐɹǝ ɹǝbnᴉɹǝd: {missing}."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 msgid ""
 "There is a problem with this transcript file. Try to upload a different "
 "file."
@@ -116,14 +116,14 @@ msgstr ""
 "ɟᴉlǝ."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 #, python-brace-format
 msgid "A transcript with the \"{language_code}\" language code already exists."
 msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ʍᴉʇɥ ʇɥǝ \"{language_code}\" lɐnƃnɐƃǝ ɔødǝ ɐlɹǝɐdʎ ǝxᴉsʇs."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
 
@@ -134,7 +134,7 @@ msgid "Name"
 msgstr "Nɐɯǝ"
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video ID"
 msgstr "Vᴉdǝø ƗĐ"
 
@@ -169,7 +169,7 @@ msgid "Log out"
 msgstr "Łøƃ ønʇ"
 
 #: common/djangoapps/course_modes/admin.py
-#: common/djangoapps/course_modes/models.py xmodule/library_content_module.py
+#: common/djangoapps/course_modes/models.py xmodule/library_content_block.py
 msgid "Mode"
 msgstr "Mødǝ"
 
@@ -221,12 +221,12 @@ msgstr "Ɏøn'ɹǝ ǝnɹøllǝd ɐs ɐ dɹøɟǝssᴉønɐl ǝdnɔɐʇᴉøn sʇ
 msgid "Professional Ed"
 msgstr "Ᵽɹøɟǝssᴉønɐl Ɇd"
 
-#: common/djangoapps/course_modes/models.py xmodule/annotatable_module.py
-#: xmodule/capa_module.py xmodule/conditional_module.py
-#: xmodule/discussion_block.py xmodule/html_module.py
-#: xmodule/library_content_module.py xmodule/library_sourced_block.py
-#: xmodule/lti_module.py xmodule/split_test_module.py xmodule/unit_block.py
-#: xmodule/word_cloud_module.py xmodule/x_module.py
+#: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
+#: xmodule/capa_block.py xmodule/conditional_block.py
+#: xmodule/discussion_block.py xmodule/html_block.py
+#: xmodule/library_content_block.py xmodule/library_sourced_block.py
+#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "Đᴉsdlɐʎ Nɐɯǝ"
@@ -4872,7 +4872,7 @@ msgstr ""
 "ʇɥǝ bløɔʞ ᴉs ɔønsᴉdǝɹǝd ʌᴉsᴉblǝ ʇø ɐll. Nøʇǝ ʇɥɐʇ ʇɥᴉs ɟᴉǝld ᴉs ᴉƃnøɹǝd ᴉɟ "
 "ʇɥǝ bløɔʞ ᴉs ʌᴉsᴉblǝ_ʇø_sʇɐɟɟ_ønlʎ."
 
-#: lms/djangoapps/lms_xblock/mixin.py xmodule/split_test_module.py
+#: lms/djangoapps/lms_xblock/mixin.py xmodule/split_test_block.py
 msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
@@ -5188,7 +5188,7 @@ msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr "Ⱥɹǝ ʎøn snɹǝ ʎøn ʍɐnʇ ʇø ɔɐnɔǝl ɹǝʇᴉɹǝɯǝnʇ ɟøɹ nsǝɹ \"%(username)s\"? "
 
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
-#: xmodule/capa_module.py cms/templates/index.html
+#: xmodule/capa_block.py cms/templates/index.html
 #: cms/templates/videos_index_pagination.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
@@ -9182,21 +9182,21 @@ msgstr "Sᴉƃn Ɨn"
 msgid "Our mailing address is"
 msgstr "Ønɹ ɯɐᴉlᴉnƃ ɐddɹǝss ᴉs"
 
-#: xmodule/annotatable_module.py
+#: xmodule/annotatable_block.py
 msgid "XML data for the annotation"
 msgstr "XMŁ dɐʇɐ ɟøɹ ʇɥǝ ɐnnøʇɐʇᴉøn"
 
-#: xmodule/annotatable_module.py xmodule/capa_module.py
-#: xmodule/conditional_module.py xmodule/discussion_block.py
-#: xmodule/html_module.py xmodule/library_content_module.py
+#: xmodule/annotatable_block.py xmodule/capa_block.py
+#: xmodule/conditional_block.py xmodule/discussion_block.py
+#: xmodule/html_block.py xmodule/library_content_block.py
 #: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_module.py xmodule/unit_block.py
-#: xmodule/video_module/video_xfields.py xmodule/word_cloud_module.py
+#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
 msgstr "Ŧɥǝ dᴉsdlɐʎ nɐɯǝ ɟøɹ ʇɥᴉs ɔøɯdønǝnʇ."
 
-#: xmodule/annotatable_module.py
+#: xmodule/annotatable_block.py
 msgid "Annotation"
 msgstr "Ⱥnnøʇɐʇᴉøn"
 
@@ -9208,11 +9208,11 @@ msgstr "Ȼɐnnøʇ ɹǝsɔøɹǝ dɹøblǝɯs ʍᴉʇɥ døssᴉblǝ ɟᴉlǝ sn
 msgid "Question {}"
 msgstr "Qnǝsʇᴉøn {}"
 
-#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+#: xmodule/capa/capa_problem.py xmodule/capa_block.py
 msgid "Incorrect"
 msgstr "Ɨnɔøɹɹǝɔʇ"
 
-#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+#: xmodule/capa/capa_problem.py xmodule/capa_block.py
 msgid "Correct"
 msgstr "Ȼøɹɹǝɔʇ"
 
@@ -9375,7 +9375,7 @@ msgstr "Ȼøɹɹǝɔʇ:"
 msgid "Incorrect:"
 msgstr "Ɨnɔøɹɹǝɔʇ:"
 
-#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+#: xmodule/capa/responsetypes.py xmodule/capa_block.py
 msgid "Answer"
 msgstr "Ⱥnsʍǝɹ"
 
@@ -9637,19 +9637,19 @@ msgstr "Ȼødǝɾɐᴉl ȺⱣƗ Sǝɹʌᴉɔǝ ᴉnʌɐlᴉd ɹǝsdønsǝ."
 msgid "Invalid JSON response received from codejail api service."
 msgstr "Ɨnʌɐlᴉd ɈSØN ɹǝsdønsǝ ɹǝɔǝᴉʌǝd ɟɹøɯ ɔødǝɾɐᴉl ɐdᴉ sǝɹʌᴉɔǝ."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Blank Advanced Problem"
 msgstr "Ƀlɐnʞ Ⱥdʌɐnɔǝd Ᵽɹøblǝɯ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Nnɯbǝɹ øɟ ɐʇʇǝɯdʇs ʇɐʞǝn bʎ ʇɥǝ sʇndǝnʇ øn ʇɥᴉs dɹøblǝɯ"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr "Mɐxᴉɯnɯ Ⱥʇʇǝɯdʇs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines the number of times a student can try to answer this problem. If the"
 " value is not set, infinite attempts are allowed."
@@ -9657,19 +9657,19 @@ msgstr ""
 "Đǝɟᴉnǝs ʇɥǝ nnɯbǝɹ øɟ ʇᴉɯǝs ɐ sʇndǝnʇ ɔɐn ʇɹʎ ʇø ɐnsʍǝɹ ʇɥᴉs dɹøblǝɯ. Ɨɟ ʇɥǝ"
 " ʌɐlnǝ ᴉs nøʇ sǝʇ, ᴉnɟᴉnᴉʇǝ ɐʇʇǝɯdʇs ɐɹǝ ɐlløʍǝd."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Date that this problem is due by"
 msgstr "Đɐʇǝ ʇɥɐʇ ʇɥᴉs dɹøblǝɯ ᴉs dnǝ bʎ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr "Ⱥɯønnʇ øɟ ʇᴉɯǝ ɐɟʇǝɹ ʇɥǝ dnǝ dɐʇǝ ʇɥɐʇ snbɯᴉssᴉøns ʍᴉll bǝ ɐɔɔǝdʇǝd"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Show Results"
 msgstr "Sɥøʍ Ɍǝsnlʇs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to show whether a learner's answer to the problem is correct. "
 "Configured on the subsection."
@@ -9677,23 +9677,23 @@ msgstr ""
 "Đǝɟᴉnǝs ʍɥǝn ʇø sɥøʍ ʍɥǝʇɥǝɹ ɐ lǝɐɹnǝɹ's ɐnsʍǝɹ ʇø ʇɥǝ dɹøblǝɯ ᴉs ɔøɹɹǝɔʇ. "
 "Ȼønɟᴉƃnɹǝd øn ʇɥǝ snbsǝɔʇᴉøn."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Always"
 msgstr "Ⱥlʍɐʎs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Never"
 msgstr "Nǝʌǝɹ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Past Due"
 msgstr "Ᵽɐsʇ Đnǝ"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Show Answer"
 msgstr "Sɥøʍ Ⱥnsʍǝɹ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
@@ -9701,47 +9701,47 @@ msgstr ""
 "Đǝɟᴉnǝs ʍɥǝn ʇø sɥøʍ ʇɥǝ ɐnsʍǝɹ ʇø ʇɥǝ dɹøblǝɯ. Ⱥ dǝɟɐnlʇ ʌɐlnǝ ɔɐn bǝ sǝʇ "
 "ᴉn Ⱥdʌɐnɔǝd Sǝʇʇᴉnƃs."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answered"
 msgstr "Ⱥnsʍǝɹǝd"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Attempted or Past Due"
 msgstr "Ⱥʇʇǝɯdʇǝd øɹ Ᵽɐsʇ Đnǝ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Closed"
 msgstr "Ȼløsǝd"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Finished"
 msgstr "Fᴉnᴉsɥǝd"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Correct or Past Due"
 msgstr "Ȼøɹɹǝɔʇ øɹ Ᵽɐsʇ Đnǝ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After Some Number of Attempts"
 msgstr "Ⱥɟʇǝɹ Søɯǝ Nnɯbǝɹ øɟ Ⱥʇʇǝɯdʇs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After All Attempts"
 msgstr "Ⱥɟʇǝɹ Ⱥll Ⱥʇʇǝɯdʇs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After All Attempts or Correct"
 msgstr "Ⱥɟʇǝɹ Ⱥll Ⱥʇʇǝɯdʇs øɹ Ȼøɹɹǝɔʇ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Attempted"
 msgstr "Ⱥʇʇǝɯdʇǝd"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Show Answer: Number of Attempts"
 msgstr "Sɥøʍ Ⱥnsʍǝɹ: Nnɯbǝɹ øɟ Ⱥʇʇǝɯdʇs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Number of times the student must attempt to answer the question before the "
 "Show Answer button appears."
@@ -9749,15 +9749,15 @@ msgstr ""
 "Nnɯbǝɹ øɟ ʇᴉɯǝs ʇɥǝ sʇndǝnʇ ɯnsʇ ɐʇʇǝɯdʇ ʇø ɐnsʍǝɹ ʇɥǝ bnǝsʇᴉøn bǝɟøɹǝ ʇɥǝ "
 "Sɥøʍ Ⱥnsʍǝɹ bnʇʇøn ɐddǝɐɹs."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether to force the save button to appear on the page"
 msgstr "Wɥǝʇɥǝɹ ʇø ɟøɹɔǝ ʇɥǝ sɐʌǝ bnʇʇøn ʇø ɐddǝɐɹ øn ʇɥǝ dɐƃǝ"
 
-#: xmodule/capa_module.py xmodule/library_content_module.py
+#: xmodule/capa_block.py xmodule/library_content_block.py
 msgid "Show Reset Button"
 msgstr "Sɥøʍ Ɍǝsǝʇ Ƀnʇʇøn"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Determines whether a 'Reset' button is shown so the user may reset their "
 "answer. A default value can be set in Advanced Settings."
@@ -9765,11 +9765,11 @@ msgstr ""
 "Đǝʇǝɹɯᴉnǝs ʍɥǝʇɥǝɹ ɐ 'Ɍǝsǝʇ' bnʇʇøn ᴉs sɥøʍn sø ʇɥǝ nsǝɹ ɯɐʎ ɹǝsǝʇ ʇɥǝᴉɹ "
 "ɐnsʍǝɹ. Ⱥ dǝɟɐnlʇ ʌɐlnǝ ɔɐn bǝ sǝʇ ᴉn Ⱥdʌɐnɔǝd Sǝʇʇᴉnƃs."
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr "Ɍɐndøɯᴉzɐʇᴉøn"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to randomize the variables specified in the associated Python "
 "script. For problems that do not randomize values, specify \"Never\". "
@@ -9777,55 +9777,55 @@ msgstr ""
 "Đǝɟᴉnǝs ʍɥǝn ʇø ɹɐndøɯᴉzǝ ʇɥǝ ʌɐɹᴉɐblǝs sdǝɔᴉɟᴉǝd ᴉn ʇɥǝ ɐssøɔᴉɐʇǝd Ᵽʎʇɥøn "
 "sɔɹᴉdʇ. Føɹ dɹøblǝɯs ʇɥɐʇ dø nøʇ ɹɐndøɯᴉzǝ ʌɐlnǝs, sdǝɔᴉɟʎ \"Nǝʌǝɹ\". "
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "On Reset"
 msgstr "Øn Ɍǝsǝʇ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Per Student"
 msgstr "Ᵽǝɹ Sʇndǝnʇ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "XML data for the problem"
 msgstr "XMŁ dɐʇɐ ɟøɹ ʇɥǝ dɹøblǝɯ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the correctness of current student answers"
 msgstr "Đᴉɔʇᴉønɐɹʎ ʍᴉʇɥ ʇɥǝ ɔøɹɹǝɔʇnǝss øɟ ɔnɹɹǝnʇ sʇndǝnʇ ɐnsʍǝɹs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary for maintaining the state of inputtypes"
 msgstr "Đᴉɔʇᴉønɐɹʎ ɟøɹ ɯɐᴉnʇɐᴉnᴉnƃ ʇɥǝ sʇɐʇǝ øɟ ᴉndnʇʇʎdǝs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the current student responses"
 msgstr "Đᴉɔʇᴉønɐɹʎ ʍᴉʇɥ ʇɥǝ ɔnɹɹǝnʇ sʇndǝnʇ ɹǝsdønsǝs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the current student score"
 msgstr "Đᴉɔʇᴉønɐɹʎ ʍᴉʇɥ ʇɥǝ ɔnɹɹǝnʇ sʇndǝnʇ sɔøɹǝ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether or not the answers have been saved since last submit"
 msgstr "Wɥǝʇɥǝɹ øɹ nøʇ ʇɥǝ ɐnsʍǝɹs ɥɐʌǝ bǝǝn sɐʌǝd sᴉnɔǝ lɐsʇ snbɯᴉʇ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether the student has answered the problem"
 msgstr "Wɥǝʇɥǝɹ ʇɥǝ sʇndǝnʇ ɥɐs ɐnsʍǝɹǝd ʇɥǝ dɹøblǝɯ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Random seed for this student"
 msgstr "Ɍɐndøɯ sǝǝd ɟøɹ ʇɥᴉs sʇndǝnʇ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Last submission time"
 msgstr "Łɐsʇ snbɯᴉssᴉøn ʇᴉɯǝ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Timer Between Attempts"
 msgstr "Ŧᴉɯǝɹ Ƀǝʇʍǝǝn Ⱥʇʇǝɯdʇs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Seconds a student must wait between submissions for a problem with multiple "
 "attempts."
@@ -9833,11 +9833,11 @@ msgstr ""
 "Sǝɔønds ɐ sʇndǝnʇ ɯnsʇ ʍɐᴉʇ bǝʇʍǝǝn snbɯᴉssᴉøns ɟøɹ ɐ dɹøblǝɯ ʍᴉʇɥ ɯnlʇᴉdlǝ "
 "ɐʇʇǝɯdʇs."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem Weight"
 msgstr "Ᵽɹøblǝɯ Wǝᴉƃɥʇ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines the number of points each problem is worth. If the value is not set,"
 " each response field in the problem is worth one point."
@@ -9845,25 +9845,25 @@ msgstr ""
 "Đǝɟᴉnǝs ʇɥǝ nnɯbǝɹ øɟ døᴉnʇs ǝɐɔɥ dɹøblǝɯ ᴉs ʍøɹʇɥ. Ɨɟ ʇɥǝ ʌɐlnǝ ᴉs nøʇ sǝʇ,"
 " ǝɐɔɥ ɹǝsdønsǝ ɟᴉǝld ᴉn ʇɥǝ dɹøblǝɯ ᴉs ʍøɹʇɥ ønǝ døᴉnʇ."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Markdown source of this module"
 msgstr "Mɐɹʞdøʍn sønɹɔǝ øɟ ʇɥᴉs ɯødnlǝ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Source code for LaTeX and Word problems. This feature is not well-supported."
 msgstr ""
 "Sønɹɔǝ ɔødǝ ɟøɹ ŁɐŦǝX ɐnd Wøɹd dɹøblǝɯs. Ŧɥᴉs ɟǝɐʇnɹǝ ᴉs nøʇ ʍǝll-snddøɹʇǝd."
 
-#: xmodule/capa_module.py xmodule/html_module.py
+#: xmodule/capa_block.py xmodule/html_block.py
 msgid "Enable LaTeX templates?"
 msgstr "Ɇnɐblǝ ŁɐŦǝX ʇǝɯdlɐʇǝs?"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
 msgstr "Mɐʇlɐb ȺⱣƗ ʞǝʎ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
 "Service. This key is granted for exclusive use by this course for the "
@@ -9879,7 +9879,7 @@ msgstr ""
 "ɔøɯdɹøɯᴉsǝd. Ŧø øbʇɐᴉn ɐ ʞǝʎ ɟøɹ ʎønɹ ɔønɹsǝ, øɹ ʇø ɹǝdøɹʇ ɐn ᴉssnǝ, dlǝɐsǝ "
 "ɔønʇɐɔʇ ɯøøɔsnddøɹʇ@ɯɐʇɥʍøɹʞs.ɔøɯ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "We're sorry, there was an error with processing your request. Please try "
 "reloading your page and trying again."
@@ -9887,7 +9887,7 @@ msgstr ""
 "Wǝ'ɹǝ søɹɹʎ, ʇɥǝɹǝ ʍɐs ɐn ǝɹɹøɹ ʍᴉʇɥ dɹøɔǝssᴉnƃ ʎønɹ ɹǝbnǝsʇ. Ᵽlǝɐsǝ ʇɹʎ "
 "ɹǝløɐdᴉnƃ ʎønɹ dɐƃǝ ɐnd ʇɹʎᴉnƃ ɐƃɐᴉn."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "The state of this problem has changed since you loaded this page. Please "
 "refresh your page."
@@ -9895,29 +9895,29 @@ msgstr ""
 "Ŧɥǝ sʇɐʇǝ øɟ ʇɥᴉs dɹøblǝɯ ɥɐs ɔɥɐnƃǝd sᴉnɔǝ ʎøn løɐdǝd ʇɥᴉs dɐƃǝ. Ᵽlǝɐsǝ "
 "ɹǝɟɹǝsɥ ʎønɹ dɐƃǝ."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answer ID"
 msgstr "Ⱥnsʍǝɹ ƗĐ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Question"
 msgstr "Qnǝsʇᴉøn"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Correct Answer"
 msgstr "Ȼøɹɹǝɔʇ Ⱥnsʍǝɹ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Submitting"
 msgstr "Snbɯᴉʇʇᴉnƃ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Warning: The problem has been reset to its initial state!"
 msgstr "Wɐɹnᴉnƃ: Ŧɥǝ dɹøblǝɯ ɥɐs bǝǝn ɹǝsǝʇ ʇø ᴉʇs ᴉnᴉʇᴉɐl sʇɐʇǝ!"
 
 #. Translators: Following this message, there will be a bulleted list of
 #. items.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "The problem's state was corrupted by an invalid submission. The submission "
 "consisted of:"
@@ -9925,7 +9925,7 @@ msgstr ""
 "Ŧɥǝ dɹøblǝɯ's sʇɐʇǝ ʍɐs ɔøɹɹndʇǝd bʎ ɐn ᴉnʌɐlᴉd snbɯᴉssᴉøn. Ŧɥǝ snbɯᴉssᴉøn "
 "ɔønsᴉsʇǝd øɟ:"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "If this error persists, please contact the course staff."
 msgstr "Ɨɟ ʇɥᴉs ǝɹɹøɹ dǝɹsᴉsʇs, dlǝɐsǝ ɔønʇɐɔʇ ʇɥǝ ɔønɹsǝ sʇɐɟɟ."
 
@@ -9934,7 +9934,7 @@ msgstr "Ɨɟ ʇɥᴉs ǝɹɹøɹ dǝɹsᴉsʇs, dlǝɐsǝ ɔønʇɐɔʇ ʇɥǝ �
 #. is a header for this hint, and {hint_text} is the text of the hint itself.
 #. This string is being passed to translation only for possible reordering of
 #. the placeholders.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
@@ -9942,63 +9942,63 @@ msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
 #. This text is shown in bold before the accompanying hint text.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "Ħᴉnʇ ({hint_num} øɟ {hints_count}): "
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "Your answers were previously saved. Click '{button_name}' to grade them."
 msgstr ""
 "Ɏønɹ ɐnsʍǝɹs ʍǝɹǝ dɹǝʌᴉønslʎ sɐʌǝd. Ȼlᴉɔʞ '{button_name}' ʇø ƃɹɐdǝ ʇɥǝɯ."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
 msgstr[0] "Ɨnɔøɹɹǝɔʇ ({progress} døᴉnʇ)"
 msgstr[1] "Ɨnɔøɹɹǝɔʇ ({progress} døᴉnʇs)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
 msgstr[0] "Ȼøɹɹǝɔʇ ({progress} døᴉnʇ)"
 msgstr[1] "Ȼøɹɹǝɔʇ ({progress} døᴉnʇs)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
 msgstr[0] "Ᵽɐɹʇᴉɐllʎ ɔøɹɹǝɔʇ ({progress} døᴉnʇ)"
 msgstr[1] "Ᵽɐɹʇᴉɐllʎ ɔøɹɹǝɔʇ ({progress} døᴉnʇs)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Partially Correct"
 msgstr "Ᵽɐɹʇᴉɐllʎ Ȼøɹɹǝɔʇ"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answer submitted."
 msgstr "Ⱥnsʍǝɹ snbɯᴉʇʇǝd."
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem is closed."
 msgstr "Ᵽɹøblǝɯ ᴉs ɔløsǝd."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem must be reset before it can be submitted again."
 msgstr "Ᵽɹøblǝɯ ɯnsʇ bǝ ɹǝsǝʇ bǝɟøɹǝ ᴉʇ ɔɐn bǝ snbɯᴉʇʇǝd ɐƃɐᴉn."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr "Ɏøn ɯnsʇ ʍɐᴉʇ ɐʇ lǝɐsʇ {wait} sǝɔønds bǝʇʍǝǝn snbɯᴉssᴉøns."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "You must wait at least {wait_secs} between submissions. {remaining_secs} "
@@ -10007,36 +10007,36 @@ msgstr ""
 "Ɏøn ɯnsʇ ʍɐᴉʇ ɐʇ lǝɐsʇ {wait_secs} bǝʇʍǝǝn snbɯᴉssᴉøns. {remaining_secs} "
 "ɹǝɯɐᴉnᴉnƃ."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
 msgstr[0] "{num_hour} ɥønɹ"
 msgstr[1] "{num_hour} ɥønɹs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
 msgstr[0] "{num_minute} ɯᴉnnʇǝ"
 msgstr[1] "{num_minute} ɯᴉnnʇǝs"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
 msgstr[0] "{num_second} sǝɔønd"
 msgstr[1] "{num_second} sǝɔønds"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem needs to be reset prior to save."
 msgstr "Ᵽɹøblǝɯ nǝǝds ʇø bǝ ɹǝsǝʇ dɹᴉøɹ ʇø sɐʌǝ."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Your answers have been saved."
 msgstr "Ɏønɹ ɐnsʍǝɹs ɥɐʌǝ bǝǝn sɐʌǝd."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "Your answers have been saved but not graded. Click '{button_name}' to grade "
@@ -10047,37 +10047,37 @@ msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "You cannot select Reset for a problem that is closed."
 msgstr "Ɏøn ɔɐnnøʇ sǝlǝɔʇ Ɍǝsǝʇ ɟøɹ ɐ dɹøblǝɯ ʇɥɐʇ ᴉs ɔløsǝd."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "You must submit an answer before you can select Reset."
 msgstr "Ɏøn ɯnsʇ snbɯᴉʇ ɐn ɐnsʍǝɹ bǝɟøɹǝ ʎøn ɔɐn sǝlǝɔʇ Ɍǝsǝʇ."
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem's definition does not support rescoring."
 msgstr "Ᵽɹøblǝɯ's dǝɟᴉnᴉʇᴉøn døǝs nøʇ snddøɹʇ ɹǝsɔøɹᴉnƃ."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem must be answered before it can be graded again."
 msgstr "Ᵽɹøblǝɯ ɯnsʇ bǝ ɐnsʍǝɹǝd bǝɟøɹǝ ᴉʇ ɔɐn bǝ ƃɹɐdǝd ɐƃɐᴉn."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional"
 msgstr "Ȼøndᴉʇᴉønɐl"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "List of urls of children that are references to external modules"
 msgstr "Łᴉsʇ øɟ nɹls øɟ ɔɥᴉldɹǝn ʇɥɐʇ ɐɹǝ ɹǝɟǝɹǝnɔǝs ʇø ǝxʇǝɹnɐl ɯødnlǝs"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Source Components"
 msgstr "Sønɹɔǝ Ȼøɯdønǝnʇs"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
 "determine whether a learner is shown the content of this conditional module."
@@ -10089,11 +10089,11 @@ msgstr ""
 " Ȼødʎ ʇɥǝ ɔøɯdønǝnʇ løɔɐʇᴉøn ƗĐ øɟ ɐ ɔøɯdønǝnʇ ɟɹøɯ ᴉʇs Sǝʇʇᴉnƃs dᴉɐløƃ ᴉn "
 "Sʇndᴉø."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional Attribute"
 msgstr "Ȼøndᴉʇᴉønɐl Ⱥʇʇɹᴉbnʇǝ"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
 "shown the content of this conditional module."
@@ -10101,11 +10101,11 @@ msgstr ""
 "Ŧɥǝ ɐʇʇɹᴉbnʇǝ øɟ ʇɥǝ sønɹɔǝ ɔøɯdønǝnʇs ʇɥɐʇ dǝʇǝɹɯᴉnǝs ʍɥǝʇɥǝɹ ɐ lǝɐɹnǝɹ ᴉs "
 "sɥøʍn ʇɥǝ ɔønʇǝnʇ øɟ ʇɥᴉs ɔøndᴉʇᴉønɐl ɯødnlǝ."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional Value"
 msgstr "Ȼøndᴉʇᴉønɐl Vɐlnǝ"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
 " before a learner is shown the content of this conditional module."
@@ -10113,11 +10113,11 @@ msgstr ""
 "Ŧɥǝ ʌɐlnǝ ʇɥɐʇ ʇɥǝ ɔøndᴉʇᴉønɐl ɐʇʇɹᴉbnʇǝ øɟ ʇɥǝ sønɹɔǝ ɔøɯdønǝnʇs ɯnsʇ ɯɐʇɔɥ"
 " bǝɟøɹǝ ɐ lǝɐɹnǝɹ ᴉs sɥøʍn ʇɥǝ ɔønʇǝnʇ øɟ ʇɥᴉs ɔøndᴉʇᴉønɐl ɯødnlǝ."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Blocked Content Message"
 msgstr "Ƀløɔʞǝd Ȼønʇǝnʇ Mǝssɐƃǝ"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
@@ -10130,24 +10130,24 @@ msgstr ""
 "ʎønɹ ɯǝssɐƃǝ ʇø ƃᴉʌǝ lǝɐɹnǝɹs ɐ dᴉɹǝɔʇ lᴉnʞ ʇø ɹǝbnᴉɹǝd nnᴉʇs. Føɹ ǝxɐɯdlǝ, "
 "'Ɏøn ɯnsʇ ɔøɯdlǝʇǝ {link} bǝɟøɹǝ ʎøn ɔɐn ɐɔɔǝss ʇɥᴉs nnᴉʇ'."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 #, python-brace-format
 msgid "You must complete {link} before you can access this unit."
 msgstr "Ɏøn ɯnsʇ ɔøɯdlǝʇǝ {link} bǝɟøɹǝ ʎøn ɔɐn ɐɔɔǝss ʇɥᴉs nnᴉʇ."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "This component has no source components configured yet."
 msgstr "Ŧɥᴉs ɔøɯdønǝnʇ ɥɐs nø sønɹɔǝ ɔøɯdønǝnʇs ɔønɟᴉƃnɹǝd ʎǝʇ."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Configure list of sources"
 msgstr "Ȼønɟᴉƃnɹǝ lᴉsʇ øɟ sønɹɔǝs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "LTI Passports"
 msgstr "ŁŦƗ Ᵽɐssdøɹʇs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
 "\"id:client_key:client_secret\"."
@@ -10155,41 +10155,41 @@ msgstr ""
 "Ɇnʇǝɹ ʇɥǝ dɐssdøɹʇs ɟøɹ ɔønɹsǝ ŁŦƗ ʇøøls ᴉn ʇɥǝ ɟølløʍᴉnƃ ɟøɹɯɐʇ: "
 "\"ᴉd:ɔlᴉǝnʇ_ʞǝʎ:ɔlᴉǝnʇ_sǝɔɹǝʇ\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "List of Textbook objects with (title, url) for textbooks used in this course"
 msgstr ""
 "Łᴉsʇ øɟ Ŧǝxʇbøøʞ øbɾǝɔʇs ʍᴉʇɥ (ʇᴉʇlǝ, nɹl) ɟøɹ ʇǝxʇbøøʞs nsǝd ᴉn ʇɥᴉs ɔønɹsǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Slug that points to the wiki for this course"
 msgstr "Slnƃ ʇɥɐʇ døᴉnʇs ʇø ʇɥǝ ʍᴉʞᴉ ɟøɹ ʇɥᴉs ɔønɹsǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that enrollment for this class is opened"
 msgstr "Đɐʇǝ ʇɥɐʇ ǝnɹøllɯǝnʇ ɟøɹ ʇɥᴉs ɔlɐss ᴉs ødǝnǝd"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that enrollment for this class is closed"
 msgstr "Đɐʇǝ ʇɥɐʇ ǝnɹøllɯǝnʇ ɟøɹ ʇɥᴉs ɔlɐss ᴉs ɔløsǝd"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Start time when this module is visible"
 msgstr "Sʇɐɹʇ ʇᴉɯǝ ʍɥǝn ʇɥᴉs ɯødnlǝ ᴉs ʌᴉsᴉblǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that this class ends"
 msgstr "Đɐʇǝ ʇɥɐʇ ʇɥᴉs ɔlɐss ǝnds"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that certificates become available to learners"
 msgstr "Đɐʇǝ ʇɥɐʇ ɔǝɹʇᴉɟᴉɔɐʇǝs bǝɔøɯǝ ɐʌɐᴉlɐblǝ ʇø lǝɐɹnǝɹs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Cosmetic Course Display Price"
 msgstr "Ȼøsɯǝʇᴉɔ Ȼønɹsǝ Đᴉsdlɐʎ Ᵽɹᴉɔǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "The cost displayed to students for enrolling in the course. If a paid course"
 " registration price is set by an administrator in the database, that price "
@@ -10199,11 +10199,11 @@ msgstr ""
 " ɹǝƃᴉsʇɹɐʇᴉøn dɹᴉɔǝ ᴉs sǝʇ bʎ ɐn ɐdɯᴉnᴉsʇɹɐʇøɹ ᴉn ʇɥǝ dɐʇɐbɐsǝ, ʇɥɐʇ dɹᴉɔǝ "
 "ʍᴉll bǝ dᴉsdlɐʎǝd ᴉnsʇǝɐd øɟ ʇɥᴉs ønǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Advertised Start"
 msgstr "Ȼønɹsǝ Ⱥdʌǝɹʇᴉsǝd Sʇɐɹʇ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the text that you want to use as the advertised starting time frame "
 "for the course, such as \"Winter 2018\". If you enter null for this value, "
@@ -10213,23 +10213,23 @@ msgstr ""
 "ɟøɹ ʇɥǝ ɔønɹsǝ, snɔɥ ɐs \"Wᴉnʇǝɹ 2018\". Ɨɟ ʎøn ǝnʇǝɹ nnll ɟøɹ ʇɥᴉs ʌɐlnǝ, "
 "ʇɥǝ sʇɐɹʇ dɐʇǝ ʇɥɐʇ ʎøn ɥɐʌǝ sǝʇ ɟøɹ ʇɥᴉs ɔønɹsǝ ᴉs nsǝd."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Requisite Courses"
 msgstr "Ᵽɹǝ-Ɍǝbnᴉsᴉʇǝ Ȼønɹsǝs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Requisite Course key if this course has a pre-requisite course"
 msgstr "Ᵽɹǝ-Ɍǝbnᴉsᴉʇǝ Ȼønɹsǝ ʞǝʎ ᴉɟ ʇɥᴉs ɔønɹsǝ ɥɐs ɐ dɹǝ-ɹǝbnᴉsᴉʇǝ ɔønɹsǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Grading policy definition for this class"
 msgstr "Ǥɹɐdᴉnƃ dølᴉɔʎ dǝɟᴉnᴉʇᴉøn ɟøɹ ʇɥᴉs ɔlɐss"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Show Calculator"
 msgstr "Sɥøʍ Ȼɐlɔnlɐʇøɹ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. When true, students can see the calculator in the "
 "course."
@@ -10237,27 +10237,27 @@ msgstr ""
 "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Wɥǝn ʇɹnǝ, sʇndǝnʇs ɔɐn sǝǝ ʇɥǝ ɔɐlɔnlɐʇøɹ ᴉn ʇɥǝ "
 "ɔønɹsǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the name of the course as it should appear in the course list."
 msgstr "Ɇnʇǝɹ ʇɥǝ nɐɯǝ øɟ ʇɥǝ ɔønɹsǝ ɐs ᴉʇ sɥønld ɐddǝɐɹ ᴉn ʇɥǝ ɔønɹsǝ lᴉsʇ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Display Name"
 msgstr "Ȼønɹsǝ Đᴉsdlɐʎ Nɐɯǝ"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Course Editor"
 msgstr "Ȼønɹsǝ Ɇdᴉʇøɹ"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
 msgstr "Ɇnʇǝɹ ʇɥǝ ɯǝʇɥød bʎ ʍɥᴉɔɥ ʇɥᴉs ɔønɹsǝ ᴉs ǝdᴉʇǝd (\"XMŁ\" øɹ \"Sʇndᴉø\")."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Survey URL"
 msgstr "Ȼønɹsǝ Snɹʌǝʎ ɄɌŁ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the URL for the end-of-course survey. If your course does not have a "
 "survey, enter null."
@@ -10265,11 +10265,11 @@ msgstr ""
 "Ɇnʇǝɹ ʇɥǝ ɄɌŁ ɟøɹ ʇɥǝ ǝnd-øɟ-ɔønɹsǝ snɹʌǝʎ. Ɨɟ ʎønɹ ɔønɹsǝ døǝs nøʇ ɥɐʌǝ ɐ "
 "snɹʌǝʎ, ǝnʇǝɹ nnll."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Blackout Dates"
 msgstr "Đᴉsɔnssᴉøn Ƀlɐɔʞønʇ Đɐʇǝs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter pairs of dates between which students cannot post to discussion "
 "forums. Inside the provided brackets, enter an additional set of square "
@@ -10291,11 +10291,11 @@ msgstr ""
 "bɹɐɔʞǝʇs: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
 "\"2015-10-08\"]] "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Topic Mapping"
 msgstr "Đᴉsɔnssᴉøn Ŧødᴉɔ Mɐddᴉnƃ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
@@ -10317,27 +10317,27 @@ msgstr ""
 "\"dǝɟɐnlʇ\" ɐʇʇɹᴉbnʇǝ ʇø ʇɹnǝ. Føɹ ǝxɐɯdlǝ, \"Łʎdᴉɐn Mødǝ\": {\"id\": "
 "\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussions Plugin Settings"
 msgstr "Đᴉsɔnssᴉøns Ᵽlnƃᴉn Sǝʇʇᴉnƃs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Settings for discussions plugins."
 msgstr "Sǝʇʇᴉnƃs ɟøɹ dᴉsɔnssᴉøns dlnƃᴉns."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Announcement Date"
 msgstr "Ȼønɹsǝ Ⱥnnønnɔǝɯǝnʇ Đɐʇǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the date to announce your course."
 msgstr "Ɇnʇǝɹ ʇɥǝ dɐʇǝ ʇø ɐnnønnɔǝ ʎønɹ ɔønɹsǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Cohort Configuration"
 msgstr "Ȼøɥøɹʇ Ȼønɟᴉƃnɹɐʇᴉøn"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter policy keys and values to enable the cohort feature, define automated "
 "student assignment to groups, or identify any course-wide discussion topics "
@@ -10347,11 +10347,11 @@ msgstr ""
 "sʇndǝnʇ ɐssᴉƃnɯǝnʇ ʇø ƃɹønds, øɹ ᴉdǝnʇᴉɟʎ ɐnʎ ɔønɹsǝ-ʍᴉdǝ dᴉsɔnssᴉøn ʇødᴉɔs "
 "ɐs dɹᴉʌɐʇǝ ʇø ɔøɥøɹʇ ɯǝɯbǝɹs."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Is New"
 msgstr "Ȼønɹsǝ Ɨs Nǝʍ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, the course appears in the list of new courses,"
 " and a New! badge temporarily appears next to the course image."
@@ -10359,11 +10359,11 @@ msgstr ""
 "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, ʇɥǝ ɔønɹsǝ ɐddǝɐɹs ᴉn ʇɥǝ lᴉsʇ øɟ nǝʍ ɔønɹsǝs,"
 " ɐnd ɐ Nǝʍ! bɐdƃǝ ʇǝɯdøɹɐɹᴉlʎ ɐddǝɐɹs nǝxʇ ʇø ʇɥǝ ɔønɹsǝ ᴉɯɐƃǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Mobile Course Available"
 msgstr "Møbᴉlǝ Ȼønɹsǝ Ⱥʌɐᴉlɐblǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, the course will be available to mobile "
 "devices."
@@ -10371,11 +10371,11 @@ msgstr ""
 "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, ʇɥǝ ɔønɹsǝ ʍᴉll bǝ ɐʌɐᴉlɐblǝ ʇø ɯøbᴉlǝ "
 "dǝʌᴉɔǝs."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Video Upload Credentials"
 msgstr "Vᴉdǝø Ʉdløɐd Ȼɹǝdǝnʇᴉɐls"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Enter the unique identifier for your course's video files provided by "
@@ -10384,36 +10384,36 @@ msgstr ""
 "Ɇnʇǝɹ ʇɥǝ nnᴉbnǝ ᴉdǝnʇᴉɟᴉǝɹ ɟøɹ ʎønɹ ɔønɹsǝ's ʌᴉdǝø ɟᴉlǝs dɹøʌᴉdǝd bʎ "
 "{platform_name}."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Not Graded"
 msgstr "Ȼønɹsǝ Nøʇ Ǥɹɐdǝd"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter true or false. If true, the course will not be graded."
 msgstr "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, ʇɥǝ ɔønɹsǝ ʍᴉll nøʇ bǝ ƃɹɐdǝd."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Disable Progress Graph"
 msgstr "Đᴉsɐblǝ Ᵽɹøƃɹǝss Ǥɹɐdɥ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter true or false. If true, students cannot view the progress graph."
 msgstr ""
 "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, sʇndǝnʇs ɔɐnnøʇ ʌᴉǝʍ ʇɥǝ dɹøƃɹǝss ƃɹɐdɥ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "PDF Textbooks"
 msgstr "ⱣĐF Ŧǝxʇbøøʞs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "List of dictionaries containing pdf_textbook configuration"
 msgstr "Łᴉsʇ øɟ dᴉɔʇᴉønɐɹᴉǝs ɔønʇɐᴉnᴉnƃ ddɟ_ʇǝxʇbøøʞ ɔønɟᴉƃnɹɐʇᴉøn"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "HTML Textbooks"
 msgstr "ĦŦMŁ Ŧǝxʇbøøʞs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "For HTML textbooks that appear as separate tabs in the course, enter the "
 "name of the tab (usually the title of the book) as well as the URLs and "
@@ -10423,11 +10423,11 @@ msgstr ""
 "nɐɯǝ øɟ ʇɥǝ ʇɐb (nsnɐllʎ ʇɥǝ ʇᴉʇlǝ øɟ ʇɥǝ bøøʞ) ɐs ʍǝll ɐs ʇɥǝ ɄɌŁs ɐnd "
 "ʇᴉʇlǝs øɟ ǝɐɔɥ ɔɥɐdʇǝɹ ᴉn ʇɥǝ bøøʞ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Remote Gradebook"
 msgstr "Ɍǝɯøʇǝ Ǥɹɐdǝbøøʞ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the remote gradebook mapping. Only use this setting when "
 "REMOTE_GRADEBOOK_URL has been specified."
@@ -10440,7 +10440,7 @@ msgstr ""
 #. a role created by a course Instructor to enable a person (the "Coach") to
 #. manage the custom course for
 #. his students.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable CCX"
 msgstr "Ɇnɐblǝ ȻȻX"
 
@@ -10449,7 +10449,7 @@ msgstr "Ɇnɐblǝ ȻȻX"
 #. a role created by a course Instructor to enable a person (the "Coach") to
 #. manage the custom course for
 #. his students.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
@@ -10462,11 +10462,11 @@ msgstr ""
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
 #. course content.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "CCX Connector URL"
 msgstr "ȻȻX Ȼønnǝɔʇøɹ ɄɌŁ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "URL for CCX Connector application for managing creation of CCXs. (optional)."
 " Ignored unless 'Enable CCX' is set to 'true'."
@@ -10474,11 +10474,11 @@ msgstr ""
 "ɄɌŁ ɟøɹ ȻȻX Ȼønnǝɔʇøɹ ɐddlᴉɔɐʇᴉøn ɟøɹ ɯɐnɐƃᴉnƃ ɔɹǝɐʇᴉøn øɟ ȻȻXs. (ødʇᴉønɐl)."
 " Ɨƃnøɹǝd nnlǝss 'Ɇnɐblǝ ȻȻX' ᴉs sǝʇ ʇø 'ʇɹnǝ'."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Anonymous Discussion Posts"
 msgstr "Ⱥlløʍ Ⱥnønʎɯøns Đᴉsɔnssᴉøn Ᵽøsʇs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to all users."
@@ -10486,11 +10486,11 @@ msgstr ""
 "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, sʇndǝnʇs ɔɐn ɔɹǝɐʇǝ dᴉsɔnssᴉøn døsʇs ʇɥɐʇ ɐɹǝ "
 "ɐnønʎɯøns ʇø ɐll nsǝɹs."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Anonymous Discussion Posts to Peers"
 msgstr "Ⱥlløʍ Ⱥnønʎɯøns Đᴉsɔnssᴉøn Ᵽøsʇs ʇø Ᵽǝǝɹs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to other students. This setting does not make posts anonymous to "
@@ -10500,15 +10500,15 @@ msgstr ""
 "ɐnønʎɯøns ʇø øʇɥǝɹ sʇndǝnʇs. Ŧɥᴉs sǝʇʇᴉnƃ døǝs nøʇ ɯɐʞǝ døsʇs ɐnønʎɯøns ʇø "
 "ɔønɹsǝ sʇɐɟɟ."
 
-#: xmodule/course_module.py xmodule/library_root_xblock.py
+#: xmodule/course_block.py xmodule/library_root_xblock.py
 msgid "Advanced Module List"
 msgstr "Ⱥdʌɐnɔǝd Mødnlǝ Łᴉsʇ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the names of the advanced modules to use in your course."
 msgstr "Ɇnʇǝɹ ʇɥǝ nɐɯǝs øɟ ʇɥǝ ɐdʌɐnɔǝd ɯødnlǝs ʇø nsǝ ᴉn ʎønɹ ɔønɹsǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
@@ -10516,11 +10516,11 @@ msgstr ""
 "Ŧɹnǝ ᴉɟ ʇᴉɯǝzønǝs sɥønld bǝ sɥøʍn øn dɐʇǝs ᴉn ʇɥǝ ɔønɹsǝ. Đǝdɹǝɔɐʇǝd ᴉn "
 "ɟɐʌøɹ øɟ dnǝ_dɐʇǝ_dᴉsdlɐʎ_ɟøɹɯɐʇ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Due Date Display Format"
 msgstr "Đnǝ Đɐʇǝ Đᴉsdlɐʎ Føɹɯɐʇ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the format for due dates. The default is Mon DD, YYYY. Enter "
 "\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
@@ -10530,19 +10530,19 @@ msgstr ""
 "\"%ɯ-%d-%Ɏ\" ɟøɹ MM-ĐĐ-ɎɎɎɎ, \"%d-%ɯ-%Ɏ\" ɟøɹ ĐĐ-MM-ɎɎɎɎ, \"%Ɏ-%ɯ-%d\" ɟøɹ "
 "ɎɎɎɎ-MM-ĐĐ, øɹ \"%Ɏ-%d-%ɯ\" ɟøɹ ɎɎɎɎ-ĐĐ-MM."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "External Login Domain"
 msgstr "Ɇxʇǝɹnɐl Łøƃᴉn Đøɯɐᴉn"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the external login method students can use for the course."
 msgstr "Ɇnʇǝɹ ʇɥǝ ǝxʇǝɹnɐl løƃᴉn ɯǝʇɥød sʇndǝnʇs ɔɐn nsǝ ɟøɹ ʇɥǝ ɔønɹsǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificates Downloadable Before End"
 msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝs Đøʍnløɐdɐblǝ Ƀǝɟøɹǝ Ɇnd"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can download certificates before the "
 "course ends, if they've met certificate requirements."
@@ -10550,11 +10550,11 @@ msgstr ""
 "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, sʇndǝnʇs ɔɐn døʍnløɐd ɔǝɹʇᴉɟᴉɔɐʇǝs bǝɟøɹǝ ʇɥǝ "
 "ɔønɹsǝ ǝnds, ᴉɟ ʇɥǝʎ'ʌǝ ɯǝʇ ɔǝɹʇᴉɟᴉɔɐʇǝ ɹǝbnᴉɹǝɯǝnʇs."
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Certificates Display Behavior"
 msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝs Đᴉsdlɐʎ Ƀǝɥɐʌᴉøɹ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "This field, together with certificate_available_date will determine when a "
 "user can see their certificate for the course"
@@ -10562,11 +10562,11 @@ msgstr ""
 "Ŧɥᴉs ɟᴉǝld, ʇøƃǝʇɥǝɹ ʍᴉʇɥ ɔǝɹʇᴉɟᴉɔɐʇǝ_ɐʌɐᴉlɐblǝ_dɐʇǝ ʍᴉll dǝʇǝɹɯᴉnǝ ʍɥǝn ɐ "
 "nsǝɹ ɔɐn sǝǝ ʇɥǝᴉɹ ɔǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ ʇɥǝ ɔønɹsǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course About Page Image"
 msgstr "Ȼønɹsǝ Ⱥbønʇ Ᵽɐƃǝ Ɨɯɐƃǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the course image file. You must upload this file on the "
 "Files & Uploads page. You can also set the course image on the Settings & "
@@ -10576,11 +10576,11 @@ msgstr ""
 "Fᴉlǝs & Ʉdløɐds dɐƃǝ. Ɏøn ɔɐn ɐlsø sǝʇ ʇɥǝ ɔønɹsǝ ᴉɯɐƃǝ øn ʇɥǝ Sǝʇʇᴉnƃs & "
 "Đǝʇɐᴉls dɐƃǝ."
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Course Banner Image"
 msgstr "Ȼønɹsǝ Ƀɐnnǝɹ Ɨɯɐƃǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the banner image file. You can set the banner image on the "
 "Settings & Details page."
@@ -10588,11 +10588,11 @@ msgstr ""
 "Ɇdᴉʇ ʇɥǝ nɐɯǝ øɟ ʇɥǝ bɐnnǝɹ ᴉɯɐƃǝ ɟᴉlǝ. Ɏøn ɔɐn sǝʇ ʇɥǝ bɐnnǝɹ ᴉɯɐƃǝ øn ʇɥǝ "
 "Sǝʇʇᴉnƃs & Đǝʇɐᴉls dɐƃǝ."
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Course Video Thumbnail Image"
 msgstr "Ȼønɹsǝ Vᴉdǝø Ŧɥnɯbnɐᴉl Ɨɯɐƃǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the video thumbnail image file. You can set the video "
 "thumbnail image on the Settings & Details page."
@@ -10600,11 +10600,11 @@ msgstr ""
 "Ɇdᴉʇ ʇɥǝ nɐɯǝ øɟ ʇɥǝ ʌᴉdǝø ʇɥnɯbnɐᴉl ᴉɯɐƃǝ ɟᴉlǝ. Ɏøn ɔɐn sǝʇ ʇɥǝ ʌᴉdǝø "
 "ʇɥnɯbnɐᴉl ᴉɯɐƃǝ øn ʇɥǝ Sǝʇʇᴉnƃs & Đǝʇɐᴉls dɐƃǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Issue Open Badges"
 msgstr "Ɨssnǝ Ødǝn Ƀɐdƃǝs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Issue Open Badges badges for this course. Badges are generated when "
 "certificates are created."
@@ -10612,7 +10612,7 @@ msgstr ""
 "Ɨssnǝ Ødǝn Ƀɐdƃǝs bɐdƃǝs ɟøɹ ʇɥᴉs ɔønɹsǝ. Ƀɐdƃǝs ɐɹǝ ƃǝnǝɹɐʇǝd ʍɥǝn "
 "ɔǝɹʇᴉɟᴉɔɐʇǝs ɐɹǝ ɔɹǝɐʇǝd."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -10622,11 +10622,11 @@ msgstr ""
 "ɯɐɹʞs, ǝnʇǝɹ ʇɥǝ sɥøɹʇ nɐɯǝ øɟ ʇɥǝ ʇʎdǝ øɟ ɔǝɹʇᴉɟᴉɔɐʇǝ ʇɥɐʇ sʇndǝnʇs ɹǝɔǝᴉʌǝ"
 " ʍɥǝn ʇɥǝʎ ɔøɯdlǝʇǝ ʇɥǝ ɔønɹsǝ. Føɹ ᴉnsʇɐnɔǝ, \"Ȼǝɹʇᴉɟᴉɔɐʇǝ\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Name (Short)"
 msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝ Nɐɯǝ (Sɥøɹʇ)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the long name of the type of certificate that students receive "
@@ -10636,27 +10636,27 @@ msgstr ""
 "ɯɐɹʞs, ǝnʇǝɹ ʇɥǝ lønƃ nɐɯǝ øɟ ʇɥǝ ʇʎdǝ øɟ ɔǝɹʇᴉɟᴉɔɐʇǝ ʇɥɐʇ sʇndǝnʇs ɹǝɔǝᴉʌǝ "
 "ʍɥǝn ʇɥǝʎ ɔøɯdlǝʇǝ ʇɥǝ ɔønɹsǝ. Føɹ ᴉnsʇɐnɔǝ, \"Ȼǝɹʇᴉɟᴉɔɐʇǝ øɟ Ⱥɔɥᴉǝʌǝɯǝnʇ\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Name (Long)"
 msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝ Nɐɯǝ (Łønƃ)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Web/HTML View Enabled"
 msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝ Wǝb/ĦŦMŁ Vᴉǝʍ Ɇnɐblǝd"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "If true, certificate Web/HTML views are enabled for the course."
 msgstr "Ɨɟ ʇɹnǝ, ɔǝɹʇᴉɟᴉɔɐʇǝ Wǝb/ĦŦMŁ ʌᴉǝʍs ɐɹǝ ǝnɐblǝd ɟøɹ ʇɥǝ ɔønɹsǝ."
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Web/HTML View Overrides"
 msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝ Wǝb/ĦŦMŁ Vᴉǝʍ Øʌǝɹɹᴉdǝs"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter course-specific overrides for the Web/HTML template parameters here "
 "(JSON format)"
@@ -10666,21 +10666,21 @@ msgstr ""
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Configuration"
 msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝ Ȼønɟᴉƃnɹɐʇᴉøn"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter course-specific configuration information here (JSON format)"
 msgstr "Ɇnʇǝɹ ɔønɹsǝ-sdǝɔᴉɟᴉɔ ɔønɟᴉƃnɹɐʇᴉøn ᴉnɟøɹɯɐʇᴉøn ɥǝɹǝ (ɈSØN ɟøɹɯɐʇ)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "CSS Class for Course Reruns"
 msgstr "ȻSS Ȼlɐss ɟøɹ Ȼønɹsǝ Ɍǝɹnns"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Allows courses to share the same css class across runs even if they have "
 "different numbers."
@@ -10688,28 +10688,28 @@ msgstr ""
 "Ⱥlløʍs ɔønɹsǝs ʇø sɥɐɹǝ ʇɥǝ sɐɯǝ ɔss ɔlɐss ɐɔɹøss ɹnns ǝʌǝn ᴉɟ ʇɥǝʎ ɥɐʌǝ "
 "dᴉɟɟǝɹǝnʇ nnɯbǝɹs."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Forum External Link"
 msgstr "Đᴉsɔnssᴉøn Føɹnɯ Ɇxʇǝɹnɐl Łᴉnʞ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allows specification of an external link to replace discussion forums."
 msgstr ""
 "Ⱥlløʍs sdǝɔᴉɟᴉɔɐʇᴉøn øɟ ɐn ǝxʇǝɹnɐl lᴉnʞ ʇø ɹǝdlɐɔǝ dᴉsɔnssᴉøn ɟøɹnɯs."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Hide Progress Tab"
 msgstr "Ħᴉdǝ Ᵽɹøƃɹǝss Ŧɐb"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allows hiding of the progress tab."
 msgstr "Ⱥlløʍs ɥᴉdᴉnƃ øɟ ʇɥǝ dɹøƃɹǝss ʇɐb."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Organization Display String"
 msgstr "Ȼønɹsǝ Øɹƃɐnᴉzɐʇᴉøn Đᴉsdlɐʎ Sʇɹᴉnƃ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the course organization that you want to appear in the course. This "
 "setting overrides the organization that you entered when you created the "
@@ -10721,11 +10721,11 @@ msgstr ""
 "ɔønɹsǝ. Ŧø nsǝ ʇɥǝ øɹƃɐnᴉzɐʇᴉøn ʇɥɐʇ ʎøn ǝnʇǝɹǝd ʍɥǝn ʎøn ɔɹǝɐʇǝd ʇɥǝ "
 "ɔønɹsǝ, ǝnʇǝɹ nnll."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Number Display String"
 msgstr "Ȼønɹsǝ Nnɯbǝɹ Đᴉsdlɐʎ Sʇɹᴉnƃ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the course number that you want to appear in the course. This setting "
 "overrides the course number that you entered when you created the course. To"
@@ -10737,11 +10737,11 @@ msgstr ""
 " nsǝ ʇɥǝ ɔønɹsǝ nnɯbǝɹ ʇɥɐʇ ʎøn ǝnʇǝɹǝd ʍɥǝn ʎøn ɔɹǝɐʇǝd ʇɥǝ ɔønɹsǝ, ǝnʇǝɹ "
 "nnll."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Maximum Student Enrollment"
 msgstr "Ȼønɹsǝ Mɐxᴉɯnɯ Sʇndǝnʇ Ɇnɹøllɯǝnʇ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the maximum number of students that can enroll in the course. To allow"
 " an unlimited number of students, enter null."
@@ -10749,11 +10749,11 @@ msgstr ""
 "Ɇnʇǝɹ ʇɥǝ ɯɐxᴉɯnɯ nnɯbǝɹ øɟ sʇndǝnʇs ʇɥɐʇ ɔɐn ǝnɹøll ᴉn ʇɥǝ ɔønɹsǝ. Ŧø ɐlløʍ"
 " ɐn nnlᴉɯᴉʇǝd nnɯbǝɹ øɟ sʇndǝnʇs, ǝnʇǝɹ nnll."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Public Wiki Access"
 msgstr "Ⱥlløʍ Ᵽnblᴉɔ Wᴉʞᴉ Ⱥɔɔǝss"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can view the course wiki even if "
 "they're not enrolled in the course."
@@ -10761,27 +10761,27 @@ msgstr ""
 "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, sʇndǝnʇs ɔɐn ʌᴉǝʍ ʇɥǝ ɔønɹsǝ ʍᴉʞᴉ ǝʌǝn ᴉɟ "
 "ʇɥǝʎ'ɹǝ nøʇ ǝnɹøllǝd ᴉn ʇɥǝ ɔønɹsǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Invitation Only"
 msgstr "Ɨnʌᴉʇɐʇᴉøn Ønlʎ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Whether to restrict enrollment to invitation by the course staff."
 msgstr "Wɥǝʇɥǝɹ ʇø ɹǝsʇɹᴉɔʇ ǝnɹøllɯǝnʇ ʇø ᴉnʌᴉʇɐʇᴉøn bʎ ʇɥǝ ɔønɹsǝ sʇɐɟɟ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Course Survey Name"
 msgstr "Ᵽɹǝ-Ȼønɹsǝ Snɹʌǝʎ Nɐɯǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Name of SurveyForm to display as a pre-course survey to the user."
 msgstr "Nɐɯǝ øɟ SnɹʌǝʎFøɹɯ ʇø dᴉsdlɐʎ ɐs ɐ dɹǝ-ɔønɹsǝ snɹʌǝʎ ʇø ʇɥǝ nsǝɹ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Course Survey Required"
 msgstr "Ᵽɹǝ-Ȼønɹsǝ Snɹʌǝʎ Ɍǝbnᴉɹǝd"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify whether students must complete a survey before they can view your "
 "course content. If you set this value to true, you must add a name for the "
@@ -10791,13 +10791,13 @@ msgstr ""
 "ɔønɹsǝ ɔønʇǝnʇ. Ɨɟ ʎøn sǝʇ ʇɥᴉs ʌɐlnǝ ʇø ʇɹnǝ, ʎøn ɯnsʇ ɐdd ɐ nɐɯǝ ɟøɹ ʇɥǝ "
 "snɹʌǝʎ ʇø ʇɥǝ Ȼønɹsǝ Snɹʌǝʎ Nɐɯǝ sǝʇʇᴉnƃ ɐbøʌǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Visibility In Catalog"
 msgstr "Ȼønɹsǝ Vᴉsᴉbᴉlᴉʇʎ Ɨn Ȼɐʇɐløƃ"
 
 #. Translators: the quoted words 'both', 'about', and 'none' must be
 #. left untranslated.  Leave them as English words.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Defines the access permissions for showing the course in the course catalog."
 " This can be set to one of three values: 'both' (show in catalog and allow "
@@ -10809,11 +10809,11 @@ msgstr ""
 "ɐɔɔǝss ʇø ɐbønʇ dɐƃǝ), 'ɐbønʇ' (ønlʎ ɐlløʍ ɐɔɔǝss ʇø ɐbønʇ dɐƃǝ), 'nønǝ' (dø"
 " nøʇ sɥøʍ ᴉn ɔɐʇɐløƃ ɐnd dø nøʇ ɐlløʍ ɐɔɔǝss ʇø ɐn ɐbønʇ dɐƃǝ)."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam Enabled"
 msgstr "Ɇnʇɹɐnɔǝ Ɇxɐɯ Ɇnɐblǝd"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
 " your course content. Note, you must enable Entrance Exams for this course "
@@ -10823,11 +10823,11 @@ msgstr ""
 " ʎønɹ ɔønɹsǝ ɔønʇǝnʇ. Nøʇǝ, ʎøn ɯnsʇ ǝnɐblǝ Ɇnʇɹɐnɔǝ Ɇxɐɯs ɟøɹ ʇɥᴉs ɔønɹsǝ "
 "sǝʇʇᴉnƃ ʇø ʇɐʞǝ ǝɟɟǝɔʇ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam Minimum Score (%)"
 msgstr "Ɇnʇɹɐnɔǝ Ɇxɐɯ Mᴉnᴉɯnɯ Sɔøɹǝ (%)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
 "view your course content. Note, you must enable Entrance Exams for this "
@@ -10837,19 +10837,19 @@ msgstr ""
 "ʌᴉǝʍ ʎønɹ ɔønɹsǝ ɔønʇǝnʇ. Nøʇǝ, ʎøn ɯnsʇ ǝnɐblǝ Ɇnʇɹɐnɔǝ Ɇxɐɯs ɟøɹ ʇɥᴉs "
 "ɔønɹsǝ sǝʇʇᴉnƃ ʇø ʇɐʞǝ ǝɟɟǝɔʇ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam ID"
 msgstr "Ɇnʇɹɐnɔǝ Ɇxɐɯ ƗĐ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Content module identifier (location) of entrance exam."
 msgstr "Ȼønʇǝnʇ ɯødnlǝ ᴉdǝnʇᴉɟᴉǝɹ (løɔɐʇᴉøn) øɟ ǝnʇɹɐnɔǝ ǝxɐɯ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Social Media Sharing URL"
 msgstr "Søɔᴉɐl Mǝdᴉɐ Sɥɐɹᴉnƃ ɄɌŁ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "If dashboard social sharing and custom course URLs are enabled, you can "
 "provide a URL (such as the URL to a course About page) that social media "
@@ -10861,19 +10861,19 @@ msgstr ""
 "sᴉʇǝs ɔɐn lᴉnʞ ʇø. ɄɌŁs ɯnsʇ bǝ ɟnllʎ bnɐlᴉɟᴉǝd. Føɹ ǝxɐɯdlǝ: "
 "ɥʇʇd://ʍʍʍ.ǝdx.øɹƃ/ɔønɹsǝ/Ɨnʇɹødnɔʇᴉøn-ʇø-MØØȻs-ƗŦM001"
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Course Language"
 msgstr "Ȼønɹsǝ Łɐnƃnɐƃǝ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Specify the language of your course."
 msgstr "Sdǝɔᴉɟʎ ʇɥǝ lɐnƃnɐƃǝ øɟ ʎønɹ ɔønɹsǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Teams Configuration"
 msgstr "Ŧǝɐɯs Ȼønɟᴉƃnɹɐʇᴉøn"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Configure team sets, limit team sizes, and set visibility settings using "
 "JSON. See <a target=\"&#95;blank\" "
@@ -10887,11 +10887,11 @@ msgstr ""
 "staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
 "teams\">ʇǝɐɯs ɔønɟᴉƃnɹɐʇᴉøn døɔnɯǝnʇɐʇᴉøn</a> ɟøɹ ɥǝld ɐnd ǝxɐɯdlǝs."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Proctored Exams"
 msgstr "Ɇnɐblǝ Ᵽɹøɔʇøɹǝd Ɇxɐɯs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, proctored exams are enabled in "
 "your course. Note that enabling proctored exams will also enable timed "
@@ -10901,11 +10901,11 @@ msgstr ""
 "ʎønɹ ɔønɹsǝ. Nøʇǝ ʇɥɐʇ ǝnɐblᴉnƃ dɹøɔʇøɹǝd ǝxɐɯs ʍᴉll ɐlsø ǝnɐblǝ ʇᴉɯǝd "
 "ǝxɐɯs."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Proctoring Provider"
 msgstr "Ᵽɹøɔʇøɹᴉnƃ Ᵽɹøʌᴉdǝɹ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Enter the proctoring provider you want to use for this course run. Choose "
@@ -10914,11 +10914,11 @@ msgstr ""
 "Ɇnʇǝɹ ʇɥǝ dɹøɔʇøɹᴉnƃ dɹøʌᴉdǝɹ ʎøn ʍɐnʇ ʇø nsǝ ɟøɹ ʇɥᴉs ɔønɹsǝ ɹnn. Ȼɥøøsǝ "
 "ɟɹøɯ ʇɥǝ ɟølløʍᴉnƃ ødʇᴉøns: {available_providers}."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Proctortrack Exam Escalation Contact"
 msgstr "Ᵽɹøɔʇøɹʇɹɐɔʞ Ɇxɐɯ Ɇsɔɐlɐʇᴉøn Ȼønʇɐɔʇ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Required if 'proctortrack' is selected as your proctoring provider. Enter an"
 " email address to be contacted by the support team whenever there are "
@@ -10928,11 +10928,11 @@ msgstr ""
 " ǝɯɐᴉl ɐddɹǝss ʇø bǝ ɔønʇɐɔʇǝd bʎ ʇɥǝ snddøɹʇ ʇǝɐɯ ʍɥǝnǝʌǝɹ ʇɥǝɹǝ ɐɹǝ "
 "ǝsɔɐlɐʇᴉøns (ǝ.ƃ. ɐddǝɐls, dǝlɐʎǝd ɹǝʌᴉǝʍs, ǝʇɔ.)."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Opting Out of Proctored Exams"
 msgstr "Ⱥlløʍ Ødʇᴉnƃ Ønʇ øɟ Ᵽɹøɔʇøɹǝd Ɇxɐɯs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, learners can choose to take "
 "proctored exams without proctoring. If this value is false, all learners "
@@ -10944,11 +10944,11 @@ msgstr ""
 "ɯnsʇ ʇɐʞǝ ʇɥǝ ǝxɐɯ ʍᴉʇɥ dɹøɔʇøɹᴉnƃ. Ŧɥᴉs sǝʇʇᴉnƃ ønlʎ ɐddlᴉǝs ᴉɟ dɹøɔʇøɹǝd "
 "ǝxɐɯs ɐɹǝ ǝnɐblǝd ɟøɹ ʇɥǝ ɔønɹsǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
 msgstr "Ȼɹǝɐʇǝ Ƶǝndǝsʞ Ŧᴉɔʞǝʇs Føɹ Snsdᴉɔᴉøns Ᵽɹøɔʇøɹǝd Ɇxɐɯ Ⱥʇʇǝɯdʇs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, a Zendesk ticket will be created"
 " for suspicious attempts."
@@ -10956,11 +10956,11 @@ msgstr ""
 "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɥᴉs ʌɐlnǝ ᴉs ʇɹnǝ, ɐ Ƶǝndǝsʞ ʇᴉɔʞǝʇ ʍᴉll bǝ ɔɹǝɐʇǝd"
 " ɟøɹ snsdᴉɔᴉøns ɐʇʇǝɯdʇs."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Timed Exams"
 msgstr "Ɇnɐblǝ Ŧᴉɯǝd Ɇxɐɯs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
 "course. Regardless of this setting, timed exams are enabled if Enable "
@@ -10970,11 +10970,11 @@ msgstr ""
 "ɔønɹsǝ. Ɍǝƃɐɹdlǝss øɟ ʇɥᴉs sǝʇʇᴉnƃ, ʇᴉɯǝd ǝxɐɯs ɐɹǝ ǝnɐblǝd ᴉɟ Ɇnɐblǝ "
 "Ᵽɹøɔʇøɹǝd Ɇxɐɯs ᴉs sǝʇ ʇø ʇɹnǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Minimum Grade for Credit"
 msgstr "Mᴉnᴉɯnɯ Ǥɹɐdǝ ɟøɹ Ȼɹǝdᴉʇ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "The minimum grade that a learner must earn to receive credit in the course, "
 "as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
@@ -10982,11 +10982,11 @@ msgstr ""
 "Ŧɥǝ ɯᴉnᴉɯnɯ ƃɹɐdǝ ʇɥɐʇ ɐ lǝɐɹnǝɹ ɯnsʇ ǝɐɹn ʇø ɹǝɔǝᴉʌǝ ɔɹǝdᴉʇ ᴉn ʇɥǝ ɔønɹsǝ, "
 "ɐs ɐ dǝɔᴉɯɐl bǝʇʍǝǝn 0.0 ɐnd 1.0. Føɹ ǝxɐɯdlǝ, ɟøɹ 75%, ǝnʇǝɹ 0.75."
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr "Sǝlɟ Ᵽɐɔǝd"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
@@ -10996,11 +10996,11 @@ msgstr ""
 "dø nøʇ ɥɐʌǝ dnǝ dɐʇǝs ɟøɹ ɐssᴉƃnɯǝnʇs, ɐnd sʇndǝnʇs ɔɐn dɹøƃɹǝss ʇɥɹønƃɥ ʇɥǝ"
 " ɔønɹsǝ ɐʇ ɐnʎ ɹɐʇǝ bǝɟøɹǝ ʇɥǝ ɔønɹsǝ ǝnds."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Subsection Prerequisites"
 msgstr "Ɇnɐblǝ Snbsǝɔʇᴉøn Ᵽɹǝɹǝbnᴉsᴉʇǝs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
@@ -11008,21 +11008,21 @@ msgstr ""
 "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɥᴉs ʌɐlnǝ ᴉs ʇɹnǝ, ʎøn ɔɐn ɥᴉdǝ ɐ snbsǝɔʇᴉøn nnʇᴉl "
 "lǝɐɹnǝɹs ǝɐɹn ɐ ɯᴉnᴉɯnɯ sɔøɹǝ ᴉn ɐnøʇɥǝɹ, dɹǝɹǝbnᴉsᴉʇǝ snbsǝɔʇᴉøn."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Learning Information"
 msgstr "Ȼønɹsǝ Łǝɐɹnᴉnƃ Ɨnɟøɹɯɐʇᴉøn"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Specify what student can learn from the course."
 msgstr "Sdǝɔᴉɟʎ ʍɥɐʇ sʇndǝnʇ ɔɐn lǝɐɹn ɟɹøɯ ʇɥǝ ɔønɹsǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Visibility For Unenrolled Learners"
 msgstr "Ȼønɹsǝ Vᴉsᴉbᴉlᴉʇʎ Føɹ Ʉnǝnɹøllǝd Łǝɐɹnǝɹs"
 
 #. Translators: the quoted words 'private', 'public_outline', and 'public'
 #. must be left untranslated.  Leave them as English words.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Defines the access permissions for unenrolled learners. This can be set to "
 "one of three values: 'private' (default visibility, only allowed for "
@@ -11034,19 +11034,19 @@ msgstr ""
 "ǝnɹøllǝd sʇndǝnʇs), 'dnblᴉɔ_ønʇlᴉnǝ' (ɐlløʍ ɐɔɔǝss ʇø ɔønɹsǝ ønʇlᴉnǝ) ɐnd "
 "'dnblᴉɔ' (ɐlløʍ ɐɔɔǝss ʇø bøʇɥ ønʇlᴉnǝ ɐnd ɔønɹsǝ ɔønʇǝnʇ)."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Ȼønɹsǝ Ɨnsʇɹnɔʇøɹ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the details for Course Instructor"
 msgstr "Ɇnʇǝɹ ʇɥǝ dǝʇɐᴉls ɟøɹ Ȼønɹsǝ Ɨnsʇɹnɔʇøɹ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Add Unsupported Problems and Tools"
 msgstr "Ⱥdd Ʉnsnddøɹʇǝd Ᵽɹøblǝɯs ɐnd Ŧøøls"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, you can add unsupported problems and tools to "
 "your course in Studio. Unsupported problems and tools are not recommended "
@@ -11060,11 +11060,11 @@ msgstr ""
 "ɹǝbnᴉɹǝɯǝnʇs, snɔɥ ɐs ʇǝsʇᴉnƃ, ɐɔɔǝssᴉbᴉlᴉʇʎ, ᴉnʇǝɹnɐʇᴉønɐlᴉzɐʇᴉøn, ɐnd "
 "døɔnɯǝnʇɐʇᴉøn."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Highlights Enabled for Messaging"
 msgstr "Ħᴉƃɥlᴉƃɥʇs Ɇnɐblǝd ɟøɹ Mǝssɐƃᴉnƃ"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, any highlights associated with content in the "
 "course will be messaged to learners at their scheduled time."
@@ -11072,11 +11072,11 @@ msgstr ""
 "Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, ɐnʎ ɥᴉƃɥlᴉƃɥʇs ɐssøɔᴉɐʇǝd ʍᴉʇɥ ɔønʇǝnʇ ᴉn ʇɥǝ "
 "ɔønɹsǝ ʍᴉll bǝ ɯǝssɐƃǝd ʇø lǝɐɹnǝɹs ɐʇ ʇɥǝᴉɹ sɔɥǝdnlǝd ʇᴉɯǝ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course-wide Custom JS"
 msgstr "Ȼønɹsǝ-ʍᴉdǝ Ȼnsʇøɯ ɈS"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter Javascript resource URLs you want to be loaded globally throughout the"
 " course pages."
@@ -11084,11 +11084,11 @@ msgstr ""
 "Ɇnʇǝɹ Ɉɐʌɐsɔɹᴉdʇ ɹǝsønɹɔǝ ɄɌŁs ʎøn ʍɐnʇ ʇø bǝ løɐdǝd ƃløbɐllʎ ʇɥɹønƃɥønʇ ʇɥǝ"
 " ɔønɹsǝ dɐƃǝs."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course-wide Custom CSS"
 msgstr "Ȼønɹsǝ-ʍᴉdǝ Ȼnsʇøɯ ȻSS"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter CSS resource URLs you want to be loaded globally throughout the course"
 " pages."
@@ -11096,13 +11096,13 @@ msgstr ""
 "Ɇnʇǝɹ ȻSS ɹǝsønɹɔǝ ɄɌŁs ʎøn ʍɐnʇ ʇø bǝ løɐdǝd ƃløbɐllʎ ʇɥɹønƃɥønʇ ʇɥǝ ɔønɹsǝ"
 " dɐƃǝs."
 
-#: xmodule/course_module.py cms/templates/certificates.html
+#: xmodule/course_block.py cms/templates/certificates.html
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 msgid "Other Course Settings"
 msgstr "Øʇɥǝɹ Ȼønɹsǝ Sǝʇʇᴉnƃs"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Any additional information about the course that the platform needs or that "
 "allows integration with external systems such as CRM software. Enter a "
@@ -11114,7 +11114,7 @@ msgstr ""
 "dᴉɔʇᴉønɐɹʎ øɟ ʌɐlnǝs ᴉn ɈSØN ɟøɹɯɐʇ, snɔɥ ɐs { \"my_custom_setting\": "
 "\"value\", \"other_setting\": \"value\" }"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "General"
 msgstr "Ǥǝnǝɹɐl"
 
@@ -11188,7 +11188,7 @@ msgstr "{section_type} Ⱥʌǝɹɐƃǝ = {percent:.0%}"
 msgid "{short_label} Avg"
 msgstr "{short_label} Ⱥʌƃ"
 
-#: xmodule/hidden_module.py
+#: xmodule/hidden_block.py
 #, python-brace-format
 msgid ""
 "ERROR: \"{block_type}\" is an unknown component type. This component will be"
@@ -11197,15 +11197,15 @@ msgstr ""
 "ɆɌɌØɌ: \"{block_type}\" ᴉs ɐn nnʞnøʍn ɔøɯdønǝnʇ ʇʎdǝ. Ŧɥᴉs ɔøɯdønǝnʇ ʍᴉll bǝ"
 " ɥᴉddǝn ᴉn ŁMS."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Html contents to display for this module"
 msgstr "Ħʇɯl ɔønʇǝnʇs ʇø dᴉsdlɐʎ ɟøɹ ʇɥᴉs ɯødnlǝ"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
 msgstr "Sønɹɔǝ ɔødǝ ɟøɹ ŁɐŦǝX døɔnɯǝnʇs. Ŧɥᴉs ɟǝɐʇnɹǝ ᴉs nøʇ ʍǝll-snddøɹʇǝd."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid ""
 "Select Visual to enter content and have the editor automatically create the "
 "HTML. Select Raw to edit HTML directly. If you change this setting, you must"
@@ -11215,23 +11215,23 @@ msgstr ""
 "ĦŦMŁ. Sǝlǝɔʇ Ɍɐʍ ʇø ǝdᴉʇ ĦŦMŁ dᴉɹǝɔʇlʎ. Ɨɟ ʎøn ɔɥɐnƃǝ ʇɥᴉs sǝʇʇᴉnƃ, ʎøn ɯnsʇ"
 " sɐʌǝ ʇɥǝ ɔøɯdønǝnʇ ɐnd ʇɥǝn ɹǝ-ødǝn ᴉʇ ɟøɹ ǝdᴉʇᴉnƃ."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Editor"
 msgstr "Ɇdᴉʇøɹ"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Visual"
 msgstr "Vᴉsnɐl"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Raw"
 msgstr "Ɍɐʍ"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Hide Page From Learners"
 msgstr "Ħᴉdǝ Ᵽɐƃǝ Fɹøɯ Łǝɐɹnǝɹs"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid ""
 "If you select this option, only course team members with the Staff or Admin "
 "role see this page."
@@ -11239,51 +11239,51 @@ msgstr ""
 "Ɨɟ ʎøn sǝlǝɔʇ ʇɥᴉs ødʇᴉøn, ønlʎ ɔønɹsǝ ʇǝɐɯ ɯǝɯbǝɹs ʍᴉʇɥ ʇɥǝ Sʇɐɟɟ øɹ Ⱥdɯᴉn "
 "ɹølǝ sǝǝ ʇɥᴉs dɐƃǝ."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "HTML for the additional pages"
 msgstr "ĦŦMŁ ɟøɹ ʇɥǝ ɐddᴉʇᴉønɐl dɐƃǝs"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "List of course update items"
 msgstr "Łᴉsʇ øɟ ɔønɹsǝ nddɐʇǝ ᴉʇǝɯs"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Any Type"
 msgstr "Ⱥnʎ Ŧʎdǝ"
 
-#: xmodule/library_content_module.py cms/templates/widgets/header.html
+#: xmodule/library_content_block.py cms/templates/widgets/header.html
 msgid "Library"
 msgstr "Łᴉbɹɐɹʎ"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select the library from which you want to draw content."
 msgstr "Sǝlǝɔʇ ʇɥǝ lᴉbɹɐɹʎ ɟɹøɯ ʍɥᴉɔɥ ʎøn ʍɐnʇ ʇø dɹɐʍ ɔønʇǝnʇ."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Library Version"
 msgstr "Łᴉbɹɐɹʎ Vǝɹsᴉøn"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Determines how content is drawn from the library"
 msgstr "Đǝʇǝɹɯᴉnǝs ɥøʍ ɔønʇǝnʇ ᴉs dɹɐʍn ɟɹøɯ ʇɥǝ lᴉbɹɐɹʎ"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Choose n at random"
 msgstr "Ȼɥøøsǝ n ɐʇ ɹɐndøɯ"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Count"
 msgstr "Ȼønnʇ"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Enter the number of components to display to each student."
 msgstr "Ɇnʇǝɹ ʇɥǝ nnɯbǝɹ øɟ ɔøɯdønǝnʇs ʇø dᴉsdlɐʎ ʇø ǝɐɔɥ sʇndǝnʇ."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Problem Type"
 msgstr "Ᵽɹøblǝɯ Ŧʎdǝ"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "Choose a problem type to fetch from the library. If \"Any Type\" is selected"
 " no filtering is applied."
@@ -11291,7 +11291,7 @@ msgstr ""
 "Ȼɥøøsǝ ɐ dɹøblǝɯ ʇʎdǝ ʇø ɟǝʇɔɥ ɟɹøɯ ʇɥǝ lᴉbɹɐɹʎ. Ɨɟ \"Ⱥnʎ Ŧʎdǝ\" ᴉs sǝlǝɔʇǝd"
 " nø ɟᴉlʇǝɹᴉnƃ ᴉs ɐddlᴉǝd."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "Determines whether a 'Reset Problems' button is shown, so users may reset "
 "their answers and reshuffle selected items."
@@ -11299,26 +11299,26 @@ msgstr ""
 "Đǝʇǝɹɯᴉnǝs ʍɥǝʇɥǝɹ ɐ 'Ɍǝsǝʇ Ᵽɹøblǝɯs' bnʇʇøn ᴉs sɥøʍn, sø nsǝɹs ɯɐʎ ɹǝsǝʇ "
 "ʇɥǝᴉɹ ɐnsʍǝɹs ɐnd ɹǝsɥnɟɟlǝ sǝlǝɔʇǝd ᴉʇǝɯs."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "Ŧɥᴉs ɔøɯdønǝnʇ ᴉs ønʇ øɟ dɐʇǝ. Ŧɥǝ lᴉbɹɐɹʎ ɥɐs nǝʍ ɔønʇǝnʇ."
 
 #. Translators: {refresh_icon} placeholder is substituted to "↻" (without
 #. double quotes)
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "{refresh_icon} Update now."
 msgstr "{refresh_icon} Ʉddɐʇǝ nøʍ."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Library is invalid, corrupt, or has been deleted."
 msgstr "Łᴉbɹɐɹʎ ᴉs ᴉnʌɐlᴉd, ɔøɹɹndʇ, øɹ ɥɐs bǝǝn dǝlǝʇǝd."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Edit Library List."
 msgstr "Ɇdᴉʇ Łᴉbɹɐɹʎ Łᴉsʇ."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "This course does not support content libraries. Contact your system "
 "administrator for more information."
@@ -11326,45 +11326,45 @@ msgstr ""
 "Ŧɥᴉs ɔønɹsǝ døǝs nøʇ snddøɹʇ ɔønʇǝnʇ lᴉbɹɐɹᴉǝs. Ȼønʇɐɔʇ ʎønɹ sʎsʇǝɯ "
 "ɐdɯᴉnᴉsʇɹɐʇøɹ ɟøɹ ɯøɹǝ ᴉnɟøɹɯɐʇᴉøn."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "A library has not yet been selected."
 msgstr "Ⱥ lᴉbɹɐɹʎ ɥɐs nøʇ ʎǝʇ bǝǝn sǝlǝɔʇǝd."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select a Library."
 msgstr "Sǝlǝɔʇ ɐ Łᴉbɹɐɹʎ."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "There are no matching problem types in the specified libraries."
 msgstr "Ŧɥǝɹǝ ɐɹǝ nø ɯɐʇɔɥᴉnƃ dɹøblǝɯ ʇʎdǝs ᴉn ʇɥǝ sdǝɔᴉɟᴉǝd lᴉbɹɐɹᴉǝs."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select another problem type."
 msgstr "Sǝlǝɔʇ ɐnøʇɥǝɹ dɹøblǝɯ ʇʎdǝ."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "The specified library is configured to fetch {count} problem, "
 msgid_plural "The specified library is configured to fetch {count} problems, "
 msgstr[0] "Ŧɥǝ sdǝɔᴉɟᴉǝd lᴉbɹɐɹʎ ᴉs ɔønɟᴉƃnɹǝd ʇø ɟǝʇɔɥ {count} dɹøblǝɯ, "
 msgstr[1] "Ŧɥǝ sdǝɔᴉɟᴉǝd lᴉbɹɐɹʎ ᴉs ɔønɟᴉƃnɹǝd ʇø ɟǝʇɔɥ {count} dɹøblǝɯs, "
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "but there is only {actual} matching problem."
 msgid_plural "but there are only {actual} matching problems."
 msgstr[0] "bnʇ ʇɥǝɹǝ ᴉs ønlʎ {actual} ɯɐʇɔɥᴉnƃ dɹøblǝɯ."
 msgstr[1] "bnʇ ʇɥǝɹǝ ɐɹǝ ønlʎ {actual} ɯɐʇɔɥᴉnƃ dɹøblǝɯs."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Edit the library configuration."
 msgstr "Ɇdᴉʇ ʇɥǝ lᴉbɹɐɹʎ ɔønɟᴉƃnɹɐʇᴉøn."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Invalid Library"
 msgstr "Ɨnʌɐlᴉd Łᴉbɹɐɹʎ"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "No Library Selected"
 msgstr "Nø Łᴉbɹɐɹʎ Sǝlǝɔʇǝd"
 
@@ -11405,7 +11405,7 @@ msgstr "Ødǝn Ɇdᴉʇøɹ"
 msgid "Importing Library Block failed - are the IDs valid and readable?"
 msgstr "Ɨɯdøɹʇᴉnƃ Łᴉbɹɐɹʎ Ƀløɔʞ ɟɐᴉlǝd - ɐɹǝ ʇɥǝ ƗĐs ʌɐlᴉd ɐnd ɹǝɐdɐblǝ?"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
 "display name to identify this component."
@@ -11413,11 +11413,11 @@ msgstr ""
 "Ŧɥǝ dᴉsdlɐʎ nɐɯǝ ɟøɹ ʇɥᴉs ɔøɯdønǝnʇ. Ⱥnɐlʎʇᴉɔs ɹǝdøɹʇs ɯɐʎ ɐlsø nsǝ ʇɥǝ "
 "dᴉsdlɐʎ nɐɯǝ ʇø ᴉdǝnʇᴉɟʎ ʇɥᴉs ɔøɯdønǝnʇ."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI ID"
 msgstr "ŁŦƗ ƗĐ"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
@@ -11430,11 +11430,11 @@ msgstr ""
 "Sǝʇʇᴉnƃs dɐƃǝ.{break_tag}Sǝǝ {docs_anchor_open}ʇɥǝ ǝdX ŁŦƗ "
 "døɔnɯǝnʇɐʇᴉøn{anchor_close} ɟøɹ ɯøɹǝ dǝʇɐᴉls øn ʇɥᴉs sǝʇʇᴉnƃ."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI URL"
 msgstr "ŁŦƗ ɄɌŁ"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
@@ -11447,11 +11447,11 @@ msgstr ""
 "{docs_anchor_open}ʇɥǝ ǝdX ŁŦƗ døɔnɯǝnʇɐʇᴉøn{anchor_close} ɟøɹ ɯøɹǝ dǝʇɐᴉls "
 "øn ʇɥᴉs sǝʇʇᴉnƃ."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Custom Parameters"
 msgstr "Ȼnsʇøɯ Ᵽɐɹɐɯǝʇǝɹs"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
@@ -11464,11 +11464,11 @@ msgstr ""
 "ɔøɯdønǝnʇ.{break_tag}Sǝǝ {docs_anchor_open}ʇɥǝ ǝdX ŁŦƗ "
 "døɔnɯǝnʇɐʇᴉøn{anchor_close} ɟøɹ ɯøɹǝ dǝʇɐᴉls øn ʇɥᴉs sǝʇʇᴉnƃ."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Open in New Page"
 msgstr "Ødǝn ᴉn Nǝʍ Ᵽɐƃǝ"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if you want students to click a link that opens the LTI tool in "
 "a new window. Select False if you want the LTI content to open in an IFrame "
@@ -11480,11 +11480,11 @@ msgstr ""
 "ᴉn ʇɥǝ ɔnɹɹǝnʇ dɐƃǝ. Ŧɥᴉs sǝʇʇᴉnƃ ᴉs ønlʎ nsǝd ʍɥǝn Ħᴉdǝ Ɇxʇǝɹnɐl Ŧøøl ᴉs "
 "sǝʇ ʇø Fɐlsǝ.  "
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Scored"
 msgstr "Sɔøɹǝd"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if this component will receive a numerical score from the "
 "external LTI system."
@@ -11492,11 +11492,11 @@ msgstr ""
 "Sǝlǝɔʇ Ŧɹnǝ ᴉɟ ʇɥᴉs ɔøɯdønǝnʇ ʍᴉll ɹǝɔǝᴉʌǝ ɐ nnɯǝɹᴉɔɐl sɔøɹǝ ɟɹøɯ ʇɥǝ "
 "ǝxʇǝɹnɐl ŁŦƗ sʎsʇǝɯ."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Weight"
 msgstr "Wǝᴉƃɥʇ"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter the number of points possible for this component.  The default value "
 "is 1.0.  This setting is only used when Scored is set to True."
@@ -11504,7 +11504,7 @@ msgstr ""
 "Ɇnʇǝɹ ʇɥǝ nnɯbǝɹ øɟ døᴉnʇs døssᴉblǝ ɟøɹ ʇɥᴉs ɔøɯdønǝnʇ.  Ŧɥǝ dǝɟɐnlʇ ʌɐlnǝ "
 "ᴉs 1.0.  Ŧɥᴉs sǝʇʇᴉnƃ ᴉs ønlʎ nsǝd ʍɥǝn Sɔøɹǝd ᴉs sǝʇ ʇø Ŧɹnǝ."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "The score kept in the xblock KVS -- duplicate of the published score in "
 "django DB"
@@ -11512,15 +11512,15 @@ msgstr ""
 "Ŧɥǝ sɔøɹǝ ʞǝdʇ ᴉn ʇɥǝ xbløɔʞ ꝀVS -- dndlᴉɔɐʇǝ øɟ ʇɥǝ dnblᴉsɥǝd sɔøɹǝ ᴉn "
 "dɾɐnƃø ĐɃ"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Comment as returned from grader, LTI2.0 spec"
 msgstr "Ȼøɯɯǝnʇ ɐs ɹǝʇnɹnǝd ɟɹøɯ ƃɹɐdǝɹ, ŁŦƗ2.0 sdǝɔ"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Hide External Tool"
 msgstr "Ħᴉdǝ Ɇxʇǝɹnɐl Ŧøøl"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if you want to use this component as a placeholder for syncing "
 "with an external grading  system rather than launch an external tool.  This "
@@ -11530,31 +11530,31 @@ msgstr ""
 "ʍᴉʇɥ ɐn ǝxʇǝɹnɐl ƃɹɐdᴉnƃ  sʎsʇǝɯ ɹɐʇɥǝɹ ʇɥɐn lɐnnɔɥ ɐn ǝxʇǝɹnɐl ʇøøl.  Ŧɥᴉs "
 "sǝʇʇᴉnƃ ɥᴉdǝs ʇɥǝ Łɐnnɔɥ bnʇʇøn ɐnd ɐnʎ ƗFɹɐɯǝs ɟøɹ ʇɥᴉs ɔøɯdønǝnʇ."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Request user's username"
 msgstr "Ɍǝbnǝsʇ nsǝɹ's nsǝɹnɐɯǝ"
 
 #. Translators: This is used to request the user's username for a third party
 #. service.
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Select True to request the user's username."
 msgstr "Sǝlǝɔʇ Ŧɹnǝ ʇø ɹǝbnǝsʇ ʇɥǝ nsǝɹ's nsǝɹnɐɯǝ."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Request user's email"
 msgstr "Ɍǝbnǝsʇ nsǝɹ's ǝɯɐᴉl"
 
 #. Translators: This is used to request the user's email for a third party
 #. service.
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Select True to request the user's email address."
 msgstr "Sǝlǝɔʇ Ŧɹnǝ ʇø ɹǝbnǝsʇ ʇɥǝ nsǝɹ's ǝɯɐᴉl ɐddɹǝss."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI Application Information"
 msgstr "ŁŦƗ Ⱥddlᴉɔɐʇᴉøn Ɨnɟøɹɯɐʇᴉøn"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter a description of the third party application. If requesting username "
 "and/or email, use this text box to inform users why their username and/or "
@@ -11564,27 +11564,27 @@ msgstr ""
 "ɐnd/øɹ ǝɯɐᴉl, nsǝ ʇɥᴉs ʇǝxʇ bøx ʇø ᴉnɟøɹɯ nsǝɹs ʍɥʎ ʇɥǝᴉɹ nsǝɹnɐɯǝ ɐnd/øɹ "
 "ǝɯɐᴉl ʍᴉll bǝ ɟøɹʍɐɹdǝd ʇø ɐ ʇɥᴉɹd dɐɹʇʎ ɐddlᴉɔɐʇᴉøn."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Button Text"
 msgstr "Ƀnʇʇøn Ŧǝxʇ"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter the text on the button used to launch the third party application."
 msgstr ""
 "Ɇnʇǝɹ ʇɥǝ ʇǝxʇ øn ʇɥǝ bnʇʇøn nsǝd ʇø lɐnnɔɥ ʇɥǝ ʇɥᴉɹd dɐɹʇʎ ɐddlᴉɔɐʇᴉøn."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Accept grades past deadline"
 msgstr "Ⱥɔɔǝdʇ ƃɹɐdǝs dɐsʇ dǝɐdlᴉnǝ"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True to allow third party systems to post grades past the deadline."
 msgstr ""
 "Sǝlǝɔʇ Ŧɹnǝ ʇø ɐlløʍ ʇɥᴉɹd dɐɹʇʎ sʎsʇǝɯs ʇø døsʇ ƃɹɐdǝs dɐsʇ ʇɥǝ dǝɐdlᴉnǝ."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
@@ -11593,7 +11593,7 @@ msgstr ""
 "Ȼønld nøʇ dɐɹsǝ ɔnsʇøɯ dɐɹɐɯǝʇǝɹ: {custom_parameter}. Sɥønld bǝ \"x=ʎ\" "
 "sʇɹᴉnƃ."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
@@ -11602,7 +11602,7 @@ msgstr ""
 "Ȼønld nøʇ dɐɹsǝ ŁŦƗ dɐssdøɹʇ: {lti_passport}. Sɥønld bǝ \"ᴉd:ʞǝʎ:sǝɔɹǝʇ\" "
 "sʇɹᴉnƃ."
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 #: lms/templates/ccx/schedule.html
 msgid "Due Date"
 msgstr "Đnǝ Đɐʇǝ"
@@ -11611,11 +11611,11 @@ msgstr "Đnǝ Đɐʇǝ"
 msgid "Enter the default date by which problems are due."
 msgstr "Ɇnʇǝɹ ʇɥǝ dǝɟɐnlʇ dɐʇǝ bʎ ʍɥᴉɔɥ dɹøblǝɯs ɐɹǝ dnǝ."
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 msgid "Number of Relative Weeks Due By"
 msgstr "Nnɯbǝɹ øɟ Ɍǝlɐʇᴉʌǝ Wǝǝʞs Đnǝ Ƀʎ"
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 msgid ""
 "Enter the number of weeks the problems are due by relative to the learner's "
 "enrollment date"
@@ -11868,35 +11868,35 @@ msgstr "Ɇnɹøllɯǝnʇ Ŧɹɐɔʞ Ǥɹønds"
 msgid "Partition for segmenting users by enrollment track"
 msgstr "Ᵽɐɹʇᴉʇᴉøn ɟøɹ sǝƃɯǝnʇᴉnƃ nsǝɹs bʎ ǝnɹøllɯǝnʇ ʇɹɐɔʞ"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Whether this student has voted on the poll"
 msgstr "Wɥǝʇɥǝɹ ʇɥᴉs sʇndǝnʇ ɥɐs ʌøʇǝd øn ʇɥǝ døll"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Student answer"
 msgstr "Sʇndǝnʇ ɐnsʍǝɹ"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll answers from all students"
 msgstr "Ᵽøll ɐnsʍǝɹs ɟɹøɯ ɐll sʇndǝnʇs"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll answers from xml"
 msgstr "Ᵽøll ɐnsʍǝɹs ɟɹøɯ xɯl"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll question"
 msgstr "Ᵽøll bnǝsʇᴉøn"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Enter the date by which problems are due."
 msgstr "Ɇnʇǝɹ ʇɥǝ dɐʇǝ bʎ ʍɥᴉɔɥ dɹøblǝɯs ɐɹǝ dnǝ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Hide sequence content After Due Date"
 msgstr "Ħᴉdǝ sǝbnǝnɔǝ ɔønʇǝnʇ Ⱥɟʇǝɹ Đnǝ Đɐʇǝ"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "If set, the sequence content is hidden for non-staff users after the due "
 "date has passed."
@@ -11904,11 +11904,11 @@ msgstr ""
 "Ɨɟ sǝʇ, ʇɥǝ sǝbnǝnɔǝ ɔønʇǝnʇ ᴉs ɥᴉddǝn ɟøɹ nøn-sʇɐɟɟ nsǝɹs ɐɟʇǝɹ ʇɥǝ dnǝ "
 "dɐʇǝ ɥɐs dɐssǝd."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Entrance Exam"
 msgstr "Ɨs Ɇnʇɹɐnɔǝ Ɇxɐɯ"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "Tag this course module as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
@@ -11916,11 +11916,11 @@ msgstr ""
 "Ŧɐƃ ʇɥᴉs ɔønɹsǝ ɯødnlǝ ɐs ɐn Ɇnʇɹɐnɔǝ Ɇxɐɯ. Nøʇǝ, ʎøn ɯnsʇ ǝnɐblǝ Ɇnʇɹɐnɔǝ "
 "Ɇxɐɯs ɟøɹ ʇɥᴉs ɔønɹsǝ sǝʇʇᴉnƃ ʇø ʇɐʞǝ ǝɟɟǝɔʇ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Time Limited"
 msgstr "Ɨs Ŧᴉɯǝ Łᴉɯᴉʇǝd"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates whether students have a limited time to view or "
 "interact with this courseware component."
@@ -11928,11 +11928,11 @@ msgstr ""
 "Ŧɥᴉs sǝʇʇᴉnƃ ᴉndᴉɔɐʇǝs ʍɥǝʇɥǝɹ sʇndǝnʇs ɥɐʌǝ ɐ lᴉɯᴉʇǝd ʇᴉɯǝ ʇø ʌᴉǝʍ øɹ "
 "ᴉnʇǝɹɐɔʇ ʍᴉʇɥ ʇɥᴉs ɔønɹsǝʍɐɹǝ ɔøɯdønǝnʇ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Time Limit in Minutes"
 msgstr "Ŧᴉɯǝ Łᴉɯᴉʇ ᴉn Mᴉnnʇǝs"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "The number of minutes available to students for viewing or interacting with "
 "this courseware component."
@@ -11940,19 +11940,19 @@ msgstr ""
 "Ŧɥǝ nnɯbǝɹ øɟ ɯᴉnnʇǝs ɐʌɐᴉlɐblǝ ʇø sʇndǝnʇs ɟøɹ ʌᴉǝʍᴉnƃ øɹ ᴉnʇǝɹɐɔʇᴉnƃ ʍᴉʇɥ "
 "ʇɥᴉs ɔønɹsǝʍɐɹǝ ɔøɯdønǝnʇ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Proctoring Enabled"
 msgstr "Ɨs Ᵽɹøɔʇøɹᴉnƃ Ɇnɐblǝd"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This setting indicates whether this exam is a proctored exam."
 msgstr "Ŧɥᴉs sǝʇʇᴉnƃ ᴉndᴉɔɐʇǝs ʍɥǝʇɥǝɹ ʇɥᴉs ǝxɐɯ ᴉs ɐ dɹøɔʇøɹǝd ǝxɐɯ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Software Secure Review Rules"
 msgstr "Søɟʇʍɐɹǝ Sǝɔnɹǝ Ɍǝʌᴉǝʍ Ɍnlǝs"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates what rules the proctoring team should follow when "
 "viewing the videos."
@@ -11960,11 +11960,11 @@ msgstr ""
 "Ŧɥᴉs sǝʇʇᴉnƃ ᴉndᴉɔɐʇǝs ʍɥɐʇ ɹnlǝs ʇɥǝ dɹøɔʇøɹᴉnƃ ʇǝɐɯ sɥønld ɟølløʍ ʍɥǝn "
 "ʌᴉǝʍᴉnƃ ʇɥǝ ʌᴉdǝøs."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Practice Exam"
 msgstr "Ɨs Ᵽɹɐɔʇᴉɔǝ Ɇxɐɯ"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates whether this exam is for testing purposes only. "
 "Practice exams are not verified."
@@ -11972,15 +11972,15 @@ msgstr ""
 "Ŧɥᴉs sǝʇʇᴉnƃ ᴉndᴉɔɐʇǝs ʍɥǝʇɥǝɹ ʇɥᴉs ǝxɐɯ ᴉs ɟøɹ ʇǝsʇᴉnƃ dnɹdøsǝs ønlʎ. "
 "Ᵽɹɐɔʇᴉɔǝ ǝxɐɯs ɐɹǝ nøʇ ʌǝɹᴉɟᴉǝd."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Onboarding Exam"
 msgstr "Ɨs Ønbøɐɹdᴉnƃ Ɇxɐɯ"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This setting indicates whether this exam is an onboarding exam."
 msgstr "Ŧɥᴉs sǝʇʇᴉnƃ ᴉndᴉɔɐʇǝs ʍɥǝʇɥǝɹ ʇɥᴉs ǝxɐɯ ᴉs ɐn ønbøɐɹdᴉnƃ ǝxɐɯ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This subsection is unlocked for learners when they meet the prerequisite "
 "requirements."
@@ -11988,23 +11988,23 @@ msgstr ""
 "Ŧɥᴉs snbsǝɔʇᴉøn ᴉs nnløɔʞǝd ɟøɹ lǝɐɹnǝɹs ʍɥǝn ʇɥǝʎ ɯǝǝʇ ʇɥǝ dɹǝɹǝbnᴉsᴉʇǝ "
 "ɹǝbnᴉɹǝɯǝnʇs."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This exam is hidden from the learner."
 msgstr "Ŧɥᴉs ǝxɐɯ ᴉs ɥᴉddǝn ɟɹøɯ ʇɥǝ lǝɐɹnǝɹ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "Because the course has ended, this assignment is hidden from the learner."
 msgstr ""
 "Ƀǝɔɐnsǝ ʇɥǝ ɔønɹsǝ ɥɐs ǝndǝd, ʇɥᴉs ɐssᴉƃnɯǝnʇ ᴉs ɥᴉddǝn ɟɹøɯ ʇɥǝ lǝɐɹnǝɹ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "Because the due date has passed, this assignment is hidden from the learner."
 msgstr ""
 "Ƀǝɔɐnsǝ ʇɥǝ dnǝ dɐʇǝ ɥɐs dɐssǝd, ʇɥᴉs ɐssᴉƃnɯǝnʇ ᴉs ɥᴉddǝn ɟɹøɯ ʇɥǝ lǝɐɹnǝɹ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This section is a prerequisite. You must complete this section in order to "
 "unlock additional content."
@@ -12012,30 +12012,30 @@ msgstr ""
 "Ŧɥᴉs sǝɔʇᴉøn ᴉs ɐ dɹǝɹǝbnᴉsᴉʇǝ. Ɏøn ɯnsʇ ɔøɯdlǝʇǝ ʇɥᴉs sǝɔʇᴉøn ᴉn øɹdǝɹ ʇø "
 "nnløɔʞ ɐddᴉʇᴉønɐl ɔønʇǝnʇ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "A list summarizing what students should look forward to in this section."
 msgstr ""
 "Ⱥ lᴉsʇ snɯɯɐɹᴉzᴉnƃ ʍɥɐʇ sʇndǝnʇs sɥønld løøʞ ɟøɹʍɐɹd ʇø ᴉn ʇɥᴉs sǝɔʇᴉøn."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 #, python-brace-format
 msgid "Group ID {group_id}"
 msgstr "Ǥɹønd ƗĐ {group_id}"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Not Selected"
 msgstr "Nøʇ Sǝlǝɔʇǝd"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "The display name for this component. (Not shown to learners)"
 msgstr "Ŧɥǝ dᴉsdlɐʎ nɐɯǝ ɟøɹ ʇɥᴉs ɔøɯdønǝnʇ. (Nøʇ sɥøʍn ʇø lǝɐɹnǝɹs)"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Content Experiment"
 msgstr "Ȼønʇǝnʇ Ɇxdǝɹᴉɯǝnʇ"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The configuration defines how users are grouped for this content experiment."
 " Caution: Changing the group configuration of a student-visible experiment "
@@ -12045,28 +12045,28 @@ msgstr ""
 " Ȼɐnʇᴉøn: Ȼɥɐnƃᴉnƃ ʇɥǝ ƃɹønd ɔønɟᴉƃnɹɐʇᴉøn øɟ ɐ sʇndǝnʇ-ʌᴉsᴉblǝ ǝxdǝɹᴉɯǝnʇ "
 "ʍᴉll ᴉɯdɐɔʇ ʇɥǝ ǝxdǝɹᴉɯǝnʇ dɐʇɐ."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Group Configuration"
 msgstr "Ǥɹønd Ȼønɟᴉƃnɹɐʇᴉøn"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Which child module students in a particular group_id should see"
 msgstr "Wɥᴉɔɥ ɔɥᴉld ɯødnlǝ sʇndǝnʇs ᴉn ɐ dɐɹʇᴉɔnlɐɹ ƃɹønd_ᴉd sɥønld sǝǝ"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 #, python-brace-format
 msgid "{group_name} (inactive)"
 msgstr "{group_name} (ᴉnɐɔʇᴉʌǝ)"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "The experiment is not associated with a group configuration."
 msgstr "Ŧɥǝ ǝxdǝɹᴉɯǝnʇ ᴉs nøʇ ɐssøɔᴉɐʇǝd ʍᴉʇɥ ɐ ƃɹønd ɔønɟᴉƃnɹɐʇᴉøn."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Select a Group Configuration"
 msgstr "Sǝlǝɔʇ ɐ Ǥɹønd Ȼønɟᴉƃnɹɐʇᴉøn"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment uses a deleted group configuration. Select a valid group "
 "configuration or delete this experiment."
@@ -12074,7 +12074,7 @@ msgstr ""
 "Ŧɥǝ ǝxdǝɹᴉɯǝnʇ nsǝs ɐ dǝlǝʇǝd ƃɹønd ɔønɟᴉƃnɹɐʇᴉøn. Sǝlǝɔʇ ɐ ʌɐlᴉd ƃɹønd "
 "ɔønɟᴉƃnɹɐʇᴉøn øɹ dǝlǝʇǝ ʇɥᴉs ǝxdǝɹᴉɯǝnʇ."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment uses a group configuration that is not supported for "
 "experiments. Select a valid group configuration or delete this experiment."
@@ -12082,17 +12082,17 @@ msgstr ""
 "Ŧɥǝ ǝxdǝɹᴉɯǝnʇ nsǝs ɐ ƃɹønd ɔønɟᴉƃnɹɐʇᴉøn ʇɥɐʇ ᴉs nøʇ snddøɹʇǝd ɟøɹ "
 "ǝxdǝɹᴉɯǝnʇs. Sǝlǝɔʇ ɐ ʌɐlᴉd ƃɹønd ɔønɟᴉƃnɹɐʇᴉøn øɹ dǝlǝʇǝ ʇɥᴉs ǝxdǝɹᴉɯǝnʇ."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment does not contain all of the groups in the configuration."
 msgstr ""
 "Ŧɥǝ ǝxdǝɹᴉɯǝnʇ døǝs nøʇ ɔønʇɐᴉn ɐll øɟ ʇɥǝ ƃɹønds ᴉn ʇɥǝ ɔønɟᴉƃnɹɐʇᴉøn."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Add Missing Groups"
 msgstr "Ⱥdd Mᴉssᴉnƃ Ǥɹønds"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment has an inactive group. Move content into active groups, then "
 "delete the inactive group."
@@ -12100,7 +12100,7 @@ msgstr ""
 "Ŧɥǝ ǝxdǝɹᴉɯǝnʇ ɥɐs ɐn ᴉnɐɔʇᴉʌǝ ƃɹønd. Møʌǝ ɔønʇǝnʇ ᴉnʇø ɐɔʇᴉʌǝ ƃɹønds, ʇɥǝn "
 "dǝlǝʇǝ ʇɥǝ ᴉnɐɔʇᴉʌǝ ƃɹønd."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "This content experiment has issues that affect content visibility."
 msgstr "Ŧɥᴉs ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ ɥɐs ᴉssnǝs ʇɥɐʇ ɐɟɟǝɔʇ ɔønʇǝnʇ ʌᴉsᴉbᴉlᴉʇʎ."
 
@@ -12120,7 +12120,7 @@ msgstr "Ɇnɐblǝ ᴉn-ɔønʇǝxʇ dᴉsɔnssᴉøns ɟøɹ ʇɥǝ Ʉnᴉʇ"
 msgid "Add discussion for the Unit."
 msgstr "Ⱥdd dᴉsɔnssᴉøn ɟøɹ ʇɥǝ Ʉnᴉʇ."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
 msgstr "Ȼɐn'ʇ ƃǝʇ ʇɹɐnsɔɹᴉdʇ lᴉnʞ ɟɹøɯ Ɏønʇnbǝ ɟøɹ {youtube_id}."
@@ -12134,11 +12134,11 @@ msgstr ""
 "Ȼɐn'ʇ ɹǝɔǝᴉʌǝ ʇɹɐnsɔɹᴉdʇs ɟɹøɯ Ɏønʇnbǝ ɟøɹ {youtube_id}. Sʇɐʇns ɔødǝ: "
 "{status_code}."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
 msgstr "Wǝ snddøɹʇ ønlʎ SnbɌᴉd (*.sɹʇ) ʇɹɐnsɔɹᴉdʇs ɟøɹɯɐʇ."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
@@ -12147,24 +12147,24 @@ msgstr ""
 "Søɯǝʇɥᴉnƃ ʍɹønƃ ʍᴉʇɥ SnbɌᴉd ʇɹɐnsɔɹᴉdʇs ɟᴉlǝ dnɹᴉnƃ dɐɹsᴉnƃ. Ɨnnǝɹ ɯǝssɐƃǝ "
 "ᴉs {error_message}"
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr "Søɯǝʇɥᴉnƃ ʍɹønƃ ʍᴉʇɥ SnbɌᴉd ʇɹɐnsɔɹᴉdʇs ɟᴉlǝ dnɹᴉnƃ dɐɹsᴉnƃ."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr "{exception_message}: Ȼɐn'ʇ ɟᴉnd ndløɐdǝd ʇɹɐnsɔɹᴉdʇs: {user_filename}"
 
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 msgid "Language is required."
 msgstr "Łɐnƃnɐƃǝ ᴉs ɹǝbnᴉɹǝd."
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr "Ƀɐsᴉɔ"
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 #, python-brace-format
 msgid "There is no transcript file associated with the {lang} language."
 msgid_plural ""
@@ -12173,7 +12173,7 @@ msgstr[0] "Ŧɥǝɹǝ ᴉs nø ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ ɐssøɔᴉɐʇǝd ʍ
 msgstr[1] ""
 "Ŧɥǝɹǝ ɐɹǝ nø ʇɹɐnsɔɹᴉdʇ ɟᴉlǝs ɐssøɔᴉɐʇǝd ʍᴉʇɥ ʇɥǝ {lang} lɐnƃnɐƃǝs."
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
@@ -12181,57 +12181,57 @@ msgstr ""
 "Ŧɥǝ ɄɌŁ ɟøɹ ʎønɹ ʌᴉdǝø. Ŧɥᴉs ɔɐn bǝ ɐ ɎønŦnbǝ ɄɌŁ øɹ ɐ lᴉnʞ ʇø ɐn .ɯd4, "
 ".øƃƃ, øɹ .ʍǝbɯ ʌᴉdǝø ɟᴉlǝ ɥøsʇǝd ǝlsǝʍɥǝɹǝ øn ʇɥǝ Ɨnʇǝɹnǝʇ."
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Default Video URL"
 msgstr "Đǝɟɐnlʇ Vᴉdǝø ɄɌŁ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Component Display Name"
 msgstr "Ȼøɯdønǝnʇ Đᴉsdlɐʎ Nɐɯǝ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Current position in the video."
 msgstr "Ȼnɹɹǝnʇ døsᴉʇᴉøn ᴉn ʇɥǝ ʌᴉdǝø."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Optional, for older browsers: the YouTube ID for the normal speed video."
 msgstr ""
 "Ødʇᴉønɐl, ɟøɹ øldǝɹ bɹøʍsǝɹs: ʇɥǝ ɎønŦnbǝ ƗĐ ɟøɹ ʇɥǝ nøɹɯɐl sdǝǝd ʌᴉdǝø."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID"
 msgstr "ɎønŦnbǝ ƗĐ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Optional, for older browsers: the YouTube ID for the .75x speed video."
 msgstr ""
 "Ødʇᴉønɐl, ɟøɹ øldǝɹ bɹøʍsǝɹs: ʇɥǝ ɎønŦnbǝ ƗĐ ɟøɹ ʇɥǝ .75x sdǝǝd ʌᴉdǝø."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for .75x speed"
 msgstr "ɎønŦnbǝ ƗĐ ɟøɹ .75x sdǝǝd"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Optional, for older browsers: the YouTube ID for the 1.25x speed video."
 msgstr ""
 "Ødʇᴉønɐl, ɟøɹ øldǝɹ bɹøʍsǝɹs: ʇɥǝ ɎønŦnbǝ ƗĐ ɟøɹ ʇɥǝ 1.25x sdǝǝd ʌᴉdǝø."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for 1.25x speed"
 msgstr "ɎønŦnbǝ ƗĐ ɟøɹ 1.25x sdǝǝd"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Optional, for older browsers: the YouTube ID for the 1.5x speed video."
 msgstr ""
 "Ødʇᴉønɐl, ɟøɹ øldǝɹ bɹøʍsǝɹs: ʇɥǝ ɎønŦnbǝ ƗĐ ɟøɹ ʇɥǝ 1.5x sdǝǝd ʌᴉdǝø."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for 1.5x speed"
 msgstr "ɎønŦnbǝ ƗĐ ɟøɹ 1.5x sdǝǝd"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Time you want the video to start if you don't want the entire video to play."
 " Not supported in the native mobile app: the full video file will play. "
@@ -12241,11 +12241,11 @@ msgstr ""
 " Nøʇ snddøɹʇǝd ᴉn ʇɥǝ nɐʇᴉʌǝ ɯøbᴉlǝ ɐdd: ʇɥǝ ɟnll ʌᴉdǝø ɟᴉlǝ ʍᴉll dlɐʎ. "
 "Føɹɯɐʇʇǝd ɐs ĦĦ:MM:SS. Ŧɥǝ ɯɐxᴉɯnɯ ʌɐlnǝ ᴉs 23:59:59."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Start Time"
 msgstr "Vᴉdǝø Sʇɐɹʇ Ŧᴉɯǝ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Time you want the video to stop if you don't want the entire video to play. "
 "Not supported in the native mobile app: the full video file will play. "
@@ -12255,11 +12255,11 @@ msgstr ""
 "Nøʇ snddøɹʇǝd ᴉn ʇɥǝ nɐʇᴉʌǝ ɯøbᴉlǝ ɐdd: ʇɥǝ ɟnll ʌᴉdǝø ɟᴉlǝ ʍᴉll dlɐʎ. "
 "Føɹɯɐʇʇǝd ɐs ĦĦ:MM:SS. Ŧɥǝ ɯɐxᴉɯnɯ ʌɐlnǝ ᴉs 23:59:59."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Stop Time"
 msgstr "Vᴉdǝø Sʇød Ŧᴉɯǝ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Allow students to download versions of this video in different formats if "
 "they cannot use the edX video player or do not have access to YouTube. You "
@@ -12269,11 +12269,11 @@ msgstr ""
 "ʇɥǝʎ ɔɐnnøʇ nsǝ ʇɥǝ ǝdX ʌᴉdǝø dlɐʎǝɹ øɹ dø nøʇ ɥɐʌǝ ɐɔɔǝss ʇø ɎønŦnbǝ. Ɏøn "
 "ɯnsʇ ɐdd ɐʇ lǝɐsʇ ønǝ nøn-ɎønŦnbǝ ɄɌŁ ᴉn ʇɥǝ Vᴉdǝø Fᴉlǝ ɄɌŁs ɟᴉǝld."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Download Allowed"
 msgstr "Vᴉdǝø Đøʍnløɐd Ⱥlløʍǝd"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
@@ -12289,11 +12289,11 @@ msgstr ""
 "ʇɥǝ sʇndǝnʇ's ɔøɯdnʇǝɹ. Ŧø ɐlløʍ sʇndǝnʇs ʇø døʍnløɐd ʇɥǝsǝ ʌᴉdǝøs, sǝʇ "
 "Vᴉdǝø Đøʍnløɐd Ⱥlløʍǝd ʇø Ŧɹnǝ."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video File URLs"
 msgstr "Vᴉdǝø Fᴉlǝ ɄɌŁs"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "By default, students can download an .srt or .txt transcript when you set "
 "Download Transcript Allowed to True. If you want to provide a downloadable "
@@ -12311,11 +12311,11 @@ msgstr ""
 " ʇɥǝ ɄɌŁ ɟøɹ ʇɥǝ ʇɹɐnsɔɹᴉdʇ ɥǝɹǝ. Sʇndǝnʇs sǝǝ ɐ lᴉnʞ ʇø døʍnløɐd ʇɥɐʇ "
 "ʇɹɐnsɔɹᴉdʇ bǝløʍ ʇɥǝ ʌᴉdǝø."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Downloadable Transcript URL"
 msgstr "Đøʍnløɐdɐblǝ Ŧɹɐnsɔɹᴉdʇ ɄɌŁ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Allow students to download the timed transcript. A link to download the file"
 " appears below the video. By default, the transcript is an .srt or .txt "
@@ -12327,11 +12327,11 @@ msgstr ""
 "ɟᴉlǝ. Ɨɟ ʎøn ʍɐnʇ ʇø dɹøʌᴉdǝ ʇɥǝ ʇɹɐnsɔɹᴉdʇ ɟøɹ døʍnløɐd ᴉn ɐ dᴉɟɟǝɹǝnʇ "
 "ɟøɹɯɐʇ, ndløɐd ɐ ɟᴉlǝ bʎ nsᴉnƃ ʇɥǝ Ʉdløɐd Ħɐndønʇ ɟᴉǝld."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Download Transcript Allowed"
 msgstr "Đøʍnløɐd Ŧɹɐnsɔɹᴉdʇ Ⱥlløʍǝd"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "The default transcript for the video, from the Default Timed Transcript "
 "field on the Basic tab. This transcript should be in English. You don't have"
@@ -12341,19 +12341,19 @@ msgstr ""
 "ɟᴉǝld øn ʇɥǝ Ƀɐsᴉɔ ʇɐb. Ŧɥᴉs ʇɹɐnsɔɹᴉdʇ sɥønld bǝ ᴉn Ɇnƃlᴉsɥ. Ɏøn døn'ʇ ɥɐʌǝ"
 " ʇø ɔɥɐnƃǝ ʇɥᴉs sǝʇʇᴉnƃ."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Default Timed Transcript"
 msgstr "Đǝɟɐnlʇ Ŧᴉɯǝd Ŧɹɐnsɔɹᴉdʇ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether the transcripts appear with the video by default."
 msgstr "Sdǝɔᴉɟʎ ʍɥǝʇɥǝɹ ʇɥǝ ʇɹɐnsɔɹᴉdʇs ɐddǝɐɹ ʍᴉʇɥ ʇɥǝ ʌᴉdǝø bʎ dǝɟɐnlʇ."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Show Transcript"
 msgstr "Sɥøʍ Ŧɹɐnsɔɹᴉdʇ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Add transcripts in different languages. Click below to specify a language "
 "and upload an .srt transcript file for that language."
@@ -12361,41 +12361,41 @@ msgstr ""
 "Ⱥdd ʇɹɐnsɔɹᴉdʇs ᴉn dᴉɟɟǝɹǝnʇ lɐnƃnɐƃǝs. Ȼlᴉɔʞ bǝløʍ ʇø sdǝɔᴉɟʎ ɐ lɐnƃnɐƃǝ "
 "ɐnd ndløɐd ɐn .sɹʇ ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ ɟøɹ ʇɥɐʇ lɐnƃnɐƃǝ."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Transcript Languages"
 msgstr "Ŧɹɐnsɔɹᴉdʇ Łɐnƃnɐƃǝs"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Preferred language for transcript."
 msgstr "Ᵽɹǝɟǝɹɹǝd lɐnƃnɐƃǝ ɟøɹ ʇɹɐnsɔɹᴉdʇ."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Preferred language for transcript"
 msgstr "Ᵽɹǝɟǝɹɹǝd lɐnƃnɐƃǝ ɟøɹ ʇɹɐnsɔɹᴉdʇ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Transcript file format to download by user."
 msgstr "Ŧɹɐnsɔɹᴉdʇ ɟᴉlǝ ɟøɹɯɐʇ ʇø døʍnløɐd bʎ nsǝɹ."
 
 #. Translators: This is a type of file used for captioning in the video
 #. player.
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "SubRip (.srt) file"
 msgstr "SnbɌᴉd (.sɹʇ) ɟᴉlǝ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Text (.txt) file"
 msgstr "Ŧǝxʇ (.ʇxʇ) ɟᴉlǝ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "The last speed that the user specified for the video."
 msgstr "Ŧɥǝ lɐsʇ sdǝǝd ʇɥɐʇ ʇɥǝ nsǝɹ sdǝɔᴉɟᴉǝd ɟøɹ ʇɥǝ ʌᴉdǝø."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "The default speed for the video."
 msgstr "Ŧɥǝ dǝɟɐnlʇ sdǝǝd ɟøɹ ʇɥǝ ʌᴉdǝø."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Specify whether to advance automatically to the next unit when the video "
 "ends."
@@ -12403,11 +12403,11 @@ msgstr ""
 "Sdǝɔᴉɟʎ ʍɥǝʇɥǝɹ ʇø ɐdʌɐnɔǝ ɐnʇøɯɐʇᴉɔɐllʎ ʇø ʇɥǝ nǝxʇ nnᴉʇ ʍɥǝn ʇɥǝ ʌᴉdǝø "
 "ǝnds."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether YouTube is available for the user."
 msgstr "Sdǝɔᴉɟʎ ʍɥǝʇɥǝɹ ɎønŦnbǝ ᴉs ɐʌɐᴉlɐblǝ ɟøɹ ʇɥǝ nsǝɹ."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Upload a handout to accompany this video. Students can download the handout "
 "by clicking Download Handout under the video."
@@ -12415,11 +12415,11 @@ msgstr ""
 "Ʉdløɐd ɐ ɥɐndønʇ ʇø ɐɔɔøɯdɐnʎ ʇɥᴉs ʌᴉdǝø. Sʇndǝnʇs ɔɐn døʍnløɐd ʇɥǝ ɥɐndønʇ "
 "bʎ ɔlᴉɔʞᴉnƃ Đøʍnløɐd Ħɐndønʇ nndǝɹ ʇɥǝ ʌᴉdǝø."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Upload Handout"
 msgstr "Ʉdløɐd Ħɐndønʇ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Specify whether access to this video is limited to browsers only, or if it "
 "can be accessed from other applications including mobile apps."
@@ -12427,11 +12427,11 @@ msgstr ""
 "Sdǝɔᴉɟʎ ʍɥǝʇɥǝɹ ɐɔɔǝss ʇø ʇɥᴉs ʌᴉdǝø ᴉs lᴉɯᴉʇǝd ʇø bɹøʍsǝɹs ønlʎ, øɹ ᴉɟ ᴉʇ "
 "ɔɐn bǝ ɐɔɔǝssǝd ɟɹøɯ øʇɥǝɹ ɐddlᴉɔɐʇᴉøns ᴉnɔlndᴉnƃ ɯøbᴉlǝ ɐdds."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Available on Web Only"
 msgstr "Vᴉdǝø Ⱥʌɐᴉlɐblǝ øn Wǝb Ønlʎ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "If you were assigned a Video ID by edX for the video to play in this "
 "component, enter the ID here. In this case, do not enter values in the "
@@ -12445,37 +12445,37 @@ msgstr ""
 "ʍǝɹǝ nøʇ ɐssᴉƃnǝd ɐ Vᴉdǝø ƗĐ, ǝnʇǝɹ ʌɐlnǝs ᴉn ʇɥøsǝ øʇɥǝɹ ɟᴉǝlds ɐnd ᴉƃnøɹǝ "
 "ʇɥᴉs ɟᴉǝld."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Date of the last view of the bumper"
 msgstr "Đɐʇǝ øɟ ʇɥǝ lɐsʇ ʌᴉǝʍ øɟ ʇɥǝ bnɯdǝɹ"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Do not show bumper again"
 msgstr "Đø nøʇ sɥøʍ bnɯdǝɹ ɐƃɐᴉn"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether the video can be accessed publicly by learners."
 msgstr "Sdǝɔᴉɟʎ ʍɥǝʇɥǝɹ ʇɥǝ ʌᴉdǝø ɔɐn bǝ ɐɔɔǝssǝd dnblᴉɔlʎ bʎ lǝɐɹnǝɹs."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Public Access"
 msgstr "Ᵽnblᴉɔ Ⱥɔɔǝss"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Add a specific thumbnail for learners to see before playing the video."
 msgstr ""
 "Ⱥdd ɐ sdǝɔᴉɟᴉɔ ʇɥnɯbnɐᴉl ɟøɹ lǝɐɹnǝɹs ʇø sǝǝ bǝɟøɹǝ dlɐʎᴉnƃ ʇɥǝ ʌᴉdǝø."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Thumbnail"
 msgstr "Ŧɥnɯbnɐᴉl"
 
-#: xmodule/word_cloud_module.py lms/templates/annotatable.html
+#: xmodule/word_cloud_block.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
 msgstr "Ɨnsʇɹnɔʇᴉøns"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid ""
 "Add instructions to help learners understand how to use the word cloud. "
 "Clear instructions are important, especially for learners who have "
@@ -12485,45 +12485,45 @@ msgstr ""
 "Ȼlǝɐɹ ᴉnsʇɹnɔʇᴉøns ɐɹǝ ᴉɯdøɹʇɐnʇ, ǝsdǝɔᴉɐllʎ ɟøɹ lǝɐɹnǝɹs ʍɥø ɥɐʌǝ "
 "ɐɔɔǝssᴉbᴉlᴉʇʎ ɹǝbnᴉɹǝɯǝnʇs."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Inputs"
 msgstr "Ɨndnʇs"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid ""
 "The number of text boxes available for learners to add words and sentences."
 msgstr ""
 "Ŧɥǝ nnɯbǝɹ øɟ ʇǝxʇ bøxǝs ɐʌɐᴉlɐblǝ ɟøɹ lǝɐɹnǝɹs ʇø ɐdd ʍøɹds ɐnd sǝnʇǝnɔǝs."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Maximum Words"
 msgstr "Mɐxᴉɯnɯ Wøɹds"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "The maximum number of words displayed in the generated word cloud."
 msgstr "Ŧɥǝ ɯɐxᴉɯnɯ nnɯbǝɹ øɟ ʍøɹds dᴉsdlɐʎǝd ᴉn ʇɥǝ ƃǝnǝɹɐʇǝd ʍøɹd ɔlønd."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Show Percents"
 msgstr "Sɥøʍ Ᵽǝɹɔǝnʇs"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Statistics are shown for entered words near that word."
 msgstr "Sʇɐʇᴉsʇᴉɔs ɐɹǝ sɥøʍn ɟøɹ ǝnʇǝɹǝd ʍøɹds nǝɐɹ ʇɥɐʇ ʍøɹd."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Whether this learner has posted words to the cloud."
 msgstr "Wɥǝʇɥǝɹ ʇɥᴉs lǝɐɹnǝɹ ɥɐs døsʇǝd ʍøɹds ʇø ʇɥǝ ɔlønd."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Student answer."
 msgstr "Sʇndǝnʇ ɐnsʍǝɹ."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "All possible words from all learners."
 msgstr "Ⱥll døssᴉblǝ ʍøɹds ɟɹøɯ ɐll lǝɐɹnǝɹs."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Top num_top_words words for word cloud."
 msgstr "Ŧød nnɯ_ʇød_ʍøɹds ʍøɹds ɟøɹ ʍøɹd ɔlønd."
 
