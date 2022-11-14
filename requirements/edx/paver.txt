@@ -28,7 +28,7 @@ paver==1.3.4
     # via -r requirements/edx/paver.in
 pbr==5.11.0
     # via stevedore
-psutil==5.9.3
+psutil==5.9.4
     # via -r requirements/edx/paver.in
 pymongo==3.13.0
     # via
@@ -44,7 +44,7 @@ six==1.16.0
     #   libsass
     #   paver
     #   python-memcached
-stevedore==4.1.0
+stevedore==4.1.1
     # via
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
