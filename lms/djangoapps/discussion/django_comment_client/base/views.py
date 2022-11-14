@@ -270,8 +270,11 @@ def track_thread_reported_event(request, course, thread):
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='reported')
     event_data = {
         'body': thread.body[:TRACKING_MAX_FORUM_BODY],
+        'truncated': len(thread.body) > TRACKING_MAX_FORUM_BODY,
         'content_type': 'Post',
         'commentable_id': thread.get('commentable_id', ''),
+        'thread_type': thread.get('thread_type', ''),
+        'group_id': thread.get('group_id', ''),
     }
     if hasattr(thread, 'username'):
         event_data['target_username'] = thread.get('username', '')
@@ -287,6 +290,7 @@ def track_comment_reported_event(request, course, comment):
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='reported')
     event_data = {
         'body': comment.body[:TRACKING_MAX_FORUM_BODY],
+        'truncated': len(comment.body) > TRACKING_MAX_FORUM_BODY,
         'commentable_id': comment.get('commentable_id', ''),
         'content_type': obj_type.capitalize(),
     }
@@ -302,9 +306,13 @@ def track_thread_unreported_event(request, course, thread):
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='unreported')
     event_data = {
         'body': thread.body[:TRACKING_MAX_FORUM_BODY],
+        'truncated': len(thread.body) > TRACKING_MAX_FORUM_BODY,
         'content_type': 'Post',
         'commentable_id': thread.get('commentable_id', ''),
         'reported_status_cleared': not bool(thread.get('abuse_flaggers', [])),
+        'thread_type': thread.get('thread_type', ''),
+        'group_id': thread.get('group_id', ''),
+
     }
     if hasattr(thread, 'username'):
         event_data['target_username'] = thread.get('username', '')
@@ -320,6 +328,7 @@ def track_comment_unreported_event(request, course, comment):
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='unreported')
     event_data = {
         'body': comment.body[:TRACKING_MAX_FORUM_BODY],
+        'truncated': len(comment.body) > TRACKING_MAX_FORUM_BODY,
         'commentable_id': comment.get('commentable_id', ''),
         'content_type': obj_type.capitalize(),
         'reported_status_cleared': not bool(comment.get('abuse_flaggers', [])),
@@ -767,9 +776,10 @@ def flag_abuse_for_thread(request, course_id, thread_id):
     """
     course_key = CourseKey.from_string(course_id)
     user = cc.User.from_django_user(request.user)
+    course = get_course_by_id(course_key)
     thread = cc.Thread.find(thread_id)
     thread.flagAbuse(user, thread)
-
+    track_discussion_reported_event(request, course, thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 
@@ -790,7 +800,7 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
         has_access(request.user, 'staff', course)
     )
     thread.unFlagAbuse(user, thread, remove_all)
-
+    track_discussion_unreported_event(request, course, thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 
@@ -804,8 +814,10 @@ def flag_abuse_for_comment(request, course_id, comment_id):
     """
     course_key = CourseKey.from_string(course_id)
     user = cc.User.from_django_user(request.user)
+    course = get_course_by_id(course_key)
     comment = cc.Comment.find(comment_id)
     comment.flagAbuse(user, comment)
+    track_discussion_unreported_event(request, course, comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
@@ -826,6 +838,7 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     )
     comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user, comment, remove_all)
+    track_discussion_unreported_event(request, course, comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 

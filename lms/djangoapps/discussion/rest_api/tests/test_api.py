@@ -2871,6 +2871,9 @@ class UpdateThreadTest(
                 'target_username': self.user.username,
                 'title_truncated': False,
                 'title': 'Original Title',
+                'thread_type': 'discussion',
+                'group_id': None,
+                'truncated': False,
             }
             if not new_flagged:
                 expected_event_data['reported_status_cleared'] = False
@@ -2919,6 +2922,9 @@ class UpdateThreadTest(
             'title_truncated': False,
             'title': 'Original Title',
             'reported_status_cleared': False,
+            'thread_type': 'discussion',
+            'group_id': None,
+            'truncated': False,
         }
 
         actual_event_name, actual_event_data = mock_emit.call_args[0]
@@ -3433,6 +3439,7 @@ class UpdateCommentTest(
                 'content_type': 'Response',
                 'commentable_id': 'dummy',
                 'url': '',
+                'truncated': False,
                 'user_course_roles': [],
                 'user_forums_roles': [FORUM_ROLE_STUDENT],
                 'target_username': self.user.username,
@@ -3477,6 +3484,7 @@ class UpdateCommentTest(
             'id': 'test_comment',
             'content_type': 'Response',
             'commentable_id': 'dummy',
+            'truncated': False,
             'url': '',
             'user_course_roles': [],
             'user_forums_roles': [FORUM_ROLE_STUDENT, FORUM_ROLE_ADMINISTRATOR],
