@@ -69,3 +69,5 @@ git+https://github.com/openedx/django-require.git@0c54adb167142383b26ea6b3edecc3
 # Third Party XBlocks
 
 git+https://github.com/open-craft/xblock-poll@v1.12.0#egg=xblock-poll==1.12.0
+
+git+https://github.com/openedx/edx-val.git@umar/remove-boto

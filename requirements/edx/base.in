@@ -98,7 +98,6 @@ edx-submissions
 edx-toggles                         # Feature toggles management
 edx-user-state-client
 edx-when
-edxval
 event-tracking
 fs
 fs-s3fs==0.1.8
