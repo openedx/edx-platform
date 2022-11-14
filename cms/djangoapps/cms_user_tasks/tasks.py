@@ -3,7 +3,6 @@ Celery tasks used by cms_user_tasks
 """
 import json
 
-from boto.exception import NoAuthHandlerFound
 from celery import shared_task
 from celery.exceptions import MaxRetriesExceededError
 from celery.utils.log import get_task_logger
@@ -13,6 +12,8 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+from .exceptions import NoAuthHandlerFound
 
 LOGGER = get_task_logger(__name__)
 TASK_COMPLETE_EMAIL_MAX_RETRIES = 3
