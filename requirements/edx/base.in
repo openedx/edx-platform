@@ -29,7 +29,6 @@ analytics-python                    # Used for Segment analytics
 attrs                               # Reduces boilerplate code involving class attributes
 Babel                               # Internationalization utilities, used for date formatting in a few places
 bleach                              # Allowed-list-based HTML sanitizing library that escapes or strips markup and attributes; used for capa and LTI
-boto==2.39.0                        # Deprecated version of the AWS SDK; we should stop using this
 boto3==1.4.8                        # Amazon Web Services SDK for Python
 botocore==1.8.17                    # via boto3, s3transfer
 bridgekeeper                        # Used for determining permissions for courseware.
