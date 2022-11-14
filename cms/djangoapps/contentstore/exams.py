@@ -2,7 +2,6 @@
 Code related to working with the exam service
 """
 
-import json
 import logging
 
 import requests
@@ -76,7 +75,7 @@ def register_exams(course_key):
             'content_id': str(timed_exam.location),
             'exam_name': timed_exam.display_name,
             'time_limit_mins': timed_exam.default_time_limit_minutes,
-            'due_date': timed_exam.due if not course.self_paced else None,
+            'due_date': timed_exam.due.isoformat() if timed_exam.due and not course.self_paced else None,
             'exam_type': exam_type,
             'is_active': True,
             'hide_after_due': timed_exam.hide_after_due,
@@ -130,7 +129,7 @@ def _patch_course_exams(exams_list, course_id):
     url = f'{settings.EXAMS_SERVICE_URL}/exams/course_id/{course_id}/'
     api_client = _get_exams_api_client()
 
-    response = api_client.patch(url, data=json.dumps(exams_list))
+    response = api_client.patch(url, json=exams_list)
     response.raise_for_status()
     response = response.json()
     return response
