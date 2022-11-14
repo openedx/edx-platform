@@ -8,7 +8,6 @@ from unittest.mock import patch
 from uuid import uuid4
 
 import ddt
-from boto.exception import NoAuthHandlerFound
 from django.conf import settings
 from django.core import mail
 from django.test import override_settings
@@ -21,6 +20,7 @@ from user_tasks.serializers import ArtifactSerializer, StatusSerializer
 from cms.djangoapps.contentstore.toggles import BYPASS_OLX_FAILURE
 from common.djangoapps.student.tests.factories import UserFactory
 
+from .exceptions import NoAuthHandlerFound
 from .signals import user_task_stopped
 
 
