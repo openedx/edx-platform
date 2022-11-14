@@ -14,6 +14,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
+from edx_rest_framework_extensions.permissions import NotJwtRestrictedApplication
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -438,7 +439,7 @@ class InitializeView(APIView):  # pylint: disable=unused-argument
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, NotJwtRestrictedApplication)
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Get masquerade user and proxy to init request"""
@@ -564,7 +565,7 @@ class CourseRecommendationApiView(APIView):
         JwtAuthentication,
         SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, NotJwtRestrictedApplication)
 
     def get(self, request):
         """
