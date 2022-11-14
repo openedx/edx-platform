@@ -8,6 +8,7 @@ import logging
 from celery import shared_task
 from django.db import transaction
 from edx_django_utils.monitoring import set_code_owner_attribute
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.django import modulestore
@@ -158,7 +159,14 @@ def update_xblocks_cache(course_id):
     if not isinstance(course_id, str):
         raise ValueError(f'course_id must be a string. {type(course_id)} is not acceptable.')
 
-    course_key = CourseKey.from_string(course_id)
+    if course_id:
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError as e:
+            message = 'Invalid course_id: {0}.'.format(course_id)
+            log.error(message)
+            raise Exception(message) from e
+
     log.info('Starting XBlockCaches update for course_key: %s', course_id)
     _update_xblocks_cache(course_key)
     log.info('Ending XBlockCaches update for course_key: %s', course_id)
