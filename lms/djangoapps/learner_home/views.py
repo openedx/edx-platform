@@ -17,7 +17,6 @@ from edx_rest_framework_extensions.auth.session.authentication import (
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -63,6 +62,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.catalog.utils import get_course_data
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import (
     get_user_course_expiration_date,
 )
@@ -430,8 +430,15 @@ def serialize_learner_home_data(data, context):
     return LearnerDashboardSerializer(data, context=context).data
 
 
-class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
+class InitializeView(APIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Get masquerade user and proxy to init request"""
