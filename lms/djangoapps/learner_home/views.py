@@ -1,13 +1,13 @@
 """
 Views for the learner dashboard.
 """
-from collections import OrderedDict
 import logging
+from collections import OrderedDict
 
-from django.conf import settings
-from django.urls import reverse
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
+from django.conf import settings
+from django.urls import reverse
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.monitoring import function_trace
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -45,24 +45,22 @@ from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
-from lms.djangoapps.courseware.access_utils import (
-    check_course_open_for_learner,
-)
+from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.learner_home.serializers import (
     CourseRecommendationSerializer,
     LearnerDashboardSerializer,
-)
-from lms.djangoapps.learner_home.waffle import (
-    should_show_learner_home_amplitude_recommendations,
 )
 from lms.djangoapps.learner_home.utils import (
     get_masquerade_user,
     get_personalized_course_recommendations,
 )
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from lms.djangoapps.learner_home.waffle import (
+    should_show_learner_home_amplitude_recommendations,
+)
 from openedx.core.djangoapps.catalog.utils import get_course_data
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import (
     get_user_course_expiration_date,
