@@ -524,11 +524,11 @@ def update_thread(request, course_id, thread_id):
     user = request.user
     # The following checks should avoid issues we've seen during deploys, where end users are hitting an updated server
     # while their browser still has the old client code. This will avoid erasing present values in those cases.
+    course = get_course_with_access(user, 'load', course_key)
     if "thread_type" in request.POST:
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
         commentable_id = request.POST["commentable_id"]
-        course = get_course_with_access(user, 'load', course_key)
         if thread_context == "course" and not discussion_category_id_access(course, user, commentable_id):
             return JsonError(_("Topic doesn't exist"))
         else:
@@ -538,6 +538,7 @@ def update_thread(request, course_id, thread_id):
 
     thread_edited.send(sender=None, user=user, post=thread)
 
+    track_thread_edited_event(request, course, thread, None)
     if request.is_ajax():
         return ajax_content_response(request, course_key, thread.to_dict())
     else:
@@ -616,9 +617,12 @@ def delete_thread(request, course_id, thread_id):
     this is ajax only
     """
     course_key = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     thread = cc.Thread.find(thread_id)
     thread.delete()
     thread_deleted.send(sender=None, user=request.user, post=thread)
+
+    track_thread_deleted_event(request, course, thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 
@@ -631,6 +635,7 @@ def update_comment(request, course_id, comment_id):
     handles static and ajax submissions
     """
     course_key = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     comment = cc.Comment.find(comment_id)
     if 'body' not in request.POST or not request.POST['body'].strip():
         return JsonError(_("Body can't be empty"))
@@ -639,6 +644,7 @@ def update_comment(request, course_id, comment_id):
 
     comment_edited.send(sender=None, user=request.user, post=comment)
 
+    track_comment_edited_event(request, course, comment, None)
     if request.is_ajax():
         return ajax_content_response(request, course_key, comment.to_dict())
     else:
@@ -672,10 +678,13 @@ def openclose_thread(request, course_id, thread_id):
     ajax only
     """
     course_key = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     thread = cc.Thread.find(thread_id)
-    thread.closed = request.POST.get('closed', 'false').lower() == 'true'
+    close_thread = request.POST.get('closed', 'false').lower() == 'true'
+    thread.closed = close_thread
     thread.save()
 
+    track_thread_lock_unlock_event(request, course, thread, None, close_thread)
     return JsonResponse({
         'content': prepare_content(thread.to_dict(), course_key),
         'ability': get_ability(course_key, thread.to_dict(), request.user),
@@ -704,9 +713,11 @@ def delete_comment(request, course_id, comment_id):
     ajax only
     """
     course_key = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     comment = cc.Comment.find(comment_id)
     comment.delete()
     comment_deleted.send(sender=None, user=request.user, post=comment)
+    track_comment_deleted_event(request, course, comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
@@ -828,7 +839,7 @@ def flag_abuse_for_comment(request, course_id, comment_id):
     course = get_course_by_id(course_key)
     comment = cc.Comment.find(comment_id)
     comment.flagAbuse(user, comment)
-    track_discussion_unreported_event(request, course, comment)
+    track_discussion_reported_event(request, course, comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
