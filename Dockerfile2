@@ -11,6 +11,7 @@ FROM ubuntu:focal as minimal-system
 # * Be a suitable base for production LMS and CMS images (THIS IS NOT YET THE CASE!).
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG DEVELOPMENT=false
 ARG SERVICE_VARIANT
 ARG SERVICE_PORT
 
@@ -72,13 +73,13 @@ RUN apt-get update && \
     apt-get clean all && \
     rm -rf /var/lib/apt/*
 
-RUN mkdir -p /edx/var/edxapp
+RUN mkdir -p /var/edx/edxapp
 RUN mkdir -p /edx/etc
-RUN chown app:app /edx/var/edxapp
+RUN chown app:app /var/edx/edxapp
 
 USER app
 
-FROM minimal-system as builder-production
+FROM minimal-system as builder
 
 USER root
 
@@ -118,18 +119,19 @@ RUN pip install -r requirements/edx/base.txt
 RUN nodeenv /edx/app/edxapp/nodeenv --node=16.14.0 --prebuilt
 RUN npm install -g npm@8.5.x
 RUN npm set progress=false && npm install
+# Install python development requirements if DEVELOPMENT ARG is set to true.
+# By using a Docker argument to install development requirements, we avoid
+# repeating the 1st COPY statement from base stage to a potential new stage
+# which also adds ~ 60 seconds to the image build time.
+RUN if $DEVELOPMENT ; then pip install -r requirements/edx/development.txt ; fi
 
 RUN pip install -e .
 
-FROM builder-production as builder-development
-
-RUN pip install -r requirements/edx/development.txt
-
 FROM minimal-system as base
 
-COPY --from=builder-production /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
-COPY --from=builder-production /edx/app/edxapp/nodeenv /edx/app/edxapp/nodeenv
-COPY --from=builder-production /edx/app/edxapp/edx-platform/node_modules /edx/app/edxapp/edx-platform/node_modules
+COPY --from=builder /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
+COPY --from=builder /edx/app/edxapp/nodeenv /edx/app/edxapp/nodeenv
+COPY --from=builder /edx/app/edxapp/edx-platform/node_modules /edx/app/edxapp/edx-platform/node_modules
 
 FROM base as production
 ENV EDX_PLATFORM_SETTINGS='docker-production'
@@ -146,8 +148,6 @@ CMD gunicorn \
     - ${SERVICE_VARIANT}.wsgi:application
 
 FROM base as development
-
-COPY --from=builder-development /edx/app/edxapp/venvs/edxapp /edx/app/edxapp/venvs/edxapp
 
 USER root
 
