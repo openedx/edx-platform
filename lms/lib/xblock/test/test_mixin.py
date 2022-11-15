@@ -14,7 +14,7 @@ from lms.djangoapps.lms_xblock.mixin import (
     NONSENSICAL_ACCESS_RESTRICTION
 )
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -296,17 +296,15 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
         assert self.open_assessment.has_score
 
 
-@ddt.ddt
 class XBlockGetParentTest(LmsXBlockMixinTestCase):
     """
     Test that XBlock.get_parent returns correct results with each modulestore
     backend.
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_parents(self, modulestore_type):
-        with self.store.default_store(modulestore_type):
+    def test_parents(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
 
             # setting up our own local course tree here, since it needs to be
             # created with the correct modulestore type.
@@ -330,10 +328,9 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
             visited = recurse(course)
             assert len(visited) == 28
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_parents_draft_content(self, modulestore_type):
+    def test_parents_draft_content(self):
         # move the video to the new vertical
-        with self.store.default_store(modulestore_type):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             self.build_course()
             subsection = self.store.get_item(self.subsection_location)
             new_vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='New Test Unit')

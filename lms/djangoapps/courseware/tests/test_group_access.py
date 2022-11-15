@@ -7,7 +7,7 @@ access control rules.
 import ddt
 from stevedore.extension import Extension, ExtensionManager
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import USER_PARTITION_SCHEME_NAMESPACE, Group, UserPartition
 
@@ -57,7 +57,7 @@ class GroupAccessTestCase(ModuleStoreTestCase):
     Tests to ensure that has_access() correctly enforces the visibility
     restrictions specified in the `group_access` field of XBlocks.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def set_user_group(self, user, partition, group):
         """

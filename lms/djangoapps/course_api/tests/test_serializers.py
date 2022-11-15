@@ -155,7 +155,7 @@ class TestCourseDetailSerializer(TestCourseSerializer):  # lint-amnesty, pylint:
 
     """
     # 1 mongo call is made to get the course About overview text.
-    expected_mongo_calls = 1
+    expected_mongo_calls = 2
     serializer_class = CourseDetailSerializer
 
     def setUp(self):

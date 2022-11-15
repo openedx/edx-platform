@@ -16,12 +16,22 @@ from openedx.core.djangoapps.theming.helpers import (
     get_themes,
     strip_site_theme_templates_path
 )
+from openedx.core.djangoapps.theming.helpers_dirs import get_theme_dirs
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 
 
 class TestHelpers(TestCase):
     """Test comprehensive theming helper functions."""
+
+    def setUp(self):
+        """
+        Clear cache on get_theme methods.
+        """
+        super().setUp()
+
+        get_themes.cache_clear()
+        get_theme_dirs.cache_clear()
 
     def test_get_themes(self):
         """

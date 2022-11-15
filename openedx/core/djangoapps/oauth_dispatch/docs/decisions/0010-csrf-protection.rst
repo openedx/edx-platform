@@ -23,7 +23,7 @@ Each backend service uses a unique SECRET_KEY to produce the CSRF token, so a CS
 be valid for another service. Therefore, frontend apps served by different subdomains will not have access to these CSRF
 token cookies.
 
-.. _Transport JWT in HTTP Cookies: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0009-jwt-in-session-cookie.rst
+.. _Transport JWT in HTTP Cookies: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0009-jwt-in-session-cookie.rst
 .. _Django CSRF Protection: https://docs.djangoproject.com/en/2.1/ref/csrf/
 
 Decisions
@@ -43,8 +43,8 @@ Decisions
    Endpoint described above to obtain a valid CSRF token for the given backend service for which a request is
    being made.
 
-.. _edx-drf-extensions: https://github.com/edx/edx-drf-extensions
-.. _@edx/frontend-auth: https://github.com/edx/frontend-auth
+.. _edx-drf-extensions: https://github.com/openedx/edx-drf-extensions
+.. _@edx/frontend-auth: https://github.com/openedx/frontend-auth
 
 Rejected Alternatives
 ---------------------

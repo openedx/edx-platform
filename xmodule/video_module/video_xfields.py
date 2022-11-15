@@ -212,3 +212,11 @@ class VideoFields:
         scope=Scope.settings,
         default=False
     )
+    # thumbnail is need as a field for the new video editor. The field is hidden in
+    # the legacy modal.
+    thumbnail = String(
+        help=_("Add a specific thumbnail for learners to see before playing the video."),
+        display_name=_("Thumbnail"),
+        scope=Scope.settings,
+        default="",
+    )

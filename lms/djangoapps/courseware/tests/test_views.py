@@ -12,7 +12,6 @@ from urllib.parse import quote, urlencode
 from uuid import uuid4
 
 import ddt
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
 from django.conf import settings
@@ -23,7 +22,8 @@ from django.test import RequestFactory, TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
-from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from edx_django_utils.cache.utils import RequestCache
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
@@ -31,6 +31,7 @@ from rest_framework import status
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
+from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
@@ -75,7 +76,6 @@ from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expirat
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -144,7 +144,6 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url.split('?')[0] == expected_url
 
     @ddt.data(
-        (False, ModuleStoreEnum.Type.mongo),
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -168,9 +167,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url == expected_redirect_url
 
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_sequence(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_sequence(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -196,9 +194,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url == expected_redirect_url
 
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_module(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_module(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -252,9 +249,8 @@ class TestJumpTo(ModuleStoreTestCase):
     # The new courseware experience does not support this sort of course structure;
     # it assumes a simple course->chapter->sequence->unit->component tree.
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_nested_module(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_nested_module(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -276,7 +272,6 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
     @ddt.data(
-        (False, ModuleStoreEnum.Type.mongo),
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -291,8 +286,6 @@ class TestJumpTo(ModuleStoreTestCase):
 
     @set_preview_mode(True)
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, False, '1'),
-        (ModuleStoreEnum.Type.mongo, True, '2'),
         (ModuleStoreEnum.Type.split, False, '1'),
         (ModuleStoreEnum.Type.split, True, '2'),
     )
@@ -764,6 +757,15 @@ class ViewsTestCase(BaseViewsTestCase):
 
         set_score(admin.id, usage_key, 0, 3)
 
+        # Typically an http request has its own thread and RequestCache which is used to ensure that only
+        # one StudentModuleHistory record is created per request. However, since tests are run locally
+        # the score updates share the same thread. If the RequestCache is not cleared in between the two
+        # activities, then there will only be one StudentModuleHistory record that reflects the final state
+        # rather than one per action. Clearing the cache here allows the second action below to generate
+        # its own history record. The assertions below are then able to check that both states are recorded
+        # in the history.
+        RequestCache('studentmodulehistory').clear()
+
         state_client.set(
             username=admin.username,
             block_key=usage_key,
@@ -779,17 +781,17 @@ class ViewsTestCase(BaseViewsTestCase):
         response = self.client.get(url)
         response_content = html.unescape(response.content.decode('utf-8'))
 
-        # We have update the state 4 times: twice to change content, and twice
-        # to set the scores. We'll check that the identifying content from each is
+        # We have update the state 2 times. We'll check that the identifying content from each is
         # displayed (but not the order), and also the indexes assigned in the output
-        # #1 - #4
+        # #1 - #2
 
         assert '#1' in response_content
         assert json.dumps({'field_a': 'a', 'field_b': 'b'}, sort_keys=True, indent=2) in response_content
         assert 'Score: 0.0 / 3.0' in response_content
         assert json.dumps({'field_a': 'x', 'field_b': 'y'}, sort_keys=True, indent=2) in response_content
         assert 'Score: 3.0 / 3.0' in response_content
-        assert '#4' in response_content
+        assert '#2' in response_content
+        assert '#3' not in response_content
 
     @ddt.data(('America/New_York', -5),  # UTC - 5
               ('Asia/Pyongyang', 9),  # UTC + 9
@@ -1333,15 +1335,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Assert that valid 'student_id' returns 200 status
         self._get_student_progress_page()
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_unenrolled_student_progress_for_credit_course(self, default_store):
+    def test_unenrolled_student_progress_for_credit_course(self):
         """
          Test that student progress page does not break while checking for an unenrolled student.
          Scenario: When instructor checks the progress of a student who is not enrolled in credit course.
          It should return 200 response.
         """
         # Create a new course, a user which will not be enrolled in course, admin user for staff access
-        course = CourseFactory.create(default_store=default_store)
+        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         admin = AdminFactory.create()
         assert self.client.login(username=admin.username, password='test')
 
@@ -1490,27 +1491,19 @@ class ProgressPageTests(ProgressPageBaseTests):
         with self.assertNumQueries(query_count, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST), check_mongo_calls(2):
             self._get_progress_page()
 
-    @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
-    @ddt.data(
-        (False, 60, 42),
-        (True, 52, 36)
-    )
-    @ddt.unpack
-    def test_progress_queries(self, enable_waffle, initial, subsequent):
+    def test_progress_queries(self):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
-        with override_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
+        with self.assertNumQueries(
+            52, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+        ), check_mongo_calls(2):
+            self._get_progress_page()
+
+        for _ in range(2):
             with self.assertNumQueries(
-                initial, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+                36, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
             ), check_mongo_calls(2):
                 self._get_progress_page()
-
-            # subsequent accesses to the progress page require fewer queries.
-            for _ in range(2):
-                with self.assertNumQueries(
-                    subsequent, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
-                ), check_mongo_calls(2):
-                    self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ENABLE_CERTIFICATES_IDV_REQUIREMENT': True})
     @ddt.data(
@@ -2207,7 +2200,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     def test_user_with_passing_grade(self, mock_is_course_passed):  # lint-amnesty, pylint: disable=unused-argument
         # If user has above passing grading then json will return cert generating message and
         # status valid code
-        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
+        with patch('xmodule.capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
             mock_send_to_queue.return_value = (0, "Successfully queued")
 
             resp = self.client.post(self.url)

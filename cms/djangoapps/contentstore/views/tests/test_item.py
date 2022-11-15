@@ -8,6 +8,7 @@ from unittest.mock import Mock, PropertyMock, patch
 
 import ddt
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -166,35 +167,6 @@ class GetItemTest(ItemTest):
         if content_contains:
             self.assertContains(resp, content_contains, status_code=expected_code)
         return resp
-
-    @ddt.data(
-        (1, 17, 15, 16, 12),
-        (2, 17, 15, 16, 12),
-        (3, 17, 15, 16, 12),
-    )
-    @ddt.unpack
-    def test_get_query_count(self, branching_factor, chapter_queries, section_queries, unit_queries, problem_queries):
-        self.populate_course(branching_factor)
-        # Retrieve it
-        with check_mongo_calls(chapter_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['chapter'][-1]))
-        with check_mongo_calls(section_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['sequential'][-1]))
-        with check_mongo_calls(unit_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['vertical'][-1]))
-        with check_mongo_calls(problem_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
-
-    @ddt.data(
-        (1, 30),
-        (2, 32),
-        (3, 34),
-    )
-    @ddt.unpack
-    def test_container_get_query_count(self, branching_factor, unit_queries,):
-        self.populate_course(branching_factor)
-        with check_mongo_calls(unit_queries):
-            self.client.get(reverse_usage_url('xblock_container_handler', self.populated_usage_keys['vertical'][-1]))
 
     def test_get_vertical(self):
         # Add a vertical
@@ -2171,6 +2143,15 @@ class TestComponentHandler(TestCase):
         with self.assertRaises(Http404):
             component_handler(self.request, self.usage_key_string, 'invalid_handler')
 
+    def test_submit_studio_edits_checks_author_permission(self):
+        with self.assertRaises(PermissionDenied):
+            with patch(
+                'common.djangoapps.student.auth.has_course_author_access',
+                return_value=False
+            ) as mocked_has_course_author_access:
+                component_handler(self.request, self.usage_key_string, 'submit_studio_edits')
+                assert mocked_has_course_author_access.called is True
+
     @ddt.data('GET', 'POST', 'PUT', 'DELETE')
     def test_request_method(self, method):
 
@@ -2253,6 +2234,9 @@ class TestComponentTemplates(CourseTestCase):
         XBlockStudioConfiguration.objects.create(name='video', enabled=True, support_level="us")
         # ORA Block has it's own category.
         XBlockStudioConfiguration.objects.create(name='openassessment', enabled=True, support_level="us")
+        # Library Sourced Block and Library Content block has it's own category.
+        XBlockStudioConfiguration.objects.create(name='library_sourced', enabled=True, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='library_content', enabled=True, support_level="fs")
         # XBlock masquerading as a problem
         XBlockStudioConfiguration.objects.create(name='drag-and-drop-v2', enabled=True, support_level="fs")
         XBlockStudioConfiguration.objects.create(name='staffgradedxblock', enabled=True, support_level="us")
@@ -2291,10 +2275,11 @@ class TestComponentTemplates(CourseTestCase):
         """
         self._verify_basic_component("discussion", "Discussion")
         self._verify_basic_component("video", "Video")
-        self._verify_basic_component("openassessment", "Blank Open Response Assessment", True, 6)
+        self._verify_basic_component("openassessment", "Peer Assessment Only", True, 5)
         self._verify_basic_component_display_name("discussion", "Discussion")
         self._verify_basic_component_display_name("video", "Video")
         self._verify_basic_component_display_name("openassessment", "Open Response")
+        self.assertGreater(len(self.get_templates_of_type('library')), 0)
         self.assertGreater(len(self.get_templates_of_type('html')), 0)
         self.assertGreater(len(self.get_templates_of_type('problem')), 0)
         self.assertIsNone(self.get_templates_of_type('advanced'))
@@ -2561,7 +2546,7 @@ class TestXBlockInfo(ItemTest):
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 3, 3),
-        (ModuleStoreEnum.Type.mongo, 5, 7),
+        (ModuleStoreEnum.Type.mongo, 8, 12),
     )
     @ddt.unpack
     def test_xblock_outline_handler_mongo_calls(self, store_type, chapter_queries, chapter_queries_1):

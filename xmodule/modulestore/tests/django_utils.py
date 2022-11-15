@@ -318,7 +318,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
 
         cls.__old_modulestores.append(copy.deepcopy(settings.MODULESTORE))
         cls.__old_contentstores.append(copy.deepcopy(settings.CONTENTSTORE))
-        override.__enter__()
+        override.__enter__()  # pylint: disable=unnecessary-dunder-call
         cls.__settings_overrides.append(override)
         XMODULE_FACTORY_LOCK.enable()
         clear_existing_modulestores()

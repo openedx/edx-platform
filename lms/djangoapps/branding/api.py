@@ -167,7 +167,7 @@ def _footer_social_links():
             {
                 "name": social_name,
                 "title": str(display.get("title", "")),
-                "url": settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
+                "url": settings.SOCIAL_MEDIA_FOOTER_ACE_URLS.get(social_name, "#"),
                 "icon-class": display.get("icon", ""),
                 "action": str(display.get("action", "")).format(platform_name=platform_name),
             }
@@ -428,7 +428,7 @@ def _footer_mobile_links(is_secure):
                 "title": _(
                     "Download the {platform_name} mobile app from the Apple App Store"
                 ).format(platform_name=platform_name),
-                "url": settings.MOBILE_STORE_URLS.get('apple', '#'),
+                "url": settings.MOBILE_STORE_ACE_URLS.get('apple', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/app_store_badge_135x40.svg'),
             },
             {
@@ -436,7 +436,7 @@ def _footer_mobile_links(is_secure):
                 "title": _(
                     "Download the {platform_name} mobile app from Google Play"
                 ).format(platform_name=platform_name),
-                "url": settings.MOBILE_STORE_URLS.get('google', '#'),
+                "url": settings.MOBILE_STORE_ACE_URLS.get('google', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/google_play_badge_45.png'),
             }
         ]

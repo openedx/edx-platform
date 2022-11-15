@@ -17,13 +17,13 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 from xmodule.discussion_block import DiscussionXBlock, loader
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
 
 from lms.djangoapps.course_api.blocks.tests.helpers import deserialize_usage_key
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
@@ -161,7 +161,10 @@ class TestViews(TestDiscussionXBlock):
         assert fragment.content == self.template_canary
         self.render_template.assert_called_once_with(
             'discussion/_discussion_inline_studio.html',
-            {'discussion_id': self.discussion_id}
+            {
+                'discussion_id': self.discussion_id,
+                'is_visible': True,
+            }
         )
 
     @ddt.data(
@@ -257,7 +260,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
     """
     Test the discussion xblock as rendered in the course and course API.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -305,52 +308,50 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         assert 'data-user-create-comment="false"' in html
         assert 'data-user-create-subcomment="false"' in html
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_discussion_render_successfully_with_orphan_parent(self, default_store):
+    def test_discussion_render_successfully_with_orphan_parent(self):
         """
         Test that discussion xblock render successfully
         if discussion xblock is child of an orphan.
         """
-        with self.store.default_store(default_store):
-            orphan_sequential = self.store.create_item(self.user.id, self.course.id, 'sequential')
+        orphan_sequential = self.store.create_item(self.user.id, self.course.id, 'sequential')
 
-            vertical = self.store.create_child(
-                self.user.id,
-                orphan_sequential.location,
-                'vertical',
-                block_id=self.course.location.block_id
-            )
+        vertical = self.store.create_child(
+            self.user.id,
+            orphan_sequential.location,
+            'vertical',
+            block_id=self.course.location.block_id
+        )
 
-            discussion = self.store.create_child(
-                self.user.id,
-                vertical.location,
-                'discussion',
-                block_id=self.course.location.block_id
-            )
+        discussion = self.store.create_child(
+            self.user.id,
+            vertical.location,
+            'discussion',
+            block_id=self.course.location.block_id
+        )
 
-            discussion = self.store.get_item(discussion.location)
+        discussion = self.store.get_item(discussion.location)
 
-            root = self.get_root(discussion)
-            # Assert that orphan sequential is root of the discussion xblock.
-            assert orphan_sequential.location.block_type == root.location.block_type
-            assert orphan_sequential.location.block_id == root.location.block_id
+        root = self.get_root(discussion)
+        # Assert that orphan sequential is root of the discussion xblock.
+        assert orphan_sequential.location.block_type == root.location.block_type
+        assert orphan_sequential.location.block_id == root.location.block_id
 
-            # Get xblock bound to a user and a descriptor.
-            discussion_xblock = get_module_for_descriptor_internal(
-                user=self.user,
-                descriptor=discussion,
-                student_data=mock.Mock(name='student_data'),
-                course_id=self.course.id,
-                track_function=mock.Mock(name='track_function'),
-                request_token='request_token',
-            )
+        # Get xblock bound to a user and a descriptor.
+        discussion_xblock = get_module_for_descriptor_internal(
+            user=self.user,
+            descriptor=discussion,
+            student_data=mock.Mock(name='student_data'),
+            course_id=self.course.id,
+            track_function=mock.Mock(name='track_function'),
+            request_token='request_token',
+        )
 
-            fragment = discussion_xblock.render('student_view')
-            html = fragment.content
+        fragment = discussion_xblock.render('student_view')
+        html = fragment.content
 
-            assert isinstance(discussion_xblock, DiscussionXBlock)
-            assert 'data-user-create-comment="false"' in html
-            assert 'data-user-create-subcomment="false"' in html
+        assert isinstance(discussion_xblock, DiscussionXBlock)
+        assert 'data-user-create-comment="false"' in html
+        assert 'data-user-create-subcomment="false"' in html
 
     def test_discussion_student_view_data(self):
         """
@@ -373,6 +374,32 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             assert block_data['type'] == block_key.block_type
             assert block_data['display_name'] == (self.store.get_item(block_key).display_name or '')
             assert block_data['student_view_data'] == {'topic_id': self.discussion_id}
+
+    def test_discussion_xblock_visibility(self):
+        """
+        Tests that the discussion xblock is hidden when discussion provider is openedx
+        """
+        # Enable new OPEN_EDX provider for this course
+        course_key = self.course.location.course_key
+        DiscussionsConfiguration.objects.create(
+            context_key=course_key,
+            enabled=True,
+            provider_type=Provider.OPEN_EDX,
+        )
+
+        discussion_xblock = get_module_for_descriptor_internal(
+            user=self.user,
+            descriptor=self.discussion,
+            student_data=mock.Mock(name='student_data'),
+            course_id=self.course.id,
+            track_function=mock.Mock(name='track_function'),
+            request_token='request_token',
+        )
+
+        fragment = discussion_xblock.render('student_view')
+        html = fragment.content
+        assert 'data-user-create-comment="false"' not in html
+        assert 'data-user-create-subcomment="false"' not in html
 
 
 class TestXBlockQueryLoad(SharedModuleStoreTestCase):
@@ -400,12 +427,14 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
                 discussion_target='Target Discussion',
             ))
 
-        # 4 queries are required to do first discussion xblock render:
+        # 6 queries are required to do first discussion xblock render:
         # * split_modulestore_django_splitmodulestorecourseindex x2
-        # * waffle_utils_waffleorgoverridemodel
+        # * waffle_flag.discussions.enable_new_structure_discussions
+        # * lms_xblock_xblockasidesconfig
         # * django_comment_client_role
+        # * DiscussionsConfiguration
 
-        num_queries = 4
+        num_queries = 6
 
         for discussion in discussions:
             discussion_xblock = get_module_for_descriptor_internal(
@@ -421,7 +450,9 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
 
             # Permissions are cached, so no queries required for subsequent renders
 
-            num_queries = 0
+            # query to check for provider_type
+            # query to check waffle flag discussions.enable_new_structure_discussions
+            num_queries = 2
 
             html = fragment.content
             assert 'data-user-create-comment="false"' in html

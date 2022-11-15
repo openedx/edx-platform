@@ -142,16 +142,16 @@ class CountMongoCallsCourseTraversal(TestCase):
         # These two lines show the way this traversal *should* be done
         # (if you'll eventually access all the fields and load all the definitions anyway).
         # 'lazy' does not matter in old Mongo.
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, False, True, 175),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, True, True, 175),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, False, True, 359),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, True, 359),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, False, True, 322),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, True, True, 322),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, False, True, 506),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, True, 506),
         # As shown in these two lines: whether or not the XBlock fields are accessed,
         # the same number of mongo calls are made in old Mongo for depth=None.
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, False, False, 175),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, True, False, 175),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, False, False, 359),
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, False, 359),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, False, False, 322),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, True, False, 322),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, False, False, 506),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, True, False, 506),
         # The line below shows the way this traversal *should* be done
         # (if you'll eventually access all the fields and load all the definitions anyway).
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, True, 2),
@@ -177,7 +177,7 @@ class CountMongoCallsCourseTraversal(TestCase):
                     self._traverse_blocks_in_course(start_block, access_all_block_fields)
 
     @ddt.data(
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 176),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 324),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 3),
     )
     @ddt.unpack

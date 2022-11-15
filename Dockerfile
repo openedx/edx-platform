@@ -46,7 +46,7 @@ RUN apt-get update && \
         libxml2-dev \
         libxmlsec1-dev \
         libxslt1-dev \
-        # lynx: Required by https://github.com/edx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
+        # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
         lynx \
         ntp \
         pkg-config \
@@ -91,15 +91,9 @@ RUN python3.8 -m venv "$VIRTUAL_ENV"
 
 # Install Python requirements.
 # Requires copying over requirements files, but not entire repository.
-# We filter out the local ('common/*' and 'openedx/*', and '.') Python projects,
-# because those require code in order to be installed. They will be installed
-# later. This step can be simplified when the local projects are dissolved
-# (see https://openedx.atlassian.net/browse/BOM-2579).
 COPY requirements requirements
-RUN  sed '/^-e \(common\/\|openedx\/\|.\)/d' requirements/edx/base.txt \
-  > requirements/edx/base-minus-local.txt
 RUN pip install -r requirements/pip.txt
-RUN pip install -r requirements/edx/base-minus-local.txt
+RUN pip install -r requirements/edx/base.txt
 
 # Set up a Node environment and install Node requirements.
 # Must be done after Python requirements, since nodeenv is installed
@@ -114,10 +108,12 @@ RUN npm set progress=false && npm install
 # Copy over remaining parts of repository (including all code).
 COPY . .
 
-# Install Python requirements again in order to capture local projects, which
-# were skipped earlier. This should be much quicker than if were installing
-# all requirements from scratch.
-RUN pip install -r requirements/edx/base.txt
+# Install Python requirements again in order to capture local projects
+RUN pip install -e .
+
+RUN useradd -m --shell /bin/false app
+
+USER app
 
 ##################################################
 # Define LMS docker-based non-dev target.
@@ -179,6 +175,7 @@ CMD gunicorn \
 # so that the installed development requirements are contained
 # in a single layer, shared between `lms-dev` and `cms-dev`.
 FROM base as dev
+USER root
 RUN pip install -r requirements/edx/development.txt
 
 # Link configuration YAMLs and set EDX_PLATFORM_SE1TTINGS.
@@ -194,6 +191,7 @@ RUN ln -s "$(pwd)/cms/envs/devstack-experimental.yml" "$CMS_CFG"
 # those variables right in the Dockerfile.
 RUN touch ../edxapp_env
 
+USER app
 
 ##################################################
 #  Define LMS dev target.

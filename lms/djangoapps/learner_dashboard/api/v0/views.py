@@ -96,6 +96,10 @@ class Programs(APIView):
         user = request.user
 
         enrollments = self._get_enterprise_course_enrollments(enterprise_uuid, user)
+        # return empty reponse if no enterprise enrollments exists for a user
+        if not enrollments:
+            return Response([])
+
         meter = ProgramProgressMeter(
             request.site,
             user,
@@ -365,21 +369,29 @@ class CourseRecommendationApiView(APIView):
             }
         )
 
-        if is_control:
+        if is_control or not course_keys:
             return Response(status=400)
 
         recommended_courses = []
-        for course_id in course_keys:
-            course_data = get_course_data(course_id)
+        user_enrolled_course_keys = set()
+        fields = ['title', 'owners', 'marketing_url']
+
+        course_enrollments = CourseEnrollment.enrollments_for_user(request.user)
+        for course_enrollment in course_enrollments:
+            course_key = f'{course_enrollment.course_id.org}+{course_enrollment.course_id.course}'
+            user_enrolled_course_keys.add(course_key)
+
+        # Pick 5 course keys, excluding the user's already enrolled course(s).
+        enrollable_course_keys = list(set(course_keys).difference(user_enrolled_course_keys))[:5]
+        for course_id in enrollable_course_keys:
+            course_data = get_course_data(course_id, fields)
             if course_data:
                 recommended_courses.append({
-                    'course_run_key': [run['key'] for run in course_data['course_runs']
-                                       if run['availability'] == 'Current'][-1],
-                    'title': str(course_data['title']),
+                    'course_key': course_id,
+                    'title': course_data['title'],
                     'logo_image_url': course_data['owners'][0]['logo_image_url'],
                     'marketing_url': course_data.get('marketing_url')
                 })
-            else:
-                return Response(status=400)
 
+        segment.track(user_id, 'edx.bi.user.recommendations.count', {'count': len(recommended_courses)})
         return Response({'courses': recommended_courses, 'is_personalized_recommendation': not is_control}, status=200)

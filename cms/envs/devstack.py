@@ -79,6 +79,11 @@ DJFS = {
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 
+# When the celery task is eagerly, it is executed locally while sharing the
+# thread and its request cache with the active Django Request. In that case,
+# do not clear the cache.
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
 ################################ DEBUG TOOLBAR ################################
 
 INSTALLED_APPS += ['debug_toolbar']
@@ -290,6 +295,15 @@ SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
 #################### Network configuration ####################
 # Devstack is directly exposed to the caller
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
+#################### Credentials Settings ####################
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
+CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
+
+#################### Event bus backend ########################
+EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
+EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
+EVENT_BUS_TOPIC_PREFIX = 'dev'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

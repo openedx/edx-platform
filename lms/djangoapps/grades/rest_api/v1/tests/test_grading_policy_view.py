@@ -8,11 +8,10 @@ from datetime import datetime
 import ddt
 from django.urls import reverse
 from pytz import UTC
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -37,8 +36,10 @@ class GradingPolicyTestMixin:
 
     @classmethod
     def create_course_data(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
-        cls.invalid_course_id = 'foo/bar/baz'
-        cls.course = CourseFactory.create(display_name='An Introduction to API Testing', raw_grader=cls.raw_grader)
+        cls.invalid_course_id = 'course-v1:foo+bar+baz'
+        cls.course = CourseFactory.create(
+            display_name='An Introduction to API Testing', grading_policy=cls.grading_policy
+        )
         cls.course_id = str(cls.course.id)
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             cls.sequential = ItemFactory.create(
@@ -142,7 +143,7 @@ class GradingPolicyTestMixin:
         auth_header = self.get_auth_header(user)
         self.assert_get_for_course(expected_status_code=403, HTTP_AUTHORIZATION=auth_header)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_course_keys(self, modulestore_type):
         """
         The view should be addressable by course-keys from both module stores.
@@ -160,25 +161,27 @@ class CourseGradingPolicyTests(GradingPolicyTestMixin, SharedModuleStoreTestCase
     """
     Tests for CourseGradingPolicy view.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     view_name = 'grades_api:v1:course_grading_policy'
 
-    raw_grader = [
-        {
-            "min_count": 24,
-            "weight": 0.2,
-            "type": "Homework",
-            "drop_count": 0,
-            "short_label": "HW"
-        },
-        {
-            "min_count": 4,
-            "weight": 0.8,
-            "type": "Exam",
-            "drop_count": 0,
-            "short_label": "Exam"
-        }
-    ]
+    grading_policy = {
+        'GRADER': [
+            {
+                "min_count": 24,
+                "weight": 0.2,
+                "type": "Homework",
+                "drop_count": 0,
+                "short_label": "HW"
+            },
+            {
+                "min_count": 4,
+                "weight": 0.8,
+                "type": "Exam",
+                "drop_count": 0,
+                "short_label": "Exam"
+            }
+        ]
+    }
 
     @classmethod
     def setUpClass(cls):
@@ -212,26 +215,28 @@ class CourseGradingPolicyMissingFieldsTests(GradingPolicyTestMixin, SharedModule
     """
     Tests for CourseGradingPolicy view when fields are missing.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     view_name = 'grades_api:v1:course_grading_policy'
 
     # Raw grader with missing keys
-    raw_grader = [
-        {
-            "min_count": 24,
-            "weight": 0.2,
-            "type": "Homework",
-            "drop_count": 0,
-            "short_label": "HW"
-        },
-        {
-            # Deleted "min_count" key
-            "weight": 0.8,
-            "type": "Exam",
-            "drop_count": 0,
-            "short_label": "Exam"
-        }
-    ]
+    grading_policy = {
+        'GRADER': [
+            {
+                "min_count": 24,
+                "weight": 0.2,
+                "type": "Homework",
+                "drop_count": 0,
+                "short_label": "HW"
+            },
+            {
+                # Deleted "min_count" key
+                "weight": 0.8,
+                "type": "Exam",
+                "drop_count": 0,
+                "short_label": "Exam"
+            }
+        ]
+    }
 
     @classmethod
     def setUpClass(cls):

@@ -68,7 +68,7 @@ class TestSite(TestCase):
             "address1": "foo",
             "city": "foo",
             "state": "foo",
-            "country": "foo",
+            "country": "US",
             "company": "foo",
             "title": "foo"
         }.items()))

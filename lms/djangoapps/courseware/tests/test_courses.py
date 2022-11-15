@@ -20,9 +20,8 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory, check_mongo_calls
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
 
@@ -39,13 +38,11 @@ from lms.djangoapps.courseware.courses import (
     get_courses,
     get_current_child
 )
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.courses import get_course_by_id
 from common.djangoapps.student.tests.factories import UserFactory
 
 CMS_BASE_TEST = 'testcms'
@@ -88,18 +85,6 @@ class CoursesTest(ModuleStoreTestCase):
         assert str(error.value) == 'Course not found.'
         assert error.value.access_response.error_code == 'not_visible_to_user'
         assert not error.value.access_response.has_access
-
-    @ddt.data(GET_COURSE_WITH_ACCESS, GET_COURSE_OVERVIEW_WITH_ACCESS)
-    def test_old_mongo_access_error(self, course_access_func_name):
-        course_access_func = self.COURSE_ACCESS_FUNCS[course_access_func_name]
-        user = UserFactory.create()
-        with self.store.default_store(ModuleStoreEnum.Type.mongo):
-            course = CourseFactory.create()
-
-        with pytest.raises(CourseAccessRedirect) as error:
-            course_access_func(user, 'load', course.id)
-        assert error.value.access_error.error_code == 'old_mongo'
-        assert not error.value.access_error.has_access
 
     @ddt.data(
         (GET_COURSE_WITH_ACCESS, 2),
@@ -281,7 +266,7 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
 
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     # TODO: this test relies on the specific setup of the toy course.
     # It should be rewritten to build the course it needs and then test that.
@@ -291,17 +276,15 @@ class CoursesRenderTest(ModuleStoreTestCase):
         """
         super().setUp()
 
-        store = modulestore()
-        course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
-        course_key = course_items[0].id
-        self.course = get_course_by_id(course_key)
+        self.course = ToyCourseFactory()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory.create())
 
     def test_get_course_info_section_render(self):
         # Test render works okay
         course_info = get_course_info_section(self.request, self.request.user, self.course, 'handouts')
-        assert course_info == "<a href='/c4x/edX/toy/asset/handouts_sample_handout.txt'>Sample</a>"
+        assert course_info == \
+            "<a href='/asset-v1:edX+toy+2012_Fall+type@asset+block/handouts_sample_handout.txt'>Sample</a>"
 
         # Test when render raises an exception
         with mock.patch('lms.djangoapps.courseware.courses.get_module') as mock_module_render:

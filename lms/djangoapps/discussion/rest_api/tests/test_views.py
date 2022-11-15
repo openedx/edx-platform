@@ -14,11 +14,15 @@ import httpretty
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
+
+from lms.djangoapps.discussion.config.waffle import ENABLE_LEARNERS_STATS
+from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -516,7 +520,8 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "provider": "legacy",
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
-                "user_is_privileged": False,
+                "has_moderation_privileges": False,
+                "is_group_ta": False,
                 'is_user_admin': False,
                 "user_roles": ["Student"],
                 'learners_tab_enabled': False,
@@ -924,7 +929,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "unread_comment_count": 3,
             "voted": True,
             "author": self.author.username,
-            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
             "abuse_flagged_count": None,
         })]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
@@ -950,7 +955,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "per_page": ["10"],
         })
 
-    @ddt.data("unread", "unanswered")
+    @ddt.data("unread", "unanswered", "unresponded")
     def test_view_query(self, query):
         threads = [make_minimal_cs_thread()]
         self.register_get_user_response(self.user)
@@ -1299,7 +1304,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'rendered_body': '<p>Edited body</p>',
             'preview_body': 'Edited body',
             'editable_fields': [
-                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
                 'title', 'topic_id', 'type', 'voted'
             ],
             'created_at': 'Test Created Date',
@@ -1352,7 +1357,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'read': True,
             'closed': True,
             'abuse_flagged': value,
-            'editable_fields': ['abuse_flagged', 'read'],
+            'editable_fields': ['abuse_flagged', 'copy_link', 'read'],
             'comment_count': 1, 'unread_comment_count': 0
         })
 
@@ -1383,7 +1388,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'comment_count': 1,
             'read': True,
             'editable_fields': [
-                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
                 'title', 'topic_id', 'type', 'voted'
             ],
             'response_count': 2
@@ -1410,7 +1415,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'comment_count': 1,
             'can_delete': False,
             'read': True,
-            'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
+            'editable_fields': ['abuse_flagged', 'copy_link', 'following', 'read', 'voted'],
             'response_count': 2
         })
 
@@ -1447,6 +1452,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response.status_code == 404
 
 
+@ddt.ddt
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
@@ -1488,7 +1494,7 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             {
                 "key": "editable_fields",
                 "value": [
-                    'abuse_flagged', 'anonymous', 'following', 'raw_body',
+                    'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body',
                     'read', 'title', 'topic_id', 'type', 'voted'
                 ]
             },
@@ -1595,6 +1601,160 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         our case
         """
         assert True
+
+    @ddt.data("None", "discussion", "question")
+    def test_thread_type_by(self, thread_type):
+        """
+        Tests the thread_type parameter
+
+        Arguments:
+            thread_type (str): Value of thread_type can be 'None',
+                          'discussion' and 'question'
+        """
+        threads = [make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(self.user.id),
+            "username": self.user.username,
+            "created_at": "2015-04-28T00:00:00Z",
+            "updated_at": "2015-04-28T11:11:11Z",
+            "title": "Test Title",
+            "body": "Test body",
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+        })]
+        expected_cs_comments_response = {
+            "collection": threads,
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_get_user_response(self.user)
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "username": self.user.username,
+                "thread_type": thread_type,
+            }
+        )
+        assert response.status_code == 200
+        self.assert_last_query_params({
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
+            "page": ["1"],
+            "per_page": ["10"],
+            "thread_type": [thread_type],
+            "sort_key": ['activity'],
+            "count_flagged": ["False"]
+        })
+
+    @ddt.data(
+        ("last_activity_at", "activity"),
+        ("comment_count", "comments"),
+        ("vote_count", "votes")
+    )
+    @ddt.unpack
+    def test_order_by(self, http_query, cc_query):
+        """
+        Tests the order_by parameter for active threads
+
+        Arguments:
+            http_query (str): Query string sent in the http request
+            cc_query (str): Query string used for the comments client service
+        """
+        threads = [make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(self.user.id),
+            "username": self.user.username,
+            "created_at": "2015-04-28T00:00:00Z",
+            "updated_at": "2015-04-28T11:11:11Z",
+            "title": "Test Title",
+            "body": "Test body",
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+        })]
+        expected_cs_comments_response = {
+            "collection": threads,
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_get_user_response(self.user)
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "username": self.user.username,
+                "order_by": http_query,
+            }
+        )
+        assert response.status_code == 200
+        self.assert_last_query_params({
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
+            "page": ["1"],
+            "per_page": ["10"],
+            "sort_key": [cc_query],
+            "count_flagged": ["False"]
+        })
+
+    @ddt.data("flagged", "unanswered", "unread", "unresponded")
+    def test_status_by(self, post_status):
+        """
+        Tests the post_status parameter
+
+        Arguments:
+            post_status (str): Value of post_status can be 'flagged',
+                          'unanswered' and 'unread'
+        """
+        threads = [make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(self.user.id),
+            "username": self.user.username,
+            "created_at": "2015-04-28T00:00:00Z",
+            "updated_at": "2015-04-28T11:11:11Z",
+            "title": "Test Title",
+            "body": "Test body",
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+        })]
+        expected_cs_comments_response = {
+            "collection": threads,
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_get_user_response(self.user)
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "username": self.user.username,
+                "status": post_status,
+            }
+        )
+        if post_status == "flagged":
+            assert response.status_code == 403
+        else:
+            assert response.status_code == 200
+            self.assert_last_query_params({
+                "user_id": [str(self.user.id)],
+                "course_id": [str(self.course.id)],
+                "page": ["1"],
+                "per_page": ["10"],
+                post_status: ['True'],
+                "sort_key": ['activity'],
+                "count_flagged": ["False"]
+            })
 
 
 @ddt.ddt
@@ -2890,6 +3050,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 
 @ddt.ddt
 @httpretty.activate
+@override_waffle_flag(ENABLE_LEARNERS_STATS, True)
 class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase,
                               SharedModuleStoreTestCase):
     """
@@ -2954,9 +3115,11 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
     @ddt.data(
         ("moderator", "flagged", "flagged"),
         ("moderator", "activity", "activity"),
+        ("moderator", "recency", "recency"),
         ("moderator", None, "flagged"),
         ("user", None, "activity"),
         ("user", "activity", "activity"),
+        ("user", "recency", "recency"),
     )
     @ddt.unpack
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -3017,3 +3180,17 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         data = response.json()
         self.assertFalse(data['results'])
         assert data['pagination']['count'] == 0
+
+    @ddt.data(
+        'user-0',
+        'USER-1',
+        'User-2',
+        'UsEr-3'
+    )
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param_case(self, username_search_string):
+        """
+        Test user search function is case-insensitive.
+        """
+        response = get_usernames_from_search_string(self.course_key, username_search_string, 1, 1)
+        assert response == (username_search_string.lower(), 1, 1)

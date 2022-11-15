@@ -254,7 +254,7 @@ class MongoPersistenceBackend:
     """
     def __init__(
         self, db, collection, host, port=27017, tz_aware=True, user=None, password=None,
-        asset_collection=None, retry_wait_time=0.1, **kwargs  # lint-amnesty, pylint: disable=unused-argument
+        asset_collection=None, retry_wait_time=0.1, with_mysql_subclass=False, **kwargs  # lint-amnesty, pylint: disable=unused-argument
     ):
         """
         Create & open the connection, authenticate, and provide pointers to the collections
@@ -275,6 +275,10 @@ class MongoPersistenceBackend:
         self.course_index = self.database[collection + '.active_versions']
         self.structures = self.database[collection + '.structures']
         self.definitions = self.database[collection + '.definitions']
+
+        # Is the MySQL subclass in use, passing through some reads/writes to us? If so this will be True.
+        # If this MongoPersistenceBackend is being used directly (only MongoDB is involved), this is False.
+        self.with_mysql_subclass = with_mysql_subclass
 
     def heartbeat(self):
         """
@@ -437,18 +441,18 @@ class MongoPersistenceBackend:
 
         return courses_queries
 
-    def insert_course_index(self, course_index, course_context=None, last_update_already_set=False):
+    def insert_course_index(self, course_index, course_context=None):
         """
         Create the course_index in the db
         """
         with TIMER.timer("insert_course_index", course_context):
             # Set last_update which is used to avoid collisions, unless a subclass already set it before calling super()
-            if not last_update_already_set:
+            if not self.with_mysql_subclass:
                 course_index['last_update'] = datetime.datetime.now(pytz.utc)
             # Insert the new index:
             self.course_index.insert_one(course_index)
 
-    def update_course_index(self, course_index, from_index=None, course_context=None, last_update_already_set=False):
+    def update_course_index(self, course_index, from_index=None, course_context=None):
         """
         Update the db record for course_index.
 
@@ -458,9 +462,10 @@ class MongoPersistenceBackend:
         with TIMER.timer("update_course_index", course_context):
             if from_index:
                 query = {"_id": from_index["_id"]}
-                # last_update not only tells us when this course was last updated but also helps
-                # prevent collisions
-                if 'last_update' in from_index:
+                # last_update not only tells us when this course was last updated but also helps prevent collisions.
+                # However, if used with MySQL, we defer to the subclass's colision logic and commit exactly the same
+                # writes as it does, rather than implementing separate (and possibly conflicting) collision detection.
+                if 'last_update' in from_index and not self.with_mysql_subclass:
                     query['last_update'] = from_index['last_update']
             else:
                 query = {
@@ -469,10 +474,16 @@ class MongoPersistenceBackend:
                     'run': course_index['run'],
                 }
             # Set last_update which is used to avoid collisions, unless a subclass already set it before calling super()
-            if not last_update_already_set:
+            if not self.with_mysql_subclass:
                 course_index['last_update'] = datetime.datetime.now(pytz.utc)
             # Update the course index:
-            self.course_index.replace_one(query, course_index, upsert=False,)
+            result = self.course_index.replace_one(query, course_index, upsert=False,)
+            if result.modified_count == 0:
+                log.warning(
+                    "Collision in Split Mongo when applying course index to MongoDB. "
+                    "Change was discarded. New index was: %s",
+                    course_index,
+                )
 
     def delete_course_index(self, course_key):
         """
@@ -575,6 +586,11 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
     either partially replacing MongoDB or fully replacing it.
     """
 
+    def __init__(self, *args, **kwargs):
+        # Initialize the parent MongoDB backend, and tell it that MySQL is in use too, so some things like collision
+        # detection will be done at the MySQL layer only and not duplicated at the MongoDB layer.
+        super().__init__(*args, **kwargs, with_mysql_subclass=True)
+
     # Structures and definitions are only supported in MongoDB for now.
     # Course indexes are read from MySQL and written to both MongoDB and MySQL
     # Course indexes are cached within the process using their key and ignore_case atrributes as keys.
@@ -673,7 +689,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         new_index = SplitModulestoreCourseIndex(**SplitModulestoreCourseIndex.fields_from_v1_schema(course_index))
         new_index.save()
         # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
-        super().insert_course_index(course_index, course_context, last_update_already_set=True)
+        super().insert_course_index(course_index, course_context)
 
     def update_course_index(self, course_index, from_index=None, course_context=None):  # pylint: disable=arguments-differ
         """
@@ -687,7 +703,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         # "last_update not only tells us when this course was last updated but also helps prevent collisions"
         # This code is just copying the behavior of the existing MongoPersistenceBackend
-        # See https://github.com/edx/edx-platform/pull/5200 for context
+        # See https://github.com/openedx/edx-platform/pull/5200 for context
         RequestCache(namespace="course_index_cache").clear()
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         # Find the SplitModulestoreCourseIndex entry that we'll be updating:
@@ -697,8 +713,8 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         if from_index and index_obj.last_update != from_index["last_update"]:
             # "last_update not only tells us when this course was last updated but also helps prevent collisions"
             log.warning(
-                "Collision in Split Mongo when applying course index. This can happen in dev if django debug toolbar "
-                "is enabled, as it slows down parallel queries. New index was: %s",
+                "Collision in Split Mongo when applying course index to MySQL. This can happen in dev if django debug "
+                "toolbar is enabled, as it slows down parallel queries. New index was: %s",
                 course_index,
             )
             return  # Collision; skip this update
@@ -727,7 +743,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         # Save the course index entry and create a historical record:
         index_obj.save()
         # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
-        super().update_course_index(course_index, from_index, course_context, last_update_already_set=True)
+        super().update_course_index(course_index, from_index, course_context)
 
     def delete_course_index(self, course_key):
         """

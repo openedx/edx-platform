@@ -11,6 +11,7 @@
 # Bartosz Muczyński <b.muczynski@gmail.com>, 2015
 # dwegiel <dwegiel@gmail.com>, 2015
 # Maciej Kolankowski <maciej@eduprojekt.org>, 2015
+# Filip Jankowski, 2022
 # Maciej Kolankowski <maciej@eduprojekt.org>, 2015-2018
 # Maciej Kolankowski <maciej@eduprojekt.org>, 2014
 # Hrehory <grzegorz.gwardys@gmail.com>, 2015
@@ -113,7 +114,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-03 20:43+0000\n"
+"POT-Creation-Date: 2022-11-06 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Aleks Ada, 2022\n"
 "Language-Team: Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)\n"
@@ -152,6 +153,22 @@ msgstr "Zapisywanie"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-settings-learning-fields.underscore
+#: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/video-transcripts.underscore
+#: cms/templates/js/xblock-outline.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Delete"
 msgstr "Usuń"
 
@@ -385,6 +402,7 @@ msgstr ""
 "ponownie."
 
 #: common/static/common/js/discussion/utils.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "…"
 msgstr "…"
 
@@ -599,6 +617,7 @@ msgid "Your post will be discarded."
 msgstr "Twój wpis zostanie odrzucony."
 
 #: common/static/common/js/discussion/views/response_comment_show_view.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "anonymous"
 msgstr "anonimowy"
 
@@ -814,7 +833,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "Add Attachment"
-msgstr ""
+msgstr "Dodaj załącznik"
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "(Optional)"
@@ -826,7 +845,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Name"
-msgstr ""
+msgstr "Nazwa kursu"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid ""
@@ -847,6 +866,7 @@ msgstr "Temat"
 msgid "Select a category"
 msgstr ""
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Ustawienia konta"
@@ -948,7 +968,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
-msgstr ""
+msgstr "Przejdź do swojego pulpitu."
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to {platform} Home"
@@ -1176,10 +1196,10 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
 msgid " Member"
 msgid_plural " Members"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Członek"
+msgstr[1] "Członków"
+msgstr[2] "Członków"
+msgstr[3] "Członków"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -1195,7 +1215,7 @@ msgstr "Tematy"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Teams"
-msgstr ""
+msgstr "Moje zespoły"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-allowlist.underscore
@@ -1516,7 +1536,7 @@ msgstr "Podgląd tej kwerendy"
 
 #: lms/static/js/calculator.js
 msgid "Open Calculator"
-msgstr ""
+msgstr "Otwórz kalkulator"
 
 #: lms/static/js/calculator.js
 msgid "Close Calculator"
@@ -1728,6 +1748,10 @@ msgstr "Mniej"
 msgid "HTML preview of post"
 msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: lms/static/js/customwmd.js xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
 msgid "Preview"
 msgstr "Podgląd"
@@ -1864,7 +1888,7 @@ msgstr ""
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
-msgstr ""
+msgstr "Wróć do mojego pulpitu"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
@@ -2998,7 +3022,31 @@ msgid "Recommendations for you"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid "loading"
+msgstr "ładowanie"
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid ""
+"Browse recently launched courses and see what's new in your favorite "
+"subjects."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Explore courses"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid "More opportunities for you"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid " to learn"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid ""
+"We've added 500+ learning opportunities to create one of the world's most "
+"comprehensive free-to-degree online learning platforms."
 msgstr ""
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
@@ -3142,7 +3190,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "New Password"
-msgstr ""
+msgstr "Nowe hasło"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Confirm Password"
@@ -3163,7 +3211,7 @@ msgstr "Zresetuj swoje hasło"
 
 #: lms/static/js/student_account/components/PasswordResetInput.jsx
 msgid "Error: "
-msgstr ""
+msgstr "Błąd:"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -3224,11 +3272,11 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Delete My Account"
-msgstr ""
+msgstr "Usuń moje konto"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Password is incorrect"
-msgstr ""
+msgstr "Hasło jest nieprawidłowe."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Unable to delete account"
@@ -4500,10 +4548,7 @@ msgstr ""
 msgid "Edit HTML"
 msgstr ""
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: xmodule/js/src/html/edit.js cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/course_info_update.underscore
 #: cms/templates/js/group-configuration-details.underscore
@@ -4513,7 +4558,7 @@ msgstr ""
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Edit"
-msgstr ""
+msgstr "Edytuj"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -5223,15 +5268,11 @@ msgid ""
 "required http:// prefix?"
 msgstr ""
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: xmodule/js/src/html/edit.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Title"
-msgstr ""
+msgstr "Tytuł"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -5371,7 +5412,7 @@ msgstr ""
 
 #: xmodule/js/src/problem/edit.js
 msgid "Short explanation"
-msgstr ""
+msgstr "Krótkie wyjaśnienie"
 
 #: xmodule/js/src/problem/edit.js
 msgid ""
@@ -5569,7 +5610,7 @@ msgstr ""
 
 #: xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
-msgstr ""
+msgstr "Otwórz menu języków"
 
 #: xmodule/js/src/video/09_video_caption.js
 msgid "Transcript will be displayed when you start playing the video."
@@ -5733,6 +5774,7 @@ msgstr "Czy na pewno chcesz usunąć {email} z kadry kursu “{container}”?"
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Staff"
 msgstr "Kadra"
 
@@ -7134,7 +7176,7 @@ msgstr "Niezaplanowany"
 #: cms/templates/js/discussion-editor.underscore
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Discussion"
-msgstr ""
+msgstr "Dyskusja"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
@@ -7267,7 +7309,7 @@ msgstr[3] ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a comment"
-msgstr ""
+msgstr "Dodaj komentarz"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7312,7 +7354,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "discussion"
-msgstr ""
+msgstr "dyskusja"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "answered question"
@@ -7324,7 +7366,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Following"
-msgstr ""
+msgstr "Obserwowanie"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Community TA"
@@ -7344,15 +7386,15 @@ msgstr ""
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr ""
+msgstr "%(comments_count)s %(span_sr_open)skomentarzy %(span_close)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "Dodaj wpis"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Visible to"
-msgstr ""
+msgstr "Widoczny dla"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid ""
@@ -7362,7 +7404,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "All Groups"
-msgstr ""
+msgstr "Wszystkich grup"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "follow this post"
@@ -7399,7 +7441,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "(Staff)"
-msgstr ""
+msgstr "(Staff)"
 
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
@@ -7412,11 +7454,11 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "View discussion"
-msgstr ""
+msgstr "Wyświetl dyskusję"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Load more"
-msgstr ""
+msgstr "Wczytaj więcej"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Post type"
@@ -7430,7 +7472,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
-msgstr ""
+msgstr "Pytanie"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Endorse"
@@ -7450,7 +7492,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Follow"
-msgstr ""
+msgstr "Obserwuj"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unfollow"
@@ -7458,7 +7500,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Vote for this post,"
-msgstr ""
+msgstr "Głosuj na ten wpis,"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Report abuse"
@@ -7466,7 +7508,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Report"
-msgstr ""
+msgstr "Zgłoś"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unreport"
@@ -7474,7 +7516,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pin"
-msgstr ""
+msgstr "Przypnij"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unpin"
@@ -7482,7 +7524,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Open"
-msgstr ""
+msgstr "Otwórz"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -7659,7 +7701,7 @@ msgstr "Autor ostatniej modyfikacji:"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Active"
-msgstr ""
+msgstr "Aktywny"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/ccx/schedule.underscore
@@ -8069,6 +8111,10 @@ msgstr "Dodaj do listy wyjątków"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "Generate Exception Certificates"
 msgstr "Wygeneruj certyfikaty w wyjątku"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Certificate exceptions group selection"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
@@ -8653,7 +8699,7 @@ msgstr ""
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Create an account"
-msgstr ""
+msgstr "Utwórz konto"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore

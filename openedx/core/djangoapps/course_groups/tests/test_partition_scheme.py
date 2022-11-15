@@ -12,7 +12,7 @@ from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartiti
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -27,7 +27,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
     """
     Test the logic for linking a user to a partition group based on their cohort.
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """
@@ -267,7 +267,7 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
     """
     Test that `get_cohorted_user_partition` returns the first user_partition with scheme `CohortPartitionScheme`.
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """

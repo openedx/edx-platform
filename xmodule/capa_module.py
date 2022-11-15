@@ -26,17 +26,17 @@ from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 from xblock.scorable import ScorableXBlockMixin, Score
 
-from capa import responsetypes
-from capa.capa_problem import LoncapaProblem, LoncapaSystem
-from capa.inputtypes import Status
-from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
+from xmodule.capa import responsetypes
+from xmodule.capa.capa_problem import LoncapaProblem, LoncapaSystem
+from xmodule.capa.inputtypes import Status
+from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+from xmodule.capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xmodule.contentstore.django import contentstore
 from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_module import RawMixin
-from xmodule.util.sandboxing import get_python_lib_zip
+from xmodule.util.sandboxing import SandboxService
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
@@ -140,7 +140,7 @@ class ProblemBlock(
     An XBlock representing a "problem".
 
     A problem contains zero or more respondable items, such as multiple choice,
-    numeric response, true/false, etc. See common/lib/capa/capa/responsetypes.py
+    numeric response, true/false, etc. See xmodule/capa/responsetypes.py
     for the full ensemble.
 
     The rendering logic of a problem is largely encapsulated within
@@ -630,7 +630,6 @@ class ProblemBlock(
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=None,
-            STATIC_URL=None,
             xqueue=None,
             matlab_api_key=None,
         )
@@ -685,13 +684,14 @@ class ProblemBlock(
             anonymous_student_id=None,
             cache=None,
             can_execute_unsafe_code=lambda: None,
-            get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, self.runtime.course_id)),
+            get_python_lib_zip=(
+                lambda: SandboxService(contentstore, self.scope_ids.usage_id.context_key).get_python_lib_zip()
+            ),
             DEBUG=None,
             i18n=self.runtime.service(self, "i18n"),
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=1,
-            STATIC_URL=None,
             xqueue=None,
             matlab_api_key=None,
         )
@@ -839,7 +839,6 @@ class ProblemBlock(
             render_template=self.runtime.service(self, 'mako').render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
-            STATIC_URL=self.runtime.STATIC_URL,
             xqueue=self.runtime.service(self, 'xqueue'),
             matlab_api_key=self.matlab_api_key
         )
@@ -1559,7 +1558,7 @@ class ProblemBlock(
         """
         event_info = {}
         event_info['problem_id'] = str(self.location)
-        self.track_function_unmask('showanswer', event_info)
+        self.publish_unmasked('showanswer', event_info)
         if not self.answer_available():  # lint-amnesty, pylint: disable=no-else-raise
             raise NotFoundError('Answer is not available')
         else:
@@ -1717,7 +1716,7 @@ class ProblemBlock(
         answers_without_files = convert_files_to_filenames(answers)
         event_info['answers'] = answers_without_files
 
-        metric_name = 'capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
+        metric_name = 'xmodule.capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
         # Can override current time
         current_time = datetime.datetime.now(utc)
         if override_time is not False:
@@ -1737,13 +1736,13 @@ class ProblemBlock(
                 self.max_attempts,
             )
             event_info['failure'] = 'closed'
-            self.track_function_unmask('problem_check_fail', event_info)
+            self.publish_unmasked('problem_check_fail', event_info)
             raise NotFoundError(_("Problem is closed."))
 
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == RANDOMIZATION.ALWAYS:
             event_info['failure'] = 'unreset'
-            self.track_function_unmask('problem_check_fail', event_info)
+            self.publish_unmasked('problem_check_fail', event_info)
             raise NotFoundError(_("Problem must be reset before it can be submitted again."))
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
@@ -1840,7 +1839,7 @@ class ProblemBlock(
         event_info['success'] = success
         event_info['attempts'] = self.attempts
         event_info['submission'] = self.get_submission_metadata_safe(answers_without_files, correct_map)
-        self.track_function_unmask('problem_check', event_info)
+        self.publish_unmasked('problem_check', event_info)
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False, submit_notification=True)
@@ -1855,9 +1854,9 @@ class ProblemBlock(
         }
     # pylint: enable=too-many-statements
 
-    def track_function_unmask(self, title, event_info):
+    def publish_unmasked(self, title, event_info):
         """
-        All calls to runtime.track_function route through here so that the
+        All calls to runtime.publish route through here so that the
         choice names can be unmasked.
         """
         # Do the unmask translates on a copy of event_info,
@@ -2034,7 +2033,7 @@ class ProblemBlock(
         # Too late. Cannot submit
         if self.closed() and not self.max_attempts == 0:
             event_info['failure'] = 'closed'
-            self.track_function_unmask('save_problem_fail', event_info)
+            self.publish_unmasked('save_problem_fail', event_info)
             return {
                 'success': False,
                 # pylint: disable=line-too-long
@@ -2047,7 +2046,7 @@ class ProblemBlock(
         # again.
         if self.done and self.rerandomize == RANDOMIZATION.ALWAYS:
             event_info['failure'] = 'done'
-            self.track_function_unmask('save_problem_fail', event_info)
+            self.publish_unmasked('save_problem_fail', event_info)
             return {
                 'success': False,
                 'msg': _("Problem needs to be reset prior to save.")
@@ -2059,7 +2058,7 @@ class ProblemBlock(
         self.set_state_from_lcp()
         self.set_score(self.score_from_lcp(self.lcp))
 
-        self.track_function_unmask('save_problem_success', event_info)
+        self.publish_unmasked('save_problem_success', event_info)
         msg = _("Your answers have been saved.")
         if not self.max_attempts == 0:
             msg = _(
@@ -2090,7 +2089,7 @@ class ProblemBlock(
 
         if self.closed():
             event_info['failure'] = 'closed'
-            self.track_function_unmask('reset_problem_fail', event_info)
+            self.publish_unmasked('reset_problem_fail', event_info)
             return {
                 'success': False,
                 # pylint: disable=line-too-long
@@ -2101,7 +2100,7 @@ class ProblemBlock(
 
         if not self.is_submitted():
             event_info['failure'] = 'not_done'
-            self.track_function_unmask('reset_problem_fail', event_info)
+            self.publish_unmasked('reset_problem_fail', event_info)
             return {
                 'success': False,
                 'msg': _("You must submit an answer before you can select Reset."),
@@ -2122,7 +2121,7 @@ class ProblemBlock(
         self.publish_grade()
 
         event_info['new_state'] = self.lcp.get_state()
-        self.track_function_unmask('reset_problem', event_info)
+        self.publish_unmasked('reset_problem', event_info)
 
         return {
             'success': True,
@@ -2156,7 +2155,7 @@ class ProblemBlock(
 
         if not self.lcp.supports_rescoring():
             event_info['failure'] = 'unsupported'
-            self.track_function_unmask('problem_rescore_fail', event_info)
+            self.publish_unmasked('problem_rescore_fail', event_info)
             # pylint: disable=line-too-long
             # Translators: 'rescoring' refers to the act of re-submitting a student's solution so it can get a new score.
             raise NotImplementedError(_("Problem's definition does not support rescoring."))
@@ -2164,7 +2163,7 @@ class ProblemBlock(
 
         if not self.done:
             event_info['failure'] = 'unanswered'
-            self.track_function_unmask('problem_rescore_fail', event_info)
+            self.publish_unmasked('problem_rescore_fail', event_info)
             raise NotFoundError(_("Problem must be answered before it can be graded again."))
 
         # get old score, for comparison:
@@ -2177,12 +2176,12 @@ class ProblemBlock(
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:  # lint-amnesty, pylint: disable=unused-variable
             log.warning("Input error in capa_module:problem_rescore", exc_info=True)
             event_info['failure'] = 'input_error'
-            self.track_function_unmask('problem_rescore_fail', event_info)
+            self.publish_unmasked('problem_rescore_fail', event_info)
             raise
 
         except Exception:
             event_info['failure'] = 'unexpected'
-            self.track_function_unmask('problem_rescore_fail', event_info)
+            self.publish_unmasked('problem_rescore_fail', event_info)
             raise
 
         # rescoring should have no effect on attempts, so don't
@@ -2204,7 +2203,7 @@ class ProblemBlock(
         event_info['correct_map'] = self.lcp.correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
-        self.track_function_unmask('problem_rescore', event_info)
+        self.publish_unmasked('problem_rescore', event_info)
 
     def has_submitted_answer(self):
         return self.done

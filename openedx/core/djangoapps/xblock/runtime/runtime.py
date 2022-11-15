@@ -23,7 +23,7 @@ from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
 from xmodule.errortracker import make_error_tracker
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import ModuleI18nService
-from xmodule.services import RebindUserService
+from xmodule.services import EventPublishingService, RebindUserService
 from xmodule.util.sandboxing import SandboxService
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.static_replace.services import ReplaceURLService
@@ -266,6 +266,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
                 track_function=make_track_function(),
                 request_token=request_token(crum.get_current_request()),
             )
+        elif service_name == 'publish':
+            return EventPublishingService(self.user, context_key, make_track_function())
 
         # Check if the XBlockRuntimeSystem wants to handle this:
         service = self.system.get_service(block, service_name)

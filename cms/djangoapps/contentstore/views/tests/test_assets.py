@@ -231,7 +231,8 @@ class PaginationTestCase(AssetsTestCase):
                     "portable_url": "/static/test.jpg",
                     "thumbnail": None,
                     "thumbnail_location": thumbnail_location,
-                    "locked": None
+                    "locked": None,
+                    "static_full_url": "/assets/courseware/v1/asset-v1:org+class+run+type@asset+block@my_file_name.jpg"
                 }
             ],
             1
@@ -419,7 +420,8 @@ class AssetToJsonTestCase(AssetsTestCase):
         thumbnail_location = course_key.make_asset_key('thumbnail', 'my_file_name_thumb.jpg')
 
         # pylint: disable=protected-access
-        output = assets._get_asset_json("my_file", content_type, upload_date, location, thumbnail_location, True)
+        output = assets._get_asset_json("my_file", content_type, upload_date, location,
+                                        thumbnail_location, True, course_key)
 
         self.assertEqual(output["display_name"], "my_file")
         self.assertEqual(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
@@ -431,8 +433,9 @@ class AssetToJsonTestCase(AssetsTestCase):
         self.assertEqual(output["thumbnail"], "/asset-v1:org+class+run+type@thumbnail+block@my_file_name_thumb.jpg")
         self.assertEqual(output["id"], str(location))
         self.assertEqual(output['locked'], True)
+        self.assertEqual(output['static_full_url'], '/asset-v1:org+class+run+type@asset+block@my_file_name.jpg')
 
-        output = assets._get_asset_json("name", content_type, upload_date, location, None, False)
+        output = assets._get_asset_json("name", content_type, upload_date, location, None, False, course_key)
         self.assertIsNone(output["thumbnail"])
 
 
@@ -454,6 +457,7 @@ class LockAssetTestCase(AssetsTestCase):
         def post_asset_update(lock, course):
             """ Helper method for posting asset update. """
             content_type = 'application/txt'
+            course_key = CourseLocator('org', 'class', 'run')
             upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
             asset_location = course.id.make_asset_key('asset', 'sample_static.html')
             url = reverse_course_url(
@@ -464,7 +468,7 @@ class LockAssetTestCase(AssetsTestCase):
                 url,
                 # pylint: disable=protected-access
                 json.dumps(assets._get_asset_json(
-                    "sample_static.html", content_type, upload_date, asset_location, None, lock)),
+                    "sample_static.html", content_type, upload_date, asset_location, None, lock, course_key)),
                 "application/json"
             )
 

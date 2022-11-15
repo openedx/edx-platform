@@ -60,12 +60,12 @@ class TestXForwardedForMiddleware(TestCase):
 
     @ddt.unpack
     @ddt.data(
-        (None, 1, 'priv'),
-        ('1.2.3.4', 2, 'pub-priv'),
-        ('XXXXXXXX, 1.2.3.4, 5.5.5.5', 4, 'unknown-pub-pub-priv'),
+        (None, '127.0.0.1', 1, 'priv'),
+        ('1.2.3.4', '1.2.3.4, 127.0.0.1', 2, 'pub-priv'),
+        ('XXXXXXXX, 1.2.3.4, 5.5.5.5', 'XXXXXXXX, 1.2.3.4, 5.5.5.5, 127.0.0.1', 4, 'unknown-pub-pub-priv'),
     )
     @patch("openedx.core.lib.x_forwarded_for.middleware.set_custom_attribute")
-    def test_xff_metrics(self, xff, expected_count, expected_types, mock_set_custom_attribute):
+    def test_xff_metrics(self, xff, expected_raw, expected_count, expected_types, mock_set_custom_attribute):
         request = RequestFactory().get('/somewhere')
         if xff is not None:
             request.META['HTTP_X_FORWARDED_FOR'] = xff
@@ -73,6 +73,7 @@ class TestXForwardedForMiddleware(TestCase):
         XForwardedForMiddleware().process_request(request)
 
         mock_set_custom_attribute.assert_has_calls([
+            call('ip_chain.raw', expected_raw),
             call('ip_chain.count', expected_count),
             call('ip_chain.types', expected_types),
         ])

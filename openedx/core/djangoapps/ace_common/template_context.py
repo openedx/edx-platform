@@ -40,8 +40,10 @@ def get_base_template_context(site):
             'CONTACT_EMAIL', site=site, site_config_name='contact_email'),
         'contact_mailing_address': get_config_value_from_site_or_settings(
             'CONTACT_MAILING_ADDRESS', site=site, site_config_name='contact_mailing_address'),
-        'social_media_urls': get_config_value_from_site_or_settings('SOCIAL_MEDIA_FOOTER_URLS', site=site),
-        'mobile_store_urls': get_config_value_from_site_or_settings('MOBILE_STORE_URLS', site=site),
+        'social_media_urls': get_config_value_from_site_or_settings('SOCIAL_MEDIA_FOOTER_ACE_URLS', site=site),
+        'social_media_logo_urls': get_config_value_from_site_or_settings('SOCIAL_MEDIA_LOGO_URLS', site=site),
+        'mobile_store_urls': get_config_value_from_site_or_settings('MOBILE_STORE_ACE_URLS', site=site),
+        'mobile_store_logo_urls': get_config_value_from_site_or_settings('MOBILE_STORE_LOGO_URLS', site=site),
         'logo_url': get_logo_url_for_email(),
         'site_configuration_values': site_configuration_values,
     }

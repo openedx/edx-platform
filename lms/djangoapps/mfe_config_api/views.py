@@ -2,6 +2,7 @@
 MFE API Views for useful information related to mfes.
 """
 
+import edx_api_doc_tools as apidocs
 from django.conf import settings
 from django.http import HttpResponseNotFound, JsonResponse
 from django.utils.decorators import method_decorator
@@ -14,15 +15,30 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 
 class MFEConfigView(APIView):
     """
-    Provides an API endpoint to get the MFE_CONFIG from site configuration.
+    Provides an API endpoint to get the MFE configuration from settings (or site configuration).
     """
 
     @method_decorator(cache_page(settings.MFE_CONFIG_API_CACHE_TIMEOUT))
+    @apidocs.schema(
+        parameters=[
+            apidocs.query_parameter(
+                'mfe',
+                str,
+                description="Name of an MFE (a.k.a. an APP_ID).",
+            ),
+        ],
+    )
     def get(self, request):
         """
-        GET /api/v1/mfe_config
-        or
-        GET /api/v1/mfe_config?mfe=name_of_mfe
+        Return the MFE configuration, optionally including MFE-specific overrides.
+
+        **Usage**
+
+          Get common config:
+          GET /api/mfe_config/v1
+
+          Get app config (common + app-specific overrides):
+          GET /api/mfe_config/v1?mfe=name_of_mfe
 
         **GET Response Values**
         ```
@@ -35,7 +51,8 @@ class MFEConfigView(APIView):
             "LOGIN_URL": "https://courses.example.com/login",
             "LOGOUT_URL": "https://courses.example.com/logout",
             "STUDIO_BASE_URL": "https://studio.example.com",
-            "LOGO_URL": "https://courses.example.com/logo.png"
+            "LOGO_URL": "https://courses.example.com/logo.png",
+            ... and so on
         }
         ```
         """
@@ -43,10 +60,12 @@ class MFEConfigView(APIView):
         if not settings.ENABLE_MFE_CONFIG_API:
             return HttpResponseNotFound()
 
-        mfe_config = configuration_helpers.get_value('MFE_CONFIG', getattr(settings, 'MFE_CONFIG', {}))
+        mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
         if request.query_params.get('mfe'):
-            mfe = str(request.query_params.get('mfe')).upper()
-            mfe_config.update(configuration_helpers.get_value(
-                f'MFE_CONFIG_{mfe}', getattr(settings, f'MFE_CONFIG_{mfe}', {})))
-
+            mfe = str(request.query_params.get('mfe'))
+            app_config = configuration_helpers.get_value(
+                'MFE_CONFIG_OVERRIDES',
+                settings.MFE_CONFIG_OVERRIDES,
+            )
+            mfe_config.update(app_config.get(mfe, {}))
         return JsonResponse(mfe_config, status=status.HTTP_200_OK)

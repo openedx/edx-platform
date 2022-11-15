@@ -22,13 +22,13 @@ from django.urls import reverse
 from django.utils.timezone import now
 from submissions import api as submissions_api
 
-from capa.tests.response_xml_factory import (
+from xmodule.capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
     CustomResponseXMLFactory,
     OptionResponseXMLFactory,
     SchematicResponseXMLFactory
 )
-from capa.xqueue_interface import XQueueInterface
+from xmodule.capa.xqueue_interface import XQueueInterface
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -497,14 +497,14 @@ class TestCourseGrader(TestSubmittingProblems):
         )
         # count how many state history entries there are
         baseline = BaseStudentModuleHistory.get_history(student_module)
-        assert len(baseline) == 2
+        assert len(baseline) == 1
 
         # now click "show answer"
         self.show_question_answer('p1')
 
         # check that we don't have more state history entries
         csmh = BaseStudentModuleHistory.get_history(student_module)
-        assert len(csmh) == 2
+        assert len(csmh) == 1
 
     def test_grade_with_collected_max_score(self):
         """

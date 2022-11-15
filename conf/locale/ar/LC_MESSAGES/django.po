@@ -8,6 +8,7 @@
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <a.nassif012@gmail.com>, 2013-2015
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 # Ali Hasan <ahasan@qrf.org>, 2014,2016
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013-2014
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
@@ -29,7 +30,7 @@
 # AzizAhmed <dr.zezo@gmail.com>, 2014
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016-2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
-# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021-2022
 # Glib Glugovskiy <glugov1998@gmail.com>, 2021
 # Hamza Madni, 2022
 # HasnaG <hasnaa.elghandor@yahoo.com>, 2014
@@ -76,6 +77,7 @@
 # Abdallah Nassif <a.nassif012@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <a.nassif012@gmail.com>, 2013,2015
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015-2016
 # a.nassif <a.nassif@sit-mena.com>, 2013
@@ -116,6 +118,7 @@
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <a.nassif012@gmail.com>, 2013-2015
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013-2014
 # ahmed hai <a7medpeace@gmail.com>, 2017
@@ -180,6 +183,7 @@
 # Abdallah Nassif <a.nassif012@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <a.nassif012@gmail.com>, 2013-2014
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015-2016
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
@@ -222,6 +226,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 # Almaazon <Ahmed.Almaazon@hotmail.com>, 2014
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
@@ -252,7 +257,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-03 20:43+0000\n"
+"POT-Creation-Date: 2022-11-06 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -1807,452 +1812,6 @@ msgstr "مدعوم مؤقتاً"
 msgid "Unsupported"
 msgstr "غير مدعوم"
 
-#: common/lib/capa/capa/capa_problem.py
-msgid "Cannot rescore problems with possible file submissions"
-msgstr "لا يمكن إعادة تقييم المسائل التي يُحتمل تقديم ملفّات فيها."
-
-#: common/lib/capa/capa/capa_problem.py
-msgid "Question {}"
-msgstr "سؤال {}"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Incorrect"
-msgstr "خاطئ"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Correct"
-msgstr "صحيح"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "correct"
-msgstr "صحيح"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incorrect"
-msgstr "خاطئ"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr "صحيح جزئياً"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incomplete"
-msgstr "غير مكتمل."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "unanswered"
-msgstr "لا توجد إجابة "
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "submitted"
-msgstr "تم الإرسال"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "processing"
-msgstr "قيد المعالجة"
-
-#. Translators: these are tooltips that indicate the state of an assessment
-#. question
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is correct."
-msgstr "هذه الإجابة صحيحة."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is incorrect."
-msgstr "هذه الإجابة خاطئة."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is partially correct."
-msgstr "هذه الإجابة صحيحة جزئيًا"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is being processed."
-msgstr "هذه الإجابة قيد المعالجة."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Not yet answered."
-msgstr "لم تتم الإجابة بعد."
-
-#: common/lib/capa/capa/inputtypes.py wiki/forms.py
-msgid "Select an option"
-msgstr "تحديد خيار"
-
-#. Translators: 'ChoiceGroup' is an input type and should not be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "ChoiceGroup: unexpected tag {tag_name}"
-msgstr "ChoiceGroup: وسم {tag_name} غير متوقّع."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Answer received."
-msgstr "جرى تلقّي الإجابة."
-
-#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
-#. be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
-msgstr ""
-"كان من المتوقَّع استلام أحد وسمي <choice> أو <compoundhint>؛ لكن جرى تلقّي "
-"وسم {given_tag} بدلًا منه."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your files have been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"جرى  استلام الملفّات التي قدّمتها. ستُستبدل هذه الرسالة، بمجرّد تقييم ملفاتك"
-" المُقدّمة، برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your answer has been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"جرى تقديم إجابتك. ستُستبدل هذه الرسالة، بمجرّد تقييم ملفاتك المُقدّمة، "
-"برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{programming_language} editor"
-msgstr "مُحرّر {programming_language} "
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Press ESC then TAB or click outside of the code editor to exit"
-msgstr "انقر فوق ESC ثم TAB أو انقر خارج مُحرر الرموز للخروج"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Submitted. As soon as a response is returned, this message will be replaced "
-"by that feedback."
-msgstr ""
-"تمّت عملية التقديم. ستُستبدل هذه الرسالةبرسالة آخرى تحوي تعليقات الأستاذ "
-"بمجرّد استلام الردّ."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
-msgstr ""
-"لا استجابة من ’Xqueue‘ في غضون {xqueue_timeout} ثوانٍ. أُوقِفت العملية."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error running code."
-msgstr "حدث خطأ في تشغيل الكود."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Cannot connect to the queue"
-msgstr "لا يمكن الاتصال بقائمة الانتظار."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "No formula specified."
-msgstr "لم يجري تحديد صيغة."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Couldn't parse formula: {error_msg}"
-msgstr "تعذّر إعراب الصيغة: {error_msg}"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error while rendering preview"
-msgstr "نعتذر لحدوث خطأ أثناء الإعداد لعرض المعاينة."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Sorry, couldn't parse formula"
-msgstr "عذراً، تعذّر إعراب الصيغة."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{input_type}: unexpected tag {tag_name}"
-msgstr "{input_type}: وسم {tag_name} غير متوقَّع."
-
-#. Translators: a "tag" is an XML element, such as "<b>" in HTML
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a {expected_tag} tag; got {given_tag} instead"
-msgstr ""
-"كان من المتوقَّع استلام وسم {expected_tag}؛ جرى تلقّي وسم {given_tag} بدلًا "
-"منه."
-
-#. Translators: index here could be 1,2,3 and so on
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Question {index}"
-msgstr "سؤال {index}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Correct:"
-msgstr "صحيح:"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect:"
-msgstr "غير صحيح:"
-
-#: common/lib/capa/capa/responsetypes.py xmodule/capa_module.py
-msgid "Answer"
-msgstr "إجابة"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error {err} in evaluating hint function {hintfn}."
-msgstr "نعتذر لحدوث الخطأ {err} في تقييم وظيفة التلميح {hintfn}."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "(Source code line unavailable)"
-msgstr "(سطر الكود المصدري غير متوفّر) "
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "See XML source line {sourcenum}."
-msgstr "يُرجى الاطّلاع على السطر الأصلي بلغة XML {sourcenum}. "
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Checkboxes"
-msgstr "مربّعات تأشير"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Multiple Choice"
-msgstr "اختيارات متعدّدة"
-
-#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
-#. be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Do not use shuffle and answer-pool at the same time"
-msgstr "يُرجى عدم استخدام ’shuffle‘ و’answer-pool‘ في الوقت ذاته."
-
-#. Translators: 'answer-pool' is an attribute name and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "answer-pool value should be an integer"
-msgstr "يجب أن تكون قيمة ’answer-pool‘ عددًا صحيحًا."
-
-#. Translators: 'Choicegroup' is an input type and should not be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
-msgstr ""
-"لا بدّ أن تتضمّن ’Choicegroup‘ خيارين،  1 صحيح وخيار 1 خاطئ، على الأقل."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "True/False Choice"
-msgstr "خيار صحيح/خاطئ"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Dropdown"
-msgstr "قائمة منسدلة"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Numerical Input"
-msgstr "قيم دخل عدديّة."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "There was a problem with the staff answer to this problem."
-msgstr "حدثت مشكلة في إجابة طاقم المساق على هذه المسألة."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{student_answer}' as a number."
-msgstr "تعذّر تفسير ’{student_answer}‘ كرقم."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Factorial function evaluated outside its domain:'{student_answer}'"
-msgstr "تم تقييم الدالة مضروب العدية الوضعية خارج نطاقها: '{student_answer}'"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid math syntax: '{student_answer}'"
-msgstr "تركيب رياضي غير صحيحة: ’{student_answer}‘"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "You may not use complex numbers in range tolerance problems"
-msgstr "لا يجوز استخدام الأعداد المركّبة في مسائل نطاق التحمّل"
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. provided a
-#. boundary (end limit) for a variable that is a complex number (a + bi), this
-#. message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: complex boundary."
-msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود مركّبة."
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. did not
-#. provide a boundary (end limit) for a variable, this message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: empty boundary."
-msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود خالية."
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: Separator used in NumericalResponse to display multiple
-#. answers.
-#. Translators: Separator used in StringResponse to display multiple answers.
-#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is the last choice of a number of choices of how to log
-#. in
-#. to the site.
-#: common/lib/capa/capa/responsetypes.py
-#: lms/templates/course_modes/choose.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "or"
-msgstr "أو"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "قيم دخَل نصّية"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "حدث خطأ"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Custom Evaluated Script"
-msgstr "نصّ مقيّم حسب الطلب"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error getting student answer from {student_answers}"
-msgstr "نعتذر لحدوث خطأ عند جلب إجابة الطالب من {student_answers}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer entered!"
-msgstr "لم تُدخَّل أي إجابة!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "CustomResponse: check function returned an invalid dictionary!"
-msgstr "CustomResponse: أرجعت وظيفة التحقّق قاموس غير صالح!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Symbolic Math Input"
-msgstr "قيم دخل رياضيّة رمزيّة"
-
-#. Translators: 'SymbolicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
-msgstr "حدث خطأ في ’SymbolicResponse‘. رسالة الخطأ: {error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Code Input"
-msgstr "إدخال الكود"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer provided."
-msgstr "لم تُقدَّم أي إجابة."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Error: No grader has been set up for this problem."
-msgstr "خطأ: لم يجري تحديد مقيّم هذه المسألة بعد."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
-"try again later."
-msgstr ""
-"تعذّر إيصال تقديمك إلى المقيّم (السبب: {error_msg}). يُرجى إعادة المحاولة "
-"لاحقًا."
-
-#. Translators: 'grader' refers to the edX automatic code grader.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Invalid grader reply. Please contact the course staff."
-msgstr "إجابة مُقيّم غير صحيحة. يُرجى الاتصال بطاقم المساق."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "External Grader"
-msgstr "مُقيّم خارجي"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Math Expression Input"
-msgstr "إدخال تعبير رياضي"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Factorial function not permitted in answer for this problem. Provided answer"
-" was: {bad_input}"
-msgstr ""
-"دالة مضروب العدية الوضعية غير مسموحة في الإجابة على هذه المسألة. الإجابة "
-"المقدَّمة كانت: {bad_input}"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula."
-msgstr "دخل غير صحيح: تعذّر إعراب ’{bad_input}‘ كمعادلة."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula"
-msgstr "دخل غير صحيح: تعذّر إعراب ’{bad_input}‘ كمعادلة."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Circuit Schematic Builder"
-msgstr "باني مخطّطات الدارات"
-
-#. Translators: 'SchematicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
-msgstr "حدوث خطأ في تقييم ’SchematicResponse‘. رسالة الخطأ: {error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Image Mapped Input"
-msgstr "دخل مربوط بصور"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error grading {image_input_id} (input={user_input})"
-msgstr "خطأ في تقييم {image_input_id} (input={user_input})"
-
-#. Translators: {sr_coords} are the coordinates of a rectangle
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
-msgstr "حدث خطأ في توصيف المسألة! لا يمكن إعراب المستطيل في {sr_coords}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Annotation Input"
-msgstr "قيم دخل توضيحية"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Checkboxes With Text Input"
-msgstr "مربّعات تأشير ذات قيم دخل نصّية"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Answer not provided for {input_type}"
-msgstr "لم تُقدَّم إجابة لأجل {input_type}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "The Staff answer could not be interpreted as a number."
-msgstr "تعذّر تفسير إجابة طاقم المساق كعدد."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{given_answer}' as a number."
-msgstr "تعذّر تفسير ’{given_answer}‘ كعدد."
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid ""
-"Codejail API Service is unavailable. Please try again in a few minutes."
-msgstr ""
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Codejail API Service invalid response."
-msgstr ""
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Invalid JSON response received from codejail api service."
-msgstr ""
-
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
 msgstr "فتح الحساب"
@@ -2489,6 +2048,9 @@ msgid ""
 "                    Proctoring requirements for %(course_name)s\n"
 "                "
 msgstr ""
+"\n"
+" متطلبات المراقبة لـ %(course_name)s\n"
+"                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 #, python-format
@@ -2497,6 +2059,9 @@ msgid ""
 "                    Hello %(full_name)s,\n"
 "                "
 msgstr ""
+"\n"
+"                    مرحبًا %(full_name)s,\n"
+"                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 #, python-format
@@ -2513,6 +2078,9 @@ msgid ""
 "                    Proctored exams are timed exams that you take while proctoring software monitors your computer's desktop, webcam video, and audio. Your course uses %(proctoring_provider)s software for proctoring.\n"
 "                "
 msgstr ""
+"\n"
+"الامتحانات التي يتم مراقبتها هي اختبارات محددة بوقت يتم إجراؤها أثناء قيام برنامج المراقبة بمراقبة سطح المكتب لجهاز الكمبيوتر الخاص بك وفيديو كاميرا الويب والصوت. تستخدم مقررك الدراسي برنامج%(proctoring_provider)s للمراقبة\n"
+"                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 msgid ""
@@ -2520,6 +2088,9 @@ msgid ""
 "                    Carefully review the system requirements as well as the steps to take a proctored exam in order to ensure that you are prepared.\n"
 "                "
 msgstr ""
+"\n"
+"قم بمراجعة متطلبات النظام بعناية بالإضافة إلى خطوات إجراء اختبار مراقب للتأكد من استعدادك.\n"
+"                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 msgid ""
@@ -2527,6 +2098,9 @@ msgid ""
 "                Proctoring Instructions and Requirements\n"
 "            "
 msgstr ""
+"\n"
+"تعليمات ومتطلبات المراقبة\n"
+"            "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
@@ -3352,7 +2926,7 @@ msgstr ""
 
 #: lms/djangoapps/commerce/models.py
 msgid "Path to order receipt page."
-msgstr "صفحة رابط لطلب الاستلام."
+msgstr "المسار إلى صفحة وصل الطلبية"
 
 #: lms/djangoapps/commerce/models.py
 msgid "Automatically approve valid refund requests, without manual processing"
@@ -3370,6 +2944,26 @@ msgid ""
 msgstr ""
 "أُصدِر طلب استرداد المال للمستخدم {username} ({email}). ويُرجى زيارة الرابط "
 "(أو الروابط) أدناه لمعالجة هذا الطلب."
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Practice Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Proctored Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Timed Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Exam"
+msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -3415,6 +3009,9 @@ msgid ""
 "                            Adjust my goal\n"
 "                        "
 msgstr ""
+"\n"
+"                            اضبط هدفي\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -3422,6 +3019,9 @@ msgid ""
 "                            Unsubscribe from goal reminder emails for this course\n"
 "                        "
 msgstr ""
+"\n"
+"                            إلغاء الاشتراك من رسائل البريد الإلكتروني الخاصة بتذكيرالاهدف لهذه الدورة\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
 msgid "You're almost there!"
@@ -3537,8 +3137,7 @@ msgstr ""
 #: lms/djangoapps/course_wiki/views.py
 #, python-brace-format
 msgid "This is the wiki for **{organization}**'s _{course_name}_."
-msgstr ""
-"هذه هي صفحة الويكي الخاصة بمساق _{course_name}_ التابع لـ**{organization}**."
+msgstr "هذا هو ويكي _{course_name}_ الخاص بـ**{organization}**."
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Course page automatically created."
@@ -3547,11 +3146,11 @@ msgstr "جرى إنشاء صفحة المساق تلقائيًّا."
 #: lms/djangoapps/course_wiki/views.py
 #, python-brace-format
 msgid "Welcome to the {platform_name} Wiki"
-msgstr "مرحبًا بك في صفحة ويكي لمنصّة  {platform_name} "
+msgstr "مرحبًا بك في ويكي {platform_name} "
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
-msgstr "تفضّل بزيارة إحدى صفحات الويكي الخاصة بالمساق لإضافة مقال. "
+msgstr "قم بزيارة ويكي أحد المساقات لإضافة مقال. "
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "Course has not started"
@@ -3576,6 +3175,18 @@ msgstr "عذرًا، لا تملك صلاحية دخول هذا المساق م�
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be enrolled in the course"
 msgstr "يجب أن تكون ملتحقًا بالمساق"
+
+#: lms/djangoapps/courseware/access_response.py
+#, python-brace-format
+msgid ""
+"You are enrolled in this course with '{enrollment_enterprise_name}'. "
+"However, you are currently logged in as a '{active_enterprise_name}' user. "
+"Please log in with '{enrollment_enterprise_name}' to access this course."
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must give Data Sharing Consent for the course"
+msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be logged in to see this course"
@@ -3812,11 +3423,11 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Progress"
-msgstr "العلامات"
+msgstr "التقدم"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Keep learners engaged and on track throughout the course."
-msgstr ""
+msgstr "أبقِ المتعلمين على السكة و حافظ على مشاركتهم خلال كامل المساق."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Textbooks' refers to the tab in the course that leads to the
@@ -3829,7 +3440,7 @@ msgstr "الكتب"
 #: lms/djangoapps/courseware/plugins.py
 msgid ""
 "Create and manage a library of course readings, textbooks, and chapters."
-msgstr ""
+msgstr "أنشئ و أدِر مكتبة من مقروءات المساق، الكتب، و الفصول."
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Calculator"
@@ -3838,6 +3449,8 @@ msgstr "الآلة الحاسبة "
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide an in-course calculator for simple and complex calculations."
 msgstr ""
+"وفِّر آلة حاسبة أثناء الدورة التدريبية لإجراء العمليات الحسابية البسيطة "
+"والمعقدة."
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Proctoring"
@@ -3846,7 +3459,7 @@ msgstr "المراقبة"
 #: lms/djangoapps/courseware/plugins.py
 msgid ""
 "Maintain exam integrity by enabling a proctoring solution for your course"
-msgstr ""
+msgstr "حافظ على نزاهة الامتحانات من خلال تفعيل وسيلة مراقبة لمساقك "
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Custom pages"
@@ -3854,7 +3467,7 @@ msgstr "الصفحات المخصّصة"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide additional course content and resources with custom pages"
-msgstr ""
+msgstr "وفّر محتوى و موارد إضافية في مساقك عن طريق صفحات مخصصة"
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
@@ -4124,6 +3737,9 @@ msgid ""
 "                        %(course_name)s: Reported content awaits review\n"
 "                    "
 msgstr ""
+"\n"
+"                        %(course_name)s: المحتوى المبلغ عنه في انتظار المراجعة\n"
+"                    "
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
@@ -5547,11 +5163,11 @@ msgstr "لغة اختيارية التي يستخدمها الفريق كرمز 
 #: lms/djangoapps/teams/plugins.py
 #: lms/djangoapps/teams/templates/teams/teams.html
 msgid "Teams"
-msgstr "فرق"
+msgstr "الفِرق"
 
 #: lms/djangoapps/teams/plugins.py
 msgid "Leverage teams to allow learners to connect by topic of interest."
-msgstr ""
+msgstr "اعتمد الفِرق لتمكين المتعلمين من التواصل حسب المواضيع المهمة."
 
 #: lms/djangoapps/teams/views.py
 msgid "course_id must be provided"
@@ -5792,6 +5408,9 @@ msgid ""
 "            To stop receiving email like this, update your course email settings\n"
 "          "
 msgstr ""
+"\n"
+"لإيقاف تلقي بريد إلكتروني مثل هذا ، قم بتحديث إعدادات البريد الإلكتروني للدورة التدريبية\n"
+"          "
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid "here"
@@ -6548,7 +6167,7 @@ msgstr "معاينة"
 
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
-msgstr "معاينة صفحة الويكي"
+msgstr "المعاينة في الويكي"
 
 #. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this text gives status on if the modal interface (a menu or
@@ -6608,7 +6227,7 @@ msgstr "التحوّل إلى النسخة المختارة"
 
 #: lms/templates/wiki/history.html
 msgid "Wiki Revision Preview"
-msgstr "معاينة مراجعة ويكي"
+msgstr "معاينة المراجعة في الويكي"
 
 #: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Back to history view"
@@ -6658,11 +6277,11 @@ msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Wiki Cheatsheet"
-msgstr "ورقة الغش الخاصة بصفحة ويكي"
+msgstr "قصاصة مساعدة خاصة الويكي"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Wiki Syntax Help"
-msgstr "المساعدة الخاصة بالقواعد اللغوية في صفحة ويكي"
+msgstr "مساعدة بخصوص قواعد كتابة الويكي"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 #, python-brace-format
@@ -6693,12 +6312,12 @@ msgid ""
 "To create a new wiki article, create a link to it. Clicking the link gives "
 "you the creation page."
 msgstr ""
-"لإنشاء مقال جديد على صفحة الويكي، يُرجى إنشاء رابط له، حيث أنّ النقر على "
-"الرابط يفتح صفحة إنشاء المقال."
+"لإنشاء مقال جديد على الويكي، أنشئ رابطًا إليه. الضغط على الرابط سيأخذك لصفحة"
+" الإنشاء."
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "[Article Name](wiki:ArticleName)"
-msgstr "[Article Name](wiki:ArticleName)"
+msgstr "[عنوان المقال](wiki:ArticleName)"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 #, python-format
@@ -6720,7 +6339,7 @@ msgstr "ويكيبيديا"
 #: lms/templates/wiki/includes/cheatsheet.html
 #, python-format
 msgid "%(platform_name)s Wiki"
-msgstr "صفحة الويكي الخاصة بـ %(platform_name)s"
+msgstr "ويكي %(platform_name)s"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Huge Header"
@@ -7096,7 +6715,7 @@ msgstr "'%s' ليس نطاقًا صحيحًا."
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
 msgid "Bookmarks"
-msgstr "العلامات"
+msgstr "الإشارات المرجعية"
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
@@ -7820,11 +7439,14 @@ msgstr ""
 msgid "Ordering of this topic in its learning context"
 msgstr ""
 
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
+msgstr ""
+
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
 "Encourage participation and engagement in your course with discussions."
-msgstr ""
-"شجع المشاركة والمشاركة في الدورة التدريبية الخاصة بك من خلال المناقشات."
+msgstr "شجع المشاركة في مساقك باستخدام المناقشات."
 
 #: openedx/core/djangoapps/django_comment_common/models.py
 msgid "Administrator"
@@ -8390,11 +8012,6 @@ msgstr "يمكن أن تحتوي أسماء المستخدمين فقط على �
 #. account using
 #. an invalid email format.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "\"{email}\" is not a valid email address."
-msgstr "\"{email}\" ليس عنوان بريد إلكتروني صالح."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
 msgstr "أرجو إدخال بريد إلكتروني صحيح"
 
@@ -8450,60 +8067,60 @@ msgstr "أدخل عنوان بريد إلكتروني صالحا يحتوي عل
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your full name."
-msgstr "أدخل اسمك الكامل."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your first name."
+msgid "Enter your full name"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your last name."
+msgid "Enter your first name"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "The email addresses do not match."
-msgstr "عناوين البريد الإلكتروني غير متطابقة."
+msgid "Enter your last name"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "The email addresses do not match"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your confirm email"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your country or region of residence."
-msgstr "حدد بلدك أو منطقتك."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your profession."
-msgstr "حدد مهنتك."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your specialty."
-msgstr "حدد تخصصك."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your profession."
-msgstr "أدخل مهنتك."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your specialty."
-msgstr "أدخل تخصصك."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your state."
+msgid "Select your country or region of residence"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your city."
-msgstr "أدخل مدينتك."
+msgid "Select your profession"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Tell us your goals."
-msgstr "أخبرنا عن أهدافك."
+msgid "Select your specialty"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select the highest level of education you have completed."
-msgstr "حدد أعلى مستوى تعليمي كنت قد أكملته."
+msgid "Enter your profession"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your specialty"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your state"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your city"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Tell us your goals"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Select the highest level of education you have completed"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your year of birth"
@@ -8514,8 +8131,8 @@ msgid "Select your gender"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your mailing address."
-msgstr "أدخل عنوانك البريدي."
+msgid "Enter your mailing address"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
@@ -9672,6 +9289,446 @@ msgstr "اسم العرض لهذا العنصر."
 msgid "Annotation"
 msgstr "ملاحظة توضيحية"
 
+#: xmodule/capa/capa_problem.py
+msgid "Cannot rescore problems with possible file submissions"
+msgstr "لا يمكن إعادة تقييم المسائل التي يُحتمل تقديم ملفّات فيها."
+
+#: xmodule/capa/capa_problem.py
+msgid "Question {}"
+msgstr "سؤال {}"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Incorrect"
+msgstr "خاطئ"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Correct"
+msgstr "صحيح"
+
+#: xmodule/capa/inputtypes.py
+msgid "correct"
+msgstr "صحيح"
+
+#: xmodule/capa/inputtypes.py
+msgid "incorrect"
+msgstr "خاطئ"
+
+#: xmodule/capa/inputtypes.py
+msgid "partially correct"
+msgstr "صحيح جزئياً"
+
+#: xmodule/capa/inputtypes.py
+msgid "incomplete"
+msgstr "غير مكتمل."
+
+#: xmodule/capa/inputtypes.py
+msgid "unanswered"
+msgstr "لا توجد إجابة "
+
+#: xmodule/capa/inputtypes.py
+msgid "submitted"
+msgstr "تم الإرسال"
+
+#: xmodule/capa/inputtypes.py
+msgid "processing"
+msgstr "قيد المعالجة"
+
+#. Translators: these are tooltips that indicate the state of an assessment
+#. question
+#: xmodule/capa/inputtypes.py
+msgid "This answer is correct."
+msgstr "هذه الإجابة صحيحة."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is incorrect."
+msgstr "هذه الإجابة خاطئة."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is partially correct."
+msgstr "هذه الإجابة صحيحة جزئيًا"
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is being processed."
+msgstr "هذه الإجابة قيد المعالجة."
+
+#: xmodule/capa/inputtypes.py
+msgid "Not yet answered."
+msgstr "لم تتم الإجابة بعد."
+
+#: xmodule/capa/inputtypes.py wiki/forms.py
+msgid "Select an option"
+msgstr "تحديد خيار"
+
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr "ChoiceGroup: وسم {tag_name} غير متوقّع."
+
+#: xmodule/capa/inputtypes.py
+msgid "Answer received."
+msgstr "جرى تلقّي الإجابة."
+
+#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
+#. be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
+msgstr ""
+"كان من المتوقَّع استلام أحد وسمي <choice> أو <compoundhint>؛ لكن جرى تلقّي "
+"وسم {given_tag} بدلًا منه."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"جرى  استلام الملفّات التي قدّمتها. ستُستبدل هذه الرسالة، بمجرّد تقييم ملفاتك"
+" المُقدّمة، برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your answer has been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"جرى تقديم إجابتك. ستُستبدل هذه الرسالة، بمجرّد تقييم ملفاتك المُقدّمة، "
+"برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{programming_language} editor"
+msgstr "مُحرّر {programming_language} "
+
+#: xmodule/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
+msgstr "انقر فوق ESC ثم TAB أو انقر خارج مُحرر الرموز للخروج"
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Submitted. As soon as a response is returned, this message will be replaced "
+"by that feedback."
+msgstr ""
+"تمّت عملية التقديم. ستُستبدل هذه الرسالةبرسالة آخرى تحوي تعليقات الأستاذ "
+"بمجرّد استلام الردّ."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+"لا استجابة من ’Xqueue‘ في غضون {xqueue_timeout} ثوانٍ. أُوقِفت العملية."
+
+#: xmodule/capa/inputtypes.py
+msgid "Error running code."
+msgstr "حدث خطأ في تشغيل الكود."
+
+#: xmodule/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr "لا يمكن الاتصال بقائمة الانتظار."
+
+#: xmodule/capa/inputtypes.py
+msgid "No formula specified."
+msgstr "لم يجري تحديد صيغة."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Couldn't parse formula: {error_msg}"
+msgstr "تعذّر إعراب الصيغة: {error_msg}"
+
+#: xmodule/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr "نعتذر لحدوث خطأ أثناء الإعداد لعرض المعاينة."
+
+#: xmodule/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr "عذراً، تعذّر إعراب الصيغة."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr "{input_type}: وسم {tag_name} غير متوقَّع."
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+"كان من المتوقَّع استلام وسم {expected_tag}؛ جرى تلقّي وسم {given_tag} بدلًا "
+"منه."
+
+#. Translators: index here could be 1,2,3 and so on
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Question {index}"
+msgstr "سؤال {index}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Correct:"
+msgstr "صحيح:"
+
+#: xmodule/capa/responsetypes.py
+msgid "Incorrect:"
+msgstr "غير صحيح:"
+
+#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+msgid "Answer"
+msgstr "إجابة"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error {err} in evaluating hint function {hintfn}."
+msgstr "نعتذر لحدوث الخطأ {err} في تقييم وظيفة التلميح {hintfn}."
+
+#: xmodule/capa/responsetypes.py
+msgid "(Source code line unavailable)"
+msgstr "(سطر الكود المصدري غير متوفّر) "
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "See XML source line {sourcenum}."
+msgstr "يُرجى الاطّلاع على السطر الأصلي بلغة XML {sourcenum}. "
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Checkboxes"
+msgstr "مربّعات تأشير"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Multiple Choice"
+msgstr "اختيارات متعدّدة"
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr "يُرجى عدم استخدام ’shuffle‘ و’answer-pool‘ في الوقت ذاته."
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr "يجب أن تكون قيمة ’answer-pool‘ عددًا صحيحًا."
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr ""
+"لا بدّ أن تتضمّن ’Choicegroup‘ خيارين،  1 صحيح وخيار 1 خاطئ، على الأقل."
+
+#: xmodule/capa/responsetypes.py
+msgid "True/False Choice"
+msgstr "خيار صحيح/خاطئ"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Dropdown"
+msgstr "قائمة منسدلة"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Numerical Input"
+msgstr "قيم دخل عدديّة."
+
+#: xmodule/capa/responsetypes.py
+msgid "There was a problem with the staff answer to this problem."
+msgstr "حدثت مشكلة في إجابة طاقم المساق على هذه المسألة."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{student_answer}' as a number."
+msgstr "تعذّر تفسير ’{student_answer}‘ كرقم."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Factorial function evaluated outside its domain:'{student_answer}'"
+msgstr "تم تقييم الدالة مضروب العدية الوضعية خارج نطاقها: '{student_answer}'"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid math syntax: '{student_answer}'"
+msgstr "تركيب رياضي غير صحيحة: ’{student_answer}‘"
+
+#: xmodule/capa/responsetypes.py
+msgid "You may not use complex numbers in range tolerance problems"
+msgstr "لا يجوز استخدام الأعداد المركّبة في مسائل نطاق التحمّل"
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. provided a
+#. boundary (end limit) for a variable that is a complex number (a + bi), this
+#. message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: complex boundary."
+msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود مركّبة."
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. did not
+#. provide a boundary (end limit) for a variable, this message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: empty boundary."
+msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود خالية."
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
+#. Translators: Separator used in StringResponse to display multiple answers.
+#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
+#: xmodule/capa/responsetypes.py lms/templates/course_modes/choose.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "or"
+msgstr "أو"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "قيم دخَل نصّية"
+
+#: xmodule/capa/responsetypes.py
+msgid "error"
+msgstr "حدث خطأ"
+
+#: xmodule/capa/responsetypes.py
+msgid "Custom Evaluated Script"
+msgstr "نصّ مقيّم حسب الطلب"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error getting student answer from {student_answers}"
+msgstr "نعتذر لحدوث خطأ عند جلب إجابة الطالب من {student_answers}"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr "لم تُدخَّل أي إجابة!"
+
+#: xmodule/capa/responsetypes.py
+msgid "CustomResponse: check function returned an invalid dictionary!"
+msgstr "CustomResponse: أرجعت وظيفة التحقّق قاموس غير صالح!"
+
+#: xmodule/capa/responsetypes.py
+msgid "Symbolic Math Input"
+msgstr "قيم دخل رياضيّة رمزيّة"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
+msgstr "حدث خطأ في ’SymbolicResponse‘. رسالة الخطأ: {error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Code Input"
+msgstr "إدخال الكود"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer provided."
+msgstr "لم تُقدَّم أي إجابة."
+
+#: xmodule/capa/responsetypes.py
+msgid "Error: No grader has been set up for this problem."
+msgstr "خطأ: لم يجري تحديد مقيّم هذه المسألة بعد."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
+"try again later."
+msgstr ""
+"تعذّر إيصال تقديمك إلى المقيّم (السبب: {error_msg}). يُرجى إعادة المحاولة "
+"لاحقًا."
+
+#. Translators: 'grader' refers to the edX automatic code grader.
+#: xmodule/capa/responsetypes.py
+msgid "Invalid grader reply. Please contact the course staff."
+msgstr "إجابة مُقيّم غير صحيحة. يُرجى الاتصال بطاقم المساق."
+
+#: xmodule/capa/responsetypes.py
+msgid "External Grader"
+msgstr "مُقيّم خارجي"
+
+#: xmodule/capa/responsetypes.py
+msgid "Math Expression Input"
+msgstr "إدخال تعبير رياضي"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Factorial function not permitted in answer for this problem. Provided answer"
+" was: {bad_input}"
+msgstr ""
+"دالة مضروب العدية الوضعية غير مسموحة في الإجابة على هذه المسألة. الإجابة "
+"المقدَّمة كانت: {bad_input}"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula."
+msgstr "دخل غير صحيح: تعذّر إعراب ’{bad_input}‘ كمعادلة."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula"
+msgstr "دخل غير صحيح: تعذّر إعراب ’{bad_input}‘ كمعادلة."
+
+#: xmodule/capa/responsetypes.py
+msgid "Circuit Schematic Builder"
+msgstr "باني مخطّطات الدارات"
+
+#. Translators: 'SchematicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
+msgstr "حدوث خطأ في تقييم ’SchematicResponse‘. رسالة الخطأ: {error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Image Mapped Input"
+msgstr "دخل مربوط بصور"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr "خطأ في تقييم {image_input_id} (input={user_input})"
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr "حدث خطأ في توصيف المسألة! لا يمكن إعراب المستطيل في {sr_coords}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Annotation Input"
+msgstr "قيم دخل توضيحية"
+
+#: xmodule/capa/responsetypes.py
+msgid "Checkboxes With Text Input"
+msgstr "مربّعات تأشير ذات قيم دخل نصّية"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Answer not provided for {input_type}"
+msgstr "لم تُقدَّم إجابة لأجل {input_type}"
+
+#: xmodule/capa/responsetypes.py
+msgid "The Staff answer could not be interpreted as a number."
+msgstr "تعذّر تفسير إجابة طاقم المساق كعدد."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{given_answer}' as a number."
+msgstr "تعذّر تفسير ’{given_answer}‘ كعدد."
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid ""
+"Codejail API Service is unavailable. Please try again in a few minutes."
+msgstr ""
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Codejail API Service invalid response."
+msgstr ""
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Invalid JSON response received from codejail api service."
+msgstr ""
+
 #: xmodule/capa_module.py
 msgid "Blank Advanced Problem"
 msgstr "مسألة متقدِّمة فارغة"
@@ -10218,7 +10275,7 @@ msgstr "قائمة بأجزاء (عناوين، وروابط) كل كتاب مس
 
 #: xmodule/course_module.py
 msgid "Slug that points to the wiki for this course"
-msgstr "العنوان المختصر لصفحة الويكي لهذا المساق"
+msgstr "العنوان المختصر الذي يشير إلى ويكي هذا المساق"
 
 #: xmodule/course_module.py
 msgid "Date that enrollment for this class is opened"
@@ -10370,20 +10427,6 @@ msgstr ""
 "يمكنك أيضا تحديد فئة منها كفئة افتراضية للمشاركات الجديدة في صفحة المناقشة "
 "عن طريق تعيين السمة \"default\" إلى صحيح. على سبيل المثال،  \"Lydian Mode\":"
 " {\"id\": \"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
-
-#: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "الترتيب الأبجدي للنقاشات"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr ""
-"يُرجى إدخال صحيح أو خاطئ. ويسمح اختيارك لصحيح بترتيب فئات النقاشات وفئاتها "
-"الفرعية بحسب الأبجدية، بينما يساعد اختيارك لخاطئ على ترتيبها زمنيًّا تبعًا "
-"للتاريخ والتوقيت."
 
 #: xmodule/course_module.py
 msgid "Discussions Plugin Settings"
@@ -10811,7 +10854,7 @@ msgstr ""
 
 #: xmodule/course_module.py
 msgid "Allow Public Wiki Access"
-msgstr "السماح باستخدام عامّة الناس لصفحة الويكي"
+msgstr "تفعيل الوصول العامّ للويكي"
 
 #: xmodule/course_module.py
 msgid ""
@@ -12519,6 +12562,14 @@ msgstr ""
 msgid "Public Access"
 msgstr ""
 
+#: xmodule/video_module/video_xfields.py
+msgid "Add a specific thumbnail for learners to see before playing the video."
+msgstr ""
+
+#: xmodule/video_module/video_xfields.py
+msgid "Thumbnail"
+msgstr ""
+
 #: xmodule/word_cloud_module.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
@@ -12657,6 +12708,7 @@ msgstr "(غير مسمّى)"
 #: cms/djangoapps/contentstore/errors.py
 msgid "Aborting import because a course with this id: {} already exists."
 msgstr ""
+"يجري الغاء عملبة لاستيراد لان مساق مع رقم التعريف هذا :{} موجود بالفغل"
 
 #: cms/djangoapps/contentstore/errors.py
 msgid "Permission denied. You do not have write access to this course."
@@ -12946,12 +12998,16 @@ msgid "Open Response"
 msgstr "ردود مفتوحة "
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Library Content"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "صفحة فارغة"
 
 #: cms/djangoapps/contentstore/views/component.py
-msgid "Blank Open Response Assessment"
-msgstr "تقييم الإجابات المفتوحة الفارغ"
+msgid "Peer Assessment Only"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
@@ -12966,7 +13022,7 @@ msgid ""
 "Special characters not allowed in organization, course number, and course "
 "run."
 msgstr ""
-"لا يُسمح باستخدام الأحرف الخاصة ضمن اسم المؤسسة ورقم المساق ورقم تشغيله."
+"لا يُسمح باستخدام الأحرف الخاصة ضمن اسم المنظمة و رقم المساق و رقم تشغيله."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -12979,7 +13035,7 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Please change either the organization or course number so that it is unique."
-msgstr "يُرجى تغيير إمّا اسم المؤسسة أو رقم المساق ليكون فريدًا."
+msgstr "يُرجى تغيير إمّا اسم المنظمة أو رقم المساق ليكون فريدًا."
 
 #: cms/djangoapps/contentstore/views/course.py
 #, python-brace-format
@@ -13572,7 +13628,7 @@ msgstr " خطأ:"
 #: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Organization:"
-msgstr "المؤسّسة: "
+msgstr "المنظمة: "
 
 #: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -13669,10 +13725,6 @@ msgstr "الاسم"
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
-
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "Code Editor"
-msgstr "محرر الرمز"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
@@ -13784,7 +13836,7 @@ msgstr "المناقشة غير متاحة"
 msgid ""
 "The discussions are currently undergoing maintenance. We'll have them back "
 "up shortly!"
-msgstr "تخضع المناقشات حاليًّا لأعمال الصيانة. سنعيد تفعيلها قريبًا! "
+msgstr "المناقشات حاليا قيد الصيانة. سنعيدها تفعيلها بعد قليل!"
 
 #: lms/templates/_gated_content.html lms/templates/seq_module.html
 msgid "Content Locked"
@@ -13816,11 +13868,11 @@ msgstr "إخفاء الملاحظات التوضيحية"
 
 #: lms/templates/bookmark_button.html lms/templates/seq_module.html
 msgid "Bookmarked"
-msgstr "جرى وضع علامة"
+msgstr "تم التأشير على الصفحة"
 
 #: lms/templates/bookmark_button.html
 msgid "Bookmark this page"
-msgstr "إضافة الصفحة للمفضلة"
+msgstr "التأشير على هذه الصفحة"
 
 #: lms/templates/conditional_module.html
 msgid "You do not have access to this dependency module."
@@ -14739,7 +14791,7 @@ msgstr "تنزيل النص"
 
 #: lms/templates/video.html
 msgid "Handouts"
-msgstr "الأوراق الموزّعة"
+msgstr "المطبوعات"
 
 #: lms/templates/video.html
 msgid "Download Handout"
@@ -16490,7 +16542,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Additional Resources"
-msgstr "مصادر إضافية"
+msgstr "موارد إضافية"
 
 #: lms/templates/courseware/course_about.html
 msgctxt "self"
@@ -16641,7 +16693,7 @@ msgstr "أخبار- MITx 6.002x "
 
 #: lms/templates/courseware/news.html
 msgid "Updates to Discussion Posts You Follow"
-msgstr "تحديثات المنشورات في النقاشات التي تتابعها "
+msgstr "تحديثات المنشورات المناقشات التي تتابعها "
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Purchase the Program ("
@@ -17421,6 +17473,12 @@ msgstr ""
 msgid "Discussion ID: {discussion_id}"
 msgstr "رقم المناقشة: {discussion_id}"
 
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid ""
+"The discussion block is disabled for this course as it is not using a "
+"compatible discussion provider."
+msgstr ""
+
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"
 msgstr "قائمة مواضيع النقاش"
@@ -17440,27 +17498,6 @@ msgstr "كافّة النقاشات"
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "المنشورات التي أتابعها "
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid ""
-"You are viewing an educator only preview of the new discussions experience!"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "An educator preview of new discussions experience is available!"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "View legacy experience"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Share feedback"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "View the new experience"
-msgstr ""
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -17524,7 +17561,7 @@ msgstr "ملاحظات الطالب"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Highlights and notes you've made in course content"
-msgstr "النقاط المهمّة والملاحظات التي أدخلتها على محتوى المساق"
+msgstr "النقاط المهمّة و الملاحظات التي دونتها عن محتوى المساق"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Search notes for:"
@@ -17536,15 +17573,15 @@ msgstr "البحث في الملاحظات عن..."
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "View notes by:"
-msgstr "مشاهدة الملاحظات من خلال:"
+msgstr "عرض الملاحظات حسب:"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid ""
 "You have not made any notes in this course yet. Other students in this "
 "course are using notes to:"
 msgstr ""
-"لم تدلِ بأي ملاحظات في هذا المساق بعد. وهنالك طلّاب آخرون في هذا المساق "
-"يستخدمون الملاحظات بهدف:"
+"لم تدون بعد أي ملاحظات في هذا المساق. الطلاب الآخرون يستخدمون الملاحظات "
+"بهدف:"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Mark a passage or concept so that it's easy to find later."
@@ -17605,19 +17642,21 @@ msgid ""
 "{order_placed_by} placed an order and mentioned your name as the "
 "Organization contact."
 msgstr ""
-"قدَّم {order_placed_by} طلبًا وحدَّد اسمك كممثّل المؤسسة للإجابة على أي "
-"استفسار."
+"لقد قٌدِّمت طلبية من طرف {order_placed_by} وقد ذُكِر اسمك بصفتك جهة اتصال "
+"المنظمة."
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
 "{order_placed_by} placed an order and mentioned your name as the additional "
 "receipt recipient."
-msgstr "قدَّم {order_placed_by} طلبًا وحدَّد اسمك كمستلم الإيصال الإضافي."
+msgstr ""
+"لقد قٌدِّمت طلبية من طرف {order_placed_by} وقد ذُكِر اسمك كمستلم إضافي "
+"للوصل."
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The items in your order are:"
-msgstr "العناصر التي يشتمل عليها طلبك هي:"
+msgstr "العناصر التي تشتمل عليها طلبيتك هي:"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
@@ -17637,7 +17676,7 @@ msgstr "اسم الشركة:"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Purchase Order Number:"
-msgstr "رقم طلب الشراء:"
+msgstr "رقم الطلبية"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Company Contact Name:"
@@ -17664,7 +17703,7 @@ msgstr "#:  "
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Order Number: {order_number}"
-msgstr "رقم الطلب: {order_number}"
+msgstr "رقم الطلبية: {order_number}"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
@@ -17795,7 +17834,7 @@ msgstr ""
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
-msgstr "رقم طلبك هو : {order_number}"
+msgstr "رقم طلبيتك هو : {order_number}"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Hello {full_name},"
@@ -18068,7 +18107,7 @@ msgstr "الملف الشخصي"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Order History"
-msgstr "تاريخ الطلب"
+msgstr "سجل الطلبيات"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Add Coupon Code"
@@ -18744,7 +18783,7 @@ msgstr "المؤسسة التي اشترت تسجيلات هذا المساق"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Organization Contact"
-msgstr "موظف الاتصال في المنظمة"
+msgstr "جهة اتصال المنظمة"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Organization Contact Name"
@@ -18764,7 +18803,7 @@ msgstr "الشخص الذي يجب أن يستلم الفاتورة"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Organization Billing Address"
-msgstr "عنوان إرسال فواتير المنظمة"
+msgstr "عنوان فوترة المنظمة"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Address Line 1"
@@ -18816,7 +18855,7 @@ msgstr "رقم العميل"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Customer's purchase order or other reference information"
-msgstr "أمر الشراء الخاص بالعميل أو غيره من المعلومات المرجعية"
+msgstr "طلبية العميل أو غيرها من المعلومات المرجعية"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Send me a copy of the invoice"
@@ -19880,7 +19919,7 @@ msgstr ""
 
 #: lms/templates/static_templates/429.html
 msgid "Too Many Requests"
-msgstr ""
+msgstr "طلبات أكثر مما ينبغي"
 
 #: lms/templates/static_templates/429.html
 msgid "Your request has been rate-limited. Please try again later."
@@ -20205,7 +20244,7 @@ msgstr "{span_start}مفعّل{span_end}"
 
 #: lms/templates/wiki/includes/breadcrumbs.html
 msgid "Course Wiki"
-msgstr "ويكي الدورة التعليمية"
+msgstr "ويكي المساق"
 
 #: lms/templates/wiki/includes/breadcrumbs.html wiki/templates/wiki/dir.html
 msgid "Add article"
@@ -20689,6 +20728,10 @@ msgstr "ضع ميثاق الشرف الخاص بك هنا!"
 msgid "Put your Copyright Text here!"
 msgstr "ضع نصّ حقوق النشر والطبع الخاصة بك هنا!"
 
+#: xmodule/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr "محرر الرمز"
+
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
 msgstr "عذراً، لم توجد الصفحة التي كنت تبحث عنها."
@@ -20986,8 +21029,8 @@ msgid ""
 "Note: Together, the organization, course number, and course run must "
 "uniquely identify this new course instance."
 msgstr ""
-"ملاحظة: من المفروض على المؤسّسة، ورقم المساق، وتشغيل المساق، أن يعرّفوا معًا"
-" عن حالة المساق الجديد هذا."
+"ملاحظة: المنظمة و رقم المساق و تشغيل المساق يجب أن تعرِّف سويا هذا المساق "
+"بشكل فريد."
 
 #: cms/templates/course-create-rerun.html
 msgid "Required Information to Create a re-run of a course"
@@ -21010,7 +21053,7 @@ msgstr ""
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
 msgid "Organization"
-msgstr "المؤسّسة"
+msgstr "المنظمة"
 
 #. Translators: This is an example for the name of the organization sponsoring
 #. a course, seen when filling out the form to create a new course. The
@@ -21019,15 +21062,15 @@ msgstr "المؤسّسة"
 #. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
-msgstr "مثلًا: الجامعةX أو المؤسّسةX"
+msgstr "مثلًا: UniversityX أو OrganizationX"
 
 #: cms/templates/course-create-rerun.html
 msgid ""
 "The name of the organization sponsoring the new course. (This name is often "
 "the same as the original organization name.)"
 msgstr ""
-"اسم المؤسّسة الراعية للمساق الجديد. (غالبًا ما يكون هذا الاسم هو نفسه اسم "
-"المؤسّسة الأساسية.)"
+"اسم المنظمة الراعية للمساق الجديد. (غالبًا ما يكون هذا الاسم هو نفسه اسم "
+"المنظمة الأصلي.)"
 
 #: cms/templates/course-create-rerun.html
 msgid "Note: No spaces or special characters are allowed."
@@ -21102,9 +21145,9 @@ msgid ""
 "in the course, and there is no student data. There is no content in the "
 "discussion topics or wiki."
 msgstr ""
-"أنت هو العضو الوحيد في طاقم المساق الجديد. فلا يوجد طلّاب مسجّلون في هذا "
-"المساق، ولا توجد أي بيانات للطلّاب. كما لا يوجد أي محتوى في مواضيع النقاش أو"
-" في موقع الويكي."
+"أنت هو العضو الوحيد في طاقم المساق الجديد. لا يوجد طلبة مسجّلون في هذا "
+"المساق، ولا توجد أي بيانات للطلبة. كما لا يوجد أي محتوى في مواضيع المناقشة "
+"ولا في الويكي."
 
 #: cms/templates/course-create-rerun.html
 msgid "Learn more about Course Re-runs"
@@ -21247,7 +21290,7 @@ msgstr "شاهد النسخة الحالية"
 
 #: cms/templates/course_outline.html
 msgid "Creating your course organization"
-msgstr "إنشاء مؤسّسة المساق الخاصة بك"
+msgstr "جارٍ إنشاء منطمة مساقك"
 
 #: cms/templates/course_outline.html
 msgid "You add sections, subsections, and units directly in the outline."
@@ -21331,7 +21374,7 @@ msgstr "تعلّم المزيد عن إعدادات رؤية المحتوى."
 #: cms/templates/edit-tabs.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
 msgid "Pages & Resources"
-msgstr ""
+msgstr "الصفحات و الموارد"
 
 #. Translators: Custom Pages refer to the tabs that appear in the top
 #. navigation of each course.
@@ -24264,7 +24307,7 @@ msgstr "دخولك مسجَّل حاليًّا كـ:"
 
 #: cms/templates/widgets/user_dropdown.html
 msgid "Maintenance"
-msgstr "صيانة"
+msgstr "الصيانة"
 
 #: wiki/admin.py wiki/models/article.py
 msgid "created"
@@ -24272,15 +24315,15 @@ msgstr "تم الإنشاء"
 
 #: wiki/apps.py
 msgid "Wiki notifications"
-msgstr "إشعارات ويكي"
+msgstr "إشعارات الويكي"
 
 #: wiki/apps.py
 msgid "Wiki images"
-msgstr "صور ويكي"
+msgstr "صور الويكي"
 
 #: wiki/apps.py
 msgid "Wiki attachments"
-msgstr "مرفقات ويكي"
+msgstr "مرفقات الويكي"
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"
@@ -25078,7 +25121,7 @@ msgstr "روابط "
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid "Link to another wiki page"
-msgstr "رابط لصفحة ويكي أخرى"
+msgstr "رابط إلى صفحة ويكي أخرى"
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid ""

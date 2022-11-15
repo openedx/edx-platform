@@ -36,7 +36,7 @@ if [ "$CIRCLE_NODE_TOTAL" == "1" ] ; then
     echo "To run in more containers, configure parallelism for this repo's settings "
     echo "via the CircleCI UI and adjust scripts/circle-ci-tests.sh to match."
 
-    echo "Running tests for common/lib/ and pavelib/"
+    echo "Running tests for pavelib/"
     paver test_lib --cov-args="-p" || EXIT=1
     echo "Running python tests for Studio"
     paver test_system -s cms --cov-args="-p" || EXIT=1
@@ -82,7 +82,7 @@ else
             paver test_system -s cms --cov-args="-p"
             ;;
 
-        3)  # run the commonlib unit tests
+        3)  # run the pavelib unit tests
             paver test_lib --cov-args="-p"
             ;;
 

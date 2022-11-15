@@ -12,7 +12,7 @@ from config_models.models import ConfigurationModel, cache
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-from django.db import models, IntegrityError
+from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from organizations.models import Organization
@@ -67,8 +67,13 @@ def clean_json(value, of_type):
 
 
 def clean_username(username=''):
-    """ Simple helper method to ensure a username is compatible with our system requirements. """
-    return ('_').join(re.findall(r'[a-zA-Z0-9\-]+', username))[:USERNAME_MAX_LENGTH]
+    """
+    Simple helper method to ensure a username is compatible with our system requirements.
+    """
+    if settings.FEATURES.get("ENABLE_UNICODE_USERNAME"):
+        return ('_').join(re.findall(settings.USERNAME_REGEX_PARTIAL, username))[:USERNAME_MAX_LENGTH]
+    else:
+        return ('_').join(re.findall(r'[a-zA-Z0-9\-]+', username))[:USERNAME_MAX_LENGTH]
 
 
 class AuthNotConfigured(SocialAuthBaseException):
@@ -746,7 +751,10 @@ class SAMLProviderConfig(ProviderConfig):
         # If any exist, raise an integrity error
         if existing_provider_configs:
             exc_str = f'Entity ID: {self.entity_id} already in use'
-            raise IntegrityError(exc_str)
+            # There are cases of preexisting configurations that share entity id's so we can't blow up if we
+            # encounter this issue. Instead just log for clarity.
+            # raise IntegrityError(exc_str)
+            log.warning(exc_str)
         super().save(*args, **kwargs)
 
     def get_url_params(self):

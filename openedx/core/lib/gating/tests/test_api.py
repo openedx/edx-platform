@@ -11,7 +11,7 @@ from ddt import data, ddt, unpack
 from django.conf import settings
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -351,7 +351,7 @@ class TestGatingGradesIntegration(GradeTestBase):
     """
     Tests the integration between the gating API and our Persistent Grades framework.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_get_subsection_grade_percentage(self):

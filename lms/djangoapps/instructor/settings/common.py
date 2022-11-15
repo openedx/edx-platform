@@ -17,7 +17,7 @@ def plugin_settings(settings):
         #   analytics section.
         # .. toggle_use_cases: opt_out
         # .. toggle_creation_date: 2014-11-12
-        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/5838
+        # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/5838
         'DISPLAY_ANALYTICS_ENROLLMENTS': True,
 
         # .. toggle_name: FEATURES['ENABLE_CCX_ANALYTICS_DASHBOARD_URL']
@@ -28,7 +28,7 @@ def plugin_settings(settings):
         #   setting, the tab does not show up for any courses.
         # .. toggle_use_cases: opt_in
         # .. toggle_creation_date: 2016-10-07
-        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/13196
+        # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/13196
         'ENABLE_CCX_ANALYTICS_DASHBOARD_URL': False,
 
         # .. setting_name: FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
@@ -47,7 +47,7 @@ def plugin_settings(settings):
         #   configured storage backend and give links for downloads.
         # .. toggle_use_cases: opt_in
         # .. toggle_creation_date: 2016-07-06
-        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/11286
+        # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/11286
         'ENABLE_GRADE_DOWNLOADS': False,
 
         # .. toggle_name: FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS']
@@ -57,7 +57,7 @@ def plugin_settings(settings):
         #   if set to False, only edX superusers can perform the downloads.
         # .. toggle_use_cases: opt_in
         # .. toggle_creation_date: 2018-03-26
-        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1750
+        # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/1750
         'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 
         # .. toggle_name: FEATURES['ALLOW_AUTOMATED_SIGNUPS']
@@ -68,7 +68,7 @@ def plugin_settings(settings):
         #   and register for course.
         # .. toggle_use_cases: opt_in
         # .. toggle_creation_date: 2014-10-21
-        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/5670
+        # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/5670
         'ALLOW_AUTOMATED_SIGNUPS': False,
 
         # .. toggle_name: FEATURES['ENABLE_AUTOMATED_SIGNUPS_EXTRA_FIELDS']
@@ -80,7 +80,7 @@ def plugin_settings(settings):
         #   assign the new user and the enrollment course mode.
         # .. toggle_use_cases: open_edx
         # .. toggle_creation_date: 2021-10-26
-        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/21260
+        # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/21260
         'ENABLE_AUTOMATED_SIGNUPS_EXTRA_FIELDS': False,
 
         # .. toggle_name: FEATURES['CERTIFICATES_INSTRUCTOR_GENERATION']  # lint-amnesty, pylint: disable=annotation-missing-token
@@ -99,6 +99,6 @@ def plugin_settings(settings):
         #   enrollment form on the instructor dashboard is already checked on page load or not.
         # .. toggle_use_cases: opt_out
         # .. toggle_creation_date: 2017-07-05
-        # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15392
+        # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/15392
         'BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT': True,
     })

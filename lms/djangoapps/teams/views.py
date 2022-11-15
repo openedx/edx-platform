@@ -17,6 +17,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
 from django_countries import countries
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -32,7 +33,7 @@ from common.djangoapps.util.model_utils import truncate_fields
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from openedx.core.lib.api.authentication import BearerAuthentication
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser, BearerAuthentication
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
@@ -114,6 +115,12 @@ class TeamsDashboardView(GenericAPIView):
     """
     View methods related to the teams dashboard.
     """
+
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, course_id):
         """
@@ -391,7 +398,10 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
     """
 
     # BearerAuthentication must come first to return a 401 for unauthenticated users
-    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = CourseTeamSerializer
 
@@ -789,7 +799,10 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
             If the user is logged in and the team does not exist, a 404 is returned.
 
     """
-    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
     permission_classes = (
         permissions.IsAuthenticated,
         IsEnrolledOrIsStaff,
@@ -859,7 +872,10 @@ class TeamsAssignmentsView(GenericAPIView):
             search in a protected team, a 404 error is returned as if the team does not exist.
 
     """
-    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
     permission_classes = (
         permissions.IsAuthenticated,
         IsEnrolledOrIsStaff,
@@ -970,7 +986,10 @@ class TopicListView(GenericAPIView):
                   those teams whose members are outside of institutions affliation.
     """
 
-    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
     permission_classes = (permissions.IsAuthenticated,)
     pagination_class = TopicsPagination
     queryset = []
@@ -1126,7 +1145,10 @@ class TopicDetailView(APIView):
                   those teams whose members are outside of institutions affliation.
     """
 
-    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, topic_id, course_id):
@@ -1297,7 +1319,10 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             another user to a team.
     """
 
-    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = MembershipSerializer
 
@@ -1553,7 +1578,10 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
             If the membership does not exist, a 404 error is returned.
     """
 
-    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    authentication_classes = (
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
     permission_classes = (permissions.IsAuthenticated,)
 
     serializer_class = MembershipSerializer

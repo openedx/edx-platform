@@ -13,6 +13,7 @@ from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.fields import Boolean, Scope
+from openedx_filters.learning.filters import VerticalBlockChildRenderStarted
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
@@ -40,10 +41,8 @@ class VerticalFields:
 
     discussion_enabled = Boolean(
         display_name=_("Enable in-context discussions for the Unit"),
-        help=_(
-            "Add discussion for the Unit."
-        ),
-        default=False,
+        help=_("Add discussion for the Unit."),
+        default=True,
         scope=Scope.settings,
     )
 
@@ -117,6 +116,13 @@ class VerticalBlock(
                 child_block_context['wrap_xblock_data'] = {
                     'mark-completed-on-view-after-delay': complete_on_view_delay
                 }
+
+            # .. filter_implemented_name: VerticalBlockChildRenderStarted
+            # .. filter_type: org.openedx.learning.vertical_block_child.render.started.v1
+            child, child_block_context = VerticalBlockChildRenderStarted.run_filter(
+                block=child, context=child_block_context
+            )
+
             rendered_child = child.render(view, child_block_context)
             fragment.add_fragment_resources(rendered_child)
 

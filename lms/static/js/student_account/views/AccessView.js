@@ -173,7 +173,7 @@
                         this.listenTo(this.subview.login, 'password-help', this.resetPassword);
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
-                        if (!isTpaSaml) {
+                        if (this.isEnterpriseEnable == true && !isTpaSaml) {
                             this.listenTo(this.subview.login, 'auth-complete', this.loginComplete);
                         } else {
                             this.listenTo(this.subview.login, 'auth-complete', this.authComplete);

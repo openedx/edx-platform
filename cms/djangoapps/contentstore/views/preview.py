@@ -207,12 +207,8 @@ def _preview_module_system(request, descriptor, field_data):
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
 
     return PreviewModuleSystem(
-        static_url=settings.STATIC_URL,
-        # TODO (cpennington): Do we want to track how instructors are using the preview problems?
-        track_function=lambda event_type, event: None,
         get_module=partial(_load_preview_module, request),
         mixins=settings.XBLOCK_MIXINS,
-        course_id=course_id,
 
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,

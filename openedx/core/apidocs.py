@@ -20,7 +20,7 @@ def cursor_paginate_serializer(inner_serializer_class):
     Create a cursor-paginated version of a serializer.
 
     This is hacky workaround for an edx-api-doc-tools issue described here:
-    https://github.com/edx/api-doc-tools/issues/32
+    https://github.com/openedx/api-doc-tools/issues/32
 
     It assumes we are using cursor-style pagination and assumes a specific
     schema for the pages. It should be removed once we address the underlying issue.

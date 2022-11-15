@@ -53,6 +53,7 @@
     "paths": [
       "lms/djangoapps/instructor_task/",
       "lms/djangoapps/learner_dashboard/",
+      "lms/djangoapps/learner_home/",
       "lms/djangoapps/lms_initialization/",
       "lms/djangoapps/lms_xblock/",
       "lms/djangoapps/lti_provider/",
@@ -261,12 +262,6 @@
     ]
   },
   "common-2": {
-    "settings": "lms.envs.test",
-    "paths": [
-      "common/lib/"
-    ]
-  },
-  "common-3": {
     "settings": "cms.envs.test",
     "paths": [
       "common/djangoapps/"

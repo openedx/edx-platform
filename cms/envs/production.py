@@ -409,6 +409,7 @@ CELERY_BROKER_HOSTNAME = ENV_TOKENS.get("CELERY_BROKER_HOSTNAME", "")
 CELERY_BROKER_VHOST = ENV_TOKENS.get("CELERY_BROKER_VHOST", "")
 CELERY_BROKER_USER = AUTH_TOKENS.get("CELERY_BROKER_USER", "")
 CELERY_BROKER_PASSWORD = AUTH_TOKENS.get("CELERY_BROKER_PASSWORD", "")
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = ENV_TOKENS.get("CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION", True)
 
 BROKER_URL = "{}://{}:{}@{}/{}".format(CELERY_BROKER_TRANSPORT,
                                        CELERY_BROKER_USER,
@@ -451,6 +452,12 @@ CELERY_QUEUES.update(
 
 # Queue to use for updating grades due to grading policy change
 POLICY_CHANGE_GRADES_ROUTING_KEY = ENV_TOKENS.get('POLICY_CHANGE_GRADES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
+
+# Queue to use for individual learner course regrades
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = ENV_TOKENS.get(
+    'SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY',
+    DEFAULT_PRIORITY_QUEUE
+)
 
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = ENV_TOKENS.get(
     'SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY',
@@ -555,6 +562,10 @@ RETIREMENT_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
     RETIREMENT_SERVICE_WORKER_USERNAME
 )
 
+############### Settings for Exams ####################
+EXAMS_SERVICE_URL = ENV_TOKENS.get('EXAMS_SERVICE_URL', EXAMS_SERVICE_URL)
+EXAMS_SERVICE_USERNAME = ENV_TOKENS.get('EXAMS_SERVICE_USERNAME', EXAMS_SERVICE_USERNAME)
+
 ############### Settings for edx-rbac  ###############
 SYSTEM_WIDE_ROLE_CLASSES = ENV_TOKENS.get('SYSTEM_WIDE_ROLE_CLASSES') or SYSTEM_WIDE_ROLE_CLASSES
 
@@ -601,6 +612,8 @@ ALTERNATE_ENV_TASKS = {
 EXPLICIT_QUEUES = {
     'lms.djangoapps.grades.tasks.compute_all_grades_for_course': {
         'queue': POLICY_CHANGE_GRADES_ROUTING_KEY},
+    'lms.djangoapps.grades.tasks.recalculate_course_and_subsection_grades_for_user': {
+        'queue': SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY},
     'cms.djangoapps.contentstore.tasks.update_search_index': {
         'queue': UPDATE_SEARCH_INDEX_JOB_QUEUE},
     'cms.djangoapps.coursegraph.tasks.dump_course_to_neo4j': {
@@ -640,3 +653,5 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
     "SECRET": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_SECRET', None),
     "URL": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_URL', None),
 }
+
+INACTIVE_USER_URL = f'http{"s" if HTTPS == "on" else ""}://{CMS_BASE}'

@@ -9,7 +9,6 @@ from unittest.mock import patch
 
 import ddt
 import pytest
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from ccx_keys.locator import CCXLocator
 from crum import set_current_request
 from django.conf import settings
@@ -20,6 +19,7 @@ from submissions import api as sub_api
 
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from common.djangoapps.student.roles import CourseCcxCoachRole
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
@@ -438,8 +438,10 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             module_state_key=msk,
             state=original_state
         )
-        # lambda to reload the module state from the database
-        module = lambda: StudentModule.objects.get(student=self.user, course_id=self.course_key, module_state_key=msk)
+
+        def module():
+            return StudentModule.objects.get(student=self.user, course_id=self.course_key, module_state_key=msk)
+
         assert json.loads(module().state)['attempts'] == 32
         reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user)
         assert json.loads(module().state)['attempts'] == 0

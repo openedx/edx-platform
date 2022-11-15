@@ -20,7 +20,7 @@ from openedx.core.lib.tests import attr
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls, mongo_uses_error_check
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBootstrapper
 from xmodule.modulestore.tests.utils import (
     DRAFT_MODULESTORE_SETUP,
@@ -45,17 +45,17 @@ class TestPublish(SplitWMongoCourseBootstrapper):
         # There are 12 created items and 7 parent updates
         # create course: finds: 1 to verify uniqueness, 1 to find parents
         # sends: 1 to create course, 1 to create overview
-        with check_mongo_calls(4, 2):
+        with check_mongo_calls(3, 2):
             super()._create_course(split=False)  # 2 inserts (course and overview)
 
         # with bulk will delay all inheritance computations which won't be added into the mongo_calls
         with self.draft_mongo.bulk_operations(self.old_course_key):
             # finds: 1 for parent to add child and 2 to get ancestors
             # sends: 1 for insert, 1 for parent (add child)
-            with check_mongo_calls(3, 2):
+            with check_mongo_calls(4, 2):
                 self._create_item('chapter', 'Chapter1', {}, {'display_name': 'Chapter 1'}, 'course', 'runid', split=False)  # lint-amnesty, pylint: disable=line-too-long
 
-            with check_mongo_calls(4, 2):
+            with check_mongo_calls(5, 2):
                 self._create_item('chapter', 'Chapter2', {}, {'display_name': 'Chapter 2'}, 'course', 'runid', split=False)  # lint-amnesty, pylint: disable=line-too-long
             # For each vertical (2) created:
             #   - load draft
@@ -64,7 +64,7 @@ class TestPublish(SplitWMongoCourseBootstrapper):
             #   - load parent
             #   - get ancestors
             #   - load inheritable data
-            with check_mongo_calls(15, 6):
+            with check_mongo_calls(16, 6):
                 self._create_item('vertical', 'Vert1', {}, {'display_name': 'Vertical 1'}, 'chapter', 'Chapter1', split=False)  # lint-amnesty, pylint: disable=line-too-long
                 self._create_item('vertical', 'Vert2', {}, {'display_name': 'Vertical 2'}, 'chapter', 'Chapter1', split=False)  # lint-amnesty, pylint: disable=line-too-long
             # For each (4) item created
@@ -73,7 +73,7 @@ class TestPublish(SplitWMongoCourseBootstrapper):
             #   - compute what is parent
             #   - load draft parent again & compute its parent chain up to course
             # count for updates increased to 16 b/c of edit_info updating
-            with check_mongo_calls(36, 16):
+            with check_mongo_calls(40, 16):
                 self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1', split=False)  # lint-amnesty, pylint: disable=line-too-long
                 self._create_item(
                     'discussion', 'Discussion1',
@@ -126,11 +126,7 @@ class TestPublish(SplitWMongoCourseBootstrapper):
         #   delete the subtree of drafts (1 call),
         #   update the published version of each node in subtree (4 calls),
         #   update the ancestors up to course (2 calls)
-        if mongo_uses_error_check(self.draft_mongo):
-            max_find = 23
-        else:
-            max_find = 22
-        with check_mongo_calls(max_find, 7):
+        with check_mongo_calls(23, 7):
             self.draft_mongo.publish(item.location, self.user_id)
 
         # verify status

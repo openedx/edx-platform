@@ -87,9 +87,6 @@ class Zoom(LiveProvider):
     """
     id = 'zoom'
     name = 'Zoom LTI PRO'
-    additional_parameters = [
-        'custom_instructor_email'
-    ]
 
     @property
     def is_enabled(self):
@@ -103,6 +100,13 @@ class BigBlueButton(LiveProvider, HasGlobalCredentials):
     id = 'big_blue_button'
     name = 'Big Blue Button'
     requires_username: bool = True
+
+    def __init__(self):
+        """
+        initialize BigBlueButton object
+        """
+        super().__init__()
+        self.has_valid_global_keys()
 
     @property
     def has_free_tier(self) -> bool:

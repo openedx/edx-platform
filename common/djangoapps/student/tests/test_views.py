@@ -45,7 +45,6 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import with_site
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -235,6 +234,14 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertRedirects(response, reverse('account_settings'))
 
+    def test_redirect_to_learner_home(self):
+        """
+        if learner home mfe is enabled, redirect to learner home mfe
+        """
+        with patch('lms.djangoapps.learner_home.waffle.ENABLE_LEARNER_HOME_MFE.is_enabled', return_value=True):
+            response = self.client.get(self.path)
+            self.assertRedirects(response, settings.LEARNER_HOME_MICROFRONTEND_URL, fetch_redirect_response=False)
+
     def test_course_cert_available_message_after_course_end(self):
         course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
         course = CourseOverviewFactory.create(
@@ -288,16 +295,15 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         *itertools.product(
             [True, False],
             [True, False],
-            [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split],
         )
     )
     @ddt.unpack
-    def test_sharing_icons_for_future_course(self, set_marketing, set_social_sharing, modulestore_type):
+    def test_sharing_icons_for_future_course(self, set_marketing, set_social_sharing):
         """
         Verify that the course sharing icons show up if course is starting in future and
         any of marketing or social sharing urls are set.
         """
-        self.course = CourseFactory.create(start=TOMORROW, emit_signals=True, default_store=modulestore_type)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.course = CourseFactory.create(start=TOMORROW, emit_signals=True)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.set_course_sharing_urls(set_marketing, set_social_sharing)
 

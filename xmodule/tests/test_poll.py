@@ -5,6 +5,7 @@ import unittest
 
 from unittest.mock import Mock
 
+from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.poll_module import PollBlock
@@ -24,8 +25,9 @@ class PollBlockTest(unittest.TestCase):
 
     def setUp(self):
         super().setUp()
-        self.system = get_test_system()
-        usage_key = self.system.course_id.make_usage_key(PollBlock.category, 'test_loc')
+        course_key = CourseKey.from_string('org/course/run')
+        self.system = get_test_system(course_key)
+        usage_key = course_key.make_usage_key(PollBlock.category, 'test_loc')
         # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
         scope_ids = ScopeIds(1, PollBlock.category, usage_key, usage_key)
         self.xmodule = PollBlock(

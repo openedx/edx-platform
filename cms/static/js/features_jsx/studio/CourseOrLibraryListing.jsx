@@ -10,34 +10,45 @@ export function CourseOrLibraryListing(props) {
   const linkClass = props.linkClass;
   const idBase = props.idBase;
 
+  const renderCourseMetadata = (item, i) => (
+    <div>
+      <h3 className="course-title" id={`title-${idBase}-${i}`}>{item.display_name}</h3>
+        <div className="course-metadata">
+          <span className="course-org metadata-item">
+            <span className="label">{gettext('Organization:')}</span>
+            <span className="value">{item.org}</span>
+          </span>
+          <span className="course-num metadata-item">
+            <span className="label">{gettext('Course Number:')}</span>
+            <span className="value">{item.number}</span>
+          </span>
+          { item.run &&
+            <span className="course-run metadata-item">
+              <span className="label">{gettext('Course Run:')}</span>
+              <span className="value">{item.run}</span>
+            </span>
+          }
+          { item.can_edit === false &&
+            <span className="extra-metadata">{gettext('(Read-only)')}</span>
+          }
+      </div>
+    </div>
+  );
+
   return (
     <ul className="list-courses">
       {
         props.items.map((item, i) =>
           (
             <li key={i} className="course-item" data-course-key={item.course_key}>
-              <a className={linkClass} href={item.url}>
-                <h3 className="course-title" id={`title-${idBase}-${i}`}>{item.display_name}</h3>
-                <div className="course-metadata">
-                  <span className="course-org metadata-item">
-                    <span className="label">{gettext('Organization:')}</span>
-                    <span className="value">{item.org}</span>
-                  </span>
-                  <span className="course-num metadata-item">
-                    <span className="label">{gettext('Course Number:')}</span>
-                    <span className="value">{item.number}</span>
-                  </span>
-                  { item.run &&
-                  <span className="course-run metadata-item">
-                    <span className="label">{gettext('Course Run:')}</span>
-                    <span className="value">{item.run}</span>
-                  </span>
-                  }
-                  { item.can_edit === false &&
-                  <span className="extra-metadata">{gettext('(Read-only)')}</span>
-                  }
-                </div>
-              </a>
+              {item.url
+                ? (
+                  <a className={linkClass} href={item.url}>
+                    {renderCourseMetadata(item, i)}
+                  </a>
+                )
+                : renderCourseMetadata(item, i)
+              }
               { item.lms_link && item.rerun_link &&
               <ul className="item-actions course-actions">
                 { allowReruns &&

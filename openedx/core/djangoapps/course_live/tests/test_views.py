@@ -63,6 +63,9 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
                 }
             },
         }
+        if not providers.get(provider).additional_parameters:
+            lti_config.pop('lti_config')
+
         course_live_config_data = {
             'enabled': True,
             'provider_type': provider,
@@ -83,7 +86,6 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
             'enabled': True,
             'lti_configuration': {
                 'lti_1p1_client_key': '',
-                'lti_1p1_client_secret': '',
                 'lti_1p1_launch_url': '',
                 'version': 'lti_1p1',
                 'lti_config': {}
@@ -106,7 +108,6 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
             'pii_sharing_allowed': True,
             'lti_configuration': {
                 'lti_1p1_client_key': '',
-                'lti_1p1_client_secret': '',
                 'lti_1p1_launch_url': '',
                 'lti_config': {},
                 'version': 'lti_1p1'
@@ -125,8 +126,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         lti_config, data, response = self.create_course_live_config(provider)
         course_live_configurations = CourseLiveConfiguration.get(self.course.id)
-        lti_configuration = CourseLiveConfiguration.get(self.course.id).lti_configuration
-
+        lti_configuration = course_live_configurations.get(self.course.id).lti_configuration
         self.assertEqual(self.course.id, course_live_configurations.course_key)
         self.assertEqual(data['enabled'], course_live_configurations.enabled)
         self.assertEqual(data['provider_type'], course_live_configurations.provider_type)
@@ -134,10 +134,64 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         self.assertEqual(lti_config['lti_1p1_client_key'], lti_configuration.lti_1p1_client_key)
         self.assertEqual(lti_config['lti_1p1_client_secret'], lti_configuration.lti_1p1_client_secret)
         self.assertEqual(lti_config['lti_1p1_launch_url'], lti_configuration.lti_1p1_launch_url)
+
+        provider_instance = ProviderManager().get_enabled_providers().get(provider)
+        additional_param = {'additional_parameters': {}}
+        if provider_instance.additional_parameters:
+            additional_param = {'additional_parameters': {'custom_instructor_email': 'email@example.com'}}
+
         self.assertEqual({
             'pii_share_username': share_username,
             'pii_share_email': share_email,
-            'additional_parameters': {'custom_instructor_email': 'email@example.com'}
+            **additional_param
+        }, lti_configuration.lti_config)
+
+        self.assertEqual(response.status_code, 200)
+
+    @ddt.data(('zoom', False, False), ('big_blue_button', False, True))
+    @ddt.unpack
+    def test_update_configurations_data(self, provider, share_email, share_username):
+        """
+        Create and test courseLiveConfiguration data in database
+        """
+        lti_config, data, response = self.create_course_live_config(provider)
+        updated_lti_config = {
+            'lti_1p1_client_key': 'new_key',
+            'lti_1p1_client_secret': '',
+            'lti_1p1_launch_url': 'example01.com',
+            'lti_config': {
+                'additional_parameters': {
+                    'custom_instructor_email': 'new_email@example.com'
+                },
+            },
+        }
+        updated_data = {
+            'enabled': False,
+            'provider_type': provider,
+            'lti_configuration': updated_lti_config
+        }
+        response = self._post(updated_data)
+
+        live_configurations = CourseLiveConfiguration.get(self.course.id)
+        lti_configuration = live_configurations.get(self.course.id).lti_configuration
+
+        self.assertEqual(self.course.id, live_configurations.course_key)
+        self.assertEqual(updated_data['enabled'], live_configurations.enabled)
+        self.assertEqual(updated_data['provider_type'], live_configurations.provider_type)
+
+        self.assertEqual(updated_lti_config.get('lti_1p1_client_key'), lti_configuration.lti_1p1_client_key)
+        self.assertEqual(lti_config.get('lti_1p1_client_secret'), lti_configuration.lti_1p1_client_secret)
+        self.assertEqual(updated_lti_config.get('lti_1p1_launch_url'), lti_configuration.lti_1p1_launch_url)
+
+        provider_instance = ProviderManager().get_enabled_providers().get(provider)
+        additional_param = {'additional_parameters': {}}
+        if provider_instance.additional_parameters:
+            additional_param = updated_lti_config.get('lti_config')
+
+        self.assertEqual({
+            'pii_share_username': share_username,
+            'pii_share_email': share_email,
+            **additional_param
         }, lti_configuration.lti_config)
 
         self.assertEqual(response.status_code, 200)
@@ -149,6 +203,12 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         Create and test POST request response data
         """
         lti_config, course_live_config_data, response = self.create_course_live_config(provider)
+
+        provider_instance = ProviderManager().get_enabled_providers().get(provider)
+        additional_param = {'additional_parameters': {}}
+        if provider_instance.additional_parameters:
+            additional_param = {'additional_parameters': {'custom_instructor_email': 'email@example.com'}}
+
         expected_data = {
             'course_key': str(self.course.id),
             'enabled': True,
@@ -157,15 +217,12 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
             'free_tier': False,
             'lti_configuration': {
                 'lti_1p1_client_key': 'this_is_key',
-                'lti_1p1_client_secret': 'this_is_secret',
                 'lti_1p1_launch_url': 'example.com',
                 'version': 'lti_1p1',
                 'lti_config': {
                     'pii_share_email': share_email,
                     'pii_share_username': share_username,
-                    'additional_parameters': {
-                        'custom_instructor_email': 'email@example.com'
-                    },
+                    **additional_param
                 },
             },
         }
@@ -198,6 +255,12 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         response = self._post(updated_data)
         content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 200)
+
+        provider_instance = ProviderManager().get_enabled_providers().get(provider)
+        additional_param = {'additional_parameters': {}}
+        if provider_instance.additional_parameters:
+            additional_param = {'additional_parameters': {'custom_instructor_email': 'new_email@example.com'}}
+
         expected_data = {
             'course_key': str(self.course.id),
             'provider_type': provider,
@@ -205,16 +268,12 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
             'free_tier': False,
             'lti_configuration': {
                 'lti_1p1_client_key': 'new_key',
-                'lti_1p1_client_secret': 'new_secret',
                 'lti_1p1_launch_url': 'example01.com',
                 'version': 'lti_1p1',
                 'lti_config': {
                     'pii_share_username': share_username,
                     'pii_share_email': share_email,
-                    'additional_parameters': {
-                        'custom_instructor_email':
-                            'new_email@example.com'
-                    }
+                    **additional_param
                 }
             },
             'pii_sharing_allowed': share_email or share_username
@@ -271,6 +330,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         Create and test POST request response data
         """
+        self.create_course_live_config()
         providers = ProviderManager().get_enabled_providers()
         if providers.get(provider).requires_pii_sharing():
             CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)

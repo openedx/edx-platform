@@ -91,20 +91,20 @@ class TestDiscussionEnabled(CourseTestCase):
         )
         return resp
 
-    def test_discussion_enabled_false_initially(self):
+    def test_discussion_enabled_true_initially(self):
         """
-        Tests discussion_enabled flag is False initially for vertical
+        Tests discussion_enabled flag is True initially for vertical
         """
-        self.assertFalse(self.get_discussion_enabled_status(self.vertical))
-        self.assertFalse(self.get_discussion_enabled_status(self.vertical_1))
+        self.assertTrue(self.get_discussion_enabled_status(self.vertical))
+        self.assertTrue(self.get_discussion_enabled_status(self.vertical_1))
 
     def test_discussion_enabled_toggle(self):
         """
         Tests discussion_enabled can be toggled.
         """
-        self.set_discussion_enabled_status(self.vertical, True)
-        self.assertTrue(self.get_discussion_enabled_status(self.vertical))
-        self.assertFalse(self.get_discussion_enabled_status(self.vertical_1))
+        self.set_discussion_enabled_status(self.vertical, False)
+        self.assertFalse(self.get_discussion_enabled_status(self.vertical))
+        self.assertTrue(self.get_discussion_enabled_status(self.vertical_1))
 
     def test_non_course_author_cannot_get_or_set_discussion_enabled_flag(self):
         """

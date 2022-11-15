@@ -1,5 +1,8 @@
 """
 Code related to the handling of Proctored Exams in Studio
+using the edx-proctoring plugin.
+
+Courses using the exam IDA are handled by ./exams.py
 """
 
 

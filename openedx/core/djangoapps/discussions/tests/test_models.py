@@ -3,13 +3,17 @@ Perform basic validation of the models
 """
 
 from unittest.mock import patch
+
+import ddt
 import pytest
 
 from django.test import TestCase
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from organizations.models import Organization
 
-from ..models import DEFAULT_CONFIG_ENABLED, DEFAULT_PROVIDER_TYPE, Provider
+from ..config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
+from ..models import DEFAULT_CONFIG_ENABLED, Provider, get_default_provider_type
 from ..models import DiscussionsConfiguration
 from ..models import ProviderFilter
 
@@ -117,6 +121,7 @@ class OrganizationFilterTest(TestCase):
         assert len(providers) == 1
 
 
+@ddt.ddt
 class DiscussionsConfigurationModelTest(TestCase):
     """
     Perform basic validation on the configuration model
@@ -162,7 +167,7 @@ class DiscussionsConfigurationModelTest(TestCase):
         assert configuration.enabled  # by default
         assert configuration.lti_configuration is None
         assert len(configuration.plugin_configuration.keys()) == 0
-        assert configuration.provider_type == DEFAULT_PROVIDER_TYPE
+        assert configuration.provider_type == get_default_provider_type()
 
     def test_get_with_values(self):
         """
@@ -216,16 +221,22 @@ class DiscussionsConfigurationModelTest(TestCase):
         is_enabled = DiscussionsConfiguration.is_enabled(self.course_key_with_values)
         assert not is_enabled
 
-    def test_get_nonexistent_defaults_to_legacy(self):
+    @ddt.data(
+        (True, Provider.OPEN_EDX),
+        (False, Provider.LEGACY),
+    )
+    @ddt.unpack
+    def test_get_nonexistent_defaults(self, new_structure_enabled, default_provider_type):
         """
         Assert we get default provider "legacy" and default enabled model instance back for nonexistent records
         """
-        configuration = DiscussionsConfiguration.get(self.course_key_without_config)
-        assert configuration is not None
-        assert configuration.enabled == DEFAULT_CONFIG_ENABLED
-        assert configuration.provider_type == DEFAULT_PROVIDER_TYPE
-        assert not configuration.lti_configuration
-        assert not configuration.plugin_configuration
+        with override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, active=new_structure_enabled):
+            configuration = DiscussionsConfiguration.get(self.course_key_without_config)
+            assert configuration is not None
+            assert configuration.enabled == DEFAULT_CONFIG_ENABLED
+            assert configuration.provider_type == default_provider_type
+            assert not configuration.lti_configuration
+            assert not configuration.plugin_configuration
 
     def test_get_defaults(self):
         """

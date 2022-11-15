@@ -3,17 +3,14 @@ Tests for functionality in openedx/core/lib/courses.py.
 """
 
 
-import ddt
 from django.test.utils import override_settings
 
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..courses import course_image_url
 
 
-@ddt.ddt
 class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""
 
@@ -52,13 +49,12 @@ class CourseImageTestCase(ModuleStoreTestCase):
         )
 
     @override_settings(DEFAULT_COURSE_ABOUT_IMAGE_URL='test.png')
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
-    def test_empty_image_name(self, default_store):
+    def test_empty_image_name(self):
         """
         Verify that if a course has empty `course_image`, `course_image_url` returns
         `DEFAULT_COURSE_ABOUT_IMAGE_URL` defined in the settings.
         """
-        course = CourseFactory.create(course_image='', default_store=default_store)
+        course = CourseFactory.create(course_image='')
         assert '/static/test.png' == course_image_url(course)
 
     def test_get_banner_image_url(self):

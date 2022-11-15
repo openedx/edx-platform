@@ -99,8 +99,8 @@
         var tinyMceConfig = {
           script_url: baseUrl + "js/vendor/tinymce/js/tinymce/tinymce.full.min.js",
           font_formats: _getFonts(),
-          theme: "modern",
-          skin: 'studio-tmce4',
+          theme: "silver",
+          skin: "studio-tmce5",
           schema: "html5",
           entity_encoding: "raw",
 
@@ -125,19 +125,23 @@
           Disable visual aid on borderless table.
            */
           visual: false,
-          plugins: "textcolor, link, image, codemirror",
+          plugins: "lists, link, image, codemirror",
           codemirror: {
-            path: baseUrl + "js/vendor"
+            path: baseUrl + "js/vendor",
+            disableFilesMerge: true,
+            jsFiles: ["codemirror-compressed.js"],
+            cssFiles: ["CodeMirror/codemirror.css"]
           },
+
           image_advtab: true,
 
           /*
           We may want to add "styleselect" when we collect all styles used throughout the LMS
            */
-          toolbar: "formatselect | fontselect | bold italic underline forecolor wrapAsCode | " +
-            "alignleft aligncenter alignright alignjustify | " +
-            "bullist numlist outdent indent blockquote | link unlink " +
-            ((this.new_image_modal ? 'insertImage' : 'image') + " | code"),
+          toolbar: "formatselect fontselect bold italic underline forecolor wrapAsCode " +
+            "alignleft aligncenter alignright alignjustify " +
+            "bullist numlist outdent indent blockquote link unlink " +
+            ((this.new_image_modal ? 'insertImage' : 'image') + " code"),
           block_formats: edx.StringUtils.interpolate(
             gettext("{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"),
             {
@@ -149,7 +153,7 @@
               heading6: gettext("Heading 6")
             }),
           width: '100%',
-          height: '400px',
+          height: '435px',
           menubar: false,
           statusbar: false,
 
@@ -1233,25 +1237,25 @@
     }
 
     HTMLEditingDescriptor.prototype.setupTinyMCE = function(ed) {
-      ed.addButton('wrapAsCode', {
+      ed.ui.registry.addButton('wrapAsCode', {
 
         /*
         Translators: this is a toolbar button tooltip from the raw HTML editor displayed in the browser when a user needs to edit HTML
          */
-        title: gettext('Code block'),
-        image: baseUrl + "images/ico-tinymce-code.png",
-        onclick: function() {
+        tooltip: gettext('Code block'),
+        icon: 'code-sample',
+        onAction: function() {
           return ed.formatter.toggle('code');
         }
       });
-      ed.addButton('insertImage', {
+      ed.ui.registry.addButton('insertImage', {
 
         /*
         Translators: this is a toolbar button tooltip from the raw HTML editor displayed in the browser when a user needs to edit HTML
          */
-        title: gettext('Insert/Edit Image'),
+        tooltip: gettext('Insert/Edit Image'),
         icon: 'image',
-        onclick: this.openImageModal
+        onAction: this.openImageModal
       });
       this.visualEditor = ed;
       this.imageModal = $('#edit-image-modal #modalWrapper');
@@ -1266,7 +1270,7 @@
       ed.on('EditLink', this.editLink);
       ed.on('ShowCodeEditor', this.showCodeEditor);
       ed.on('SaveCodeEditor', this.saveCodeEditor);
-       $(".action-cancel").on('click', this.cancelButton)
+      $(".action-cancel").on('click', this.cancelButton);
 
       this.imageModal.on('closeModal', this.closeImageModal);
       return this.imageModal.on('submitForm', this.editImageSubmit);

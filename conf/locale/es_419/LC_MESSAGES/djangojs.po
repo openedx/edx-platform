@@ -25,6 +25,7 @@
 # Gerardo Laster, 2014
 # Gerardo Laster, 2014
 # Javier Galnares Arias <javigalnares@yahoo.es>, 2015
+# Jesica Greco, 2022
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2021
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
@@ -73,6 +74,7 @@
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
 # Francisco Palm <francisco.palm@gmail.com>, 2017
 # gildardo lasso bañol <gildardolasso@hotmail.com>, 2016
+# Jesica Greco, 2022
 # 1673e3cf8bd85685e54576636ae7f409, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
@@ -160,7 +162,7 @@
 # Poxtic <erandelle@outlook.com>, 2017
 # Javier Galnares Arias <javigalnares@yahoo.es>, 2015
 # Jose Antonio Sanchez Romero <isc.antonio.sr@gmail.com>, 2017
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017,2022
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # karlman72 <karlman72@gmail.com>, 2014
@@ -175,9 +177,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-03 20:43+0000\n"
+"POT-Creation-Date: 2022-11-06 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Carolina De Mares <carolina.demares@edunext.co>, 2021\n"
+"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017,2022\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -433,7 +435,7 @@ msgstr "Navegue hacia arriba"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
-msgstr ""
+msgstr "Explorando"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
@@ -1013,19 +1015,19 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
-msgstr ""
+msgstr "Detalles"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "the more quickly and helpfully we can respond!"
-msgstr ""
+msgstr "podemos responder más rápido y mejor!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
-msgstr ""
+msgstr "Crear caso de soporte"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr ""
+msgstr "¿En qué podemos ayudarte, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -1033,7 +1035,7 @@ msgstr "Ingrese a  {platform} para que podamos ayudarle mejor."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Need help logging in?"
-msgstr ""
+msgstr "¿Necesita ayuda para iniciar sesión?"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -1969,47 +1971,56 @@ msgstr "¡Ayuda a edX a ser mejor para todos!"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Why does edX collect this information?"
-msgstr ""
+msgstr "¿Por qué edX obtiene esta información?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "An error occurred while attempting to retrieve or save the information "
 "below. Please try again later."
 msgstr ""
+"Se produjo un error al intentar recuperar o guardar la información que "
+"figura a continuación. Por favor intente de nuevo más tarde. "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What was the total combined income, during the last 12 months, of all "
 "members of your family? "
 msgstr ""
+"¿Cuál fue el ingreso total de todos los miembros de tu familia durante los "
+"últimos 12 meses? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
 "National Guard?"
 msgstr ""
+"¿Alguna vez prestó servicios en un deber activo en las Fuerzas Armadas, "
+"grupo de Reservas, o en la Guardia Nacional de los Estados Unidos de "
+"América? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What is the highest level of education that you have achieved so far?"
-msgstr ""
+msgstr "¿Cuál es el nivel más alto de educación que obtuvo hasta la fecha?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What is the highest level of education that any of your parents or guardians"
 " have achieved?"
 msgstr ""
+"¿Cuál es el nivel de educación más alto que alguno de sus padres o tutores "
+"obtuvieron? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select employment status"
-msgstr ""
+msgstr "Seleccionar su estado laboral"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you currently work in?"
-msgstr ""
+msgstr "¿En qué industria se encuentra trabajando actualmente?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you want to work in?"
-msgstr ""
+msgstr "¿En qué industria te gustaría trabajar?"
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -2025,19 +2036,19 @@ msgstr "questionario cerrado"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "finish later"
-msgstr ""
+msgstr "terminar despues"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
-msgstr ""
+msgstr "Volver a mi panel de control"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
-msgstr ""
+msgstr "Terminar despues"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "next page"
-msgstr ""
+msgstr "Siguiente página"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -2300,7 +2311,7 @@ msgstr "Correo electrónico inválido: {email}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Cohort assignment not allowed: {email_or_username}"
-msgstr ""
+msgstr "Asignación de cohorte no permitida: {email_or_username}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "There was an error when trying to add learners:"
@@ -3182,11 +3193,39 @@ msgstr "Ir al panel principal"
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Recommendations for you"
+msgstr "Recomendaciones para ti"
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid "loading"
+msgstr "cargando"
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid ""
+"Browse recently launched courses and see what's new in your favorite "
+"subjects."
 msgstr ""
+"Echa un vistazo a nuestros cursos lanzados recientemente y qué hay de nuevo "
+"en tus temas favoritos."
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Explore courses"
+msgstr "Explorar cursos"
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid "More opportunities for you"
+msgstr "Más oportunidades para ti"
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid " to learn"
+msgstr "aprender"
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid ""
+"We've added 500+ learning opportunities to create one of the world's most "
+"comprehensive free-to-degree online learning platforms."
 msgstr ""
+"Hemos agregado más de 500 oportunidades de aprendizaje para crear una de las"
+" plataformas de aprendizaje en línea gratuitas más completas del mundo."
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
@@ -4236,11 +4275,11 @@ msgstr "Actualizando con el más reciente contenido de la librería"
 
 #: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Loading..."
-msgstr ""
+msgstr "Cargando..."
 
 #: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Selected blocks"
-msgstr ""
+msgstr "Bloques seleccionados"
 
 #: xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Unable to update settings"
@@ -6125,24 +6164,25 @@ msgstr "Ha habido un error con la subida del archivo"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr ""
+msgstr "Organización:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr ""
+msgstr "Número del curso:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr ""
+msgstr "Curso dirigido por:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr ""
+msgstr "(Solo-lectura)"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr ""
+msgstr "Reabrir Curso"
 
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Ver en vivo"
@@ -8460,6 +8500,10 @@ msgstr "Agregar a lista de excepciones"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "Generate Exception Certificates"
 msgstr "Generar excepciones de certificados"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Certificate exceptions group selection"
+msgstr "Selección de grupo de excepciones de certificado"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
@@ -11720,7 +11764,7 @@ msgid ""
 " transcript on YouTube. You can import the YouTube transcript or upload your"
 " own .srt transcript file."
 msgstr ""
-"EdX no tiene una transcripción de este video en Studio, pero hemos "
+"No se encontró una transcripción de este video en Studio, pero hemos "
 "encontrado una en Youtube. Puede importar la transcripción de Youtube o "
 "subir su propio archivo .srt."
 
@@ -11737,8 +11781,8 @@ msgid ""
 "EdX doesn\\'t have a timed transcript for this video. Please upload an .srt "
 "file."
 msgstr ""
-"EdX no cuenta con una transcripción para este video. Por favor suba un "
-"archivo de transcripción .srt"
+"No se encontró una transcripción para este video. Por favor suba un archivo "
+"de transcripción .srt"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid ""
