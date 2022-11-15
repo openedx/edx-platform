@@ -57,6 +57,7 @@ class LtiCourseLaunchMixin:
         pii_config = {}
         if lti_config.pii_share_username:
             pii_config['person_sourcedid'] = request.user.username
+
         if lti_config.pii_share_email:
             pii_config['person_contact_email_primary'] = request.user.email
         return pii_config
