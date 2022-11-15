@@ -2,6 +2,7 @@
 
 # Core
 common/djangoapps/student/
+common/djangoapps/student/models.py               @openedx/teaching-and-learning
 common/djangoapps/third_party_auth/
 lms/djangoapps/course_api/blocks
 lms/djangoapps/courseware/
