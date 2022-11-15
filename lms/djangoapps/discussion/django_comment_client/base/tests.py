@@ -139,7 +139,7 @@ class ThreadActionGroupIdTestCase(
                 "closed": False,
                 "type": "thread",
                 "commentable_id": "non_team_dummy_id",
-                "body": "test body"
+                "body": "test body",
             }
         )
         request = RequestFactory().post("dummy_url", post_params or {})
@@ -412,7 +412,7 @@ class ViewsQueryCountTestCase(
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 6, 38),
+        (ModuleStoreEnum.Type.split, 3, 6, 42),
     )
     @ddt.unpack
     @count_queries
@@ -528,6 +528,7 @@ class ViewsTestCase(
         self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
+            "body": "test body",
         })
         test_thread_id = "test_thread_id"
         request = RequestFactory().post("dummy_url", {"id": test_thread_id})
@@ -546,6 +547,7 @@ class ViewsTestCase(
         self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
+            "body": "test body",
         })
         test_comment_id = "test_comment_id"
         request = RequestFactory().post("dummy_url", {"id": test_comment_id})
@@ -1595,7 +1597,8 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             "commentable_id": commentable_id,
             "user_id": str(comment_author.id),
             "username": comment_author.username,
-            "course_id": str(self.course.id)
+            "course_id": str(self.course.id),
+            "body": "test body",
         })
 
         response = self.client.post(
