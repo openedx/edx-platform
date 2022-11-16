@@ -1,24 +1,35 @@
 from django.dispatch import receiver
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 from .models import GenUser, Student, Teacher, TempUser, Class, JournalPost, Activity
 from .constants import JournalTypes, ActivityTypes
+import logging
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
-
-@receiver(post_save, sender=USER_MODEL)
-def delete_temp_user(sender, instance, created, **kwargs):
-    if created:
-        TempUser.objects.filter(username=instance.username).delete()
+logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=GenUser)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        if instance.is_student:
-            Student.objects.create(gen_user=instance)
-        elif instance.is_teacher:
-            Teacher.objects.create(gen_user=instance)
+        try:
+            user_pk = instance.user.pk
+            # check if temp_user with same username,email exists
+            gen_user = GenUser.objects.get(temp_user__username=instance.user.username,
+                                           temp_user__email=instance.user.email)
+            gen_user.user = get_user_model().objects.get(pk=user_pk)
+            # delete current genUser
+            GenUser.objects.filter(pk=instance.pk).delete()
+            # delete TempUser at the end
+            TempUser.objects.get(pk=gen_user.temp_user.id).delete()
+            gen_user.save()
+        except Exception as e:
+            logger.exception(str(e))
+            if instance.is_student:
+                Student.objects.create(gen_user=instance)
+            elif instance.is_teacher:
+                Teacher.objects.create(gen_user=instance)
 
 
 @receiver(post_save, sender=Teacher)

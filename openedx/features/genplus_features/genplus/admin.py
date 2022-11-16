@@ -191,3 +191,4 @@ class StudentAdmin(admin.ModelAdmin):
 admin.site.register(JournalPost)
 admin.site.register(Activity)
 admin.site.register(ClassStudents)
+admin.site.register(TempUser)
