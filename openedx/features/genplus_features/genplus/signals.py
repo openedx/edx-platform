@@ -16,14 +16,13 @@ def create_user_profile(sender, instance, created, **kwargs):
         try:
             user_pk = instance.user.pk
             # check if temp_user with same username,email exists
-            gen_user = GenUser.objects.get(temp_user__username=instance.user.username,
-                                           temp_user__email=instance.user.email)
+            gen_user = GenUser.objects.get(temp_user__email=instance.user.email)
             gen_user.user = get_user_model().objects.get(pk=user_pk)
             # delete current genUser
             GenUser.objects.filter(pk=instance.pk).delete()
+            gen_user.save()
             # delete TempUser at the end
             TempUser.objects.get(pk=gen_user.temp_user.id).delete()
-            gen_user.save()
         except Exception as e:
             logger.exception(str(e))
             if instance.is_student:
