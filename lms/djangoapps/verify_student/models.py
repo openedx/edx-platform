@@ -910,7 +910,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         config = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]
 
         # Default to the S3 backend for backward compatibility
-        storage_class = config.get("STORAGE_CLASS", "storages.backends.s3boto.S3BotoStorage")
+        storage_class = config.get("STORAGE_CLASS", "storages.backends.s3boto.S3Boto3Storage")
         storage_kwargs = config.get("STORAGE_KWARGS", {})
 
         # Map old settings to the parameters expected by the storage backend
