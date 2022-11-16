@@ -8,12 +8,14 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
+from openedx_filters.learning.filters import AccountSettingsRenderStarted
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.models import UserProfile
@@ -72,6 +74,12 @@ def account_settings(request):
         return redirect(url)
 
     context = account_settings_context(request)
+
+    try:
+        context = AccountSettingsRenderStarted().run_filter(context=context)
+    except AccountSettingsRenderStarted.ErrorFilteringContext as exc:
+        raise ImproperlyConfigured(f'Pipeline configuration error: {exc}') from exc
+
     return render_to_response('student_account/account_settings.html', context)
 
 
