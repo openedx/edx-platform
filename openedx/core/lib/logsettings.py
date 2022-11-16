@@ -80,13 +80,6 @@ def get_logger_config(log_dir,  # lint-amnesty, pylint: disable=unused-argument
             },
             'tracking': {
                 'level': 'DEBUG',
-                'class': 'logging.handlers.SysLogHandler',
-                'address': '/dev/log',
-                'facility': SysLogHandler.LOG_LOCAL1,
-                'formatter': 'raw',
-            },
-            'test': {
-                'level': 'DEBUG',
                 'class': 'logging.handlers.RotatingFileHandler',
                 'filename': '/var/tmp/logs.log',
                 'backupCount': 1,
