@@ -31,7 +31,14 @@ data: |
     -->
     <div class="lesson-overview">
       <div class="text-right">
-        <button class="btn-download-lesson-plan"><span class="ico-download"></span>Download Lesson Plan</button>
+        <a
+          href="https://www.africau.edu/images/default/sample.pdf"
+          class="btn-download-lesson-plan"
+          target="_blank"
+          download
+        >
+          <span class="ico-download"></span>Download Lesson Plan
+        </a>
       </div>
       <div class="lesson-overview-header row no-gutters" style="background-image: url('https://dev.genplus.co.uk/asset-v1:genplus+GP310+2022_T1+type@asset+block@bg-organization.png');">
         <div class="col-12 col-sm-6 col-lg-3">
@@ -85,7 +92,7 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <button class="btn" data-title="Teacher">
                 <span class="icon ico-teacher"></span>
                 <span class="text">Teacher</span>
               </button>
@@ -113,9 +120,9 @@ data: |
               <span class="time">8 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <button class="btn" data-title="Individual">
                 <span class="icon ico-single"></span>
-                <span class="text">Solo</span>
+                <span class="text">Individual</span>
               </button>
             </div>
             <div class="text-block">

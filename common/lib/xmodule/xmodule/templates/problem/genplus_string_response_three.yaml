@@ -8,8 +8,7 @@ data: |
         <div class="journals-xblock-wapper">
           <div class="journals-info">
             <h2>Your Turn</h2>
-            <p>Think. What's the one thing you want to achieve this year?</p>
-            <p>It could be something to do with school, home or the community.</p>
+            <p>Think. What's the one thing you want to achieve this year?<br />It could be something to do with school, home or the community.</p>
           </div>
           <div class="journals-form three">
             <div class="col">
@@ -32,7 +31,14 @@ data: |
             </div>
             <div class="col">
               <stringresponse answer="\w" type="regexp ci">
-                <label class="question-text">'<strong>Calculate</strong>' the risks vs pay-offs.</label>
+                <label class="question-text">
+                  '<strong>Calculate</strong>' the risks vs pay-offs.
+                  <br />
+                  <small>
+                  - What's the worst that could happen?<br />
+                  - How can you ovetcome the difficulties?<br />
+                  </small>
+                </label>
                 <additional_answer answer="Please type a response"/>
                 <div class="text-wrapper">
                   <textline multiline="true" size="20" placeholder="Type in your answer here..." />
