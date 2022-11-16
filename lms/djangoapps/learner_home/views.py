@@ -627,11 +627,6 @@ class CourseRecommendationApiView(APIView):
                     }
                 )
 
-        segment.track(
-            user_id,
-            "edx.bi.user.recommendations.count",
-            {"count": len(recommended_courses)},
-        )
         return Response(
             CourseRecommendationSerializer(
                 {
