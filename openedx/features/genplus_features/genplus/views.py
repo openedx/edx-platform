@@ -3,7 +3,6 @@ import logging
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from common.djangoapps import third_party_auth

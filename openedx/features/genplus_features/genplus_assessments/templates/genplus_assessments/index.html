@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../static/genplus_assessments/assets/css/main.css">
+  <title>Gen+ Report</title>
+</head>
+<body>
+  <div class="wrapper">
+    <header class="header">
+      <div class="container">
+        <div class="profile-image">
+          <div class="profile-frame">
+            <img src="../../static/genplus_assessments/assets/images/jay.png" alt="Student Name">
+          </div>
+        </div>
+        <div class="text-block">
+          <img class="logo" src="../../static/genplus_assessments/assets/images/logo.png" alt="GenPlus logo" >
+          <div class="text-frame">
+            <span class="subtitle">Student Class and School Name Here</span>
+            <h1 class="name">Student Name Here</h1>
+            <h2 class="title"><span class="text">GEN+ REPORT</span></h2>
+          </div>
+        </div>
+      </div>
+    </header>
+    <header class="header alt">
+      <div class="container">
+        <div class="text-block">
+          <div class="text-frame">
+            <div class="profile-image">
+              <div class="profile-frame">
+                <img src="../../static/genplus_assessments/assets/images/jay.png" alt="Student Name">
+              </div>
+            </div>
+            <h2 class="title"><span class="text">GEN+ REPORT</span></h2>
+          </div>
+          <img class="logo" src="../../static/genplus_assessments/assets/images/logo.png" alt="GenPlus logo" >
+        </div>
+      </div>
+    </header>
+    <div class="content">
+      <div class="container">
+        <section class="section">
+          <div class="heading">
+            <div class="image-frame">
+              <img src="../../static/genplus_assessments/assets/images/Question.svg" alt="Question">
+            </div>
+            <div class="text-block">
+              <span class="subtitle">End of Year Self Evaluation</span>
+              <h2>Skills Assessment</h2>
+            </div>
+          </div>
+          <div class="content">
+            <p>Ximustio ritatur? Dolluptas restium facea cum fugitatiis molore velesed maximus modignis nusapis magnam voloresto eiur alitium voluptatibus rem. Ciis volorei ciuntia earchiciis expliqui cus et volo to expe volorupta sinum enis ipicips aectiam inus voluptis dolupta sitatium quamendi dolesent.</p>
+          </div>
+        </section>
+        <section class="skills-assessments-chart">
+          <canvas id="radarChart" width="400" height="400"></canvas>
+        </section>
+        <hr />
+        <section>
+          <div class="multiple-choices">
+            <p>Please list as many communication skills as you can think of. There are five boxes available - it’s okay if you just write a couple, or, if you can’t think of any, it’s also okay to leave it blank!</p>
+            <ol class="alphabets-list">
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 1</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 2</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 3</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 4</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 5</span>
+              </li>
+            </ol>
+          </div>
+          <hr />
+          <div class="feedback">
+            <ul class="star-rating">
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-outline.png" width="25" alt="Favourite" /></li>
+            </ul>
+            <p>How would you rate your overall listening skills, on a scale from 1-5?</p>
+          </div>
+          <div class="feedback">
+            <ul class="star-rating">
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-outline.png" width="25" alt="Favourite" /></li>
+            </ul>
+            <p>How would you rate your overall ability to tell a story and communicate your points well, on a scale from 1-5?</p>
+          </div>
+          <div class="feedback">
+            <ul class="star-rating">
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-outline.png" width="25" alt="Favourite" /></li>
+            </ul>
+            <p>How organised would you say you feel, on a scale from 1-5?</p>
+          </div>
+          <hr />
+          <div class="multiple-choices">
+            <p>What tools and techniques do you use to help you stay organised? Please list as many as you can think of. There are five boxes available - it’s okay if you just write a couple, or, if you can’t think of any, it’s also okay to leave it blank!</p>
+            <ol class="alphabets-list">
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 1</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 2</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 3</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 4</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 5</span>
+              </li>
+            </ol>
+          </div>
+          <hr />
+          <div class="multiple-choices">
+            <p>Please list as many habits for a good night’s sleep as you can think of. There are five boxes available - it’s okay if you just write a couple, or, if you can’t think of any, it’s also okay to leave it blank!</p>
+            <ol class="alphabets-list">
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 1</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 2</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 3</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 4</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 5</span>
+              </li>
+            </ol>
+          </div>
+          <hr />
+          <div class="multiple-choices">
+            <p>What tools and techniques do you use to look after your mental wellbeing? Please list as many as you can think of. There are five boxes available - it’s okay if you just write a couple, or, if you can’t think of any, it’s also okay to leave it blank!</p>
+            <ol class="alphabets-list">
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 1</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 2</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 3</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 4</span>
+              </li>
+              <li>
+                <img src="../../static/genplus_assessments/assets/images/hexagone.png" alt="" />
+                <span class="text">Skill 5</span>
+              </li>
+            </ol>
+          </div>
+          <hr />
+          <div class="feedback">
+            <ul class="star-rating">
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-fill.png" width="25" alt="Favourite" /></li>
+              <li><img src="../../static/genplus_assessments/assets/images/star-outline.png" width="25" alt="Favourite" /></li>
+            </ul>
+            <p>How organised would you say you feel, on a scale from 1-5?</p>
+          </div>
+          <hr />
+          <div class="unit-complition">
+            <h3>Units completed so far</h3>
+            <ul class="complition-badges">
+              <li>
+                <div class="image-frame">
+                  <img src="../../static/genplus_assessments/assets/images/communication.svg" alt="Question">
+                </div>
+                <span class="text">Communication</span>
+              </li>
+              <li>
+                <div class="image-frame">
+                  <img src="../../static/genplus_assessments/assets/images/organisation.svg" alt="Question">
+                  <img class="completed" src="../../static/genplus_assessments/assets/images/check.svg" alt="Completed">
+                </div>
+                <span class="text">ORGANISATION</span>
+              </li>
+              <li>
+                <div class="image-frame">
+                  <img src="../../static/genplus_assessments/assets/images/resilience.svg" alt="Question">
+                </div>
+                <span class="text">resilience</span>
+              </li>
+              <li>
+                <div class="image-frame">
+                  <img src="../../static/genplus_assessments/assets/images/initiative.svg" alt="Question">
+                  <img class="completed" src="../../static/genplus_assessments/assets/images/check.svg" alt="Completed">
+                </div>
+                <span class="text">COLLABORATION</span>
+              </li>
+              <li>
+                <div class="image-frame">
+                  <img src="../../static/genplus_assessments/assets/images/organisation.svg" alt="Question">
+                </div>
+                <span class="text">Communication</span>
+              </li>
+              <li>
+                <div class="image-frame">
+                  <img src="../../static/genplus_assessments/assets/images/resilience.svg" alt="Question">
+                </div>
+                <span class="text">resilience</span>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p>In each unit, pupils complete a series of questions to assess their knowledge and
+              understanding of the skills being taught. They are also asked to reflect on their own
+              learning. A selection of their reflections are highlighted below.</p>
+          </div>
+        </section>
+        <hr />
+        <section class="section">
+          <div class="heading">
+            <div class="image-frame">
+              <img src="../../static/genplus_assessments/assets/images/communication.svg" alt="Question">
+            </div>
+            <div class="text-block">
+              <h2>Communication</h2>
+            </div>
+          </div>
+          <div class="content">
+            <p>
+              <strong>What have you learnt today about active listening?</strong><br /> That it is a important part of communication. It is important to look, nod, use facial expressions and concentrate
+on what people are saying to you. You can become better at listening with time and tools to help you.
+            </p>
+            <p>
+              <strong>Which do you think is the most important aspect of BFG and why?</strong><br />Facial expressions convey feelings really well and it is difficult to disguise them.
+            </p>
+            <p>
+              <strong>What verbal and non-verbal communication skills do you want to practice more?</strong><br />I want to practice varying my pace more when I am answering questions or giving a presentation – I tend to rush and it can be hard for people to follow what I am saying. I am going to make it easier and more interesting by varying and slowing my pace.
+            </p>
+          </div>
+        </section>
+        <section class="section">
+          <div class="heading">
+            <div class="image-frame">
+              <img src="../../static/genplus_assessments/assets/images/organisation.svg" alt="Question">
+            </div>
+            <div class="text-block">
+              <h2>organisation</h2>
+            </div>
+          </div>
+          <div class="content">
+            <p>
+              <strong>Which are the most helpful tools you’ve learned about organisation in this unit?
+                Click two tools and state why.</strong><br />The three Rs, - recharge, required, redundant. Because they help me to manage both my space, and school bags
+                and also my time. It is helpful to think about what I need to do and then prioritise my time accordingly, and
+                what is actually not required and I can leave until another day. Also, it helpful to remember that I need to make
+                time to recharge.
+            </p>
+            <p>
+              <strong>Why is it important for leaders to be organised?</strong><br />It is important for leaders to be organised as they have a lot to accomplish and you have to be organised to do
+              that. To manage your time well to meet your commitments.
+            </p>
+          </div>
+        </section>
+        <section class="section">
+          <div class="heading">
+            <div class="image-frame">
+              <img src="../../static/genplus_assessments/assets/images/innovator.svg" alt="Question">
+            </div>
+            <div class="text-block">
+              <h2>Leadership</h2>
+            </div>
+          </div>
+          <div class="content">
+            <strong>Create your own personal brand</strong>
+            <ul class="fill-in-blanks">
+              <li><span class="text">Handle:</span></li>
+              <li><span class="text">Known for:</span></li>
+              <li><span class="text">My core value is:</span></li>
+              <li><span class="text">My #1 goal right now is:</span></li>
+              <li><span class="text">I help others by:</span></li>
+              <li><span class="text">motivates me:</span></li>
+              <li><span class="text">I am working on:</span></li>
+              <li><span class="text">My skills suit my dream career of:</span></li>
+              <li><span class="text">When I’m struggling a little, I will remember to:</span></li>
+            </ul>
+            <strong>How would you define a leader?</strong>
+            <ul class="fill-in-blanks alt">
+              <li>
+                <p>Type in three adjectives to complete the following sentence:</p>
+                <span class="text">- A leader is:</span>
+              </li>
+              <li>
+                <p>Type in three verbs to complete the following sentence:</p>
+                <span class="text">- A leader</span>
+              </li>
+              <li>
+                <p>Type in three nouns to complete the following sentence:</p>
+                <span class="text">- A leader believes in</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <section class="booster-badges">
+          <h2>Booster badges</h2>
+          <ul class="badges">
+            <li>
+              <img src="../../static/genplus_assessments/assets/images/unit-complete.svg" alt="">
+              <span class="date">XX/XX/XXXX</span>
+            </li>
+            <li>
+              <img src="../../static/genplus_assessments/assets/images/behaviour-badge.svg" alt="">
+              <span class="date">XX/XX/XXXX</span>
+            </li>
+            <li>
+              <img src="../../static/genplus_assessments/assets/images/confidence-badge.svg" alt="">
+              <span class="date">XX/XX/XXXX</span>
+            </li>
+            <li>
+              <img src="../../static/genplus_assessments/assets/images/creativity-badge.svg" alt="">
+              <span class="date">XX/XX/XXXX</span>
+            </li>
+            <li>
+              <img src="../../static/genplus_assessments/assets/images/effort-badge.svg" alt="">
+              <span class="date">XX/XX/XXXX</span>
+            </li>
+          </ul>
+        </section>
+        <section class="section">
+          <div class="heading">
+            <div class="image-frame">
+              <img src="../../static/genplus_assessments/assets/images/Question.svg" alt="Question">
+            </div>
+            <div class="text-block">
+              <span class="subtitle">Teacher Comments</span>
+              <h2>(Teacher Name)</h2>
+            </div>
+          </div>
+          <div class="content">
+            <blockquote>
+              <q>Rum dolentibus enihit, to et, soluptat elescidunt pos dolupta tiberuntem. Et fugiate sumquo odia volorem
+                adias et ut hil inci di quodiasitio imusam velistrum invelis re quis venis verferferro tem evelibus et voluptur
+                apersperorro consero ideni sant doles sae.</q>
+              </blockquote>
+              <blockquote>
+                <q>Dae nim facea volorem quati inisit laute consequi con non por rendia dis molum volo quaturi oratem imusand
+                aestrum hit offici sus explaccum senda deligenis am fugiasped et eum faccusd aectusam, ut untenis mod
+                minto cum et vit faccullore re si is es alis am aut et,Eprature ptatem et et aut officiis et fugia corest omnimpedi
+                offictessunt maximinvent, simus doluptatur? Qui doluptam rercia dionsed igentint fuga. Nam et peliquo cuptat.
+                Lectem estinie nihicidias atio. Is dolorum quae cuptatiat.</q>
+            </blockquote>
+
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <script>
+    const ctx = document.getElementById('radarChart');
+    const myChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['Collaboration', 'Resilience', 'Initiative', 'Communication', 'Leadership', 'Organisation'],
+          datasets: [
+            {
+              label: 'Start of Year',
+              data: [2, 6, 3, 5, 2, 3],
+              backgroundColor: 'rgba(99, 217, 255, .24)',
+              borderColor: 'rgba(99, 217, 255, 1)',
+              pointBackgroundColor: 'rgba(99, 217, 255, 1)',
+              pointBorderWidth: 1,
+              pointWidth: 6,
+              borderWidth: 2,
+            },
+            {
+              label: 'End of Year',
+              data: [4, 9, 6, 8, 4, 6],
+              backgroundColor: 'rgba(255, 1, 157, .24)',
+              borderColor: 'rgba(255, 1, 157, 1)',
+              pointBackgroundColor: 'rgba(255, 1, 157, 1)',
+              pointBorderWidth: 1,
+              pointWidth: 6,
+              borderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            r: {
+              angleLines: {
+                color: '#1c223f',
+              },
+              grid: {
+                color: '#1c223f',
+              },
+              suggestedMin: 0,
+              pointLabels: {
+                font: {
+                  size: 15,
+                },
+                color: '#1c223f',
+                pointBorderColor: '#1c223f',
+              },
+              ticks: {
+                backdropColor: '#1c223f',
+                color: '#fff',
+                beginAtZero: true,
+                fontSize: 20,
+              },
+            },
+          },
+          plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 6,
+              boxHeight: 6,
+              font: {
+                size: 12,
+              },
+              color: '#1c223f',
+            },
+          },
+        },
+      },
+    });
+  </script>
+</body>
+</html>

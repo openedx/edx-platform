@@ -1,0 +1,31 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- <link rel="stylesheet" href="${static.url('genplus_assessments/assets/css/main.css')}"> -->
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="profile-image">
+        <div class="profile-frame">
+          <img src="${student_data.get('character_image_url')}" alt="Student Name">
+        </div>
+      </div>
+      <div class="text-block">
+        <img class="logo" src="${ images_dir }/logo.png" alt="GenPlus logo" >
+        <div class="text-frame">
+          <span class="subtitle">${ student_data.get('school_name') }</span>
+          <h1 id="test-name" class="name">${ student_data.get('full_name') }</h1>
+          <h2 class="title"><span class="text">GEN+ REPORT</span></h2>
+        </div>
+      </div>
+    </div>
+  </header>
+</body>
+</html>

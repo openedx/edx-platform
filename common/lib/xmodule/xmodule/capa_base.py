@@ -265,6 +265,18 @@ class CapaFields:
                "or to report an issue, please contact moocsupport@mathworks.com"),
         scope=Scope.settings
     )
+    is_exportable = Boolean(
+        display_name=_("Export to PDF"),
+        help=_("Export this problem response to PDF"),
+        default=False,
+        scope=Scope.settings
+    )
+    is_journal_entry = Boolean(
+        display_name=_("Save as Journal Entry"),
+        help=_("Save this problem response to Student Journal"),
+        default=False,
+        scope=Scope.settings
+    )
 
 
 class CapaMixin(ScorableXBlockMixin, CapaFields):

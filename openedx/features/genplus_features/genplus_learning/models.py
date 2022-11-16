@@ -76,6 +76,7 @@ class Unit(models.Model):
     course = models.OneToOneField(CourseOverview, on_delete=models.CASCADE)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="units")
     skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True, blank=True)
+    unit_image = models.ImageField(upload_to="unit_images", blank=True, default="")
 
     class Meta:
         ordering = ['order']

@@ -34,7 +34,8 @@ def build_problem_list(course_blocks, root, path=None):
             name = course_blocks.get_xblock_field(block, 'display_name') or block.block_type
             yield from build_problem_list(course_blocks, block, path + [name])
 
-def build_students_result(user_id, course_key, usage_key_str, student_list, filter):
+
+def build_students_result(user_id, course_key, usage_key_str, student_list, filter_type):
     """
     Generate a result for problem responses for all problem under the
     ``problem_location`` root.
@@ -44,89 +45,80 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
             is being generated
         usage_key_str: The generated report will include these
             blocks and their child blocks.
-        filter_types (List[str]): The report generator will only include data for
-            block types in this list.
+        filter_type (str): The filter_type type tells us that response generate on individual basis or aggregate basis.
     Returns:
         List[Dict]: Returns a list of dictionaries
             containing the student aggregate result data.
     """
-    usage_keys = [UsageKey.from_string(usage_key_str).map_into_course(course_key)]
+    usage_key = UsageKey.from_string(usage_key_str).map_into_course(course_key)
     user = get_user_model().objects.get(pk=user_id)
 
     student_data = []
-    max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
 
     store = modulestore()
     user_state_client = DjangoXBlockUserStateClient()
 
     with store.bulk_operations(course_key):
-        for usage_key in usage_keys:  # lint-amnesty, pylint: disable=too-many-nested-blocks
-            if max_count is not None and max_count <= 0:
-                break
-            course_blocks = get_course_blocks(user, usage_key)
-            for title, path, block_key in build_problem_list(course_blocks, usage_key):
-                # Chapter and sequential blocks are filtered out since they include state
-                # which isn't useful for this report.
-                if block_key.block_type in ('sequential', 'chapter'):
-                    continue
+        course_blocks = get_course_blocks(user, usage_key)
+        for title, path, block_key in build_problem_list(course_blocks, usage_key):
+            # Chapter and sequential blocks are filtered out since they include state
+            # which isn't useful for this report.
+            if block_key.block_type in ('sequential', 'chapter'):
+                continue
 
-                block = store.get_item(block_key)
-                generated_report_data = defaultdict(list)
+            block = store.get_item(block_key)
+            generated_report_data = defaultdict(list)
 
-                # Blocks can implement the generate_report_data method to provide their own
-                # human-readable formatting for user state.
-                if hasattr(block, 'generate_report_data'):
-                    try:
-                        user_state_iterator = user_state_client.iter_all_for_block(block_key)
-                        for username, state in block.generate_report_data(user_state_iterator, max_count):
-                            generated_report_data[username].append(state)
-                    except NotImplementedError:
-                        pass
+            # Blocks can implement the generate_report_data method to provide their own
+            # human-readable formatting for user state.
+            if hasattr(block, 'generate_report_data'):
+                try:
+                    user_state_iterator = user_state_client.iter_all_for_block(block_key)
+                    for username, state in block.generate_report_data(user_state_iterator):
+                        generated_report_data[username].append(state)
+                except NotImplementedError:
+                    pass
 
-                responses = {}
-                
-                if block_key.block_type in ('problem'):
-                    responses = get_problem_attributes(store, block_key)
-                    responses['results'] = []
-                    aggregate_result = {}
+            responses = {}
 
-                    for user_id in student_list:
-                        user = get_user_model().objects.get(pk=user_id)
-                        user_states = generated_report_data.get(user.username)
-                        if user_states:
-                            # For each response in the block, aggregate the result for the problem, and add in the responses
-                            if responses['problem_type'] in ('single_choice', 'multiple_choice'):
-                                if filter == "aggregate_response":
-                                    aggregate_result.update(students_aggregate_result(user_states, aggregate_result))
-                                elif filter == "individual_response":
-                                    responses['results'].append(students_multiple_choice_response(user_states, user))
-                            else:
-                                responses['results'].append(students_short_answer_response(user_states, user))
+            if block_key.block_type in ('problem'):
+                responses = get_problem_attributes(block.data, block_key)
+                responses['results'] = []
+                aggregate_result = {}
 
-                    if responses['problem_type'] in ('single_choice', 'multiple_choice') and filter == "aggregate_response":
-                        for key,value in aggregate_result.items():
-                            responses['results'].append({
-                                'title': key,
-                                'count': value['count'],
-                                'is_correct': value['is_correct'],
-                            }) 
-                    student_data.append(responses)
+                for user_id in student_list:
+                    user = get_user_model().objects.get(pk=user_id)
+                    user_states = generated_report_data.get(user.username)
+                    if user_states:
+                        # For each response in the block, aggregate the result for the problem, and add in the responses
+                        if responses['problem_type'] in ('single_choice', 'multiple_choice'):
+                            if filter_type == "aggregate_response":
+                                aggregate_result.update(students_aggregate_result(user_states, aggregate_result))
+                            elif filter_type == "individual_response":
+                                responses['results'].append(students_multiple_choice_response(user_states, user))
+                        else:
+                            for user_state in user_states:
+                                responses['results'].append(get_students_short_answer_response(user_state, user))
 
-                if max_count is not None:
-                    max_count -= len(responses)
-                    if max_count <= 0:
-                        break
+                if responses['problem_type'] in ('single_choice', 'multiple_choice') and filter_type == "aggregate_response":
+                    for key,value in aggregate_result.items():
+                        responses['results'].append({
+                            'title': key,
+                            'count': value['count'],
+                            'is_correct': value['is_correct'],
+                        })
+                student_data.append(responses)
 
     return student_data
 
-  
+
 def students_aggregate_result(user_states, aggregate_result):
     """
     Generate aggregate response for problem(Multiple Choices and Single Choices) as per the user state  under the
     ``problem_location`` root.
     Arguments:
         user_State (List): The user id for the user generating the report
-        
+
     Returns:
             [Dict]: Returns a dictionaries
             containing the students aggregate result data.
@@ -144,15 +136,15 @@ def students_aggregate_result(user_states, aggregate_result):
     return aggregate_result
 
 
-def get_problem_attributes(store, block_key):
+def get_problem_attributes(raw_data, block_key):
     """
-    Parse the problem which we got in the form of XML and extract 
+    Parse the problem which we got in the form of XML and extract
     the problem information(title of problem, problem text and choices)
     for a paricular problem under the
     ``problem_location`` root.
     Arguments:
         block_key: The block_key so that we get the problem data from mongo DB
-        
+
     Returns:
             [Dict]: Returns a dictionaries
             containing the problem data.
@@ -161,14 +153,13 @@ def get_problem_attributes(store, block_key):
     responses['problem_key'] = str(block_key)
     responses['problem_id'] = block_key.block_id
     responses['selection'] = 0
-    raw_data = store.get_item(block_key).data
     parser = etree.XMLParser(remove_blank_text=True)
     problem = etree.XML(raw_data, parser=parser)
     data_dict = {}
     for e in problem.iter("*"):
         if e.tag == 'problem':
             responses['problem_type'] =  e.attrib.get('class')
-        elif e.text and e.attrib.get('class') == 'question-text':
+        elif e.text and e.attrib.get('class') == 'question-text' and responses['problem_type'] != "short_answers":
             responses['question_text'] =  e.text
         elif e.text and e.tag == 'choice':
             choice_dict = {}
@@ -182,28 +173,29 @@ def get_problem_attributes(store, block_key):
     return responses
 
 
-def students_short_answer_response(user_states, user):
+def get_students_short_answer_response(user_state, user):
     """
     Generate response for as per the user state for all short answers under the
     ``problem_location`` root.
     Arguments:
         user_State (List): The user id for the user generating the report
-        
+
     Returns:
             [Dict]: Returns a dictionaries
             containing the student aggregate result data.
     """
     student_response_dict = {}
-    for user_state in user_states:
-        user_answer = user_state['Answer']
-        user_question = user_state['Question']
-        student_response_dict = {
-            'username': user.username,
-            'full_name': user.get_full_name(),
-            'question': user_question,
-            'answer': user_answer,
-        }
-    
+    answer_id = user_state['Answer ID']
+    user_answer = user_state['Answer']
+    user_question = user_state['Question']
+    student_response_dict = {
+        'username': user.username,
+        'full_name': user.get_full_name(),
+        'answer_id': answer_id,
+        'question': user_question,
+        'answer': user_answer,
+    }
+
     return student_response_dict
 
 
@@ -213,7 +205,7 @@ def students_multiple_choice_response(user_states, user):
     ``problem_location`` root.
     Arguments:
         user_State (List): The user id for the user generating the report
-        
+
     Returns:
             [Dict]: Returns a dictionaries
             containing the student aggregate result data.
@@ -232,5 +224,75 @@ def students_multiple_choice_response(user_states, user):
             'earned_score': len(list(set(correct_answer_list).intersection(set(user_answer_list)))),
             'total_score': len(correct_answer_list),
         }
-    
-    return student_response_dict 
+
+    return student_response_dict
+
+
+def build_course_report_for_students(user_id, course_key, student_list):
+    """
+    Generate a list of problem responses for all problem under the
+    ``problem_location`` root.
+    Arguments:
+        user_id (int): The user id for the user generating the report
+        course_key (CourseKey): The ``CourseKey`` for the course whose report
+            is being generated
+    Returns:
+            Tuple[List[Dict], List[str]]: Returns a list of dictionaries
+            containing the student data which will be included in the
+            final csv, and the features/keys to include in that CSV.
+    """
+    store = modulestore()
+    user = get_user_model().objects.get(pk=user_id)
+    usage_key = store.make_course_usage_key(course_key)
+    user_state_client = DjangoXBlockUserStateClient()
+    student_data = {}
+
+    with store.bulk_operations(course_key):
+        course_blocks = get_course_blocks(user, usage_key)
+
+        for student_id in student_list:
+            student_data[student_id] = []
+
+            for title, path, block_key in build_problem_list(course_blocks, usage_key):
+                # Chapter and sequential blocks are filtered out since they include state
+                # which isn't useful for this report.
+                if block_key.block_type in ('course', 'sequential', 'chapter', 'vertical'):
+                    continue
+
+                block = store.get_item(block_key)
+                if not hasattr(block, 'is_exportable'):
+                    continue
+                if not block.is_exportable:
+                    continue
+
+                generated_report_data = defaultdict(list)
+
+                # Blocks can implement the generate_report_data method to provide their own
+                # human-readable formatting for user state.
+                if hasattr(block, 'generate_report_data'):
+                    try:
+                        user_state_iterator = user_state_client.iter_all_for_block(block_key)
+                        for username, state in block.generate_report_data(user_state_iterator):
+                            generated_report_data[username].append(state)
+                    except NotImplementedError:
+                        pass
+
+                if block_key.block_type in ('problem'):
+                    responses = get_problem_attributes(block.data, block_key)
+                    responses['results'] = []
+                    student = get_user_model().objects.get(pk=student_id)
+                    user_states = generated_report_data.get(student.username)
+                    if responses['problem_type'] == 'short_answers' and user_states:
+                        for user_state in user_states:
+                            responses['results'].append({
+                                'answer_id': user_state['Answer ID'],
+                                'question': user_state['Question'],
+                                'answer': user_state['Answer'],
+                            })
+                        student_data[student_id].append(responses)
+
+    return student_data
+
+
+def get_absolute_url(request, file):
+    return request.build_absolute_uri(file.url) if file else None

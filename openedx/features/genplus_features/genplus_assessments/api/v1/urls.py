@@ -9,7 +9,7 @@ from .views import (
     StudentAnswersView, ClassFilterViewSet
 )
 
-app_name = 'genplus_learning_api_v1'
+app_name = 'genplus_assessments_api_v1'
 
 urlpatterns = [
     url(r'^students-response/(?P<class_id>\w+)/$', StudentAnswersView.as_view({'get': 'students_problem_response'}), name='students-response-view'),

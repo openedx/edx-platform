@@ -1,0 +1,356 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=2.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- <link rel="stylesheet" href="${static.url('genplus_assessments/assets/css/main.css')}"> -->
+  <title></title>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="content">
+      <div class="container">
+        <section class="section">
+          <div class="heading">
+            <div class="image-frame">
+              <img src="${static.url('genplus_assessments/assets/images/Question.png')}" alt="Question">
+            </div>
+            <div class="text-block">
+              <span class="subtitle">End of Year Self Evaluation</span>
+              <h2>Skills Assessment</h2>
+            </div>
+          </div>
+          <div class="content">
+            <p>Ximustio ritatur? Dolluptas restium facea cum fugitatiis molore velesed maximus modignis nusapis magnam voloresto eiur alitium voluptatibus rem. Ciis volorei ciuntia earchiciis expliqui cus et volo to expe volorupta sinum enis ipicips aectiam inus voluptis dolupta sitatium quamendi dolesent.</p>
+          </div>
+        </section>
+        <canvas id="radarChart"></canvas>
+        <hr />
+        <section>
+          <div class="multiple-choices">
+            <p>Please list as many communication skills as you can think of. There are five boxes available - it’s okay if you just write a couple, or, if you can’t think of any, it’s also okay to leave it blank!</p>
+            <ol class="alphabets-list">
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 1</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 2</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 3</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 4</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 5</span>
+              </li>
+            </ol>
+          </div>
+          <hr />
+          <div class="feedback">
+            <ul class="star-rating">
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-outline.png')}" width="25" alt="Favourite" /></li>
+            </ul>
+            <p>How would you rate your overall listening skills, on a scale from 1-5?</p>
+          </div>
+          <div class="feedback">
+            <ul class="star-rating">
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-outline.png')}" width="25" alt="Favourite" /></li>
+            </ul>
+            <p>How would you rate your overall ability to tell a story and communicate your points well, on a scale from 1-5?</p>
+          </div>
+          <div class="feedback">
+            <ul class="star-rating">
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-outline.png')}" width="25" alt="Favourite" /></li>
+            </ul>
+            <p>How organised would you say you feel, on a scale from 1-5?</p>
+          </div>
+          <hr />
+          <div class="multiple-choices">
+            <p>What tools and techniques do you use to help you stay organised? Please list as many as you can think of. There are five boxes available - it’s okay if you just write a couple, or, if you can’t think of any, it’s also okay to leave it blank!</p>
+            <ol class="alphabets-list">
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 1</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 2</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 3</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 4</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 5</span>
+              </li>
+            </ol>
+          </div>
+          <hr />
+          <div class="multiple-choices">
+            <p>Please list as many habits for a good night’s sleep as you can think of. There are five boxes available - it’s okay if you just write a couple, or, if you can’t think of any, it’s also okay to leave it blank!</p>
+            <ol class="alphabets-list">
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 1</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 2</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 3</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 4</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 5</span>
+              </li>
+            </ol>
+          </div>
+          <hr />
+          <div class="multiple-choices">
+            <p>What tools and techniques do you use to look after your mental wellbeing? Please list as many as you can think of. There are five boxes available - it’s okay if you just write a couple, or, if you can’t think of any, it’s also okay to leave it blank!</p>
+            <ol class="alphabets-list">
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 1</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 2</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 3</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 4</span>
+              </li>
+              <li>
+                <img src="${static.url('genplus_assessments/assets/images/hexagone.png')}" alt="" />
+                <span class="text">Skill 5</span>
+              </li>
+            </ol>
+          </div>
+          <hr />
+          <div class="feedback">
+            <ul class="star-rating">
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+              <li><img src="${static.url('genplus_assessments/assets/images/star-outline.png')}" width="25" alt="Favourite" /></li>
+            </ul>
+            <p>How organised would you say you feel, on a scale from 1-5?</p>
+          </div>
+        </section>
+        <hr />
+        <section>
+          <div class="unit-complition">
+            <h3>Units completed so far</h3>
+            <ul class="complition-badges">
+              % for unit in student_data.get('units'):
+                <li>
+                  <div class="image-frame">
+                    <img src="${unit.get('unit_image_url')}" alt="Question">
+                    % if unit.get('is_complete'):
+                    <img class="completed" src="${static.url('genplus_assessments/assets/images/check.png')}" alt="Completed">
+                    % endif
+                  </div>
+                  <span class="text">${unit.get('display_name')}</span>
+                </li>
+              % endfor
+            </ul>
+          </div>
+          <div>
+            <p>In each unit, pupils complete a series of questions to assess their knowledge and
+              understanding of the skills being taught. They are also asked to reflect on their own
+              learning. A selection of their reflections are highlighted below.</p>
+          </div>
+        </section>
+        <hr />
+
+        % for unit in student_data.get('units'):
+          % if unit.get('reflections'):
+            <section class="section">
+              <div class="heading">
+                <div class="image-frame">
+                  <img src="${unit.get('unit_image_url')}" alt="Question">
+                </div>
+                <div class="text-block">
+                  <h2>${unit.get('display_name')}</h2>
+                </div>
+              </div>
+              <div class="content">
+                % for reflection in unit.get('reflections'):
+                  % for result in reflection.get('results'):
+                <p>
+                  <strong>${ result.get('question') }</strong>
+                  <br />
+                  ${ result.get('answer') }
+                </p>
+                  % endfor
+                % endfor
+              </div>
+            </section>
+          % endif
+        % endfor
+
+        <section class="booster-badges">
+          <h2>Booster badges</h2>
+          <ul class="badges">
+            % for badge in student_data.get('booster_badges'):
+              <li>
+                <img src="${ badge.get('image_url') }" alt="">
+                <span class="date">${ badge.get('created').strftime('%d-%m-%Y') }</span>
+              </li>
+            % endfor
+          </ul>
+        </section>
+        <section class="teacher-feedbacks">
+          <h2 class="teacher-comments">Teacher Comments</h2>
+          % for key, value in student_data.get('teacher_feedbacks').items():
+          <section class="section">
+            <div class="heading">
+              <div class="image-frame">
+                <img src="${static.url('genplus_assessments/assets/images/Question.png')}" alt="Question">
+              </div>
+              <div class="text-block">
+                <h2>${ value.get('teacher_name') }</h2>
+              </div>
+            </div>
+            <div class="content">
+              % for comment in value.get('comments'):
+                <blockquote>
+                  <q>${ comment }</q>
+                </blockquote>
+              % endfor
+            </div>
+          </section>
+          % endfor
+        </section>
+
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    Function.prototype.bind = Function.prototype.bind || function (thisp) {
+      var fn = this;
+      return function () {
+        return fn.apply(thisp, arguments);
+      };
+    };
+
+    var ctx = document.getElementById("radarChart").getContext('2d');
+    ctx.canvas.width = 400;
+    ctx.canvas.height = 400;
+    var myChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Collaboration', 'Resilience', 'Initiative', 'Communication', 'Leadership', 'Organisation'],
+        datasets: [
+          {
+            label: 'Start of Year',
+            data: [2, 6, 3, 5, 2, 3],
+            backgroundColor: 'rgba(99, 217, 255, .24)',
+            borderColor: 'rgba(99, 217, 255, 1)',
+            pointBackgroundColor: 'rgba(99, 217, 255, 1)',
+            pointBorderWidth: 1,
+            pointWidth: 6,
+            borderWidth: 2,
+          },
+          {
+            label: 'End of Year',
+            data: [4, 9, 6, 8, 4, 6],
+            backgroundColor: 'rgba(255, 1, 157, .24)',
+            borderColor: 'rgba(255, 1, 157, 1)',
+            pointBackgroundColor: 'rgba(255, 1, 157, 1)',
+            pointBorderWidth: 1,
+            pointWidth: 6,
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          r: {
+            angleLines: {
+              color: '#1c223f',
+            },
+            grid: {
+              color: '#1c223f',
+            },
+            suggestedMin: 0,
+            pointLabels: {
+              font: {
+                size: 15,
+              },
+              color: '#1c223f',
+              pointBorderColor: '#1c223f',
+            },
+            ticks: {
+              backdropColor: '#1c223f',
+              color: '#fff',
+              beginAtZero: true,
+              fontSize: 20,
+            },
+          },
+        },
+        plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            pointStyle: 'circle',
+            boxWidth: 6,
+            boxHeight: 6,
+            font: {
+              size: 12,
+            },
+            color: '#1c223f',
+          },
+        },
+      },
+    },
+  });
+</script>
+</body>
+</html>

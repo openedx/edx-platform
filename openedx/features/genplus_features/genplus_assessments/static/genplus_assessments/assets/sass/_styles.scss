@@ -1,0 +1,441 @@
+* {
+  box-sizing: border-box;
+}
+
+*:after,
+*:before {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: "Readex Pro", serifsystem-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  color: $text-color;
+  font-size: 1rem;
+  line-height: 1.3;
+  margin: .75in;
+  padding-top: .5rem;
+}
+
+hr {
+  margin: 1rem 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+canvas {
+  page-break-inside: avoid;
+  max-width: 80%;
+  margin: 0 auto 1rem;
+}
+
+blockquote {
+  margin: 0 1rem 2rem;
+  padding: .3rem 2rem;
+  border-left: 5px solid $pink;
+}
+
+.container {
+  margin: 0 auto;
+
+  @include clearfix;
+}
+
+.wrapper {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 3rem;
+}
+
+.header {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 4rem;
+  page-break-inside: avoid;
+
+  .container {
+
+    .text-block {
+      overflow: hidden;
+    }
+
+    .text-frame {
+      overflow: hidden;
+      padding-top: 4rem;
+    }
+  }
+
+  .name {
+    margin: 0;
+    color: $pink;
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    color: $pink;
+  }
+
+  .title {
+    margin: 0;
+    background: $text-color;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 3.65rem;
+    line-height: 1;
+    text-align: right;
+    padding-right: 2rem;
+
+    .text {
+      display: inline-block;
+      position: relative;
+      vertical-align: bottom;
+      margin-bottom: -.5rem;
+    }
+  }
+
+  .logo {
+    float: right;
+    width: 9rem;
+    margin-left: -2rem;
+  }
+
+  .profile-image {
+    text-align: center;
+    float: left;
+    width: 8rem;
+    height: 8rem;
+    margin-right: 1rem;
+    margin-top: 3.3rem;
+    background: $pink;
+    border-radius: 50%;
+
+    .profile-frame {
+      width: 7rem;
+      height: 7rem;
+      margin: 0 auto;
+      background: $purple;
+      position: relative;
+      overflow: hidden;
+      border-radius: 50%;
+    }
+
+    img {
+      vertical-align: top;
+      width: 5.8rem;
+    }
+  }
+
+  &.alt {
+
+    .text-block {
+      max-width: 50%;
+      margin-left: auto;
+    }
+
+    .logo {
+      width: 6rem;
+    }
+
+    .title {
+      font-size: 2.25rem;
+      padding-top: 1rem;
+
+      .text {
+        margin-bottom: -.26rem;
+      }
+    }
+
+    .profile-image {
+      float: left;
+      width: 6rem;
+      height: 6rem;
+      margin-bottom: -1rem;
+      position: relative;
+      z-index: 1;
+
+      .profile-frame {
+        width: 5.2rem;
+        height: 5.2rem;
+
+        img {
+          width: 4.2rem;
+        }
+      }
+    }
+  }
+}
+
+.section {
+  border: .5rem solid $pink-lighter;
+  border-radius: $default-radius;
+  position: relative;
+  padding: 0 1rem;
+  margin: 2.7rem 0 3rem;
+  page-break-inside: avoid;
+  z-index: 1;
+
+  .heading {
+    position: relative;
+    margin: -2.7rem 0 1rem;
+
+    .text-block {
+      position: relative;
+      background: #fff;
+      border: .25rem solid $pink;
+      margin-left: -2rem;
+      padding: 5px .5rem 5px 35px;
+      display: inline-block;
+      vertical-align: middle;
+      border-radius: 0 $default-radius $default-radius 0;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      text-transform: capitalize;
+    }
+
+    .subtitle {
+      color: $pink;
+    }
+
+    .image-frame {
+      height: 5rem;
+      width: 5rem;
+      border-radius: 50%;
+      border: .5rem solid $pink;
+      display: inline-block;
+      vertical-align: middle;
+      background: #fff;
+      padding: .5rem;
+      position: relative;
+      z-index: 1;
+    }
+  }
+
+  .content {
+
+    p {
+      margin: 0 0 1.2rem;
+    }
+  }
+}
+
+.feedback {
+  border: .5rem solid $pink-lighter;
+  border-radius: $default-radius;
+  overflow: hidden;
+  padding: .5rem 1rem;
+  margin-bottom: 1rem;
+  page-break-inside: avoid;
+  @include clearfix;
+
+  p {
+    margin: 0;
+    overflow: hidden;
+  }
+}
+
+.multiple-choices {
+  page-break-inside: avoid;
+
+  p {
+    margin: 0 0 .5rem;
+    padding-left: .5rem;
+  }
+}
+
+.alphabets-list {
+  counter-reset: alphabets;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+
+  li {
+    counter-increment: alphabets;
+    width: 20%;
+    float: left;
+    position: relative;
+    padding: 0 13px 0 15px;
+
+    &:last-of-type {
+      padding-right: 0;
+    }
+
+    &:before {
+      content: counter(alphabets, upper-alpha);
+      color: #fff;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2.32rem;
+      width: 2rem;
+      text-align: center;
+      margin-top: -1.16rem;
+      z-index: 1;
+      line-height: 2.32rem;
+    }
+
+    img {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2.32rem;
+      width: 2rem;
+      margin-top: -1.16rem;
+    }
+
+    .text {
+      display: block;
+      border: .25rem solid $pink-lighter;
+      border-radius: $default-radius;
+      padding: 6px .5rem 6px 18px;
+    }
+  }
+}
+
+.star-rating {
+  margin: 0 0 0 auto;
+  padding: 0 0 0 1rem;
+  list-style: none;
+  float: right;
+
+  li {
+    float: left;
+    position: relative;
+    margin-left: .25rem;
+  }
+}
+
+.unit-complition {
+  page-break-before: always;
+  @include clearfix;
+
+  h3 {
+    color: $pink;
+    float: left;
+    margin-right: 1rem;
+    width: 14%;
+  }
+}
+
+.complition-badges {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: .6rem;
+  text-align: center;
+  text-transform: uppercase;
+  overflow: hidden;
+  @include clearfix;
+
+  li {
+    float: left;
+    margin-right: .5rem;
+  }
+
+  .text {
+    display: block;
+  }
+
+  .image-frame {
+    height: 5rem;
+    width: 5rem;
+    border-radius: 50%;
+    margin: 0 auto .6rem;
+    border: .5rem solid $pink-lighter;
+    background: #fff;
+    padding: .5rem;
+    position: relative;
+    z-index: 1;
+
+    .completed {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      max-width: 3rem;
+      margin: -18px 0 0 -24px;
+    }
+  }
+}
+
+.fill-in-blanks {
+  margin: .5rem 0 2rem;
+  padding: 0;
+  list-style: none;
+
+  &.alt {
+
+    li {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  li {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: .5rem;
+
+    p {
+      .section & {
+        margin: 0;
+      }
+    }
+  }
+
+  .text {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+
+    &:after {
+      content: '';
+      position: absolute;
+      border-bottom: 2px dotted #000;
+      width: 600rem;
+      left: 100%;
+      bottom: .27rem;
+      margin-left: 0.5rem;
+    }
+  }
+}
+
+.teacher-comments {
+  color: $pink;
+  page-break-before: always;
+}
+
+.booster-badges {
+
+  h2 {
+    color: $pink;
+  }
+
+  .badges {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+    font-size: .8rem;
+
+    .date {
+      display: block;
+    }
+
+    li {
+      text-align: center;
+      float: left;
+      margin: 0 1rem 2rem;
+
+      img {
+        max-width: 6rem;
+      }
+    }
+  }
+}

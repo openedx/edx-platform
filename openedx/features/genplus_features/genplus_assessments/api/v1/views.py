@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 class StudentAnswersView(viewsets.ViewSet):
-    
+
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsTeacher]
 
@@ -30,19 +30,19 @@ class StudentAnswersView(viewsets.ViewSet):
         else:
             students.append(student_id)
         course_id = request.query_params.get('course_id',None)
-        course_keys = CourseKey.from_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         problem_locations = request.query_params.get('problem_locations',None)
-        filter = request.query_params.get('filter',None)
+        filter_type = request.query_params.get('filter',None)
 
         response = build_students_result(
-            user_id = self.request.user.id,
-            course_key = course_keys,
-            usage_key_str = problem_locations,
-            student_list = students,
-            filter = filter,
+            user_id=self.request.user.id,
+            course_key=course_key,
+            usage_key_str=problem_locations,
+            student_list=students,
+            filter_type=filter_type,
         )
 
-        return Response(response)     
+        return Response(response)
 
 class ClassFilterViewSet(views.APIView):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
@@ -57,5 +57,3 @@ class ClassFilterViewSet(views.APIView):
         except Class.DoesNotExist:
             return Class.objects.none()
         return Response(data)
-
-

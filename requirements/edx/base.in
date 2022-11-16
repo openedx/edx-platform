@@ -39,6 +39,7 @@ chem                                # A helper library for chemistry calculation
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
 crowdsourcehinter-xblock
 defusedxml
+pdfkit
 Django                              # Web application framework
 django-appconf
 django-celery-results               # Only used for the CacheBackend for celery results
@@ -163,6 +164,5 @@ user-util                           # Functionality for retiring users (GDPR com
 web-fragments                       # Provides the ability to render fragments of web pages
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
-xhtml2pdf
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
