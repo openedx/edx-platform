@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, Reflection, \
-    ReflectionAnswer, ArticleViewLog, PortfolioEntry, HelpGuideType, HelpGuide, AlertBarEntry
+    ReflectionAnswer, ArticleViewLog, PortfolioEntry, HelpGuideType, HelpGuide, AlertBarEntry, HelpGuideRating
 from openedx.features.genplus_features.genplus.api.v1.serializers import SkillSerializer
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from openedx.features.genplus_features.common.utils import get_generic_serializer
@@ -133,11 +133,42 @@ class PortfolioEntrySerializer(serializers.ModelSerializer):
         serializer.save(teacher=teacher)
 
 
-HelpGuideSerializer = get_generic_serializer({'name': HelpGuide, 'fields': '__all__'},)
+class GuideRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HelpGuideRating
+        fields = ('rating', 'comment')
+
+
+class HelpGuideSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+
+    def get_rating(self, instance):
+        teacher = self.context.get('teacher')
+        try:
+            guide_rating = HelpGuideRating.objects.get(teacher=teacher, help_guide=instance)
+            return GuideRatingSerializer(guide_rating).data
+        except HelpGuideRating.DoesNotExist:
+            return
+    
+    class Meta:
+        model = HelpGuide
+        fields = '__all__'
+        depth = 1
 
 
 class HelpGuideTypeSerializer(serializers.ModelSerializer):
-    help_guides = HelpGuideSerializer(source='helpguide_set', many=True, read_only=True)
+    help_guides = serializers.SerializerMethodField()
+
+    def get_help_guides(self, instance):
+        media_type_id = self.context['request'].query_params.get('media_type')
+
+        if media_type_id:
+            items = HelpGuide.objects.filter(guide_type=instance, media_types__id=media_type_id)
+        else:
+            items = HelpGuide.objects.filter(guide_type=instance)
+
+        serializer = HelpGuideSerializer(instance=items, many=True)
+        return serializer.data
 
     class Meta:
         model = HelpGuideType

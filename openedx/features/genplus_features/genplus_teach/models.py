@@ -201,6 +201,23 @@ class HelpGuide(TimeStampedModel):
         return self.title
 
 
+class HelpGuideRating(TimeStampedModel):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    help_guide = models.ForeignKey(HelpGuide, on_delete=models.CASCADE, related_name='ratings')
+    rating = models.PositiveIntegerField(default=0)
+    comment = models.TextField()
+
+    class Meta:
+        unique_together = ('teacher', 'help_guide')
+
+    def __str__(self):
+        return '{} has rated {} stars to guide {}'.format(
+            self.teacher.gen_user.user.get_full_name(),
+            self.rating,
+            self.help_guide.title
+        )
+
+
 class AlertBarEntry(TimeStampedModel):
     message = models.TextField()
     link = models.URLField(max_length=1024)
