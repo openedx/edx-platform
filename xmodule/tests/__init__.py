@@ -138,7 +138,6 @@ def get_test_system(
         return descriptor
 
     return TestModuleSystem(
-        track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
         services={
             'user': user_service,

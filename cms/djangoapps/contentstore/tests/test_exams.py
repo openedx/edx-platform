@@ -89,7 +89,7 @@ class TestExamService(ModuleStoreTestCase):
             'content_id': str(sequence.location),
             'exam_name': sequence.display_name,
             'time_limit_mins': sequence.default_time_limit_minutes,
-            'due_date': due_date,
+            'due_date': due_date.isoformat(),
             'exam_type': expected_type,
             'is_active': True,
             'hide_after_due': True,
