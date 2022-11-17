@@ -2116,7 +2116,6 @@ class TestComponentHandler(TestCase):
     def setUp(self):
         super().setUp()
 
-
         self.request_factory = RequestFactory()
 
         patcher = patch('cms.djangoapps.contentstore.views.component.modulestore')
@@ -2142,11 +2141,6 @@ class TestComponentHandler(TestCase):
         with self.assertRaises(Http404):
             component_handler(self.request, self.usage_key_string, 'invalid_handler')
 
-    def test_submit_studio_edits_checks_author_permission(self):
-        self.request.user = UserFactory()
-        with self.assertRaises(PermissionDenied):
-           component_handler(self.request, self.usage_key_string, 'submit_studio_edits')
-
     @ddt.data('GET', 'POST', 'PUT', 'DELETE')
     def test_request_method(self, method):
 
@@ -2171,6 +2165,40 @@ class TestComponentHandler(TestCase):
 
         self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                          status_code)
+
+
+    @patch('cms.djangoapps.contentstore.views.component.log')
+    def test_submit_studio_edits_checks_author_permission(self, mock_logger):
+        """
+        Test logging a user without studio write permissions attempts to run a studio submit handler..
+
+        Arguments:
+            mock_logger (object):  A mock logger object.
+        """
+
+        def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
+            """create dummy response"""
+            return Response(status_code=200)
+
+        self.request.user = UserFactory()
+        mock_handler = 'dummy_handler'
+
+        self.descriptor.handle = create_response
+
+        with patch(
+            'cms.djangoapps.contentstore.views.component.is_xblock_aside',
+            return_value=False
+        ), patch(
+            "cms.djangoapps.contentstore.views.component.webob_to_django_response"
+        ) as mocked_webob_to_django_response:
+             component_handler(self.request, self.usage_key_string, mock_handler)
+
+        mock_logger.warning.assert_called_with(
+            "%s does not have have studio write permissions on course: %s. write operations not performed on %r",
+            self. request.user.id,
+            UsageKey.from_string(self.usage_key_string).course_key,
+            mock_handler
+        )
 
     @ddt.data((True, True), (False, False),)
     @ddt.unpack

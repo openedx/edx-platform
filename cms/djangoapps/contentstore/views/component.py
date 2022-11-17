@@ -565,7 +565,12 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     if has_course_author_access(request.user, usage_key.course_key):
         modulestore().update_item(descriptor, request.user.id, asides=asides)
     else:
-        #try to fail loudly
-        raise PermissionDenied("No studio write Permissions, no changes to course content made")
+        #fail quietly if user is not course author.
+        log.warning(
+            "%s does not have have studio write permissions on course: %s. write operations not performed on %r",
+            request.user.id,
+            usage_key.course_key,
+            handler
+        )
 
     return webob_to_django_response(resp)
