@@ -418,7 +418,11 @@ blockquote {
   background: #ff0d5a;
   border-radius: 50%;
 }
-.header .profile-image .profile-frame {
+.header .profile-image img {
+  vertical-align: top;
+  width: 100%;
+}
+.header .profile-frame {
   width: 7rem;
   height: 7rem;
   margin: 0 auto;
@@ -427,9 +431,13 @@ blockquote {
   overflow: hidden;
   border-radius: 50%;
 }
-.header .profile-image img {
-  vertical-align: top;
+.header .profile-box {
   width: 5.8rem;
+  height: 5.8rem;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #1c223f;
 }
 .header.alt .text-block {
   max-width: 50%;

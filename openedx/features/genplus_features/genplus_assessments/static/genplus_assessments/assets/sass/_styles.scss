@@ -104,17 +104,25 @@ blockquote {
     margin-left: -2rem;
   }
 
-  .profile-image {
-    text-align: center;
-    float: left;
-    width: 8rem;
-    height: 8rem;
-    margin-right: 1rem;
-    margin-top: 3.3rem;
-    background: $pink;
-    border-radius: 50%;
+  .profile {
 
-    .profile-frame {
+    &-image {
+      text-align: center;
+      float: left;
+      width: 8rem;
+      height: 8rem;
+      margin-right: 1rem;
+      margin-top: 3.3rem;
+      background: $pink;
+      border-radius: 50%;
+
+      img {
+        vertical-align: top;
+        width: 100%;
+      }
+    }
+
+    &-frame {
       width: 7rem;
       height: 7rem;
       margin: 0 auto;
@@ -124,9 +132,13 @@ blockquote {
       border-radius: 50%;
     }
 
-    img {
-      vertical-align: top;
+    &-box {
       width: 5.8rem;
+      height: 5.8rem;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 50%;
+      background: $text-color;
     }
   }
 
