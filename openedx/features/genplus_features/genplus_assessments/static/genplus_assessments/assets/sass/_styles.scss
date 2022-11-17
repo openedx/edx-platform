@@ -182,17 +182,23 @@ blockquote {
   }
 }
 
+.section-wrapper {
+  page-break-inside: avoid;
+  padding: 2.7rem 0 3rem;
+}
+
 .section {
   border: .5rem solid $pink-lighter;
   border-radius: $default-radius;
   position: relative;
   padding: 0 1rem;
-  margin: 2.7rem 0 3rem;
+  margin: 0;
   page-break-inside: avoid;
   z-index: 1;
 
   .heading {
     position: relative;
+    page-break-inside: avoid;
     margin: -2.7rem 0 1rem;
 
     .text-block {

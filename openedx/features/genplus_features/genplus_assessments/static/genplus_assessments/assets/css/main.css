@@ -469,17 +469,23 @@ blockquote {
   width: 4.2rem;
 }
 
+.section-wrapper {
+  page-break-inside: avoid;
+  padding: 2.7rem 0 3rem;
+}
+
 .section {
   border: 0.5rem solid #eecae2;
   border-radius: 20px;
   position: relative;
   padding: 0 1rem;
-  margin: 2.7rem 0 3rem;
+  margin: 0;
   page-break-inside: avoid;
   z-index: 1;
 }
 .section .heading {
   position: relative;
+  page-break-inside: avoid;
   margin: -2.7rem 0 1rem;
 }
 .section .heading .text-block {

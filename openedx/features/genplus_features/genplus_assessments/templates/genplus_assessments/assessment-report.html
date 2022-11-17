@@ -18,20 +18,22 @@
   <div class="wrapper">
     <div class="content">
       <div class="container">
-        <section class="section">
-          <div class="heading">
-            <div class="image-frame">
-              <img src="${static.url('genplus_assessments/assets/images/Question.png')}" alt="Question">
+        <div class="section-wrapper">
+          <section class="section">
+            <div class="heading">
+              <div class="image-frame">
+                <img src="${static.url('genplus_assessments/assets/images/Question.png')}" alt="Question">
+              </div>
+              <div class="text-block">
+                <span class="subtitle">End of Year Self Evaluation</span>
+                <h2>Skills Assessment</h2>
+              </div>
             </div>
-            <div class="text-block">
-              <span class="subtitle">End of Year Self Evaluation</span>
-              <h2>Skills Assessment</h2>
+            <div class="content">
+              <p>Ximustio ritatur? Dolluptas restium facea cum fugitatiis molore velesed maximus modignis nusapis magnam voloresto eiur alitium voluptatibus rem. Ciis volorei ciuntia earchiciis expliqui cus et volo to expe volorupta sinum enis ipicips aectiam inus voluptis dolupta sitatium quamendi dolesent.</p>
             </div>
-          </div>
-          <div class="content">
-            <p>Ximustio ritatur? Dolluptas restium facea cum fugitatiis molore velesed maximus modignis nusapis magnam voloresto eiur alitium voluptatibus rem. Ciis volorei ciuntia earchiciis expliqui cus et volo to expe volorupta sinum enis ipicips aectiam inus voluptis dolupta sitatium quamendi dolesent.</p>
-          </div>
-        </section>
+          </section>
+        </div>
         <canvas id="radarChart"></canvas>
         <hr />
         <section>
@@ -209,30 +211,33 @@
 
         % for unit in student_data.get('units'):
           % if unit.get('reflections'):
-            <section class="section">
-              <div class="heading">
-                <div class="image-frame">
-                  <img src="${unit.get('unit_image_url')}" alt="Question">
+            <div class="section-wrapper">
+              <section class="section">
+                <div class="heading">
+                  <div class="image-frame">
+                    <img src="${unit.get('unit_image_url')}" alt="Question">
+                  </div>
+                  <div class="text-block">
+                    <h2>${unit.get('display_name')}</h2>
+                  </div>
                 </div>
-                <div class="text-block">
-                  <h2>${unit.get('display_name')}</h2>
-                </div>
-              </div>
-              <div class="content">
-                % for reflection in unit.get('reflections'):
-                  % for result in reflection.get('results'):
-                <p>
-                  <strong>${ result.get('question') }</strong>
-                  <br />
-                  ${ result.get('answer') }
-                </p>
+                <div class="content">
+                  % for reflection in unit.get('reflections'):
+                    % for result in reflection.get('results'):
+                  <p>
+                    <strong>${ result.get('question') }</strong>
+                    <br />
+                    ${ result.get('answer') }
+                  </p>
+                    % endfor
                   % endfor
-                % endfor
-              </div>
-            </section>
+                </div>
+              </section>
+            </div>
           % endif
         % endfor
 
+        % if student_data.get('booster_badges'):
         <section class="booster-badges">
           <h2>Booster badges</h2>
           <ul class="badges">
@@ -244,29 +249,33 @@
             % endfor
           </ul>
         </section>
+        % endif
+        % if student_data.get('teacher_feedbacks'):
         <section class="teacher-feedbacks">
           <h2 class="teacher-comments">Teacher Comments</h2>
           % for key, value in student_data.get('teacher_feedbacks').items():
-          <section class="section">
-            <div class="heading">
-              <div class="image-frame">
-                <img src="${static.url('genplus_assessments/assets/images/Question.png')}" alt="Question">
+          <div class="section-wrapper">
+            <section class="section">
+              <div class="heading">
+                <div class="image-frame">
+                  <img src="${static.url('genplus_assessments/assets/images/Question.png')}" alt="Question">
+                </div>
+                <div class="text-block">
+                  <h2>${ value.get('teacher_name') }</h2>
+                </div>
               </div>
-              <div class="text-block">
-                <h2>${ value.get('teacher_name') }</h2>
+              <div class="content">
+                % for comment in value.get('comments'):
+                  <blockquote>
+                    <q>${ comment }</q>
+                  </blockquote>
+                % endfor
               </div>
-            </div>
-            <div class="content">
-              % for comment in value.get('comments'):
-                <blockquote>
-                  <q>${ comment }</q>
-                </blockquote>
-              % endfor
-            </div>
-          </section>
+            </section>
+          </div>
           % endfor
         </section>
-
+        % endif
       </div>
     </div>
   </div>
