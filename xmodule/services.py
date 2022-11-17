@@ -5,15 +5,17 @@ Module contains various XModule/XBlock services
 
 import inspect
 import logging
-
 from functools import partial
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
+from eventtracking import tracker
 from edx_when.field_data import DateLookupFieldData
 from xblock.reference.plugins import Service
 from xblock.runtime import KvsFieldData
 
+from common.djangoapps.track import contexts
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student
 from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
@@ -21,6 +23,7 @@ from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataC
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 
+from lms.djangoapps.grades.api import signals as grades_signals
 
 log = logging.getLogger(__name__)
 
@@ -222,3 +225,98 @@ class RebindUserService(Service):
         # now bind the module to the new ModuleSystem instance and vice-versa
         block.runtime = inner_system
         inner_system.xmodule_instance = block
+
+
+class EventPublishingService(Service):
+    """
+    An XBlock Service that allows XModules to publish events (e.g. grading, completion).
+
+    We have separated it from the ModuleSystem to be able to alter its behavior when using a different context:
+    LMS, Studio, or Instructor tasks.
+    """
+    def __init__(self, user, course_id, track_function, **kwargs):
+        super().__init__(**kwargs)
+        self.user = user
+        self.course_id = course_id
+        self.track_function = track_function
+        self.completion_service = None
+
+    def publish(self, block, event_type, event):
+        """
+        A function that allows XModules to publish events.
+        """
+        self.completion_service = block.runtime.service(block, 'completion')
+
+        handle_event = self._get_event_handler(event_type)
+        if handle_event and not is_masquerading_as_specific_student(self.user, self.course_id):
+            handle_event(block, event)
+        else:
+            context = contexts.course_context_from_course_id(self.course_id)
+            if not self.user.is_anonymous:
+                context['user_id'] = self.user.id
+
+            context['asides'] = {}
+            for aside in block.runtime.get_asides(block):
+                if hasattr(aside, 'get_event_context'):
+                    aside_event_info = aside.get_event_context(event_type, event)
+                    if aside_event_info is not None:
+                        context['asides'][aside.scope_ids.block_type] = aside_event_info
+            with tracker.get_tracker().context(event_type, context):
+                self.track_function(event_type, event)
+
+    def _get_event_handler(self, event_type):
+        """
+        Return an appropriate function to handle the event.
+
+        Returns None if no special processing is required.
+        """
+        handlers = {
+            'grade': self._handle_grade_event,
+        }
+        if self.completion_service and self.completion_service.completion_tracking_enabled():
+            handlers.update(
+                {
+                    'completion': lambda block, event: self.completion_service.submit_completion(
+                        block.scope_ids.usage_id, event['completion']
+                    ),
+                    'progress': self._handle_deprecated_progress_event,
+                }
+            )
+        return handlers.get(event_type)
+
+    def _handle_grade_event(self, block, event):
+        """
+        Submit a grade for the block.
+        """
+        if not self.user.is_anonymous:
+            grades_signals.SCORE_PUBLISHED.send(
+                sender=None,
+                block=block,
+                user=self.user,
+                raw_earned=event['value'],
+                raw_possible=event['max_value'],
+                only_if_higher=event.get('only_if_higher'),
+                score_deleted=event.get('score_deleted'),
+                grader_response=event.get('grader_response'),
+            )
+
+    def _handle_deprecated_progress_event(self, block, event):
+        """
+        DEPRECATED: Submit a completion for the block represented by the
+        progress event.
+
+        This exists to support the legacy progress extension used by
+        edx-solutions.  New XBlocks should not emit these events, but instead
+        emit completion events directly.
+        """
+        requested_user_id = event.get('user_id', self.user.id)
+        if requested_user_id != self.user.id:
+            log.warning(f"{self.user} tried to submit a completion on behalf of {requested_user_id}")
+            return
+
+        # If blocks explicitly declare support for the new completion API,
+        # we expect them to emit 'completion' events,
+        # and we ignore the deprecated 'progress' events
+        # in order to avoid duplicate work and possibly conflicting semantics.
+        if not getattr(block, 'has_custom_completion', False):
+            self.completion_service.submit_completion(block.scope_ids.usage_id, 1.0)

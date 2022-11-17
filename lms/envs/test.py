@@ -671,3 +671,6 @@ MFE_CONFIG_OVERRIDES = {
         "LOGO_URL": "https://courses.example.com/yourmfe-logo.png",
     },
 }
+
+############## Settings for survey report ##############
+SURVEY_REPORT_EXTRA_DATA = {}

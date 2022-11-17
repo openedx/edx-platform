@@ -393,5 +393,4 @@ class CourseRecommendationApiView(APIView):
                     'marketing_url': course_data.get('marketing_url')
                 })
 
-        segment.track(user_id, 'edx.bi.user.recommendations.count', {'count': len(recommended_courses)})
         return Response({'courses': recommended_courses, 'is_personalized_recommendation': not is_control}, status=200)
