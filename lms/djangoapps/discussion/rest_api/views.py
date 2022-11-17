@@ -361,7 +361,7 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * view: "unread" for threads the requesting user has not read, or
             "unanswered" for question threads with no marked answer. Only one
-            can be selected.
+            can be selected, or unresponded for discussion type posts with no response
 
         * requested_fields: (list) Indicates which additional fields to return
           for each thread. (supports 'profile_image')

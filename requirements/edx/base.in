@@ -114,7 +114,7 @@ jsonfield                           # Django model field for validated JSON; use
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lxml                                # XML parser
 learner-pathway-progress    # A plugin for lms to track learners progress in pathays
-lti-consumer-xblock==5.0.1          # version 6 does not work with studio, pinning while that is resolved
+lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
