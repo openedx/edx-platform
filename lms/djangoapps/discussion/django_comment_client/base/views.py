@@ -167,6 +167,17 @@ def track_voted_event(request, course, obj, vote_value, undo_vote=False):
     track_forum_event(request, event_name, course, obj, event_data)
 
 
+def track_forum_search_event(request, course, search_event_data):
+    """
+    Send analytics event for discussions related search.
+    """
+    event_name = 'edx.forum.searched'
+
+    context = contexts.course_context_from_course_id(course.id)
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(event_name, search_event_data)
+
+
 def track_thread_viewed_event(request, course, thread):
     """
     Send analytics event for a viewed thread.
