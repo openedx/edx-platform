@@ -7,13 +7,12 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Q
-from django.forms.models import model_to_dict
 from django.utils.translation import ugettext_lazy as _
 
 from lms.djangoapps.branding.api import get_privacy_url, get_tos_and_honor_code_url
 from openedx.core.djangoapps.site_configuration.helpers import get_current_site_configuration
+from openedx.features.edly.constants import ESSENTIALS
 from openedx.features.edly.models import EdlyUserProfile, EdlySubOrganization
-from student import auth
 from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
@@ -401,6 +400,22 @@ def get_logo_from_current_site_configurations():
         context['logo_src'] = current_site_configuration.get_value('BRANDING', {}).get('logo', '')
 
     return context
+
+
+def get_current_plan_from_site_configurations():
+    """
+    Gets the "CURRENT_PLAN" value in "DJANGO_SETTINGS_OVERRIDE" from current site configurations.
+
+    Returns:
+        str: current plan.
+    """
+    current_plan = ESSENTIALS
+    current_site_configuration = get_current_site_configuration()
+    if current_site_configuration:
+        current_plan = current_site_configuration.get_value(
+                'DJANGO_SETTINGS_OVERRIDE', {}).get('CURRENT_PLAN', ESSENTIALS)
+
+    return current_plan
 
 
 def clean_django_settings_override(django_settings_override):

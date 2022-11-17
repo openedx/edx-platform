@@ -11,8 +11,10 @@ from django.utils.deprecation import MiddlewareMixin
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.features.edly.constants import TRIAL_EXPIRED
 from openedx.features.edly.utils import (
     is_edly_sub_org_active,
+    get_current_plan_from_site_configurations,
     user_has_edly_organization_access,
 )
 
@@ -30,6 +32,10 @@ class EdlyOrganizationAccessMiddleware(MiddlewareMixin):
         """
         if request.user.is_superuser or request.user.is_staff:
             return
+
+        if get_current_plan_from_site_configurations() == TRIAL_EXPIRED and not _is_logged_in_path(request.path):
+            redirect_url = getattr(settings, 'EXPIRE_REDIRECT_URL', None)
+            return HttpResponseRedirect(redirect_url)
 
         edly_sub_org = getattr(request.site, 'edly_sub_org_for_lms', None)
         if edly_sub_org:
@@ -95,3 +101,19 @@ def _should_update_config(current_value, new_value):
     Check if middleware should replace config value or update it.
     """
     return isinstance(current_value, dict) and isinstance(new_value, dict)
+
+
+def _is_logged_in_path(path):
+    """
+    Check if the given path is for login.
+    """
+    login_paths = ['/login', '/oauth2/']
+    for login_path in login_paths:
+        if login_path in path:
+            return True
+
+    # Exception for media paths
+    if '/media' in path:
+        return True
+
+    return False
