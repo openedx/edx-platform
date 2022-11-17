@@ -2166,7 +2166,6 @@ class TestComponentHandler(TestCase):
         self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                          status_code)
 
-
     @patch('cms.djangoapps.contentstore.views.component.log')
     def test_submit_studio_edits_checks_author_permission(self, mock_logger):
         """
@@ -2188,10 +2187,8 @@ class TestComponentHandler(TestCase):
         with patch(
             'cms.djangoapps.contentstore.views.component.is_xblock_aside',
             return_value=False
-        ), patch(
-            "cms.djangoapps.contentstore.views.component.webob_to_django_response"
-        ) as mocked_webob_to_django_response:
-             component_handler(self.request, self.usage_key_string, mock_handler)
+        ), patch("cms.djangoapps.contentstore.views.component.webob_to_django_response"):
+            component_handler(self.request, self.usage_key_string, mock_handler)
 
         mock_logger.warning.assert_called_with(
             "%s does not have have studio write permissions on course: %s. write operations not performed on %r",
