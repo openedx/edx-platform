@@ -197,6 +197,7 @@
 
       .browse {
         @include button(simple, $primary);
+        box-sizing: border-box;
         height: 30px;
         position: absolute;
         bottom: 0;
@@ -208,6 +209,7 @@
       }
 
       .file_field {
+        box-sizing: border-box;
         position: relative;
         left: 0;
         width: 100%;
