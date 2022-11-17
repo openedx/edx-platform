@@ -27,7 +27,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         self.users = UserFactory.create_batch(5)
         CourseOverview.load_from_module_store(self.course.id)
 
-    @patch('common.djangoapps.student.models.tracker')
+    @patch('common.djangoapps.student.models.course_enrollment.tracker')
     @ddt.data(('audit', 'honor'), ('honor', 'audit'))
     @ddt.unpack
     def test_bulk_convert(self, from_mode, to_mode, mock_tracker):
@@ -55,7 +55,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
             CourseEnrollment.objects.get(mode=to_mode, course_id=self.course.id, user=user)
             self._assert_mode_changed(mock_tracker, self.course, user, to_mode)
 
-    @patch('common.djangoapps.student.models.tracker')
+    @patch('common.djangoapps.student.models.course_enrollment.tracker')
     @ddt.data(('audit', 'no-id-professional'), ('no-id-professional', 'audit'))
     @ddt.unpack
     def test_bulk_convert_with_org(self, from_mode, to_mode, mock_tracker):
@@ -108,7 +108,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
 
         assert 'Error: argument -o/--org: not allowed with argument -c/--course' == str(err.value)
 
-    @patch('common.djangoapps.student.models.tracker')
+    @patch('common.djangoapps.student.models.course_enrollment.tracker')
     def test_with_org_and_invalid_to_mode(self, mock_tracker):
         """Verify that enrollments are changed correctly when org was given."""
         from_mode = 'audit'
