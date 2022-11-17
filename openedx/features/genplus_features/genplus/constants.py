@@ -90,3 +90,16 @@ class ActivityTypes:
     __MODEL_CHOICES__ = (
         (activity_type, activity_type) for activity_type in __ALL__
     )
+
+
+class EmailTypes:
+
+    """
+    Email type choices
+    """
+    MISSING_CLASS_EMAIL= 'Missing Class'
+
+    __ALL__ = (MISSING_CLASS_EMAIL,)
+    __MODEL_CHOICES__ = (
+        (email_type, email_type) for email_type in __ALL__
+    )

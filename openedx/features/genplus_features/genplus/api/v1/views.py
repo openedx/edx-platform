@@ -24,7 +24,7 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 from openedx.features.genplus_features.genplus.models import (
     GenUser, Character, Class, Teacher, Student, TeacherClass, JournalPost, Skill
 )
-from openedx.features.genplus_features.genplus.constants import JournalTypes
+from openedx.features.genplus_features.genplus.constants import JournalTypes, EmailTypes
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from openedx.features.genplus_features.genplus_badges.api.v1.serializers import JournalBoosterBadgeSerializer
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
@@ -329,16 +329,23 @@ class ContactAPIView(views.APIView):
     permission_classes = [IsAuthenticated, IsTeacher]
 
     def post(self, request, *args, **kwargs):
-        serializer = ContactSerailizer(data=request.data)
+        email_data = {
+            'from_email': settings.DEFAULT_FROM_EMAIL,
+            'to_email': settings.CONTACT_EMAIL,
+            'subject': EmailTypes.MISSING_CLASS_EMAIL,
+        }
+        serializer = ContactSerailizer(data=email_data)
+        message = request.data.get('message', '')
 
-        if serializer.is_valid():
-            subject = 'Missing Classes'
+        if serializer.is_valid() and message:
+            record = serializer.save()
+            subject = f'{record.subject} ref:{record.email_reference}'
             email = request.user.email
-            
+
             data = {
                 'name': request.user.profile.name,
                 'school': request.user.gen_user.school.name,
-                'message': serializer.validated_data.get('message')
+                'message': message,
             }
 
             plain_message = get_template('genplus/contact_us_email.txt')
@@ -349,7 +356,7 @@ class ContactAPIView(views.APIView):
             msg = EmailMultiAlternatives(subject, text_content, settings.DEFAULT_FROM_EMAIL, [settings.CONTACT_EMAIL])
             msg.cc = [email]
             msg.attach_alternative(html_content, "text/html")
-            
+
             msg_status = msg.send(fail_silently=True)
 
             if (msg_status > 0):

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.middleware import csrf
 from rest_framework import serializers
 from common.djangoapps.student.models import UserProfile
-from openedx.features.genplus_features.genplus.models import Teacher, Character, Skill, Class, JournalPost
+from openedx.features.genplus_features.genplus.models import Teacher, Character, Skill, Class, JournalPost, EmailRecord
 from openedx.features.genplus_features.common.display_messages import ErrorMessages
 from django.contrib.auth import get_user_model
 
@@ -56,7 +56,7 @@ class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
         fields = ('id', 'user_id', 'name', 'profile_image')
-    
+
     def get_user_id(self, obj):
         return obj.gen_user.user.id
 
@@ -137,5 +137,7 @@ class TeacherFeedbackSerializer(serializers.ModelSerializer):
         extra_kwargs = {'teacher': {'required': True, 'allow_null': False}}
 
 
-class ContactSerailizer(serializers.Serializer):
-    message = serializers.CharField(required=True)
+class ContactSerailizer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailRecord
+        fields = ('from_email', 'to_email', 'subject',)

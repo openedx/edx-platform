@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
-from .constants import GenUserRoles, ClassColors, JournalTypes, SchoolTypes, ClassTypes, ActivityTypes
+from .constants import GenUserRoles, ClassColors, JournalTypes, SchoolTypes, ClassTypes, ActivityTypes, EmailTypes
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -235,3 +235,20 @@ class Activity(TimeStampedModel):
     )
     is_read = models.BooleanField(default=False)
     objects = ActivityManager()
+
+
+class EmailRecord(TimeStampedModel):
+    EMAIL_TYPE_CHOICES = EmailTypes.__MODEL_CHOICES__
+    email_reference = models.BigIntegerField()
+    from_email = models.EmailField()
+    to_email = models.EmailField()
+    subject = models.CharField(max_length=128, choices=EMAIL_TYPE_CHOICES)
+
+    def save(self, *args, **kwargs):
+        record = EmailRecord.objects.filter(subject=self.subject).order_by('-email_reference').first()
+        if record:
+            self.email_reference = record.email_reference + 1
+        else:
+            self.email_reference = 1
+
+        super(EmailRecord, self).save(*args, **kwargs)
