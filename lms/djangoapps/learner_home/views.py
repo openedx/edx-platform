@@ -626,6 +626,12 @@ class CourseRecommendationApiView(APIView):
                     }
                 )
 
+        # If no courses are left after filtering already enrolled courses from
+        # the list of amplitude recommendations, show general recommendations
+        # to the user.
+        if not recommended_courses:
+            return general_recommendations_response
+
         return Response(
             CourseRecommendationSerializer(
                 {
