@@ -125,6 +125,11 @@ class CourseModeModelTest(TestCase):
         # no modes, should get 0
         assert 0 == CourseMode.min_course_price_for_currency(self.course_key, 'usd')
 
+        # with mode with other currency, should get 0
+        mode = Mode('audit', 'Audit', 30, '', 'eur', None, None, None, None)
+        self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices, mode.currency)
+        assert 0 == CourseMode.min_course_price_for_currency(self.course_key, 'usd')
+
         # create some modes
         mode1 = Mode('honor', 'Honor Code Certificate', 10, '', 'usd', None, None, None, None)
         mode2 = Mode('verified', 'Verified Certificate', 20, '', 'usd', None, None, None, None)
