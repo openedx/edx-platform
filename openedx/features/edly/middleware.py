@@ -33,7 +33,7 @@ class EdlyOrganizationAccessMiddleware(MiddlewareMixin):
         if request.user.is_superuser or request.user.is_staff:
             return
 
-        if get_current_plan_from_site_configurations() == TRIAL_EXPIRED and not _is_logged_in_path(request.path):
+        if get_current_plan_from_site_configurations() == TRIAL_EXPIRED and not _is_internal_path(request.path):
             redirect_url = getattr(settings, 'EXPIRE_REDIRECT_URL', None)
             return HttpResponseRedirect(redirect_url)
 
@@ -103,17 +103,13 @@ def _should_update_config(current_value, new_value):
     return isinstance(current_value, dict) and isinstance(new_value, dict)
 
 
-def _is_logged_in_path(path):
+def _is_internal_path(path):
     """
-    Check if the given path is for login.
+    Check if the given path is for internal use.
     """
-    login_paths = ['/login', '/oauth2/']
+    login_paths = ['login', 'oauth2', 'logout', 'api', 'media', ]
     for login_path in login_paths:
         if login_path in path:
             return True
-
-    # Exception for media paths
-    if '/media' in path:
-        return True
 
     return False
