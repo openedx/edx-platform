@@ -2695,3 +2695,10 @@ INACTIVE_USER_LOGIN = True
 
 # Redirect URL for inactive user. If not set, user will be redirected to /login after the login itself (loop)
 INACTIVE_USER_URL = f'http://{CMS_BASE}'
+
+######################## BRAZE API SETTINGS ########################
+
+EDX_BRAZE_API_KEY = None
+EDX_BRAZE_API_SERVER = None
+
+BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''

@@ -857,6 +857,14 @@ def _prepare_date_block(block, block_date, user_timezone):
     return block
 
 
+def _remove_date_key_from_course_dates(course_data):
+    """
+    Remove date key from course dates list
+    """
+    _ = course_data.pop('date')
+    return course_data
+
+
 def get_course_dates_for_email(user, course_id, request):
     """
     Getting nearest dates from today one would be before today and one
@@ -904,4 +912,5 @@ def get_course_dates_for_email(user, course_id, request):
             if course_date_list[2]['date'] == '':
                 course_date_list[2].update(_prepare_date_block(block, block_date, user_timezone))
 
+    course_date_list = list(map(_remove_date_key_from_course_dates, course_date_list))
     return course_date_list
