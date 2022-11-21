@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey
 
+from common.djangoapps.track import segment
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.helpers import (
     get_course_dates_for_email,
@@ -40,7 +41,7 @@ def send_course_enrollment_email(
     In case the course run call to discovery fails, we use the course details sent
     to the celery task in our email.
     """
-    course_date_blocks, course_key = [], None
+    course_date_blocks, course_key, is_course_run_missing, is_course_date_missing = [], None, False, False
     course_run_fields = [
         "key",
         "title",
@@ -75,7 +76,7 @@ def send_course_enrollment_email(
         course_key = CourseKey.from_string(course_id)
         course_date_blocks = get_course_dates_for_email(user, course_key, request=None)
     except Exception:  # pylint: disable=broad-except
-        pass
+        is_course_date_missing = True
 
     canvas_entry_properties.update(
         {
@@ -108,9 +109,16 @@ def send_course_enrollment_email(
             }
         )
     except Exception:  # pylint: disable=broad-except
-        log.exception(
-            f"Unable to get data for user {user_id} from discovery for course {course_id}"
-        )
+        is_course_run_missing = True
+        log.info(f"[Course Enrollment] Course run call failed for user: {user_id} course: {course_id}")
+
+    if is_course_run_missing or is_course_date_missing:
+        segment_properties = {
+            'course_key': course_id,
+            'is_course_run_missing': is_course_run_missing,
+            'is_course_date_missing': is_course_date_missing,
+        }
+        segment.track(user_id, 'edx.course.enrollment.email.missingdata', segment_properties)
 
     try:
         recipients = [{"external_user_id": user_id}]
@@ -122,5 +130,5 @@ def send_course_enrollment_email(
                 canvas_entry_properties=canvas_entry_properties,
             )
     except Exception as exc:  # pylint: disable=broad-except
-        log.exception(f"Unable to send email due to exception: {exc}")
+        log.error(f"[Course Enrollment] Email sending failed with exception: {exc}")
         raise self.retry(exc=exc, countdown=COUNTDOWN, max_retries=MAX_RETRIES)
