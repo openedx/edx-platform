@@ -28,7 +28,6 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
 from storages.backends.s3boto3 import S3Boto3Storage
-from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 

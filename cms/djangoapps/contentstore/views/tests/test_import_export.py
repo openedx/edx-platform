@@ -26,7 +26,6 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
 from storages.backends.s3boto3 import S3Boto3Storage
-from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.models import UserTaskStatus
 
 from cms.djangoapps.contentstore import errors as import_error
@@ -968,7 +967,7 @@ class ExportTestCase(CourseTestCase):
         result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/path/to/testfile.tar.gz')
 
-    @ddt.data(S3Boto3Storage, S3Boto3Storage)
+    @ddt.data(S3Boto3Storage)
     @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
     @patch('user_tasks.models.UserTaskArtifact.objects.get')
     def test_export_status_handler_s3(

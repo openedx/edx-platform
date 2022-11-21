@@ -45,7 +45,7 @@ try:
     import django.contrib.admin
 
     admin_display = django.contrib.admin.display
-    if _admin_display or AdminMethod:
+    if _admin_display or AdminMethod: # type: ignore[truthy-function]
         warnings.warn(
             (
                 "Django 3.2+ available: the _admin_display method and the AdminMethod"

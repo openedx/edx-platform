@@ -230,7 +230,7 @@ class ReportStore:
         storage_type = config.get('STORAGE_TYPE', '').lower()
         if storage_type == 's3':
             return DjangoStorageReportStore(
-                storage_class='storages.backends.s3boto.S3Boto3Storage',
+                storage_class='storages.backends.s3boto3.S3Boto3Storage',
                 storage_kwargs={
                     'bucket': config['BUCKET'],
                     'location': config['ROOT_PATH'],
