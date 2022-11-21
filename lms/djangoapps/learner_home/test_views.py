@@ -838,6 +838,21 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         },
     ]
 
+    SERIALIZED_GENERAL_RECOMMENDATIONS = [
+        {
+            "courseKey": GENERAL_RECOMMENDATIONS[0]["course_key"],
+            "logoImageUrl": GENERAL_RECOMMENDATIONS[0]["logo_image_url"],
+            "marketingUrl": GENERAL_RECOMMENDATIONS[0]["marketing_url"],
+            "title": GENERAL_RECOMMENDATIONS[0]["title"],
+        },
+        {
+            "courseKey": GENERAL_RECOMMENDATIONS[1]["course_key"],
+            "logoImageUrl": GENERAL_RECOMMENDATIONS[1]["logo_image_url"],
+            "marketingUrl": GENERAL_RECOMMENDATIONS[1]["marketing_url"],
+            "title": GENERAL_RECOMMENDATIONS[1]["title"],
+        },
+    ]
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
@@ -853,6 +868,18 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
             "TUMx+QPLS2x",
             "NYUx+FCS.NET.1",
             "MichinX+101x",
+        ]
+        self.course_run_keys = [
+            "course-v1:MITx+6.00.1x+Run_0",
+            "course-v1:IBM+PY0101EN+Run_0",
+            "course-v1:HarvardX+CS50P+Run_0",
+            "course-v1:UQx+IELTSx+Run_0",
+            "course-v1:HarvardX+CS50x+Run_0",
+            "course-v1:Harvard+CS50z+Run_0",
+            "course-v1:BabsonX+EPS03x+Run_0",
+            "course-v1:TUMx+QPLS2x+Run_0",
+            "course-v1:NYUx+FCS.NET.1+Run_0",
+            "course-v1:MichinX+101x+Run_0"
         ]
         self.course_data = {
             "course_key": "MITx+6.00.1x",
@@ -871,35 +898,48 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.data, None)
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
     @mock.patch(
         "lms.djangoapps.learner_home.views.get_personalized_course_recommendations"
     )
-    @mock.patch("lms.djangoapps.learner_home.views.get_course_data")
     def test_no_recommendations_from_amplitude(
-        self, mocked_get_course_data, mocked_get_personalized_course_recommendations
+        self, mocked_get_personalized_course_recommendations
     ):
         """
-        Verify API returns 404 if no course recommendations from amplitude.
+        Verify API returns general recommendations if no course recommendations from amplitude.
         """
         mocked_get_personalized_course_recommendations.return_value = [False, []]
-        mocked_get_course_data.return_value = self.course_data
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.data, None)
+        self.assertEqual(response.status_code, 200)
+
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content.get("isPersonalizedRecommendation"), False)
+        self.assertEqual(
+            response_content.get("courses"),
+            self.SERIALIZED_GENERAL_RECOMMENDATIONS,
+        )
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
     @mock.patch(
         "lms.djangoapps.learner_home.views.get_personalized_course_recommendations",
         Mock(side_effect=Exception),
     )
     def test_amplitude_api_unexpected_error(self):
         """
-        Test that if the Amplitude API gives an unexpected error, 500 is returned.
+        Test that if the Amplitude API gives an unexpected error, general recommendations are returned.
         """
+
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 500)
-        self.assertEqual(response.data, None)
+        self.assertEqual(response.status_code, 200)
+
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content.get("isPersonalizedRecommendation"), False)
+        self.assertEqual(
+            response_content.get("courses"),
+            self.SERIALIZED_GENERAL_RECOMMENDATIONS,
+        )
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch(
@@ -951,20 +991,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response_content.get("isPersonalizedRecommendation"), False)
         self.assertEqual(
             response_content.get("courses"),
-            [
-                {
-                    "courseKey": self.GENERAL_RECOMMENDATIONS[0]["course_key"],
-                    "logoImageUrl": self.GENERAL_RECOMMENDATIONS[0]["logo_image_url"],
-                    "marketingUrl": self.GENERAL_RECOMMENDATIONS[0]["marketing_url"],
-                    "title": self.GENERAL_RECOMMENDATIONS[0]["title"],
-                },
-                {
-                    "courseKey": self.GENERAL_RECOMMENDATIONS[1]["course_key"],
-                    "logoImageUrl": self.GENERAL_RECOMMENDATIONS[1]["logo_image_url"],
-                    "marketingUrl": self.GENERAL_RECOMMENDATIONS[1]["marketing_url"],
-                    "title": self.GENERAL_RECOMMENDATIONS[1]["title"],
-                },
-            ],
+            self.SERIALIZED_GENERAL_RECOMMENDATIONS,
         )
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
@@ -983,18 +1010,10 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
             self.recommended_courses,
         ]
         mocked_get_course_data.return_value = self.course_data
-        course_keys = [
-            "course-v1:IBM+PY0101EN+Run_0",
-            "course-v1:UQx+IELTSx+Run_0",
-            "course-v1:MITx+6.00.1x+Run_0",
-            "course-v1:HarvardX+CS50P+Run_0",
-            "course-v1:Harvard+CS50z+Run_0",
-            "course-v1:TUMx+QPLS2x+Run_0",
-        ]
         expected_recommendations = 4
         # enrolling in 6 courses
-        for course_key in course_keys:
-            CourseEnrollmentFactory(course_id=course_key, user=self.user)
+        for course_run_key in self.course_run_keys[:6]:
+            CourseEnrollmentFactory(course_id=course_run_key, user=self.user)
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -1002,3 +1021,36 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         response_content = json.loads(response.content)
         self.assertEqual(response_content.get("isPersonalizedRecommendation"), True)
         self.assertEqual(len(response_content.get("courses")), expected_recommendations)
+
+    @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
+    @mock.patch(
+        "lms.djangoapps.learner_home.views.get_personalized_course_recommendations"
+    )
+    @mock.patch("lms.djangoapps.learner_home.views.get_course_data")
+    def test_no_enrollable_course(
+        self, mocked_get_course_data, mocked_get_personalized_course_recommendations
+    ):
+        """
+        Test that if after filtering already enrolled courses from Amplitude recommendations
+        we are left with zero personalized recommendations, we return general recommendations.
+        """
+        mocked_get_personalized_course_recommendations.return_value = [
+            False,
+            self.recommended_courses,
+        ]
+        mocked_get_course_data.return_value = self.course_data
+
+        # Enrolling in all courses
+        for course_run_key in self.course_run_keys:
+            CourseEnrollmentFactory(course_id=course_run_key, user=self.user)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content.get("isPersonalizedRecommendation"), False)
+        self.assertEqual(
+            response_content.get("courses"),
+            self.SERIALIZED_GENERAL_RECOMMENDATIONS,
+        )
