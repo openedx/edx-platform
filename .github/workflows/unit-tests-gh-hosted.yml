@@ -31,7 +31,7 @@ jobs:
             "cms-2",
             "common-1",
             "common-2",
-            "common-3",
+            "xmodule-1"
         ]
     name: gh-hosted-python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
     steps:
