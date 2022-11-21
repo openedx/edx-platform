@@ -50,7 +50,7 @@ pygments==2.13.0
     # via sphinx
 pyparsing==3.0.9
     # via packaging
-python-slugify==6.1.2
+python-slugify==7.0.0
     # via code-annotations
 pytz==2022.2.1
     # via
