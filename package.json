@@ -83,6 +83,7 @@
     "eslint-config-edx": "3.0.1",
     "eslint-config-edx-es5": "2.0.0",
     "eslint-import-resolver-webpack": "0.8.4",
+    "esplint": "^0.10.1",
     "jasmine-core": "2.6.4",
     "jasmine-jquery": "git+https://git@github.com/velesin/jasmine-jquery.git#ebad463d592d3fea00c69f26ea18a930e09c7b58",
     "jest": "26.0.0",
