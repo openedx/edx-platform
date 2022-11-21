@@ -2440,7 +2440,7 @@ VIDEO_IMAGE_SETTINGS = dict(
     VIDEO_IMAGE_MAX_BYTES=2 * 1024 * 1024,    # 2 MB
     VIDEO_IMAGE_MIN_BYTES=2 * 1024,       # 2 KB
     # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3Boto3Storage',
+    # STORAGE_CLASS='storages.backends.s3boto3.S3Boto3Storage',
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
@@ -2455,7 +2455,7 @@ VIDEO_IMAGE_MAX_AGE = 31536000
 VIDEO_TRANSCRIPTS_SETTINGS = dict(
     VIDEO_TRANSCRIPTS_MAX_BYTES=3 * 1024 * 1024,    # 3 MB
     # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3Boto3Storage',
+    # STORAGE_CLASS='storages.backends.s3boto3.S3Boto3Storage',
     # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
