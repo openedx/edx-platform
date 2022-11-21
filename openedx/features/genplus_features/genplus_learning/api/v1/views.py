@@ -145,9 +145,16 @@ class StudentDashboardAPIView(APIView):
     def get_next_lesson(self, gen_class):
         class_units = gen_class.class_units.all()
         course_keys = class_units.values_list('course_key', flat=True)
-        incomplete_unit_completion = UnitCompletion.objects.filter(user=self.request.user,
-                                                                   is_complete=False,
-                                                                   course_key__in=course_keys).first()
+        user_completions = UnitCompletion.objects.filter(user=self.request.user)
+
+        # User has not started a course yet.
+        if not user_completions:
+            next_unit = class_units.first()
+            next_lesson = next_unit.class_lessons.first()
+            return {'url': next_lesson.lms_url, 'display_name': next_lesson.display_name}
+
+        incomplete_unit_completion = user_completions.filter(is_complete=False,
+                                                             course_key__in=course_keys).first()
 
         if incomplete_unit_completion:
             next_unit = class_units.filter(course_key=incomplete_unit_completion.course_key).first()
