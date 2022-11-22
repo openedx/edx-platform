@@ -5267,3 +5267,5 @@ URLS_2U_LOBS = {
 ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 
 ############## PLOTLY ##############
+
+ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
