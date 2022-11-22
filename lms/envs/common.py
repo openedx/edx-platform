@@ -3191,6 +3191,7 @@ RM_UNIFY_SECRET = 'rmunify-secret'
 GENPLUS_FRONTEND_URL = ''
 PROGRAM_ENROLLMENT_COUNTDOWN = 10
 TP_LOGOUT_REDIRECT_URL = ''
+DISABLE_ACCORDION = False
 
 ######################### Django Rest Framework ########################
 

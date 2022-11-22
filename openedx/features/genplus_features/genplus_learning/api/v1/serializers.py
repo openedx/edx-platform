@@ -1,5 +1,7 @@
+from django.conf import settings
 from rest_framework import serializers
 from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.genplus_features.genplus_learning.models import (
     Program,
     ProgramEnrollment,
@@ -42,14 +44,45 @@ class UnitSerializer(serializers.ModelSerializer):
         return units_context[obj.pk]['progress']
 
 
+class AssessmentUnitSerializer(serializers.ModelSerializer):
+    is_locked = serializers.SerializerMethodField()
+    lms_url = serializers.SerializerMethodField()
+    is_complete = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CourseOverview
+        fields = ('id', 'display_name', 'short_description',
+                  'course_image_url', 'is_locked', 'lms_url',
+                  'is_complete')
+
+    def get_is_locked(self, obj):
+        return self.context.get('is_locked', False)
+
+    def get_is_complete(self, obj):
+        return self.context.get('is_complete', False)
+
+    def get_lms_url(self, obj):
+        course = modulestore().get_course(obj.id)
+        course_key_str = str(obj.id)
+        sections = course.children
+        if sections:
+            usage_key_str = str(sections[0])
+        else:
+            usage_key_str = str(modulestore().make_course_usage_key(course.id))
+
+        return f"{settings.LMS_ROOT_URL}/courses/{course_key_str}/jump_to/{usage_key_str}"
+
+
 class ProgramSerializer(serializers.ModelSerializer):
     units = serializers.SerializerMethodField()
+    intro_unit = serializers.SerializerMethodField()
+    outro_unit = serializers.SerializerMethodField()
     year_group_name = serializers.CharField(source='year_group.name')
     program_name = serializers.CharField(source='year_group.program_name')
 
     class Meta:
         model = Program
-        fields = ('program_name', 'year_group_name', 'units')
+        fields = ('program_name', 'year_group_name', 'intro_unit', 'units', 'outro_unit')
 
     def get_units(self, obj):
         gen_user = self.context.get('gen_user')
@@ -76,6 +109,39 @@ class ProgramSerializer(serializers.ModelSerializer):
                 }
 
         return UnitSerializer(units, many=True, read_only=True, context={'units_context': units_context}).data
+
+    def get_intro_unit(self, obj):
+        if not obj.intro_unit:
+            return None
+
+        gen_user = self.context.get('gen_user')
+        context = {
+            'is_locked': False,
+            'is_complete': False,
+        }
+        if gen_user.is_student:
+            completion = UnitCompletion.objects.filter(user=gen_user.user, course_key=obj.intro_unit.id).first()
+            context['is_complete'] = completion.is_complete if completion else False
+
+        return AssessmentUnitSerializer(obj.intro_unit, read_only=True, context=context).data
+
+    def get_outro_unit(self, obj):
+        if not obj.outro_unit:
+            return None
+
+        gen_user = self.context.get('gen_user')
+        context = {
+            'is_locked': False,
+            'is_complete': False,
+        }
+        if gen_user.is_student:
+            completion = UnitCompletion.objects.filter(user=gen_user.user, course_key=obj.outro_unit.id).first()
+            context['is_complete'] = completion.is_complete if completion else False
+            last_unit = obj.units.last()
+            enrollment = gen_user.student.program_enrollments.get(program=obj)
+            context['is_locked'] = last_unit.is_locked(enrollment.gen_class) if last_unit else False
+
+        return AssessmentUnitSerializer(obj.outro_unit, read_only=True, context=context).data
 
 
 class ClassLessonSerializer(serializers.ModelSerializer):

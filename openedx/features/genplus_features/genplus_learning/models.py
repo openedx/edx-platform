@@ -41,6 +41,8 @@ class Program(TimeStampedModel):
     end_date = models.DateField()
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=ProgramStatuses.UNPUBLISHED)
     banner_image = models.ImageField(upload_to="program_banner_images", default="")
+    intro_unit = models.ForeignKey(CourseOverview, on_delete=models.SET_NULL, null=True, blank=True, related_name='intro_unit_programs')
+    outro_unit = models.ForeignKey(CourseOverview, on_delete=models.SET_NULL, null=True, blank=True, related_name='outro_unit_programs')
     history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
