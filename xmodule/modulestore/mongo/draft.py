@@ -616,8 +616,6 @@ class DraftModuleStore(MongoModuleStore):
 
         first_tier = [as_func(location) for as_func in as_functions]
         self._breadth_first(_delete_item, first_tier)
-        # recompute (and update) the metadata inheritance tree which is cached
-        self.refresh_cached_metadata_inheritance_tree(location.course_key)
 
     def _breadth_first(self, function, root_usages):
         """

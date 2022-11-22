@@ -314,7 +314,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-10-16 20:42+0000\n"
+"POT-Creation-Date: 2022-11-06 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Alexandre DS <alexandre@cleverm8.com>, 2020\n"
 "Language-Team: French (https://www.transifex.com/open-edx/teams/6205/fr/)\n"
@@ -3063,6 +3063,26 @@ msgid ""
 msgstr ""
 "Une demande de remboursement a été initiée pour {username} ({email}). Afin "
 "de traiter cette demande, svp visiter le ou les liens ci-dessous."
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Practice Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Proctored Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Timed Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Exam"
+msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -15373,7 +15393,7 @@ msgstr "En retard"
 
 #: lms/templates/vert_module.html
 msgid "Reset Problems"
-msgstr ""
+msgstr "Réinitialiser les problèmes"
 
 #: lms/templates/video.html
 msgid "Loading video player"
@@ -18003,6 +18023,9 @@ msgid ""
 "{start_bold}Get the most out of your course!{end_bold} Upgrade to earn a "
 "{link_start}verified certificate{link_end} to showcase on your resumé."
 msgstr ""
+"{start_bold}Tirez le maximum de votre cours!{end_bold} Mettez à niveau pour "
+"obtenir une {link_start}attestation vérifiée{link_end} à afficher sur votre "
+"CV."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
@@ -18261,6 +18284,8 @@ msgid ""
 "The discussion block is disabled for this course as it is not using a "
 "compatible discussion provider."
 msgstr ""
+"Le fil de discussion est désactivé pour ce cours car il n'utilise pas un "
+"fournisseur compatible."
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"

@@ -111,6 +111,10 @@ COPY . .
 # Install Python requirements again in order to capture local projects
 RUN pip install -e .
 
+RUN useradd -m --shell /bin/false app
+
+USER app
+
 ##################################################
 # Define LMS docker-based non-dev target.
 FROM base as lms-docker
@@ -171,6 +175,7 @@ CMD gunicorn \
 # so that the installed development requirements are contained
 # in a single layer, shared between `lms-dev` and `cms-dev`.
 FROM base as dev
+USER root
 RUN pip install -r requirements/edx/development.txt
 
 # Link configuration YAMLs and set EDX_PLATFORM_SE1TTINGS.
@@ -186,6 +191,7 @@ RUN ln -s "$(pwd)/cms/envs/devstack-experimental.yml" "$CMS_CFG"
 # those variables right in the Dockerfile.
 RUN touch ../edxapp_env
 
+USER app
 
 ##################################################
 #  Define LMS dev target.

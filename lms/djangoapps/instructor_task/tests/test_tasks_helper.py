@@ -67,7 +67,6 @@ from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from openedx.core.lib.teams_config import TeamsConfig
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
@@ -369,27 +368,21 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         # verifies that verified passing learner is eligible for certificate
         self._verify_cell_data_for_user(verified_user.username, course.id, 'Certificate Eligible', 'Y', num_rows=2)
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 4, 47),
-        (ModuleStoreEnum.Type.split, 2, 48),
-    )
-    @ddt.unpack
-    def test_query_counts(self, store_type, mongo_count, expected_query_count):
-        with self.store.default_store(store_type):
-            experiment_group_a = Group(2, 'Expériment Group A')
-            experiment_group_b = Group(3, 'Expériment Group B')
-            experiment_partition = UserPartition(
-                1,
-                'Content Expériment Configuration',
-                'Group Configuration for Content Expériments',
-                [experiment_group_a, experiment_group_b],
-                scheme_id='random'
-            )
-            course = CourseFactory.create(
-                cohort_config={'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort 1', 'cohort 2']},
-                user_partitions=[experiment_partition],
-                teams_configuration=_TEAMS_CONFIG,
-            )
+    def test_query_counts(self):
+        experiment_group_a = Group(2, 'Expériment Group A')
+        experiment_group_b = Group(3, 'Expériment Group B')
+        experiment_partition = UserPartition(
+            1,
+            'Content Expériment Configuration',
+            'Group Configuration for Content Expériments',
+            [experiment_group_a, experiment_group_b],
+            scheme_id='random'
+        )
+        course = CourseFactory.create(
+            cohort_config={'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort 1', 'cohort 2']},
+            user_partitions=[experiment_partition],
+            teams_configuration=_TEAMS_CONFIG,
+        )
         _ = CreditCourseFactory(course_key=course.id)
 
         num_users = 5
@@ -401,8 +394,8 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         RequestCache.clear_all_namespaces()
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            with check_mongo_calls(mongo_count):
-                with self.assertNumQueries(expected_query_count):
+            with check_mongo_calls(2):
+                with self.assertNumQueries(48):
                     CourseGradeReport.generate(None, None, course.id, {}, 'graded')
 
     def test_inactive_enrollments(self):
@@ -531,7 +524,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
-            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
             'title': 'Problem1',
         }, student_data[0])
         assert 'state' in student_data[0]
@@ -561,7 +554,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
-            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
             'title': 'Problem1',
             'some': 'state1',
             'more': 'state1!',
@@ -569,7 +562,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
-            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
             'title': 'Problem1',
             'some': 'state2',
             'more': 'state2!',
@@ -602,7 +595,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
-            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
             'title': 'Problem1',
             'some': 'state1',
             'more': 'state1!',
@@ -610,7 +603,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
-            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
             'title': 'Problem1',
             'some': 'state2',
             'more': 'state2!',
@@ -634,9 +627,9 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
-            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'block_key': 'block-v1:edx+1.23x+test_course+type@problem+block@Problem1',
             'title': 'Problem1',
-            'Answer ID': 'i4x-edx-1_23x-problem-Problem1_2_1',
+            'Answer ID': 'Problem1_2_1',
             'Answer': 'Option 1',
             'Correct Answer': 'Option 1',
             'Question': 'The correct answer is Option 1',
@@ -663,9 +656,9 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             self.assertDictContainsSubset({
                 'username': 'student',
                 'location': f'test_course > Section > Subsection > Problem{idx}',
-                'block_key': f'i4x://edx/1.23x/problem/Problem{idx}',
+                'block_key': f'block-v1:edx+1.23x+test_course+type@problem+block@Problem{idx}',
                 'title': f'Problem{idx}',
-                'Answer ID': f'i4x-edx-1_23x-problem-Problem{idx}_2_1',
+                'Answer ID': f'Problem{idx}_2_1',
                 'Answer': 'Option 1',
                 'Correct Answer': 'Option 1',
                 'Question': 'The correct answer is Option 1',
@@ -675,8 +668,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     @ddt.data(
         (['problem'], 5),
         (['other'], 0),
-        (['problem', 'test-category'], 10),
-        (None, 10),
+        (None, 5),
     )
     @ddt.unpack
     def test_build_student_data_with_filter(self, filters, filtered_count):
@@ -688,7 +680,6 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             item = ItemFactory.create(
                 parent_location=self.problem_section.location,
                 parent=self.problem_section,
-                category="test-category",
                 display_name=f"Item{idx}",
                 data=''
             )
@@ -1748,7 +1739,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             metadata={'graded': True, 'format': 'Homework'},
             display_name='Subsection'
         )
-        self.define_option_problem('Problem1', parent=self.problem_section, num_responses=1)
+        self.define_option_problem('Problem1', parent=self.problem_section)
         self.hidden_section = ItemFactory.create(
             parent=self.chapter,
             category='sequential',
@@ -1779,8 +1770,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.define_option_problem('Unreleased', parent=self.unreleased_section)
 
     @patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
-    @ddt.data(True, False)
-    def test_grade_report(self, persistent_grades_enabled):
+    def test_grade_report(self):
         self.submit_student_answer(self.student.username, 'Problem1', ['Option 1'])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
@@ -1883,10 +1873,10 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                 metadata={'graded': True},
                 display_name='Problem Vertical'
             )
-            self.define_option_problem('Problem1', parent=vertical)
+            self.define_option_problem('Problem4', parent=vertical)
 
-            self.submit_student_answer(student_1.username, 'Problem1', ['Option 1'])
-            self.submit_student_answer(student_verified.username, 'Problem1', ['Option 1'])
+            self.submit_student_answer(student_1.username, 'Problem4', ['Option 1'])
+            self.submit_student_answer(student_verified.username, 'Problem4', ['Option 1'])
             result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result

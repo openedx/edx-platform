@@ -8,7 +8,7 @@ from crum import set_current_request
 from xmodule.graders import ProblemScore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
@@ -29,7 +29,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
     Test grading of different problem types.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     SCORED_BLOCK_COUNT = 7
     ACTUAL_TOTAL_POSSIBLE = 17.0
@@ -58,10 +58,12 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         For details on the contents and structure of the file, see
         `common/test/data/scoreable/README`.
         """
+        password = 'test'
+        user = UserFactory.create(is_staff=False, username='test_student', password=password)
 
         course_items = import_course_from_xml(
             cls.store,
-            'test_user',
+            user.id,
             TEST_DATA_DIR,
             source_dirs=['scoreable'],
             static_content_store=None,
@@ -104,7 +106,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     Test that changing the metadata on a block has the desired effect on the
     persisted score.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     default_problem_metadata = {
         'graded': True,
@@ -214,7 +216,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
     """
     Test scores and grades with various problem weight values.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
     def setUpClass(cls):

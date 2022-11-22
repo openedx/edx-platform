@@ -297,19 +297,6 @@ class RuntimeShim:
             result['default_value'] = field.to_json(field.default)
         return result
 
-    def track_function(self, title, event_info):
-        """
-        Publish an event to the tracking log.
-
-        This is deprecated in favor of runtime.publish
-        See https://git.io/JeGLf and https://git.io/JeGLY for context.
-        """
-        warnings.warn(
-            "runtime.track_function is deprecated. Use runtime.publish() instead.",
-            DeprecationWarning, stacklevel=2,
-        )
-        self.publish(self._active_block, title, event_info)
-
     @property
     def user_location(self):
         """

@@ -6,11 +6,11 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.helpers import user_has_passing_grade_in_course
 from openedx.features.course_experience import course_home_url
 from xmodule.data import CertificatesDisplayBehaviors
 
@@ -62,6 +62,8 @@ class CourseProviderSerializer(serializers.Serializer):
 
 class CourseSerializer(serializers.Serializer):
     """Course header information, derived from a CourseOverview"""
+
+    requires_context = True
 
     bannerImgSrc = serializers.URLField(source="image_urls.small")
     courseName = serializers.CharField(source="display_name_with_default")
@@ -130,10 +132,7 @@ class CourseRunSerializer(serializers.Serializer):
             return f"{ecommerce_payment_page}?sku={verified_sku}"
 
     def get_resumeUrl(self, instance):
-        resumeUrl = self.context.get("resume_course_urls", {}).get(instance.course_id)
-
-        # Return None if missing or empty string
-        return resumeUrl if bool(resumeUrl) else None
+        return self.context.get("resume_course_urls", {}).get(instance.course_id)
 
 
 class CoursewareAccessSerializer(serializers.Serializer):
@@ -141,6 +140,8 @@ class CoursewareAccessSerializer(serializers.Serializer):
     Info determining whether a user should be able to view course material.
     Mirrors logic in "show_courseware_links_for" from old dashboard.py
     """
+
+    requires_context = True
 
     hasUnmetPrerequisites = serializers.SerializerMethodField()
     isTooEarly = serializers.SerializerMethodField()
@@ -175,15 +176,17 @@ class EnrollmentSerializer(serializers.Serializer):
     """
     Info about this particular enrollment.
     Derived from a CourseEnrollment with added context:
+    - "audit_access_deadlines" (dict): when audit access expires for user.
     - "ecommerce_payment_page" (url): ecommerce page, used to determine if we can upgrade.
     - "course_mode_info" (dict): keyed by course ID with the following values:
-        - "expiration_datetime" (int): when the verified mode will expire.
         - "show_upsell" (bool): whether or not we offer an upsell for this course.
         - "verified_sku" (uuid): ID for the verified mode for upgrade.
     - "show_courseware_link": keyed by course ID with added metadata.
     - "show_email_settings_for" (dict): keyed by course ID with a boolean whether we
        show email settings.
     """
+
+    requires_context = True
 
     accessExpirationDate = serializers.SerializerMethodField()
     isAudit = serializers.SerializerMethodField()
@@ -198,11 +201,7 @@ class EnrollmentSerializer(serializers.Serializer):
     isEnrolled = serializers.BooleanField(source="is_active")
 
     def get_accessExpirationDate(self, instance):
-        return (
-            self.context.get("course_mode_info", {})
-            .get(instance.course_id)
-            .get("expiration_datetime")
-        )
+        return self.context.get("audit_access_deadlines", {}).get(instance.course_id)
 
     def get_isAudit(self, enrollment):
         return enrollment.mode in CourseMode.AUDIT_MODES
@@ -230,10 +229,12 @@ class EnrollmentSerializer(serializers.Serializer):
         )
 
     def get_isAuditAccessExpired(self, enrollment):
-        show_courseware_link = self.context.get("show_courseware_link", {}).get(
-            enrollment.course.id, {}
+        """Mirrors logic in "check_course_expired" but using pre-fetched expiration date"""
+        expiration_date = self.context.get("audit_access_deadlines", {}).get(
+            enrollment.course_id
         )
-        return show_courseware_link.get("error_code") == "audit_expired"
+
+        return bool(expiration_date) and timezone.now() > expiration_date
 
     def get_isEmailEnabled(self, enrollment):
         return enrollment.course_id in self.context.get("show_email_settings_for", [])
@@ -245,14 +246,18 @@ class EnrollmentSerializer(serializers.Serializer):
 class GradeDataSerializer(serializers.Serializer):
     """Info about grades for this enrollment"""
 
+    requires_context = True
+
     isPassing = serializers.SerializerMethodField()
 
     def get_isPassing(self, enrollment):
-        return user_has_passing_grade_in_course(enrollment)
+        return self.context.get("grade_statuses", {}).get(enrollment.course_id, False)
 
 
 class CertificateSerializer(serializers.Serializer):
     """Certificate availability info"""
+
+    requires_context = True
 
     availableDate = serializers.SerializerMethodField()
     isRestricted = serializers.SerializerMethodField()
@@ -329,7 +334,6 @@ class EntitlementSerializer(serializers.Serializer):
     changeDeadline = serializers.SerializerMethodField()
     isExpired = serializers.SerializerMethodField()
     expirationDate = serializers.SerializerMethodField()
-    enrollmentUrl = serializers.SerializerMethodField()
 
     # DRF doesn't convert None to False so we must do this rather than a booleanfield:
     # https://github.com/encode/django-rest-framework/issues/2299
@@ -353,9 +357,6 @@ class EntitlementSerializer(serializers.Serializer):
 
     def get_changeDeadline(self, instance):
         return self.get_expirationDate(instance)
-
-    def get_enrollmentUrl(self, instance):
-        return reverse("entitlements_api:v1:enrollments", args=[str(instance.uuid)])
 
 
 class RelatedProgramSerializer(serializers.Serializer):
@@ -492,17 +493,15 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         )
         if pseudo_session:
             course_key = CourseKey.from_string(pseudo_session["key"])
-            return self.context.get("pseudo_session_course_overviews").get(
-                course_key
-            )
+            return self.context.get("pseudo_session_course_overviews").get(course_key)
 
     def get_course(self, instance):
-        """ Serialize course info from a course overview """
+        """Serialize course info from a course overview"""
         course_overview = self._get_course_overview(instance)
         return CourseSerializer(course_overview, context=self.context).data
 
     def get_courseProvider(self, instance):
-        """ Serialize course provider info from a course overview """
+        """Serialize course provider info from a course overview"""
         course_overview = self._get_course_overview(instance)
         return CourseProviderSerializer(course_overview, allow_null=True).data
 
@@ -514,6 +513,26 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         return ProgramsSerializer(
             {"relatedPrograms": programs}, context=self.context
         ).data
+
+
+class RecommendedCourseSerializer(serializers.Serializer):
+    """Serializer for a recommended course from the recommendation engine"""
+
+    courseKey = serializers.CharField(source="course_key")
+    logoImageUrl = serializers.URLField(source="logo_image_url")
+    marketingUrl = serializers.URLField(source="marketing_url")
+    title = serializers.CharField()
+
+
+class CourseRecommendationSerializer(serializers.Serializer):
+    """Recommended courses by the Amplitude"""
+
+    courses = serializers.ListField(
+        child=RecommendedCourseSerializer(), allow_empty=True
+    )
+    isPersonalizedRecommendation = serializers.BooleanField(
+        source="is_personalized_recommendation"
+    )
 
 
 class SuggestedCourseSerializer(serializers.Serializer):

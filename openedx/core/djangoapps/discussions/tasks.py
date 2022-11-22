@@ -51,37 +51,42 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
     provider_type = discussions_config.provider_type
 
     def iter_discussable_units():
-        subsections = store.get_items(course_key, qualifiers={"category": "sequential"})
         # Start at 99 so that the initial increment starts it at 100.
         # This leaves the first 100 slots for the course wide topics, which is only a concern if there are more
         # than that many.
         idx = 99
-        for subsection in subsections:
-            section = store.get_item(subsection.parent)
-            for unit in subsection.get_children():
-                # Increment index even for skipped units so that the index is more stable and won't change
-                # if settings change, only if a unit is added or removed.
-                idx += 1
-                # If unit-level visibility is enabled and the unit doesn't have discussion enabled, skip it.
-                if unit_level_visibility and not getattr(unit, "discussion_enabled", False):
+        for section in course.get_children():
+            if section.location.block_type != "chapter":
+                continue
+            for subsection in section.get_children():
+                if subsection.location.block_type != "sequential":
                     continue
-                # If the unit is in a graded section and graded sections aren't enabled skip it.
-                if subsection.graded and not enable_graded_units:
-                    continue
-                # If the unit is an exam, skip it.
-                if subsection.is_practice_exam or subsection.is_proctored_enabled or subsection.is_time_limited:
-                    continue
-                yield DiscussionTopicContext(
-                    usage_key=unit.location,
-                    title=unit.display_name,
-                    group_id=None,
-                    ordering=idx,
-                    context={
-                        "section": section.display_name,
-                        "subsection": subsection.display_name,
-                        "unit": unit.display_name,
-                    },
-                )
+                for unit in subsection.get_children():
+                    if unit.location.block_type != 'vertical':
+                        continue
+                    # Increment index even for skipped units so that the index is more stable and won't change
+                    # if settings change, only if a unit is added or removed.
+                    idx += 1
+                    # If unit-level visibility is enabled and the unit doesn't have discussion enabled, skip it.
+                    if unit_level_visibility and not getattr(unit, "discussion_enabled", False):
+                        continue
+                    # If the unit is in a graded section and graded sections aren't enabled skip it.
+                    if subsection.graded and not enable_graded_units:
+                        continue
+                    # If the unit is an exam, skip it.
+                    if subsection.is_practice_exam or subsection.is_proctored_enabled or subsection.is_time_limited:
+                        continue
+                    yield DiscussionTopicContext(
+                        usage_key=unit.location,
+                        title=unit.display_name,
+                        group_id=None,
+                        ordering=idx,
+                        context={
+                            "section": section.display_name,
+                            "subsection": subsection.display_name,
+                            "unit": unit.display_name,
+                        },
+                    )
 
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         course = store.get_course(course_key)

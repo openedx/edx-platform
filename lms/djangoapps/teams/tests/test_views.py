@@ -104,6 +104,16 @@ class TestDashboard(SharedModuleStoreTestCase):
         response = self.client.get(self.teams_url)
         self.assertContains(response, "TeamsTabFactory", status_code=200)
 
+    def test_inactive_user(self):
+        """
+        Verifies that an inactive user can still access the dashboard.
+        """
+        user = UserFactory(is_staff=False, is_active=False, password=self.test_password)
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+        self.client.login(username=user.username, password=self.test_password)
+        response = self.client.get(self.teams_url)
+        self.assertContains(response, "TeamsTabFactory", status_code=200)
+
     def test_enrolled_teams_not_enabled_no_teamsets(self):
         """
         Verifies that a user without global access who is enrolled in the course cannot access the team dashboard
@@ -406,6 +416,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             'admin': AdminFactory.create(password=cls.test_password)
         }
         cls.create_and_enroll_student(username='student_enrolled')
+        cls.create_and_enroll_student(username='student_enrolled_inactive', is_active=False)
         cls.create_and_enroll_student(username='student_on_team_1_private_set_1', mode=CourseMode.MASTERS)
         cls.create_and_enroll_student(username='student_on_team_2_private_set_1', mode=CourseMode.MASTERS)
         cls.create_and_enroll_student(username='student_not_member_of_private_teams', mode=CourseMode.MASTERS)
@@ -580,17 +591,21 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         return self.build_membership_data_raw(self.users[username].username, team.team_id)
 
     @classmethod
-    def create_and_enroll_student(cls, courses=None, username=None, mode=None, external_key=None):
+    def create_and_enroll_student(cls, is_active=True, courses=None, username=None, mode=None, external_key=None):
         """ Creates a new student and enrolls that student in the course.
 
         Adds the new user to the cls.users dictionary with the username as the key.
 
         Returns the username once the user has been created.
         """
+        kwargs = {
+            'password': cls.test_password,
+            'is_active': is_active,
+        }
         if username is not None:
-            user = UserFactory.create(password=cls.test_password, username=username)
-        else:
-            user = UserFactory.create(password=cls.test_password)
+            kwargs['username'] = username
+
+        user = UserFactory.create(**kwargs)
         courses = courses if courses is not None else [cls.test_course_1]
         for course in courses:
             CourseEnrollment.enroll(user, course.id, mode=mode, check_access=True)
@@ -805,9 +820,10 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 403),
         ('student_unenrolled', 403),
         ('student_enrolled', 200, 3),
+        ('student_enrolled_inactive', 200, 3),
         ('staff', 200, 7),
         ('course_staff', 200, 7),
         ('community_ta', 200, 3),
@@ -1118,9 +1134,10 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 403),
         ('student_unenrolled', 403),
         ('student_enrolled_not_on_team', 200),
+        ('student_enrolled_inactive', 200),
         ('staff', 200),
         ('course_staff', 200),
         ('community_ta', 200),
@@ -1338,9 +1355,10 @@ class TestDetailTeamAPI(TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 403),
         ('student_unenrolled', 403),
         ('student_enrolled', 200),
+        ('student_enrolled_inactive', 200),
         ('staff', 200),
         ('course_staff', 200),
         ('community_ta', 200),
@@ -1453,6 +1471,7 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     @ddt.data(
         ('student_unenrolled', 403),
         ('student_enrolled', 403),
+        ('student_inactive', 403),
     )
     @ddt.unpack
     def test_access_forbidden(self, user, status):
@@ -1467,7 +1486,6 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
     )
     @ddt.unpack
     def test_access_unauthorized(self, user, status):
@@ -1541,9 +1559,10 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 403),
         ('student_unenrolled', 403),
         ('student_enrolled', 403),
+        ('student_enrolled_inactive', 403),
         ('staff', 200),
         ('course_staff', 200),
         ('community_ta', 200),
@@ -1565,7 +1584,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 404),
         ('student_unenrolled', 404),
         ('student_enrolled', 404),
         ('staff', 404),
@@ -1703,10 +1722,11 @@ class TestTeamAssignmentsView(TeamAPITestCase):
     @ddt.unpack
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 403),
         ('student_unenrolled', 403),
         ('student_on_team_2_private_set_1', 404),
         ('student_enrolled', 200),
+        ('student_enrolled_inactive', 200),
         ('staff', 200),
         ('course_staff', 200),
         ('community_ta', 200),
@@ -1754,9 +1774,10 @@ class TestListTopicsAPI(TeamAPITestCase):
 
     @ddt.data(
         (None, 401, None),
-        ('student_inactive', 401, None),
+        ('student_inactive', 403, None),
         ('student_unenrolled', 403, None),
         ('student_enrolled', 200, 4),
+        ('student_enrolled_inactive', 200, 4),
         ('staff', 200, 7),
         ('course_staff', 200, 7),
         ('community_ta', 200, 4),
@@ -1937,9 +1958,10 @@ class TestDetailTopicAPI(TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 403),
         ('student_unenrolled', 403),
         ('student_enrolled', 200),
+        ('student_enrolled_inactive', 200),
         ('staff', 200),
         ('course_staff', 200),
         ('community_ta', 200),
@@ -2005,9 +2027,10 @@ class TestListMembershipAPI(TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 404),
         ('student_unenrolled', 404),
         ('student_enrolled', 200),
+        ('student_enrolled_inactive', 200),
         ('student_enrolled_both_courses_other_team', 200),
         ('staff', 200),
         ('course_staff', 200),
@@ -2022,7 +2045,7 @@ class TestListMembershipAPI(TeamAPITestCase):
 
     @ddt.data(
         (None, 401, False),
-        ('student_inactive', 401, False),
+        ('student_inactive', 200, False),
         ('student_unenrolled', 200, False),
         ('student_enrolled', 200, True),
         ('student_enrolled_both_courses_other_team', 200, True),
@@ -2336,10 +2359,11 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 404),
         ('student_unenrolled', 404),
         ('student_enrolled_not_on_team', 200),
         ('student_enrolled', 404),
+        ('student_enrolled_inactive', 404),
         ('student_enrolled_both_courses_other_team', 404),
         ('staff', 200),
         ('course_staff', 200),
@@ -2497,10 +2521,11 @@ class TestDetailMembershipAPI(TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 404),
         ('student_unenrolled', 404),
         ('student_enrolled_not_on_team', 200),
         ('student_enrolled', 200),
+        ('student_enrolled_inactive', 200),
         ('staff', 200),
         ('course_staff', 200),
         ('community_ta', 200),
@@ -2625,10 +2650,11 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
 
     @ddt.data(
         (None, 401),
-        ('student_inactive', 401),
+        ('student_inactive', 404),
         ('student_unenrolled', 404),
         ('student_enrolled_not_on_team', 404),
         ('student_enrolled', 204),
+        ('student_enrolled_inactive', 404),
         ('staff', 204),
         ('course_staff', 204),
         ('community_ta', 204),

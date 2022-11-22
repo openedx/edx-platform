@@ -95,7 +95,7 @@ def _load_mixed_class(category):
     """
     Load an XBlock by category name, and apply all defined mixins
     """
-    component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
+    component_class = XBlock.load_class(category)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
 
@@ -559,6 +559,18 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 
     # unintentional update to handle any side effects of handle call
     # could potentially be updating actual course data or simply caching its values
-    modulestore().update_item(descriptor, request.user.id, asides=asides)
+    # Addendum:
+    # TNL 101-62 studio write permission is also checked for editing content.
+
+    if has_course_author_access(request.user, usage_key.course_key):
+        modulestore().update_item(descriptor, request.user.id, asides=asides)
+    else:
+        #fail quietly if user is not course author.
+        log.warning(
+            "%s does not have have studio write permissions on course: %s. write operations not performed on %r",
+            request.user.id,
+            usage_key.course_key,
+            handler
+        )
 
     return webob_to_django_response(resp)

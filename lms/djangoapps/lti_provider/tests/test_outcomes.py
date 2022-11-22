@@ -371,7 +371,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
         assert count == 3
 
     def test_with_no_graded_assignments(self):
-        with check_mongo_calls(3):
+        with check_mongo_calls(7):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
@@ -379,7 +379,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
 
     def test_with_graded_unit(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
-        with check_mongo_calls(3):
+        with check_mongo_calls(7):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
@@ -388,7 +388,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
 
     def test_with_graded_vertical(self):
         self.create_graded_assignment(self.vertical, 'graded_vertical', self.outcome_service)
-        with check_mongo_calls(3):
+        with check_mongo_calls(7):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
@@ -398,7 +398,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
     def test_with_graded_unit_and_vertical(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
         self.create_graded_assignment(self.vertical, 'graded_vertical', self.outcome_service)
-        with check_mongo_calls(3):
+        with check_mongo_calls(7):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
@@ -409,7 +409,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
     def test_with_unit_used_twice(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
         self.create_graded_assignment(self.unit, 'graded_unit2', self.outcome_service)
-        with check_mongo_calls(3):
+        with check_mongo_calls(7):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )
@@ -420,7 +420,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
     def test_with_unit_graded_for_different_user(self):
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
         other_user = UserFactory.create()
-        with check_mongo_calls(3):
+        with check_mongo_calls(7):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, other_user.id, self.course.id
             )
@@ -430,7 +430,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
         other_outcome_service = self.create_outcome_service('second_consumer')
         self.create_graded_assignment(self.unit, 'graded_unit', self.outcome_service)
         self.create_graded_assignment(self.unit, 'graded_unit2', other_outcome_service)
-        with check_mongo_calls(3):
+        with check_mongo_calls(7):
             assignments = outcomes.get_assignments_for_problem(
                 self.unit, self.user_id, self.course.id
             )

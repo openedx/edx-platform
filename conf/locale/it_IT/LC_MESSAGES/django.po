@@ -127,7 +127,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-10-16 20:42+0000\n"
+"POT-Creation-Date: 2022-11-06 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2021\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/open-edx/teams/6205/it_IT/)\n"
@@ -2890,6 +2890,26 @@ msgid ""
 msgstr ""
 "Una richiesta di rimborso è stata avviata per {username} ({email}). Per "
 "elaborare questa richiesta, visitare il link (i link) riportato di seguito."
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Practice Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Proctored Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Timed Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Exam"
+msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""

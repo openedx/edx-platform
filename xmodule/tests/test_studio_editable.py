@@ -1,5 +1,5 @@
 """
-Tests for StudioEditableModule.
+Tests for StudioEditableBlock.
 """
 
 
@@ -7,9 +7,9 @@ from xmodule.tests.test_vertical import BaseVerticalBlockTest
 from xmodule.x_module import AUTHOR_VIEW
 
 
-class StudioEditableModuleTestCase(BaseVerticalBlockTest):
+class StudioEditableBlockTestCase(BaseVerticalBlockTest):
     """
-    Class containing StudioEditableModule tests.
+    Class containing StudioEditableBlock tests.
     """
 
     def test_render_reorderable_children(self):

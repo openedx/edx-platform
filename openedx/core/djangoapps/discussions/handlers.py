@@ -66,7 +66,7 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
                     # If the section/subsection/unit a topic is in is deleted, add that context to title.
                     topic_link.title = "{section}|{subsection}|{unit}".format(**topic_link.context)
                 except KeyError:
-                    # It's possible the context is if the topic link was created before the context field was added.
+                    # It's possible the context is empty if the link was created before the context field was added.
                     pass
             else:
                 topic_link.enabled_in_context = True

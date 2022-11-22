@@ -305,7 +305,6 @@ def create_modulestore_instance(
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
         request_cache=request_cache,
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
-        xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
         xblock_field_data_wrappers=xblock_field_data_wrappers,
         disabled_xblock_types=fetch_disabled_xblock_types,
         doc_store_config=doc_store_config,

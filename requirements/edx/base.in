@@ -114,7 +114,7 @@ jsonfield                           # Django model field for validated JSON; use
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lxml                                # XML parser
 learner-pathway-progress    # A plugin for lms to track learners progress in pathays
-lti-consumer-xblock>=4.1.1
+lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
@@ -176,3 +176,5 @@ XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
+xblock-drag-and-drop-v2             # Drag and Drop XBlock
+xblock-google-drive                 # XBlock for google docs and calendar
