@@ -6,6 +6,7 @@ Django Admin page for SurveyReport.
 from django.contrib import admin
 from .models import SurveyReport
 
+
 class SurveyReportAdmin(admin.ModelAdmin):
     """
     Admin to manage survey reports.
