@@ -879,7 +879,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
             "course-v1:BabsonX+EPS03x+Run_0",
             "course-v1:TUMx+QPLS2x+Run_0",
             "course-v1:NYUx+FCS.NET.1+Run_0",
-            "course-v1:MichinX+101x+Run_0"
+            "course-v1:MichinX+101x+Run_0",
         ]
         self.course_data = {
             "course_key": "MITx+6.00.1x",
