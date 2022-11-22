@@ -51,7 +51,7 @@ object attached.
 
 Finally, the handler for this discussion change signal, takes the information
 from the discussion change signal and compares it to the topics in the
-database, and does the following;
+database, and does the following:
 
 - If it sees discussions contexts (units) without topics it creates new topics
   link entries for the new units. This will happen if you create a new unit,

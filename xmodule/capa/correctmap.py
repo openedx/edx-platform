@@ -91,7 +91,7 @@ class CorrectMap(object):
 
         """
         # empty current dict
-        self.__init__()
+        self.__init__()  # pylint: disable=unnecessary-dunder-call
 
         if not correct_map:
             return

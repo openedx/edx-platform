@@ -244,7 +244,7 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
         self.course = None
         self.user = UserFactory()
 
-    @ddt.data('course_run_1', 'matt''s course', 'matt＇s run')
+    @ddt.data('course_run_1', 'matt\'s course', 'matt＇s run')
     def test_send_proctoring_requirements_email(self, course_run_name):
         self.course = CourseFactory(
             display_name=course_run_name,

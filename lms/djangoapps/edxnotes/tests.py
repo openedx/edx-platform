@@ -103,9 +103,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         super().setUp()
 
         ApplicationFactory(name="edx-notes")
-        # Using old mongo because of locator comparison issues (see longer
-        # note below in EdxNotesHelpersTest setUp.
-        self.course = CourseFactory(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
+        self.course = CourseFactory(edxnotes=True, default_store=ModuleStoreEnum.Type.split)
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
         self.problem = TestProblem(self.course, self.user)
@@ -204,11 +202,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         super().setUp()
 
-        # There are many tests that are comparing locators as returned from helper methods. When using
-        # the split modulestore, some of those locators have version and branch information, but the
-        # comparison values do not. This needs further investigation in order to enable these tests
-        # with the split modulestore.
-        with self.store.default_store(ModuleStoreEnum.Type.mongo):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             ApplicationFactory(name="edx-notes")
             self.course = CourseFactory.create()
             self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)

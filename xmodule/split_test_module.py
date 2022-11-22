@@ -399,7 +399,6 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         """
         Record in the tracking logs which child was rendered
         """
-        # TODO: use publish instead, when publish is wired to the tracking logs
         try:
             child_id = str(self.child.scope_ids.usage_id)
         except Exception:
@@ -410,7 +409,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             )
             raise
         else:
-            self.system.track_function('xblock.split_test.child_render', {'child_id': child_id})
+            self.runtime.publish('xblock.split_test.child_render', {'child_id': child_id})
             return Response()
 
     def get_icon_class(self):

@@ -14,7 +14,6 @@ from django.core.management import call_command
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase
 )
@@ -221,15 +220,6 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         assert_in('edX-simple-2012_Fall/html/toylab.html', names)
         assert_in('edX-simple-2012_Fall/sequential/A_simple_sequence.xml', names)
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
-
-
-class CommandsMongoTestCase(CommandsTestBase):
-    """
-    Test case for management commands using the mixed mongo modulestore with old mongo as the default.
-
-    """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
-    __test__ = True
 
 
 class CommandSplitMongoTestCase(CommandsTestBase):

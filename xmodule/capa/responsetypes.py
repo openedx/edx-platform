@@ -371,8 +371,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
             else:
                 label = _('Incorrect:')
 
-        # self.runtime.track_function('get_demand_hint', event_info)
-        # This this "feedback hint" event
+        # This is the "feedback hint" event
         event_info = {}
         event_info['module_id'] = text_type(self.capa_module.location)
         event_info['problem_part_id'] = self.id
@@ -384,7 +383,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         event_info['question_type'] = question_tag
         if log_extra:
             event_info.update(log_extra)
-        self.capa_module.runtime.track_function('edx.problem.hint.feedback_displayed', event_info)
+        self.capa_module.runtime.publish(self.capa_module, 'edx.problem.hint.feedback_displayed', event_info)
 
         # Form the div-wrapped hint texts
         hints_wrap = HTML('').join(
@@ -726,8 +725,8 @@ class ChoiceResponse(LoncapaResponse):
         edc_max_grade = len(all_choices)
         edc_current_grade = 0
 
-        good_answers = sum([1 for answer in student_answer if answer in self.correct_choices])
-        good_non_answers = sum([1 for blank in student_non_answers if blank in self.incorrect_choices])
+        good_answers = sum(1 for answer in student_answer if answer in self.correct_choices)
+        good_non_answers = sum(1 for blank in student_non_answers if blank in self.incorrect_choices)
         edc_current_grade = good_answers + good_non_answers
 
         return_grade = round_away_from_zero(self.get_max_score() * float(edc_current_grade) / float(edc_max_grade), 2)
@@ -759,8 +758,8 @@ class ChoiceResponse(LoncapaResponse):
 
         halves_error_count = 0
 
-        incorrect_answers = sum([1 for answer in student_answer if answer in self.incorrect_choices])
-        missed_answers = sum([1 for blank in student_non_answers if blank in self.correct_choices])
+        incorrect_answers = sum(1 for answer in student_answer if answer in self.incorrect_choices)
+        missed_answers = sum(1 for blank in student_non_answers if blank in self.correct_choices)
         halves_error_count = incorrect_answers + missed_answers
 
         if halves_error_count == 0:

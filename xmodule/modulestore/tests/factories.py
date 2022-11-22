@@ -22,7 +22,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlock
 
 from xmodule.course_module import Textbook
-from xmodule.modulestore import ModuleStoreEnum, prefer_xmodules
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mixed import strip_key
 from xmodule.modulestore.tests.sample_courses import TOY_BLOCK_INFO_TREE, default_block_info_tree
 from xmodule.tabs import CourseTab
@@ -389,7 +389,7 @@ class ItemFactory(XModuleFactory):
 
             if 'boilerplate' in kwargs:
                 template_id = kwargs.pop('boilerplate')
-                clz = XBlock.load_class(category, select=prefer_xmodules)
+                clz = XBlock.load_class(category)
                 template = clz.get_template(template_id)
                 assert template is not None
                 metadata.update(template.get('metadata', {}))

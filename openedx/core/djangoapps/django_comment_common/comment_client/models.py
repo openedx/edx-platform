@@ -122,7 +122,7 @@ class Model:
     def _update_from_response(self, response_data):
         for k, v in response_data.items():
             if k in self.accessible_fields:
-                self.__setattr__(k, v)
+                setattr(self, k, v)
             else:
                 log.warning(
                     "Unexpected field {field_name} in model {model_name}".format(

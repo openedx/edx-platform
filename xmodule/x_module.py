@@ -86,9 +86,11 @@ DEFAULT_PUBLIC_VIEW_MESSAGE = (
     'Sign in or register, and enroll in this course to view it.'
 )
 
+
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
-_ = lambda text: text
+def _(text):
+    return text
 
 
 class OpaqueKeyReader(IdReader):
@@ -201,10 +203,6 @@ class AsideKeyGenerator(IdGenerator):
 
         """
         raise NotImplementedError("Specific Modulestores must provide implementations of create_definition")
-
-
-def dummy_track(_event_type, _event):
-    pass
 
 
 class HTMLSnippet:
@@ -1675,38 +1673,26 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
         self,
-        track_function,
         get_module,
         descriptor_runtime,
-        publish=None,
         **kwargs,
     ):
         """
         Create a closure around the system environment.
-
-        track_function - function of (event_type, event), intended for logging
-                         or otherwise tracking the event.
-                         TODO: Not used, and has inconsistent args in different
-                         files.  Update or remove.
 
         get_module - function that takes a descriptor and returns a corresponding
                          module instance object.  If the current user does not have
                          access to that location, returns None.
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
-
-        publish(event) - A function that allows XModules to publish events (such as grade changes)
         """
 
         kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
         kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
         super().__init__(**kwargs)
 
-        self.track_function = track_function
         self.get_module = get_module
 
-        if publish:
-            self.publish = publish
         self.xmodule_instance = None
 
         self.descriptor_runtime = descriptor_runtime
@@ -1742,7 +1728,12 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def publish(self, block, event_type, event):  # lint-amnesty, pylint: disable=arguments-differ
-        pass
+        """
+        Publish events through the `EventPublishingService`.
+        This ensures that the correct track method is used for Instructor tasks.
+        """
+        if publish_service := self._services.get('publish'):
+            publish_service.publish(block, event_type, event)
 
     def service(self, block, service_name):
         """
@@ -1800,7 +1791,7 @@ class CombinedSystem:
 
         """
         context = context or {}
-        return self.__getattr__('render')(block, view_name, context)
+        return self.__getattr__('render')(block, view_name, context)  # pylint: disable=unnecessary-dunder-call
 
     def service(self, block, service_name):
         """Return a service, or None.

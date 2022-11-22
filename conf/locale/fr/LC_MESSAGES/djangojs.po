@@ -219,7 +219,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-10-16 20:42+0000\n"
+"POT-Creation-Date: 2022-11-06 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: iderr <ibrahim@derraz.fr>, 2021-2022\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -8573,7 +8573,7 @@ msgstr "Générer les attestations de dérogation"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "Certificate exceptions group selection"
-msgstr ""
+msgstr "Sélection des groupes d’exceptions au certificat"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "All users on the Exception list who do not yet have a certificate"

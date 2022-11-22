@@ -268,7 +268,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         super().setUpClass()
 
-        names_and_prefixes = [(ModuleStoreEnum.Type.split, 'split'), (ModuleStoreEnum.Type.mongo, 'old')]
+        names_and_prefixes = [(ModuleStoreEnum.Type.split, 'split')]
         for store, prefix in names_and_prefixes:
             with cls.store.default_store(store):
                 cls.courses[prefix] = CourseFactory.create(org='a', course='b', run=prefix)
@@ -592,202 +592,6 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
             asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
             assert re.match(expected, asset_path) is not None
 
-    @ddt.data(
-        # No leading slash.
-        ('', '{prfx}_ünlöck.png', '/{c4x}/{prfx}_ünlöck.png', 1),
-        ('', '{prfx}_lock.png', '/{c4x}/{prfx}_lock.png', 1),
-        ('', 'weird {prfx}_ünlöck.png', '/{c4x}/weird_{prfx}_ünlöck.png', 1),
-        ('', '{prfx}_excluded.html', '/{base_c4x}/{prfx}_excluded.html', 1),
-        ('', '{prfx}_not_excluded.htm', '/{c4x}/{prfx}_not_excluded.htm', 1),
-        ('dev', '{prfx}_ünlöck.png', '//dev/{c4x}/{prfx}_ünlöck.png', 1),
-        ('dev', '{prfx}_lock.png', '/{c4x}/{prfx}_lock.png', 1),
-        ('dev', 'weird {prfx}_ünlöck.png', '//dev/{c4x}/weird_{prfx}_ünlöck.png', 1),
-        ('dev', '{prfx}_excluded.html', '/{base_c4x}/{prfx}_excluded.html', 1),
-        ('dev', '{prfx}_not_excluded.htm', '//dev/{c4x}/{prfx}_not_excluded.htm', 1),
-        # No leading slash with subdirectory.  This ensures we probably substitute slashes.
-        ('', 'special/{prfx}_ünlöck.png', '/{c4x}/special_{prfx}_ünlöck.png', 1),
-        ('', 'special/{prfx}_lock.png', '/{c4x}/special_{prfx}_lock.png', 1),
-        ('', 'special/weird {prfx}_ünlöck.png', '/{c4x}/special_weird_{prfx}_ünlöck.png', 1),
-        ('', 'special/{prfx}_excluded.html', '/{base_c4x}/special_{prfx}_excluded.html', 1),
-        ('', 'special/{prfx}_not_excluded.htm', '/{c4x}/special_{prfx}_not_excluded.htm', 1),
-        ('dev', 'special/{prfx}_ünlöck.png', '//dev/{c4x}/special_{prfx}_ünlöck.png', 1),
-        ('dev', 'special/{prfx}_lock.png', '/{c4x}/special_{prfx}_lock.png', 1),
-        ('dev', 'special/weird {prfx}_ünlöck.png', '//dev/{c4x}/special_weird_{prfx}_ünlöck.png', 1),
-        ('dev', 'special/{prfx}_excluded.html', '/{base_c4x}/special_{prfx}_excluded.html', 1),
-        ('dev', 'special/{prfx}_not_excluded.htm', '//dev/{c4x}/special_{prfx}_not_excluded.htm', 1),
-        # Leading slash.
-        ('', '/{prfx}_ünlöck.png', '/{c4x}/{prfx}_ünlöck.png', 1),
-        ('', '/{prfx}_lock.png', '/{c4x}/{prfx}_lock.png', 1),
-        ('', '/weird {prfx}_ünlöck.png', '/{c4x}/weird_{prfx}_ünlöck.png', 1),
-        ('', '/{prfx}_excluded.html', '/{base_c4x}/{prfx}_excluded.html', 1),
-        ('', '/{prfx}_not_excluded.htm', '/{c4x}/{prfx}_not_excluded.htm', 1),
-        ('dev', '/{prfx}_ünlöck.png', '//dev/{c4x}/{prfx}_ünlöck.png', 1),
-        ('dev', '/{prfx}_lock.png', '/{c4x}/{prfx}_lock.png', 1),
-        ('dev', '/weird {prfx}_ünlöck.png', '//dev/{c4x}/weird_{prfx}_ünlöck.png', 1),
-        ('dev', '/{prfx}_excluded.html', '/{base_c4x}/{prfx}_excluded.html', 1),
-        ('dev', '/{prfx}_not_excluded.htm', '//dev/{c4x}/{prfx}_not_excluded.htm', 1),
-        # Leading slash with subdirectory. This ensures we properly substitute slashes.
-        ('', '/special/{prfx}_ünlöck.png', '/{c4x}/special_{prfx}_ünlöck.png', 1),
-        ('', '/special/{prfx}_lock.png', '/{c4x}/special_{prfx}_lock.png', 1),
-        ('', '/special/weird {prfx}_ünlöck.png', '/{c4x}/special_weird_{prfx}_ünlöck.png', 1),
-        ('', '/special/{prfx}_excluded.html', '/{base_c4x}/special_{prfx}_excluded.html', 1),
-        ('', '/special/{prfx}_not_excluded.htm', '/{c4x}/special_{prfx}_not_excluded.htm', 1),
-        ('dev', '/special/{prfx}_ünlöck.png', '//dev/{c4x}/special_{prfx}_ünlöck.png', 1),
-        ('dev', '/special/{prfx}_lock.png', '/{c4x}/special_{prfx}_lock.png', 1),
-        ('dev', '/special/weird {prfx}_ünlöck.png', '//dev/{c4x}/special_weird_{prfx}_ünlöck.png', 1),
-        ('dev', '/special/{prfx}_excluded.html', '/{base_c4x}/special_{prfx}_excluded.html', 1),
-        ('dev', '/special/{prfx}_not_excluded.htm', '//dev/{c4x}/special_{prfx}_not_excluded.htm', 1),
-        # Static path.
-        ('', '/static/{prfx}_ünlöck.png', '/{c4x}/{prfx}_ünlöck.png', 1),
-        ('', '/static/{prfx}_lock.png', '/{c4x}/{prfx}_lock.png', 1),
-        ('', '/static/weird {prfx}_ünlöck.png', '/{c4x}/weird_{prfx}_ünlöck.png', 1),
-        ('', '/static/{prfx}_excluded.html', '/{base_c4x}/{prfx}_excluded.html', 1),
-        ('', '/static/{prfx}_not_excluded.htm', '/{c4x}/{prfx}_not_excluded.htm', 1),
-        ('dev', '/static/{prfx}_ünlöck.png', '//dev/{c4x}/{prfx}_ünlöck.png', 1),
-        ('dev', '/static/{prfx}_lock.png', '/{c4x}/{prfx}_lock.png', 1),
-        ('dev', '/static/weird {prfx}_ünlöck.png', '//dev/{c4x}/weird_{prfx}_ünlöck.png', 1),
-        ('dev', '/static/{prfx}_excluded.html', '/{base_c4x}/{prfx}_excluded.html', 1),
-        ('dev', '/static/{prfx}_not_excluded.htm', '//dev/{c4x}/{prfx}_not_excluded.htm', 1),
-        # Static path with subdirectory.  This ensures we properly substitute slashes.
-        ('', '/static/special/{prfx}_ünlöck.png', '/{c4x}/special_{prfx}_ünlöck.png', 1),
-        ('', '/static/special/{prfx}_lock.png', '/{c4x}/special_{prfx}_lock.png', 1),
-        ('', '/static/special/weird {prfx}_ünlöck.png', '/{c4x}/special_weird_{prfx}_ünlöck.png', 1),
-        ('', '/static/special/{prfx}_excluded.html', '/{base_c4x}/special_{prfx}_excluded.html', 1),
-        ('', '/static/special/{prfx}_not_excluded.htm', '/{c4x}/special_{prfx}_not_excluded.htm', 1),
-        ('dev', '/static/special/{prfx}_ünlöck.png', '//dev/{c4x}/special_{prfx}_ünlöck.png', 1),
-        ('dev', '/static/special/{prfx}_lock.png', '/{c4x}/special_{prfx}_lock.png', 1),
-        ('dev', '/static/special/weird {prfx}_ünlöck.png', '//dev/{c4x}/special_weird_{prfx}_ünlöck.png', 1),
-        ('dev', '/static/special/{prfx}_excluded.html', '/{base_c4x}/special_{prfx}_excluded.html', 1),
-        ('dev', '/static/special/{prfx}_not_excluded.htm', '//dev/{c4x}/special_{prfx}_not_excluded.htm', 1),
-        # Static path with query parameter.
-        (
-            '',
-            '/static/{prfx}_ünlöck.png?foo=/static/{prfx}_lock.png',
-            '/{c4x}/{prfx}_ünlöck.png?foo={encoded_c4x}{prfx}_lock.png',
-            2
-        ),
-        (
-            '',
-            '/static/{prfx}_lock.png?foo=/static/{prfx}_ünlöck.png',
-            '/{c4x}/{prfx}_lock.png?foo={encoded_c4x}{prfx}_ünlöck.png',
-            2
-        ),
-        (
-            '',
-            '/static/{prfx}_excluded.html?foo=/static/{prfx}_excluded.html',
-            '/{base_c4x}/{prfx}_excluded.html?foo={encoded_base_c4x}{prfx}_excluded.html',
-            2
-        ),
-        (
-            '',
-            '/static/{prfx}_excluded.html?foo=/static/{prfx}_not_excluded.htm',
-            '/{base_c4x}/{prfx}_excluded.html?foo={encoded_c4x}{prfx}_not_excluded.htm',
-            2
-        ),
-        (
-            '',
-            '/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_excluded.html',
-            '/{c4x}/{prfx}_not_excluded.htm?foo={encoded_base_c4x}{prfx}_excluded.html',
-            2
-        ),
-        (
-            '',
-            '/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_not_excluded.htm',
-            '/{c4x}/{prfx}_not_excluded.htm?foo={encoded_c4x}{prfx}_not_excluded.htm',
-            2
-        ),
-        (
-            'dev',
-            '/static/{prfx}_ünlöck.png?foo=/static/{prfx}_lock.png',
-            '//dev/{c4x}/{prfx}_ünlöck.png?foo={encoded_c4x}{prfx}_lock.png',
-            2
-        ),
-        (
-            'dev',
-            '/static/{prfx}_lock.png?foo=/static/{prfx}_ünlöck.png',
-            '/{c4x}/{prfx}_lock.png?foo={encoded_base_url}{encoded_c4x}{prfx}_ünlöck.png',
-            2
-        ),
-        (
-            'dev',
-            '/static/{prfx}_excluded.html?foo=/static/{prfx}_excluded.html',
-            '/{base_c4x}/{prfx}_excluded.html?foo={encoded_base_c4x}{prfx}_excluded.html',
-            2
-        ),
-        (
-            'dev',
-            '/static/{prfx}_excluded.html?foo=/static/{prfx}_not_excluded.htm',
-            '/{base_c4x}/{prfx}_excluded.html?foo={encoded_base_url}{encoded_c4x}{prfx}_not_excluded.htm',
-            2
-        ),
-        (
-            'dev',
-            '/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_excluded.html',
-            '//dev/{c4x}/{prfx}_not_excluded.htm?foo={encoded_base_c4x}{prfx}_excluded.html',
-            2
-        ),
-        (
-            'dev',
-            '/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_not_excluded.htm',
-            '//dev/{c4x}/{prfx}_not_excluded.htm?foo={encoded_base_url}{encoded_c4x}{prfx}_not_excluded.htm',
-            2
-        ),
-        # Old, c4x-style path.
-        ('', '/{c4x}/{prfx}_ünlöck.png', '/{c4x}/{prfx}_ünlöck.png', 1),
-        ('', '/{c4x}/{prfx}_lock.png', '/{c4x}/{prfx}_lock.png', 1),
-        ('', '/{c4x}/weird_{prfx}_lock.png', '/{c4x}/weird_{prfx}_lock.png', 1),
-        ('', '/{c4x}/{prfx}_excluded.html', '/{base_c4x}/{prfx}_excluded.html', 1),
-        ('', '/{c4x}/{prfx}_not_excluded.htm', '/{c4x}/{prfx}_not_excluded.htm', 1),
-        ('dev', '/{c4x}/{prfx}_ünlöck.png', '//dev/{c4x}/{prfx}_ünlöck.png', 1),
-        ('dev', '/{c4x}/{prfx}_lock.png', '/{c4x}/{prfx}_lock.png', 1),
-        ('dev', '/{c4x}/weird_{prfx}_ünlöck.png', '//dev/{c4x}/weird_{prfx}_ünlöck.png', 1),
-        ('dev', '/{c4x}/{prfx}_excluded.html', '/{base_c4x}/{prfx}_excluded.html', 1),
-        ('dev', '/{c4x}/{prfx}_not_excluded.htm', '//dev/{c4x}/{prfx}_not_excluded.htm', 1),
-    )
-    @ddt.unpack
-    def test_canonical_asset_path_with_c4x_style_assets(self, base_url, start, expected, mongo_calls):
-        exts = ['.html', '.tm']
-        prefix = 'old'
-        base_c4x_block = 'c4x/a/b/asset'
-        adjusted_c4x_block = base_c4x_block
-        encoded_c4x_block = quote('/' + base_c4x_block + '/')
-        encoded_base_url = quote('//' + base_url)
-        encoded_base_c4x_block = encoded_c4x_block
-
-        start = start.format(
-            prfx=prefix,
-            encoded_base_url=encoded_base_url,
-            c4x=base_c4x_block,
-            encoded_c4x=encoded_c4x_block
-        )
-
-        # Adjust for content digest.  This gets dicey quickly and we have to order our steps:
-        # - replace format markets because they have curly braces
-        # - encode Unicode characters to percent-encoded
-        # - finally shove back in our regex patterns
-        digest = CanonicalContentTest.get_content_digest_for_asset_path(prefix, start)
-        if digest:
-            adjusted_c4x_block = 'assets/courseware/VMARK/HMARK/c4x/a/b/asset'
-            encoded_c4x_block = quote('/' + adjusted_c4x_block + '/')
-
-        expected = expected.format(
-            prfx=prefix,
-            encoded_base_url=encoded_base_url,
-            base_c4x=base_c4x_block,
-            c4x=adjusted_c4x_block,
-            encoded_c4x=encoded_c4x_block,
-            encoded_base_c4x=encoded_base_c4x_block,
-        )
-
-        expected = encode_unicode_characters_in_url(expected)
-        expected = expected.replace('VMARK', r'v[\d]')
-        expected = expected.replace('HMARK', '[a-f0-9]{32}')
-        expected = expected.replace('+', r'\+').replace('?', r'\?')
-
-        with check_mongo_calls(mongo_calls):
-            asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
-            assert re.match(expected, asset_path) is not None
-
 
 class ReplaceURLServiceTest(TestCase):
     """
@@ -855,28 +659,19 @@ class TestReplaceURLWrapper(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.course_mongo = CourseFactory.create(
-            default_store=ModuleStoreEnum.Type.mongo,
-            org='TestX',
-            number='TS01',
-            run='2015'
-        )
-        cls.course_split = CourseFactory.create(
-            default_store=ModuleStoreEnum.Type.split,
+        cls.course = CourseFactory.create(
             org='TestX',
             number='TS02',
             run='2015'
         )
 
-    @ddt.data('course_mongo', 'course_split')
-    def test_replace_jump_to_id_urls(self, course_id):
+    def test_replace_jump_to_id_urls(self):
         """
         Verify that the jump-to URL has been replaced.
         """
-        course = getattr(self, course_id)
-        replace_url_service = ReplaceURLService(course_id=course.id, jump_to_id_base_url='/base_url/')
+        replace_url_service = ReplaceURLService(course_id=self.course.id, jump_to_id_base_url='/base_url/')
         test_replace = replace_urls_wrapper(
-            block=course,
+            block=self.course,
             view='baseview',
             frag=Fragment('<a href="/jump_to_id/id">'),
             context=None,
@@ -885,40 +680,28 @@ class TestReplaceURLWrapper(SharedModuleStoreTestCase):
         assert isinstance(test_replace, Fragment)
         assert test_replace.content == '<a href="/base_url/id">'
 
-    @ddt.data(
-        ('course_mongo', '<a href="/courses/TestX/TS01/2015/id">'),
-        ('course_split', '<a href="/courses/course-v1:TestX+TS02+2015/id">')
-    )
-    @ddt.unpack
-    def test_replace_course_urls(self, course_id, anchor_tag):
+    def test_replace_course_urls(self):
         """
         Verify that the course URL has been replaced.
         """
-        course = getattr(self, course_id)
-        replace_url_service = ReplaceURLService(course_id=course.id)
+        replace_url_service = ReplaceURLService(course_id=self.course.id)
         test_replace = replace_urls_wrapper(
-            block=course,
+            block=self.course,
             view='baseview',
             frag=Fragment('<a href="/course/id">'),
             context=None,
             replace_url_service=replace_url_service
         )
         assert isinstance(test_replace, Fragment)
-        assert test_replace.content == anchor_tag
+        assert test_replace.content == '<a href="/courses/course-v1:TestX+TS02+2015/id">'
 
-    @ddt.data(
-        ('course_mongo', '<a href="/c4x/TestX/TS01/asset/id">'),
-        ('course_split', '<a href="/asset-v1:TestX+TS02+2015+type@asset+block/id">')
-    )
-    @ddt.unpack
-    def test_replace_static_urls(self, course_id, anchor_tag):
+    def test_replace_static_urls(self):
         """
         Verify that the static URL has been replaced.
         """
-        course = getattr(self, course_id)
-        replace_url_service = ReplaceURLService(course_id=course.id)
+        replace_url_service = ReplaceURLService(course_id=self.course.id)
         test_replace = replace_urls_wrapper(
-            block=course,
+            block=self.course,
             view='baseview',
             frag=Fragment('<a href="/static/id">'),
             context=None,
@@ -926,4 +709,4 @@ class TestReplaceURLWrapper(SharedModuleStoreTestCase):
             static_replace_only=True
         )
         assert isinstance(test_replace, Fragment)
-        assert test_replace.content == anchor_tag
+        assert test_replace.content == '<a href="/asset-v1:TestX+TS02+2015+type@asset+block/id">'

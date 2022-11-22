@@ -38,12 +38,15 @@ def send_ace_message(goal):
 
     Arguments:
         goal (CourseGoal): Goal object
+
+    Returns true if sent, false if it absorbed an exception and did not send
     """
     user = goal.user
     try:
         course = CourseOverview.get_from_id(goal.course_key)
     except CourseOverview.DoesNotExist:
-        log.error("Goal Reminder course not found.")
+        log.error(f"Goal Reminder course {goal.course_key} not found.")
+        return False
 
     course_name = course.display_name
 
@@ -92,7 +95,12 @@ def send_ace_message(goal):
     )
 
     with emulate_http_request(site, user):
-        ace.send(msg)
+        try:
+            ace.send(msg)
+        except Exception as exc:  # pylint: disable=broad-except
+            log.error(f"Goal Reminder for {user.id} for course {goal.course_key} could not send: {exc}")
+            return False
+    return True
 
 
 class Command(BaseCommand):
@@ -181,8 +189,9 @@ class Command(BaseCommand):
             return False
 
         if required_days_left == days_left_in_week:
-            send_ace_message(goal)
-            CourseGoalReminderStatus.objects.update_or_create(goal=goal, defaults={'email_reminder_sent': True})
-            return True
+            sent = send_ace_message(goal)
+            if sent:
+                CourseGoalReminderStatus.objects.update_or_create(goal=goal, defaults={'email_reminder_sent': True})
+                return True
 
         return False
