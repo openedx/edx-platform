@@ -556,6 +556,7 @@ class EnterpriseDashboardSerializer(serializers.Serializer):
 
     label = serializers.CharField(source="name")
     url = serializers.SerializerMethodField()
+    uuid = serializers.UUIDField()
 
     def get_url(self, instance):
         return urljoin(
