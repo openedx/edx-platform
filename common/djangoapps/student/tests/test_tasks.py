@@ -37,6 +37,7 @@ class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
             "course_id": str(self.course.id),
             "course_title": "Test course",
             "short_description": "Short description of course",
+            "course_ended": False,
             "pacing_type": "self-paced",
         }
 
