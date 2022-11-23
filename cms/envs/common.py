@@ -1246,6 +1246,8 @@ EMBARGO_SITE_REDIRECT_URL = None
 ##### custom vendor plugin variables #####
 # JavaScript code can access this data using `process.env.JS_ENV_EXTRA_CONFIG`
 # One of the current use cases for this is enabling custom TinyMCE plugins
+# (TINYMCE_ADDITIONAL_PLUGINS) and overriding the TinyMCE configuration
+# (TINYMCE_CONFIG_OVERRIDES).
 JS_ENV_EXTRA_CONFIG = {}
 
 ############################### PIPELINE #######################################
