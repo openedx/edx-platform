@@ -1,5 +1,5 @@
 /* JavaScript for special editing operations that can be done on LibraryContentXBlock */
-window.LibraryContentAuthorView = function(runtime, element) {
+window.LibrarySourceAuthorView = function(runtime, element) {
     'use strict';
     var $element = $(element);
     var usage_id = $element.data('usage-id');
