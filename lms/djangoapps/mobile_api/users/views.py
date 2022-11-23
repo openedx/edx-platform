@@ -13,6 +13,7 @@ from django.utils import dateparse
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from openedx_filters.learning.filters import CourseEnrollmentSiteFilterRequested
 from rest_framework import generics, views
 from rest_framework.decorators import api_view
 from rest_framework.permissions import SAFE_METHODS
@@ -340,6 +341,10 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             is_active=True
         ).order_by('created').reverse()
         org = self.request.query_params.get('org', None)
+
+        ## .. filter_implemented_name: CourseEnrollmentSiteFilterRequested
+        ## .. filter_type: org.openedx.learning.course_enrollments_site.filter.requested.v1
+        enrollments = CourseEnrollmentSiteFilterRequested.run_filter(context=enrollments)
 
         same_org = (
             enrollment for enrollment in enrollments
