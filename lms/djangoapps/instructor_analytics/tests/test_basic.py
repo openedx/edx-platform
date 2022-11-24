@@ -182,7 +182,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             assert userreport['verification_status'] in ['N/A']
         # make sure that the user report respects whatever value
         # is returned by verification and enrollment code
-        with patch("common.djangoapps.student.models.CourseEnrollment.enrollment_mode_for_user") as enrollment_patch:
+        with patch("common.djangoapps.student.models.course_enrollment.CourseEnrollment.enrollment_mode_for_user") as enrollment_patch:
             with patch(
                 "lms.djangoapps.verify_student.services.IDVerificationService.verification_status_for_user"
             ) as verify_patch:
