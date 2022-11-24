@@ -13,7 +13,8 @@ class ReflectionAdminInline(admin.TabularInline):
 class ArticleAdmin(admin.ModelAdmin):
     inlines = (ReflectionAdminInline,)
     filter_horizontal = ('skills', 'gtcs', 'media_types')
-    list_display = ('title', 'reflections', 'time', 'favorites_count', 'rating_average', 'is_featured')
+    list_display = ('title', 'reflections', 'time', 'favorites_count', 'rating_average', 'is_featured', 'is_archived',
+                    'is_draft', 'academic_year')
     actions = ['mark_as_featured', ]
 
     def reflections(self, obj):

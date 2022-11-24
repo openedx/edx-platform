@@ -8,6 +8,7 @@ from html import unescape
 from django.utils.html import strip_tags
 from tinymce.models import HTMLField
 from openedx.features.genplus_features.genplus.models import Skill, Teacher
+from .constants import AcademicYears
 
 
 logger = logging.getLogger(__name__)
@@ -28,6 +29,7 @@ class MediaType(models.Model):
 
 
 class Article(TimeStampedModel):
+    ACADEMIC_YEAR_CHOICES = AcademicYears.__MODEL_CHOICES__
     title = models.CharField(max_length=1024)
     cover = models.ImageField(upload_to='article_covers',
                               help_text='Upload the cover for the article')
@@ -38,6 +40,8 @@ class Article(TimeStampedModel):
     content = HTMLField()
     author = models.CharField(max_length=1024, help_text='Add name of the author')
     time = models.PositiveIntegerField(default=0, help_text='Time required to read/watch/listen the article')
+    academic_year = models.CharField(default=AcademicYears.YEAR_2022_23, max_length=32, choices=ACADEMIC_YEAR_CHOICES)
+    is_archived = models.BooleanField(default=False)
     is_draft = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
 

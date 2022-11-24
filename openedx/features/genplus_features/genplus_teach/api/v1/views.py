@@ -36,7 +36,7 @@ class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
     serializer_class = ArticleSerializer
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['title', 'content']
-    filter_fields = ('skill', 'media_type', 'gtcs')
+    filterset_fields = ('skill', 'media_type', 'gtcs', 'is_completed')
     filterset_class = ArticleFilter
     queryset = Article.objects.exclude(is_draft=True)
 
@@ -47,7 +47,6 @@ class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
         return context
 
     def get_queryset(self):
-        print(self.action)
         queryset = self.queryset
         if self.action == 'list':
             teacher = Teacher.objects.get(gen_user=self.gen_user)
@@ -300,13 +299,13 @@ class HelpGuideViewSet(viewsets.ReadOnlyModelViewSet, GenzMixin):
     queryset = serializer_class.Meta.model.objects.all()
     filter_backends = [filters.SearchFilter]
     search_fields = ['helpguide__title']
-    
+
     def retrieve(self, request, pk=None):
         teacher = Teacher.objects.get(gen_user=self.gen_user)
         guide = get_object_or_404(HelpGuide, pk=pk)
         serializer = HelpGuideSerializer(instance=guide, context={ 'teacher': teacher })
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=['put'])
     def rate_guide(self, request, pk=None):  # pylint: disable=unused-argument
         """
