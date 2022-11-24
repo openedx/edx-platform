@@ -31,7 +31,6 @@ from rest_framework.response import Response
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
-    GlobalStaff,
 )
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
