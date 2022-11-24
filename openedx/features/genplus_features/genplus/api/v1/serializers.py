@@ -1,16 +1,17 @@
-from django.conf import settings
-from django.middleware import csrf
 from rest_framework import serializers
 from common.djangoapps.student.models import UserProfile
 from openedx.features.genplus_features.genplus.models import Teacher, Character, Skill, Class, JournalPost, EmailRecord
 from openedx.features.genplus_features.common.display_messages import ErrorMessages
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, logout
+from django.contrib.auth.forms import SetPasswordForm
+from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='profile.name')
     role = serializers.CharField(source='gen_user.role')
     school = serializers.CharField(source='gen_user.school.name')
+    school_type = serializers.CharField(source='gen_user.school.type')
     csrf_token = serializers.SerializerMethodField('get_csrf_token')
 
     def to_representation(self, instance):
@@ -48,7 +49,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('id', 'name', 'username', 'csrf_token', 'role',
-                  'first_name', 'last_name', 'email', 'school')
+                  'first_name', 'last_name', 'email', 'school', 'school_type')
 
 class TeacherSerializer(serializers.ModelSerializer):
     user_id = serializers.SerializerMethodField()
@@ -135,6 +136,50 @@ class TeacherFeedbackSerializer(serializers.ModelSerializer):
         model = JournalPost
         fields = ('teacher', 'student', 'title', 'description', 'journal_type')
         extra_kwargs = {'teacher': {'required': True, 'allow_null': False}}
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(max_length=128)
+    new_password1 = serializers.CharField(max_length=128)
+    new_password2 = serializers.CharField(max_length=128)
+
+    set_password_form_class = SetPasswordForm
+
+    def __init__(self, *args, **kwargs):
+        super(ChangePasswordSerializer, self).__init__(*args, **kwargs)
+        self.request = self.context.get('request')
+        self.user = getattr(self.request, 'user', None)
+
+    def validate_old_password(self, value):
+        invalid_password_conditions = (
+            self.user,
+            not self.user.check_password(value)
+        )
+
+        if all(invalid_password_conditions):
+            raise serializers.ValidationError(ErrorMessages.OLD_PASSWORD_ERROR)
+        return value
+
+    def validate(self, attrs):
+        self.set_password_form = self.set_password_form_class(
+            user=self.user, data=attrs
+        )
+
+        if not self.set_password_form.is_valid():
+            print(self.set_password_form.errors)
+            raise serializers.ValidationError(self.set_password_form.errors)
+        return attrs
+
+    def save(self):
+        self.set_password_form.save()
+        # delete all oauth token and logout the user
+        destroy_oauth_tokens(self.user)
+        logout(self.request)
+
+
+class ChangePasswordByTeacherSerializer(serializers.Serializer):
+    students = serializers.ListField(required=True, child=serializers.IntegerField())
+    password = serializers.CharField(required=True)
 
 
 class ContactSerailizer(serializers.ModelSerializer):

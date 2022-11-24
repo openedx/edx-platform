@@ -28,6 +28,7 @@ from openedx.features.genplus_features.genplus.constants import JournalTypes, Em
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from openedx.features.genplus_features.genplus_badges.api.v1.serializers import JournalBoosterBadgeSerializer
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
+from django.views.decorators.debug import sensitive_post_parameters
 from .serializers import (
     CharacterSerializer,
     ClassListSerializer,
@@ -39,10 +40,19 @@ from .serializers import (
     TeacherFeedbackSerializer,
     SkillSerializer,
     ContactSerailizer,
+    ChangePasswordByTeacherSerializer,
+    ChangePasswordSerializer
 )
-from .permissions import IsStudent, IsTeacher, IsStudentOrTeacher, IsGenUser
+from .permissions import IsStudent, IsTeacher, IsStudentOrTeacher, IsGenUser, FromPrivateSchool
 from .mixins import GenzMixin
 from .pagination import JournalListPagination
+
+
+sensitive_post_parameters_m = method_decorator(
+    sensitive_post_parameters(
+        'password', 'old_password', 'new_password1', 'new_password2'
+    )
+)
 
 
 class UserInfo(GenzMixin, views.APIView):
@@ -365,3 +375,49 @@ class ContactAPIView(views.APIView):
                 return Response({"error": "Failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChangePasswordByTeacherView(GenzMixin, views.APIView):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsTeacher, FromPrivateSchool]
+
+    def post(self, request, *args, **kwargs):
+        serializer = ChangePasswordByTeacherSerializer(data=request.data)
+        users_list = []
+        if serializer.is_valid():
+            students = serializer.data['students']
+            password = serializer.data['password']
+            for student in Student.objects.filter(id__in=students):
+                if student.gen_user.from_private_school:
+                    user = student.gen_user.user
+                    user.set_password(password)
+                    user.save()
+                    users_list.append(user.email)
+            return Response({"message": SuccessMessages.PASSWORD_CHANGED_BY_TEACHER.format(users=','.join(users_list))},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChangePasswordView(GenzMixin, generics.GenericAPIView):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [IsAuthenticated, FromPrivateSchool]
+
+    @sensitive_post_parameters_m
+    def dispatch(self, *args, **kwargs):
+        return super(ChangePasswordView, self).dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "New password has been saved."})
+        else:
+            return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+

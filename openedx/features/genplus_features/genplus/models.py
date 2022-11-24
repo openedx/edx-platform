@@ -1,4 +1,5 @@
 import os
+import uuid
 from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
@@ -19,6 +20,12 @@ class School(TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.type == SchoolTypes.PRIVATE and self.guid == '':
+            self.guid = f'private-{str(uuid.uuid4())[0:10]}'
+            self.external_id = f'private-{str(uuid.uuid4())[0:10]}'
+        super(School, self).save(*args, **kwargs)
 
 
 class Skill(models.Model):
@@ -95,6 +102,10 @@ class GenUser(models.Model):
     @property
     def is_teacher(self):
         return self.role == GenUserRoles.TEACHING_STAFF
+
+    @property
+    def from_private_school(self):
+        return self.school.type == SchoolTypes.PRIVATE
 
     def __str__(self):
         if self.user:

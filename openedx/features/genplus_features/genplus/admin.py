@@ -1,15 +1,23 @@
+import csv
+import codecs
 from django.contrib import admin
 from openedx.features.genplus_features.genplus.models import *
 from openedx.features.genplus_features.genplus_learning.models import Program
-from openedx.features.genplus_features.genplus.rmunify import RmUnify
+from django import forms
 from django.contrib import messages
-from openedx.features.genplus_features.genplus.constants import ClassTypes
+from openedx.features.genplus_features.genplus.constants import ClassTypes, SchoolTypes
 import openedx.features.genplus_features.genplus.tasks as genplus_tasks
 from django.urls import reverse
 from django.utils.text import format_lazy
 from django.utils.safestring import mark_safe
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from .filters import MoreThanOneClassFilter
+from django.template.loader import get_template
+from django.shortcuts import redirect, render
+from django.conf.urls import url
+from .constants import GenUserRoles
+from django.contrib.auth.models import User
+
 
 @admin.register(GenUser)
 class GenUserAdmin(admin.ModelAdmin):
@@ -28,8 +36,12 @@ class SkillAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
+class CsvImportForm(forms.Form):
+    csv_file = forms.FileField()
+
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
+    change_list_template = get_template("genplus/extended/schools_changelist.html")
     list_display = (
         'guid',
         'name',
@@ -41,6 +53,73 @@ class SchoolAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('type', )
     actions = ['sync_registration_group_classes', 'sync_teaching_group_classes']
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            url(r'import-csv/', self.import_csv),
+        ]
+        return my_urls + urls
+
+    def import_csv(self, request):
+        if request.method == "POST":
+            csv_file = request.FILES["csv_file"]
+            reader = csv.DictReader(codecs.iterdecode(csv_file, 'utf-8'))
+            for row in reader:
+                try:
+                    # convert dict into lower case and the empty string into None
+                    non_empty_row = {k.lower().replace(" ", ""): (None if v == "" else v) for k, v in row.items()}
+                    first_name = non_empty_row['firstname']
+                    last_name = non_empty_row['secondname']
+                    email = non_empty_row['email']
+                    username = non_empty_row['username'] if non_empty_row['username'] else email
+                    password = non_empty_row['password']
+                    role = GenUserRoles.STUDENT if non_empty_row['role'] == GenUserRoles.STUDENT else GenUserRoles.TEACHING_STAFF
+                    school, gen_class = self.get_school_and_class(non_empty_row['school'],
+                                                                  non_empty_row['classname'],
+                                                                  non_empty_row['classcode'])
+                    user, created = User.objects.get_or_create(
+                                username=username,
+                                email=email,
+                                first_name=first_name,
+                                last_name=last_name,
+                        )
+                    user.set_password(password)
+                    user.save()
+                    gen_user, created = GenUser.objects.get_or_create(
+                            role=role,
+                            user=user,
+                            school=school
+                        )
+                    if role == GenUserRoles.STUDENT:
+                        gen_student = gen_user.student
+                        gen_user.refresh_from_db()
+                        gen_class.students.add(gen_student)
+                except KeyError as e:
+                    print(e)
+                    self.message_user(request, 'An Error occurred while parsing the csv', level=messages.ERROR)
+            self.message_user(request, "Your csv file has been imported")
+            return redirect("..")
+        form = CsvImportForm()
+        payload = {"form": form}
+        return render(
+            request, "genplus/extended/csv_form.html", payload
+        )
+
+    @staticmethod
+    def get_school_and_class(school_name, class_name, class_code):
+        school, created = School.objects.get_or_create(
+            type=SchoolTypes.PRIVATE,
+            name=school_name
+        )
+        gen_class, created = Class.objects.get_or_create(
+            name=class_name,
+            group_id=class_code,
+            school=school
+        )
+        return school, gen_class
+
+
 
     def classes(self, obj):
         url = reverse('admin:genplus_class_changelist')

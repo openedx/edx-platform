@@ -1,5 +1,6 @@
 from rest_framework import permissions
 from openedx.features.genplus_features.genplus.models import GenUser
+from openedx.features.genplus_features.genplus.constants import SchoolTypes
 
 
 class IsGenUser(permissions.BasePermission):
@@ -31,3 +32,10 @@ class IsStudentOrTeacher(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return IsStudent().has_permission(request, view) or IsTeacher().has_permission(request, view)
+
+
+class FromPrivateSchool(permissions.BasePermission):
+    message = 'Current user is not from a private School'
+
+    def has_permission(self, request, view):
+        return request.user.gen_user.from_private_school
