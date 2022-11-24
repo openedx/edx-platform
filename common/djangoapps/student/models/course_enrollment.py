@@ -1,3 +1,4 @@
+"""Models for course enrollment"""
 import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
 import uuid  # lint-amnesty, pylint: disable=wrong-import-order
