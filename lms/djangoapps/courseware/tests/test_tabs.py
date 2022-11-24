@@ -761,7 +761,8 @@ class DiscussionLinkTestCase(TabTestCase):
             is_enrolled=True
     ):
         """Helper function to verify whether the discussion tab exists and can be displayed"""
-        with patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_enrolled') as check_is_enrolled:
+        IS_ENROLLED_METHOD_NAME = 'common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_enrolled'
+        with patch(IS_ENROLLED_METHOD_NAME) as check_is_enrolled:
             self.course.tabs = tab_list
             self.course.discussion_link = discussion_link_in_course
             discussion_tab = xmodule_tabs.CourseTabList.get_discussion(self.course)
