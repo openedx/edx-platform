@@ -55,7 +55,12 @@ from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: d
 log = logging.getLogger(__name__)
 
 BETA_TESTER_METHOD = 'common.djangoapps.student.helpers.access.is_beta_tester'
-
+EXTRA_SEG_PROPERTIES = \
+{
+    'studio_request': False,
+    'exception_raised': False,
+    'redesign_email': False
+}
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
@@ -646,7 +651,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
         )
         self.mock_segment_tracker.reset_mock()
 
-    def assert_enrollment_event_was_emitted(self, user, course_key, course, enrollment):
+    def assert_enrollment_event_was_emitted(self, user, course_key, course, enrollment, extra_seg_properties = None):
         """Ensures an enrollment event was emitted since the last event related assertion"""
         self.mock_tracker.emit.assert_called_once_with(
             'edx.course.enrollment.activated',
@@ -658,6 +663,8 @@ class EnrollmentEventTestMixin(EventTestMixin):
         )
         self.mock_tracker.reset_mock()
         properties, traits = self._build_segment_properties_and_traits(user, course_key, course, enrollment, True)
+        if (extra_seg_properties):
+            properties.update(extra_seg_properties)
         self.mock_segment_tracker.track.assert_called_once_with(
             user.id, 'edx.course.enrollment.activated', properties, traits=traits
         )
@@ -721,7 +728,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         enrollment = CourseEnrollment.enroll(user, course_id)
         assert CourseEnrollment.is_enrolled(user, course_id)
         assert CourseEnrollment.is_enrolled_by_partial(user, course_id_partial)
-        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment)
+        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment, EXTRA_SEG_PROPERTIES)
 
         # Enrolling them again should be harmless
         enrollment = CourseEnrollment.enroll(user, course_id)
@@ -772,7 +779,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         # should still work
         enrollment = CourseEnrollment.enroll(user, course_id)
         assert CourseEnrollment.is_enrolled(user, course_id)
-        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment)
+        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment, EXTRA_SEG_PROPERTIES)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_enrollment_by_email(self):
@@ -782,7 +789,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
 
         enrollment = CourseEnrollment.enroll_by_email("jack@fake.edx.org", course_id)
         assert CourseEnrollment.is_enrolled(user, course_id)
-        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment)
+        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment, EXTRA_SEG_PROPERTIES)
 
         # This won't throw an exception, even though the user is not found
         assert CourseEnrollment.enroll_by_email('not_jack@fake.edx.org', course_id) is None
@@ -820,9 +827,9 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         course2 = CourseOverviewFactory.create(id=course_id2)
 
         enrollment1 = CourseEnrollment.enroll(user, course_id1)
-        self.assert_enrollment_event_was_emitted(user, course_id1, course1, enrollment1)
+        self.assert_enrollment_event_was_emitted(user, course_id1, course1, enrollment1, EXTRA_SEG_PROPERTIES)
         enrollment2 = CourseEnrollment.enroll(user, course_id2)
-        self.assert_enrollment_event_was_emitted(user, course_id2, course2, enrollment2)
+        self.assert_enrollment_event_was_emitted(user, course_id2, course2, enrollment2, EXTRA_SEG_PROPERTIES)
         assert CourseEnrollment.is_enrolled(user, course_id1)
         assert CourseEnrollment.is_enrolled(user, course_id2)
 
@@ -852,7 +859,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         # Until you explicitly activate it
         enrollment.activate()
         assert CourseEnrollment.is_enrolled(user, course_id)
-        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment)
+        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment, EXTRA_SEG_PROPERTIES)
 
         # Activating something that's already active does nothing
         enrollment.activate()
@@ -873,15 +880,18 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         # for that user/course_id combination
         CourseEnrollment.enroll(user, course_id)
         assert CourseEnrollment.is_enrolled(user, course_id)
-        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment)
+        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment, EXTRA_SEG_PROPERTIES)
 
+    """
+    transition through various modes, verifying that change events are emitted when appropriate
+    """
     def test_change_enrollment_modes(self):
         user = UserFactory.create(username="justin", email="jh@fake.edx.org")
         course_id = CourseLocator("edX", "Test101", "2013")
         course = CourseOverviewFactory.create(id=course_id)
 
         enrollment = CourseEnrollment.enroll(user, course_id, "audit")
-        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment)
+        self.assert_enrollment_event_was_emitted(user, course_id, course, enrollment, EXTRA_SEG_PROPERTIES)
 
         enrollment = CourseEnrollment.enroll(user, course_id, "honor")
         self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "honor", course, enrollment)
