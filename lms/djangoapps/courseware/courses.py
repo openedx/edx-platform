@@ -799,8 +799,9 @@ def sort_by_announcement(courses):
     """
 
     # Sort courses by how far are they from they start day
-    key = lambda course: course.sorting_score
-    courses = sorted(courses, key=key)
+    def _key(course):
+        return course.sorting_score
+    courses = sorted(courses, key=_key)
 
     return courses
 

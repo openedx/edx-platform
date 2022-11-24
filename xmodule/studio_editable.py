@@ -25,7 +25,7 @@ class StudioEditableBlock(XBlockMixin):
             if can_reorder:
                 context['reorderable_items'].add(child.location)
             context['can_add'] = can_add
-            rendered_child = child.render(StudioEditableModule.get_preview_view_name(child), context)
+            rendered_child = child.render(StudioEditableBlock.get_preview_view_name(child), context)
             fragment.add_fragment_resources(rendered_child)
 
             contents.append({
@@ -46,9 +46,6 @@ class StudioEditableBlock(XBlockMixin):
         Helper method for getting preview view name (student_view or author_view) for a given module.
         """
         return AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
-
-
-StudioEditableModule = StudioEditableBlock
 
 
 def has_author_view(descriptor):

@@ -85,7 +85,7 @@ def test_capa_system(render_template=None):
 
 def mock_capa_module():
     """
-    capa response types needs just two things from the capa_module: location and track_function.
+    capa response types needs just two things from the capa_module: location and publish.
     """
     def mock_location_text(self):  # lint-amnesty, pylint: disable=unused-argument
         """
@@ -99,7 +99,7 @@ def mock_capa_module():
     else:
         capa_module.location.__str__ = mock_location_text
     # The following comes into existence by virtue of being called
-    # capa_module.runtime.track_function
+    # capa_module.runtime.publish
     return capa_module
 
 

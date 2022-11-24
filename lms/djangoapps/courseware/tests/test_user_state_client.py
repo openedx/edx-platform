@@ -36,3 +36,21 @@ class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
         super().setUp()
         self.client = DjangoXBlockUserStateClient()
         self.users = defaultdict(UserFactory.create)
+
+    def test_history_after_delete(self):
+        """
+        Changes made in the edx-platform repo broke this test in the edx-user-state-client repo.
+        Getting the tests and code in sync is a three step process:
+            1. Override the test here to make it a no-op and merge this code
+            2. Update the test in the other repo to align with the new functionality
+            3. Remove this override to re-enable the working test
+        """
+
+    def test_multiple_history_entries(self):
+        """
+        Changes made in the edx-platform repo broke this test in the edx-user-state-client repo.
+        Getting the tests and code in sync is a three step process:
+            1. Override the test here to make it a no-op and merge this code
+            2. Update the test in the other repo to align with the new functionality
+            3. Remove this override to re-enable the working test
+        """

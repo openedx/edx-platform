@@ -1672,10 +1672,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         Test calling get_demand_hunt() results in an event being published.
         """
         module = CapaFactory.create(xml=self.demand_xml)
-        with patch.object(module.runtime, 'publish') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_publish:
             module.get_problem_html()
             module.get_demand_hint(0)
-            mock_track_function.assert_called_with(
+            mock_publish.assert_called_with(
                 module, 'edx.problem.hint.demandhint_displayed',
                 {'hint_index': 0, 'module_id': str(module.location),
                  'hint_text': 'Demand 1', 'hint_len': 2}
@@ -2026,13 +2026,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     def test_check_unmask(self):
         """
         Check that shuffle unmasking is plumbed through: when submit_problem is called,
-        unmasked names should appear in the track_function event_info.
+        unmasked names should appear in the publish event_info.
         """
         module = CapaFactory.create(xml=self.common_shuffle_xml)
-        with patch.object(module.runtime, 'publish') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_publish:
             get_request_dict = {CapaFactory.input_key(): 'choice_3'}  # the correct choice
             module.submit_problem(get_request_dict)
-            mock_call = mock_track_function.mock_calls[1]
+            mock_call = mock_publish.mock_calls[1]
             event_info = mock_call[1][2]
             assert event_info['answers'][CapaFactory.answer_key()] == 'choice_3'
             # 'permutation' key added to record how problem was shown
@@ -2042,26 +2042,26 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
     @unittest.skip("masking temporarily disabled")
     def test_save_unmask(self):
-        """On problem save, unmasked data should appear on track_function."""
+        """On problem save, unmasked data should appear on publish."""
         module = CapaFactory.create(xml=self.common_shuffle_xml)
-        with patch.object(module.runtime, 'track_function') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_publish:
             get_request_dict = {CapaFactory.input_key(): 'mask_0'}
             module.save_problem(get_request_dict)
-            mock_call = mock_track_function.mock_calls[0]
+            mock_call = mock_publish.mock_calls[0]
             event_info = mock_call[1][1]
             assert event_info['answers'][CapaFactory.answer_key()] == 'choice_2'
             assert event_info['permutation'][CapaFactory.answer_key()] is not None
 
     @unittest.skip("masking temporarily disabled")
     def test_reset_unmask(self):
-        """On problem reset, unmask names should appear track_function."""
+        """On problem reset, unmask names should appear publish."""
         module = CapaFactory.create(xml=self.common_shuffle_xml)
         get_request_dict = {CapaFactory.input_key(): 'mask_0'}
         module.submit_problem(get_request_dict)
         # On reset, 'old_state' should use unmasked names
-        with patch.object(module.runtime, 'track_function') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_publish:
             module.reset_problem(None)
-            mock_call = mock_track_function.mock_calls[0]
+            mock_call = mock_publish.mock_calls[0]
             event_info = mock_call[1][1]
             assert mock_call[1][0] == 'reset_problem'
             assert event_info['old_state']['student_answers'][CapaFactory.answer_key()] == 'choice_2'
@@ -2069,21 +2069,21 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
     @unittest.skip("masking temporarily disabled")
     def test_rescore_unmask(self):
-        """On problem rescore, unmasked names should appear on track_function."""
+        """On problem rescore, unmasked names should appear on publish."""
         module = CapaFactory.create(xml=self.common_shuffle_xml)
         get_request_dict = {CapaFactory.input_key(): 'mask_0'}
         module.submit_problem(get_request_dict)
         # On rescore, state/student_answers should use unmasked names
-        with patch.object(module.runtime, 'track_function') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_publish:
             module.rescore_problem(only_if_higher=False)  # lint-amnesty, pylint: disable=no-member
-            mock_call = mock_track_function.mock_calls[0]
+            mock_call = mock_publish.mock_calls[0]
             event_info = mock_call[1][1]
             assert mock_call[1][0] == 'problem_rescore'
             assert event_info['state']['student_answers'][CapaFactory.answer_key()] == 'choice_2'
             assert event_info['permutation'][CapaFactory.answer_key()] is not None
 
     def test_check_unmask_answerpool(self):
-        """Check answer-pool question track_function uses unmasked names"""
+        """Check answer-pool question publish uses unmasked names"""
         xml = textwrap.dedent("""
             <problem>
             <multiplechoiceresponse>
@@ -2097,10 +2097,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             </problem>
         """)
         module = CapaFactory.create(xml=xml)
-        with patch.object(module.runtime, 'publish') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_publish:
             get_request_dict = {CapaFactory.input_key(): 'choice_2'}  # mask_X form when masking enabled
             module.submit_problem(get_request_dict)
-            mock_call = mock_track_function.mock_calls[1]
+            mock_call = mock_publish.mock_calls[1]
             event_info = mock_call[1][2]
             assert event_info['answers'][CapaFactory.answer_key()] == 'choice_2'
             # 'permutation' key added to record how problem was shown
@@ -2982,12 +2982,12 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         return CustomCapaFactory
 
     def get_event_for_answers(self, module, answer_input_dict):  # lint-amnesty, pylint: disable=missing-function-docstring
-        with patch.object(module.runtime, 'publish') as mock_track_function:
+        with patch.object(module.runtime, 'publish') as mock_publish:
             module.submit_problem(answer_input_dict)
 
-            assert len(mock_track_function.mock_calls) >= 2
+            assert len(mock_publish.mock_calls) >= 2
             # There are potentially 2 track logs: answers and hint. [-1]=answers.
-            mock_call = mock_track_function.mock_calls[-1]
+            mock_call = mock_publish.mock_calls[-1]
             event = mock_call[1][2]
 
             return event

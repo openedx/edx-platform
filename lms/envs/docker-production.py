@@ -48,12 +48,25 @@ def get_docker_logger_config(log_dir='/var/tmp',
                 'formatter': 'standard',
                 'stream': sys.stdout,
             },
+            'tracking': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'filename': '/var/tmp/tracking_logs.log',
+                'backupCount': 5,
+                'formatter': 'raw',
+                'maxBytes': 10485760
+            }
         },
         'loggers': {
             'django': {
                 'handlers': handlers,
                 'propagate': True,
                 'level': 'INFO'
+            },
+            'tracking': {
+                'handlers': ['tracking'],
+                'level': 'DEBUG',
+                'propagate': False,
             },
             'requests': {
                 'handlers': handlers,

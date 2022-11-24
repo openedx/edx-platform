@@ -208,6 +208,12 @@
               }
             });
           }
+
+          // apply configuration overrides if have been defined
+          var tinyMceConfigOverrides = process.env.JS_ENV_EXTRA_CONFIG.TINYMCE_CONFIG_OVERRIDES;
+          if (tinyMceConfigOverrides) {
+            Object.assign(tinyMceConfig, tinyMceConfigOverrides);
+          }
         }
 
         this.tiny_mce_textarea = $(".tiny-mce", this.element).tinymce(tinyMceConfig);
@@ -1390,7 +1396,7 @@
       haven't dirtied the Editor. Store the raw content so we can compare it later.
        */
       this.starting_content = visualEditor.getContent({
-        format: "text",
+        format: "raw",
         no_events: 1
       });
       return visualEditor.focus();
@@ -1410,7 +1416,7 @@
       if (this.editor_choice === 'visual') {
         visualEditor = this.getVisualEditor();
         raw_content = visualEditor.getContent({
-          format: "text",
+          format: "raw",
           no_events: 1
         });
         if (this.starting_content !== raw_content) {

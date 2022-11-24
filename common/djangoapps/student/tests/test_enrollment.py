@@ -26,7 +26,6 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 
 
 @ddt.ddt
@@ -74,17 +73,6 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         ]
         # Set up proctored exam
         self._create_proctored_exam(self.proctored_course)
-
-        course_run = CourseRunFactory.create(key=self.course.id)
-        course_run.update({
-            'min_effort': 1,
-            'enrollment_count': 12345
-        })
-
-        patch_course_data = patch('openedx.core.djangoapps.catalog.api.get_course_run_details')
-        course_data = patch_course_data.start()
-        course_data.return_value = course_run
-        self.addCleanup(patch_course_data.stop)
 
     def _create_proctored_exam(self, course):
         """

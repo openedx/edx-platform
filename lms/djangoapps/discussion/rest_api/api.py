@@ -21,7 +21,6 @@ from django.db.models import Q
 from django.http import Http404
 from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
-from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework import status
@@ -34,7 +33,7 @@ from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
-from lms.djangoapps.discussion.views import is_user_moderator
+from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -81,7 +80,10 @@ from ..django_comment_client.base.views import (
     track_thread_created_event,
     track_thread_deleted_event,
     track_thread_viewed_event,
-    track_voted_event
+    track_voted_event,
+    track_discussion_reported_event,
+    track_discussion_unreported_event,
+    track_forum_search_event
 )
 from ..django_comment_client.utils import (
     get_group_id_for_user,
@@ -871,7 +873,7 @@ def get_thread_list(
     }
 
     if view:
-        if view in ["unread", "unanswered"]:
+        if view in ["unread", "unanswered", "unresponded"]:
             query_params[view] = "true"
         else:
             ValidationError({
@@ -1001,8 +1003,14 @@ def get_learner_active_thread_list(request, course_key, query_params):
 
     group_id = query_params.get('group_id', None)
     user_id = query_params.get('user_id', None)
+    count_flagged = query_params.get('count_flagged', None)
     if user_id is None:
         return Response({'detail': 'Invalid user id'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if count_flagged and not context["has_moderation_privilege"]:
+        raise PermissionDenied("count_flagged can only be set by users with moderation roles.")
+    if "flagged" in query_params.keys() and not context["has_moderation_privilege"]:
+        raise PermissionDenied("Flagged filter is only available for moderators")
 
     if group_id is None:
         comment_client_user = comment_client.User(id=user_id, course_id=course_key)
@@ -1196,7 +1204,7 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
             if field == "following":
                 _handle_following_field(form_value, context["cc_requester"], cc_content)
             elif field == "abuse_flagged":
-                _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content)
+                _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content, request)
             elif field == "voted":
                 _handle_voted_field(form_value, cc_content, api_content, request, context)
             elif field == "read":
@@ -1215,11 +1223,13 @@ def _handle_following_field(form_value, user, cc_content):
         user.unfollow(cc_content)
 
 
-def _handle_abuse_flagged_field(form_value, user, cc_content):
+def _handle_abuse_flagged_field(form_value, user, cc_content, request):
     """mark or unmark thread/comment as abused"""
     course_key = CourseKey.from_string(cc_content.course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     if form_value:
         cc_content.flagAbuse(user, cc_content)
+        track_discussion_reported_event(request, course, cc_content)
         if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and reported_content_email_notification_enabled(
                 course_key):
             if cc_content.type == 'thread':
@@ -1227,8 +1237,9 @@ def _handle_abuse_flagged_field(form_value, user, cc_content):
             else:
                 comment_flagged.send(sender='flag_abuse_for_comment', user=user, post=cc_content)
     else:
-        remove_all = bool(is_user_moderator(course_key, User.objects.get(id=user.id)))
+        remove_all = bool(is_privileged_user(course_key, User.objects.get(id=user.id)))
         cc_content.unFlagAbuse(user, cc_content, remove_all)
+        track_discussion_unreported_event(request, course, cc_content)
 
 
 def _handle_voted_field(form_value, cc_content, api_content, request, context):
@@ -1689,7 +1700,7 @@ def get_course_discussion_user_stats(
         order_by = order_by or UserOrdering.BY_FLAGS
     else:
         order_by = order_by or UserOrdering.BY_ACTIVITY
-        if order_by != UserOrdering.BY_ACTIVITY:
+        if order_by == UserOrdering.BY_FLAGS:
             raise ValidationError({"order_by": "Invalid value"})
 
     if not ENABLE_LEARNERS_STATS.is_enabled(course_key):
@@ -1712,24 +1723,23 @@ def get_course_discussion_user_stats(
         comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_from_search_string(
             course_key, username_search_string, page, page_size
         )
-        if not comma_separated_usernames:
-            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
-                "results": [],
-            })
-        params['usernames'] = comma_separated_usernames
-
-    course_stats_response = get_course_user_stats(course_key, params)
-
-    tracker.emit(
-        'edx.forum.searched',
-        {
+        search_event_data = {
             'query': username_search_string,
             'search_type': 'Learner',
             'page': params.get('page'),
             'sort_key': params.get('sort_key'),
-            'total_results': course_stats_response.get('total_results'),
+            'total_results': matched_users_count,
         }
-    )
+        course = _get_course(course_key, request.user)
+        track_forum_search_event(request, course, search_event_data)
+        if not comma_separated_usernames:
+            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
+                "results": [],
+            })
+
+        params['usernames'] = comma_separated_usernames
+
+    course_stats_response = get_course_user_stats(course_key, params)
 
     if comma_separated_usernames:
         updated_course_stats = add_stats_for_users_with_no_discussion_content(

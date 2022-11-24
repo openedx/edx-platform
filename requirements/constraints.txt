@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.58.0
+edx-enterprise==3.58.12
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -51,9 +51,6 @@ django-webpack-loader==0.7.0
 # Feel free to loosen this constraint if/when it is confirmed that a later
 # version of py2neo will work with Neo4j 3.5.
 py2neo<2022
-
-# pylint==2.14.0 is causing test failures
-pylint==2.13.9
 
 # scipy version 1.8 requires numpy>=1.17.3, we've pinned numpy to <1.17.0 in requirements/edx-sandbox/py38.in
 scipy<1.8.0
@@ -87,10 +84,6 @@ pyopenssl==22.0.0
 
 # pytz>2022.2.1 causes test failures in edx-platform
 pytz==2022.2.1
-
-# openedx-events>0.13.0 causes test failures due to breaking changes
-# These broken tests will be fixed in a separate PR
-openedx-events==0.13.0
 
 # docutils==0.19 has removed the docutils.core.ErrorString which is required by the sphinxcontrib-openapi
 # This constraint can be removed once sphinxcontrib-openapi is updated to resolve this issue.

@@ -138,7 +138,6 @@ def get_test_system(
         return descriptor
 
     return TestModuleSystem(
-        track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
         services={
             'user': user_service,
@@ -465,9 +464,9 @@ class CourseComparisonTest(TestCase):
             actual_course_key, None, sort=('displayname', ModuleStoreEnum.SortOrder.descending)
         )
         assert len(expected_course_assets) == len(actual_course_assets)
-        for idx, __ in enumerate(expected_course_assets):
+        for idx, expected_val in enumerate(expected_course_assets):
             for attr in AssetMetadata.ATTRS_ALLOWED_TO_UPDATE:
                 if attr in ('edited_on',):
                     # edited_on is updated upon import.
                     continue
-                assert getattr(expected_course_assets[idx], attr) == getattr(actual_course_assets[idx], attr)
+                assert getattr(expected_val, attr) == getattr(actual_course_assets[idx], attr)

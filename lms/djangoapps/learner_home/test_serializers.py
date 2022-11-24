@@ -1,15 +1,15 @@
 """Tests for serializers for the Learner Dashboard"""
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from itertools import product
 from random import randint
 from unittest import mock
 from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase
-import ddt
 from opaque_keys.edx.keys import CourseKey
 
 
@@ -30,6 +30,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import (
 from lms.djangoapps.learner_home.serializers import (
     CertificateSerializer,
     CourseProviderSerializer,
+    CourseRecommendationSerializer,
     CourseRunSerializer,
     CourseSerializer,
     EmailConfirmationSerializer,
@@ -164,11 +165,7 @@ class TestCourseSerializer(LearnerDashboardBaseTest):
     """Tests for the CourseSerializer"""
 
     def create_test_context(self, course_id):
-        return {
-            "course_share_urls": {
-                course_id: random_url()
-            }
-        }
+        return {"course_share_urls": {course_id: random_url()}}
 
     def test_happy_path(self):
         test_enrollment = self.create_test_enrollment()
@@ -182,7 +179,7 @@ class TestCourseSerializer(LearnerDashboardBaseTest):
             "bannerImgSrc": test_enrollment.course_overview.banner_image_url,
             "courseName": test_enrollment.course_overview.display_name_with_default,
             "courseNumber": test_enrollment.course_overview.display_number_with_default,
-            "socialShareUrl": test_context['course_share_urls'][course_id]
+            "socialShareUrl": test_context["course_share_urls"][course_id],
         }
 
 
@@ -217,12 +214,12 @@ class TestCourseRunSerializer(LearnerDashboardBaseTest):
         input_context = self.create_test_context(input_data.course.id)
 
         # ... where a user hasn't started
-        input_context["resume_course_urls"][input_data.course.id] = ""
+        input_context["resume_course_urls"][input_data.course.id] = None
 
         # When I serialize
         output_data = CourseRunSerializer(input_data, context=input_context).data
 
-        # Then the resumeUrl is None
+        # Then the resumeUrl is None, which is allowed
         self.assertIsNone(output_data["resumeUrl"])
 
 
@@ -321,15 +318,14 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
     def create_test_context(self, course):
         """Get a test context object"""
         return {
+            "audit_access_deadlines": {course.id: random_date()},
             "course_mode_info": {
                 course.id: {
-                    "expiration_datetime": random_date(),
                     "show_upsell": True,
                 }
             },
             "course_optouts": [],
             "show_email_settings_for": [course.id],
-            "show_courseware_link": {course.id: {"has_access": True}},
             "resume_course_urls": {course.id: "some_url"},
             "ecommerce_payment_page": random_url(),
         }
@@ -350,23 +346,33 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
         for key in output:
             assert output[key] is not None
 
-    def test_audit_access_expired(self):
+    @ddt.data(
+        (None, False),  # No expiration date, allowed for non-audit, non-expired.
+        (datetime.max, False),  # Expiration in the far future. Shouldn't be expired.
+        (datetime.min, True),  # Expiration in the far past. Should be expired.
+    )
+    @ddt.unpack
+    def test_audit_access_expired(self, expiration_datetime, should_be_expired):
+        # Given an enrollment
         input_data = self.create_test_enrollment()
         input_context = self.create_test_context(input_data.course)
 
-        # Example audit expired context
+        # With/out an expiration date (made timezone aware, if it exists)
+        expiration_datetime = (
+            expiration_datetime.replace(tzinfo=timezone.utc)
+            if expiration_datetime
+            else None
+        )
         input_context.update(
             {
-                "show_courseware_link": {
-                    input_data.course.id: {"error_code": "audit_expired"}
-                },
+                "audit_access_deadlines": {input_data.course.id: expiration_datetime},
             }
         )
 
-        serializer = EnrollmentSerializer(input_data, context=input_context)
-        output = serializer.data
+        # When I serialize
+        output = EnrollmentSerializer(input_data, context=input_context).data
 
-        assert output["isAuditAccessExpired"] is True
+        self.assertEqual(output["isAuditAccessExpired"], should_be_expired)
 
     @ddt.data(
         (random_url(), True, uuid4(), True),
@@ -430,17 +436,18 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
 class TestGradeDataSerializer(LearnerDashboardBaseTest):
     """Tests for the GradeDataSerializer"""
 
-    @mock.patch(
-        "lms.djangoapps.learner_home.serializers.user_has_passing_grade_in_course"
-    )
+    def create_test_context(self, course, is_passing):
+        """Get a test context object"""
+        return {"grade_statuses": {course.id: is_passing}}
+
     @ddt.data(True, False, None)
-    def test_happy_path(self, is_passing, mock_get_grade_data):
+    def test_happy_path(self, is_passing):
         # Given a course where I am/not passing
         input_data = self.create_test_enrollment()
-        mock_get_grade_data.return_value = is_passing
+        input_context = self.create_test_context(input_data.course, is_passing)
 
         # When I serialize grade data
-        output_data = GradeDataSerializer(input_data).data
+        output_data = GradeDataSerializer(input_data, context=input_context).data
 
         # Then I get the correct data shape out
         self.assertDictEqual(
@@ -718,7 +725,6 @@ class TestEntitlementSerializer(TestCase):
             "isExpired": bool(entitlement.expired_at),
             "expirationDate": expected_expiration_date,
             "uuid": str(entitlement.uuid),
-            "enrollmentUrl": f"/api/entitlements/v1/entitlements/{entitlement.uuid}/enrollments",
         }
 
 
@@ -907,9 +913,10 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
             output_data["enrollment"]
             == UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA
         )
-        assert output_data["course"] == CourseSerializer(
-            pseudo_session_course_overviews.popitem()[1]
-        ).data
+        assert (
+            output_data["course"]
+            == CourseSerializer(pseudo_session_course_overviews.popitem()[1]).data
+        )
         assert output_data["courseProvider"] is not None
         assert output_data["programs"] == {"relatedPrograms": []}
 
@@ -952,6 +959,81 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         )
         actual_keys = output_data.keys()
         assert expected_keys == actual_keys
+
+
+class TestCourseRecommendationSerializer(TestCase):
+    """High-level tests for CourseRecommendationSerializer"""
+
+    @classmethod
+    def mock_recommended_courses(cls, courses_count=2):
+        """Sample course data"""
+
+        recommended_courses = []
+
+        for _ in range(courses_count):
+            recommended_courses.append(
+                {
+                    "course_key": str(uuid4()),
+                    "logo_image_url": random_url(),
+                    "marketing_url": random_url(),
+                    "title": str(uuid4()),
+                },
+            )
+
+        return recommended_courses
+
+    def test_no_recommended_courses(self):
+        """That that data serializes correctly for empty courses list"""
+
+        recommended_courses = self.mock_recommended_courses(courses_count=0)
+
+        output_data = CourseRecommendationSerializer(
+            {
+                "courses": recommended_courses,
+                "is_personalized_recommendation": False,
+            }
+        ).data
+
+        self.assertDictEqual(
+            output_data,
+            {
+                "courses": [],
+                "isPersonalizedRecommendation": False,
+            },
+        )
+
+    def test_happy_path(self):
+        """Test that data serializes correctly"""
+
+        recommended_courses = self.mock_recommended_courses()
+
+        output_data = CourseRecommendationSerializer(
+            {
+                "courses": recommended_courses,
+                "is_personalized_recommendation": True,
+            }
+        ).data
+
+        self.assertDictEqual(
+            output_data,
+            {
+                "courses": [
+                    {
+                        "courseKey": recommended_courses[0]["course_key"],
+                        "logoImageUrl": recommended_courses[0]["logo_image_url"],
+                        "marketingUrl": recommended_courses[0]["marketing_url"],
+                        "title": recommended_courses[0]["title"],
+                    },
+                    {
+                        "courseKey": recommended_courses[1]["course_key"],
+                        "logoImageUrl": recommended_courses[1]["logo_image_url"],
+                        "marketingUrl": recommended_courses[1]["marketing_url"],
+                        "title": recommended_courses[1]["title"],
+                    },
+                ],
+                "isPersonalizedRecommendation": True,
+            },
+        )
 
 
 class TestSuggestedCourseSerializer(TestCase):
@@ -1053,10 +1135,7 @@ class TestEnterpriseDashboardSerializer(TestCase):
 
         output_data = EnterpriseDashboardSerializer(input_data).data
 
-        expected_keys = [
-            "label",
-            "url",
-        ]
+        expected_keys = ["label", "url", "uuid"]
         self.assertEqual(output_data.keys(), set(expected_keys))
 
     def test_happy_path(self):
@@ -1073,12 +1152,13 @@ class TestEnterpriseDashboardSerializer(TestCase):
                 "url": settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL
                 + "/"
                 + input_data["slug"],
+                "uuid": input_data["uuid"],
             },
         )
 
 
 class TestSocialMediaSettingsSiteSerializer(TestCase):
-    """ Tests for the SocialMediaSiteSettingsSerializer """
+    """Tests for the SocialMediaSiteSettingsSerializer"""
 
     @classmethod
     def generate_test_social_media_settings(cls):
@@ -1103,13 +1183,13 @@ class TestSocialMediaSettingsSiteSerializer(TestCase):
 
 
 class TestSocialShareSettingsSerializer(TestCase):
-    """ Tests for the SocialShareSettingsSerializer """
+    """Tests for the SocialShareSettingsSerializer"""
 
     @classmethod
     def generate_test_social_share_settings(cls):
         return {
             "twitter": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings(),
-            "facebook": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings()
+            "facebook": TestSocialMediaSettingsSiteSerializer.generate_test_social_media_settings(),
         }
 
     def test_structure(self):
@@ -1118,10 +1198,7 @@ class TestSocialShareSettingsSerializer(TestCase):
 
         output_data = SocialShareSettingsSerializer(input_data).data
 
-        expected_keys = [
-            "twitter",
-            "facebook"
-        ]
+        expected_keys = ["twitter", "facebook"]
         self.assertEqual(output_data.keys(), set(expected_keys))
 
 

@@ -69,7 +69,7 @@
 [MASTER]
 ignore = ,.git,.tox,migrations,node_modules,.pycharm_helpers
 persistent = yes
-load-plugins = edx_lint.pylint,pylint_django_settings,pylint_django,pylint_celery,pylint_pytest
+load-plugins = edx_lint.pylint,pylint_django,pylint_celery,pylint_pytest
 
 [MESSAGES CONTROL]
 enable =
@@ -286,7 +286,6 @@ disable =
 	illegal-waffle-usage,
 
 	logging-fstring-interpolation,
-	native-string,
 	import-outside-toplevel,
 	inconsistent-return-statements,
 	no-else-break,
@@ -308,8 +307,12 @@ disable =
 	unused-argument,
 	unsubscriptable-object,
 	abstract-method,
-	wrong-import-order,
-	no-self-use,
+	not-callable,
+	unsupported-binary-operation,
+	missing-timeout,
+	c-extension-no-member,
+	no-name-in-module,
+	unnecessary-lambda-assignment,
 
 [REPORTS]
 output-format = text
@@ -406,4 +409,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 976a7bc58c47b2957e91b1632c6ea16e0112bc3b
+# 567bf30b121db79bc07a7028651f7efa0724e8a4

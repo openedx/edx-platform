@@ -22,6 +22,7 @@ from django.test import RequestFactory, TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
+from edx_django_utils.cache.utils import RequestCache
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -143,7 +144,6 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url.split('?')[0] == expected_url
 
     @ddt.data(
-        (False, ModuleStoreEnum.Type.mongo),
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -167,9 +167,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url == expected_redirect_url
 
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_sequence(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_sequence(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -195,9 +194,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url == expected_redirect_url
 
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_module(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_module(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -251,9 +249,8 @@ class TestJumpTo(ModuleStoreTestCase):
     # The new courseware experience does not support this sort of course structure;
     # it assumes a simple course->chapter->sequence->unit->component tree.
     @set_preview_mode(True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_legacy_from_nested_module(self, store_type):
-        with self.store.default_store(store_type):
+    def test_jump_to_legacy_from_nested_module(self):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -275,7 +272,6 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
     @ddt.data(
-        (False, ModuleStoreEnum.Type.mongo),
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -290,8 +286,6 @@ class TestJumpTo(ModuleStoreTestCase):
 
     @set_preview_mode(True)
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, False, '1'),
-        (ModuleStoreEnum.Type.mongo, True, '2'),
         (ModuleStoreEnum.Type.split, False, '1'),
         (ModuleStoreEnum.Type.split, True, '2'),
     )
@@ -337,10 +331,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     """
     NUM_PROBLEMS = 20
 
-    @patch('common.djangoapps.student.helpers.get_course_dates_for_email')
-    def test_index_query_counts(self, mock_course_dates_for_email):
+    def test_index_query_counts(self):
         # TODO: decrease query count as part of REVO-28
-        mock_course_dates_for_email.return_value = []
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -350,20 +342,6 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 vertical = ItemFactory.create(category='vertical', parent_location=section.location)
                 for _ in range(self.NUM_PROBLEMS):
                     ItemFactory.create(category='problem', parent_location=vertical.location)
-
-        course_run = CourseRunFactory.create(key=course.id)
-        course_run['title'] = course.display_name
-        course_run['short_description'] = None
-        course_run['marketing_url'] = 'www.edx.org'
-        course_run['pacing_type'] = 'self_paced'
-        course_run['banner_image_url'] = ''
-        course_run['min_effort'] = 1
-        course_run['enrollment_count'] = 12345
-
-        patch_course_data = patch('openedx.core.djangoapps.catalog.api.get_course_run_details')
-        course_data = patch_course_data.start()
-        course_data.return_value = course_run
-        self.addCleanup(patch_course_data.stop)
 
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, course.id)
@@ -779,6 +757,15 @@ class ViewsTestCase(BaseViewsTestCase):
 
         set_score(admin.id, usage_key, 0, 3)
 
+        # Typically an http request has its own thread and RequestCache which is used to ensure that only
+        # one StudentModuleHistory record is created per request. However, since tests are run locally
+        # the score updates share the same thread. If the RequestCache is not cleared in between the two
+        # activities, then there will only be one StudentModuleHistory record that reflects the final state
+        # rather than one per action. Clearing the cache here allows the second action below to generate
+        # its own history record. The assertions below are then able to check that both states are recorded
+        # in the history.
+        RequestCache('studentmodulehistory').clear()
+
         state_client.set(
             username=admin.username,
             block_key=usage_key,
@@ -794,17 +781,17 @@ class ViewsTestCase(BaseViewsTestCase):
         response = self.client.get(url)
         response_content = html.unescape(response.content.decode('utf-8'))
 
-        # We have update the state 4 times: twice to change content, and twice
-        # to set the scores. We'll check that the identifying content from each is
+        # We have update the state 2 times. We'll check that the identifying content from each is
         # displayed (but not the order), and also the indexes assigned in the output
-        # #1 - #4
+        # #1 - #2
 
         assert '#1' in response_content
         assert json.dumps({'field_a': 'a', 'field_b': 'b'}, sort_keys=True, indent=2) in response_content
         assert 'Score: 0.0 / 3.0' in response_content
         assert json.dumps({'field_a': 'x', 'field_b': 'y'}, sort_keys=True, indent=2) in response_content
         assert 'Score: 3.0 / 3.0' in response_content
-        assert '#4' in response_content
+        assert '#2' in response_content
+        assert '#3' not in response_content
 
     @ddt.data(('America/New_York', -5),  # UTC - 5
               ('Asia/Pyongyang', 9),  # UTC + 9
@@ -1348,15 +1335,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Assert that valid 'student_id' returns 200 status
         self._get_student_progress_page()
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_unenrolled_student_progress_for_credit_course(self, default_store):
+    def test_unenrolled_student_progress_for_credit_course(self):
         """
          Test that student progress page does not break while checking for an unenrolled student.
          Scenario: When instructor checks the progress of a student who is not enrolled in credit course.
          It should return 200 response.
         """
         # Create a new course, a user which will not be enrolled in course, admin user for staff access
-        course = CourseFactory.create(default_store=default_store)
+        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         admin = AdminFactory.create()
         assert self.client.login(username=admin.username, password='test')
 
