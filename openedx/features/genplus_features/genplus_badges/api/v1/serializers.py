@@ -104,19 +104,19 @@ class AwardBoosterBadgesSerializer(serializers.Serializer):
         badges = validated_data.pop('badge')
         feedback = validated_data.pop('feedback')
         request = self.context.get('request')
-
+        teacher = request.user
         user_qs = User.objects.filter(pk__in=users)
         badge_qs = BoosterBadge.objects.filter(pk__in=badges)
         instance = None
         for badge in badge_qs:
             for user in user_qs:
-                instance, created = BoosterBadgeAward.objects.update_or_create(user=user,
-                                                                               badge=badge,
-                                                                               awarded_by=request.user,
-                                                                               defaults={'feedback': feedback,
-                                                                                         'image_url': get_absolute_url(
-                                                                                             request, badge.image)},
-                                                                               )
+                instance, created = BoosterBadgeAward.objects.get_or_create(user=user,
+                                                                            badge=badge,
+                                                                            defaults={'feedback': feedback,
+                                                                                      'awarded_by': teacher,
+                                                                                      'image_url': get_absolute_url(
+                                                                                          request, badge.image)},
+                                                                            )
         return instance
 
     def validate(self, data):
