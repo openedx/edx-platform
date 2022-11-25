@@ -242,7 +242,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         requirements should be sent. The email should not be sent for non-verified modes.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             # First enroll in a non-proctored course. This should not trigger the email.
@@ -259,7 +259,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         any proctored exams, they should not receive a proctoring requirements email.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             CourseEnrollment.enroll(
@@ -274,7 +274,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         should be sent.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             enrollment = CourseEnrollment.enroll(
@@ -293,7 +293,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         enroll in honor mode for a course with proctored exams.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             course_honor_mode = CourseFactory(

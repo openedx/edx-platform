@@ -156,7 +156,8 @@ class RefundableTest(SharedModuleStoreTestCase):
             value=self.ORDER_NUMBER
         )
 
-        with patch('common.djangoapps.student.models.EnrollmentRefundConfiguration.current') as config:
+        CONFIG_METHOD_NAME = 'common.djangoapps.student.models.course_enrollment.EnrollmentRefundConfiguration.current'
+        with patch(CONFIG_METHOD_NAME) as config:
             instance = config.return_value
             instance.refund_window = refund_period
             assert self.enrollment.refund_cutoff_date() == (expected_date + refund_period)

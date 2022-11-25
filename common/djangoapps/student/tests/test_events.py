@@ -94,7 +94,7 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         self.profile.save()
         self.assert_no_events_were_emitted()
 
-    @mock.patch('common.djangoapps.student.models.UserProfile.save', side_effect=IntegrityError)
+    @mock.patch('common.djangoapps.student.models.user.UserProfile.save', side_effect=IntegrityError)
     def test_no_event_if_save_failed(self, _save_mock):
         """
         Verify no event is triggered if the save does not complete. Note that the pre_save
