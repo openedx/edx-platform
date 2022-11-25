@@ -37,6 +37,12 @@ class SurveyReportAdmin(admin.ModelAdmin):
         """
         return False
 
+    def has_delete_permission(self, request, obj=None):
+        """
+        Removes the "delete" options from admin.
+        """
+        return False
+
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         """
         Removes the "save" buttons from admin change view.
@@ -48,5 +54,15 @@ class SurveyReportAdmin(admin.ModelAdmin):
         extra_context['show_save_and_add_another'] = False
 
         return super().changeform_view(request, object_id, form_url, extra_context)
+
+    def get_actions(self, request):
+        """
+        Removes the default bulk delete option provided by Django,
+        it doesn't do what we need for this model.
+        """
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
 admin.site.register(SurveyReport, SurveyReportAdmin)
