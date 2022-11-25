@@ -4,13 +4,30 @@ Django Admin page for SurveyReport.
 
 
 from django.contrib import admin
+from django import forms
 from .models import SurveyReport
+
+
+class SurveyReportForm(forms.ModelForm):
+    class Meta:
+        model = SurveyReport
+        help_texts = {
+            'courses_offered': 'Total number of active unique courses.',
+            'learners': 'Total number of recently active users with login in some weeks.',
+            'registered_learners': 'Total number of users ever registered in the platform.',
+            'enrollments': 'Total number of active enrollments in the platform.',
+            'generated_certificates': 'Total number of generated certificates.',
+            'extra_data': 'Extra information that will be saved in the report, E.g: site_name, openedx-release.',
+        }
+        exclude = ()
 
 
 class SurveyReportAdmin(admin.ModelAdmin):
     """
     Admin to manage survey reports.
     """
+    form = SurveyReportForm
+
     readonly_fields = (
         'courses_offered', 'learners', 'registered_learners',
         'enrollments', 'generated_certificates', 'extra_data',
@@ -29,7 +46,8 @@ class SurveyReportAdmin(admin.ModelAdmin):
         - Learners: Recently active users with login in some weeks.
         - Enrollments: Total number of active enrollments in the platform.
         """
-        return f"Courses: {obj.courses_offered}, Learners: {obj.learners}, Enrollments: {obj.enrollments}"
+        return f"Total Courses: {obj.courses_offered}," \
+               f"Total Learners: {obj.learners}, Total Enrollments: {obj.enrollments}"
 
     def has_add_permission(self, request):
         """
