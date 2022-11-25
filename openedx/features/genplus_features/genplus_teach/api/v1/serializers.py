@@ -161,11 +161,15 @@ class HelpGuideTypeSerializer(serializers.ModelSerializer):
 
     def get_help_guides(self, instance):
         media_type_id = self.context['request'].query_params.get('media_type')
+        search = self.context['request'].query_params.get('search')
 
+        items = HelpGuide.objects.filter(guide_type=instance)
+
+        if search:
+            items = items.filter(title__icontains=search)
+        
         if media_type_id:
-            items = HelpGuide.objects.filter(guide_type=instance, media_types__id=media_type_id)
-        else:
-            items = HelpGuide.objects.filter(guide_type=instance)
+            items = items.filter(media_types__id=media_type_id)
 
         serializer = HelpGuideSerializer(instance=items, many=True)
         return serializer.data

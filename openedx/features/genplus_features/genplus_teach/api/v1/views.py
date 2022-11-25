@@ -297,8 +297,6 @@ class HelpGuideViewSet(viewsets.ReadOnlyModelViewSet, GenzMixin):
     serializer_class = HelpGuideTypeSerializer
     pagination_class = None
     queryset = serializer_class.Meta.model.objects.all()
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['helpguide__title']
 
     def retrieve(self, request, pk=None):
         teacher = Teacher.objects.get(gen_user=self.gen_user)
