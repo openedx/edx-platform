@@ -1,11 +1,17 @@
 """Helper functions for working with Credentials."""
+import logging
 import requests
-from edx_rest_api_client.auth import SuppliedJwtAuth
+from django.conf import settings
 from urllib.parse import urljoin
+from django.contrib.auth.models import User
 
+from edx_rest_api_client.auth import SuppliedJwtAuth
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_api_data
+
+
+log = logging.getLogger(__name__)
 
 
 def get_credentials_records_url(program_uuid=None):
@@ -101,3 +107,46 @@ def get_credentials(user, program_uuid=None, credential_type=None):
         querystring=querystring,
         cache_key=cache_key
     )
+
+
+def send_course_certificate_configuration(course_id: str, config_data: dict, signature_assets):
+    try:
+        credentials_client = get_credentials_api_client(
+            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
+        )
+        credentials_api_base_url = get_credentials_api_base_url()
+        api_url = urljoin(f'{credentials_api_base_url}/', 'course_certificates/')
+        config_data['course_id'] = str(config_data.pop('course_key'))
+        response = credentials_client.post(
+            api_url,
+            files=signature_assets,
+            data=config_data
+        )
+        response.raise_for_status()
+        log.info(f'Course certificate config sent for course {course_id} to Credentials.')
+    except Exception:  # lint-amnesty, pylint: disable=W0703
+        log.exception(f'Failed to send course certificate config for course {course_id} to Credentials.')
+        raise
+    else:
+        return response
+
+
+def delete_course_certificate_configuration(course_id: str, config_data: dict):
+    try:
+        credentials_client = get_credentials_api_client(
+            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
+        )
+        credentials_api_base_url = get_credentials_api_base_url()
+        api_url = urljoin(f'{credentials_api_base_url}/', 'course_certificates/')
+        config_data['course_id'] = str(config_data.pop('course_key'))
+        response = credentials_client.delete(
+            api_url,
+            data=config_data
+        )
+        response.raise_for_status()
+        log.info(f'Course certificate config is deleted for course {course_id} from Credentials.')
+    except Exception:  # lint-amnesty, pylint: disable=W0703
+        log.exception(f'Failed to delete certificate config for course {course_id} from Credentials.')
+        raise
+    else:
+        return response

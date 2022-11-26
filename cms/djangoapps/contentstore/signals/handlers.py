@@ -1,10 +1,10 @@
 """ receivers of course_published and library_updated events in order to trigger indexing task """
 
-
+import attr
 import logging
 from datetime import datetime, timezone
-from functools import wraps
-from typing import Optional
+from functools import partial, wraps
+from typing import BinaryIO, Dict, Iterator, List, Optional, Tuple, Union
 
 from django.conf import settings
 from django.core.cache import cache
@@ -12,14 +12,22 @@ from django.db import transaction
 from django.dispatch import receiver
 from edx_toggles.toggles import SettingToggle
 from opaque_keys.edx.keys import CourseKey
-from openedx_events.content_authoring.data import CourseCatalogData, CourseScheduleData
+from openedx_events.content_authoring.data import (
+    CertificateConfigData,
+    CertificateSignatoryData,
+    CourseCatalogData,
+    CourseScheduleData,
+)
 from openedx_events.content_authoring.signals import (
     COURSE_CATALOG_INFO_CHANGED,
+    COURSE_CERTIFICATE_CONFIG_DELETED,
+    COURSE_CERTIFICATE_CONFIG_CHANGED,
     XBLOCK_DELETED,
     XBLOCK_DUPLICATED,
     XBLOCK_PUBLISHED,
 )
 from openedx_events.event_bus import get_producer
+from openedx_events.tooling import OpenEdxPublicSignal
 from pytz import UTC
 
 from cms.djangoapps.contentstore.courseware_index import (
@@ -27,11 +35,19 @@ from cms.djangoapps.contentstore.courseware_index import (
     CoursewareSearchIndexer,
     LibrarySearchIndexer,
 )
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from common.djangoapps.util.block_utils import yield_dynamic_block_descendants
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
+from openedx.core.djangoapps.credentials.utils import (
+    get_credentials_api_base_url,
+    get_credentials_api_client,
+    delete_course_certificate_configuration,
+    send_course_certificate_configuration,
+)
+from openedx.core.djangoapps.olx_rest_api.adapters import get_asset_content_from_path
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
@@ -71,6 +87,16 @@ def locked(expiry_seconds, key):  # lint-amnesty, pylint: disable=missing-functi
 SEND_CATALOG_INFO_SIGNAL = SettingToggle('SEND_CATALOG_INFO_SIGNAL', default=False, module_name=__name__)
 
 
+def get_certificate_signature_assets(certificate_config: CertificateConfigData) -> Iterator[Tuple[str, BinaryIO]]:
+    """
+    Get certificates' signatures from asset content storage.
+    """
+    for signatory in certificate_config.signatories:
+        if signatory.image:
+            if content := get_asset_content_from_path(certificate_config.course_key, signatory.image):
+                yield signatory.image, content.data
+
+
 def _create_catalog_data_for_signal(course_key: CourseKey) -> (Optional[datetime], Optional[CourseCatalogData]):
     """
     Creates data for catalog-info-changed signal when course is published.
@@ -106,6 +132,30 @@ def _create_catalog_data_for_signal(course_key: CourseKey) -> (Optional[datetime
         )
 
 
+def create_course_certificate_config_data(
+    course_key: CourseKey,
+    certificate_type: str,
+    certificate_data: Dict[str, Union[str, List[str]]]
+) -> CourseCatalogData:
+    """
+    Creates data for course-certificate-config signal
+    when either course is imported or course certificate config is changed.
+    """
+    signatories = [CertificateSignatoryData(
+        name=item['name'],
+        title=item['title'],
+        organization=item['organization'],
+        image=item['signature_image_path']
+    ) for item in certificate_data['signatories']]
+    return CertificateConfigData(
+        course_key=course_key,
+        title=certificate_data.get('course_title'),
+        is_active=certificate_data['is_active'],
+        signatories=signatories,
+        certificate_type=certificate_type
+    )
+
+
 def emit_catalog_info_changed_signal(course_key: CourseKey):
     """
     Given the key of a recently published course, send course data to catalog-info-changed signal.
@@ -114,6 +164,35 @@ def emit_catalog_info_changed_signal(course_key: CourseKey):
         timestamp, catalog_info = _create_catalog_data_for_signal(course_key)
         if catalog_info is not None:
             COURSE_CATALOG_INFO_CHANGED.send_event(time=timestamp, catalog_info=catalog_info)
+
+
+def _emit_course_certificate_config_signal(
+    course_key: CourseKey,
+    certificate_data: Dict[str, Union[str, List[str]]],
+    course_certificate_config_signal: OpenEdxPublicSignal
+):
+    """
+    Given the key of a recently changed course certificate config,
+    send course certificate config data to course-certificate-config-changed signal.
+    """
+    course_modes = CourseMode.objects.filter(
+        course_id=str(course_key),
+        mode_slug__in=CourseMode.CERTIFICATE_RELEVANT_MODES
+    )
+    for mode in course_modes:
+        certificate_config = create_course_certificate_config_data(course_key, mode.slug, certificate_data)
+        course_certificate_config_signal.send_event(certificate_config=certificate_config)
+
+
+emit_course_certificate_config_changed_signal = partial(
+    _emit_course_certificate_config_signal,
+    course_certificate_config_signal=COURSE_CERTIFICATE_CONFIG_CHANGED
+)
+
+emit_course_certificate_config_deleted_signal = partial(
+    _emit_course_certificate_config_signal,
+    course_certificate_config_signal=COURSE_CERTIFICATE_CONFIG_DELETED
+)
 
 
 @receiver(SignalHandler.course_published)
@@ -208,6 +287,28 @@ def listen_for_xblock_duplicated(sender, signal, **kwargs):
             event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
             event_metadata=kwargs['metadata'],
         )
+
+
+@receiver(COURSE_CERTIFICATE_CONFIG_CHANGED)
+def listen_for_course_certificate_config_changed(sender, signal, **kwargs):
+    """
+    Send course certificate config data onto the Credentials service to create or change one.
+    """
+    certificate_config = kwargs['certificate_config']
+    files_to_upload = dict(get_certificate_signature_assets(certificate_config))
+    certificate_config_data = attr.asdict(certificate_config)
+    course_id = str(certificate_config_data.get('course_key'))
+    send_course_certificate_configuration(course_id, certificate_config_data, files_to_upload)
+
+
+@receiver(COURSE_CERTIFICATE_CONFIG_DELETED)
+def listen_for_course_certificate_config_deleted(sender, signal, **kwargs):
+    """
+    Send course certificate config data onto the Credentials service to delete one.
+    """
+    certificate_config = attr.asdict(kwargs['certificate_config'])
+    course_id = str(certificate_config.get('course_key'))
+    delete_course_certificate_configuration(course_id, certificate_config)
 
 
 @receiver(SignalHandler.course_deleted)

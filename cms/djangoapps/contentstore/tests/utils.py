@@ -15,12 +15,80 @@ from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
+from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tests.test_transcripts_utils import YoutubeVideoHTMLResponse
 
 from cms.djangoapps.contentstore.utils import reverse_url
+from cms.djangoapps.contentstore.views.certificates import CERTIFICATE_SCHEMA_VERSION
 from common.djangoapps.student.models import Registration
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+
+CERTIFICATE_JSON_WITH_SIGNATORIES = {
+    'name': 'Test certificate',
+    'description': 'Test description',
+    'version': CERTIFICATE_SCHEMA_VERSION,
+    'course_title': 'Course Title Override',
+    'is_active': True,
+    'signatories': [
+        {
+            'name': 'Bob Smith',
+            'title': 'The DEAN.',
+            'organization': 'Test org',
+            'signature_image_path': '/c4x/test/CSS101/asset/Signature.png'
+        }
+    ]
+}
+C4X_SIGNATORY_PATH = '/c4x/test/CSS101/asset/Signature{}.png'
+
+
+# pylint: disable=no-member
+class HelperMethods:
+    """
+    Mixin that provides useful methods for certificate configuration tests.
+    """
+    def _create_fake_images(self, asset_keys):
+        """
+        Creates fake image files for a list of asset_keys.
+        """
+        for asset_key_string in asset_keys:
+            asset_key = AssetKey.from_string(asset_key_string)
+            content = StaticContent(
+                asset_key, 'Fake asset', 'image/png', 'data',
+            )
+            contentstore().save(content)
+
+    def _add_course_certificates(self, count=1, signatory_count=0, is_active=False,
+                                 asset_path_format=C4X_SIGNATORY_PATH):
+        """
+        Create certificate for the course.
+        """
+        signatories = [
+            {
+                'name': 'Name ' + str(i),
+                'title': 'Title ' + str(i),
+                'signature_image_path': asset_path_format.format(i),
+                'organization': 'Organization ' + str(i),
+                'id': i
+            } for i in range(signatory_count)
+
+        ]
+
+        # create images for signatory signatures except the last signatory
+        self._create_fake_images(signatory['signature_image_path'] for signatory in signatories[:-1])
+
+        certificates = [
+            {
+                'id': i,
+                'name': 'Name ' + str(i),
+                'description': 'Description ' + str(i),
+                'signatories': signatories,
+                'version': CERTIFICATE_SCHEMA_VERSION,
+                'is_active': is_active
+            } for i in range(count)
+        ]
+        self.course.certificates = {'certificates': certificates}
+        self.save_course()
 
 
 def parse_json(response):
