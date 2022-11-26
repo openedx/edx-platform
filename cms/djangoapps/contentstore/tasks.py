@@ -44,6 +44,7 @@ from cms.djangoapps.contentstore.courseware_index import (
     LibrarySearchIndexer,
     SearchIndexingError
 )
+from cms.djangoapps.contentstore.signals.handlers import emit_course_certificate_config_changed_signal
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -673,6 +674,10 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 from .views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
                 LOGGER.info(f'Course import {course.id}: Entrance exam imported')
+
+            if certificates := course.certificates.get('certificates'):
+                for certificate in certificates:
+                    emit_course_certificate_config_changed_signal(courselike_key, certificate)
 
 
 @shared_task
