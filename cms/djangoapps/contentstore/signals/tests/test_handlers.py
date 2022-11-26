@@ -175,6 +175,7 @@ class SignalCourseCertificateConfigurationListenerTestCase(TestCase):
         - COURSE_CERTIFICATE_CONFIG_DELETED,
         - COURSE_CERTIFICATE_CONFIG_CHANGED.
     """
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory(username='cred-user')

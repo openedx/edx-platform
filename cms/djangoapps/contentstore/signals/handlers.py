@@ -134,7 +134,7 @@ def create_course_certificate_config_data_for_signal(
     course_key: CourseKey,
     certificate_type: str,
     certificate_data: Dict[str, Union[str, List[str]]]
-) -> Optional[CourseCatalogData]:
+) -> CourseCatalogData:
     """
     Creates data for course-certificate-config signal
     when either course is imported or course certificate config is changed.
