@@ -9,17 +9,23 @@ from unittest import mock
 
 import ddt
 from django.conf import settings
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import AssetKey
 
-from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.tests.utils import (
+    CourseTestCase,
+    HelperMethods,
+    CERTIFICATE_JSON_WITH_SIGNATORIES,
+    C4X_SIGNATORY_PATH,
+)
 from cms.djangoapps.contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
+from cms.djangoapps.contentstore.views.certificates import certificates_list_handler, certificates_detail_handler
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import EventTestMixin, UrlResetMixin
-from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -35,71 +41,7 @@ CERTIFICATE_JSON = {
     'version': CERTIFICATE_SCHEMA_VERSION,
 }
 
-CERTIFICATE_JSON_WITH_SIGNATORIES = {
-    'name': 'Test certificate',
-    'description': 'Test description',
-    'version': CERTIFICATE_SCHEMA_VERSION,
-    'course_title': 'Course Title Override',
-    'is_active': True,
-    'signatories': [
-        {
-            "name": "Bob Smith",
-            "title": "The DEAN.",
-            "signature_image_path": "/c4x/test/CSS101/asset/Signature.png"
-        }
-    ]
-}
-
-C4X_SIGNATORY_PATH = '/c4x/test/CSS101/asset/Signature{}.png'
 SIGNATORY_PATH = 'asset-v1:test+CSS101+SP2017+type@asset+block@Signature{}.png'
-
-
-# pylint: disable=no-member
-class HelperMethods:
-    """
-    Mixin that provides useful methods for certificate configuration tests.
-    """
-    def _create_fake_images(self, asset_keys):
-        """
-        Creates fake image files for a list of asset_keys.
-        """
-        for asset_key_string in asset_keys:
-            asset_key = AssetKey.from_string(asset_key_string)
-            content = StaticContent(
-                asset_key, "Fake asset", "image/png", "data",
-            )
-            contentstore().save(content)
-
-    def _add_course_certificates(self, count=1, signatory_count=0, is_active=False,
-                                 asset_path_format=C4X_SIGNATORY_PATH):
-        """
-        Create certificate for the course.
-        """
-        signatories = [
-            {
-                'name': 'Name ' + str(i),
-                'title': 'Title ' + str(i),
-                'signature_image_path': asset_path_format.format(i),
-                'id': i
-            } for i in range(signatory_count)
-
-        ]
-
-        # create images for signatory signatures except the last signatory
-        self._create_fake_images(signatory['signature_image_path'] for signatory in signatories[:-1])
-
-        certificates = [
-            {
-                'id': i,
-                'name': 'Name ' + str(i),
-                'description': 'Description ' + str(i),
-                'signatories': signatories,
-                'version': CERTIFICATE_SCHEMA_VERSION,
-                'is_active': is_active
-            } for i in range(count)
-        ]
-        self.course.certificates = {'certificates': certificates}
-        self.save_course()
 
 
 # pylint: disable=no-member
@@ -209,6 +151,14 @@ class CertificatesListHandlerTestCase(
         Set up CertificatesListHandlerTestCase.
         """
         super().setUp('cms.djangoapps.contentstore.views.certificates.tracker')
+        self.user = UserFactory(is_staff=True)
+        self.request = RequestFactory().post(
+            self._url(),
+            data=json.dumps(CERTIFICATE_JSON_WITH_SIGNATORIES),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json',
+        )
+        self.request.user = self.user
         self.reset_urls()
 
     def _url(self):
@@ -300,6 +250,17 @@ class CertificatesListHandlerTestCase(
         self.assertEqual(data[0]['name'], 'Test certificate')
         self.assertEqual(data[0]['description'], 'Test description')
         self.assertEqual(data[0]['version'], CERTIFICATE_SCHEMA_VERSION)
+
+    def test_emit_course_certificate_config_signal_when_certificate_creates(self):
+        """
+        Test that course certificate config signal has been emmited.
+        """
+        with mock.patch(
+            'cms.djangoapps.contentstore.views.certificates.emit_course_certificate_config_changed_signal',
+        ) as mocked_emit_course_certificate_config_changed_signal:
+            CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
+            certificates_list_handler(self.request, str(self.course.id))
+            self.assertTrue(mocked_emit_course_certificate_config_changed_signal.called)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_certificate_info_not_in_response(self):
@@ -434,6 +395,21 @@ class CertificatesDetailHandlerTestCase(
         Set up CertificatesDetailHandlerTestCase.
         """
         super().setUp('cms.djangoapps.contentstore.views.certificates.tracker')
+        self.user = UserFactory(is_staff=True)
+        self.edit_request = RequestFactory().put(
+            self._url(cid=0),
+            data=json.dumps(CERTIFICATE_JSON_WITH_SIGNATORIES),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json',
+        )
+        self.delete_request = RequestFactory().delete(
+            self._url(cid=0),
+            data=json.dumps(CERTIFICATE_JSON_WITH_SIGNATORIES),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json',
+        )
+        self.edit_request.user = self.user
+        self.delete_request.user = self.user
         self.reset_urls()
 
     def _url(self, cid=-1):
@@ -553,6 +529,17 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(response.status_code, 201)
         content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
+
+    def test_emit_course_certificate_config_signal_when_certificate_edits(self):
+        """
+        Check that the course certificate configuration signal was sent when editing.
+        """
+        with mock.patch(
+            'cms.djangoapps.contentstore.views.certificates.emit_course_certificate_config_changed_signal',
+        ) as mocked_emit_course_certificate_config_changed_signal:
+            self._add_course_certificates()
+            certificates_detail_handler(self.edit_request, str(self.course.id), 0)
+            self.assertTrue(mocked_emit_course_certificate_config_changed_signal.called)
 
     @ddt.data(C4X_SIGNATORY_PATH, SIGNATORY_PATH)
     def test_can_delete_certificate_with_signatories(self, signatory_path):
@@ -759,6 +746,17 @@ class CertificatesDetailHandlerTestCase(
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 404)
+
+    def test_emit_course_certificate_config_signal_when_certificate_deletes(self):
+        """
+        Check that the course certificate configuration signal was sent when deleting.
+        """
+        with mock.patch(
+            'cms.djangoapps.contentstore.views.certificates.emit_course_certificate_config_deleted_signal',
+        ) as mocked_emit_course_certificate_config_deleted_signal:
+            self._add_course_certificates()
+            certificates_detail_handler(self.delete_request, str(self.course.id), 0)
+            self.assertTrue(mocked_emit_course_certificate_config_deleted_signal.called)
 
     @ddt.data(C4X_SIGNATORY_PATH, SIGNATORY_PATH)
     def test_certificate_activation_success(self, signatory_path):
