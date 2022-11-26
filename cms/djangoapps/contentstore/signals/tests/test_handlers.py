@@ -2,15 +2,31 @@
 Tests for signal handlers in the contentstore.
 """
 
+import attr
+import httpretty
 from datetime import datetime, timezone
+import json
+import requests
 from unittest.mock import patch
-
+from django.test import TestCase
 from django.test.utils import override_settings
+from edx_rest_api_client.auth import SuppliedJwtAuth
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
-from openedx_events.content_authoring.data import CourseCatalogData, CourseScheduleData
-
+from openedx_events.content_authoring.data import (
+    CertificateSignatoryData,
+    CertificateConfigData,
+    CourseCatalogData,
+    CourseScheduleData,
+)
+from openedx_events.content_authoring.signals import (
+    COURSE_CERTIFICATE_CONFIG_DELETED,
+    COURSE_CERTIFICATE_CONFIG_CHANGED,
+)
 import cms.djangoapps.contentstore.signals.handlers as sh
 from xmodule.modulestore.edit_info import EditInfoMixin
+from cms.djangoapps.contentstore.tests.utils import CERTIFICATE_JSON_WITH_SIGNATORIES
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
@@ -84,3 +100,132 @@ class TestCatalogInfoSignal(ModuleStoreTestCase):
         """When toggle is disabled, don't send."""
         sh.emit_catalog_info_changed_signal(self.course_key)
         mock_signal.send_event.assert_not_called()
+
+
+class TestCourseCertificateConfigSignal(ModuleStoreTestCase):
+    """
+    Test functionality of triggering course certificate config signals (and events).
+    """
+
+    def setUp(self):
+        super().setUp()
+        signatory = CERTIFICATE_JSON_WITH_SIGNATORIES['signatories'][0]
+        self.course = SampleCourseFactory.create(
+            org='TestU',
+            number='sig101',
+            display_name='Signals 101',
+            run='Summer2022',
+        )
+        self.course_key = self.course.id
+        self.expected_data = CertificateConfigData(
+            course_key=self.course_key,
+            title=CERTIFICATE_JSON_WITH_SIGNATORIES['name'],
+            is_active=CERTIFICATE_JSON_WITH_SIGNATORIES['is_active'],
+            certificate_type='verified',
+            signatories=[
+                CertificateSignatoryData(
+                    name=signatory['name'],
+                    title=signatory['title'],
+                    organization=signatory['organization'],
+                    image=signatory['signature_image_path']
+                )
+            ],
+        )
+
+    @patch('cms.djangoapps.contentstore.signals.handlers.COURSE_CERTIFICATE_CONFIG_CHANGED.send_event', autospec=True)
+    def test_course_certificate_config_changed(self, mock_signal):
+        """
+        Test that the change event is fired when course is in state where a certificate is available.
+        """
+        CourseModeFactory.create(mode_slug='verified', course_id=self.course.id)
+        sh.emit_course_certificate_config_changed_signal(self.course_key, CERTIFICATE_JSON_WITH_SIGNATORIES)
+        mock_signal.assert_called_once_with(certificate_config=self.expected_data)
+
+    @patch('cms.djangoapps.contentstore.signals.handlers.COURSE_CERTIFICATE_CONFIG_CHANGED.send_event', autospec=True)
+    def test_course_certificate_config_changed_does_not_emit(self, mock_signal):
+        """
+        Test that the change event is not fired when course is in state where a certificate is not available.
+        """
+        CourseModeFactory.create(mode_slug='audit', course_id=self.course.id)
+        sh.emit_course_certificate_config_changed_signal(self.course_key, CERTIFICATE_JSON_WITH_SIGNATORIES)
+        mock_signal.assert_not_called()
+
+    @patch('cms.djangoapps.contentstore.signals.handlers.COURSE_CERTIFICATE_CONFIG_DELETED.send_event', autospec=True)
+    def test_course_certificate_config_deleted(self, mock_signal):
+        """
+        Test that the delete event is fired when course is in state where a certificate is available.
+        """
+        CourseModeFactory.create(mode_slug='verified', course_id=self.course.id)
+        sh.emit_course_certificate_config_deleted_signal(self.course_key, CERTIFICATE_JSON_WITH_SIGNATORIES)
+        mock_signal.assert_called_once_with(certificate_config=self.expected_data)
+
+    @patch('cms.djangoapps.contentstore.signals.handlers.COURSE_CERTIFICATE_CONFIG_DELETED.send_event', autospec=True)
+    def test_course_certificate_config_deleted_does_not_emit(self, mock_signal):
+        """
+        Test that the delete event is not fired when course is in state where a certificate is not available.
+        """
+        CourseModeFactory.create(mode_slug='audit', course_id=self.course.id)
+        sh.emit_course_certificate_config_deleted_signal(self.course_key, CERTIFICATE_JSON_WITH_SIGNATORIES)
+        mock_signal.assert_not_called()
+
+
+class SignalCourseCertificateConfigurationListenerTestCase(TestCase):
+    """
+    Test case for end listeners of signals:
+        - COURSE_CERTIFICATE_CONFIG_DELETED,
+        - COURSE_CERTIFICATE_CONFIG_CHANGED.
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory(username='cred-user')
+        self.course_key = CourseLocator(org='TestU', course='sig101', run='Summer2022', branch=None, version_guid=None)
+        self.expected_data = CertificateConfigData(
+            course_key=str(self.course_key),
+            title=CERTIFICATE_JSON_WITH_SIGNATORIES['name'],
+            is_active=CERTIFICATE_JSON_WITH_SIGNATORIES['is_active'],
+            certificate_type='verified',
+            signatories=[
+                CertificateSignatoryData(
+                    name=CERTIFICATE_JSON_WITH_SIGNATORIES['signatories'][0]['name'],
+                    title=CERTIFICATE_JSON_WITH_SIGNATORIES['signatories'][0]['title'],
+                    organization=CERTIFICATE_JSON_WITH_SIGNATORIES['signatories'][0]['organization'],
+                    image=CERTIFICATE_JSON_WITH_SIGNATORIES['signatories'][0]['signature_image_path']
+                )
+            ],
+        )
+
+    @override_settings(CREDENTIALS_SERVICE_USERNAME='cred-user')
+    @httpretty.activate
+    @patch('cms.djangoapps.contentstore.signals.handlers.get_credentials_api_base_url')
+    def test_course_certificate_config_deleted_listener(self, mock_get_api_base_url):
+        """
+        Ensure the correct API call when the signal COURSE_CERTIFICATE_CONFIG_DELETED happened.
+        """
+        mock_get_api_base_url.return_value = 'http://test-server/'
+        test_client = requests.Session()
+        test_client.auth = SuppliedJwtAuth('test-token')
+        httpretty.register_uri(
+            httpretty.DELETE,
+            'http://test-server/course_certificates/',
+        )
+        COURSE_CERTIFICATE_CONFIG_DELETED.send_event(certificate_config=self.expected_data)
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        assert json.loads(last_request_body) == attr.asdict(self.expected_data)
+
+    @override_settings(CREDENTIALS_SERVICE_USERNAME='cred-user')
+    @httpretty.activate
+    @patch('cms.djangoapps.contentstore.signals.handlers.get_credentials_api_base_url')
+    def test_course_certificate_config_changed_listener(self, mock_get_api_base_url):
+        """
+        Ensure the correct API call when the signal COURSE_CERTIFICATE_CONFIG_CHANGED happened.
+        """
+        mock_get_api_base_url.return_value = 'http://test-server/'
+        test_client = requests.Session()
+        test_client.auth = SuppliedJwtAuth('test-token')
+        httpretty.register_uri(
+            httpretty.POST,
+            'http://test-server/course_certificates/',
+        )
+        COURSE_CERTIFICATE_CONFIG_CHANGED.send_event(certificate_config=self.expected_data)
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        assert json.loads(last_request_body) == attr.asdict(self.expected_data)
