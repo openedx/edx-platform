@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-13 20:34+0000\n"
-"PO-Revision-Date: 2022-11-13 20:34:30.576557\n"
+"POT-Creation-Date: 2022-11-27 20:35+0000\n"
+"PO-Revision-Date: 2022-11-27 20:35:34.677445\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8402,7 +8402,6 @@ msgstr ""
 " ʎǝʇ, ɔlᴉɔʞ {register_label_strong} ɐʇ ʇɥǝ ʇød øɟ ʇɥǝ dɐƃǝ."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -18051,6 +18050,10 @@ msgstr "Ħøʍ ᴉʇ Wøɹʞs"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "Sɔɥøøls"
+
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Register for free"
+msgstr "Ɍǝƃᴉsʇǝɹ ɟøɹ ɟɹǝǝ"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
