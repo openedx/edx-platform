@@ -134,7 +134,6 @@ outcome-surveys                     # edx-platform plugin to send and track segm
 path
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
-PGPy>=0.6.0, < 0.7.0                # edx-enterprise requirement, need to remove: https://2u-internal.atlassian.net/browse/ENT-6547
 py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
 pycountry
 pycryptodomex
