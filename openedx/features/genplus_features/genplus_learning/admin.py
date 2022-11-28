@@ -22,13 +22,7 @@ class YearGroupAdmin(admin.ModelAdmin):
 @admin.register(ProgramEnrollment)
 class ProgramEnrollmentAdmin(admin.ModelAdmin):
     list_display = ('student', 'gen_class', 'program', 'status',)
-    readonly_fields = ('student', 'gen_class', 'program',)
-
-
-@admin.register(ProgramUnitEnrollment)
-class ProgramUnitEnrollmentAdmin(admin.ModelAdmin):
-    list_display = ('program_enrollment', 'course',)
-    readonly_fields = ('program_enrollment', 'course', 'course_enrollment',)
+    readonly_fields = ('student', 'gen_class', 'program', 'status',)
 
 
 class UnitInline(SortableInlineAdminMixin, admin.TabularInline):

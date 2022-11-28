@@ -137,18 +137,6 @@ class ProgramEnrollment(TimeStampedModel):
     history = HistoricalRecords()
 
 
-class ProgramUnitEnrollment(TimeStampedModel):
-    class Meta:
-        unique_together = ('program_enrollment', 'course',)
-
-    program_enrollment = models.ForeignKey(ProgramEnrollment, on_delete=models.CASCADE,
-                                           related_name="program_unit_enrollments")
-    course_enrollment = models.ForeignKey(CourseEnrollment, null=True, blank=True, on_delete=models.CASCADE)
-    course = models.ForeignKey(CourseOverview, on_delete=models.CASCADE)
-    is_active = models.BooleanField(default=True)
-    history = HistoricalRecords()
-
-
 class ClassUnit(models.Model):
     class Meta:
         unique_together = ("gen_class", "unit",)
