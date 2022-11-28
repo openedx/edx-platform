@@ -157,6 +157,7 @@ cryptography==36.0.2
     #   edx-enterprise
     #   jwcrypto
     #   optimizely-sdk
+    #   pgpy
     #   pyjwt
     #   pyopenssl
     #   snowflake-connector-python
@@ -798,6 +799,10 @@ pbr==5.11.0
     # via
     #   -r requirements/edx/paver.txt
     #   stevedore
+pgpy==0.6.0
+    # via
+    #   -r requirements/edx/base.in
+    #   edx-enterprise
 piexif==1.1.3
     # via -r requirements/edx/base.in
 pillow==9.3.0
@@ -819,6 +824,8 @@ py2neo==2021.2.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
+pyasn1==0.4.8
+    # via pgpy
 pyblake2==1.1.2
     # via blockstore
 pycountry==22.3.5
@@ -1022,7 +1029,6 @@ six==1.16.0
     #   bleach
     #   chem
     #   click-repl
-    #   codejail
     #   codejail-includes
     #   crowdsourcehinter-xblock
     #   edx-ace
