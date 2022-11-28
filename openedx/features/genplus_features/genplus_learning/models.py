@@ -117,6 +117,11 @@ class Unit(models.Model):
         return str(self.course.id)
 
 
+class ProgramEnrollmentManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status__in=ProgramEnrollmentStatuses.__VISIBLE__)
+
+
 class ProgramEnrollment(TimeStampedModel):
     STATUS_CHOICES = ProgramEnrollmentStatuses.__MODEL_CHOICES__
 
@@ -127,6 +132,8 @@ class ProgramEnrollment(TimeStampedModel):
     gen_class = models.ForeignKey(Class, on_delete=models.SET_NULL, null=True, related_name="program_enrollments")
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="program_enrollments")
     status = models.CharField(max_length=9, choices=STATUS_CHOICES)
+    objects = models.Manager()
+    visible_objects = ProgramEnrollmentManager()
     history = HistoricalRecords()
 
 

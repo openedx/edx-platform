@@ -11,8 +11,6 @@ import openedx.features.genplus_features.genplus_learning.tasks as genplus_learn
 from openedx.features.genplus_features.genplus_learning.models import (
     Program, Unit, ClassUnit, ClassLesson , UnitBlockCompletion
 )
-from openedx.features.genplus_features.genplus_learning.access import allow_access
-from openedx.features.genplus_features.genplus_learning.roles import ProgramInstructorRole
 log = logging.getLogger(__name__)
 
 
@@ -47,8 +45,10 @@ def gen_class_changed(sender, instance, *args, **kwargs):
         )
 
         # give staff access to teachers
-        for teacher in instance.teachers.all():
-            allow_access(instance.program, teacher.gen_user, ProgramInstructorRole.ROLE_NAME)
+        genplus_learning_tasks.allow_program_access_to_class_teachers.apply_async(
+            args=[instance.pk, instance.program.pk],
+            countdown=settings.PROGRAM_ENROLLMENT_COUNTDOWN,
+        )
 
         _create_class_unit_and_lessons(instance)
 

@@ -1,15 +1,21 @@
 import statistics
+from collections import defaultdict
 
 from django.conf import settings
 from django.apps import apps
 from django.test import RequestFactory
 
 from xmodule.modulestore.django import modulestore
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.genplus_features.genplus_learning.models import (
-    ClassLesson, ClassUnit, UnitCompletion, UnitBlockCompletion
+    Program, ProgramEnrollment, ClassLesson, ClassUnit, UnitCompletion, UnitBlockCompletion
 )
+from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
+from openedx.features.genplus_features.genplus_learning.access import allow_access
+from openedx.features.genplus_features.genplus_learning.roles import ProgramStaffRole
 
 
 def calculate_class_lesson_progress(course_key, usage_key, gen_class):
@@ -157,3 +163,31 @@ def update_class_lessons(course_key):
 
 def get_absolute_url(request, file):
     return request.build_absolute_uri(file.url) if file else None
+
+
+def process_pending_student_program_enrollments(gen_user):
+    pending_enrollments = ProgramEnrollment.objects.filter(
+                                student__gen_user=gen_user,
+                                gen_class__isnull=False,
+                                status=ProgramEnrollmentStatuses.PENDING)
+
+    for program_enrollment in pending_enrollments:
+        course_ids = program_enrollment.program.units.all().values_list('course', flat=True)
+
+        for course_id in course_ids:
+            course_enrollment, created = CourseEnrollment.objects.get_or_create(
+                course_id=course_id,
+                user_id=gen_user.user.id,
+                mode=CourseMode.AUDIT,
+            )
+
+        if CourseEnrollment.objects.filter(course_id__in=course_ids, user_id=gen_user.user.id).count() == len(course_ids):
+            program_enrollment.status = ProgramEnrollmentStatuses.ENROLLED
+            program_enrollment.save()
+
+
+def process_pending_teacher_program_access(gen_user):
+    classes = gen_user.school.classes.all()
+    for gen_class in classes:
+        if gen_class.program:
+            allow_access(gen_class.program, gen_user, ProgramStaffRole.ROLE_NAME)

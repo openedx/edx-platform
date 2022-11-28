@@ -26,11 +26,12 @@ class ProgramViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         gen_user = self.request.user.gen_user
-        qs = Program.get_active_programs()
         if gen_user.is_student:
-            enrollments = ProgramEnrollment.objects.filter(student=gen_user.student)
+            enrollments = ProgramEnrollment.visible_objects.filter(student=gen_user.student)
             program_ids = enrollments.values_list('program', flat=True)
             qs = Program.objects.filter(id__in=program_ids)
+        else:
+            qs = Program.get_active_programs()
         return qs
 
     def get_serializer_context(self):

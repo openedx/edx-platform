@@ -58,6 +58,7 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     get_registration_extension_form
 )
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
+from openedx.features.genplus_features.genplus.utils import register_gen_user
 from common.djangoapps.student.helpers import (
     AccountValidationError,
     authenticate_new_user,
@@ -203,19 +204,24 @@ def create_account_with_params(request, params):
         tos_required=tos_required,
     )
 
-    custom_data = params
+    current_provider = None
     running_pipeline = pipeline.get(request)
     if running_pipeline:
         current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-        if current_provider:
-            custom_data = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
 
-    custom_form = get_registration_extension_form(data=custom_data)
+    custom_form = get_registration_extension_form(data=params)
 
     # Perform operations within a transaction that are critical to account creation
     with outer_atomic(read_committed=True):
         # first, create the account
         (user, profile, registration) = do_create_account(form, custom_form)
+
+        if current_provider:
+            gen_user_data = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
+            try:
+                register_gen_user(user, gen_user_data)
+            except ValidationError as err:
+                log.error("Gen user registration failed!: %s", err)
 
         third_party_provider, running_pipeline = _link_user_to_third_party_provider(
             is_third_party_auth_enabled, third_party_auth_credentials_in_api, user, request, params,

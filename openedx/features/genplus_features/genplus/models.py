@@ -74,26 +74,15 @@ class Character(models.Model):
         return self.dance1
 
 
-class TempUser(TimeStampedModel):
-    """
-    To store temporary unregister user data
-    """
-    username = models.CharField(max_length=128, unique=True)
-    email = models.EmailField(unique=True)
-
-    def __str__(self):
-        return self.username
-
-
 class GenUser(models.Model):
     ROLE_CHOICES = GenUserRoles.__MODEL_CHOICES__
 
+    email = models.EmailField(unique=True)
     user = models.OneToOneField(USER_MODEL, on_delete=models.CASCADE, null=True, related_name='gen_user')
     role = models.CharField(blank=True, null=True, max_length=32, choices=ROLE_CHOICES)
     school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True)
     year_of_entry = models.CharField(max_length=32, null=True, blank=True)
     registration_group = models.CharField(max_length=32, null=True, blank=True)
-    temp_user = models.OneToOneField(TempUser, on_delete=models.SET_NULL, null=True, blank=True)
 
     @property
     def is_student(self):
@@ -108,12 +97,7 @@ class GenUser(models.Model):
         return self.school.type == SchoolTypes.PRIVATE
 
     def __str__(self):
-        if self.user:
-            return self.user.username
-        elif self.temp_user:
-            return self.temp_user.username
-        else:
-            return str(self.pk)
+        return self.email
 
 
 class Student(models.Model):
@@ -130,12 +114,7 @@ class Student(models.Model):
         return self.classes.count() > 0
 
     def __str__(self):
-        if self.gen_user.user:
-            return self.gen_user.user.username
-        elif self.gen_user.temp_user:
-            return self.gen_user.temp_user.username
-        else:
-            return str(self.gen_user.pk)
+        return self.gen_user.email
 
 
 class ClassManager(models.Manager):

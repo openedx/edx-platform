@@ -19,6 +19,8 @@ from openedx.features.genplus_features.genplus_learning.constants import Program
 from openedx.features.genplus_features.genplus_learning.utils import (
     get_course_completion, get_progress_and_completion_status
 )
+from openedx.features.genplus_features.genplus_learning.access import allow_access
+from openedx.features.genplus_features.genplus_learning.roles import ProgramStaffRole
 
 log = logging.getLogger(__name__)
 
@@ -57,14 +59,14 @@ def enroll_class_students_to_program(self, class_id, program_id, class_student_i
                 student=student,
                 program=program,
                 gen_class=gen_class,
-                status=ProgramEnrollmentStatuses.ENROLLED
+                status=ProgramEnrollmentStatuses.PENDING
             )
             log.info(f"Program enrollment created for student: {student}, class: {gen_class}, program: {program}")
 
         for unit in units:
-            if CourseEnrollment.is_enrolled(student.gen_user.user, unit.course.id):
-                log.error(f'Student: {student} is already enrolled to course: {unit}!')
-                return
+            if not student.user or CourseEnrollment.is_enrolled(student.gen_user.user, unit.course.id):
+                log.error(f'User does not exist or Student: {student} is already enrolled to course: {unit}!')
+                continue
 
             unit_enrollment, created = ProgramUnitEnrollment.objects.get_or_create(
                 program_enrollment=program_enrollment,
@@ -78,6 +80,33 @@ def enroll_class_students_to_program(self, class_id, program_id, class_student_i
                 )
                 unit_enrollment.save()
                 log.info(f"Program unit enrollment created for student: {student}, course: {unit}, program :{program}")
+
+        if units.count() == program_enrollment.program_unit_enrollments.all().count():
+            program_enrollment.status = ProgramEnrollmentStatuses.ENROLLED
+            program_enrollment.save()
+
+
+@shared_task(
+    bind=True,
+    max_retries=2,
+    default_retry_delay=60,
+)
+@set_code_owner_attribute
+def allow_program_access_to_class_teachers(self, class_id, program_id, class_teacher_ids=[]):
+    try:
+        gen_class = Class.objects.get(pk=class_id)
+        program = Program.objects.get(pk=program_id)
+    except ObjectDoesNotExist:
+        log.info("Class or program id does not exist")
+        return
+
+    teachers = gen_class.teachers.select_related('gen_user').exclude(gen_user__user__isnull=True)
+
+    if class_teacher_ids:
+        teachers = teachers.filter(pk__in=class_teacher_ids)
+
+    for teacher in teachers:
+        allow_access(program, teacher.gen_user, ProgramStaffRole.ROLE_NAME)
 
 
 @shared_task(

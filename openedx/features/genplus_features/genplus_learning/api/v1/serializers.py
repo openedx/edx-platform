@@ -1,6 +1,7 @@
 from django.conf import settings
 from rest_framework import serializers
 from xmodule.modulestore.django import modulestore
+from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.genplus_features.genplus_learning.models import (
     Program,
@@ -94,19 +95,22 @@ class ProgramSerializer(serializers.ModelSerializer):
         units_context = {}
 
         for unit in units:
-            units_context[unit.pk] = {}
+            is_locked = False
+            progress = None
+
             if gen_user.is_student:
                 enrollment = gen_user.student.program_enrollments.get(program=obj)
                 completion = completions.filter(user=gen_user.user, course_key=unit.course.id).first()
-                units_context[unit.pk] = {
-                    'is_locked': unit.is_locked(enrollment.gen_class),
-                    'progress': completion.progress if completion else 0,
-                }
-            else:
-                units_context[unit.pk] = {
-                    'is_locked': False,
-                    'progress': None,
-                }
+                progress = completion.progress if completion else 0
+                if CourseEnrollment.is_enrolled(gen_user.user, unit.course.id):
+                    is_locked = unit.is_locked(enrollment.gen_class)
+                else:
+                    is_locked = True
+
+            units_context[unit.pk] = {
+                'is_locked': is_locked,
+                'progress': progress,
+            }
 
         return UnitSerializer(units, many=True, read_only=True, context={'units_context': units_context}).data
 
@@ -137,9 +141,6 @@ class ProgramSerializer(serializers.ModelSerializer):
         if gen_user.is_student:
             completion = UnitCompletion.objects.filter(user=gen_user.user, course_key=obj.outro_unit.id).first()
             context['is_complete'] = completion.is_complete if completion else False
-            last_unit = obj.units.last()
-            enrollment = gen_user.student.program_enrollments.get(program=obj)
-            context['is_locked'] = last_unit.is_locked(enrollment.gen_class) if last_unit else False
 
         return AssessmentUnitSerializer(obj.outro_unit, read_only=True, context=context).data
 

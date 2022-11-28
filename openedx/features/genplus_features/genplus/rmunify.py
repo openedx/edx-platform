@@ -7,7 +7,7 @@ import requests
 import base64
 import hmac
 from datetime import datetime
-from openedx.features.genplus_features.genplus.models import GenUser, Student, TempUser, School, Class
+from openedx.features.genplus_features.genplus.models import GenUser, Student, School, Class
 from openedx.features.genplus_features.genplus.constants import SchoolTypes, ClassTypes, GenUserRoles
 
 
@@ -83,37 +83,20 @@ class RmUnify:
 
     def fetch_students(self, query=Class.visible_objects.all()):
         for gen_class in query:
-            print(gen_class.name)
             fetch_type = re.sub(r'(?<!^)(?=[A-Z])', '_', gen_class.type).upper()
             # formatting url according to class type
             url = getattr(self, fetch_type).format(RmUnify.ORGANISATION,
                                                    gen_class.school.guid)
-            print(url)
             data = self.fetch(f"{url}/{gen_class.group_id}")
-            try:
-                for student in data['Students']:
-                    student_email = student['UnifyEmailAddress']
-                    student_username = student['UserName']
-                    try:
-                        # check if student already exists in the system
-                        gen_student = Student.objects.get(gen_user__user__username=student_username,
-                                                          gen_user__user__email=student_email)
-                    except Student.DoesNotExist:
-                        try:
-                            # check if student exist with a temp_user
-                            gen_student = Student.objects.get(gen_user__temp_user__username=student_username,
-                                                              gen_user__temp_user__email=student_email)
-                        except Student.DoesNotExist:
-                            # create a gen_user with tempuser
-                            temp_user = TempUser.objects.get_or_create(username=student_username,
-                                                                       email=student_email)
-                            gen_user = GenUser.objects.create(
-                                role=GenUserRoles.STUDENT,
-                                school=gen_class.school,
-                                temp_user=temp_user[0])
-                            gen_user.refresh_from_db()
-                            gen_student = gen_user.student
-                    gen_class.students.add(gen_student)
-                    logger.info(f"{student_username} has been added to {gen_class.name}")
-            except KeyError:
-                logger.exception('An Error occur while getting students')
+            gen_user_ids = []
+            for student_data in data['Students']:
+                student_email = student_data.get('UnifyEmailAddress')
+                gen_user, created = GenUser.objects.get_or_create(
+                    email=student_email,
+                    role=GenUserRoles.STUDENT,
+                    school=gen_class.school,
+                )
+                gen_user_ids.append(gen_user.pk)
+
+            gen_students = Student.objects.filter(gen_user__in=gen_user_ids)
+            gen_class.students.add(*gen_students)
