@@ -8,7 +8,7 @@ chardet==5.0.0
     # via diff-cover
 coverage==6.5.0
     # via -r requirements/edx/coverage.in
-diff-cover==7.0.1
+diff-cover==7.1.0
     # via -r requirements/edx/coverage.in
 jinja2==3.1.2
     # via diff-cover
