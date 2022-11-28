@@ -79,13 +79,13 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                 except NotImplementedError:
                     pass
 
-            responses = {}
+            responses = dict()
 
             if block_key.block_type in ('problem'):
                 responses = get_problem_attributes(block.data, block_key)
                 responses['results'] = []
-                aggregate_result = {}
-
+                aggregate_result = dict()
+                user_short_answers = dict()
                 for user_id in student_list:
                     user = get_user_model().objects.get(pk=user_id)
                     user_states = generated_report_data.get(user.username)
@@ -96,9 +96,13 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                                 aggregate_result.update(students_aggregate_result(user_states, aggregate_result))
                             elif filter_type == "individual_response":
                                 responses['results'].append(students_multiple_choice_response(user_states, user))
-                        else:
+                        elif responses['problem_type'] == "short_answers":
                             for user_state in user_states:
-                                responses['results'].append(get_students_short_answer_response(user_state, user))
+                                if user_state['Answer ID'] not in user_short_answers:
+                                    user_short_answers[user_state['Answer ID']] = dict()
+                                if user_id not in user_short_answers[user_state['Answer ID']]:
+                                    user_short_answers[user_state['Answer ID']][user_id] = get_students_short_answer_response(user_state, user)
+                responses['results'].append(user_short_answers)
 
                 if responses['problem_type'] in ('single_choice', 'multiple_choice') and filter_type == "aggregate_response":
                     for key,value in aggregate_result.items():
@@ -107,7 +111,8 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                             'count': value['count'],
                             'is_correct': value['is_correct'],
                         })
-                student_data.append(responses)
+                if responses['problem_type'] in ('single_choice', 'multiple_choice', 'short_answers'):
+                    student_data.append(responses)
 
     return student_data
 
@@ -127,7 +132,7 @@ def students_aggregate_result(user_states, aggregate_result):
         user_answer = user_state['Answer']
         correct_answer = user_state['Correct Answer']
         if user_state['Answer'] not in aggregate_result:
-            aggregate_result[user_state['Answer']] = {}
+            aggregate_result[user_state['Answer']] = dict()
             aggregate_result[user_state['Answer']]['count'] = 1
             aggregate_result[user_state['Answer']]['is_correct'] = correct_answer == user_answer
         else:
@@ -149,20 +154,20 @@ def get_problem_attributes(raw_data, block_key):
             [Dict]: Returns a dictionaries
             containing the problem data.
     """
-    responses = {}
+    responses = dict()
     responses['problem_key'] = str(block_key)
     responses['problem_id'] = block_key.block_id
     responses['selection'] = 0
     parser = etree.XMLParser(remove_blank_text=True)
     problem = etree.XML(raw_data, parser=parser)
-    data_dict = {}
+    data_dict = dict()
     for e in problem.iter("*"):
         if e.tag == 'problem':
             responses['problem_type'] =  e.attrib.get('class')
         elif e.text and e.attrib.get('class') == 'question-text' and responses['problem_type'] != "short_answers":
             responses['question_text'] =  e.text
         elif e.text and e.tag == 'choice':
-            choice_dict = {}
+            choice_dict = dict()
             choice_dict['statement'] = e.text
             choice_dict['correct'] = e.attrib.get('correct')
             if e.attrib.get('correct') == 'true':
@@ -184,7 +189,7 @@ def get_students_short_answer_response(user_state, user):
             [Dict]: Returns a dictionaries
             containing the student aggregate result data.
     """
-    student_response_dict = {}
+    student_response_dict = dict()
     answer_id = user_state['Answer ID']
     user_answer = user_state['Answer']
     user_question = user_state['Question']
@@ -210,7 +215,7 @@ def students_multiple_choice_response(user_states, user):
             [Dict]: Returns a dictionaries
             containing the student aggregate result data.
     """
-    student_response_dict = {}
+    student_response_dict = dict()
     for user_state in user_states:
         user_answer = user_state['Answer']
         correct_answer = user_state['Correct Answer']
@@ -245,7 +250,7 @@ def build_course_report_for_students(user_id, course_key, student_list):
     user = get_user_model().objects.get(pk=user_id)
     usage_key = store.make_course_usage_key(course_key)
     user_state_client = DjangoXBlockUserStateClient()
-    student_data = {}
+    student_data = dict()
 
     with store.bulk_operations(course_key):
         course_blocks = get_course_blocks(user, usage_key)

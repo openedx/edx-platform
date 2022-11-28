@@ -1,8 +1,13 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from openedx.features.genplus_features.genplus.models import Student
 from openedx.features.genplus_features.genplus.models import Class
+from openedx.features.genplus_features.genplus_assessments.models import (
+    UserResponse,
+    UserRating
+)
 from openedx.features.genplus_features.genplus_learning.models import (
     ClassLesson,
     ClassUnit
@@ -50,3 +55,23 @@ class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
         fields = ('group_id', 'name', 'students', 'class_units')
+        
+class TextAssessmentSerializer(serializers.ModelSerializer):
+    skill = serializers.CharField(source='skill.name')
+    full_name = serializers.SerializerMethodField()
+    class Meta:
+        model = UserResponse
+        fields = ('user', 'course_id', 'usage_id', 'course_id', 'problem_id', 'assessment_time', 'skill', 'full_name', 'student_response', 'score')
+
+    def get_full_name(self, obj):
+        return get_user_model().objects.get(pk=obj.user_id).get_full_name()
+
+class RatingAssessmentSerializer(serializers.ModelSerializer):
+    skill = serializers.CharField(source='skill.name')
+    full_name = serializers.SerializerMethodField()
+    class Meta:
+        model = UserRating
+        fields = ('user', 'course_id', 'usage_id', 'course_id', 'problem_id', 'assessment_time', 'skill', 'full_name', 'rating')
+    
+    def get_full_name(self, obj):
+        return get_user_model().objects.get(pk=obj.user_id).get_full_name()
