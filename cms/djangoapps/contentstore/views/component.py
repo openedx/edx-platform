@@ -538,7 +538,6 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     """
     usage_key = UsageKey.from_string(usage_key_string)
 
-
     # Addendum:
     # TNL 101-62 studio write permission is also checked for editing content.
 
