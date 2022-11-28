@@ -301,6 +301,7 @@ CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
 #################### Event bus backend ########################
+EVENT_BUS_PRODUCER = 'edx_event_bus_kafka.create_producer'
 EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
 EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
