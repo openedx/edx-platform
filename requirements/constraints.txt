@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.58.12
+edx-enterprise==3.58.13
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
