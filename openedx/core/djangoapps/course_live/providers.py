@@ -1,6 +1,7 @@
 """
 LTI Providers for course live module
 """
+
 from abc import ABC
 from typing import List, Dict
 from django.conf import settings
