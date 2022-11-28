@@ -12,6 +12,8 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from openedx_events.content_authoring.data import DuplicatedXBlockData
+from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
@@ -550,6 +552,7 @@ class DuplicateHelper:
             self._check_equality(source_usage_key, usage_key, parent_usage_key, check_asides=check_asides),
             "Duplicated item differs from original"
         )
+        return usage_key
 
     def _check_equality(self, source_usage_key, duplicate_usage_key, parent_usage_key=None, check_asides=False,
                         is_child=False):
@@ -647,6 +650,10 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
     Test the duplicate method.
     """
 
+    ENABLED_OPENEDX_EVENTS = [
+        "org.openedx.content_authoring.xblock.duplicated.v1",
+    ]
+
     def setUp(self):
         """ Creates the test course structure and a few components to 'duplicate'. """
         super().setUp()
@@ -683,6 +690,27 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
         self._duplicate_and_verify(self.vert_usage_key, self.seq_usage_key)
         self._duplicate_and_verify(self.seq_usage_key, self.chapter_usage_key)
         self._duplicate_and_verify(self.chapter_usage_key, self.usage_key)
+
+    def test_duplicate_event(self):
+        """
+        Check that XBLOCK_DUPLICATED event is sent when xblock is duplicated.
+        """
+        event_receiver = Mock()
+        XBLOCK_DUPLICATED.connect(event_receiver)
+        usage_key = self._duplicate_and_verify(self.vert_usage_key, self.seq_usage_key)
+        event_receiver.assert_called()
+        self.assertDictContainsSubset(
+            {
+                "signal": XBLOCK_DUPLICATED,
+                "sender": None,
+                "xblock_info": DuplicatedXBlockData(
+                    usage_key=usage_key,
+                    block_type=usage_key.block_type,
+                    source_usage_key=self.vert_usage_key,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
 
     def test_ordering(self):
         """

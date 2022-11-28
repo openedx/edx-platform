@@ -14,6 +14,8 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from edx_django_utils.plugins import pluggable_override
+from openedx_events.content_authoring.data import DuplicatedXBlockData
+from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from edx_proctoring.api import (
     does_backend_support_onboarding,
     get_exam_by_content_id,
@@ -958,6 +960,15 @@ def _duplicate_block(parent_usage_key, duplicate_source_usage_key, user, display
             else:
                 parent.children.append(dest_block.location)
             store.update_item(parent, user.id)
+
+        # .. event_implemented_name: XBLOCK_DUPLICATED
+        XBLOCK_DUPLICATED.send_event(
+            xblock_info=DuplicatedXBlockData(
+                usage_key=dest_module.location,
+                block_type=dest_module.location.block_type,
+                source_usage_key=duplicate_source_usage_key,
+            )
+        )
 
         return dest_block.location
 

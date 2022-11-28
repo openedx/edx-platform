@@ -12,6 +12,8 @@ from contextlib import contextmanager
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
+from openedx_events.content_authoring.data import XBlockData
+from openedx_events.content_authoring.signals import XBLOCK_DELETED, XBLOCK_PUBLISHED
 
 from xmodule.assetstore import AssetMetadata
 
@@ -797,7 +799,15 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
         """
         store = self._verify_modulestore_support(location.course_key, 'delete_item')
-        return store.delete_item(location, user_id=user_id, **kwargs)
+        item = store.delete_item(location, user_id=user_id, **kwargs)
+        # .. event_implemented_name: XBLOCK_DELETED
+        XBLOCK_DELETED.send_event(
+            xblock_info=XBlockData(
+                usage_key=location,
+                block_type=location.block_type,
+            )
+        )
+        return item
 
     def revert_to_published(self, location, user_id):
         """
@@ -911,7 +921,15 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Returns the newly published item.
         """
         store = self._verify_modulestore_support(location.course_key, 'publish')
-        return store.publish(location, user_id, **kwargs)
+        item = store.publish(location, user_id, **kwargs)
+        # .. event_implemented_name: XBLOCK_PUBLISHED
+        XBLOCK_PUBLISHED.send_event(
+            xblock_info=XBlockData(
+                usage_key=location,
+                block_type=location.block_type,
+            )
+        )
+        return item
 
     @strip_key
     def unpublish(self, location, user_id, **kwargs):
