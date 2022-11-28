@@ -1120,8 +1120,8 @@ xblock==1.6.1
     #   xblock-google-drive
     #   xblock-poll
     #   xblock-utils
-xblock-drag-and-drop-v2 @ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.5
-    # via -r requirements/edx/github.in
+xblock-drag-and-drop-v2==3.0.0
+    # via -r requirements/edx/base.in
 xblock-poll @ git+https://github.com/open-craft/xblock-poll@v1.12.0
     # via -r requirements/edx/github.in
 xblock-utils==3.0.0
