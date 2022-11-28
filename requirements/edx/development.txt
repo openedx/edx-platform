@@ -1667,7 +1667,7 @@ xblock==1.6.1
     #   xblock-google-drive
     #   xblock-poll
     #   xblock-utils
-xblock-drag-and-drop-v2==2.5.0
+xblock-drag-and-drop-v2==3.0.0
     # via -r requirements/edx/testing.txt
 xblock-google-drive==0.3.0
     # via -r requirements/edx/testing.txt
