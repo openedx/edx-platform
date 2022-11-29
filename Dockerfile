@@ -155,8 +155,6 @@ RUN ln -s "$(pwd)/lms/envs/devstack-experimental.yml" "$LMS_CFG"
 RUN ln -s "$(pwd)/cms/envs/devstack-experimental.yml" "$CMS_CFG"
 RUN touch ../edxapp_env
 
-USER app
-
 ENV EDX_PLATFORM_SETTINGS='devstack_docker'
 ENV SERVICE_VARIANT "${SERVICE_VARIANT}"
 ENV DJANGO_SETTINGS_MODULE="${SERVICE_VARIANT}.envs.$EDX_PLATFORM_SETTINGS"
