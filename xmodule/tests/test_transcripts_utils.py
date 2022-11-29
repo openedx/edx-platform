@@ -70,13 +70,15 @@ class YoutubeVideoHTMLResponse:
         '''An object fit to be returned from a an HTTP GET operation, exposing
         a UTF-8 encoded version of the youtube_html input string in its content attribute'''
         def __init__(self, youtube_html):
-            self.content = bytearray(youtube_html, 'UTF-8')
+            self.get_content = bytearray(youtube_html, 'UTF-8')
 
         def content(self):
-            return self.content
+            return self.get_content
 
 
 class TranscriptsUtilsTest(TestCase):
+    ''' Tests utility fucntions for transcripts (in video_module)'''
+
     @mock.patch('requests.get')
     def test_get_transcript_link_from_youtube(self, mock_get):
         '''Happy path test: english caption link returned when video page HTML has one english caption'''
