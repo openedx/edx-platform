@@ -166,8 +166,8 @@ class ClassUnitSerializer(serializers.ModelSerializer):
 
 
 class ClassStudentSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username')
-    user_id = serializers.CharField(source='user.id')
+    user_id = serializers.CharField(source='gen_user.user.id', default=None)
+    username = serializers.SerializerMethodField()
     profile_pic = serializers.SerializerMethodField()
     skills_assessment = serializers.SerializerMethodField()
     unit_lesson_completion = serializers.SerializerMethodField()
@@ -175,6 +175,9 @@ class ClassStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = ('id', 'user_id', 'username', 'profile_pic', 'skills_assessment', 'unit_lesson_completion')
+
+    def get_username(self, obj):
+        return obj.gen_user.user.email if obj.gen_user.user else obj.gen_user.email
 
     def get_profile_pic(self, obj):
         profile = obj.character.profile_pic if obj.character else None

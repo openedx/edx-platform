@@ -117,15 +117,18 @@ class StudentDashboardAPIView(APIView):
        student dashboard data
         """
         student = request.user.gen_user.student
-        gen_class = student.classes.first()
+        gen_class = student.active_class
         if gen_class:
             data = {
                 'progress': self.get_progress(gen_class),
                 'next_lesson': self.get_next_lesson(gen_class)
             }
             program_progress = data['progress']['average_progress']
-            character_state = student.character.get_state(program_progress)
-            data.update({'character_video_url': get_absolute_url(request, character_state)})
+            character_video_url = None
+            if student.character:
+                character_state = student.character.get_state(program_progress)
+                character_video_url = get_absolute_url(request, character_state)
+            data.update({'character_video_url': character_video_url})
             return Response(data, status.HTTP_200_OK)
 
         return Response(ErrorMessages.NOT_A_PART_OF_PROGRAMME, status.HTTP_400_BAD_REQUEST)

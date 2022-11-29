@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 import pytz
 
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from celery import shared_task
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -20,7 +21,7 @@ from openedx.features.genplus_features.genplus_learning.constants import Program
 from openedx.features.genplus_features.genplus_learning.utils import (
     get_course_completion, get_progress_and_completion_status
 )
-from openedx.features.genplus_features.genplus_learning.access import allow_access
+from openedx.features.genplus_features.genplus_learning.access import allow_access, revoke_access
 from openedx.features.genplus_features.genplus_learning.roles import ProgramStaffRole
 
 log = logging.getLogger(__name__)
@@ -83,9 +84,33 @@ def enroll_class_students_to_program(self, class_id, program_id, class_student_i
                 course_enrollment, created = CourseEnrollment.objects.get_or_create(
                     user=student.gen_user.user, course=course, mode=CourseMode.AUDIT
                 )
-
+            student.active_class = gen_class
+            student.save()
             ProgramEnrollment.objects.filter(program=program, student=student).update(status=ProgramEnrollmentStatuses.ENROLLED)
             log.info("Program and Unit Enrollments successfully created for student: %s", student)
+
+
+@shared_task(
+    bind=True,
+    max_retries=2,
+    default_retry_delay=60,
+)
+@set_code_owner_attribute
+def unenroll_class_students_from_program(self, class_id, program_id, class_student_ids=[]):
+    try:
+        gen_class = Class.objects.get(pk=class_id)
+        program = Program.objects.get(pk=program_id)
+    except ObjectDoesNotExist:
+        log.info("Class or program id does not exist")
+        return
+
+    removed_class_students = gen_class.students.select_related('gen_user').filter(pk__in=class_student_ids)
+
+    for student in removed_class_students:
+        ProgramEnrollment.objects.filter(program=program, student=student).delete()
+        if student.active_class.pk == gen_class.pk:
+            student.active_class = None
+            student.save()
 
 
 @shared_task(
@@ -109,6 +134,29 @@ def allow_program_access_to_class_teachers(self, class_id, program_id, class_tea
 
     for teacher in teachers:
         allow_access(program, teacher.gen_user, ProgramStaffRole.ROLE_NAME)
+
+
+@shared_task(
+    bind=True,
+    max_retries=2,
+    default_retry_delay=60,
+)
+@set_code_owner_attribute
+def revoke_program_access_for_class_teachers(self, class_id, program_id, class_teacher_ids=[]):
+    try:
+        gen_class = Class.objects.get(pk=class_id)
+        program = Program.objects.get(pk=program_id)
+    except ObjectDoesNotExist:
+        log.info("Class or program id does not exist")
+        return
+
+    teachers = gen_class.teachers.select_related('gen_user').exclude(gen_user__user__isnull=True)
+
+    if class_teacher_ids:
+        teachers = teachers.filter(pk__in=class_teacher_ids)
+
+    for teacher in teachers:
+        revoke_access(program, teacher.gen_user, ProgramStaffRole.ROLE_NAME)
 
 
 @shared_task(

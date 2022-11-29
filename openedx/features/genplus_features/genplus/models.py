@@ -103,6 +103,7 @@ class GenUser(models.Model):
 class Student(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='student')
     character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True, blank=True)
+    active_class = models.ForeignKey('genplus.Class', on_delete=models.SET_NULL, null=True, blank=True)
     onboarded = models.BooleanField(default=False)
 
     @property
@@ -152,7 +153,7 @@ class Teacher(models.Model):
         return self.gen_user.user
 
     def __str__(self):
-        return self.user.username
+        return self.gen_user.email
 
 
 class TeacherClass(models.Model):

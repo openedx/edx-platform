@@ -414,10 +414,3 @@ class ChangePasswordView(GenzMixin, generics.GenericAPIView):
             return Response({"message": "New password has been saved."})
         else:
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-

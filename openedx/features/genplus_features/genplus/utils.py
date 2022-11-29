@@ -35,11 +35,6 @@ def register_gen_user(user, gen_user_data):
         gen_user.school = school
         gen_user.save()
 
-        if gen_user.is_student:
-            process_pending_student_program_enrollments(gen_user)
-        elif gen_user.is_teacher:
-            process_pending_teacher_program_access(gen_user)
-
     except GenUser.DoesNotExist:
         gen_user = GenUser.objects.create(
             email=user.email,
@@ -49,3 +44,8 @@ def register_gen_user(user, gen_user_data):
             registration_group=registration_group,
             school=school
         )
+
+    if gen_user.is_student:
+        process_pending_student_program_enrollments(gen_user)
+    elif gen_user.is_teacher:
+        process_pending_teacher_program_access(gen_user)

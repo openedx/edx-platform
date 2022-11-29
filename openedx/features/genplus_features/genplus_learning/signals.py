@@ -59,9 +59,21 @@ def gen_class_changed(sender, instance, *args, **kwargs):
 @receiver(m2m_changed, sender=Class.students.through)
 def class_students_changed(sender, instance, action, **kwargs):
     pk_set = kwargs.pop('pk_set', None)
-    if action == "post_add" and pk_set:
+    if not pk_set:
+        return
+
+    if action == "post_add":
         if isinstance(instance, Class) and instance.program:
             genplus_learning_tasks.enroll_class_students_to_program.apply_async(
+                args=[instance.pk, instance.program.pk],
+                kwargs={
+                    'class_student_ids': list(pk_set),
+                },
+                countdown=settings.PROGRAM_ENROLLMENT_COUNTDOWN
+            )
+    if action == "pre_remove":
+        if isinstance(instance, Class) and instance.program:
+            genplus_learning_tasks.unenroll_class_students_from_program.apply_async(
                 args=[instance.pk, instance.program.pk],
                 kwargs={
                     'class_student_ids': list(pk_set),
@@ -91,6 +103,11 @@ def create_activity_on_lesson_completion(sender, instance, created, **kwargs):
 
 @receiver(pre_delete, sender=ProgramEnrollment)
 def delete_course_enrollments(sender, instance, **kwargs):
-    unit_ids = instance.program.units.all().values_list('course', flat=True)
-    if instance.status == ProgramEnrollmentStatuses.ENROLLED:
-        CourseEnrollment.objects.filter(user=instance.student.gen_user.user, course__in=unit_ids).delete()
+    program = instance.program
+    course_ids = list(program.units.all().values_list('course', flat=True))
+    if program.intro_unit:
+        course_ids.append(program.intro_unit.id)
+    if program.outro_unit:
+        course_ids.append(program.outro_unit.id)
+
+    CourseEnrollment.objects.filter(user=instance.student.gen_user.user, course__in=course_ids).delete()

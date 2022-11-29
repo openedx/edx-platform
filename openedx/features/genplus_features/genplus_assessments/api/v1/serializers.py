@@ -29,14 +29,17 @@ class ClassUnitSerializer(serializers.ModelSerializer):
         fields = ('id', 'display_name', 'course_key' ,'class_lessons')
 
 class ClassStudentSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username')
-    user_id = serializers.CharField(source='user.id')
+    user_id = serializers.CharField(source='gen_user.user.id', default=None)
+    username = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     profile_pic_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Student
         fields = ('id', 'user_id', 'username', 'full_name', 'profile_pic_url')
+
+    def get_username(self, obj):
+        return obj.gen_user.user.email if obj.gen_user.user else obj.gen_user.email
 
     def get_full_name(self, obj):
         return obj.gen_user.user.get_full_name()

@@ -10,22 +10,33 @@ class ProgramAccessRole(AccessRole):
         super().__init__()
         self.program = program
         self._role_name = role_name
-        self._store = modulestore()
 
     def has_user(self, gen_user):
         pass
 
     def add_users(self, *gen_users, send_email):
-        units = self.program.units.all()
-        for unit in units:
+        courses = []
+        if self.program.intro_unit:
+            courses.append(self.program.intro_unit)
+        if self.program.outro_unit:
+            courses.append(self.program.outro_unit)
+        courses += [unit.course for unit in self.program.units.all()]
+
+        for course in courses:
             for gen_user in gen_users:
-                allow_access(unit.course, gen_user.user, self._role_name, send_email)
+                allow_access(course, gen_user.user, self._role_name, send_email)
 
     def remove_users(self, *gen_users, send_email):
-        units = self.program.units.all()
-        for unit in units:
+        courses = []
+        if self.program.intro_unit:
+            courses.append(self.program.intro_unit)
+        if self.program.outro_unit:
+            courses.append(self.program.outro_unit)
+        courses += [unit.course for unit in self.program.units.all()]
+
+        for course in courses:
             for gen_user in gen_users:
-                revoke_access(unit.course, gen_user.user, self._role_name, send_email)
+                revoke_access(course, gen_user.user, self._role_name, send_email)
 
 
     def users_with_role(self):

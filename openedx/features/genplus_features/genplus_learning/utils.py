@@ -10,6 +10,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.genplus_features.genplus.models import Student
 from openedx.features.genplus_features.genplus_learning.models import (
     Program, ProgramEnrollment, ClassLesson, ClassUnit, UnitCompletion, UnitBlockCompletion
 )
@@ -172,7 +173,12 @@ def process_pending_student_program_enrollments(gen_user):
                                 status=ProgramEnrollmentStatuses.PENDING)
 
     for program_enrollment in pending_enrollments:
-        course_ids = program_enrollment.program.units.all().values_list('course', flat=True)
+        program = program_enrollment.program
+        course_ids = program.units.all().values_list('course', flat=True)
+        if program.intro_unit:
+            course_ids.append(program.intro_unit)
+        if program.outro_unit:
+            course_ids.append(program.outro_unit)
 
         for course_id in course_ids:
             course_enrollment, created = CourseEnrollment.objects.get_or_create(
@@ -184,10 +190,14 @@ def process_pending_student_program_enrollments(gen_user):
         if CourseEnrollment.objects.filter(course_id__in=course_ids, user_id=gen_user.user.id).count() == len(course_ids):
             program_enrollment.status = ProgramEnrollmentStatuses.ENROLLED
             program_enrollment.save()
+            Student.objects.filter(gen_user=gen_user).update(active_class=program_enrollment.gen_class)
 
 
 def process_pending_teacher_program_access(gen_user):
-    classes = gen_user.school.classes.all()
-    for gen_class in classes:
-        if gen_class.program:
-            allow_access(gen_class.program, gen_user, ProgramStaffRole.ROLE_NAME)
+    program_ids = gen_user.school.classes.exclude(program__isnull=True)\
+                                        .values_list('program', flat=True)\
+                                        .distinct()\
+                                        .order_by()
+    programs = Program.objects.filter(pk__in=program_ids)
+    for program in programs:
+        allow_access(program, gen_user, ProgramStaffRole.ROLE_NAME)
