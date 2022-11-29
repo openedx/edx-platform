@@ -44,12 +44,7 @@ class LtiSerializer(serializers.ModelSerializer):
                 validate_email(custom_instructor_email)
             except ValidationError as error:
                 raise serializers.ValidationError(f'{custom_instructor_email} is not valid email address') from error
-            return value
-
-        if not requires_email:
-            return value
-
-        raise serializers.ValidationError('custom_instructor_email is required value in additional_parameters')
+        return value
 
     def create(self, validated_data):
         lti_config = validated_data.pop('lti_config', None)
