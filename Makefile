@@ -174,3 +174,10 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push "openedx/cms:${GITHUB_SHA}"
 	docker push "openedx/cms-dev:latest"
 	docker push "openedx/cms-dev:${GITHUB_SHA}"
+
+# WARNING (EXPERIMENTAL):
+# This installs the Ubuntu requirements necessary to make `pip install` and some other basic
+# dev commands to pass. This is not necessarily everything needed to get a working edx-platform.
+# Part of https://github.com/openedx/wg-developer-experience/issues/136
+ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
+	sudo apt install libmysqlclient-dev libxmlsec1-dev
