@@ -9,6 +9,9 @@ from .models import SurveyReport
 
 
 class SurveyReportForm(forms.ModelForm):
+    """
+    ModelForm to survey report.
+    """
     class Meta:
         model = SurveyReport
         help_texts = {
@@ -19,7 +22,7 @@ class SurveyReportForm(forms.ModelForm):
             'generated_certificates': 'Total number of generated certificates.',
             'extra_data': 'Extra information that will be saved in the report, E.g: site_name, openedx-release.',
         }
-        exclude = ()
+        fields = '__all__'
 
 
 class SurveyReportAdmin(admin.ModelAdmin):
