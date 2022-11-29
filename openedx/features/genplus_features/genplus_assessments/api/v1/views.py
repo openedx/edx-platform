@@ -1,5 +1,6 @@
 import json
 import logging
+import copy
 from django.db.models import Q
 
 from rest_framework import views, viewsets
@@ -14,7 +15,7 @@ from openedx.features.genplus_features.genplus.models import Class
 from openedx.features.genplus_features.genplus_assessments.models import UserResponse, UserRating
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher
 from .serializers import ClassSerializer, TextAssessmentSerializer, RatingAssessmentSerializer
-from openedx.features.genplus_features.genplus_assessments.constants import TOTAL_PROBLEM_SCORE, INTRO_RATING_ASSESSMENT_RESPONSE ,OUTRO_RATING_ASSESSMENT_RESPONSE
+from openedx.features.genplus_features.genplus_assessments.constants import TOTAL_PROBLEM_SCORE, INTRO_RATING_ASSESSMENT_RESPONSE, OUTRO_RATING_ASSESSMENT_RESPONSE
 from openedx.features.genplus_features.genplus_assessments.utils import (
     build_students_result,
 )
@@ -27,7 +28,7 @@ class ClassFilterViewSet(views.APIView):
     permission_classes = [IsAuthenticated, IsTeacher]
     serializer_class = ClassSerializer
 
-    def get(self,request, **kwargs):
+    def get(self, request, **kwargs):
         class_id = kwargs.get('class_id', None)
         try:
             gen_class = Class.objects.get(pk=class_id)
@@ -72,7 +73,7 @@ class SkillAssessmentView(viewsets.ViewSet):
 
     def aggregate_assessments_response(self, request, **kwargs):
         class_id = kwargs.get('class_id')
-        student_id = request.query_params.get('student_id',None)
+        student_id = request.query_params.get('student_id')
         response = dict()
         response['aggregate_all_problem'] = dict()
         response['aggregate_skill'] = dict()
@@ -197,7 +198,7 @@ class SkillAssessmentView(viewsets.ViewSet):
                 [Dict]: Returns a dictionaries
                 containing the students aggregate skill base result data.
         """
-        aggregate_result =  dict()
+        aggregate_result = dict()
         for data in raw_data:
             data = dict(data)
             if data['skill'] not in aggregate_result:
@@ -250,8 +251,8 @@ class SkillAssessmentView(viewsets.ViewSet):
                 aggregate_result[problem_id]['count_response_start_of_year'] = 0
                 aggregate_result[problem_id]['count_response_end_of_year'] = 0
                 if assessment.get('type') == 'genz_rating_assessment':
-                    aggregate_result[problem_id]['rating_start_of_year'] = INTRO_RATING_ASSESSMENT_RESPONSE
-                    aggregate_result[problem_id]['rating_end_of_year'] = OUTRO_RATING_ASSESSMENT_RESPONSE
+                    aggregate_result[problem_id]['rating_start_of_year'] = copy.deepcopy(INTRO_RATING_ASSESSMENT_RESPONSE)
+                    aggregate_result[problem_id]['rating_end_of_year'] = copy.deepcopy(OUTRO_RATING_ASSESSMENT_RESPONSE)
                 else:
                     aggregate_result[problem_id]['score_start_of_year'] = 0
                     aggregate_result[problem_id]['score_end_of_year'] = 0
@@ -358,7 +359,7 @@ class SkillAssessmentView(viewsets.ViewSet):
         """
         store = modulestore()
         assessments = []
-        aggregate_result =  dict()
+        aggregate_result = dict()
         #get assessment usage key and type for program intro assessment course
         assessments = self.get_assessment_block_data(gen_class.program.intro_unit.id)
         #get assessment usage key and type for program outro assessment course
