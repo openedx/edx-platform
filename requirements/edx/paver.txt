@@ -5,52 +5,86 @@
 #    make upgrade
 #
 certifi==2022.9.24
-    # via requests
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   requests
 charset-normalizer==2.0.12
     # via
-    #   -c requirements/edx/../constraints.txt
+    #   -c requirements/edx/lock-all.txt
     #   requests
-edx-opaque-keys==2.3.0
-    # via -r requirements/edx/paver.in
+edx-opaque-keys[django]==2.3.0
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 idna==3.4
-    # via requests
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   requests
 lazy==1.5
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 libsass==0.10.0
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 markupsafe==2.1.1
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 mock==4.0.3
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 path==16.5.0
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 paver==1.3.4
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 pbr==5.11.0
-    # via stevedore
-psutil==5.9.3
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   stevedore
+psutil==5.9.4
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 pymongo==3.13.0
     # via
-    #   -c requirements/edx/../constraints.txt
+    #   -c requirements/edx/lock-all.txt
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
 python-memcached==1.59
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 requests==2.28.1
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 six==1.16.0
     # via
+    #   -c requirements/edx/lock-all.txt
     #   libsass
     #   paver
     #   python-memcached
-stevedore==4.1.0
+stevedore==4.1.1
     # via
+    #   -c requirements/edx/lock-all.txt
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
-urllib3==1.26.12
-    # via requests
+urllib3==1.26.13
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   requests
 watchdog==2.1.9
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in
 wrapt==1.14.1
-    # via -r requirements/edx/paver.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/paver.in

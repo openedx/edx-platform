@@ -5,16 +5,34 @@
 #    make upgrade
 #
 chardet==5.0.0
-    # via diff-cover
-coverage==6.5.0
-    # via -r requirements/edx/coverage.in
-diff-cover==7.0.1
-    # via -r requirements/edx/coverage.in
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   diff-cover
+coverage[toml]==6.5.0
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/coverage.in
+diff-cover==7.1.1
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   -r requirements/edx/coverage.in
 jinja2==3.1.2
-    # via diff-cover
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   diff-cover
 markupsafe==2.1.1
-    # via jinja2
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   jinja2
 pluggy==1.0.0
-    # via diff-cover
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   diff-cover
 pygments==2.13.0
-    # via diff-cover
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   diff-cover
+tomli==2.0.1
+    # via
+    #   -c requirements/edx/lock-all.txt
+    #   coverage
