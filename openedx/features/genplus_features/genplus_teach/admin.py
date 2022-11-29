@@ -15,6 +15,7 @@ class ArticleAdmin(admin.ModelAdmin):
     filter_horizontal = ('skills', 'gtcs', 'media_types')
     list_display = ('title', 'reflections', 'time', 'favorites_count', 'rating_average', 'is_featured', 'is_archived',
                     'is_draft', 'academic_year')
+    list_filter = ('is_archived', 'is_draft', 'academic_year', 'is_featured')
     actions = ['mark_as_featured', ]
 
     def reflections(self, obj):

@@ -89,7 +89,8 @@ class SchoolAdmin(admin.ModelAdmin):
                     gen_user, created = GenUser.objects.get_or_create(
                             role=role,
                             user=user,
-                            school=school
+                            school=school,
+                            email=user.email,
                         )
                     if role == GenUserRoles.STUDENT:
                         gen_student = gen_user.student
