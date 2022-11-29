@@ -148,7 +148,7 @@ class BigBlueButton(LiveProvider, HasGlobalCredentials):
 
 class ProviderManager:
     """
-    This class provides access to all available provider objects
+    This class provides access to all available provider objects test
     """
     providers: Dict[str, LiveProvider]
 
