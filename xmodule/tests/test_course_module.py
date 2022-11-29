@@ -324,13 +324,13 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         assert not self.course.teams_enabled
         assert not self.course.teams_configuration.is_enabled
 
-    def test_teams_disabled_no_teamsets(self):
+    def test_teams_enabled_no_teamsets(self):
         """
-        Test that teams is disabled if there are no teamsets whether enabled is set to true or false
+        Test that teams can be enabled / disabled with only the flag, even if no teamsets exist
         """
         self.add_team_configuration(max_team_size=4, topics=[], enabled=True)
-        assert not self.course.teams_enabled
-        assert not self.course.teams_configuration.is_enabled
+        assert self.course.teams_enabled
+        assert self.course.teams_configuration.is_enabled
         self.add_team_configuration(max_team_size=4, topics=[], enabled=False)
         assert not self.course.teams_enabled
         assert not self.course.teams_configuration.is_enabled
