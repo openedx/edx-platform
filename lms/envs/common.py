@@ -52,6 +52,18 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 )
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
+from openedx.features.edly.constants import (
+    ADDITIONAL_USER_PRICE,
+    COURSE_AUTHORS,
+    ELITE,
+    ESSENTIALS,
+    MONTHLY_ACTIVE_USERS,
+    NUMBER_OF_COURSES,
+    NUMBER_OF_REGISTERED_USERS,
+    STAFF_USERS,
+    TRIAL,
+    WP_ADMIN_USERS,
+)
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
@@ -3998,3 +4010,34 @@ GITHUB_REPO_ROOT = '/edx/var/edxapp/data'
 
 ##################### SUPPORT URL ############################
 SUPPORT_HOW_TO_UNENROLL_LINK = ''
+
+# Subscription Plans
+PLAN_FEATURES = {
+    TRIAL: {
+        ADDITIONAL_USER_PRICE: 0,
+        MONTHLY_ACTIVE_USERS: 20,
+        NUMBER_OF_REGISTERED_USERS: 20,
+        NUMBER_OF_COURSES: 3,
+        STAFF_USERS: 1,
+        WP_ADMIN_USERS: 1,
+        COURSE_AUTHORS: 1,
+    },
+    ESSENTIALS: {
+        ADDITIONAL_USER_PRICE: 2,
+        MONTHLY_ACTIVE_USERS: 1000,
+        NUMBER_OF_REGISTERED_USERS: 5000,
+        NUMBER_OF_COURSES: 50,
+        STAFF_USERS: 1,
+        WP_ADMIN_USERS: 1,
+        COURSE_AUTHORS: 3,
+    },
+    ELITE: {
+        ADDITIONAL_USER_PRICE: 2,
+        MONTHLY_ACTIVE_USERS: 5000,
+        NUMBER_OF_REGISTERED_USERS: 50000,
+        NUMBER_OF_COURSES: 200,
+        STAFF_USERS: 3,
+        WP_ADMIN_USERS: 3,
+        COURSE_AUTHORS: 10,
+    }
+}
