@@ -760,6 +760,28 @@ class CourseMode(models.Model):
         return False
 
     @classmethod
+    def has_honor_seat(cls, course_id, modes_dict=None):
+        """Check whether a course has an honor seat available.
+
+        Args:
+            course_id (CourseKey): The course to check.
+
+        Keyword Args:
+            modes_dict (dict): If provided, use these course modes.
+                Useful for avoiding unnecessary database queries.
+
+        Returns:
+            bool
+
+        """
+        if modes_dict is None:
+            modes_dict = cls.modes_for_course_dict(course_id)
+
+        if cls.HONOR in modes_dict:
+            return True
+        return False
+
+    @classmethod
     def min_course_price_for_currency(cls, course_id, currency):
         """
         Returns the minimum price of the course in the appropriate currency over all the course's

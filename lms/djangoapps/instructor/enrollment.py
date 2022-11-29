@@ -146,7 +146,9 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         # "honor" course_mode. Given the change to use "audit" as the default
         # course_mode in Open edX, we need to be backwards compatible with
         # how White Labels approach enrollment modes.
-        if CourseMode.is_white_label(course_id):
+        # This has been changed for implementation in Edly such that if a
+        # course has an honor seat then enroll the student in that honor mode.
+        if CourseMode.has_honor_seat(course_id):
             course_mode = CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
         else:
             course_mode = None
