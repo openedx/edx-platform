@@ -152,3 +152,22 @@ def get_blocks(
 
     # return serialized data
     return serializer.data
+
+
+def get_block_metadata(block, includes=()):
+    """
+    Get metadata about the specified XBlock.
+
+    Args:
+        block (XModuleDescriptor): block object
+        includes (list|set): list or set of metadata keys to include. Valid keys are:
+            index_dictionary: a dictionary of data used to add this XBlock's content
+                to a search index.
+    """
+    data = {
+        "id": str(block.scope_ids.usage_id),
+        "type": block.scope_ids.block_type,
+    }
+    if "index_dictionary" in includes:
+        data["index_dictionary"] = block.index_dictionary()
+    return data
