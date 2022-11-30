@@ -207,6 +207,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
     utf8_parser = etree.XMLParser(encoding='utf-8')
 
     transcript_link = get_transcript_link_from_youtube(youtube_id)
+    log.info('transcript_link = {0}'.format(transcript_link))
 
     if not transcript_link:
         msg = _("Can't get transcript link from Youtube for {youtube_id}.").format(
@@ -215,6 +216,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
         raise GetTranscriptsFromYouTubeException(msg)
 
     data = requests.get(transcript_link)
+    log.info('data = {0}'.format(data))
 
     if data.status_code != 200 or not data.text:
         msg = _("Can't receive transcripts from Youtube for {youtube_id}. Status code: {status_code}.").format(

@@ -22,6 +22,8 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tests.test_transcripts_utils import YoutubeVideoHTMLResponse
+
 from xmodule.video_module import transcripts_utils  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -233,12 +235,16 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         good_youtube_sub = 'good_id_2'
         self.clear_sub_content(good_youtube_sub)
 
+        language_code = 'en'
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
-            mock_get.return_value = Mock(status_code=200, text=response, content=response.encode('utf-8'))
+            mock_get.side_effect = [
+                {'content': bytearray(YoutubeVideoHTMLResponse.with_caption_link(language_code), 'UTF-8')},
+                { 'status_code': 200, 'text': response, 'content': response.encode('utf-8')},
+            ]
             # Check transcripts_utils.GetTranscriptsFromYouTubeException not thrown
             transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
 
-        mock_get.assert_any_call('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_id_2'})
+        # mock_get.assert_any_call('https: //www.youtube.com/api/timedtext', params={'lang': 'en', 'v': 'good_id_2'})
 
     def test_subs_for_html5_vid_with_periods(self):
         """
