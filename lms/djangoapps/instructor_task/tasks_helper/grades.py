@@ -854,7 +854,10 @@ class ProblemGradeReport(GradeReportBase):
 
         success_rows_size += getsizeof(success_rows)
         error_rows_size += getsizeof(error_rows)
-        self.log_additional_info_for_testing(context, f'ProblemGradeReport memory usage: succeess {success_rows_size} error {error_rows_size}')
+        self.log_additional_info_for_testing(
+            context,
+            f'ProblemGradeReport memory usage: succeess {success_rows_size} error {error_rows_size}'
+        )
 
         return success_rows, error_rows
 
