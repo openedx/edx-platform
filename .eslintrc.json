@@ -18,6 +18,6 @@
     "spyOnEvent": true,
 
     // used by our requirejs implementation
-    "RequireJS": true
+    "RequireJS": true 
   }
 }
