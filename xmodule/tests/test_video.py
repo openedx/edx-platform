@@ -916,6 +916,12 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
             'v': 'set_youtube_id_of_11_symbols_here',
         },
     },
+
+    # Current web page mechanism for scraping transcript information from youtube video pages
+    'TRANSCRIPTS': {
+        'CAPTION_TRACKS_REGEX': r"captionTracks\"\:\[(?P<caption_tracks>[^\]]+)",
+        'YOUTUBE_URL_BASE': 'https://www.youtube.com/watch?v=',
+    }
 })
 @patch.object(settings, 'CONTENTSTORE', create=True, new={
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
@@ -1006,6 +1012,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
                    sub="OEoXaMPEzfM"
                    start_time="00:00:01"
                    download_video="false"
+                   end_time="00:01:00">
                    end_time="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
