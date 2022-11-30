@@ -131,29 +131,6 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     return save_to_store(filedata, filename, 'application/json', item.location)
 
 
-def youtube_video_transcript_name(youtube_text_api):
-    """
-    Get the transcript name from available transcripts of video
-    with respect to language from youtube server
-    """
-    utf8_parser = etree.XMLParser(encoding='utf-8')
-
-    transcripts_param = {'type': 'list', 'v': youtube_text_api['params']['v']}
-    lang = youtube_text_api['params']['lang']
-    # get list of transcripts of specific video
-    # url-form
-    # http://video.google.com/timedtext?type=list&v={VideoId}
-    youtube_response = requests.get('http://' + youtube_text_api['url'], params=transcripts_param)
-    if youtube_response.status_code == 200 and youtube_response.text:
-        youtube_data = etree.fromstring(youtube_response.text.encode('utf-8'), parser=utf8_parser)
-        # iterate all transcripts information from youtube server
-        for element in youtube_data:
-            # search specific language code such as 'en' in transcripts info list
-            if element.tag == 'track' and element.get('lang_code', '') == lang:
-                return element.get('name')
-    return None
-
-
 def get_transcript_link_from_youtube(youtube_id):
     """
     Get the link for YouTube transcript by parsing the source of the YouTube webpage.
