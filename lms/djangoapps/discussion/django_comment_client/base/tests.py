@@ -269,7 +269,9 @@ class ViewsTestCaseMixin:
         data = {
             "user_id": str(self.student.id),
             "closed": False,
-            "commentable_id": "non_team_dummy_id"
+            "commentable_id": "non_team_dummy_id",
+            "thread_id": "dummy",
+            "thread_type": "discussion"
         }
         if include_depth:
             data["depth"] = 0
@@ -1141,7 +1143,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
     def test_endorse_response_as_staff(self, mock_request):
         self._set_mock_request_thread_and_comment(
             mock_request,
-            {"type": "thread", "thread_type": "question", "user_id": str(self.student.id)},
+            {"type": "thread", "thread_type": "question", "user_id": str(self.student.id), "commentable_id": "course"},
             {"type": "comment", "thread_id": "dummy"}
         )
         self.client.login(username=self.moderator.username, password=self.password)
@@ -1153,7 +1155,8 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
     def test_endorse_response_as_student(self, mock_request):
         self._set_mock_request_thread_and_comment(
             mock_request,
-            {"type": "thread", "thread_type": "question", "user_id": str(self.moderator.id)},
+            {"type": "thread", "thread_type": "question",
+             "user_id": str(self.moderator.id), "commentable_id": "course"},
             {"type": "comment", "thread_id": "dummy"}
         )
         self.client.login(username=self.student.username, password=self.password)
@@ -1165,7 +1168,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
     def test_endorse_response_as_student_question_author(self, mock_request):
         self._set_mock_request_thread_and_comment(
             mock_request,
-            {"type": "thread", "thread_type": "question", "user_id": str(self.student.id)},
+            {"type": "thread", "thread_type": "question", "user_id": str(self.student.id), "commentable_id": "course"},
             {"type": "comment", "thread_id": "dummy"}
         )
         self.client.login(username=self.student.username, password=self.password)
