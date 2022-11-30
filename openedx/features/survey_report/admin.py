@@ -4,33 +4,13 @@ Django Admin page for SurveyReport.
 
 
 from django.contrib import admin
-from django import forms
 from .models import SurveyReport
-
-
-class SurveyReportForm(forms.ModelForm):
-    """
-    ModelForm to survey report.
-    """
-    class Meta:
-        model = SurveyReport
-        help_texts = {
-            'courses_offered': 'Total number of active unique courses.',
-            'learners': 'Total number of recently active users with login in some weeks.',
-            'registered_learners': 'Total number of users ever registered in the platform.',
-            'enrollments': 'Total number of active enrollments in the platform.',
-            'generated_certificates': 'Total number of generated certificates.',
-            'extra_data': 'Extra information that will be saved in the report, E.g: site_name, openedx-release.',
-        }
-        fields = '__all__'
 
 
 class SurveyReportAdmin(admin.ModelAdmin):
     """
     Admin to manage survey reports.
     """
-    form = SurveyReportForm
-
     readonly_fields = (
         'courses_offered', 'learners', 'registered_learners',
         'enrollments', 'generated_certificates', 'extra_data',
