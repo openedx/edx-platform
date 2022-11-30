@@ -8139,7 +8139,6 @@ msgid ""
 " yet, click {register_label_strong} at the top of the page."
 msgstr ""
 
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -17535,6 +17534,10 @@ msgstr "Jak to działa"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "Uczelnie"
+
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Register for free"
+msgstr ""
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
