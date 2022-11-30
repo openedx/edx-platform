@@ -36,7 +36,7 @@ class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
     serializer_class = ArticleSerializer
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['title', 'content']
-    filterset_fields = ('skill', 'media_type', 'gtcs', 'is_completed')
+    filterset_fields = ('skill', 'media_type', 'gtcs', 'is_completed', 'is_archived')
     filterset_class = ArticleFilter
     queryset = Article.objects.exclude(is_draft=True)
 
@@ -321,6 +321,7 @@ class HelpGuideViewSet(viewsets.ReadOnlyModelViewSet, GenzMixin):
             defaults=serializer.data
         )
         return Response(SuccessMessages.ARTICLE_RATED, status=status.HTTP_200_OK)
+
 
 class AlertBarEntryView(generics.ListAPIView):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]

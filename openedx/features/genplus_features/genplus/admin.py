@@ -17,6 +17,7 @@ from django.shortcuts import redirect, render
 from django.conf.urls import url
 from .constants import GenUserRoles
 from django.contrib.auth.models import User
+from openedx.features.genplus_features.genplus.rmunify import RmUnify
 
 
 @admin.register(GenUser)
@@ -58,6 +59,7 @@ class SchoolAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         my_urls = [
             url(r'import-csv/', self.import_csv),
+            url(r'sync-schools/', self.sync_schools),
         ]
         return my_urls + urls
 
@@ -106,6 +108,12 @@ class SchoolAdmin(admin.ModelAdmin):
         return render(
             request, "genplus/extended/csv_form.html", payload
         )
+
+    def sync_schools(self, request):
+        rm_unify = RmUnify()
+        rm_unify.fetch_schools()
+        self.message_user(request, "Schools synced successfully.")
+        return redirect("..")
 
     @staticmethod
     def get_school_and_class(school_name, class_name, class_code):

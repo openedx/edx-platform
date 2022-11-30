@@ -14,6 +14,7 @@ class ArticleFilter(django_filters.FilterSet):
         field_name='gtcs__id',
     )
     is_completed = django_filters.BooleanFilter(method='filter_is_completed')
+    is_archived = django_filters.BooleanFilter()
 
     def filter_is_completed(self, queryset, name, value):
         teacher = Teacher.objects.get(gen_user__user=self.request.user)
@@ -30,4 +31,5 @@ class ArticleFilter(django_filters.FilterSet):
 
     class Meta:
         model = Article
-        fields = ('title', 'skill', 'media_types', 'gtcs')
+        fields = ('title', 'skill', 'media_types', 'gtcs',
+                  'is_archived')
