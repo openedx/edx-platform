@@ -70,10 +70,7 @@ class YoutubeVideoHTMLResponse:
         '''An object fit to be returned from a an HTTP GET operation, exposing
         a UTF-8 encoded version of the youtube_html input string in its content attribute'''
         def __init__(self, youtube_html):
-            self.get_content = bytearray(youtube_html, 'UTF-8')
-
-        def content(self):
-            return self.get_content
+            self.content = bytearray(youtube_html, 'UTF-8')
 
 
 class TranscriptsUtilsTest(TestCase):
