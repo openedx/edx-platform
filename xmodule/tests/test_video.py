@@ -916,6 +916,12 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
             'v': 'set_youtube_id_of_11_symbols_here',
         },
     },
+
+    # Current web page mechanism for scraping transcript information from youtube video pages
+    'TRANSCRIPTS': {
+        'CAPTION_TRACKS_REGEX': r"captionTracks\"\:\[(?P<caption_tracks>[^\]]+)",
+        'YOUTUBE_URL_BASE': 'https://www.youtube.com/watch?v=',
+    }
 })
 @patch.object(settings, 'CONTENTSTORE', create=True, new={
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
@@ -959,7 +965,6 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=xml_data)
         assert descriptor.index_dictionary() == {'content': {'display_name': 'Test Video'}, 'content_type': 'Video'}
 
-    @unittest.skip("API for youtube captions no longer supported")
     @httpretty.activate
     def test_video_with_youtube_subs_index_dictionary(self):
         """
@@ -993,7 +998,6 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         assert descriptor.index_dictionary() ==\
                {'content': {'display_name': 'Test Video', 'transcript_en': YOUTUBE_SUBTITLES}, 'content_type': 'Video'}
 
-    @unittest.skip("API for youtube captions no longer supported")
     @httpretty.activate
     def test_video_with_subs_and_transcript_index_dictionary(self):
         """
