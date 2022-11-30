@@ -205,7 +205,7 @@ def get_transcript_link_from_youtube(youtube_id):
     try:
         youtube_html = requests.get(f"{youtube_url_base}{youtube_id}")
         caption_re = settings.YOUTUBE['TRANSCRIPTS']['CAPTION_TRACKS_REGEX']
-        caption_matched = caption_re.search(youtube_html.content.decode("utf-8"))
+        caption_matched = re.search(caption_re, youtube_html.content.decode("utf-8"))
         if caption_matched:
             caption_tracks = json.loads(f'[{caption_matched.group("caption_tracks")}]')
             for caption in caption_tracks:
