@@ -238,7 +238,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         language_code = 'en'
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
             mock_get.side_effect = [
-                {'content': bytearray(YoutubeVideoHTMLResponse.with_caption_link(language_code), 'UTF-8')},
+                YoutubeVideoHTMLResponse.with_caption_link(language_code),
                 { 'status_code': 200, 'text': response, 'content': response.encode('utf-8')},
             ]
             # Check transcripts_utils.GetTranscriptsFromYouTubeException not thrown
