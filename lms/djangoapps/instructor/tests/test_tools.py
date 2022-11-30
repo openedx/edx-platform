@@ -12,8 +12,9 @@ import pytest
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import MultipleObjectsReturned
 from django.test import TestCase
-from edx_when.api import set_dates_for_course
+from edx_when.api import get_dates_for_course, set_dates_for_course
 from edx_when.field_data import DateLookupFieldData
+from mock.mock import MagicMock, patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from xmodule.fields import Date
@@ -283,6 +284,31 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         with pytest.raises(tools.DashboardError):
             tools.set_due_date_extension(self.course, self.week3, user, extended)
+
+    @patch('edx_when.api.get_dates_for_course', wraps=get_dates_for_course)
+    def test_set_due_date_extension_cache_invalidation(self, mock_method: MagicMock):
+        """
+        Tests that the course dates are reloaded once they are overridden.
+        """
+        extended_hw = datetime.datetime(2013, 10, 25, 0, 0, tzinfo=UTC)
+        tools.set_due_date_extension(self.course, self.assignment, self.user, extended_hw)
+
+        assert mock_method.call_count == 2
+        mock_method.assert_called_with(self.course.id, user=self.user, published_version=None, use_cached=False)
+
+    @patch('edx_when.api.get_dates_for_course', wraps=get_dates_for_course)
+    def test_set_due_date_extension_cache_invalidation_with_version(self, mock_method: MagicMock):
+        """
+        Tests that the course dates are reloaded for both versioned and non-versioned scenarios, to provide
+        a unified experience across the platform.
+        """
+        self.course.course_version = 'test_version'
+        extended_hw = datetime.datetime(2013, 10, 25, 0, 0, tzinfo=UTC)
+        tools.set_due_date_extension(self.course, self.assignment, self.user, extended_hw)
+
+        assert mock_method.call_count == 3
+        mock_method.assert_any_call(self.course.id, user=self.user, published_version='test_version', use_cached=False)
+        mock_method.assert_any_call(self.course.id, user=self.user, use_cached=False)
 
 
 class TestDataDumps(ModuleStoreTestCase):

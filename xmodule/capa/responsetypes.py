@@ -371,8 +371,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
             else:
                 label = _('Incorrect:')
 
-        # self.runtime.track_function('get_demand_hint', event_info)
-        # This this "feedback hint" event
+        # This is the "feedback hint" event
         event_info = {}
         event_info['module_id'] = text_type(self.capa_module.location)
         event_info['problem_part_id'] = self.id
@@ -384,7 +383,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         event_info['question_type'] = question_tag
         if log_extra:
             event_info.update(log_extra)
-        self.capa_module.runtime.track_function('edx.problem.hint.feedback_displayed', event_info)
+        self.capa_module.runtime.publish(self.capa_module, 'edx.problem.hint.feedback_displayed', event_info)
 
         # Form the div-wrapped hint texts
         hints_wrap = HTML('').join(

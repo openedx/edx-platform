@@ -208,6 +208,12 @@
               }
             });
           }
+
+          // apply configuration overrides if have been defined
+          var tinyMceConfigOverrides = process.env.JS_ENV_EXTRA_CONFIG.TINYMCE_CONFIG_OVERRIDES;
+          if (tinyMceConfigOverrides) {
+            Object.assign(tinyMceConfig, tinyMceConfigOverrides);
+          }
         }
 
         this.tiny_mce_textarea = $(".tiny-mce", this.element).tinymce(tinyMceConfig);

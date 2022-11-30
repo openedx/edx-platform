@@ -926,7 +926,6 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
 # Import after sys.path fixup
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 
 # These are the Mixins that should be added to every XBlock.
@@ -940,8 +939,6 @@ XBLOCK_MIXINS = (
     AuthoringMixin,
 )
 XBLOCK_EXTRA_MIXINS = ()
-
-XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 # Paths to wrapper methods which should be applied to every XBlock's FieldData.
 XBLOCK_FIELD_DATA_WRAPPERS = ()
@@ -1246,6 +1243,8 @@ EMBARGO_SITE_REDIRECT_URL = None
 ##### custom vendor plugin variables #####
 # JavaScript code can access this data using `process.env.JS_ENV_EXTRA_CONFIG`
 # One of the current use cases for this is enabling custom TinyMCE plugins
+# (TINYMCE_ADDITIONAL_PLUGINS) and overriding the TinyMCE configuration
+# (TINYMCE_CONFIG_OVERRIDES).
 JS_ENV_EXTRA_CONFIG = {}
 
 ############################### PIPELINE #######################################
@@ -2698,3 +2697,10 @@ INACTIVE_USER_LOGIN = True
 
 # Redirect URL for inactive user. If not set, user will be redirected to /login after the login itself (loop)
 INACTIVE_USER_URL = f'http://{CMS_BASE}'
+
+######################## BRAZE API SETTINGS ########################
+
+EDX_BRAZE_API_KEY = None
+EDX_BRAZE_API_SERVER = None
+
+BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''

@@ -11,10 +11,10 @@ from django.core.cache import cache
 from django.db import transaction
 from django.dispatch import receiver
 from edx_toggles.toggles import SettingToggle
-from edx_event_bus_kafka import get_producer
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.content_authoring.data import CourseCatalogData, CourseScheduleData
 from openedx_events.content_authoring.signals import COURSE_CATALOG_INFO_CHANGED
+from openedx_events.event_bus import get_producer
 from pytz import UTC
 
 from cms.djangoapps.contentstore.courseware_index import (
@@ -142,7 +142,10 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     if CoursewareSearchIndexer.indexing_is_enabled() and CourseAboutSearchIndexer.indexing_is_enabled():
         update_search_index.delay(course_key_str, datetime.now(UTC).isoformat())
 
-    update_discussions_settings_from_course_task.delay(course_key_str)
+    update_discussions_settings_from_course_task.apply_async(
+        args=[course_key_str],
+        countdown=settings.DISCUSSION_SETTINGS['COURSE_PUBLISH_TASK_DELAY'],
+    )
 
     # Send to a signal for catalog info changes as well, but only once we know the transaction is committed.
     transaction.on_commit(lambda: emit_catalog_info_changed_signal(course_key))

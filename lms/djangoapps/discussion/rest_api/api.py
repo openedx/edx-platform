@@ -21,7 +21,6 @@ from django.db.models import Q
 from django.http import Http404
 from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
-from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework import status
@@ -84,6 +83,7 @@ from ..django_comment_client.base.views import (
     track_voted_event,
     track_discussion_reported_event,
     track_discussion_unreported_event,
+    track_forum_search_event
 )
 from ..django_comment_client.utils import (
     get_group_id_for_user,
@@ -873,7 +873,7 @@ def get_thread_list(
     }
 
     if view:
-        if view in ["unread", "unanswered"]:
+        if view in ["unread", "unanswered", "unresponded"]:
             query_params[view] = "true"
         else:
             ValidationError({
@@ -1723,24 +1723,23 @@ def get_course_discussion_user_stats(
         comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_from_search_string(
             course_key, username_search_string, page, page_size
         )
-        if not comma_separated_usernames:
-            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
-                "results": [],
-            })
-        params['usernames'] = comma_separated_usernames
-
-    course_stats_response = get_course_user_stats(course_key, params)
-
-    tracker.emit(
-        'edx.forum.searched',
-        {
+        search_event_data = {
             'query': username_search_string,
             'search_type': 'Learner',
             'page': params.get('page'),
             'sort_key': params.get('sort_key'),
-            'total_results': course_stats_response.get('total_results'),
+            'total_results': matched_users_count,
         }
-    )
+        course = _get_course(course_key, request.user)
+        track_forum_search_event(request, course, search_event_data)
+        if not comma_separated_usernames:
+            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
+                "results": [],
+            })
+
+        params['usernames'] = comma_separated_usernames
+
+    course_stats_response = get_course_user_stats(course_key, params)
 
     if comma_separated_usernames:
         updated_course_stats = add_stats_for_users_with_no_discussion_content(

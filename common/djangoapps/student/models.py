@@ -1557,6 +1557,8 @@ class CourseEnrollment(models.Model):
         Emits an event to explicitly track course enrollment and unenrollment.
         """
         from openedx.core.djangoapps.schedules.config import set_up_external_updates_for_enrollment
+        from common.djangoapps.student.toggles import should_send_enrollment_email
+        from common.djangoapps.student.tasks import send_course_enrollment_email
 
         segment_properties = {
             'category': 'conversion',
@@ -1595,6 +1597,13 @@ class CourseEnrollment(models.Model):
             segment_traits['email'] = self.user.email
 
             if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
+                if should_send_enrollment_email():
+                    course_pacing_type = 'self-paced' if self.course_overview.self_paced else 'instructor-paced'
+                    send_course_enrollment_email.apply_async((self.user.id, str(self.course_id),
+                                                              self.course_overview.display_name,
+                                                              self.course_overview.short_description,
+                                                              self.course_overview.has_ended(),
+                                                              course_pacing_type))
                 segment_properties['email'] = self.user.email
                 # This next property is for an experiment, see method's comments for more information
                 segment_properties['external_course_updates'] = set_up_external_updates_for_enrollment(self.user,

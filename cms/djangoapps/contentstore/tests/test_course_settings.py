@@ -482,6 +482,66 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(course.entrance_exam_enabled)
         self.assertEqual(course.entrance_exam_minimum_score_pct, .5)
 
+    @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    def test_entrance_after_changing_other_setting(self):
+        """
+        Test entrance exam is not deactivated when prerequisites removed.
+
+        This test ensures that the entrance milestone is not deactivated after
+        course details are saves without pre-requisite courses active.
+
+        The test was implemented after a bug fixing, correcting the behaviour
+        that every time course details were saved,
+        if there wasn't any pre-requisite course in the POST
+        the view just deleted all the pre-requisite courses, including entrance exam,
+        despite the fact that the entrance_exam_enabled was True.
+        """
+        assert not milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
+            'The initial empty state should be: no entrance exam'
+
+        settings_details_url = get_url(self.course.id)
+        data = {
+            'entrance_exam_enabled': 'true',
+            'entrance_exam_minimum_score_pct': '60',
+            'syllabus': 'none',
+            'short_description': 'empty',
+            'overview': '',
+            'effort': '',
+            'intro_video': '',
+            'start_date': '2012-01-01',
+            'end_date': '2012-12-31',
+        }
+        response = self.client.post(
+            settings_details_url,
+            data=json.dumps(data),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json'
+        )
+
+        assert response.status_code == 200
+        course = modulestore().get_course(self.course.id)
+        assert course.entrance_exam_enabled
+        assert course.entrance_exam_minimum_score_pct == .60
+
+        assert milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
+            'The entrance exam should be required.'
+
+        # Call the settings handler again then ensure it didn't delete the settings of the entrance exam
+        data.update({
+            'start_date': '2018-01-01',
+            'end_date': '{year}-12-31'.format(year=datetime.datetime.now().year + 4),
+        })
+        response = self.client.post(
+            settings_details_url,
+            data=json.dumps(data),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json'
+        )
+        assert response.status_code == 200
+        assert milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
+            'The entrance exam should be required.'
+
     def test_editable_short_description_fetch(self):
         settings_details_url = get_url(self.course.id)
 

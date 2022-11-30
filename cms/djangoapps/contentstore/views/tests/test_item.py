@@ -8,7 +8,6 @@ from unittest.mock import Mock, PropertyMock, patch
 
 import ddt
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -47,7 +46,7 @@ from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.views import item as item_module
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
     XBlockStudioConfiguration,
@@ -2131,9 +2130,7 @@ class TestComponentHandler(TestCase):
             CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name'
         )
         self.usage_key_string = str(self.usage_key)
-
-        self.user = UserFactory()
-
+        self.user = StaffFactory(course_key=CourseLocator('dummy_org', 'dummy_course', 'dummy_run'))
         self.request = self.request_factory.get('/dummy-url')
         self.request.user = self.user
 
@@ -2142,15 +2139,6 @@ class TestComponentHandler(TestCase):
 
         with self.assertRaises(Http404):
             component_handler(self.request, self.usage_key_string, 'invalid_handler')
-
-    def test_submit_studio_edits_checks_author_permission(self):
-        with self.assertRaises(PermissionDenied):
-            with patch(
-                'common.djangoapps.student.auth.has_course_author_access',
-                return_value=False
-            ) as mocked_has_course_author_access:
-                component_handler(self.request, self.usage_key_string, 'submit_studio_edits')
-                assert mocked_has_course_author_access.called is True
 
     @ddt.data('GET', 'POST', 'PUT', 'DELETE')
     def test_request_method(self, method):
@@ -2165,7 +2153,6 @@ class TestComponentHandler(TestCase):
         req_factory_method = getattr(self.request_factory, method.lower())
         request = req_factory_method('/dummy-url')
         request.user = self.user
-
         component_handler(request, self.usage_key_string, 'dummy_handler')
 
     @ddt.data(200, 404, 500)
@@ -2178,12 +2165,44 @@ class TestComponentHandler(TestCase):
         self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                          status_code)
 
+    @patch('cms.djangoapps.contentstore.views.component.log')
+    def test_submit_studio_edits_checks_author_permission(self, mock_logger):
+        """
+        Test logging a user without studio write permissions attempts to run a studio submit handler..
+
+        Arguments:
+            mock_logger (object):  A mock logger object.
+        """
+
+        def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
+            """create dummy response"""
+            return Response(status_code=200)
+
+        self.request.user = UserFactory()
+        mock_handler = 'dummy_handler'
+
+        self.descriptor.handle = create_response
+
+        with patch(
+            'cms.djangoapps.contentstore.views.component.is_xblock_aside',
+            return_value=False
+        ), patch("cms.djangoapps.contentstore.views.component.webob_to_django_response"):
+            component_handler(self.request, self.usage_key_string, mock_handler)
+
+        mock_logger.warning.assert_called_with(
+            "%s does not have have studio write permissions on course: %s. write operations not performed on %r",
+            self. request.user.id,
+            UsageKey.from_string(self.usage_key_string).course_key,
+            mock_handler
+        )
+
     @ddt.data((True, True), (False, False),)
     @ddt.unpack
     def test_aside(self, is_xblock_aside, is_get_aside_called):
         """
         test get_aside_from_xblock called
         """
+
         def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
             """create dummy response"""
             return Response(status_code=200)

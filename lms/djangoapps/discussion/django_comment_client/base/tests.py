@@ -138,7 +138,8 @@ class ThreadActionGroupIdTestCase(
                 "group_id": self.student_cohort.id,
                 "closed": False,
                 "type": "thread",
-                "commentable_id": "non_team_dummy_id"
+                "commentable_id": "non_team_dummy_id",
+                "body": "test body",
             }
         )
         request = RequestFactory().post("dummy_url", post_params or {})
@@ -411,7 +412,7 @@ class ViewsQueryCountTestCase(
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 6, 38),
+        (ModuleStoreEnum.Type.split, 3, 6, 42),
     )
     @ddt.unpack
     @count_queries
@@ -527,6 +528,7 @@ class ViewsTestCase(
         self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
+            "body": "test body",
         })
         test_thread_id = "test_thread_id"
         request = RequestFactory().post("dummy_url", {"id": test_thread_id})
@@ -545,6 +547,7 @@ class ViewsTestCase(
         self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
+            "body": "test body",
         })
         test_comment_id = "test_comment_id"
         request = RequestFactory().post("dummy_url", {"id": test_comment_id})
@@ -1594,7 +1597,8 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             "commentable_id": commentable_id,
             "user_id": str(comment_author.id),
             "username": comment_author.username,
-            "course_id": str(self.course.id)
+            "course_id": str(self.course.id),
+            "body": "test body",
         })
 
         response = self.client.post(
@@ -1663,7 +1667,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user, mock_request,
-            {"closed": False, "commentable_id": commentable_id, "thread_id": "dummy_thread"},
+            {"closed": False, "commentable_id": commentable_id, "thread_id": "dummy_thread", "body": 'dummy body'},
         )
         for action in ["upvote_comment", "downvote_comment", "un_flag_abuse_for_comment", "flag_abuse_for_comment"]:
             response = self.client.post(
@@ -1684,7 +1688,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user, mock_request,
-            {"closed": False, "commentable_id": commentable_id},
+            {"closed": False, "commentable_id": commentable_id, "body": "dummy body"},
         )
         for action in ["upvote_thread", "downvote_thread", "un_flag_abuse_for_thread", "flag_abuse_for_thread",
                        "follow_thread", "unfollow_thread"]:

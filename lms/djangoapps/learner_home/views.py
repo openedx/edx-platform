@@ -1,23 +1,23 @@
 """
 Views for the learner dashboard.
 """
-from collections import OrderedDict
 import logging
+from collections import OrderedDict
 
-from django.conf import settings
-from django.urls import reverse
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
+from django.conf import settings
+from django.urls import reverse
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.monitoring import function_trace
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
+from edx_rest_framework_extensions.permissions import NotJwtRestrictedApplication
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -45,24 +45,23 @@ from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
-from lms.djangoapps.courseware.access_utils import (
-    check_course_open_for_learner,
-)
+from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.learner_home.serializers import (
     CourseRecommendationSerializer,
     LearnerDashboardSerializer,
-)
-from lms.djangoapps.learner_home.waffle import (
-    should_show_learner_home_amplitude_recommendations,
 )
 from lms.djangoapps.learner_home.utils import (
     get_masquerade_user,
     get_personalized_course_recommendations,
 )
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from lms.djangoapps.learner_home.waffle import (
+    should_show_learner_home_amplitude_recommendations,
+)
 from openedx.core.djangoapps.catalog.utils import get_course_data
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import (
     get_user_course_expiration_date,
 )
@@ -430,8 +429,15 @@ def serialize_learner_home_data(data, context):
     return LearnerDashboardSerializer(data, context=context).data
 
 
-class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
+class InitializeView(APIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated, NotJwtRestrictedApplication)
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Get masquerade user and proxy to init request"""
@@ -557,7 +563,7 @@ class CourseRecommendationApiView(APIView):
         JwtAuthentication,
         SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, NotJwtRestrictedApplication)
 
     def get(self, request):
         """
@@ -566,12 +572,22 @@ class CourseRecommendationApiView(APIView):
         if not should_show_learner_home_amplitude_recommendations():
             return Response(status=404)
 
+        general_recommendations_response = Response(
+            CourseRecommendationSerializer(
+                {
+                    "courses": settings.GENERAL_RECOMMENDATIONS,
+                    "is_personalized_recommendation": False,
+                }
+            ).data,
+            status=200,
+        )
+
         try:
             user_id = request.user.id
             is_control, course_keys = get_personalized_course_recommendations(user_id)
         except Exception as ex:  # pylint: disable=broad-except
             logger.warning(f"Cannot get recommendations from Amplitude: {ex}")
-            return Response(status=500)
+            return general_recommendations_response
 
         # Emits an event to track student dashboard page visits.
         segment.track(
@@ -582,19 +598,8 @@ class CourseRecommendationApiView(APIView):
             },
         )
 
-        if is_control:
-            return Response(
-                CourseRecommendationSerializer(
-                    {
-                        "courses": settings.GENERAL_RECOMMENDATIONS,
-                        "is_personalized_recommendation": False,
-                    }
-                ).data,
-                status=200,
-            )
-
-        if not course_keys:
-            return Response(status=404)
+        if is_control or not course_keys:
+            return general_recommendations_response
 
         recommended_courses = []
         user_enrolled_course_keys = set()
@@ -621,11 +626,12 @@ class CourseRecommendationApiView(APIView):
                     }
                 )
 
-        segment.track(
-            user_id,
-            "edx.bi.user.recommendations.count",
-            {"count": len(recommended_courses)},
-        )
+        # If no courses are left after filtering already enrolled courses from
+        # the list of amplitude recommendations, show general recommendations
+        # to the user.
+        if not recommended_courses:
+            return general_recommendations_response
+
         return Response(
             CourseRecommendationSerializer(
                 {

@@ -1519,7 +1519,6 @@ COURSE_LISTINGS = {}
 # Import after sys.path fixup
 from xmodule.modulestore.edit_info import EditInfoMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
-from xmodule.modulestore import prefer_xmodules  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 
 # These are the Mixins that should be added to every XBlock.
@@ -1527,14 +1526,6 @@ from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 XBLOCK_EXTRA_MIXINS = ()
-
-# .. setting_name: XBLOCK_SELECT_FUNCTION
-# .. setting_default: prefer_xmodules
-# .. setting_description: Function used to select an XBlock from the python package EntryPoints.
-#     Some alternatives are `prefer_xmodules` and `default_select`. The `prefer_modules` function
-#     will choose the first "xmodule" if there is one, otherwise, it will act like `default_select`.
-#     The `default_select` function will simply choose the first match found.
-XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 # .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
 # .. setting_default: ()
@@ -3239,6 +3230,9 @@ INSTALLED_APPS = [
     # Agreements
     'openedx.core.djangoapps.agreements',
 
+    # Survey reports
+    'openedx.features.survey_report',
+
     # User and group management via edx-django-utils
     'edx_django_utils.user',
 
@@ -4746,8 +4740,12 @@ PASSWORD_RESET_EMAIL_RATE = '2/h'
 SAVE_FOR_LATER_IP_RATE_LIMIT = '100/d'
 SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
 
+
+#### BRAZE API SETTINGS ####
+
 EDX_BRAZE_API_KEY = None
 EDX_BRAZE_API_SERVER = None
+BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
 ### SETTINGS FOR AMPLITUDE ####
 AMPLITUDE_URL = ''
@@ -5269,3 +5267,5 @@ URLS_2U_LOBS = {
 ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 
 ############## PLOTLY ##############
+
+ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []

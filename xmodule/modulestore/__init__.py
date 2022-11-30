@@ -1271,7 +1271,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         result = defaultdict(dict)
         if fields is None:
             return result
-        classes = XBlock.load_class(category, select=prefer_xmodules)
+        classes = XBlock.load_class(category)
         cls = self.mixologist.mix(classes)
         for field_name, value in fields.items():
             field = getattr(cls, field_name)
@@ -1393,12 +1393,3 @@ def only_xmodules(identifier, entry_points):
     from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
 
     return default_select(identifier, from_xmodule)
-
-
-def prefer_xmodules(identifier, entry_points):
-    """Prefer entry_points from the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-    if from_xmodule:
-        return default_select(identifier, from_xmodule)
-    else:
-        return default_select(identifier, entry_points)
