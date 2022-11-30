@@ -287,57 +287,6 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
 
         self.clear_sub_content(good_youtube_sub)
 
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
-    def test_get_transcript_name_youtube_server_success(self, mock_get):
-        """
-        Get transcript name from transcript_list fetch from youtube server api
-        depends on language code, default language in YOUTUBE Text Api is "en"
-        """
-        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
-        youtube_text_api['params']['v'] = 'dummy_video_id'
-        response_success = """
-        <transcript_list>
-            <track id="1" name="Custom" lang_code="en" />
-            <track id="0" name="Custom1" lang_code="en-GB"/>
-        </transcript_list>
-        """
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
-
-        transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
-        self.assertEqual(transcript_name, 'Custom')
-
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
-    def test_get_transcript_name_youtube_server_no_transcripts(self, mock_get):
-        """
-        When there are no transcripts of video transcript name will be None
-        """
-        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
-        youtube_text_api['params']['v'] = 'dummy_video_id'
-        response_success = "<transcript_list></transcript_list>"
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
-
-        transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
-        self.assertIsNone(transcript_name)
-
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
-    def test_get_transcript_name_youtube_server_language_not_exist(self, mock_get):
-        """
-        When the language does not exist in transcript_list transcript name will be None
-        """
-        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
-        youtube_text_api['params']['v'] = 'dummy_video_id'
-        youtube_text_api['params']['lang'] = 'abc'
-        response_success = """
-        <transcript_list>
-            <track id="1" name="Custom" lang_code="en" />
-            <track id="0" name="Custom1" lang_code="en-GB"/>
-        </transcript_list>
-        """
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
-
-        transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
-        self.assertIsNone(transcript_name)
-
     @patch('xmodule.video_module.transcripts_utils.requests.get', side_effect=mock_requests_get)
     def test_downloading_subs_using_transcript_name(self, mock_get):
         """
