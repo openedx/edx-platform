@@ -177,7 +177,6 @@ class GradeReportBase:
         error_rows = list(chain(*error_rows))
         self.log_additional_info_for_testing(context, "Compilation complete")
 
-
         # update metrics on task status
         context.task_progress.succeeded = len(success_rows)
         context.task_progress.failed = len(error_rows)
