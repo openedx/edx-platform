@@ -87,6 +87,9 @@ class Zoom(LiveProvider):
     """
     id = 'zoom'
     name = 'Zoom LTI PRO'
+    additional_parameters = [
+        'custom_instructor_email'
+    ]
 
     @property
     def is_enabled(self):
