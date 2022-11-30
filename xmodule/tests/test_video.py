@@ -959,6 +959,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=xml_data)
         assert descriptor.index_dictionary() == {'content': {'display_name': 'Test Video'}, 'content_type': 'Video'}
 
+    @unittest.skip("API for youtube captions no longer supported")
     @httpretty.activate
     def test_video_with_youtube_subs_index_dictionary(self):
         """
@@ -992,6 +993,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         assert descriptor.index_dictionary() ==\
                {'content': {'display_name': 'Test Video', 'transcript_en': YOUTUBE_SUBTITLES}, 'content_type': 'Video'}
 
+    @unittest.skip("API for youtube captions no longer supported")
     @httpretty.activate
     def test_video_with_subs_and_transcript_index_dictionary(self):
         """
@@ -1006,6 +1008,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
                    sub="OEoXaMPEzfM"
                    start_time="00:00:01"
                    download_video="false"
+                   end_time="00:01:00">
                    end_time="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
