@@ -1602,6 +1602,7 @@ class CourseEnrollment(models.Model):
                     send_course_enrollment_email.apply_async((self.user.id, str(self.course_id),
                                                               self.course_overview.display_name,
                                                               self.course_overview.short_description,
+                                                              self.course_overview.has_ended(),
                                                               course_pacing_type))
                 segment_properties['email'] = self.user.email
                 # This next property is for an experiment, see method's comments for more information

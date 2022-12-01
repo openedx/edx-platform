@@ -7,6 +7,7 @@ import re
 from collections import OrderedDict, defaultdict
 from datetime import datetime
 from itertools import chain
+from sys import getsizeof
 from time import time
 
 from django.conf import settings
@@ -168,9 +169,13 @@ class GradeReportBase:
         the given batched_rows and context.
         """
         # partition and chain successes and errors
+        self.log_additional_info_for_testing(context, "Begin Zipping Batched Rows")
         success_rows, error_rows = zip(*batched_rows)
+        self.log_additional_info_for_testing(context, "Evaluating Success Rows")
         success_rows = list(chain(*success_rows))
+        self.log_additional_info_for_testing(context, "Evaluating Error Rows")
         error_rows = list(chain(*error_rows))
+        self.log_additional_info_for_testing(context, "Compilation complete")
 
         # update metrics on task status
         context.task_progress.succeeded = len(success_rows)
@@ -790,6 +795,7 @@ class ProblemGradeReport(GradeReportBase):
         """
         self.log_additional_info_for_testing(context, 'ProblemGradeReport: Starting to process new user batch.')
         success_rows, error_rows = [], []
+        success_rows_size, error_rows_size = 0, 0
         for student, course_grade, error in CourseGradeFactory().iter(
             users,
             course=context.course,
@@ -810,6 +816,7 @@ class ProblemGradeReport(GradeReportBase):
                     [student.id, student.email, student.username] +
                     [err_msg]
                 )
+                error_rows_size += getsizeof(error_rows[-1])
                 context.task_progress.failed += 1
                 self.log_additional_info_for_testing(
                     context,
@@ -842,7 +849,15 @@ class ProblemGradeReport(GradeReportBase):
                 [enrollment_status, course_grade.percent] +
                 _flatten(earned_possible_values)
             )
+            success_rows_size += getsizeof(success_rows[-1])
             self.log_additional_info_for_testing(context, 'ProblemGradeReport: Added rows')
+
+        success_rows_size += getsizeof(success_rows)
+        error_rows_size += getsizeof(error_rows)
+        self.log_additional_info_for_testing(
+            context,
+            f'ProblemGradeReport memory usage: succeess {success_rows_size} error {error_rows_size}'
+        )
 
         return success_rows, error_rows
 

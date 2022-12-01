@@ -31,7 +31,7 @@ COUNTDOWN = 60
 
 @shared_task(bind=True, ignore_result=True)
 def send_course_enrollment_email(
-    self, user_id, course_id, course_title, short_description, pacing_type
+    self, user_id, course_id, course_title, short_description, course_ended, pacing_type
 ):
     """
     Send course enrollment email using Braze API.
@@ -74,7 +74,8 @@ def send_course_enrollment_email(
     try:
         user = User.objects.get(id=user_id)
         course_key = CourseKey.from_string(course_id)
-        course_date_blocks = get_course_dates_for_email(user, course_key, request=None)
+        if not course_ended:
+            course_date_blocks = get_course_dates_for_email(user, course_key, request=None)
     except Exception:  # pylint: disable=broad-except
         is_course_date_missing = True
 

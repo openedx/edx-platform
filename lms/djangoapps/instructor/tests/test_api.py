@@ -3916,13 +3916,13 @@ def get_extended_due(course, unit, user):
     return None
 
 
-def get_date_for_block(course, unit, user):
+def get_date_for_block(course, unit, user, use_cached=False):
     """
     Gets the due date for the given user on the given unit (overridden or original).
     Returns `None` if there is no date set.
-    (Differs from edx-when's get_date_for_block only in that we skip the cache.
+    Differs from edx-when's get_date_for_block only in that we skip the cache when `use_cached` is `False` (default).
     """
-    return get_dates_for_course(course.id, user=user, use_cached=False).get((unit.location, 'due'), None)
+    return get_dates_for_course(course.id, user=user, use_cached=use_cached).get((unit.location, 'due'), None)
 
 
 class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -4014,14 +4014,16 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date(self):
         url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        due_date = datetime.datetime(2013, 12, 30, tzinfo=UTC)
         response = self.client.post(url, {
             'student': self.user1.username,
             'url': str(self.week1.location),
             'due_datetime': '12/30/2013 00:00'
         })
         assert response.status_code == 200, response.content
-        assert datetime.datetime(2013, 12, 30, 0, 0, tzinfo=UTC) ==\
-               get_extended_due(self.course, self.week1, self.user1)
+        assert get_extended_due(self.course, self.week1, self.user1) == due_date
+        # This operation regenerates the cache, so we can use cached results from edx-when.
+        assert get_date_for_block(self.course, self.week1, self.user1, use_cached=True) == due_date
 
     def test_change_to_invalid_due_date(self):
         url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
@@ -4074,7 +4076,8 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             'url': str(self.week3.location),
         })
         self.assertContains(response, 'Successfully reset due date for student')
-        assert get_date_for_block(self.course, self.week3, self.user1) == original_due
+        # This operation regenerates the cache, so we can use cached results from edx-when.
+        assert get_date_for_block(self.course, self.week3, self.user1, use_cached=True) == original_due
 
     def test_show_unit_extensions(self):
         self.test_change_due_date()

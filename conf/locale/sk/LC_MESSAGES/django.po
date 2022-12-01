@@ -7663,7 +7663,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -16223,6 +16222,10 @@ msgstr ""
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
+msgstr ""
+
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Register for free"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
