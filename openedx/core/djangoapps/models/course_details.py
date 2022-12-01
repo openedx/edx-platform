@@ -208,6 +208,9 @@ class CourseDetails:
         # is what the setter expects as input.
         date = Date()
 
+        if jsondict['overview'] == '':
+            jsondict['overview'] = '<p>&nbsp;</p>'
+
         if 'start_date' in jsondict:
             converted = date.from_json(jsondict['start_date'])
         else:
