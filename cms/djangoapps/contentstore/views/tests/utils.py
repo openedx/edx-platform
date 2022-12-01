@@ -6,7 +6,7 @@ Utilities for view tests.
 import json
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from xmodule.modulestore.tests.factories import ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..helpers import xblock_studio_url
 
@@ -18,10 +18,10 @@ class StudioPageTestCase(CourseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.chapter = ItemFactory.create(parent_location=self.course.location,
-                                          category='chapter', display_name="Week 1")
-        self.sequential = ItemFactory.create(parent_location=self.chapter.location,
-                                             category='sequential', display_name="Lesson 1")
+        self.chapter = BlockFactory.create(parent_location=self.course.location,
+                                           category='chapter', display_name="Week 1")
+        self.sequential = BlockFactory.create(parent_location=self.chapter.location,
+                                              category='sequential', display_name="Lesson 1")
 
     def get_page_html(self, xblock):
         """

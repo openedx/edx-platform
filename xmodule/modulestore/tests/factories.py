@@ -279,7 +279,7 @@ class LibraryFactory(XModuleFactory):
             return new_library
 
 
-class ItemFactory(XModuleFactory):
+class BlockFactory(XModuleFactory):
     """
     Factory for XModule items.
     """

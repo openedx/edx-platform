@@ -9,7 +9,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from .. import url_helpers
 
@@ -90,22 +90,22 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             display_name='URL Helpers Test Course',
         )
         with cls.store.bulk_operations(course_run.id):
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent_location=course_run.location,
                 category='chapter',
                 display_name="Generated Section",
             )
-            subsection = ItemFactory.create(
+            subsection = BlockFactory.create(
                 parent_location=section.location,
                 category='sequential',
                 display_name="Generated Subsection",
             )
-            unit = ItemFactory.create(
+            unit = BlockFactory.create(
                 parent_location=subsection.location,
                 category='vertical',
                 display_name="Generated Unit",
             )
-            component = ItemFactory.create(
+            component = BlockFactory.create(
                 parent_location=unit.location,
                 category='problem',
                 display_name="Generated Problem Component",

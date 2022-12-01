@@ -55,7 +55,7 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
@@ -235,7 +235,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         Tests course student have right access to content w/o preview.
         """
         course_key = self.course.id
-        chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
+        chapter = BlockFactory.create(category="chapter", parent_location=self.course.location)
         overview = CourseOverview.get_from_id(course_key)
 
         # Enroll student to the course
@@ -291,7 +291,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.course.user_partitions.append(user_partition)
         self.course.cohort_config = {'cohorted': True}
 
-        chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
+        chapter = BlockFactory.create(category="chapter", parent_location=self.course.location)
         chapter.group_access = {partition_id: [group_0_id]}
 
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)

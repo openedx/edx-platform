@@ -46,7 +46,7 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 PASSWORD = 'test'
 TOMORROW = now() + timedelta(days=1)
@@ -754,7 +754,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         course_key = course.id
         block_keys = [
-            ItemFactory.create(
+            BlockFactory.create(
                 category='video',
                 parent_location=course.location,
                 display_name=f'Video {str(number)}'
@@ -854,7 +854,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             # Submit completed course blocks in even-numbered courses.
             if isEven(i):
                 block_keys = [
-                    ItemFactory.create(
+                    BlockFactory.create(
                         category='video',
                         parent_location=course.location,
                         display_name=f'Video {str(number)}'

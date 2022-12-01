@@ -35,7 +35,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..course import _deprecated_blocks_info, course_outline_initial_state, reindex_course_and_check_access
 from ..item import VisibilityState, create_xblock_info
@@ -136,14 +136,14 @@ class TestCourseIndex(CourseTestCase):
     def test_json_responses(self):
 
         outline_url = reverse_course_url('course_handler', self.course.id)
-        chapter = ItemFactory.create(parent_location=self.course.location, category='chapter', display_name="Week 1")
-        lesson = ItemFactory.create(parent_location=chapter.location, category='sequential', display_name="Lesson 1")
-        subsection = ItemFactory.create(
+        chapter = BlockFactory.create(parent_location=self.course.location, category='chapter', display_name="Week 1")
+        lesson = BlockFactory.create(parent_location=chapter.location, category='sequential', display_name="Lesson 1")
+        subsection = BlockFactory.create(
             parent_location=lesson.location,
             category='vertical',
             display_name='Subsection 1'
         )
-        ItemFactory.create(parent_location=subsection.location, category="video", display_name="My Video")
+        BlockFactory.create(parent_location=subsection.location, category="video", display_name="My Video")
 
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
 
@@ -460,16 +460,16 @@ class TestCourseOutline(CourseTestCase):
         """
         super().setUp()
 
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1"
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Lesson 1"
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location, category='vertical', display_name='Subsection 1'
         )
-        self.video = ItemFactory.create(
+        self.video = BlockFactory.create(
             parent_location=self.vertical.location, category="video", display_name="My Video"
         )
 
@@ -549,7 +549,7 @@ class TestCourseOutline(CourseTestCase):
         """
         if create_blocks:
             for block_type in block_types:
-                ItemFactory.create(
+                BlockFactory.create(
                     parent_location=self.vertical.location,
                     category=block_type,
                     display_name=f'{block_type} Problem'
@@ -669,20 +669,20 @@ class TestCourseReIndex(CourseTestCase):
         self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
         modulestore().update_item(self.course, self.user.id)
 
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1"
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Lesson 1"
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location, category='vertical', display_name='Subsection 1'
         )
-        self.video = ItemFactory.create(
+        self.video = BlockFactory.create(
             parent_location=self.vertical.location, category="video", display_name="My Video"
         )
 
-        self.html = ItemFactory.create(
+        self.html = BlockFactory.create(
             parent_location=self.vertical.location, category="html", display_name="My HTML",
             data="<div>This is my unique HTML content</div>",
 
@@ -748,7 +748,7 @@ class TestCourseReIndex(CourseTestCase):
         """
         Test json response with real data
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -774,7 +774,7 @@ class TestCourseReIndex(CourseTestCase):
         """
         Test json response with mocked error data for video
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -796,7 +796,7 @@ class TestCourseReIndex(CourseTestCase):
         """
         Test json response with mocked error data for html
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -818,7 +818,7 @@ class TestCourseReIndex(CourseTestCase):
         """
         Test json response with mocked error data for sequence
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -858,7 +858,7 @@ class TestCourseReIndex(CourseTestCase):
         """
         Test do_course_reindex response with real data
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -884,7 +884,7 @@ class TestCourseReIndex(CourseTestCase):
         """
         Test do_course_reindex response with mocked error data for video
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -906,7 +906,7 @@ class TestCourseReIndex(CourseTestCase):
         """
         Test do_course_reindex response with mocked error data for html
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -928,7 +928,7 @@ class TestCourseReIndex(CourseTestCase):
         """
         Test do_course_reindex response with mocked error data for sequence
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,

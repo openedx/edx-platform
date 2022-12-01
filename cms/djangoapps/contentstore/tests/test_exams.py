@@ -12,7 +12,7 @@ from pytz import UTC
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 
 @ddt.ddt
@@ -40,12 +40,12 @@ class TestExamService(ModuleStoreTestCase):
             enable_proctored_exams=True,
             proctoring_provider='null',
         )
-        self.chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        self.chapter = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         self.course_key = str(self.course.id)
 
         # create one non-exam sequence
-        chapter2 = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Homework')
-        ItemFactory.create(
+        chapter2 = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Homework')
+        BlockFactory.create(
             parent=chapter2,
             category='sequential',
             display_name='Homework 1',
@@ -72,7 +72,7 @@ class TestExamService(ModuleStoreTestCase):
         default_time_limit_minutes = 10
         due_date = datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1)
 
-        sequence = ItemFactory.create(
+        sequence = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -113,7 +113,7 @@ class TestExamService(ModuleStoreTestCase):
         """
         Make sure we filter out all dangling items
         """
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -133,7 +133,7 @@ class TestExamService(ModuleStoreTestCase):
         """
         Make sure the feature flag is honored
         """
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -150,7 +150,7 @@ class TestExamService(ModuleStoreTestCase):
     def test_self_paced_no_due_dates(self, mock_patch_course_exams):
         self.course.self_paced = True
         self.course = self.update_course(self.course, 1)
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name='Test Proctored Exam',

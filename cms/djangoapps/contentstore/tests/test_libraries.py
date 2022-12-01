@@ -11,7 +11,7 @@ from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.x_module import STUDIO_VIEW
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
@@ -80,7 +80,7 @@ class LibraryTestCase(ModuleStoreTestCase):
         specified by library_key.
         other_settings can be a dict of Scope.settings fields to set on the block.
         """
-        return ItemFactory.create(
+        return BlockFactory.create(
             category='library_content',
             parent_location=course.location,
             user_id=self.user.id,
@@ -91,7 +91,7 @@ class LibraryTestCase(ModuleStoreTestCase):
 
     def _add_simple_content_block(self):
         """ Adds simple HTML block to library """
-        return ItemFactory.create(
+        return BlockFactory.create(
             category="html", parent_location=self.library.location,
             user_id=self.user.id, publish_item=False
         )
@@ -188,7 +188,7 @@ class TestLibraries(LibraryTestCase):
         """
         # Create many blocks in the library and add them to a course:
         for num in range(8):
-            ItemFactory.create(
+            BlockFactory.create(
                 data=f"This is #{num + 1}",
                 category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False
             )
@@ -264,7 +264,7 @@ class TestLibraries(LibraryTestCase):
         """
         data_value = "A Scope.content value"
         name_value = "A Scope.settings value"
-        lib_block = ItemFactory.create(
+        lib_block = BlockFactory.create(
             category="html",
             parent_location=self.library.location,
             user_id=self.user.id,
@@ -294,13 +294,13 @@ class TestLibraries(LibraryTestCase):
         data_value = "A Scope.content value"
         name_value = "A Scope.settings value"
         # In the library, create a vertical block with a child:
-        vert_block = ItemFactory.create(
+        vert_block = BlockFactory.create(
             category="vertical",
             parent_location=self.library.location,
             user_id=self.user.id,
             publish_item=False,
         )
-        child_block = ItemFactory.create(
+        child_block = BlockFactory.create(
             category="html",
             parent_location=vert_block.location,
             user_id=self.user.id,
@@ -334,7 +334,7 @@ class TestLibraries(LibraryTestCase):
         """
         # Add a block to the library:
         data_value = "Hello world!"
-        ItemFactory.create(
+        BlockFactory.create(
             category="html",
             parent_location=self.library.location,
             user_id=self.user.id,
@@ -367,7 +367,7 @@ class TestLibraries(LibraryTestCase):
         library2key = self._create_library("org2", "lib2", "Library2")
         library2 = modulestore().get_library(library2key)
         data1, data2 = "Hello world!", "Hello other world!"
-        ItemFactory.create(
+        BlockFactory.create(
             category="html",
             parent_location=self.library.location,
             user_id=self.user.id,
@@ -376,7 +376,7 @@ class TestLibraries(LibraryTestCase):
             data=data1,
         )
 
-        ItemFactory.create(
+        BlockFactory.create(
             category="html",
             parent_location=library2.location,
             user_id=self.user.id,
@@ -410,7 +410,7 @@ class TestLibraries(LibraryTestCase):
     def test_refreshes_children_if_capa_type_change(self):
         """ Tests that children are automatically refreshed if capa type field changes """
         name1, name2 = "Option Problem", "Multiple Choice Problem"
-        ItemFactory.create(
+        BlockFactory.create(
             category="problem",
             parent_location=self.library.location,
             user_id=self.user.id,
@@ -418,7 +418,7 @@ class TestLibraries(LibraryTestCase):
             display_name=name1,
             data="<problem><optionresponse></optionresponse></problem>",
         )
-        ItemFactory.create(
+        BlockFactory.create(
             category="problem",
             parent_location=self.library.location,
             user_id=self.user.id,
@@ -791,7 +791,7 @@ class TestLibraryAccess(LibraryTestCase):
         instructor_role = CourseInstructorRole(course.id)
         auth.add_users(self.user, instructor_role, self.non_staff_user)
 
-        lib_block = ItemFactory.create(
+        lib_block = BlockFactory.create(
             category='library_content',
             parent_location=course.location,
             user_id=self.non_staff_user.id,
@@ -842,7 +842,7 @@ class TestOverrides(LibraryTestCase):
         self.original_weight = 1
 
         # Create a problem block in the library:
-        self.problem = ItemFactory.create(
+        self.problem = BlockFactory.create(
             category="problem",
             parent_location=self.library.location,
             display_name=self.original_display_name,  # display_name is a Scope.settings field
@@ -982,7 +982,7 @@ class TestOverrides(LibraryTestCase):
         self.problem.display_name = "--changed in library--"
         store.update_item(self.problem, self.user.id)
         # Create an additional problem block in the library:
-        ItemFactory.create(
+        BlockFactory.create(
             category="problem",
             parent_location=self.library.location,
             user_id=self.user.id,

@@ -39,7 +39,7 @@ from openedx.core.lib.courses import course_image_url
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from xmodule.course_block import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import errors
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05
@@ -457,23 +457,23 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         """
         super().setUp()
 
-        self.section = ItemFactory.create(
+        self.section = BlockFactory.create(
             parent=self.course,
             category='chapter',
         )
-        self.sub_section = ItemFactory.create(
+        self.sub_section = BlockFactory.create(
             parent=self.section,
             category='sequential',
         )
-        self.unit = ItemFactory.create(
+        self.unit = BlockFactory.create(
             parent=self.sub_section,
             category='vertical',
         )
-        self.other_sub_section = ItemFactory.create(
+        self.other_sub_section = BlockFactory.create(
             parent=self.section,
             category='sequential',
         )
-        self.other_unit = ItemFactory.create(
+        self.other_unit = BlockFactory.create(
             parent=self.other_sub_section,
             category='vertical',
         )

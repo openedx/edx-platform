@@ -25,7 +25,7 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
-    ItemFactory,
+    BlockFactory,
     check_mongo_calls
 )
 
@@ -1357,7 +1357,7 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-
         )
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
-        self.discussion1 = ItemFactory.create(
+        self.discussion1 = BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="discussion1",
@@ -1897,7 +1897,7 @@ class DividedDiscussionsTestCase(CohortViewsTestCase):  # lint-amnesty, pylint: 
         divided_discussions = divided_inline_discussions + divided_course_wide_discussions
 
         # inline discussion
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id=topic_name_to_id(self.course, "Topic A"),
@@ -2068,7 +2068,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         RequestCache.clear_all_namespaces()
         now = datetime.now()
         # inline discussion
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="Topic_A",
@@ -2208,7 +2208,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
         self.staff = UserFactory.create(is_staff=True)
         UserBasedRole(user=self.staff, role=CourseStaffRole.ROLE).add_course(self.course.id)
 
-        self.category = ItemFactory.create(
+        self.category = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id=self.CATEGORY_ID,

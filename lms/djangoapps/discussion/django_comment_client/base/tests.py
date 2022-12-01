@@ -55,7 +55,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 
 from .event_transformers import ForumThreadViewedEventTransformer
 
@@ -225,7 +225,7 @@ class ViewsTestCaseMixin:
 
         # add some discussion modules
         for i in range(module_count):
-            ItemFactory.create(
+            BlockFactory.create(
                 parent_location=self.course.location,
                 category='discussion',
                 discussion_id=f'id_module_{i}',
@@ -2064,14 +2064,14 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
         self.staff = UserFactory.create(is_staff=True)
         UserBasedRole(user=self.staff, role=CourseStaffRole.ROLE).add_course(self.course.id)
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.category = ItemFactory.create(
+        self.category = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id=self.CATEGORY_ID,
             discussion_category=self.PARENT_CATEGORY_NAME,
             discussion_target=self.CATEGORY_NAME,
         )
-        self.team_category = ItemFactory.create(
+        self.team_category = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id=self.TEAM_CATEGORY_ID,

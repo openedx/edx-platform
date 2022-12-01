@@ -43,7 +43,7 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.utils import SPLIT_MODULESTORE_SETUP, TEST_DATA_DIR, MongoContentstoreBuilder  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.xml_importer import (  # lint-amnesty, pylint: disable=wrong-import-order
@@ -407,13 +407,13 @@ class ImportTestCase(CourseTestCase):
         # Create some blocks to overwrite
         library = LibraryFactory.create(modulestore=self.store)
         lib_key = library.location.library_key
-        test_block = ItemFactory.create(
+        test_block = BlockFactory.create(
             category="vertical",
             parent_location=library.location,
             user_id=self.user.id,
             publish_item=False,
         )
-        test_block2 = ItemFactory.create(
+        test_block2 = BlockFactory.create(
             category="vertical",
             parent_location=library.location,
             user_id=self.user.id,
@@ -422,13 +422,13 @@ class ImportTestCase(CourseTestCase):
         # Create a library and blocks that should remain unmolested.
         unchanged_lib = LibraryFactory.create()
         unchanged_key = unchanged_lib.location.library_key
-        test_block3 = ItemFactory.create(
+        test_block3 = BlockFactory.create(
             category="vertical",
             parent_location=unchanged_lib.location,
             user_id=self.user.id,
             publish_item=False
         )
-        test_block4 = ItemFactory.create(
+        test_block4 = BlockFactory.create(
             category="vertical",
             parent_location=unchanged_lib.location,
             user_id=self.user.id,
@@ -749,7 +749,7 @@ class ExportTestCase(CourseTestCase):
         """
         Export unknown XBlock type (i.e. we uninstalled the XBlock), top level.
         """
-        fake_xblock = ItemFactory.create(
+        fake_xblock = BlockFactory.create(
             parent_location=self.course.location,
             category='not_a_real_block_type'
         )
@@ -784,12 +784,12 @@ class ExportTestCase(CourseTestCase):
         """
         Export unknown XBlock type deeper in the course.
         """
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             parent_location=self.course.location,
             category='vertical',
             display_name='sample_vertical',
         )
-        fake_xblock = ItemFactory.create(
+        fake_xblock = BlockFactory.create(
             parent_location=vertical.location,
             category='not_a_real_block_type',
         )
@@ -849,7 +849,7 @@ class ExportTestCase(CourseTestCase):
         """
         youtube_id = "qS4NO9MNC6w"
         library = LibraryFactory.create(modulestore=self.store)
-        video_block = ItemFactory.create(
+        video_block = BlockFactory.create(
             category="video",
             parent_location=library.location,
             user_id=self.user.id,
@@ -880,10 +880,10 @@ class ExportTestCase(CourseTestCase):
         Verify that course export with customtag
         """
         xml_string = '<impl>slides</impl>'
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             parent_location=self.course.location, category='vertical', display_name='foo'
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=vertical.location,
             category='customtag',
             display_name='custom_tag_foo',
@@ -1078,7 +1078,7 @@ class TestCourseExportImport(LibraryTestCase):
         self.export_dir = tempfile.mkdtemp()
 
         # Create a problem in library
-        ItemFactory.create(
+        BlockFactory.create(
             category="problem",
             parent_location=self.library.location,
             user_id=self.user.id,
@@ -1095,17 +1095,17 @@ class TestCourseExportImport(LibraryTestCase):
         """
         Sets up course with library content.
         """
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.source_course.location,
             category='chapter',
             display_name='Test Section'
         )
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=chapter.location,
             category='sequential',
             display_name='Test Sequential'
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             category='vertical',
             parent_location=sequential.location,
             display_name='Test Unit'
@@ -1213,23 +1213,23 @@ class TestCourseExportImportProblem(CourseTestCase):
         """
         Sets up course with problem content.
         """
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.source_course.location,
             category='chapter',
             display_name='Test Section'
         )
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=chapter.location,
             category='sequential',
             display_name='Test Sequential'
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             category='vertical',
             parent_location=sequential.location,
             display_name='Test Unit'
         )
 
-        ItemFactory.create(
+        BlockFactory.create(
             parent=vertical,
             category='problem',
             display_name='Test Problem',

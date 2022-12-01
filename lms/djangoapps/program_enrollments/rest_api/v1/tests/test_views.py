@@ -22,7 +22,7 @@ from rest_framework.test import APITestCase
 from social_django.models import UserSocialAuth
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCourseFactory
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -1891,7 +1891,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
     )
     @ddt.unpack
     def test_due_dates(self, now_time, course_in_progress):
-        section_1 = ItemFactory.create(
+        section_1 = BlockFactory.create(
             category='chapter',
             start=self.yesterday,
             due=self.tomorrow,
@@ -1899,27 +1899,27 @@ class ProgramCourseEnrollmentOverviewGetTests(
             display_name='section 1'
         )
 
-        subsection_1 = ItemFactory.create(
+        subsection_1 = BlockFactory.create(
             category='sequential',
             due=self.tomorrow,
             parent=section_1,
             display_name='subsection 1'
         )
 
-        subsection_2 = ItemFactory.create(
+        subsection_2 = BlockFactory.create(
             category='sequential',
             due=self.tomorrow - timedelta(1),
             parent=section_1,
             display_name='subsection 2'
         )
 
-        subsection_3 = ItemFactory.create(
+        subsection_3 = BlockFactory.create(
             category='sequential',
             parent=section_1,
             display_name='subsection 3'
         )
 
-        unit_1 = ItemFactory.create(
+        unit_1 = BlockFactory.create(
             category='vertical',
             due=self.tomorrow + timedelta(2),
             parent=subsection_3,

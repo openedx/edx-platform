@@ -21,7 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, BlockFactory, check_mongo_calls
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
 
@@ -371,9 +371,9 @@ class CourseInstantiationTests(ModuleStoreTestCase):
 
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
-            chapter = ItemFactory(parent=course, category='chapter', graded=True)
-            section = ItemFactory(parent=chapter, category='sequential')
-            __ = ItemFactory(parent=section, category='problem')
+            chapter = BlockFactory(parent=course, category='chapter', graded=True)
+            section = BlockFactory(parent=chapter, category='sequential')
+            __ = BlockFactory(parent=section, category='problem')
 
         fake_request = self.factory.get(
             reverse('progress', kwargs={'course_id': str(course.id)})
@@ -418,8 +418,8 @@ class TestGetCourseChapters(ModuleStoreTestCase):
         Test get_course_chapter_ids returns expected result.
         """
         course = CourseFactory()
-        ItemFactory(parent=course, category='chapter')
-        ItemFactory(parent=course, category='chapter')
+        BlockFactory(parent=course, category='chapter')
+        BlockFactory(parent=course, category='chapter')
         course_chapter_ids = get_course_chapter_ids(course.location.course_key)
         assert len(course_chapter_ids) == 2
         assert course_chapter_ids == [str(child) for child in course.children]
@@ -435,11 +435,11 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         Test that we treat a sequential with incomplete (but not scored) items (like a video maybe) as complete.
         """
         course = CourseFactory()
-        chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now(),
-                              start=datetime.datetime.now() - datetime.timedelta(hours=1))
-        sequential = ItemFactory(parent=chapter, category='sequential')
-        problem = ItemFactory(parent=sequential, category='problem', has_score=True)
-        ItemFactory(parent=sequential, category='video', has_score=False)
+        chapter = BlockFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now(),
+                               start=datetime.datetime.now() - datetime.timedelta(hours=1))
+        sequential = BlockFactory(parent=chapter, category='sequential')
+        problem = BlockFactory(parent=sequential, category='problem', has_score=True)
+        BlockFactory(parent=sequential, category='video', has_score=False)
 
         self.override_waffle_switch(True)
         BlockCompletion.objects.submit_completion(self.user, problem.location, 1)
@@ -455,8 +455,8 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         This can happen with unreleased assignments, for example (start date in future).
         """
         course = CourseFactory()
-        chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now())
-        ItemFactory(parent=chapter, category='sequential')
+        chapter = BlockFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now())
+        BlockFactory(parent=chapter, category='sequential')
 
         assignments = get_course_assignments(course.location.context_key, self.user, None)
         assert len(assignments) == 1
@@ -467,12 +467,12 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         Test that unreleased assignments are not treated as complete.
         """
         course = CourseFactory()
-        chapter = ItemFactory(parent=course, category='chapter', graded=True,
-                              due=datetime.datetime.now() + datetime.timedelta(hours=2),
-                              start=datetime.datetime.now() + datetime.timedelta(hours=1))
-        sequential = ItemFactory(parent=chapter, category='sequential')
-        problem = ItemFactory(parent=sequential, category='problem', has_score=True)
-        ItemFactory(parent=sequential, category='video', has_score=False)
+        chapter = BlockFactory(parent=course, category='chapter', graded=True,
+                               due=datetime.datetime.now() + datetime.timedelta(hours=2),
+                               start=datetime.datetime.now() + datetime.timedelta(hours=1))
+        sequential = BlockFactory(parent=chapter, category='sequential')
+        problem = BlockFactory(parent=sequential, category='problem', has_score=True)
+        BlockFactory(parent=sequential, category='video', has_score=False)
 
         self.override_waffle_switch(True)
         BlockCompletion.objects.submit_completion(self.user, problem.location, 1)
