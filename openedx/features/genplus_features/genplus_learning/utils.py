@@ -174,11 +174,11 @@ def process_pending_student_program_enrollments(gen_user):
 
     for program_enrollment in pending_enrollments:
         program = program_enrollment.program
-        course_ids = program.units.all().values_list('course', flat=True)
+        course_ids = list(program.units.all().values_list('course', flat=True))
         if program.intro_unit:
-            course_ids.append(program.intro_unit)
+            course_ids.append(program.intro_unit.id)
         if program.outro_unit:
-            course_ids.append(program.outro_unit)
+            course_ids.append(program.outro_unit.id)
 
         for course_id in course_ids:
             course_enrollment, created = CourseEnrollment.objects.get_or_create(

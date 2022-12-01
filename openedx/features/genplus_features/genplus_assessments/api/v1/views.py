@@ -45,9 +45,12 @@ class StudentAnswersView(viewsets.ViewSet):
         class_id = kwargs.get('class_id', None)
         student_id = request.query_params.get('student_id',None)
         students = []
+        response = dict()
         try:
             if student_id == "all":
-                students = list(Class.objects.prefetch_related('students').get(pk=class_id).students.values_list('gen_user__user_id',flat=True))
+                gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
+                students = gen_class.students.exclude(gen_user__user__isnull=True)
+                students = list(students.values_list('gen_user__user',flat=True))
             else:
                 students.append(student_id)
             course_id = request.query_params.get('course_id',None)
@@ -100,7 +103,7 @@ class SkillAssessmentView(viewsets.ViewSet):
 
         return Response(response)
 
-    
+
     def single_assessment_response(self, request, **kwargs):
         class_id = kwargs.get('class_id')
         start_year_usage_key = request.query_params.get('start_year_usage_key',None)
@@ -182,7 +185,7 @@ class SkillAssessmentView(viewsets.ViewSet):
                 else:
                     problem_ids[data['problem_id']]['count_response_end_of_year'] += 1
                     aggregate_result['accumulative_score_end_of_year'] += data['score'] if 'score' in data else data['rating']
-        
+
         aggregate_result['count_response_start_of_year'] = problem_ids[next(iter(problem_ids))]['count_response_start_of_year'] if len(problem_ids) > 0 else 0
         aggregate_result['count_response_end_of_year'] = problem_ids[next(iter(problem_ids))]['count_response_end_of_year'] if len(problem_ids) > 0 else 0
 
@@ -217,10 +220,10 @@ class SkillAssessmentView(viewsets.ViewSet):
                     aggregate_result[data['skill']]['score_end_of_year'] += data['score'] if 'score' in data else data['rating']
 
         return aggregate_result
-    
+
     def get_assessment_result(self, raw_data, gen_class):
         """
-        Generate aggregate result for single assessment for bar and graph char on base of single assessment 
+        Generate aggregate result for single assessment for bar and graph char on base of single assessment
         as per the user state  under the ``problem_location`` root.
         Arguments:
             raw_data (list): data get from UserResponse and UserRating models.
@@ -231,11 +234,13 @@ class SkillAssessmentView(viewsets.ViewSet):
         store = modulestore()
         assessments = []
         aggregate_result =  dict()
-        #get assessment usage key and type for program intro assessment course
-        assessments = self.get_assessment_block_data(gen_class.program.intro_unit.id)
-        #get assessment usage key and type for program outro assessment course
-        assessments.extend(self.get_assessment_block_data(gen_class.program.outro_unit.id))
-
+        try:
+            #get assessment usage key and type for program intro assessment course
+            assessments.extend(self.get_assessment_block_data(gen_class.program.intro_unit.id))
+            #get assessment usage key and type for program outro assessment course
+            assessments.extend(self.get_assessment_block_data(gen_class.program.outro_unit.id))
+        except Exception as e:
+            logger.exception(e)
         #prepare dictionary for every particular assessment problem in a course
         for assessment in assessments:
             usage_key = UsageKey.from_string(assessment.get('id'))
@@ -264,7 +269,7 @@ class SkillAssessmentView(viewsets.ViewSet):
                 if assessment_xblock.select_assessment_time == "start_of_year":
                     aggregate_result[problem_id]['usage_key_start_of_year'] = assessment.get('id')
                 else:
-                    aggregate_result[problem_id]['usage_key_end_of_year'] = assessment.get('id')   
+                    aggregate_result[problem_id]['usage_key_end_of_year'] = assessment.get('id')
 
         for data in raw_data:
             problem_id = data['problem_id']
@@ -289,7 +294,7 @@ class SkillAssessmentView(viewsets.ViewSet):
         ``problem_location`` root.
         Arguments:
             raw_data (list): data get from UserResponse OR UserRating models.
-            response(dict): 
+            response(dict):
         Returns:
                 [Dict]: Returns a dictionaries
                 containing the students updated response.
@@ -297,7 +302,7 @@ class SkillAssessmentView(viewsets.ViewSet):
         for data in raw_data:
             user_id = 'user_' + str(data['user'])
             if data['assessment_time'] == "start_of_year":
-                response['available_responses'] += 1 
+                response['available_responses'] += 1
                 if 'student_response' in data:
                     response['student_response'][user_id]['response_start_of_year'] = json.loads(data['student_response'])
                     response['student_response'][user_id]['score_start_of_year'] = data['score']
@@ -346,10 +351,10 @@ class SkillAssessmentView(viewsets.ViewSet):
                 if children:
                     assessments.extend(self.get_assessment_course_block(children))
         return assessments
-        
+
     def get_user_assessment_result(self, raw_data, gen_class):
         """
-        Generate result for single user for bar and graph char on base of single assessment 
+        Generate result for single user for bar and graph char on base of single assessment
         as per the user state  under the ``problem_location`` root.
         Arguments:
             raw_data (list): data get from UserResponse and UserRating models.
@@ -360,10 +365,13 @@ class SkillAssessmentView(viewsets.ViewSet):
         store = modulestore()
         assessments = []
         aggregate_result = dict()
-        #get assessment usage key and type for program intro assessment course
-        assessments = self.get_assessment_block_data(gen_class.program.intro_unit.id)
-        #get assessment usage key and type for program outro assessment course
-        assessments.extend(self.get_assessment_block_data(gen_class.program.outro_unit.id))
+        try:
+            #get assessment usage key and type for program intro assessment course
+            assessments.extend(self.get_assessment_block_data(gen_class.program.intro_unit.id))
+            #get assessment usage key and type for program outro assessment course
+            assessments.extend(self.get_assessment_block_data(gen_class.program.outro_unit.id))
+        except Exception as e:
+            logger.exception(e)
 
         #prepare dictionary for every particular assessment problem in a course
         for assessment in assessments:
