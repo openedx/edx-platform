@@ -253,6 +253,7 @@ dill==0.3.6
     # via pylint
 distlib==0.3.6
     # via virtualenv
+django==3.2.16
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt

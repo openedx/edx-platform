@@ -118,12 +118,6 @@ $(COMMON_CONSTRAINTS_TXT):
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
 compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
-	@# This is a temporary solution to override the real common_constraints.txt
-	@# In edx-lint, until the pyjwt constraint in edx-lint has been removed.
-	@# See BOM-2721 for more details.
-	sed 's/Django<2.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
-	mv requirements/common_constraints.tmp requirements/common_constraints.txt
-
 	pip install -q pip-tools
 	pip-compile --allow-unsafe --upgrade -o requirements/edx/pip.txt requirements/edx/pip.in
 
@@ -138,11 +132,6 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 
 	pip install -qr requirements/edx/pip.txt
 	pip install -qr requirements/edx/pip-tools.txt
-
-	# Let tox control the Django version for tests
-	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
-	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
-	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
 upgrade: pre-requirements  ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
