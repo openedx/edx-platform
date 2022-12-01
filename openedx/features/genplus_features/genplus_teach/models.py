@@ -167,8 +167,11 @@ class PortfolioEntry(TimeStampedModel):
     title = models.CharField(max_length=1024)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='portfolio_entries')
     skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True)
-    gtcs = models.ForeignKey(Gtcs, on_delete=models.SET_NULL, null=True)
+    gtcs = models.ManyToManyField(Gtcs, blank=True)
     description = models.TextField()
+
+    def __str__(self):
+        return self.title
 
 
 class Quote(TimeStampedModel):
