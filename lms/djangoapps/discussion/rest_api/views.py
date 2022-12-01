@@ -527,7 +527,8 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the GET method for thread ID
         """
         requested_fields = request.GET.get('requested_fields')
-        return Response(get_thread(request, thread_id, requested_fields))
+        course_id = request.GET.get('course_id')
+        return Response(get_thread(request, thread_id, requested_fields, course_id))
 
     def create(self, request):
         """
