@@ -399,7 +399,7 @@ class LibraryContentBlock(
                 # 500-response.
                 logger.error('Skipping display for child block that is None')
                 continue
-            for displayable in child.displayable_items():
+            for displayable in child.displayable_blocks():
                 rendered_child = displayable.render(STUDENT_VIEW, child_context)
                 fragment.add_fragment_resources(rendered_child)
                 contents.append({

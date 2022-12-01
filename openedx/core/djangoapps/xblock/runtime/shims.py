@@ -395,16 +395,16 @@ class XBlockShim:
         """
         return False
 
-    def get_display_items(self):
+    def get_display_blocks(self):
         """
         Returns a list of descendent XBlock instances that will display
         immediately inside this module.
         """
-        warnings.warn("get_display_items() is deprecated.", DeprecationWarning, stacklevel=2)
-        items = []
+        warnings.warn("get_display_blocks() is deprecated.", DeprecationWarning, stacklevel=2)
+        blocks = []
         for child in self.get_children():
-            items.extend(child.displayable_items())
-        return items
+            blocks.extend(child.displayable_blocks())
+        return blocks
 
     def displayable_items(self):
         """

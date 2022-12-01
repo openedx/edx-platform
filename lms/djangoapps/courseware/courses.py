@@ -912,7 +912,7 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
         else:
             content_children = [
                 child for child in child_modules
-                if child.has_children_at_depth(min_depth - 1) and child.get_display_items()
+                if child.has_children_at_depth(min_depth - 1) and child.get_display_blocks()
             ]
             return _get_child(content_children) if content_children else None
 
@@ -926,7 +926,7 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
         return child
 
     if has_position:
-        children = xmodule.get_display_items()
+        children = xmodule.get_display_blocks()
         if len(children) > 0:
             if xmodule.position is not None and not requested_child:
                 pos = int(xmodule.position) - 1  # position is 1-indexed

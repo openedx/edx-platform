@@ -379,7 +379,7 @@ class SequenceBlock(
         prereq_met = True
         prereq_meta_info = {}
         banner_text = None
-        display_items = self.get_display_items()
+        display_blocks = self.get_display_blocks()
         course = self._get_course()
         is_hidden_after_due = False
 
@@ -399,7 +399,7 @@ class SequenceBlock(
             else:
                 is_hidden_after_due = True
 
-        meta = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view)
+        meta = self._get_render_metadata(context, display_blocks, prereq_met, prereq_meta_info, banner_text, view)
         meta['display_name'] = self.display_name_with_default
         meta['format'] = getattr(self, 'format', '')
         meta['is_hidden_after_due'] = is_hidden_after_due
@@ -567,7 +567,7 @@ class SequenceBlock(
         # NOTE (CCB): We default to true to maintain the behavior in place prior to allowing anonymous access access.
         return context.get('user_authenticated', True)
 
-    def _get_render_metadata(self, context, display_items, prereq_met, prereq_meta_info, banner_text=None,
+    def _get_render_metadata(self, context, display_blocks, prereq_met, prereq_meta_info, banner_text=None,
                              view=STUDENT_VIEW, fragment=None):
         """Returns a dictionary of sequence metadata, used by render methods and for the courseware API"""
         if prereq_met and not self._is_gate_fulfilled():
@@ -576,10 +576,10 @@ class SequenceBlock(
                 'This section is a prerequisite. You must complete this section in order to unlock additional content.'
             )
 
-        items = self._render_student_view_for_items(context, display_items, fragment, view) if prereq_met else []
+        blocks = self._render_student_view_for_blocks(context, display_blocks, fragment, view) if prereq_met else []
 
         params = {
-            'items': items,
+            'items': blocks,
             'element_id': self.location.html_id(),
             'item_id': str(self.location),
             'is_time_limited': self.is_time_limited,
@@ -606,19 +606,19 @@ class SequenceBlock(
         content.
         """
         _ = self.runtime.service(self, "i18n").ugettext
-        display_items = self.get_display_items()
-        self._update_position(context, len(display_items))
+        display_blocks = self.get_display_blocks()
+        self._update_position(context, len(display_blocks))
 
         fragment = Fragment()
-        params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)  # lint-amnesty, pylint: disable=line-too-long
+        params = self._get_render_metadata(context, display_blocks, prereq_met, prereq_meta_info, banner_text, view, fragment)  # lint-amnesty, pylint: disable=line-too-long
         if SHOW_PROGRESS_BAR.is_enabled() and getattr(settings, 'COMPLETION_AGGREGATOR_URL', ''):
             parent_block_id = self.get_parent().scope_ids.usage_id.block_id
             params['chapter_completion_aggregator_url'] = '/'.join(
                 [settings.COMPLETION_AGGREGATOR_URL, str(self.scope_ids.usage_id.context_key), parent_block_id]) + '/'
         fragment.add_content(self.runtime.service(self, 'mako').render_template("seq_block.html", params))
 
-        self._capture_full_seq_item_metrics(display_items)
-        self._capture_current_unit_metrics(display_items)
+        self._capture_full_seq_item_metrics(display_blocks)
+        self._capture_current_unit_metrics(display_blocks)
 
         add_webpack_to_fragment(fragment, 'SequenceBlockPreview')
         shim_xmodule_js(fragment, 'Sequence')
@@ -740,10 +740,10 @@ class SequenceBlock(
 
         return True, {}
 
-    def _update_position(self, context, number_of_display_items):
+    def _update_position(self, context, number_of_display_blocks):
         """
         Update the user's sequential position given the context and the
-        number_of_display_items
+        number_of_display_blocks
         """
 
         position = context.get('position')
@@ -751,25 +751,25 @@ class SequenceBlock(
             self.position = position
 
         # If we're rendering this sequence, but no position is set yet,
-        # or exceeds the length of the displayable items,
+        # or exceeds the length of the displayable blocks,
         # default the position to the first element
         if context.get('requested_child') == 'first':
             self.position = 1
         elif context.get('requested_child') == 'last':
-            self.position = number_of_display_items or 1
-        elif self.position is None or self.position > number_of_display_items:
+            self.position = number_of_display_blocks or 1
+        elif self.position is None or self.position > number_of_display_blocks:
             self.position = 1
 
-    def _render_student_view_for_items(self, context, display_items, fragment, view=STUDENT_VIEW):
+    def _render_student_view_for_blocks(self, context, display_blocks, fragment, view=STUDENT_VIEW):
         """
         Updates the given fragment with rendered student views of the given
-        display_items.  Returns a list of dict objects with information about
-        the given display_items.
+        display_blocks.  Returns a list of dict objects with information about
+        the given display_blocks.
         """
         # Avoid circular imports.
         from openedx.core.lib.xblock_utils import get_icon
 
-        render_items = not context.get('exclude_units', False)
+        render_blocks = not context.get('exclude_units', False)
         is_user_authenticated = self.is_user_authenticated(context)
         completion_service = self.runtime.service(self, 'completion')
         try:
@@ -784,9 +784,9 @@ class SequenceBlock(
             self.display_name_with_default
         ]
         contents = []
-        for item in display_items:
-            item_type = get_icon(item)
-            usage_id = item.scope_ids.usage_id
+        for block in display_blocks:
+            item_type = get_icon(block)
+            usage_id = block.scope_ids.usage_id
 
             show_bookmark_button = False
             is_bookmarked = False
@@ -799,10 +799,10 @@ class SequenceBlock(
             context['bookmarked'] = is_bookmarked
             context['format'] = getattr(self, 'format', '')
 
-            if render_items:
-                rendered_item = item.render(view, context)
-                fragment.add_fragment_resources(rendered_item)
-                content = rendered_item.content
+            if render_blocks:
+                rendered_block = block.render(view, context)
+                fragment.add_fragment_resources(rendered_block)
+                content = rendered_block.content
             else:
                 content = ''
 
@@ -810,27 +810,27 @@ class SequenceBlock(
             contains_content_type_gated_content = False
             if content_type_gating_service:
                 contains_content_type_gated_content = content_type_gating_service.check_children_for_content_type_gating_paywall(  # pylint:disable=line-too-long
-                    item, self.scope_ids.usage_id.context_key
+                    block, self.scope_ids.usage_id.context_key
                 ) is not None
-            iteminfo = {
+            block_info = {
                 'content': content,
-                'page_title': getattr(item, 'tooltip_title', ''),
+                'page_title': getattr(block, 'tooltip_title', ''),
                 'type': item_type,
                 'id': str(usage_id),
                 'bookmarked': is_bookmarked,
-                'path': " > ".join(display_names + [item.display_name_with_default]),
-                'graded': item.graded,
+                'path': " > ".join(display_names + [block.display_name_with_default]),
+                'graded': block.graded,
                 'contains_content_type_gated_content': contains_content_type_gated_content,
             }
-            if not render_items:
+            if not render_blocks:
                 # The item url format can be defined in the template context like so:
                 # context['item_url'] = '/my/item/path/{usage_key}/whatever'
-                iteminfo['href'] = context.get('item_url', '').format(usage_key=usage_id)
+                block_info['href'] = context.get('item_url', '').format(usage_key=usage_id)
             if is_user_authenticated:
-                if item.location.block_type == 'vertical' and completion_service:
-                    iteminfo['complete'] = completion_service.vertical_is_complete(item)
+                if block.location.block_type == 'vertical' and completion_service:
+                    block_info['complete'] = completion_service.vertical_is_complete(block)
 
-            contents.append(iteminfo)
+            contents.append(block_info)
 
         return contents
 
@@ -862,7 +862,7 @@ class SequenceBlock(
         newrelic.agent.add_custom_parameter('seq.position', self.position)
         newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
 
-    def _capture_full_seq_item_metrics(self, display_items):
+    def _capture_full_seq_item_metrics(self, display_blocks):
         """
         Capture information about the number and types of XBlock content in
         the sequence as a whole. We send this information to New Relic so that
@@ -872,7 +872,7 @@ class SequenceBlock(
             return
         # Basic count of the number of Units (a.k.a. VerticalBlocks) we have in
         # this learning sequence
-        newrelic.agent.add_custom_parameter('seq.num_units', len(display_items))
+        newrelic.agent.add_custom_parameter('seq.num_units', len(display_blocks))
 
         # Count of all modules (leaf nodes) in this sequence (e.g. videos,
         # problems, etc.) The units (verticals) themselves are not counted.
@@ -884,7 +884,7 @@ class SequenceBlock(
         for block_type, count in block_counts.items():
             newrelic.agent.add_custom_parameter(f'seq.block_counts.{block_type}', count)
 
-    def _capture_current_unit_metrics(self, display_items):
+    def _capture_current_unit_metrics(self, display_blocks):
         """
         Capture information about the current selected Unit within the Sequence.
         """
@@ -893,13 +893,13 @@ class SequenceBlock(
         # Positions are stored with indexing starting at 1. If we get into a
         # weird state where the saved position is out of bounds (e.g. the
         # content was changed), avoid going into any details about this unit.
-        if 1 <= self.position <= len(display_items):
+        if 1 <= self.position <= len(display_blocks):
             # Basic info about the Unit...
-            current = display_items[self.position - 1]
+            current = display_blocks[self.position - 1]
             newrelic.agent.add_custom_parameter('seq.current.block_id', str(current.location))
             newrelic.agent.add_custom_parameter('seq.current.display_name', current.display_name or '')
 
-            # Examining all items inside the Unit (or split_test, conditional, etc.)
+            # Examining all blocks inside the Unit (or split_test, conditional, etc.)
             child_locs = self._locations_in_subtree(current)
             newrelic.agent.add_custom_parameter('seq.current.num_items', len(child_locs))
             curr_block_counts = collections.Counter(usage_key.block_type for usage_key in child_locs)

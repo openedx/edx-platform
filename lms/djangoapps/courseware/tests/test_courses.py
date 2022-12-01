@@ -166,7 +166,7 @@ class CoursesTest(ModuleStoreTestCase):
         assert get_current_child(mock_xmodule) is None
 
         mock_xmodule.position = -1
-        mock_xmodule.get_display_items.return_value = ['one', 'two', 'three']
+        mock_xmodule.get_display_blocks.return_value = ['one', 'two', 'three']
         assert get_current_child(mock_xmodule) == 'one'
 
         mock_xmodule.position = 2
@@ -175,7 +175,7 @@ class CoursesTest(ModuleStoreTestCase):
         assert get_current_child(mock_xmodule, requested_child='last') == 'three'
 
         mock_xmodule.position = 3
-        mock_xmodule.get_display_items.return_value = []
+        mock_xmodule.get_display_blocks.return_value = []
         assert get_current_child(mock_xmodule) is None
 
 
