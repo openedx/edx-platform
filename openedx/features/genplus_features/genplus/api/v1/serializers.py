@@ -172,9 +172,6 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def save(self):
         self.set_password_form.save()
-        # delete all oauth token and logout the user
-        destroy_oauth_tokens(self.user)
-        logout(self.request)
 
 
 class ChangePasswordByTeacherSerializer(serializers.Serializer):
