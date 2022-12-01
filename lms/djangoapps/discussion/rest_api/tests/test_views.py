@@ -521,6 +521,8 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
                 "has_moderation_privileges": False,
+                'is_course_admin': False,
+                'is_course_staff': False,
                 "is_group_ta": False,
                 'is_user_admin': False,
                 "user_roles": ["Student"],
