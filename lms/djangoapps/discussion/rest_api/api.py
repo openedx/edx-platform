@@ -1465,7 +1465,7 @@ def update_comment(request, comment_id, update_data):
     return api_comment
 
 
-def get_thread(request, thread_id, requested_fields=None):
+def get_thread(request, thread_id, requested_fields=None, course_id=None):
     """
     Retrieve a thread.
 
@@ -1475,6 +1475,8 @@ def get_thread(request, thread_id, requested_fields=None):
           determining the requesting user.
 
         thread_id: The id for the thread to retrieve
+
+        course_id: the id of the course the threads belongs to
 
         requested_fields: Indicates which additional fields to return for
         thread. (i.e. ['profile_image'])
@@ -1489,6 +1491,8 @@ def get_thread(request, thread_id, requested_fields=None):
             "user_id": str(request.user.id),
         }
     )
+    if course_id and course_id != cc_thread.course_id:
+        raise ThreadNotFoundError("Thread not found.")
     return _serialize_discussion_entities(request, context, [cc_thread], requested_fields, DiscussionEntity.thread)[0]
 
 
