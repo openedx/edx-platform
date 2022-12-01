@@ -400,8 +400,9 @@ class ChangePasswordByTeacherView(GenzMixin, views.APIView):
 
 
 class ChangePasswordView(GenzMixin, generics.GenericAPIView):
-    serializer_class = ChangePasswordSerializer
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, FromPrivateSchool]
+    serializer_class = ChangePasswordSerializer
 
     @sensitive_post_parameters_m
     def dispatch(self, *args, **kwargs):
