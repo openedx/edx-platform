@@ -960,7 +960,7 @@ multidict==6.0.2
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==0.982
+mypy==0.991
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
     # via mypy
