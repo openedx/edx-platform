@@ -42,7 +42,6 @@ class UserInfoSerializer(serializers.ModelSerializer):
             user_info.update(teacher_profile)
         return user_info
 
-
     def get_csrf_token(self, instance):
         return self.context.get('request').COOKIES.get('csrftoken')
 
@@ -51,9 +50,11 @@ class UserInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'username', 'csrf_token', 'role',
                   'first_name', 'last_name', 'email', 'school', 'school_type')
 
+
 class TeacherSerializer(serializers.ModelSerializer):
     user_id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
+
     class Meta:
         model = Teacher
         fields = ('id', 'user_id', 'name', 'profile_image')
@@ -86,11 +87,28 @@ class ClassListSerializer(serializers.ModelSerializer):
     current_unit = serializers.SerializerMethodField('get_current_unit')
     lesson = serializers.SerializerMethodField('get_lesson')
 
+    def lastest_unlocked_unit(self, gen_class):
+        # Returns: Latest unlocked unit
+        reversed_class_units = gen_class.class_units.all().reverse()
+
+        for class_unit in reversed_class_units:
+            if not class_unit.is_locked:
+                return class_unit
+        return None
+
     def get_current_unit(self, instance):
-        return 'Current Unit'
+        current_unit = self.lastest_unlocked_unit(instance)
+
+        if current_unit:
+            return current_unit.unit.course.display_name
+        return 'Not Available'
 
     def get_lesson(self, instance):
-        return 'Lesson'
+        current_unit = self.lastest_unlocked_unit(instance)
+        if current_unit:
+            current_lesson = current_unit.class_lessons.filter(is_locked=False).last()
+            return current_lesson.display_name
+        return 'Not Available'
 
     class Meta:
         model = Class
@@ -120,9 +138,11 @@ class FavoriteClassSerializer(serializers.Serializer):
 class JournalListSerializer(serializers.ModelSerializer):
     skill = SkillSerializer(read_only=True)
     teacher = TeacherSerializer(read_only=True)
+
     class Meta:
         model = JournalPost
         fields = ('id', 'title', 'skill', 'description', 'teacher', 'journal_type', 'created')
+
 
 class StudentPostSerializer(serializers.ModelSerializer):
     class Meta:
