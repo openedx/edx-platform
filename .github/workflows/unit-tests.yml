@@ -62,10 +62,9 @@ jobs:
       - name: install requirements
         run: |
           sudo make test-requirements
-          if [[ "${{ matrix.django-version }}" == "pinned" ]]; then
-            sudo pip install -r requirements/edx/django.txt
-          else
+          if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
             sudo pip install "django~=${{ matrix.django-version }}.0"
+            sudo pip check # fail if this test-reqs/Django combination is broken
           fi
 
       - name: list installed package versions
