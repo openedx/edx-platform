@@ -159,6 +159,7 @@ def listen_for_course_catalog_info_changed(sender, signal, **kwargs):
     get_producer().send(
         signal=COURSE_CATALOG_INFO_CHANGED, topic='course-catalog-info-changed',
         event_key_field='catalog_info.course_key', event_data={'catalog_info': kwargs['catalog_info']},
+        event_metadata=kwargs['metadata'],
     )
 
 
