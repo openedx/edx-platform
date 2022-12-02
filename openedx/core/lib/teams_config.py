@@ -82,9 +82,16 @@ class TeamsConfig:
         """
         Whether the Course Teams feature is enabled for this course run.
         """
-        # Check if the enabled field is set, and teamsets are defined
         has_teamsets = bool(self.teamsets)
-        return self._data.get('enabled', True) and has_teamsets
+        enabled = self._data.get('enabled')
+
+        # The `enabled` field is a relatively recent addition and thus is not present in all team configurations.
+        # If it is present in the data, it controls whether the feature is turned on or off.
+        # If it isn't present, the feature is considered enabled if there are teamsets defined.
+        if enabled is not None:
+            return enabled
+        else:
+            return has_teamsets
 
     @is_enabled.setter
     def is_enabled(self, value):

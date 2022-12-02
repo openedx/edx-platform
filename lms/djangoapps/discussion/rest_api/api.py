@@ -28,6 +28,11 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+)
+
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -340,6 +345,8 @@ def get_course(request, course_key):
         }),
         "is_group_ta": bool(user_roles & {FORUM_ROLE_GROUP_MODERATOR}),
         "is_user_admin": request.user.is_staff,
+        "is_course_staff": CourseStaffRole(course_key).has_user(request.user),
+        "is_course_admin": CourseInstructorRole(course_key).has_user(request.user),
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
@@ -1465,7 +1472,7 @@ def update_comment(request, comment_id, update_data):
     return api_comment
 
 
-def get_thread(request, thread_id, requested_fields=None):
+def get_thread(request, thread_id, requested_fields=None, course_id=None):
     """
     Retrieve a thread.
 
@@ -1475,6 +1482,8 @@ def get_thread(request, thread_id, requested_fields=None):
           determining the requesting user.
 
         thread_id: The id for the thread to retrieve
+
+        course_id: the id of the course the threads belongs to
 
         requested_fields: Indicates which additional fields to return for
         thread. (i.e. ['profile_image'])
@@ -1489,6 +1498,8 @@ def get_thread(request, thread_id, requested_fields=None):
             "user_id": str(request.user.id),
         }
     )
+    if course_id and course_id != cc_thread.course_id:
+        raise ThreadNotFoundError("Thread not found.")
     return _serialize_discussion_entities(request, context, [cc_thread], requested_fields, DiscussionEntity.thread)[0]
 
 
