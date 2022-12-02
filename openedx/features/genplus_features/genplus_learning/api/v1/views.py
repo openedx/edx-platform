@@ -147,27 +147,25 @@ class StudentDashboardAPIView(APIView):
         }
 
     def get_next_lesson(self, gen_class):
-        class_units = gen_class.class_units.all()
-        course_keys = class_units.values_list('course_key', flat=True)
-        user_completions = UnitCompletion.objects.filter(user=self.request.user)
+        """
+        Fetches all the units and lessons in a single query and then traverses through
+        each lesson to get a lesson that is incomplete and unlocked.
 
-        # User has not started a course yet.
-        if not user_completions:
-            next_unit = class_units.first()
-            next_lesson = next_unit.class_lessons.first()
-            return {'url': next_lesson.lms_url, 'display_name': next_lesson.display_name}
+        params: class
+        Returns: Next lesson for a student of a class.
+        """
+        class_units = gen_class.class_units.prefetch_related("class_lessons").all()
 
-        incomplete_unit_completion = user_completions.filter(is_complete=False,
-                                                             course_key__in=course_keys).first()
-
-        if incomplete_unit_completion:
-            next_unit = class_units.filter(course_key=incomplete_unit_completion.course_key).first()
-            next_unit_lessons = next_unit.class_lessons.filter(is_locked=False)
-            for lesson in next_unit_lessons:
-                lesson_completion = UnitBlockCompletion.objects.filter(user=self.request.user,
-                                                                       usage_key=lesson.usage_key).first()
-                if not lesson_completion or not lesson_completion.is_complete:
-                    return {'url': lesson.lms_url, 'display_name': lesson.display_name}
+        for class_unit in class_units:
+            unit_lessons = class_unit.class_lessons.all()
+            for lesson in unit_lessons:
+                if not lesson.is_locked:
+                    lesson_completion = UnitBlockCompletion.objects.filter(user=self.request.user,
+                                                                           usage_key=lesson.usage_key,
+                                                                           is_complete=True).first()
+                    # if user has not attempted the lesson or lesson is incomplete
+                    if not lesson_completion:
+                        return {'url': lesson.lms_url, 'display_name': lesson.display_name}
         return None
 
 
