@@ -22,12 +22,31 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tests.test_transcripts_utils import YoutubeVideoHTMLResponse
+from xmodule.tests.test_transcripts_utils import YoutubeVideoHTMLResponse, CAPTION_URL_UTF8_DECODED_TEMPLATE
 
 from xmodule.video_module import transcripts_utils  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
+
+
+class HTTPGetResponse:
+    """
+    Generic object used to return results from a mock patch to an HTTP GET request
+    """
+    def __init__(self, status_code, response_string):
+        self.status_code = status_code
+        self.text = response_string
+        self.content = response_string.encode('utf-8')
+
+
+def setup_caption_responses(mock_get, language_code, caption_response_string, track_status_code=200):
+    caption_link_response = YoutubeVideoHTMLResponse.with_caption_track(language_code)
+    caption_track_response = HTTPGetResponse(track_status_code, caption_response_string)
+    mock_get.side_effect = [
+        caption_link_response,
+        caption_track_response,
+    ]
 
 
 class TestGenerateSubs(unittest.TestCase):
@@ -224,7 +243,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
 
     def test_success_downloading_subs(self):
 
-        response = textwrap.dedent("""<?xml version="1.0" encoding="utf-8" ?>
+        caption_response_string = textwrap.dedent("""<?xml version="1.0" encoding="utf-8" ?>
                 <transcript>
                     <text start="0" dur="0.27"></text>
                     <text start="0.27" dur="2.45">Test text 1.</text>
@@ -237,14 +256,14 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
 
         language_code = 'en'
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
-            mock_get.side_effect = [
-                YoutubeVideoHTMLResponse.with_caption_link(language_code),
-                {'status_code': 200, 'text': response, 'content': response.encode('utf-8')},
-            ]
-            # Check transcripts_utils.GetTranscriptsFromYouTubeException not thrown
+            setup_caption_responses(mock_get, language_code, caption_response_string)
             transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
 
-        # mock_get.assert_any_call('https: //www.youtube.com/api/timedtext', params={'lang': 'en', 'v': 'good_id_2'})
+            self.assertEqual(2, len(mock_get.mock_calls))
+            args, kwargs = mock_get.call_args_list[0]
+            self.assertEqual(args[0], 'https://www.youtube.com/watch?v=good_id_2')
+            args, kwargs = mock_get.call_args_list[1]
+            self.assertRegexpMatches(args[0], "^https://www\.youtube\.com/api/timedtext.*")
 
     def test_subs_for_html5_vid_with_periods(self):
         """
@@ -262,7 +281,8 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
     @patch('xmodule.video_module.transcripts_utils.requests.get')
     def test_fail_downloading_subs(self, mock_get):
 
-        mock_get.return_value = Mock(status_code=404, text='Error 404')
+        track_status_code = 404
+        setup_caption_responses(mock_get, 'en', 'Error 404', track_status_code)
 
         bad_youtube_sub = 'BAD_YOUTUBE_ID2'
         self.clear_sub_content(bad_youtube_sub)
@@ -292,20 +312,6 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
             self.assertTrue(contentstore().find(content_location))
 
         self.clear_sub_content(good_youtube_sub)
-
-    @patch('xmodule.video_module.transcripts_utils.requests.get', side_effect=mock_requests_get)
-    def test_downloading_subs_using_transcript_name(self, mock_get):
-        """
-        Download transcript using transcript name in url
-        """
-        good_youtube_sub = 'good_id_2'
-        self.clear_sub_content(good_youtube_sub)
-
-        transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
-        mock_get.assert_any_call(
-            'http://video.google.com/timedtext',
-            params={'lang': 'en', 'v': 'good_id_2', 'name': 'Custom'}
-        )
 
 
 class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):  # lint-amnesty, pylint: disable=test-inherits-tests
@@ -475,20 +481,21 @@ class TestYoutubeTranscripts(unittest.TestCase):
     """
     @patch('xmodule.video_module.transcripts_utils.requests.get')
     def test_youtube_bad_status_code(self, mock_get):
-        mock_get.return_value = Mock(status_code=404, text='test')
+        track_status_code = 404
+        setup_caption_responses(mock_get, 'en', 'test', track_status_code)
         youtube_id = 'bad_youtube_id'
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
             transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
 
     @patch('xmodule.video_module.transcripts_utils.requests.get')
     def test_youtube_empty_text(self, mock_get):
-        mock_get.return_value = Mock(status_code=200, text='')
+        setup_caption_responses(mock_get, 'en', '')
         youtube_id = 'bad_youtube_id'
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
             transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
 
     def test_youtube_good_result(self):
-        response = textwrap.dedent("""<?xml version="1.0" encoding="utf-8" ?>
+        caption_response_string = textwrap.dedent("""<?xml version="1.0" encoding="utf-8" ?>
                 <transcript>
                     <text start="0" dur="0.27"></text>
                     <text start="0.27" dur="2.45">Test text 1.</text>
@@ -502,11 +509,21 @@ class TestYoutubeTranscripts(unittest.TestCase):
             'text': ['Test text 1.', 'Test text 2.', 'Test text 3.']
         }
         youtube_id = 'good_youtube_id'
+        language_code = 'en'
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
-            mock_get.return_value = Mock(status_code=200, text=response, content=response.encode('utf-8'))
+            setup_caption_responses(mock_get, language_code, caption_response_string)
             transcripts = transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
+
         self.assertEqual(transcripts, expected_transcripts)
-        mock_get.assert_called_with('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_youtube_id'})
+        self.assertEqual(2, len(mock_get.mock_calls))
+        args, kwargs = mock_get.call_args_list[0]
+        self.assertEqual(args[0], f'https://www.youtube.com/watch?v={youtube_id}')
+        args, kwargs = mock_get.call_args_list[1]
+        self.assertRegexpMatches(args[0], "^https://www\.youtube\.com/api/timedtext.*")
+
+
+
+
 
 
 class TestTranscript(unittest.TestCase):
