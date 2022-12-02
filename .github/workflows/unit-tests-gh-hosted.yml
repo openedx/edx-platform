@@ -17,23 +17,13 @@ jobs:
         python-version: [ '3.8' ]
         django-version: [
           - "pinned"
+          - "4.0"
         django-version: [ "3.2" ]
         shard_name: [
             "lms-1",
-            "lms-2",
-            "lms-3",
-            "lms-4",
-            "lms-5",
-            "lms-6",
             "openedx-1",
-            "openedx-2",
-            "openedx-3",
-            "openedx-4",
             "cms-1",
-            "cms-2",
             "common-1",
-            "common-2",
-            "common-3",
         ]
     name: gh-hosted-python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
     steps:
