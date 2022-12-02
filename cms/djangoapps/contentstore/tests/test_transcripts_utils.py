@@ -1,8 +1,8 @@
 """ Tests for transcripts_utils. """
 
-
 import copy
 import json
+import re
 import tempfile
 import textwrap
 import unittest
@@ -15,38 +15,17 @@ from django.conf import settings
 from django.test.utils import override_settings
 from django.utils import translation
 
-from cms.djangoapps.contentstore.tests.utils import mock_requests_get
+from cms.djangoapps.contentstore.tests.utils import setup_caption_responses
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tests.test_transcripts_utils import YoutubeVideoHTMLResponse, CAPTION_URL_UTF8_DECODED_TEMPLATE
-
 from xmodule.video_module import transcripts_utils  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
-
-
-class HTTPGetResponse:
-    """
-    Generic object used to return results from a mock patch to an HTTP GET request
-    """
-    def __init__(self, status_code, response_string):
-        self.status_code = status_code
-        self.text = response_string
-        self.content = response_string.encode('utf-8')
-
-
-def setup_caption_responses(mock_get, language_code, caption_response_string, track_status_code=200):
-    caption_link_response = YoutubeVideoHTMLResponse.with_caption_track(language_code)
-    caption_track_response = HTTPGetResponse(track_status_code, caption_response_string)
-    mock_get.side_effect = [
-        caption_link_response,
-        caption_track_response,
-    ]
 
 
 class TestGenerateSubs(unittest.TestCase):
@@ -263,7 +242,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
             args, kwargs = mock_get.call_args_list[0]
             self.assertEqual(args[0], 'https://www.youtube.com/watch?v=good_id_2')
             args, kwargs = mock_get.call_args_list[1]
-            self.assertRegexpMatches(args[0], "^https://www\.youtube\.com/api/timedtext.*")
+            self.assertTrue(re.match(r"^https://www\.youtube\.com/api/timedtext.*", args[0]))
 
     def test_subs_for_html5_vid_with_periods(self):
         """
@@ -519,11 +498,7 @@ class TestYoutubeTranscripts(unittest.TestCase):
         args, kwargs = mock_get.call_args_list[0]
         self.assertEqual(args[0], f'https://www.youtube.com/watch?v={youtube_id}')
         args, kwargs = mock_get.call_args_list[1]
-        self.assertRegexpMatches(args[0], "^https://www\.youtube\.com/api/timedtext.*")
-
-
-
-
+        self.assertTrue(re.match(r"^https://www\.youtube\.com/api/timedtext.*", args[0]))
 
 
 class TestTranscript(unittest.TestCase):

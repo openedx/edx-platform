@@ -3,6 +3,7 @@
 
 import copy
 import json
+import re
 import tempfile
 import textwrap
 from codecs import BOM_UTF8
@@ -16,7 +17,7 @@ from django.urls import reverse
 from edxval.api import create_video
 from opaque_keys.edx.keys import UsageKey
 
-from cms.djangoapps.contentstore.tests.utils import CourseTestCase, mock_requests_get
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase, setup_caption_responses
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -940,7 +941,7 @@ class TestCheckTranscripts(BaseTranscripts):
             }
         )
 
-    @patch('xmodule.video_module.transcripts_utils.requests.get', side_effect=mock_requests_get)
+    @patch('xmodule.video_module.transcripts_utils.requests.get')
     def test_check_youtube_with_transcript_name(self, mock_get):
         """
         Test that the transcripts are fetched correctly when the the transcript name is set
@@ -958,6 +959,7 @@ class TestCheckTranscripts(BaseTranscripts):
             ]
         }
         self.save_subs_to_store(subs, 'good_id_2')
+        setup_caption_responses(mock_get, 'en', 'caption_response_string')
         link = reverse('check_transcripts')
         data = {
             'locator': str(self.video_usage_key),
@@ -969,10 +971,9 @@ class TestCheckTranscripts(BaseTranscripts):
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
 
-        mock_get.assert_any_call(
-            'http://video.google.com/timedtext',
-            params={'lang': 'en', 'v': 'good_id_2', 'name': 'Custom'}
-        )
+        self.assertEqual(2, len(mock_get.mock_calls))
+        args, kwargs = mock_get.call_args_list[0]
+        self.assertEqual(args[0], 'https://www.youtube.com/watch?v=good_id_2')
 
         self.assertEqual(resp.status_code, 200)
 
