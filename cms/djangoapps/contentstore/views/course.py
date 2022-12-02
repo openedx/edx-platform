@@ -76,6 +76,7 @@ from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.edly.utils import filter_courses_based_on_org, get_edx_org_from_cookie, get_enabled_organizations
+from openedx.features.edly.validators import is_courses_limit_reached_for_plan
 from student import auth
 from student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
 from student.roles import (
@@ -865,6 +866,14 @@ def _create_or_rerun_course(request):
     """
     if not auth.user_has_role(request.user, CourseCreatorRole()):
         raise PermissionDenied()
+
+    if is_courses_limit_reached_for_plan():
+        return JsonResponse({
+            "ErrMsg": _(
+                u"The limit for maximum accounts for this organization has been reached. "
+                u"Please contact the admin or edly support."
+            )}
+        )
 
     try:
         org = request.json.get('org')
