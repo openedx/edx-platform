@@ -3,7 +3,6 @@
 
 import copy
 import json
-import re
 import tempfile
 import textwrap
 from codecs import BOM_UTF8
