@@ -4,8 +4,6 @@ Utilities for contentstore tests
 
 
 import json
-import textwrap
-from unittest.mock import Mock
 
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -391,6 +389,7 @@ def setup_caption_responses(mock_get, language_code, caption_response_string, tr
         caption_link_response,
         caption_track_response,
     ]
+
 
 def get_url(handler_name, key_value, key_name='usage_key_string', kwargs=None):
     """
