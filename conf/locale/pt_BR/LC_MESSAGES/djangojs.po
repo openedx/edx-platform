@@ -193,7 +193,7 @@
 # Lucas Oliveira Silva <lucas_sem@hotmail.com>, 2014
 # 65971a0953e55f53f5475a3fa483ec89_9b4f7df <c1633493954e537617ecd67b590e3d56_202429>, 2015
 # Marcos Paulo Castilho Costa <hospitaldomicro2@yahoo.com.br>, 2019
-# Matheus Gomes Correia, 2017
+# Matheus Gomes, 2017
 # Maurício Gonçalves Melara Camargo <mauriciogmc@gmail.com>, 2015
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Drew Melim <nokostya.translation@gmail.com>, 2015
@@ -227,7 +227,7 @@
 # Magaly Munik da Rocha, 2014
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
 # Mariana Jó de Souza <mariana.jsouza@gmail.com>, 2015
-# Matheus Gomes Correia, 2017
+# Matheus Gomes, 2017
 # fb1100192853591078ce093a2958833f_1c08340 <6229efa64eb5c47989565636219dbce1_187150>, 2014
 # Maurício Gonçalves Melara Camargo <mauriciogmc@gmail.com>, 2015
 # Mike Job <mikejobrn@gmail.com>, 2015
@@ -246,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-06 20:42+0000\n"
+"POT-Creation-Date: 2022-11-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Rodrigo Rocha <prof.rodrigorocha@yahoo.com>, 2020\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
