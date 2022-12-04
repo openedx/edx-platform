@@ -108,7 +108,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-20 20:42+0000\n"
+"POT-Creation-Date: 2022-11-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2018,2020-2021\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -1651,7 +1651,7 @@ msgstr " öğrenci istisna listesine başarıyla eklendi"
 msgid ""
 " records are not in the correct format and have not been added to the "
 "exception list"
-msgstr ""
+msgstr " kayıtlar doğru formatta değil ve istisna listesine eklenmemişler"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
@@ -10435,7 +10435,7 @@ msgstr "Gönderi"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Enable discussion"
-msgstr ""
+msgstr "Tartışmayı genişlet"
 
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
@@ -10467,7 +10467,7 @@ msgstr "Bölüm Verisi"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "path/to/introductionToCookieBaking-CH{order}.pdf"
-msgstr ""
+msgstr "adres/yolu/KekPişirmeyeGiriş-TR{order}.pdf"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "upload a PDF file or provide the path to a Studio asset file"
@@ -10860,7 +10860,7 @@ msgstr "Yayın Tarihi/Saati Temizle"
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid "Due in:"
-msgstr ""
+msgstr "Tamamlanma:"
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid "weeks from learner enrollment date"
@@ -11078,6 +11078,10 @@ msgid ""
 "reverted back to a basic or timed exam. You may not configure it as a "
 "proctored exam now. Contact edX Support for assistance."
 msgstr ""
+"Bu alt bölüm öğrencilere gözetimli bir sınav olarak yayınlandı, ancak basit "
+"ya da zamanlanmış sınav ayarlarına geri döndürüldü. Artık bunu bir gözetimli"
+" sınav olarak yapılandıramazsınız. Yardım için edX Destek ile iletişime "
+"geçin. "
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
@@ -11086,6 +11090,10 @@ msgid ""
 "a basic exam by selecting 'None', or a timed exam, but you will NOT be able "
 "to configure it as a proctored exam in the future."
 msgstr ""
+"Bu gözetimli sınav öğrencilere sunulmuştur. Başka bir tür özel sınava "
+"dönüştüremezsiniz. \"None\" ayarını seçerek bu alt bölümü basit ya da "
+"zamanlanmış sınav haline geri döndürebilirsiniz, ancak ileride bunu "
+"gözetimli bir sınav olarak yapılandıramazsınız. "
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"

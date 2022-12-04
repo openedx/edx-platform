@@ -10,6 +10,7 @@
 # Alexander Gropmann <alexander.gropmann@charite.de>, 2018
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2013-2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2016-2017
+# Alfredo Guillem, 2022
 # andreas.frey <andreas.frey@liip.ch>, 2014
 # Arno <transifex@senlogik.de>, 2013
 # Arno <transifex@senlogik.de>, 2013
@@ -51,6 +52,7 @@
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2013
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2017
+# Alfredo Guillem, 2022
 # andreas.frey <andreas.frey@liip.ch>, 2014
 # Arno <transifex@senlogik.de>, 2013
 # Christian Layr <Christian.Layr@unisg.ch>, 2014
@@ -79,6 +81,7 @@
 # Alexander Gropmann <alexander.gropmann@charite.de>, 2018
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2013-2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2016-2017
+# Alfredo Guillem, 2022
 # 9309a68e5ef70fb98095fd18e848e998_2d7fe4e, 2014
 # Bert Krohn <bert.krohn@tum.de>, 2018
 # derMarc <dasunuebliche@email.de>, 2014
@@ -173,7 +176,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-06 20:42+0000\n"
+"POT-Creation-Date: 2022-11-27 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -12338,7 +12341,7 @@ msgstr ""
 
 #: xmodule/video_module/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
-msgstr "Wir unterstützen nur SubRip (*.srt) Transskriptformate."
+msgstr "Wir unterstützen nur SubRip (*.srt) Transkriptformate."
 
 #: xmodule/video_module/transcripts_utils.py
 #, python-brace-format
@@ -12346,20 +12349,20 @@ msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
 "is {error_message}"
 msgstr ""
-"Wärend des Parsens ist ein Fehler mit der SubRip-Transskriptdatei "
+"Wärend des Parsens ist ein Fehler mit der SubRip-Transkriptdatei "
 "aufgetreten. Interner Fehlerkode {error_message}"
 
 #: xmodule/video_module/transcripts_utils.py
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr ""
-"Wärend des Parsens ist ein Fehler mit der SubRip-Transskriptdatei "
+"Wärend des Parsens ist ein Fehler mit der SubRip-Transkriptdatei "
 "aufgetreten."
 
 #: xmodule/video_module/transcripts_utils.py
 #, python-brace-format
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
-"{exception_message}: Kann die hochgeladenen Transskripte nicht finden: "
+"{exception_message}: Kann die hochgeladenen Transkripte nicht finden: "
 "{user_filename}"
 
 #: xmodule/video_module/video_handlers.py
@@ -13390,7 +13393,7 @@ msgstr "Die von Ihnen eingegebene Information ist falsch."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" modules."
-msgstr "Transskripte sind nur für \"Video\" Module verfügbar."
+msgstr "Transkripte sind nur für \"Video\" Module verfügbar."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -13418,7 +13421,7 @@ msgstr "Kann kein Item mit diesem Locator finden."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "No such transcript."
-msgstr "Kein solches Transskript vorhanden"
+msgstr "Kein solches Transkript vorhanden"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "There is a problem with the chosen transcript file."
@@ -14913,7 +14916,7 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Downloads and transcripts"
-msgstr "Downloads und Transskripte"
+msgstr "Downloads und Transkripte"
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -14921,7 +14924,7 @@ msgstr "Videodatei herunterladen"
 
 #: lms/templates/video.html
 msgid "Transcripts"
-msgstr "Transskripte"
+msgstr "Transkripte"
 
 #: lms/templates/video.html
 msgid "Download {file}"
