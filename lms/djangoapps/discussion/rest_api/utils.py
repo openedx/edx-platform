@@ -159,3 +159,87 @@ def get_moderator_users_list(course_id):
         for user in role.users.all()
     ]
     return moderator_user_ids
+
+
+def filter_topic_from_discussion_id(discussion_id, topics_list):
+    """
+    Returns topic based on discussion id
+    """
+    for topic in topics_list:
+        if topic.get("id") == discussion_id:
+            return topic
+    return {}
+
+
+def create_discussion_children_from_ids(children_ids, blocks, topics):
+    """
+    Takes ids of discussion and return discussion dictionary
+    """
+    discussions = []
+    for child_id in children_ids:
+        topic = blocks.get(child_id)
+        if topic.get('type') == 'vertical':
+            discussions_id = topic.get('discussions_id')
+            topic = filter_topic_from_discussion_id(discussions_id, topics)
+        if topic:
+            discussions.append(topic)
+    return discussions
+
+
+def create_blocks_params(course_usage_key, user):
+    """
+    Returns param dict that is needed to get blocks
+    """
+    return {
+        'usage_key': course_usage_key,
+        'user': user,
+        'depth': None,
+        'nav_depth': None,
+        'requested_fields': {
+            'display_name',
+            'student_view_data',
+            'children',
+            'discussions_id',
+            'type',
+            'block_types_filter'
+        },
+        'block_counts': set(),
+        'student_view_data': {'discussion'},
+        'return_type': 'dict',
+        'block_types_filter': {
+            'discussion',
+            'chapter',
+            'vertical',
+            'sequential',
+            'course'
+        }
+    }
+
+
+def create_topics_v3_structure(blocks, topics):
+    """
+    Create V3 topics structure from blocks and v2 topics
+    """
+    non_courseware_topics = [
+        dict({**topic, 'courseware': False})
+        for topic in topics
+        if topic.get('usage_key', '') is None
+    ]
+    courseware_topics = []
+    for key, value in blocks.items():
+        if value.get("type") == "chapter":
+            value['courseware'] = True
+            courseware_topics.append(value)
+            value['children'] = create_discussion_children_from_ids(
+                value['children'],
+                blocks,
+                topics,
+            )
+            subsections = value.get('children')
+            for subsection in subsections:
+                subsection['children'] = create_discussion_children_from_ids(
+                    subsection['children'],
+                    blocks,
+                    topics,
+                )
+    return non_courseware_topics + courseware_topics
