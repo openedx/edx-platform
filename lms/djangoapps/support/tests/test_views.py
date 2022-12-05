@@ -24,6 +24,7 @@ from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.statuses import ProctoredExamStudentAttemptStatus
 from edx_proctoring.tests.test_services import MockLearningSequencesService, MockScheduleItemData
 from edx_proctoring.tests.utils import ProctoredExamTestCase
+from oauth2_provider.models import AccessToken, RefreshToken
 from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.tests.factories import OrganizationFactory
 from pytz import UTC
@@ -58,6 +59,7 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.oauth_dispatch.tests import factories
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.enterprise_support.api import enterprise_is_enabled
@@ -155,6 +157,15 @@ class SupportViewManageUserTests(SupportViewTestCase):
         test_user = UserFactory(
             username='foobar', email='foobar@foobar.com', password='foobar'
         )
+
+        application = factories.ApplicationFactory(user=test_user)
+        access_token = factories.AccessTokenFactory(user=test_user, application=application)
+        factories.RefreshTokenFactory(
+            user=test_user, application=application, access_token=access_token
+        )
+        assert 0 != AccessToken.objects.filter(user=test_user).count()
+        assert 0 != RefreshToken.objects.filter(user=test_user).count()
+
         url = reverse('support:manage_user_detail') + test_user.username
         response = self.client.post(url, data={
             'username_or_email': test_user.username,
@@ -164,6 +175,8 @@ class SupportViewManageUserTests(SupportViewTestCase):
         assert data['success_msg'] == 'User Disabled Successfully'
         test_user = User.objects.get(username=test_user.username, email=test_user.email)
         assert test_user.has_usable_password() is False
+        assert 0 == AccessToken.objects.filter(user=test_user).count()
+        assert 0 == RefreshToken.objects.filter(user=test_user).count()
 
 
 @ddt.ddt
