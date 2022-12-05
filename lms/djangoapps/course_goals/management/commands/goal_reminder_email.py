@@ -120,7 +120,7 @@ class Command(BaseCommand):
 
         try:
             self._handle_all_goals()
-        except Exception:  # pylint: disable=broad-except
+        except BaseException:  # pylint: disable=broad-except
             log.exception("Error while sending course goals emails: ")
             raise
 
