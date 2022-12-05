@@ -3,7 +3,6 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey
 from collections import defaultdict
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -86,9 +85,11 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                 responses['results'] = []
                 aggregate_result = dict()
                 user_short_answers = dict()
+                
                 for user_id in student_list:
                     user = get_user_model().objects.get(pk=user_id)
                     user_states = generated_report_data.get(user.username)
+                    user_id = "user_" + str(user_id)
                     if user_states:
                         # For each response in the block, aggregate the result for the problem, and add in the responses
                         if responses['problem_type'] in ('single_choice', 'multiple_choice'):
@@ -98,12 +99,15 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                                 responses['results'].append(students_multiple_choice_response(user_states, user))
                         elif responses['problem_type'] == "short_answers":
                             for user_state in user_states:
-                                if user_state['Answer ID'] not in user_short_answers:
-                                    user_short_answers[user_state['Answer ID']] = dict()
-                                if user_id not in user_short_answers[user_state['Answer ID']]:
-                                    user_short_answers[user_state['Answer ID']][user_id] = get_students_short_answer_response(user_state, user)
-                responses['results'].append(user_short_answers)
-
+                                answer_id = user_state['Answer ID']
+                                if answer_id not in user_short_answers:
+                                    user_short_answers[answer_id] = dict()
+                                    user_short_answers[answer_id]['question_text'] = user_state['Question']
+                                if user_id not in user_short_answers[answer_id]:
+                                    user_short_answers[answer_id][user_id] = get_students_short_answer_response(user_state, user)
+                                    
+                if len(user_short_answers)>0:
+                    responses['results'].append(user_short_answers)
                 if responses['problem_type'] in ('single_choice', 'multiple_choice') and filter_type == "aggregate_response":
                     for key,value in aggregate_result.items():
                         responses['results'].append({
@@ -131,12 +135,12 @@ def students_aggregate_result(user_states, aggregate_result):
     for user_state in user_states:
         user_answer = user_state['Answer']
         correct_answer = user_state['Correct Answer']
-        if user_state['Answer'] not in aggregate_result:
-            aggregate_result[user_state['Answer']] = dict()
-            aggregate_result[user_state['Answer']]['count'] = 1
-            aggregate_result[user_state['Answer']]['is_correct'] = correct_answer == user_answer
+        if user_answer not in aggregate_result:
+            aggregate_result[user_answer] = dict()
+            aggregate_result[user_answer]['count'] = 1
+            aggregate_result[user_answer]['is_correct'] = correct_answer == user_answer
         else:
-            aggregate_result[user_state['Answer']]['count'] += 1
+            aggregate_result[user_answer]['count'] += 1
 
     return aggregate_result
 
@@ -190,14 +194,10 @@ def get_students_short_answer_response(user_state, user):
             containing the student aggregate result data.
     """
     student_response_dict = dict()
-    answer_id = user_state['Answer ID']
     user_answer = user_state['Answer']
-    user_question = user_state['Question']
     student_response_dict = {
         'username': user.username,
         'full_name': user.get_full_name(),
-        'answer_id': answer_id,
-        'question': user_question,
         'answer': user_answer,
     }
 
