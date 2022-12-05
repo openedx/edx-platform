@@ -326,7 +326,7 @@ class ConditionalBlock(
         descriptors = []
         for location in self.sources_list:
             try:
-                descriptor = self.system.load_item(location)
+                descriptor = self.system.get_block(location)
                 descriptors.append(descriptor)
             except ItemNotFoundError:
                 msg = "Invalid module by location."
