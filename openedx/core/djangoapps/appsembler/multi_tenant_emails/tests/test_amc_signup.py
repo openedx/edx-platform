@@ -1,7 +1,9 @@
+import unittest
 import json
 from mock import patch, Mock
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -98,6 +100,7 @@ class MultiTenantAMCSignupTest(APITestCase):
         assert site_response.status_code == status.HTTP_201_CREATED, '{}: {}'.format(color, site_response.content)
         return user_response, site_response
 
+    @unittest.skipUnless(settings.FEATURES.get('TAHOE_SITES_USE_ORGS_MODELS', False), 'RED-2845 Remove with AMC')
     def test_new_admin_with_learner(self, mock_add_creator):
         """
         Test happy scenario regardless of APPSEMBLER_MULTI_TENANT_EMAILS.
@@ -110,6 +113,7 @@ class MultiTenantAMCSignupTest(APITestCase):
         with with_organization_context(site_color=red_site):
             self.register_learner('learner@example.com', 'learner')
 
+    @unittest.skipUnless(settings.FEATURES.get('TAHOE_SITES_USE_ORGS_MODELS', False), 'RED-2845 Remove with AMC')
     def test_learner_registers_for_trial(self, mock_add_creator):
         """
         Test learner registers for a new Tahoe trial signup when APPSEMBLER_MULTI_TENANT_EMAILS is enabled.
