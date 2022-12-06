@@ -47,7 +47,12 @@ ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes(
 
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
 
-LIBRARY_BLOCK_TYPES = settings.LIBRARY_BLOCK_TYPES
+
+# NOTE: PER PR #30803 we are setting this value to not include the "Library Sourced Content" xblock on the Olive Release.
+LIBRARY_BLOCK_TYPES =  filter(
+    lambda b: b["component"] != "library_sourced",
+    settings.LIBRARY_BLOCK_TYPES
+)
 
 CONTAINER_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal",
