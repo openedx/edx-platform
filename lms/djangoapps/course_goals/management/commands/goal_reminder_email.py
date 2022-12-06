@@ -153,16 +153,24 @@ class Command(BaseCommand):
         courses_to_exclude = CourseOverview.objects.filter(
             id__in=all_goal_course_keys, end__date__lte=sunday_date
         ).values_list('id', flat=True)
+        log.info(f"Processing course goals across {len(all_goal_course_keys)} courses "
+                 + f"excluding {len(courses_to_exclude)} ended courses")
 
-        count = 0
+        sent_count = 0
+        filtered_count = 0
         course_goals = course_goals.exclude(course_key__in=courses_to_exclude).select_related('user').order_by('user')
+        log.info(f'Processing course goals, total goal count {len(course_goals)}')
         for goal in course_goals:
             # emulate a request for waffle's benefit
             with emulate_http_request(site=Site.objects.get_current(), user=goal.user):
                 if self.handle_goal(goal, today, sunday_date, monday_date):
-                    count += 1
+                    sent_count += 1
+                else:
+                    filtered_count += 1
+            if (sent_count + filtered_count) % 1000 == 0:
+                log.info(f'Processing course goals: sent {sent_count} filtered {filtered_count}')
 
-        log.info(f'Sent {count} emails')
+        log.info(f'Sent {sent_count} emails, filtered out {filtered_count} emails')
 
     @staticmethod
     def handle_goal(goal, today, sunday_date, monday_date):
