@@ -3,7 +3,6 @@ These views handle all actions in Studio related to import and exporting of
 courses
 """
 
-
 import base64
 import json
 import logging
