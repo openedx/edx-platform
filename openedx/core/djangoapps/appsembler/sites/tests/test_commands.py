@@ -1,4 +1,3 @@
-import hashlib
 import os
 from unittest.mock import patch, mock_open, Mock
 from io import StringIO
@@ -57,11 +56,8 @@ from student.tests.factories import (
     UserStandingFactory,
 )
 
-from organizations.models import Organization, OrganizationCourse
-
-from oauth2_provider.models import AccessToken, RefreshToken, Application
-
-from student.roles import CourseCreatorRole
+from organizations.models import OrganizationCourse, Organization
+from oauth2_provider.models import Application
 
 
 @override_settings(
@@ -109,50 +105,7 @@ class CreateDevstackSiteCommandTestCase(TestCase):
         assert Site.objects.get(domain=self.site_name)
         organization = Organization.objects.get(name=self.name)
         user = get_user_model().objects.get()
-        assert user.check_password(self.name)
-        assert user.profile.name == self.name
         assert get_organization_for_user(user=user) == organization
-
-        assert CourseCreatorRole().has_user(user), 'User should be a course creator'
-
-        fake_token = hashlib.md5(user.username.encode('utf-8')).hexdigest()  # Using a fake token so AMC devstack can guess it
-        assert fake_token == '80bfa968ffad007c79bfc603f3670c99', 'Ensure hash is identical to AMC'
-        assert AccessToken.objects.get(user=user).token == fake_token, 'Access token is needed'
-        assert RefreshToken.objects.get(user=user).token == fake_token, 'Refresh token is needed'
-
-
-@override_settings(
-    DEBUG=True,
-)
-class TestCandidateSitesCleanupCommand(TestCase):
-    """
-    Tests for the `danger_candidate_sites_cleanup` management command.
-    """
-    def setUp(self):
-        Application.objects.create(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID,
-                                   client_type=Application.CLIENT_CONFIDENTIAL)
-        call_command('create_devstack_site', 'blue', 'oldlocalhost')
-        site_config = self.get_site().configuration
-        site_config.site_values.update({
-            'SEGMENT_KEY': 'test1',
-            'customer_gtm_id': 'test2',
-        })
-        site_config.save()
-
-    def get_site(self):
-        return Site.objects.get(domain__startswith='blue.')
-
-    def test_run(self):
-        assert self.get_site().domain == 'blue.oldlocalhost:18000'
-        active_orgs = Organization.objects.all()
-        active_orgs_function_path = 'openedx.core.djangoapps.appsembler.sites.utils.get_active_organizations'
-        with patch(active_orgs_function_path, return_value=active_orgs):
-            # Side-step the `Tier` model.
-            call_command('danger_candidate_sites_cleanup', 'oldlocalhost:18000', 'newlocalhost:18000')
-        assert self.get_site().domain == 'blue.newlocalhost:18000'
-        assert not self.get_site().configuration.get_value('customer_gtm_id')
-        assert not self.get_site().configuration.get_value('SEGMENT_KEY')
-        assert self.get_site().configuration.get_value('SITE_NAME') == self.get_site().domain
 
 
 @override_settings(
@@ -189,7 +142,7 @@ class RemoveSiteCommandTestCase(TestCase):
         """
         deleted_domain = '{}.localhost:18000'.format(self.to_be_deleted)
         remained_domain = '{}.localhost:18000'.format(self.shall_remain)
-        assert SiteConfiguration.objects.count() == 2, 'there are two sites'
+        assert Site.objects.filter(domain__endswith='.localhost:18000').count() == 2, 'there are two sites'
         remained_site = Site.objects.get(domain=remained_domain)
 
         # TODO: Re-produce the error we face in staging
@@ -202,9 +155,8 @@ class RemoveSiteCommandTestCase(TestCase):
         # Ensure objects are removed correctly.
         assert not Site.objects.filter(domain=deleted_domain).exists()
 
-        assert SiteConfiguration.objects.count() == 1, 'One site is deleted'
-        assert SiteConfiguration.objects.get(site=remained_site), 'remained_domain site config is kept'
-
+        assert Site.objects.filter(domain__endswith='.localhost:18000').count() == 1, 'One site is deleted'
+        remained_site.refresh_from_db()  # remained_domain site config is kept
         assert SiteTheme.objects.filter(site=remained_site).count() == remained_site.themes.count()
 
     def test_remove_devstack_site_rollback(self):

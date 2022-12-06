@@ -1,7 +1,8 @@
-import hashlib
 import inspect
 import json
-import uuid
+
+from openedx.core.djangoapps.appsembler.sites.serializers_v2 import TahoeSiteCreationSerializer
+from tahoe_sites.api import add_user_to_organization
 
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
@@ -10,16 +11,11 @@ from django.conf import settings
 from django.db import transaction
 
 from openedx.core.djangoapps.appsembler.sites.serializers import RegistrationSerializer
-from openedx.core.djangoapps.appsembler.sites.utils import reset_amc_tokens
-from student.models import UserProfile
-from student.roles import CourseCreatorRole
 
 
 class Command(BaseCommand):
     """
-    Create the demo something.localhost:18000 site for devstack.
-
-    Needs the corresponding `create_devstack_site` AMC command to be run as well.
+    Create a Tahoe 2.0 demo something.localhost:18000 site for devstack.
     """
 
     def add_arguments(self, parser):
@@ -46,17 +42,14 @@ class Command(BaseCommand):
             """
             Congrats, Your site is ready!
 
-            Username: "{name}"
-            Email: "{email}"
-            Password: "{password}"
-
             Site URL: "http://{site}/"
 
             Please add the following entry to your /etc/hosts file:
 
                 127.0.0.1 {domain}
 
-            Remember to run the corresponding AMC command.
+            You can login via FusionAuth via a Learner or an Administrator depending
+            on the user.data.platform_role you chose.
 
             Enjoy!
             """.format(**kwargs)
@@ -83,52 +76,32 @@ class Command(BaseCommand):
         domain = '{name}.{base_domain}'.format(name=name, base_domain=base_domain)
         site_name = '{domain}:18000'.format(domain=domain)
 
-        user = User.objects.create_user(
-            username=name,
-            email='{}@example.com'.format(name),
-            password=name,
-        )
-        CourseCreatorRole().add_users(user)
-        UserProfile.objects.create(user=user, name=name)
-
-        # Calculated access tokens to the AMC devstack can have them without needing to communicate with the LMS.
-        # Just making it easier to automate this without having cross-dependency in devstack
-        fake_token = hashlib.md5(user.username.encode('utf-8')).hexdigest()
-        reset_amc_tokens(user, access_token=fake_token, refresh_token=fake_token)
-
-        data = {
-            'site': {
-                'domain': site_name,
-                'name': site_name,
-            },
-            'username': user.username,
-            'organization': {
-                'name': name,
-                'short_name': name,
-                'edx_uuid': uuid.uuid4(),  # TODO: RED-2845 Remove this line when AMC is migrated
-            },
-            'initial_values': {
-                'SITE_NAME': site_name,
-                'platform_name': '{} Academy'.format(name),
-                'logo_positive': None,
-                'logo_negative': None,
-                'font': 'Roboto',
-                'accent-font': 'Delius Unicase',
-                'primary_brand_color': '#F00',
-                'base_text_color': '#000',
-                'cta_button_bg': '#00F',
-            }
-        }
-        serializer = RegistrationSerializer(data=data)
+        serializer = TahoeSiteCreationSerializer(data={
+            'short_name': name,
+            'domain': site_name,
+        })
         if not serializer.is_valid():
             raise CommandError('Something went wrong with the process: \n{errors}'.format(
                 errors=json.dumps(serializer.errors, indent=4)
             ))
-        serializer.save()
+        site_data = serializer.save()
+
+        # This admin cannot login without FusionAuth, but it's added for simulation purposes
+        # in testing.
+        fake_admin_user = User.objects.create_user(
+            username=name,
+            email='{}@example.com'.format(name),
+            password=name,
+        )
+        add_user_to_organization(
+            user=fake_admin_user,
+            organization=site_data['organization'],
+            is_admin=True,
+        )
 
         self.congrats(
-            name=user.username,
-            email=user.email,
+            name=fake_admin_user.username,
+            email=fake_admin_user.email,
             password=name,
             site=site_name,
             domain=domain,
