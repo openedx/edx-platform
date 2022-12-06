@@ -1,44 +1,40 @@
 ---
 metadata:
-    display_name: Gen+ String Responses (Three)
+    display_name: Gen+ Journal Responses (Three)
     markdown: !!null
 data: |
-    <div class="journals-xblock multiple theme-dark">
-      <problem class="short_answers">
+    <div class="journals-xblock journal-responses multiple theme-pink">
+      <problem class="journal_responses">
         <div class="journals-xblock-wapper">
-          <div class="journals-info">
-            <h2>Your Turn</h2>
-            <p>Think. What's the one thing you want to achieve this year?<br />It could be something to do with school, home or the community.</p>
-          </div>
-          <div class="journals-form three">
-            <div class="col">
+          <img class="asn-icon" src="https://dev.genplus.co.uk/asset-v1:genplus+GP414+2022_T1+type@asset+block@logo-black.svg" alt="Logo Left" />
+          <div class="journal-entries journals-form">
+            <div class="col order-sm-2">
+              <img src="https://dev.genplus.co.uk/asset-v1:genplus+GP414+2022_T1+type@asset+block@journal-flipped.png" alt="journal" />
+            </div>
+            <div class="col order-sm-1">
+              <div class="journals-info">
+                <h2>JOURNAL TITLE</h2>
+              </div>
               <stringresponse answer="\w" type="regexp ci">
-                <label class="question-text">Describe what you want to achieve and why.</label>
+                <label class="question-text">Short description of what to write in this box.</label>
                 <additional_answer answer="Please type a response"/>
                 <div class="text-wrapper">
                   <textline multiline="true" size="20" placeholder="Type in your answer here..." />
                 </div>
               </stringresponse>
             </div>
-            <div class="col">
+            <div class="col order-sm-3">
               <stringresponse answer="\w" type="regexp ci">
-                <label class="question-text">How are you going to achieve it?</label>
+                <label class="question-text">Short description of what to write in this box.</label>
                 <additional_answer answer="Please type a response"/>
                 <div class="text-wrapper">
                   <textline multiline="true" size="20" placeholder="Type in your answer here..." />
                 </div>
               </stringresponse>
             </div>
-            <div class="col">
+            <div class="col order-sm-4">
               <stringresponse answer="\w" type="regexp ci">
-                <label class="question-text">
-                  '<strong>Calculate</strong>' the risks vs pay-offs.
-                  <br />
-                  <small>
-                  - What's the worst that could happen?<br />
-                  - How can you ovetcome the difficulties?<br />
-                  </small>
-                </label>
+                <label class="question-text">Short description of what to write in this box.</label>
                 <additional_answer answer="Please type a response"/>
                 <div class="text-wrapper">
                   <textline multiline="true" size="20" placeholder="Type in your answer here..." />
