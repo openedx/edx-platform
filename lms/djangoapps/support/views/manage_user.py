@@ -75,7 +75,7 @@ class ManageUserDetailView(GenericAPIView):
             UserPasswordToggleHistory.objects.create(
                 user=user, comment=comment, created_by=request.user, disabled=True
             )
-            retire_dot_oauth2_models(request.user)
+            retire_dot_oauth2_models(user)
         else:
             user.set_password(generate_password(length=25))
             UserPasswordToggleHistory.objects.create(
