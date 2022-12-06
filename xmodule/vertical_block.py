@@ -13,7 +13,7 @@ from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.fields import Boolean, Scope
-from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockChildrenLoaded
+from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_block import SequenceFields
@@ -97,12 +97,6 @@ class VerticalBlock(
 
         child_blocks = self.get_children()  # lint-amnesty, pylint: disable=no-member
 
-        # .. filter_implemented_name: VerticalBlockChildrenLoaded
-        # .. filter_type: org.openedx.learning.vertical_block.children.loaded.v1
-        child_blocks, context, view = VerticalBlockChildrenLoaded.run_filter(
-            children=child_blocks, context=context, view=view
-        )
-
         child_blocks_to_complete_on_view = set()
         completion_service = self.runtime.service(self, 'completion')
         if completion_service and completion_service.completion_tracking_enabled():
@@ -167,6 +161,12 @@ class VerticalBlock(
 
         add_webpack_to_fragment(fragment, 'VerticalStudentView')
         fragment.initialize_js('VerticalStudentView')
+
+        # .. filter_implemented_name: VerticalBlockRenderCompleted
+        # .. filter_type: org.openedx.learning.vertical_block.render.completed.v1
+        fragment, context, view = VerticalBlockRenderCompleted.run_filter(
+            fragment=fragment, context=context, view=view
+        )
 
         return fragment
 
