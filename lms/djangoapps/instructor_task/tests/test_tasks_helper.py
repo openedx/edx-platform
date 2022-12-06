@@ -44,7 +44,8 @@ from lms.djangoapps.instructor_task.tasks_helper.grades import (
     NOT_ENROLLED_IN_COURSE,
     CourseGradeReport,
     ProblemGradeReport,
-    ProblemResponses
+    ProblemResponses,
+    TempFileProblemGradeReport,
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
@@ -793,12 +794,13 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.csv_header_row = ['Student ID', 'Email', 'Username', 'Enrollment Status', 'Grade']
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    def test_no_problems(self, _get_current_task):
+    @ddt.data(ProblemGradeReport, TempFileProblemGradeReport)
+    def test_no_problems(self, problem_grade_report_class, _):
         """
         Verify that we see no grade information for a course with no graded
         problems.
         """
-        result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
+        result = problem_grade_report_class.generate(None, None, self.course.id, {}, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv([
             dict(list(zip(
@@ -812,7 +814,8 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    def test_single_problem(self, _get_current_task):
+    @ddt.data(ProblemGradeReport, TempFileProblemGradeReport)
+    def test_single_problem(self, problem_grade_report_class, _):
         vertical = ItemFactory.create(
             parent_location=self.problem_section.location,
             category='vertical',
@@ -822,7 +825,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.define_option_problem('Problem1', parent=vertical)
 
         self.submit_student_answer(self.student_1.username, 'Problem1', ['Option 1'])
-        result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
+        result = problem_grade_report_class.generate(None, None, self.course.id, {}, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         problem_name = 'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
@@ -850,7 +853,8 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    def test_single_problem_verified_student_only(self, _get_current_task):
+    @ddt.data(ProblemGradeReport, TempFileProblemGradeReport)
+    def test_single_problem_verified_student_only(self, problem_grade_report_class, _):
         with patch(
             'lms.djangoapps.instructor_task.tasks_helper.grades.problem_grade_report_verified_only',
             return_value=True,
@@ -866,13 +870,14 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 
             self.submit_student_answer(self.student_1.username, 'Problem1', ['Option 1'])
             self.submit_student_answer(student_verified.username, 'Problem1', ['Option 1'])
-            result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
+            result = problem_grade_report_class.generate(None, None, self.course.id, {}, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
             )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    def test_inactive_enrollment_included(self, _get_current_task):
+    @ddt.data(ProblemGradeReport, TempFileProblemGradeReport)
+    def test_inactive_enrollment_included(self, problem_grade_report_class, _):
         """
         Students with inactive enrollments in a course should be included in Problem Grade Report.
         """
@@ -886,7 +891,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.define_option_problem('Problem1', parent=vertical)
 
         self.submit_student_answer(self.student_1.username, 'Problem1', ['Option 1'])
-        result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
+        result = problem_grade_report_class.generate(None, None, self.course.id, {}, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 3, 'succeeded': 3, 'failed': 0}, result)
         problem_name = 'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']

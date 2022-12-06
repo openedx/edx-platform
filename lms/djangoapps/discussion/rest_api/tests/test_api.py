@@ -201,6 +201,8 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'group_at_subsection': False,
             'provider': 'legacy',
             'has_moderation_privileges': False,
+            "is_course_staff": False,
+            "is_course_admin": False,
             'is_group_ta': False,
             'is_user_admin': False,
             'user_roles': {'Student'},
@@ -3992,6 +3994,14 @@ class RetrieveThreadTest(
             assert not expected_error
         except ThreadNotFoundError:
             assert expected_error
+
+    def test_course_id_mismatch(self):
+        """
+            Test if the api throws not found exception if course_id from params mismatches course_id in thread
+        """
+        self.register_thread()
+        get_thread(self.request, self.thread_id, 'different_course_id')
+        assert ThreadNotFoundError
 
 
 @mock.patch('lms.djangoapps.discussion.rest_api.api._get_course', mock.Mock())

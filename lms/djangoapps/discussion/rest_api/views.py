@@ -23,6 +23,7 @@ from rest_framework.viewsets import ViewSet
 from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.file import store_uploaded_file
+from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
@@ -73,6 +74,11 @@ from ..rest_api.serializers import (
     DiscussionTopicSerializerV2,
     TopicOrdering,
 )
+from .utils import (
+    create_blocks_params,
+    create_topics_v3_structure,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -290,6 +296,85 @@ class CourseTopicsViewV2(DeveloperErrorViewMixin, APIView):
             form_query_params.cleaned_data["order_by"]
         )
         return Response(response)
+
+
+@view_auth_classes()
+class CourseTopicsViewV3(DeveloperErrorViewMixin, APIView):
+    """
+    View for listing course topics v3.
+
+    ** Response Example **:
+    [
+        {
+            "id": "non-courseware-discussion-id",
+            "usage_key": None,
+            "name": "Non Courseware Topic",
+            "thread_counts": {"discussion": 0, "question": 0},
+            "enabled_in_context": true,
+            "courseware": false
+        },
+        {
+            "id": "id",
+            "block_id": "block_id",
+            "lms_web_url": "",
+            "legacy_web_url": "",
+            "student_view_url": "",
+            "type": "chapter",
+            "display_name": "First section",
+            "children": [
+                "id": "id",
+                "block_id": "block_id",
+                "lms_web_url": "",
+                "legacy_web_url": "",
+                "student_view_url": "",
+                "type": "sequential",
+                "display_name": "First Sub-Section",
+                "children": [
+                    "id": "id",
+                    "usage_key": "",
+                    "name": "First Unit?",
+                    "thread_counts": { "discussion": 0, "question": 0 },
+                    "enabled_in_context": true
+                ]
+            ],
+            "courseware": true,
+        }
+    ]
+    """
+
+    def get(self, request, course_id):
+        """
+        **Use Cases**
+
+            Retrieve the topic listing for a course.
+
+        **Example Requests**:
+
+            GET /api/discussion/v3/course_topics/course-v1:ExampleX+Subject101+2015
+        """
+        course_key = CourseKey.from_string(course_id)
+        topics = get_course_topics_v2(
+            course_key,
+            request.user,
+        )
+        course_usage_key = modulestore().make_course_usage_key(course_key)
+        blocks_params = create_blocks_params(course_usage_key, request.user)
+        blocks = get_blocks(
+            request,
+            blocks_params['usage_key'],
+            blocks_params['user'],
+            blocks_params['depth'],
+            blocks_params['nav_depth'],
+            blocks_params['requested_fields'],
+            blocks_params['block_counts'],
+            blocks_params['student_view_data'],
+            blocks_params['return_type'],
+            blocks_params['block_types_filter'],
+            hide_access_denials=False,
+        )['blocks']
+
+        topics = create_topics_v3_structure(blocks, topics)
+        return Response(topics)
 
 
 @view_auth_classes()
@@ -527,7 +612,8 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the GET method for thread ID
         """
         requested_fields = request.GET.get('requested_fields')
-        return Response(get_thread(request, thread_id, requested_fields))
+        course_id = request.GET.get('course_id')
+        return Response(get_thread(request, thread_id, requested_fields, course_id))
 
     def create(self, request):
         """

@@ -16,7 +16,7 @@ from rest_framework import serializers
 from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_lock_unlock_event, \
-    track_thread_edited_event, track_comment_edited_event
+    track_thread_edited_event, track_comment_edited_event, track_forum_response_mark_event
 from lms.djangoapps.discussion.django_comment_client.utils import (
     course_discussion_division_enabled,
     get_group_id_for_user,
@@ -591,6 +591,7 @@ class CommentSerializer(_ContentSerializer):
             # endorsement_user_id on update
             requesting_user_id = self.context["cc_requester"]["id"]
             if key == "endorsed":
+                track_forum_response_mark_event(self.context['request'], self.context['course'], instance, val)
                 instance["endorsement_user_id"] = requesting_user_id
             if key == "body" and val:
                 instance["editing_user_id"] = requesting_user_id

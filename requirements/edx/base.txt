@@ -478,12 +478,12 @@ edx-drf-extensions==8.3.1
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.58.14
+edx-enterprise==3.58.15
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   learner-pathway-progress
-edx-event-bus-kafka==2.0.0
+edx-event-bus-kafka==2.1.0
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.9.2
     # via ora2
@@ -669,7 +669,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==7.0.1
+lti-consumer-xblock==7.0.2
     # via -r requirements/edx/base.in
 lxml==4.9.1
     # via
@@ -758,7 +758,7 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.in
 openedx-django-wiki==1.1.4
     # via -r requirements/edx/base.in
-openedx-events==3.1.0
+openedx-events==3.2.0
     # via
     #   -r requirements/edx/base.in
     #   edx-event-bus-kafka

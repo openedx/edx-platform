@@ -349,6 +349,42 @@ def track_comment_unreported_event(request, course, comment):
     track_forum_event(request, event_name, course, comment, event_data)
 
 
+def track_response_mark_event(request, course, comment, commentable_id, thread_type):
+    """
+    Send analytics event for response that is marked as endorsed or answered.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='response', action_name='mark')
+    if thread_type == 'question':
+        mark_type = 'Answer'
+    else:
+        mark_type = 'Endorse'
+    event_data = {
+        'discussion': {'id': comment.thread_id},
+        'commentable_id': commentable_id,
+        'mark_type': mark_type,
+        'target_username': comment.get('username')
+    }
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
+def track_response_unmark_event(request, course, comment, commentable_id, thread_type):
+    """
+    Send analytics event for response that is marked as unendorsed or unanswered.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='response', action_name='unmark')
+    if thread_type == 'question':
+        mark_type = 'Answer'
+    else:
+        mark_type = 'Endorse'
+    event_data = {
+        'discussion': {'id': comment.thread_id},
+        'commentable_id': commentable_id,
+        'mark_type': mark_type,
+        'target_username': comment.get('username'),
+    }
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
 def track_discussion_reported_event(request, course, cc_content):
     """
     Helper method for discussion reported events.
@@ -367,6 +403,20 @@ def track_discussion_unreported_event(request, course, cc_content):
         track_thread_unreported_event(request, course, cc_content)
     else:
         track_comment_unreported_event(request, course, cc_content)
+
+
+def track_forum_response_mark_event(request, course, cc_content, value):
+    """
+    Helper method for discussions response mark event
+    """
+    thread = cc.Thread.find(cc_content.thread_id)
+    commentable_id = thread.get('commentable_id')
+    thread_type = thread.get('thread_type')
+
+    if value:
+        track_response_mark_event(request, course, cc_content, commentable_id, thread_type)
+    else:
+        track_response_unmark_event(request, course, cc_content, commentable_id, thread_type)
 
 
 def permitted(func):
@@ -661,11 +711,14 @@ def endorse_comment(request, course_id, comment_id):
     """
     course_key = CourseKey.from_string(course_id)
     comment = cc.Comment.find(comment_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     user = request.user
-    comment.endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
+    endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
+    comment.endorsed = endorsed
     comment.endorsement_user_id = user.id
     comment.save()
     comment_endorsed.send(sender=None, user=user, post=comment)
+    track_forum_response_mark_event(request, course, comment, endorsed)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 

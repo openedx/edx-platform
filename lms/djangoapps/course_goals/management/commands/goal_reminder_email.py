@@ -112,7 +112,21 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """
-        Docstring
+        Handle goal emails across all courses.
+
+        This outer layer calls the inner and reports on any exception that
+        occurred.
+        """
+
+        try:
+            self._handle_all_goals()
+        except BaseException:  # pylint: disable=broad-except
+            log.exception("Error while sending course goals emails: ")
+            raise
+
+    def _handle_all_goals(self):
+        """
+        Handle goal emails across all courses
 
         Helpful notes for the function:
             weekday() returns an int 0-6 with Monday being 0 and Sunday being 6
