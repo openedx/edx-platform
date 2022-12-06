@@ -20,7 +20,10 @@ def test_get_user_by_username_or_email_single_tenant(settings):
     """
     Ensure `get_user_by_username_or_email` works as upstream intended if APPSEMBLER_MULTI_TENANT_EMAILS is disabled.
     """
-    settings.FEATURES = {'APPSEMBLER_MULTI_TENANT_EMAILS': False}
+    settings.FEATURES = {
+        **settings.FEATURES,
+        'APPSEMBLER_MULTI_TENANT_EMAILS': False,
+    }
 
     with with_organization_context(site_color='blue1') as blue_org:
         blue_user = create_org_user(blue_org)
@@ -44,7 +47,10 @@ def test_get_user_by_username_or_email_multi_tenant(settings):
     """
     Ensure `get_user_by_username_or_email` works with APPSEMBLER_MULTI_TENANT_EMAILS is enabled.
     """
-    settings.FEATURES = {'APPSEMBLER_MULTI_TENANT_EMAILS': True}
+    settings.FEATURES = {
+        **settings.FEATURES,
+        'APPSEMBLER_MULTI_TENANT_EMAILS': True,
+    }
 
     with with_organization_context(site_color='blue1') as blue_org:
         blue_user = create_org_user(blue_org)
