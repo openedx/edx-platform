@@ -48,6 +48,7 @@ COPY cms cms
 COPY requirements/pip.txt requirements/pip.txt
 COPY requirements/edx/pip-tools.txt requirements/edx/pip-tools.txt
 COPY requirements/edx/testing.txt requirements/edx/testing.txt
+COPY Makefile Makefile
 RUN make test-requirements
 
 FROM base as runner
