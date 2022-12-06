@@ -727,6 +727,9 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
         """ Reset learner password using passed token and new credentials """
 
         reset_status = False
+        err_msg = _(
+            "An error has occurred. Try refreshing the page, or check your internet connection."
+        )
         user_id = None
         uidb36 = kwargs.get('uidb36')
         token = kwargs.get('token')
@@ -734,7 +737,7 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
         has_required_values, uid_int = self._check_token_has_required_values(uidb36, token)
         if not has_required_values:
             AUDIT_LOG.exception("Invalid password reset confirm token")
-            return Response({'reset_status': reset_status})
+            return Response({'reset_status': reset_status, 'token_invalid': True})
 
         request.data._mutable = True  # lint-amnesty, pylint: disable=protected-access
         request.data['new_password1'] = normalize_password(request.data['new_password1'])
@@ -746,7 +749,7 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
             user_id = user.id
             if not default_token_generator.check_token(user, token):
                 AUDIT_LOG.exception(f"Token validation failed for user {user_id}")
-                return Response({'reset_status': reset_status})
+                return Response({'reset_status': reset_status, 'token_invalid': True})
 
             validate_password(password, user=user)
 
@@ -764,6 +767,7 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
             if form.is_valid():
                 form.save()
                 reset_status = True
+                err_msg = ''
 
                 if 'is_account_recovery' in request.GET:
                     try:
@@ -802,7 +806,7 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
         except Exception:   # pylint: disable=broad-except
             AUDIT_LOG.exception(f"Setting new password failed for {user_id}")
 
-        return Response({'reset_status': reset_status})
+        return Response({'reset_status': reset_status, 'err_msg': err_msg})
 
     def _check_token_has_required_values(self, uidb36, token):
         """
