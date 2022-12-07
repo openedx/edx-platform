@@ -598,7 +598,7 @@ edx-drf-extensions==8.3.1
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.58.15
+edx-enterprise==3.58.16
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -635,7 +635,7 @@ edx-opaque-keys[django]==2.3.0
     #   outcome-surveys
 edx-organizations==6.11.1
     # via -r requirements/edx/testing.txt
-edx-proctoring==4.13.2
+edx-proctoring==4.13.3
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
