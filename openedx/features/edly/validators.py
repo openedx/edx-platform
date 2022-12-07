@@ -121,5 +121,7 @@ def is_registered_user_limit_reached_for_plan(request):
                 )}]
             return errors
 
+        return False
+
     except AttributeError:
         return False
