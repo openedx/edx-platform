@@ -177,7 +177,8 @@ class ClassStudentSerializer(serializers.ModelSerializer):
         fields = ('id', 'user_id', 'username', 'profile_pic', 'skills_assessment', 'unit_lesson_completion')
 
     def get_username(self, obj):
-        return obj.gen_user.user.email if obj.gen_user.user else obj.gen_user.email
+        edx_user = obj.gen_user.user
+        return edx_user.get_full_name() if edx_user else obj.gen_user.email
 
     def get_profile_pic(self, obj):
         profile = obj.character.profile_pic if obj.character else None
