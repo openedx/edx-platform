@@ -186,7 +186,7 @@ def get_transcript_link_from_youtube(youtube_id):
         if caption_matched:
             caption_tracks = json.loads(f'[{caption_matched.group("caption_tracks")}]')
             for caption in caption_tracks:
-                if caption["languageCode"] == "en":
+                if "languageCode" in caption.keys() and caption["languageCode"] == "en":
                     return caption["baseUrl"]
         return None
     except ConnectionError:
