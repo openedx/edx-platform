@@ -33,6 +33,7 @@ from lms.djangoapps.learner_home.serializers import (
     CourseRecommendationSerializer,
     CourseRunSerializer,
     CourseSerializer,
+    CreditSerializer,
     EmailConfirmationSerializer,
     EnrollmentSerializer,
     EnterpriseDashboardSerializer,
@@ -810,16 +811,60 @@ class TestProgramsSerializer(TestCase):
         assert output_data == {"relatedPrograms": []}
 
 
+class TestCreditSerializer(LearnerDashboardBaseTest):
+    """Tests for the CreditSerializer"""
+
+    @classmethod
+    def create_test_data(cls, enrollment):
+        """Mock data following the shape of credit_statuses"""
+
+        return {
+            "course_key": enrollment.course.id,
+            "eligible": True,
+            "deadline": random_date(),
+            "purchased": False,
+            "provider_name": "Hogwarts",
+            "provider_status_url": "http://example.com/status",
+            "provider_id": "HSWW",
+            "request_status": "pending",
+            "error": False,
+        }
+
+    @classmethod
+    def create_test_context(cls, enrollment):
+        """Credit data, packaged as it would be for serialization context"""
+
+        return {enrollment.course.id: {**cls.create_test_data(enrollment)}}
+
+    def test_serialize_credit(self):
+        # Given an enrollment and a course with ability to purchase credit
+        enrollment = self.create_test_enrollment()
+        credit_data = self.create_test_data(enrollment)
+
+        # When I serialize
+        output_data = CreditSerializer(credit_data).data
+
+        # Then I get the appropriate data shape
+        self.assertDictEqual(
+            output_data,
+            {
+                "providerStatusUrl": credit_data["provider_status_url"],
+                "providerName": credit_data["provider_name"],
+                "providerId": credit_data["provider_id"],
+                "error": credit_data["error"],
+                "purchased": credit_data["purchased"],
+                "requestStatus": credit_data["request_status"],
+            },
+        )
+
+
 class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
     """High-level tests for LearnerEnrollmentsSerializer"""
 
-    def test_happy_path(self):
-        """Test that nothing breaks and the output fields look correct"""
-
-        enrollment = self.create_test_enrollment()
-
-        input_data = enrollment
-        input_context = {
+    @classmethod
+    def create_test_context(cls, enrollment):
+        """Create context that is expected to be required / common across tests"""
+        return {
             "resume_course_urls": {enrollment.course.id: random_url()},
             "ecommerce_payment_page": random_url(),
             "course_mode_info": {
@@ -831,11 +876,18 @@ class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
             "fulfilled_entitlements": {},
             "unfulfilled_entitlement_pseudo_sessions": {},
             "programs": {},
+            "credit_statuses": TestCreditSerializer.create_test_context(enrollment),
         }
 
-        output_data = LearnerEnrollmentSerializer(
-            input_data, context=input_context
-        ).data
+    def test_happy_path(self):
+        """Test that nothing breaks and the output fields look correct"""
+
+        enrollment = self.create_test_enrollment()
+        input_data = enrollment
+        input_context = self.create_test_context(enrollment)
+
+        output = LearnerEnrollmentSerializer(input_data, context=input_context).data
+
         expected_keys = [
             "courseProvider",
             "course",
@@ -845,8 +897,40 @@ class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
             "certificate",
             "entitlement",
             "programs",
+            "credit",
         ]
-        assert output_data.keys() == set(expected_keys)
+        self.assertEqual(output.keys(), set(expected_keys))
+
+    def test_credit_no_credit_option(self):
+        # Given an enrollment
+        enrollment = self.create_test_enrollment()
+        input_data = enrollment
+        input_context = self.create_test_context(enrollment)
+
+        # Given where the course does not offer the ability to purchase credit
+        input_context["credit_statuses"] = {}
+
+        # When I serialize
+        output = LearnerEnrollmentSerializer(input_data, context=input_context).data
+
+        # Then I return empty credit info
+        self.assertDictEqual(output["credit"], {})
+
+    def test_user_ineligible(self):
+
+        # Given an enrollment
+        enrollment = self.create_test_enrollment()
+        input_data = enrollment
+        input_context = self.create_test_context(enrollment)
+
+        # ... but the user is ineligible
+        input_context["credit_statuses"]["eligible"] = False
+
+        # When I serialize
+        output = LearnerEnrollmentSerializer(input_data, context=input_context).data
+
+        # Then I return empty credit info
+        self.assertDictEqual(output["credit"], {})
 
 
 class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
