@@ -161,6 +161,20 @@ def get_enabled_organizations(request):
     return studio_site_edx_organizations.values()
 
 
+def get_edly_sub_org_from_request(request):
+    """
+    Helper method to get edly sub organization from request object.
+
+    Returns:
+        EdlySubOrg: edly_sub_org object
+    """
+    try:
+        edly_sub_org = request.site.edly_sub_org_for_lms
+    except EdlySubOrganization.DoesNotExist:
+        edly_sub_org = request.site.edly_sub_org_for_studio
+
+    return edly_sub_org
+
 def create_user_link_with_edly_sub_organization(request, user):
     """
     Create edly user profile link with edly sub organization.
@@ -173,10 +187,7 @@ def create_user_link_with_edly_sub_organization(request, user):
         object: EdlyUserProfile object.
 
     """
-    try:
-        edly_sub_org = request.site.edly_sub_org_for_lms
-    except EdlySubOrganization.DoesNotExist:
-        edly_sub_org = request.site.edly_sub_org_for_studio
+    edly_sub_org = get_edly_sub_org_from_request(request)
     edly_user_profile, __ = EdlyUserProfile.objects.get_or_create(user=user)
     edly_user_profile.edly_sub_organizations.add(edly_sub_org)
     edly_user_profile.save()
@@ -224,6 +235,10 @@ def set_global_course_creator_status(request, user, set_global_creator):
     course_creator.save()
     edly_user_info_cookie = request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME, None)
     edx_orgs = get_edx_org_from_cookie(edly_user_info_cookie)
+
+    if not edx_orgs:
+        edx_orgs = get_edly_sub_org_from_request(request)
+        edx_orgs = [edx_orgs.slug]
 
     for edx_org in edx_orgs:
         if set_global_creator:
