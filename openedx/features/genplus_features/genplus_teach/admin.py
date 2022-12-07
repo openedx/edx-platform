@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Article, Reflection, ReflectionAnswer, ArticleRating, MediaType, Gtcs, ArticleViewLog,\
-    Quote, HelpGuideType, HelpGuide, AlertBarEntry, HelpGuideRating, PortfolioEntry
+    Quote, HelpGuideType, HelpGuide, AlertBarEntry, HelpGuideRating, PortfolioEntry, PortfolioReflection
 from django.urls import reverse
 from django.contrib import messages
 from django.utils.safestring import mark_safe
@@ -67,3 +67,4 @@ admin.site.register(HelpGuide, HelpGuideAdmin)
 admin.site.register(HelpGuideRating)
 admin.site.register(AlertBarEntry)
 admin.site.register(PortfolioEntry)
+admin.site.register(PortfolioReflection)

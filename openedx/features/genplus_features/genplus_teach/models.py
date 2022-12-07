@@ -3,6 +3,8 @@ import logging
 import pafy
 from django.db import models
 from django.db.models import Avg
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django_extensions.db.models import TimeStampedModel
 from html import unescape
 from django.utils.html import strip_tags
@@ -107,6 +109,14 @@ class Article(TimeStampedModel):
             return 0
 
 
+class PortfolioReflection(TimeStampedModel):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self) -> str:
+        return self.content_object.__str__()
+
 class Reflection(TimeStampedModel):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='reflections')
     title = models.TextField()
@@ -119,6 +129,7 @@ class ReflectionAnswer(TimeStampedModel):
     reflection = models.ForeignKey(Reflection, on_delete=models.CASCADE, related_name='answers')
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     answer = models.TextField()
+    portfolio_reflection = GenericRelation(PortfolioReflection, related_query_name='reflection')
 
     class Meta:
         unique_together = ('reflection', 'teacher')
@@ -169,6 +180,7 @@ class PortfolioEntry(TimeStampedModel):
     skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True)
     gtcs = models.ManyToManyField(Gtcs, blank=True)
     description = models.TextField()
+    portfolio_reflection = GenericRelation(PortfolioReflection, related_query_name='portfolio')
 
     def __str__(self):
         return self.title

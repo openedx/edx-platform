@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, Reflection, \
-    ReflectionAnswer, ArticleViewLog, PortfolioEntry, HelpGuideType, HelpGuide, AlertBarEntry, HelpGuideRating
+    ReflectionAnswer, ArticleViewLog, PortfolioEntry, HelpGuideType, HelpGuide, AlertBarEntry, HelpGuideRating, PortfolioReflection
 from openedx.features.genplus_features.genplus.api.v1.serializers import SkillSerializer
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from openedx.features.genplus_features.common.utils import get_generic_serializer
@@ -183,3 +183,25 @@ class AlertBarEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = AlertBarEntry
         fields = ('id', 'message', 'link')
+
+
+class ContentObjectRelatedField(serializers.RelatedField):
+    def to_representation(self, value):
+        if isinstance(value, PortfolioEntry):
+            serializer = get_generic_serializer({ 'name': PortfolioEntry, 'fields': '__all__' }, 1)(value)
+        elif isinstance(value, ReflectionAnswer):
+            serializer = get_generic_serializer({ 'name': ReflectionAnswer, 'fields': '__all__' }, 1)(value)
+        else:
+            raise Exception('Unexpected type of tagged object')
+
+        return serializer.data
+
+
+class PortfolioReflectionSerializer(serializers.ModelSerializer):
+    content_object = ContentObjectRelatedField(read_only=True)
+    entry_type = serializers.CharField(source="content_type.model")
+
+    class Meta:
+        model = PortfolioReflection
+        fields = ('id', 'created', 'content_object', 'object_id', 'entry_type')
+        depth = 2

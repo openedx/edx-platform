@@ -12,14 +12,15 @@ from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeach
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, \
     FavoriteArticle, ReflectionAnswer, Reflection, \
-    ArticleViewLog, PortfolioEntry, Quote, AlertBarEntry, HelpGuide, HelpGuideRating
+    ArticleViewLog, PortfolioEntry, Quote, AlertBarEntry, HelpGuide, HelpGuideRating, PortfolioReflection
 from openedx.features.genplus_features.genplus.api.v1.mixins import GenzMixin
 from openedx.features.genplus_features.genplus.models import Teacher, Skill
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from .serializers import (ArticleSerializer, FavoriteArticleSerializer, ArticleRatingSerializer,
                           ReflectionAnswerSerializer,ArticleViewLogSerializer, GtcsSerializer,
                           MediaTypeSerializer, PortfolioEntrySerializer, HelpGuideTypeSerializer,
-                          AlertBarEntrySerializer, HelpGuideSerializer, GuideRatingSerializer)
+                          AlertBarEntrySerializer, HelpGuideSerializer, GuideRatingSerializer,
+                          PortfolioReflectionSerializer)
 from openedx.features.genplus_features.genplus.api.v1.serializers import SkillSerializer
 from openedx.features.genplus_features.common.utils import get_generic_serializer
 from .pagination import PortfolioPagination
@@ -333,3 +334,41 @@ class AlertBarEntryView(generics.ListAPIView):
         alert_bar = get_object_or_404(AlertBarEntry, is_current=True)
         serializer = self.serializer_class(alert_bar)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PortfolioReflectionView(generics.ListAPIView):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsTeacher]
+    serializer_class = PortfolioReflectionSerializer
+
+    def get_queryset(self):
+        queryset = PortfolioReflection.objects.all()
+        teacher = Teacher.objects.get(gen_user=self.request.user.gen_user)
+
+        search = self.request.query_params.get('search', '')
+        skill = self.request.query_params.get('skill')
+        gtcs = self.request.query_params.get('standard')
+        
+        query = (
+            Q(portfolio__teacher=teacher) & (
+                Q(portfolio__title__icontains=search)
+                | Q(portfolio__description__icontains=search)
+            )
+        )
+        
+        if skill:
+            query &= Q(portfolio__skill__id=skill)
+        
+        if gtcs:
+            query &= Q(portfolio__gtcs__id=gtcs)
+        
+        if not (skill or gtcs):
+            query |= (
+                Q(reflection__teacher=teacher) & (
+                    Q(reflection__answer__icontains=search)
+                    | Q(reflection__reflection__title__icontains=search)
+                )
+            )
+
+        queryset = queryset.filter(query).prefetch_related('content_object').order_by('-created')
+        return queryset
