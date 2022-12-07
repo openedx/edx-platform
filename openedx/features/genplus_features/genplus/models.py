@@ -8,6 +8,7 @@ from .constants import GenUserRoles, ClassColors, JournalTypes, SchoolTypes, Cla
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 
@@ -53,13 +54,13 @@ class Character(models.Model):
     standing = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
                                 help_text='Provide standing position of character')
     dance1 = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
-                               help_text='Provide running position of character')
+                              help_text='Provide running position of character')
     dance2 = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
-                                 help_text='Provide crouching position of character')
+                              help_text='Provide crouching position of character')
     dance3 = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
-                               help_text='Provide jumping position of character')
+                              help_text='Provide jumping position of character')
     dance4 = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
-                               help_text='Provide jumping position of character')
+                              help_text='Provide jumping position of character')
 
     def __str__(self):
         return self.name
@@ -106,6 +107,9 @@ class Student(models.Model):
     active_class = models.ForeignKey('genplus.Class', on_delete=models.SET_NULL, null=True, blank=True)
     onboarded = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ('gen_user__user__first_name', )
+
     @property
     def user(self):
         return self.gen_user.user
@@ -134,7 +138,8 @@ class Class(TimeStampedModel):
     name = models.CharField(max_length=128)
     is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
     students = models.ManyToManyField(Student, blank=True, through="genplus.ClassStudents", related_name='classes')
-    program = models.ForeignKey('genplus_learning.Program', on_delete=models.CASCADE, null=True, blank=True, related_name="classes")
+    program = models.ForeignKey('genplus_learning.Program', on_delete=models.CASCADE, null=True, blank=True,
+                                related_name="classes")
     objects = models.Manager()
     visible_objects = ClassManager()
 

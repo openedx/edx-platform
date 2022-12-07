@@ -57,6 +57,7 @@ class ClassStudentViewSet(mixins.ListModelMixin,
     serializer_class = ClassStudentSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['gen_user__user__username']
+    pagination_class = None
 
     def get_serializer_context(self):
         context = super(ClassStudentViewSet, self).get_serializer_context()
