@@ -455,7 +455,7 @@ def certificates_list_handler(request, course_key_string):
                     kwargs={'certificate_id': new_certificate.id}
                 )
                 store.update_item(course, request.user.id)
-                emit_course_certificate_config_changed_signal(course_key, new_certificate.certificate_data)
+                emit_course_certificate_config_changed_signal(str(course.id), new_certificate.certificate_data)
                 CertificateManager.track_event('created', {
                     'course_id': str(course.id),
                     'configuration_id': new_certificate.id
@@ -513,7 +513,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
             certificates_list.append(serialized_certificate)
 
         store.update_item(course, request.user.id)
-        emit_course_certificate_config_changed_signal(course_key, new_certificate.certificate_data)
+        emit_course_certificate_config_changed_signal(str(course.id), new_certificate.certificate_data)
         CertificateManager.track_event(cert_event_type, {
             'course_id': str(course.id),
             'configuration_id': serialized_certificate["id"]
@@ -536,7 +536,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
             course=course,
             certificate_id=certificate_id
         )
-        emit_course_certificate_config_deleted_signal(course_key, match_cert)
+        emit_course_certificate_config_deleted_signal(str(course.id), match_cert)
         CertificateManager.track_event('deleted', {
             'course_id': str(course.id),
             'configuration_id': certificate_id

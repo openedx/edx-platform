@@ -5,11 +5,9 @@ import logging
 from datetime import datetime, timezone
 from functools import partial, wraps
 from typing import BinaryIO, Dict, Iterator, List, Optional, Tuple, Union
-from urllib.parse import urljoin  # pylint: disable=import-error
 
 import attr
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db import transaction
 from django.dispatch import receiver
@@ -43,8 +41,11 @@ from common.djangoapps.track.event_transaction_utils import get_event_transactio
 from common.djangoapps.util.block_utils import yield_dynamic_block_descendants
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
-from openedx.core.djangoapps.credentials.utils import get_credentials_api_base_url, get_credentials_api_client
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
+from openedx.core.djangoapps.credentials.utils import (
+    delete_course_certificate_configuration,
+    send_course_certificate_configuration,
+)
 from openedx.core.djangoapps.olx_rest_api.adapters import get_asset_content_from_path
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore import ModuleStoreEnum
@@ -90,8 +91,9 @@ def get_certificate_signature_assets(certificate_config: CertificateConfigData) 
     """
     Get certificates' signatures from asset content storage.
     """
+    course_key = CourseKey.from_string(certificate_config.course_id)
     for signatory in certificate_config.signatories:
-        if content := get_asset_content_from_path(certificate_config.course_key, signatory.image):
+        if content := get_asset_content_from_path(course_key, signatory.image):
             yield signatory.image, content.data
 
 
@@ -130,8 +132,8 @@ def _create_catalog_data_for_signal(course_key: CourseKey) -> (Optional[datetime
         )
 
 
-def create_course_certificate_config_data_for_signal(
-    course_key: CourseKey,
+def create_course_certificate_config_data(
+    course_id: str,
     certificate_type: str,
     certificate_data: Dict[str, Union[str, List[str]]]
 ) -> CourseCatalogData:
@@ -147,7 +149,7 @@ def create_course_certificate_config_data_for_signal(
     ) for item in certificate_data['signatories']]
 
     return CertificateConfigData(
-        course_key=course_key,
+        course_id=course_id,
         title=certificate_data['name'],
         is_active=certificate_data['is_active'],
         signatories=signatories,
@@ -166,7 +168,7 @@ def emit_catalog_info_changed_signal(course_key: CourseKey):
 
 
 def _emit_course_certificate_config_signal(
-    course_key: CourseKey,
+    course_id: str,
     certificate_data: Dict[str, Union[str, List[str]]],
     course_certificate_config_signal: OpenEdxPublicSignal
 ):
@@ -174,11 +176,10 @@ def _emit_course_certificate_config_signal(
     Given the key of a recently changed course certificate config,
     send course certificate config data to course-certificate-config-changed signal.
     """
-    course_modes = CourseMode.objects.filter(course_id=course_key, mode_slug__in=CourseMode.CERTIFICATE_RELEVANT_MODES)
+    course_modes = CourseMode.objects.filter(course_id=course_id, mode_slug__in=CourseMode.CERTIFICATE_RELEVANT_MODES)
     for mode in course_modes:
-        certificate_config = create_course_certificate_config_data_for_signal(course_key, mode.slug, certificate_data)
-        if certificate_config is not None:
-            course_certificate_config_signal.send_event(certificate_config=certificate_config)
+        certificate_config = create_course_certificate_config_data(course_id, mode.slug, certificate_data)
+        course_certificate_config_signal.send_event(certificate_config=certificate_config)
 
 
 emit_course_certificate_config_changed_signal = partial(
@@ -293,23 +294,9 @@ def listen_for_course_certificate_config_changed(sender, signal, **kwargs):
     """
     certificate_config = kwargs['certificate_config']
     files_to_upload = dict(get_certificate_signature_assets(certificate_config))
-    try:
-        credentials_client = get_credentials_api_client(
-            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
-        )
-        credentials_api_base_url = get_credentials_api_base_url()
-        api_url = urljoin(f'{credentials_api_base_url}/', 'course_certificates/')
-        payload = attr.asdict(certificate_config)
-        payload['course_key'] = str(payload.pop('course_key'))
-        response = credentials_client.post(
-            api_url,
-            files=files_to_upload,
-            json=payload
-        )
-        response.raise_for_status()
-        log.info(f'Course certificate config sent for course {certificate_config.course_key} to Credentials.')
-    except Exception:  # lint-amnesty, pylint: disable=W0703
-        log.exception(f'Failed to send course certificate config for course {certificate_config.course_key}.')
+    certificate_config_data = attr.asdict(certificate_config)
+    course_id = certificate_config_data.get('course_id')
+    send_course_certificate_configuration(course_id, certificate_config_data, files_to_upload)
 
 
 @receiver(COURSE_CERTIFICATE_CONFIG_DELETED)
@@ -317,23 +304,9 @@ def listen_for_course_certificate_config_deleted(sender, signal, **kwargs):
     """
     Send course certificate config data onto the Credentials service to delete one.
     """
-    certificate_config = kwargs['certificate_config']
-    try:
-        credentials_client = get_credentials_api_client(
-            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
-        )
-        credentials_api_base_url = get_credentials_api_base_url()
-        api_url = urljoin(f'{credentials_api_base_url}/', 'course_certificates/')
-        payload = attr.asdict(certificate_config)
-        payload['course_key'] = str(payload.pop('course_key'))
-        response = credentials_client.delete(
-            api_url,
-            json=payload
-        )
-        response.raise_for_status()
-        log.info(f'Course certificate config is deleted for course {certificate_config.course_key} from Credentials.')
-    except Exception:  # lint-amnesty, pylint: disable=W0703
-        log.exception(f'Failed to delete certificate config for course {certificate_config.course_key}.')
+    certificate_config = attr.asdict(kwargs['certificate_config'])
+    course_id = certificate_config.get('course_id')
+    delete_course_certificate_configuration(course_id, certificate_config)
 
 
 @receiver(SignalHandler.course_deleted)
