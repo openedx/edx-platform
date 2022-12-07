@@ -2906,17 +2906,7 @@ YOUTUBE = {
     # URL to get YouTube metadata
     'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos/',
 
-    # Deprecated youtube api for requesting transcripts.
-    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
-    'TEXT_API': {
-        'url': 'video.google.com/timedtext',
-        'params': {
-            'lang': 'en',
-            'v': 'set_youtube_id_of_11_symbols_here',
-        },
-    },
-
-    # Current web page mechanism for scraping transcript information from youtube video pages
+    # Web page mechanism for scraping transcript information from youtube video pages
     'TRANSCRIPTS': {
         'CAPTION_TRACKS_REGEX': r"captionTracks\"\:\[(?P<caption_tracks>[^\]]+)",
         'YOUTUBE_URL_BASE': 'https://www.youtube.com/watch?v=',
