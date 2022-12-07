@@ -184,6 +184,9 @@ def container_handler(request, usage_key_string):
                     break
                 index += 1
 
+            library_block_types = [problem_type['component'] for problem_type in LIBRARY_BLOCK_TYPES]
+            is_library_xblock = xblock.location.block_type in library_block_types
+
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
@@ -192,6 +195,7 @@ def container_handler(request, usage_key_string):
                 'xblock_locator': xblock.location,
                 'unit': unit,
                 'is_unit_page': is_unit_page,
+                'is_collapsible': is_library_xblock,
                 'subsection': subsection,
                 'section': section,
                 'position': index,
@@ -204,7 +208,9 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-                'templates': CONTAINER_TEMPLATES
+                'templates': CONTAINER_TEMPLATES,
+                'is_sourced_block': xblock.location.block_type == 'library_sourced',
+                'is_fullwidth_content': is_library_xblock,
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")

@@ -206,6 +206,9 @@ def _preview_module_system(request, descriptor, field_data):
         else:
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
 
+    # Avoid circular import issues
+    from .item import StudioPermissionsService
+
     return PreviewModuleSystem(
         get_module=partial(_load_preview_module, request),
         mixins=settings.XBLOCK_MIXINS,
@@ -216,6 +219,7 @@ def _preview_module_system(request, descriptor, field_data):
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
+            "studio_user_permissions": StudioPermissionsService(request.user),
             "field-data": field_data,
             "i18n": ModuleI18nService,
             'mako': mako_service,
@@ -305,6 +309,10 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'content': frag.content,
             'is_root': is_root,
             'is_reorderable': is_reorderable,
+            'is_loading': context.get('is_loading', False),
+            'is_selected': context.get('is_selected', False),
+            'selectable': context.get('selectable', False),
+            'can_collapse': context.get('can_collapse', False),
             'can_edit': context.get('can_edit', True),
             'can_edit_visibility': context.get('can_edit_visibility', xblock.scope_ids.usage_id.context_key.is_course),
             'selected_groups_label': selected_groups_label,

@@ -1,5 +1,5 @@
 /* JavaScript for special editing operations that can be done on LibraryContentXBlock */
-window.LibraryContentAuthorView = function(runtime, element) {
+window.LibrarySourceAuthorView = function(runtime, element) {
     'use strict';
     var $element = $(element);
     var usage_id = $element.data('usage-id');
@@ -37,7 +37,7 @@ window.LibraryContentAuthorView = function(runtime, element) {
     var $loader = $wrapper.find('.ui-loading');
     var $xblockHeader = $wrapper.find('.xblock-header');
     if (!$loader.hasClass('is-hidden')) {
-        var timer = setInterval(function() {
+        var timer = setInterval(function() { 
             $.get(runtime.handlerUrl(element, 'get_import_task_status'), function( data ) {
                 if (data.status == 'Succeeded') {
                     $loader.addClass('is-hidden');
