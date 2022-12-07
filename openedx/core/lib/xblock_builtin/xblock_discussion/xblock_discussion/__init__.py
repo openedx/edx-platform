@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils.translation import get_language_bidi
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
-from xblock.fields import Scope, String, UNIQUE_ID, Integer
+from xblock.fields import Scope, String, UNIQUE_ID
 from web_fragments.fragment import Fragment
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
@@ -67,17 +67,9 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
         ),
         scope=Scope.settings
     )
-    ### EOL ###
-    limit_character = Integer(
-        display_name=_('Límite de carácteres'),
-        help=_('Entero que representa el limite de carácteres entre 1 y 2000'),
-        default=1000,
-        values={'min': 1, 'max':2000},
-        scope=Scope.settings,
-    )
     sort_key = String(scope=Scope.settings)
 
-    editable_fields = ["display_name", "discussion_category", "discussion_target", "limit_character"]
+    editable_fields = ["display_name", "discussion_category", "discussion_target"]
 
     has_author_view = True  # Tells Studio to use author_view
 
@@ -204,7 +196,6 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
         context = {
             'discussion_id': self.discussion_id,
             'display_name': self.display_name if self.display_name else _("Discussion"),
-            'limit_character': self.limit_character,
             'user': self.django_user,
             'course_id': self.course_key,
             'discussion_category': self.discussion_category,
