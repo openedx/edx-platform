@@ -29,6 +29,7 @@ from common.djangoapps.student.helpers import (
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
+    credit_statuses,
     get_course_enrollments,
     get_filtered_course_entitlements,
     get_org_black_and_whitelist_for_site,
@@ -423,6 +424,18 @@ def get_user_grade_passing_statuses(course_enrollments):
     }
 
 
+@function_trace("get_credit_statuses")
+def get_credit_statuses(user, course_enrollments):
+    """
+    Wrapper for getting credit statuses. Credit statuses are already in a
+    format we can use so this is largely for profiling / testing.
+
+    Returns (only for courses with credit options)
+    - Dict {course_id: <credit_status>}
+    """
+    return credit_statuses(user, course_enrollments)
+
+
 @function_trace("serialize_learner_home_data")
 def serialize_learner_home_data(data, context):
     """Wrapper for serialization so we can profile"""
@@ -517,6 +530,9 @@ class InitializeView(APIView):  # pylint: disable=unused-argument
         # Get social media sharing config
         course_share_urls = get_course_share_urls(course_enrollments)
 
+        # Get credit availability
+        credit_statuses = get_credit_statuses(user, course_enrollments)
+
         learner_dash_data = {
             "emailConfirmation": email_confirmation,
             "enterpriseDashboard": enterprise_customer,
@@ -534,6 +550,7 @@ class InitializeView(APIView):  # pylint: disable=unused-argument
             "course_mode_info": course_mode_info,
             "course_optouts": course_optouts,
             "course_access_checks": course_access_checks,
+            "credit_statuses": credit_statuses,
             "grade_statuses": grade_statuses,
             "resume_course_urls": resume_button_urls,
             "course_share_urls": course_share_urls,
