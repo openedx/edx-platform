@@ -324,7 +324,7 @@ def reverification_info(statuses):
     return reverifications
 
 
-def _credit_statuses(user, course_enrollments):
+def credit_statuses(user, course_enrollments):
     """
     Retrieve the status for credit courses.
 
@@ -353,12 +353,13 @@ def _credit_statuses(user, course_enrollments):
         * purchased (bool): Whether the user has purchased credit for this course.
         * provider_name (string): The display name of the credit provider.
         * provider_status_url (string): A URL the user can visit to check on their credit request status.
+        * provider_id (string): A unique alphanumeric (plus hyphens) string identifying the provider.
         * request_status (string): Either "pending", "approved", or "rejected"
         * error (bool): If true, an unexpected error occurred when retrieving the credit status,
             so the user should contact the support team.
 
     Example:
-    >>> _credit_statuses(user, course_enrollments)
+    >>> credit_statuses(user, course_enrollments)
     {
         CourseKey.from_string("edX/DemoX/Demo_Course"): {
             "course_key": "edX/DemoX/Demo_Course",
@@ -367,6 +368,7 @@ def _credit_statuses(user, course_enrollments):
             "purchased": True,
             "provider_name": "Hogwarts",
             "provider_status_url": "http://example.com/status",
+            "provider_id": "HSWW",
             "request_status": "pending",
             "error": False
         }
@@ -807,7 +809,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'show_courseware_links_for': show_courseware_links_for,
         'all_course_modes': course_mode_info,
         'cert_statuses': cert_statuses,
-        'credit_statuses': _credit_statuses(user, course_enrollments),
+        'credit_statuses': credit_statuses(user, course_enrollments),
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
         'verification_display': verification_status['should_display'],
