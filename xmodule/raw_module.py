@@ -4,7 +4,6 @@ import re
 
 from lxml import etree
 from xblock.fields import Scope, String
-from xmodule.xml_module import XmlDescriptor  # pylint: disable=unused-import
 
 from .exceptions import SerializationError
 

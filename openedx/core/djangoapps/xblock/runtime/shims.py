@@ -154,7 +154,7 @@ class RuntimeShim:
 
     def process_xml(self, xml):
         """
-        Code to handle parsing of child XML for old blocks that use XmlParserMixin.
+        Code to handle parsing of child XML for old blocks that use XmlMixin.
         """
         # We can't parse XML in a vacuum - we need to know the parent block and/or the
         # OLX file that holds this XML in order to generate useful definition keys etc.

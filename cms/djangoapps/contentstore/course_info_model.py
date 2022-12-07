@@ -24,7 +24,7 @@ from xmodule.html_module import CourseInfoBlock  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
-# # This should be in a class which inherits from XmlDescriptor
+# # This should be in a class which inherits from XModuleDescriptor
 log = logging.getLogger(__name__)
 
 
