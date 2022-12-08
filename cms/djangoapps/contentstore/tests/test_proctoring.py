@@ -4,7 +4,7 @@ Tests for the edx_proctoring integration into Studio
 
 
 from datetime import datetime, timedelta
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import ddt
 from django.conf import settings
@@ -20,6 +20,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+@patch('cms.djangoapps.contentstore.signals.handlers.transaction.on_commit',
+       new=Mock(side_effect=lambda func: func()),)  # run right away
 class TestProctoredExams(ModuleStoreTestCase):
     """
     Tests for the publishing of proctored exams
