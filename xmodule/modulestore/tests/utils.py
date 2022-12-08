@@ -137,7 +137,7 @@ class ProceduralCourseTestMixin:
             for _ in range(branching):
                 child = ItemFactory.create(
                     category=xblock_type,
-                    parent_location=parent.location,
+                    parent=parent,
                     user_id=user_id
                 )
                 self.populated_usage_keys.setdefault(xblock_type, []).append(

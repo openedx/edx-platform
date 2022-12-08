@@ -3,7 +3,7 @@ from datetime import timedelta
 from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 
 from edx_toggles.toggles.testutils import override_waffle_flag
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
@@ -19,13 +19,15 @@ from . import utils
 
 
 class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
-        self.course = CourseFactory.create()
+        course = CourseFactory.create()
         for i in range(4):
-            ItemFactory(parent=self.course, category="sequential", display_name=f"Section {i}")
+            ItemFactory(parent=course, category="sequential", display_name=f"Section {i}")
+        # get updated course
+        self.course = self.store.get_item(course.location)
 
     def test_basic_spacing(self):
         expected_sections = [
@@ -61,36 +63,38 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
         with self.store.bulk_operations(self.course.id):
             sequence = ItemFactory(parent=self.course, category="sequential")
             vertical = ItemFactory(parent=sequence, category="vertical")
-            sequence = self.store.get_item(sequence.location)
-            assert _has_assignment_blocks(sequence) is False
 
-            # Ungraded problems do not count as assignment blocks
-            ItemFactory.create(
-                parent=vertical,
-                category='problem',
-                graded=True,
-                weight=0,
-            )
-            sequence = self.store.get_item(sequence.location)
-            assert _has_assignment_blocks(sequence) is False
-            ItemFactory.create(
-                parent=vertical,
-                category='problem',
-                graded=False,
-                weight=1,
-            )
-            sequence = self.store.get_item(sequence.location)
-            assert _has_assignment_blocks(sequence) is False
+        sequence = self.store.get_item(sequence.location)
+        assert _has_assignment_blocks(sequence) is False
 
-            # Method will return true after adding a graded, scored assignment block
-            ItemFactory.create(
-                parent=vertical,
-                category='problem',
-                graded=True,
-                weight=1,
-            )
-            sequence = self.store.get_item(sequence.location)
-            assert _has_assignment_blocks(sequence) is True
+        # Ungraded problems do not count as assignment blocks
+        ItemFactory.create(
+            parent=vertical,
+            category='problem',
+            graded=True,
+            weight=0,
+        )
+        sequence = self.store.get_item(sequence.location)
+        assert _has_assignment_blocks(sequence) is False
+
+        ItemFactory.create(
+            parent=vertical,
+            category='problem',
+            graded=False,
+            weight=1,
+        )
+        sequence = self.store.get_item(sequence.location)
+        assert _has_assignment_blocks(sequence) is False
+
+        # Method will return true after adding a graded, scored assignment block
+        ItemFactory.create(
+            parent=vertical,
+            category='problem',
+            graded=True,
+            weight=1,
+        )
+        sequence = self.store.get_item(sequence.location)
+        assert _has_assignment_blocks(sequence) is True
 
     def test_sequence_with_graded_and_ungraded_assignments(self):
         """
@@ -174,8 +178,10 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
                 (vertical2.location, {'due': timedelta(weeks=2)}),
                 (vertical3.location, {'due': timedelta(weeks=2)})
             ]
-            self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
+        sequence = self.store.get_item(sequence.location)
+        self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
 
+        with self.store.bulk_operations(self.course.id):
             # A subsection with multiple units, each of which has a problem.
             # Problems should also inherit due date.
             problem1 = ItemFactory(parent=vertical1, category='problem')
@@ -184,33 +190,35 @@ class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disa
                 (problem1.location, {'due': timedelta(weeks=2)}),
                 (problem2.location, {'due': timedelta(weeks=2)})
             ])
-            sequence = self.store.get_item(sequence.location)
-            self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
+        sequence = self.store.get_item(sequence.location)
+        self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
 
-            # A subsection that has ORA as a problem. ORA should not inherit due date.
-            ItemFactory.create(parent=vertical3, category='openassessment')
-            sequence = self.store.get_item(sequence.location)
-            self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
+        # A subsection that has ORA as a problem. ORA should not inherit due date.
+        ItemFactory.create(parent=vertical3, category='openassessment')
+        sequence = self.store.get_item(sequence.location)
+        self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
 
-            # A subsection that has an ORA problem and a non ORA problem. ORA should
-            # not inherit due date, but non ORA problems should.
-            problem3 = ItemFactory(parent=vertical3, category='problem')
-            expected_dates.append((problem3.location, {'due': timedelta(weeks=2)}))
-            sequence = self.store.get_item(sequence.location)
-            self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
+        # A subsection that has an ORA problem and a non ORA problem. ORA should
+        # not inherit due date, but non ORA problems should.
+        problem3 = ItemFactory(parent=vertical3, category='problem')
+        expected_dates.append((problem3.location, {'due': timedelta(weeks=2)}))
+        sequence = self.store.get_item(sequence.location)
+        self.assertCountEqual(_get_custom_pacing_children(sequence, 2), expected_dates)
 
 
 class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
     """
     Tests the custom Personalized Learner Schedule (PLS) dates in self paced courses
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
         SelfPacedRelativeDatesConfig.objects.create(enabled=True)
-        self.course = CourseFactory.create(self_paced=True)
-        self.chapter = ItemFactory.create(category='chapter', parent=self.course)
+        course = CourseFactory.create(self_paced=True)
+        self.chapter = ItemFactory.create(category='chapter', parent=course)
+        # get updated course
+        self.course = self.store.get_item(course.location)
 
     @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
     def test_extract_dates_from_course_inheritance(self):
@@ -310,8 +318,10 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
                 (problem1.location, {'due': timedelta(days=28)})
             ]
 
-            for i in range(3):
-                chapter = ItemFactory.create(category='chapter', parent=self.course)
+        for i in range(3):
+            course = self.store.get_item(self.course.location)
+            chapter = ItemFactory.create(category='chapter', parent=course)
+            with self.store.bulk_operations(self.course.id):
                 sequential = ItemFactory.create(category='sequential', parent=chapter, graded=True)
                 vertical = ItemFactory.create(category='vertical', parent=sequential)
                 problem = ItemFactory.create(category='problem', parent=vertical)
@@ -322,6 +332,7 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
                     (vertical.location, {'due': timedelta(days=num_days)}),
                     (problem.location, {'due': timedelta(days=num_days)}),
                 ])
+
         course = self.store.get_item(self.course.location)
         with patch.object(utils, 'get_expected_duration', return_value=timedelta(weeks=8)):
             self.assertCountEqual(extract_dates_from_course(course), expected_dates)
@@ -333,12 +344,13 @@ class SelfPacedCustomDueDateTests(ModuleStoreTestCase):
         have their corresponding due dates.
         """
         with self.store.bulk_operations(self.course.id):
-            sequential1 = ItemFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=3)
-            sequential2 = ItemFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=4)
-            sequential3 = ItemFactory.create(category='sequential', parent=self.chapter, relative_weeks_due=5)
+            chapter = ItemFactory.create(category='chapter', parent=self.course)
+            sequential1 = ItemFactory.create(category='sequential', parent=chapter, relative_weeks_due=3)
+            sequential2 = ItemFactory.create(category='sequential', parent=chapter, relative_weeks_due=4)
+            sequential3 = ItemFactory.create(category='sequential', parent=chapter, relative_weeks_due=5)
             expected_dates = [
                 (self.course.location, {}),
-                (self.chapter.location, {'due': timedelta(days=35)}),
+                (chapter.location, {'due': timedelta(days=35)}),
                 (sequential1.location, {'due': timedelta(days=21)}),
                 (sequential2.location, {'due': timedelta(days=28)}),
                 (sequential3.location, {'due': timedelta(days=35)})
