@@ -20,6 +20,8 @@ from openedx.features.genplus_features.genplus.models import Student, JournalPos
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
 from openedx.features.genplus_features.genplus.api.v1.serializers import TeacherSerializer
 from openedx.features.genplus_features.common.utils import get_generic_serializer
+from openedx.features.genplus_features.genplus_assessments.utils import get_assessment_problem_data, get_assessment_completion
+
 
 
 class UnitSerializer(serializers.ModelSerializer):
@@ -190,7 +192,22 @@ class ClassStudentSerializer(serializers.ModelSerializer):
         return get_absolute_url(request, profile)
 
     def get_skills_assessment(self, obj):
-        return True
+        intro_assessments_completion = False
+        outro_assessments_completion = False
+        request = self.context.get('request')
+        gen_program = obj.active_class.program if obj.active_class else None
+        if obj.gen_user.user:
+            user = obj.gen_user.user
+            if gen_program is not None and gen_program.intro_unit:
+                intro_unit_id = gen_program.intro_unit.id
+                intro_assessments = get_assessment_problem_data(request, intro_unit_id, user)
+                intro_assessments_completion = get_assessment_completion(intro_assessments)
+            if gen_program is not None and gen_program.outro_unit:
+                outro_unit_id = gen_program.outro_unit.id
+                outro_assessments = get_assessment_problem_data(request, outro_unit_id, user)
+                outro_assessments_completion = get_assessment_completion(outro_assessments)
+
+        return [intro_assessments_completion,outro_assessments_completion]
 
     def get_unit_lesson_completion(self, obj):
         results = []

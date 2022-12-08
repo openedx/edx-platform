@@ -20,13 +20,15 @@ class ClassLessonSerializer(serializers.ModelSerializer):
         model = ClassLesson
         fields = ('id', 'display_name', 'lms_url', 'usage_key')
 
+
 class ClassUnitSerializer(serializers.ModelSerializer):
     class_lessons = ClassLessonSerializer(many=True, read_only=True)
     display_name = serializers.CharField(source="unit.display_name")
 
     class Meta:
         model = ClassUnit
-        fields = ('id', 'display_name', 'course_key' ,'class_lessons')
+        fields = ('id', 'display_name', 'course_key', 'class_lessons')
+
 
 class ClassStudentSerializer(serializers.ModelSerializer):
     user_id = serializers.CharField(source='gen_user.user.id', default=None)
@@ -67,19 +69,24 @@ class ClassSerializer(serializers.ModelSerializer):
 class TextAssessmentSerializer(serializers.ModelSerializer):
     skill = serializers.CharField(source='skill.name')
     full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = UserResponse
-        fields = ('user', 'course_id', 'usage_id', 'course_id', 'problem_id', 'assessment_time', 'skill', 'full_name', 'student_response', 'score')
+        fields = ('user', 'course_id', 'usage_id', 'course_id', 'problem_id',
+                  'assessment_time', 'skill', 'full_name', 'student_response', 'score')
 
     def get_full_name(self, obj):
         return get_user_model().objects.get(pk=obj.user_id).get_full_name()
 
+
 class RatingAssessmentSerializer(serializers.ModelSerializer):
     skill = serializers.CharField(source='skill.name')
     full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = UserRating
-        fields = ('user', 'course_id', 'usage_id', 'course_id', 'problem_id', 'assessment_time', 'skill', 'full_name', 'rating')
+        fields = ('user', 'course_id', 'usage_id', 'course_id',
+                  'problem_id', 'assessment_time', 'skill', 'full_name', 'rating')
 
     def get_full_name(self, obj):
         return get_user_model().objects.get(pk=obj.user_id).get_full_name()
