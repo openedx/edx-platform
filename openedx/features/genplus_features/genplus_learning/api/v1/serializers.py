@@ -49,6 +49,7 @@ class AssessmentUnitSerializer(serializers.ModelSerializer):
     is_locked = serializers.SerializerMethodField()
     lms_url = serializers.SerializerMethodField()
     is_complete = serializers.SerializerMethodField()
+    course_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseOverview
@@ -61,6 +62,9 @@ class AssessmentUnitSerializer(serializers.ModelSerializer):
 
     def get_is_complete(self, obj):
         return self.context.get('is_complete', False)
+
+    def get_course_image_url(self, obj):
+        return f"{settings.LMS_ROOT_URL}{obj.course_image_url}"
 
     def get_lms_url(self, obj):
         course = modulestore().get_course(obj.id)
