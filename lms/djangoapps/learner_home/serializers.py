@@ -507,6 +507,7 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
     gradeData = LiteralField(None)
     certificate = LiteralField(None)
     enrollment = LiteralField(STATIC_ENTITLEMENT_ENROLLMENT_DATA)
+    credit = LiteralField({})
 
     def _get_course_overview(self, instance):
         """Look up course provider from CourseOverview matching the pseudo session"""

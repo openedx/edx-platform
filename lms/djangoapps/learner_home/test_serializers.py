@@ -986,6 +986,7 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
             "gradeData",
             "certificate",
             "enrollment",
+            "credit",
         ]
 
         assert output_data.keys() == set(expected_keys)
@@ -1360,6 +1361,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             "resume_course_urls": resume_course_urls,
             "ecommerce_payment_page": random_url(),
             "course_mode_info": course_mode_info,
+            "credit_statuses": {},
             "fulfilled_entitlements": fulfilled_entitlements,
             "unfulfilled_entitlement_pseudo_sessions": unfulfilled_entitlement_pseudo_sessions,
             "course_entitlement_available_sessions": course_entitlement_available_sessions,
