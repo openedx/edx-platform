@@ -407,6 +407,17 @@ class ProgramsSerializer(serializers.Serializer):
     )
 
 
+class CreditSerializer(serializers.Serializer):
+    """Credit status information"""
+
+    providerStatusUrl = serializers.URLField(source="provider_status_url")
+    providerName = serializers.CharField(source="provider_name")
+    providerId = serializers.CharField(source="provider_id")
+    error = serializers.BooleanField()
+    purchased = serializers.BooleanField()
+    requestStatus = serializers.CharField(source="request_status")
+
+
 class LearnerEnrollmentSerializer(serializers.Serializer):
     """
     Info for displaying an enrollment on the learner dashboard.
@@ -423,6 +434,7 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     entitlement = serializers.SerializerMethodField()
     gradeData = GradeDataSerializer(source="*")
     programs = serializers.SerializerMethodField()
+    credit = serializers.SerializerMethodField()
 
     def get_entitlement(self, instance):
         """
@@ -444,6 +456,16 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
         return ProgramsSerializer(
             {"relatedPrograms": programs}, context=self.context
         ).data
+
+    def get_credit(self, instance):
+        """Pull credit statuses from context"""
+        credit_status = self.context["credit_statuses"].get(str(instance.course_id))
+
+        # If user or course is ineligible for credit, return empty
+        if not credit_status:
+            return {}
+        else:
+            return CreditSerializer(credit_status).data
 
 
 class UnfulfilledEntitlementSerializer(serializers.Serializer):
@@ -485,6 +507,7 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
     gradeData = LiteralField(None)
     certificate = LiteralField(None)
     enrollment = LiteralField(STATIC_ENTITLEMENT_ENROLLMENT_DATA)
+    credit = LiteralField({})
 
     def _get_course_overview(self, instance):
         """Look up course provider from CourseOverview matching the pseudo session"""
