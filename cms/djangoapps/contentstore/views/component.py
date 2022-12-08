@@ -354,10 +354,13 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
                             )
                         )
 
-
+        #If using new problem editor, we select problem type inside the editor
+        # because of this, we only show one problem.
         if category == 'problem' and use_new_problem_editor():
             print('problemma',templates_for_category)
-            templates_for_category = [ template for template in templates_for_category if template['boilerplate_name'] == 'blank_common.yaml' ]
+            templates_for_category = [
+                template for template in templates_for_category if template['boilerplate_name'] == 'blank_common.yaml'
+                ]
 
         # Add any advanced problem types. Note that these are different xblocks being stored as Advanced Problems,
         # currently not supported in libraries .
