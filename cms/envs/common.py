@@ -1978,10 +1978,8 @@ ADVANCED_PROBLEM_TYPES = [
 ]
 
 LIBRARY_BLOCK_TYPES = [
-    {
-        'component': 'library_sourced',
-        'boilerplate_name': None
-    },
+    # Per https://github.com/openedx/build-test-release-wg/issues/231
+    # we removed the library source content block from defaults until complete.
     {
         'component': 'library_content',
         'boilerplate_name': None
