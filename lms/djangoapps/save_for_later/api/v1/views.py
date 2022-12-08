@@ -6,7 +6,7 @@ import logging
 
 from django.conf import settings
 from django.utils.decorators import method_decorator
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import transaction

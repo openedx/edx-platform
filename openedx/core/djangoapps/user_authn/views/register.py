@@ -28,7 +28,7 @@ from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import STUDENT_REGISTRATION_COMPLETED
 from openedx_filters.learning.filters import StudentRegistrationRequested
 from pytz import UTC
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
 from requests import HTTPError
 from rest_framework.response import Response
 from rest_framework.views import APIView
