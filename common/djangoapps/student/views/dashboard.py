@@ -324,7 +324,7 @@ def reverification_info(statuses):
     return reverifications
 
 
-def credit_statuses(user, course_enrollments):  # pylint: disable=redefined-outer-name
+def credit_statuses(user, course_enrollments):
     """
     Retrieve the status for credit courses.
 

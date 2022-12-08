@@ -531,7 +531,7 @@ class InitializeView(APIView):  # pylint: disable=unused-argument
         course_share_urls = get_course_share_urls(course_enrollments)
 
         # Get credit availability
-        credit_statuses = get_credit_statuses(user, course_enrollments)
+        user_credit_statuses = get_credit_statuses(user, course_enrollments)
 
         learner_dash_data = {
             "emailConfirmation": email_confirmation,
@@ -550,7 +550,7 @@ class InitializeView(APIView):  # pylint: disable=unused-argument
             "course_mode_info": course_mode_info,
             "course_optouts": course_optouts,
             "course_access_checks": course_access_checks,
-            "credit_statuses": credit_statuses,
+            "credit_statuses": user_credit_statuses,
             "grade_statuses": grade_statuses,
             "resume_course_urls": resume_button_urls,
             "course_share_urls": course_share_urls,

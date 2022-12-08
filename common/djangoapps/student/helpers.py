@@ -454,7 +454,7 @@ class AccountValidationError(Exception):
         self.error_code = error_code
 
 
-def cert_info(user, enrollment):  # pylint: disable=redefined-outer-name
+def cert_info(user, enrollment):
     """
     Get the certificate info needed to render the dashboard section for the given
     student and course.
