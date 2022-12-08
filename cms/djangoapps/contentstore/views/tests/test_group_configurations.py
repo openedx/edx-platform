@@ -19,7 +19,7 @@ from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.validation import StudioValidation, StudioValidationMessage  # lint-amnesty, pylint: disable=wrong-import-order
@@ -64,9 +64,9 @@ class HelperMethods:
             parent_location=sequential.location,
             display_name=f'Test Unit {name_suffix}'
         )
-        c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
-        c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
-        c2_url = self.course.id.make_usage_key("vertical", "split_test_cond2")
+        c0_url = self.course.id.make_usage_key("vertical", f"split_test_cond0_{name_suffix}")
+        c1_url = self.course.id.make_usage_key("vertical", f"split_test_cond1_{name_suffix}")
+        c2_url = self.course.id.make_usage_key("vertical", f"split_test_cond2_{name_suffix}")
         split_test = ItemFactory.create(
             category='split_test',
             parent_location=vertical.location,
@@ -693,6 +693,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations and content groups.
     """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def _get_user_partition(self, scheme):
         """
@@ -770,13 +771,12 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
 
         self.assertEqual(actual, expected)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_can_get_correct_usage_info_with_orphan(self, module_store_type):
+    def test_can_get_correct_usage_info_with_orphan(self):
         """
         Test if content group json updated successfully with usage information
         even if there is an orphan in content group.
         """
-        self.course = CourseFactory.create(default_store=module_store_type)
+        self.course = CourseFactory.create()
         self._add_user_partitions(count=1, scheme_id='cohort')
         vertical, __ = self._create_problem_with_content_group(cid=0, group_id=1, name_suffix='0', orphan=True)
 
@@ -784,16 +784,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         self.assertEqual(len(self.store.get_orphans(self.course.id)), 1)
         self.assertIn(vertical.location, self.store.get_orphans(self.course.id))
 
-        # Get the expected content group information based on module store.
-        if module_store_type == ModuleStoreEnum.Type.mongo:
-            expected = self._get_expected_content_group(usage_for_group=[
-                {
-                    'url': f'/container/{vertical.location}',
-                    'label': 'Test Unit 0 / Test Problem 0'
-                }
-            ])
-        else:
-            expected = self._get_expected_content_group(usage_for_group=[])
+        # Get the expected content group information.
+        expected = self._get_expected_content_group(usage_for_group=[])
 
         # Get the actual content group information
         actual = self._get_user_partition('cohort')
@@ -807,8 +799,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         content group.
         """
         self._add_user_partitions(scheme_id='cohort')
-        vertical, __ = self._create_problem_with_content_group(cid=0, group_id=1, name_suffix='0')
         vertical1, __ = self._create_problem_with_content_group(cid=0, group_id=1, name_suffix='1')
+        vertical, __ = self._create_problem_with_content_group(cid=0, group_id=1, name_suffix='0')
 
         actual = self._get_user_partition('cohort')
 
@@ -868,6 +860,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
             ),
         ]
         self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
+        self.reload_course()
 
         __, split_test, problem = self._create_content_experiment(cid=0, name_suffix='0', group_id=3, cid_for_problem=1)  # lint-amnesty, pylint: disable=unused-variable
 
@@ -1066,14 +1059,13 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         """
         self._add_user_partitions()
         # Create split test without parent.
-        with modulestore().branch_setting(ModuleStoreEnum.Branch.published_only):
-            orphan = modulestore().create_item(
-                ModuleStoreEnum.UserID.test,
-                self.course.id, 'split_test',
-            )
-            orphan.user_partition_id = 0
-            orphan.display_name = 'Test Content Experiment'
-            modulestore().update_item(orphan, ModuleStoreEnum.UserID.test)
+        orphan = self.store.create_item(
+            ModuleStoreEnum.UserID.test,
+            self.course.id, 'split_test',
+        )
+        orphan.user_partition_id = 0
+        orphan.display_name = 'Test Content Experiment'
+        self.store.update_item(orphan, ModuleStoreEnum.UserID.test)
 
         self.save_course()
         actual = GroupConfiguration.get_content_experiment_usage_info(self.store, self.course)

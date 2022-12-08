@@ -20,7 +20,11 @@ from cms.djangoapps.contentstore.tests.utils import TEST_DATA_DIR, CourseTestCas
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -337,15 +341,16 @@ class GroupVisibilityTest(CourseTestCase):
     Test content group access rules.
     """
 
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         super().setUp()
-
-        chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
-        sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
-        html = ItemFactory.create(category='html', parent_location=vertical.location)
+        chapter = ItemFactory.create(category='chapter', parent=self.course)
+        sequential = ItemFactory.create(category='sequential', parent=chapter)
+        vertical = ItemFactory.create(category='vertical', parent=sequential)
+        html = ItemFactory.create(category='html', parent=vertical)
         problem = ItemFactory.create(
-            category='problem', parent_location=vertical.location, data="<problem></problem>"
+            category='problem', parent=vertical, data="<problem></problem>"
         )
         self.sequential = self.store.get_item(sequential.location)
         self.vertical = self.store.get_item(vertical.location)
@@ -417,6 +422,10 @@ class GroupVisibilityTest(CourseTestCase):
         # This is a no-op.
         self.set_group_access(self.vertical, {1: []})
         self.set_group_access(self.problem, {2: [3, 4]})
+        # get updated sequential/vertical/problem
+        self.sequential = self.store.get_item(self.sequential.location)
+        self.vertical = self.store.get_item(self.vertical.location)
+        self.problem = self.store.get_item(self.problem.location)
 
         # Note that "has_children_visible_to_specific_partition_groups" only checks immediate children.
         self.assertFalse(utils.has_children_visible_to_specific_partition_groups(self.sequential))
