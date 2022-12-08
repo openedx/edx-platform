@@ -887,7 +887,7 @@ class CourseOverview(TimeStampedModel):
 
     def __str__(self):
         """Represent ourselves with the course key."""
-        return str(self.id)
+        return f'{self.display_name} | {str(self.id)}'
 
 
 class CourseOverviewTab(models.Model):

@@ -14,6 +14,7 @@ from completion.models import BlockCompletion
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.genplus_features.genplus.models import Class
+from openedx.features.genplus_features.genplus.constants import GenUserRoles
 from openedx.features.genplus_features.genplus_learning.models import (
     Program, ProgramEnrollment, UnitCompletion, UnitBlockCompletion
 )
@@ -127,13 +128,11 @@ def allow_program_access_to_class_teachers(self, class_id, program_id, class_tea
         log.info("Class or program id does not exist")
         return
 
-    teachers = gen_class.teachers.select_related('gen_user').exclude(gen_user__user__isnull=True)
-
+    users = User.objects.filter(gen_user__school=gen_class.school, gen_user__role=GenUserRoles.TEACHING_STAFF)
     if class_teacher_ids:
-        teachers = teachers.filter(pk__in=class_teacher_ids)
+        users = users.filter(gen_user__teacher__in=class_teacher_ids)
 
-    for teacher in teachers:
-        allow_access(program, teacher.gen_user, ProgramStaffRole.ROLE_NAME)
+    allow_access(program, ProgramStaffRole.ROLE_NAME, users)
 
 
 @shared_task(
@@ -150,13 +149,11 @@ def revoke_program_access_for_class_teachers(self, class_id, program_id, class_t
         log.info("Class or program id does not exist")
         return
 
-    teachers = gen_class.teachers.select_related('gen_user').exclude(gen_user__user__isnull=True)
-
+    users = User.objects.filter(gen_user__school=gen_class.school, gen_user__role=GenUserRoles.TEACHING_STAFF)
     if class_teacher_ids:
-        teachers = teachers.filter(pk__in=class_teacher_ids)
+        users = users.filter(gen_user__teacher__in=class_teacher_ids)
 
-    for teacher in teachers:
-        revoke_access(program, teacher.gen_user, ProgramStaffRole.ROLE_NAME)
+    revoke_access(program, ProgramStaffRole.ROLE_NAME, users)
 
 
 @shared_task(

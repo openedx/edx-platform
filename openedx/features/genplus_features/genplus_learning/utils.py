@@ -1,6 +1,7 @@
 import statistics
 from collections import defaultdict
 
+from django.contrib.auth.models import User
 from django.conf import settings
 from django.apps import apps
 from django.test import RequestFactory
@@ -16,7 +17,7 @@ from openedx.features.genplus_features.genplus_learning.models import (
 )
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
 from openedx.features.genplus_features.genplus_learning.access import allow_access
-from openedx.features.genplus_features.genplus_learning.roles import ProgramStaffRole
+from openedx.features.genplus_features.genplus_learning.roles import ProgramStaffRole, ProgramInstructorRole
 
 
 def calculate_class_lesson_progress(course_key, usage_key, gen_class):
@@ -173,12 +174,7 @@ def process_pending_student_program_enrollments(gen_user):
                                 status=ProgramEnrollmentStatuses.PENDING)
 
     for program_enrollment in pending_enrollments:
-        program = program_enrollment.program
-        course_ids = list(program.units.all().values_list('course', flat=True))
-        if program.intro_unit:
-            course_ids.append(program.intro_unit.id)
-        if program.outro_unit:
-            course_ids.append(program.outro_unit.id)
+        course_ids = program_enrollment.program.all_units_ids
 
         for course_id in course_ids:
             course_enrollment, created = CourseEnrollment.objects.get_or_create(
@@ -194,10 +190,11 @@ def process_pending_student_program_enrollments(gen_user):
 
 
 def process_pending_teacher_program_access(gen_user):
+    user = User.objects.filter(gen_user=gen_user)
     program_ids = gen_user.school.classes.exclude(program__isnull=True)\
                                         .values_list('program', flat=True)\
                                         .distinct()\
                                         .order_by()
     programs = Program.objects.filter(pk__in=program_ids)
     for program in programs:
-        allow_access(program, gen_user, ProgramStaffRole.ROLE_NAME)
+        allow_access(program, ProgramStaffRole.ROLE_NAME, user)

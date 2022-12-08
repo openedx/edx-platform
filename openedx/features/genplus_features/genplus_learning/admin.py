@@ -68,3 +68,4 @@ class ClassUnitAdmin(admin.ModelAdmin):
 
 admin.site.register(UnitCompletion)
 admin.site.register(UnitBlockCompletion)
+admin.site.register(ProgramAccessRole)

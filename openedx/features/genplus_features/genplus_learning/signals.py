@@ -14,6 +14,8 @@ import openedx.features.genplus_features.genplus_learning.tasks as genplus_learn
 from openedx.features.genplus_features.genplus_learning.models import (
     Program, ProgramEnrollment, Unit, ClassUnit, ClassLesson , UnitBlockCompletion
 )
+from openedx.features.genplus_features.genplus_learning.cache import ProgramCache
+
 log = logging.getLogger(__name__)
 
 
@@ -103,11 +105,16 @@ def create_activity_on_lesson_completion(sender, instance, created, **kwargs):
 
 @receiver(pre_delete, sender=ProgramEnrollment)
 def delete_course_enrollments(sender, instance, **kwargs):
-    program = instance.program
-    course_ids = list(program.units.all().values_list('course', flat=True))
-    if program.intro_unit:
-        course_ids.append(program.intro_unit.id)
-    if program.outro_unit:
-        course_ids.append(program.outro_unit.id)
-
+    course_ids = instance.program.all_units_ids
     CourseEnrollment.objects.filter(user=instance.student.gen_user.user, course__in=course_ids).delete()
+
+
+@receiver(pre_delete, sender=Program)
+def program_deleted(sender, instance, **kwargs):
+    ProgramCache.clear_mapping_for_all_courses(instance)
+
+
+@receiver(post_save, sender=Program)
+def program_updated(sender, instance, created, **kwargs):
+    if not created:
+        ProgramCache.clear_mapping_for_all_courses(instance)

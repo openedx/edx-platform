@@ -1,49 +1,54 @@
-from xmodule.modulestore.django import modulestore
+from django.contrib.auth.models import User
 
 from common.djangoapps.student.roles import AccessRole
-from lms.djangoapps.instructor.access import allow_access, revoke_access
-from .models import Program
+from .models import Program, ProgramAccessRole
+from .cache import ProgramRoleCache
 
 
-class ProgramAccessRole(AccessRole):
+class ProgramRole(AccessRole):
     def __init__(self, role_name, program: Program):
         super().__init__()
         self.program = program
         self._role_name = role_name
 
-    def has_user(self, gen_user):
-        pass
+    def has_user(self, user, check_user_activation=True):
+        if check_user_activation and not user.is_authenticated:
+            return False
 
-    def add_users(self, *gen_users, send_email):
-        courses = []
-        if self.program.intro_unit:
-            courses.append(self.program.intro_unit)
-        if self.program.outro_unit:
-            courses.append(self.program.outro_unit)
-        courses += [unit.course for unit in self.program.units.all()]
+        if not hasattr(user, '_program_roles'):
+            # Cache a list of tuples identifying the particular roles that a user has
+            # Stored as tuples, rather than django models, to make it cheaper to construct objects for comparison
+            user._program_roles = ProgramRoleCache(user)
 
-        for course in courses:
-            for gen_user in gen_users:
-                allow_access(course, gen_user.user, self._role_name, send_email)
+        return user._program_roles.has_role(self._role_name, self.program)
 
-    def remove_users(self, *gen_users, send_email):
-        courses = []
-        if self.program.intro_unit:
-            courses.append(self.program.intro_unit)
-        if self.program.outro_unit:
-            courses.append(self.program.outro_unit)
-        courses += [unit.course for unit in self.program.units.all()]
+    def add_users(self, users):
+        for user in users:
+            if user.is_authenticated and not self.has_user(user):
+                entry = ProgramAccessRole(user=user, role=self._role_name, program=self.program)
+                entry.save()
+                if hasattr(user, '_program_roles'):
+                    del user._program_roles
 
-        for course in courses:
-            for gen_user in gen_users:
-                revoke_access(course, gen_user.user, self._role_name, send_email)
-
+    def remove_users(self, *users):
+        entries = ProgramAccessRole.objects.filter(
+            user__in=users, role=self._role_name, program=self.program
+        )
+        entries.delete()
+        for user in users:
+            if hasattr(user, '_program_roles'):
+                del user._program_roles
 
     def users_with_role(self):
-        pass
+        entries = User.objects.filter(
+            programaccessrole__role=self._role_name,
+            programaccessrole__program=self.program
+        )
+        return entries
 
 
-class ProgramStaffRole(ProgramAccessRole):
+
+class ProgramStaffRole(ProgramRole):
     """A Staff member of all courses in a Program"""
     ROLE_NAME = 'staff'
 
@@ -51,7 +56,7 @@ class ProgramStaffRole(ProgramAccessRole):
         super().__init__(self.ROLE_NAME, *args, **kwargs)
 
 
-class ProgramInstructorRole(ProgramAccessRole):
+class ProgramInstructorRole(ProgramRole):
     """Instructor of all courses in a Program"""
     ROLE_NAME = 'instructor'
 

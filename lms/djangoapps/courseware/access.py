@@ -44,6 +44,8 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import check_course_expired
+from openedx.features.genplus_features.genplus_learning.access import administrative_accesses_to_program_for_user
+from openedx.features.genplus_features.genplus_learning.cache import ProgramCache
 from common.djangoapps.student import auth
 from common.djangoapps.student.models import CourseEnrollmentAllowed
 from common.djangoapps.student.roles import (
@@ -745,7 +747,7 @@ def _has_access_to_course(user, access_level, course_key):
     if is_masquerading_as_student(user, course_key):
         return ACCESS_DENIED
 
-    global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key)
+    global_staff, staff_access, instructor_access = admin_access_to_course_for_user(user, course_key)
 
     if global_staff:
         debug("Allow: user.is_staff")
@@ -766,6 +768,14 @@ def _has_access_to_course(user, access_level, course_key):
 
     debug("Deny: user did not have correct access")
     return ACCESS_DENIED
+
+
+def admin_access_to_course_for_user(user, course_key):
+    program = ProgramCache.find_course_mapping(course_key)
+    if program:
+        return administrative_accesses_to_program_for_user(user, program)
+
+    return administrative_accesses_to_course_for_user(user, course_key)
 
 
 def administrative_accesses_to_course_for_user(user, course_key):

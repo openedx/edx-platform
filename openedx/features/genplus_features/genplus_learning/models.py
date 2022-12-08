@@ -41,8 +41,8 @@ class Program(TimeStampedModel):
     end_date = models.DateField()
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=ProgramStatuses.UNPUBLISHED)
     banner_image = models.ImageField(upload_to="program_banner_images", default="")
-    intro_unit = models.ForeignKey(CourseOverview, on_delete=models.SET_NULL, null=True, blank=True, related_name='intro_unit_programs')
-    outro_unit = models.ForeignKey(CourseOverview, on_delete=models.SET_NULL, null=True, blank=True, related_name='outro_unit_programs')
+    intro_unit = models.OneToOneField(CourseOverview, on_delete=models.SET_NULL, null=True, blank=True, related_name='intro_unit_program')
+    outro_unit = models.OneToOneField(CourseOverview, on_delete=models.SET_NULL, null=True, blank=True, related_name='outro_unit_program')
     history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
@@ -56,6 +56,15 @@ class Program(TimeStampedModel):
                 ), separator="_"
             )
         super(Program, self).save(*args, **kwargs)
+
+    @property
+    def all_units_ids(self):
+        course_ids = list(self.units.all().values_list('course', flat=True))
+        if self.intro_unit:
+            course_ids.append(self.intro_unit.id)
+        if self.outro_unit:
+            course_ids.append(self.outro_unit.id)
+        return course_ids
 
     @property
     def is_active(self):
@@ -135,6 +144,15 @@ class ProgramEnrollment(TimeStampedModel):
     objects = models.Manager()
     visible_objects = ProgramEnrollmentManager()
     history = HistoricalRecords()
+
+
+class ProgramAccessRole(models.Model):
+    class Meta:
+        unique_together = ('user', 'program', 'role')
+
+    user = models.ForeignKey(USER_MODEL, on_delete=models.CASCADE)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, db_index=True)
+    role = models.CharField(max_length=64, db_index=True)
 
 
 class ClassUnit(models.Model):
