@@ -26,6 +26,15 @@ def plugin_settings(settings):
     settings.TAHOE_ALWAYS_SKIP_TEST = True
     settings.CMS_UPDATE_SEARCH_INDEX_JOB_QUEUE = 'edx.cms.core.default'
 
+    # TODO: Remove when AMC is removed: RED-2845
+    settings.FEATURES['TAHOE_SITES_USE_ORGS_MODELS'] = getenv('TEST_TAHOE_SITES_USE_ORGS_MODELS', 'true') == 'true'
+
+    # TODO: Remove when AMC is removed: RED-2845
+    settings.TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
+    settings.INSTALLED_APPS += [
+        'tiers',
+    ]
+
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
         settings.INSTALLED_APPS += [
             'openedx.core.djangoapps.appsembler.multi_tenant_emails',

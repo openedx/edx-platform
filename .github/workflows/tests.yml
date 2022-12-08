@@ -24,6 +24,7 @@ jobs:
           - lms-1
           - lms-2
           - mte
+          - legacy-amc-tests
           - studio
 
     steps:
