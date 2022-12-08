@@ -241,12 +241,20 @@ def _build_help_center_url(language):
     return support_url
 
 
+def _security_url():
+    """
+    Return the security policy page URL.
+    """
+    return settings.SECURITY_PAGE_URL
+
+
 def _footer_connect_links(language=settings.LANGUAGE_CODE):
     """Return the connect links to display in the footer. """
     links = [
         ("blog", (marketing_link("BLOG"), _("Blog"))),
         ("contact", (_build_support_form_url(full_path=True), _("Contact Us"))),
         ("help-center", (_build_help_center_url(language), _("Help Center"))),
+        ("security", (_security_url(), _("Security"))),
     ]
 
     if language == settings.LANGUAGE_CODE:
