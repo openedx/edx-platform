@@ -53,7 +53,7 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
     usage_key = UsageKey.from_string(usage_key_str).map_into_course(course_key)
     user = get_user_model().objects.get(pk=user_id)
 
-    if single_problem is True:
+    if single_problem:
         student_data = {}
     else:
         student_data = []
@@ -93,7 +93,7 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                     responses['results'] = []
                 else:
                     responses['results'] = {}
-                    
+
                 for user_id in student_list:
                     user = get_user_model().objects.get(pk=user_id)
                     user_states = generated_report_data.get(user.username)
@@ -130,11 +130,12 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                             'count': value['count'],
                             'is_correct': value['is_correct'],
                         })
-
-                if responses['problem_type'] in ('single_choice', 'multiple_choice', 'short_answers') and single_problem is not True:
-                    student_data.append(responses)
-                else:
-                    student_data.update(responses)
+                        
+                if responses['problem_type'] in ('single_choice', 'multiple_choice', 'short_answers'):
+                    if not single_problem:
+                        student_data.append(responses)
+                    else:
+                        student_data.update(responses)
 
     return student_data
 

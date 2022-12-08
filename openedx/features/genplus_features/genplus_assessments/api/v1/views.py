@@ -217,9 +217,9 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
             'response_end_of_year': 0
         }
         request = self.request
-        # list of user who complete all the assessment in the intro course
+        # list of user id who complete all the assessment in the intro course
         intro_user = []
-        # list of user who complete all the assessment in the outro course
+        # list of user id who complete all the assessment in the outro course
         outro_user = []
         
         for student in gen_class.students.all():
@@ -228,14 +228,14 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 if gen_class.program.intro_unit:
                     self.intro_assessments = get_assessment_problem_data(request, gen_class.program.intro_unit.id, user)
                     intro_assessments_completion = get_assessment_completion(self.intro_assessments)
-                    if intro_assessments_completion is True:
-                        intro_user.append(user)
+                    if intro_assessments_completion:
+                        intro_user.append(user.id)
                         aggregate_result['response_start_of_year'] += 1
                 if gen_class.program.outro_unit:
                     self.outro_assessments = get_assessment_problem_data(request, gen_class.program.outro_unit.id, user)
                     outro_assessments_completion = get_assessment_completion(self.outro_assessments)
-                    if outro_assessments_completion is True:
-                        outro_user.append(user)
+                    if outro_assessments_completion:
+                        outro_user.append(user.id)
                         aggregate_result['response_end_of_year'] += 1
 
         for data in raw_data:
@@ -244,8 +244,8 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
             elif data['assessment_time'] == "end_of_year" and data['user'] in outro_user:
                 aggregate_result['average_score_end_of_year'] += data['score'] if 'score' in data else data['rating']
 
-        aggregate_result['average_score_start_of_year'] /= aggregate_result['response_start_of_year']
-        aggregate_result['average_score_end_of_year'] /= aggregate_result['response_end_of_year']
+        aggregate_result['average_score_start_of_year'] /= aggregate_result['response_start_of_year'] if aggregate_result['response_start_of_year'] > 0 else 1
+        aggregate_result['average_score_end_of_year'] /= aggregate_result['response_end_of_year'] if aggregate_result['response_end_of_year'] > 0 else 1
         total_problems = len(self.intro_assessments)
         aggregate_result['accumulative_all_problem_score'] = total_problems * TOTAL_PROBLEM_SCORE
 
