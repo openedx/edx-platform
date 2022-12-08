@@ -916,22 +916,6 @@ class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
         # Then I return empty credit info
         self.assertDictEqual(output["credit"], {})
 
-    def test_user_ineligible(self):
-
-        # Given an enrollment
-        enrollment = self.create_test_enrollment()
-        input_data = enrollment
-        input_context = self.create_test_context(enrollment)
-
-        # ... but the user is ineligible
-        input_context["credit_statuses"]["eligible"] = False
-
-        # When I serialize
-        output = LearnerEnrollmentSerializer(input_data, context=input_context).data
-
-        # Then I return empty credit info
-        self.assertDictEqual(output["credit"], {})
-
 
 class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
     """High-level tests for UnfulfilledEntitlementSerializer"""
