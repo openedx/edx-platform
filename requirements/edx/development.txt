@@ -441,10 +441,8 @@ django-pipeline==2.0.8
     # via -r requirements/edx/testing.txt
 django-pyfs==3.2.0
     # via -r requirements/edx/testing.txt
-django-ratelimit==3.0.1
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.txt
+django-ratelimit==4.0.0
+    # via -r requirements/edx/testing.txt
 django-require @ git+https://github.com/openedx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/testing.txt
 django-sekizai==4.0.0
@@ -709,7 +707,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==16.4.0
+faker==16.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
