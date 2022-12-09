@@ -10,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.db.models import TextChoices
 from django.urls import reverse
 from django.utils.html import strip_tags
-from django.utils.text import Truncator
 from rest_framework import serializers
 
 from common.djangoapps.student.models import get_user_by_username_or_email
@@ -406,7 +405,7 @@ class ThreadSerializer(_ContentSerializer):
         Returns a cleaned and truncated version of the thread's body to display in a
         preview capacity.
         """
-        return Truncator(strip_tags(self.get_rendered_body(obj))).chars(35, ).replace('\n', ' ')
+        return strip_tags(self.get_rendered_body(obj)).replace('\n', ' ')
 
     def get_close_reason(self, obj):
         """
