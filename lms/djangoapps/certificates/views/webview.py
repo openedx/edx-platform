@@ -4,6 +4,7 @@ Certificate HTML webview.
 
 
 import logging
+from typing import Dict, List, Union
 import urllib
 from datetime import datetime
 from uuid import uuid4
@@ -47,6 +48,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.permissions import PREVIEW_CERTIFICATES
 from lms.djangoapps.certificates.utils import (
     emit_certificate_event,
+    get_certificate_configuration_from_credentials,
     get_certificate_url,
     get_preferred_certificate_name
 )
@@ -575,6 +577,13 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
         )
         return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
+    if course_key.deprecated:
+        active_configuration = _update_certificate_configuration_from_credentials(
+            configuration=active_configuration,
+            course_id=str(course.id),
+            mode=preview_mode or user_certificate.mode,
+        )
+
     # Get data from Discovery service that will be necessary for rendering this Certificate.
     catalog_data = _get_catalog_data_for_course(course_key)
 
@@ -667,6 +676,29 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
 
         # Render the certificate
         return response
+
+
+def _update_certificate_configuration_from_credentials(
+    configuration: Dict[str, Union[str, List[Dict[str, str]]]],
+    course_id: str,
+    mode: str
+) -> Dict[str, Union[str, List[Dict[str, str]]]]:
+    """
+    Populates certificate configuration from credentials service.
+
+    If config not found in credentials returns configuration without changes.
+    """
+    credentials_certificate_conf = get_certificate_configuration_from_credentials(course_id, mode)
+    if credentials_certificate_conf:
+        if title := credentials_certificate_conf.get('title'):
+            configuration['course_title'] = title
+        if is_active := credentials_certificate_conf.get('is_active'):
+            configuration['is_active'] = is_active
+        if signatories := credentials_certificate_conf.get('signatories', []):
+            for signatory in signatories:
+                signatory['signature_image_path'] = signatory.pop('image') or ''
+            configuration['signatories'] = signatories
+    return configuration
 
 
 def _get_catalog_data_for_course(course_key):
