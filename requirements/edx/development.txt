@@ -598,7 +598,7 @@ edx-drf-extensions==8.3.1
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.58.16
+edx-enterprise==3.58.17
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -975,6 +975,10 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
+networkx==2.8.8
+    # via
+    #   -r requirements/edx/testing.txt
+    #   grimp
 newrelic==8.4.0
     # via
     #   -r requirements/edx/testing.txt
