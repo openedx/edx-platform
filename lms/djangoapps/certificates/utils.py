@@ -2,18 +2,24 @@
 Certificates utilities
 """
 from datetime import datetime
+from typing import Optional
 import logging
 
 from django.conf import settings
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
+from requests.models import Response
 
 from common.djangoapps.student import models_api as student_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
+from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.utils import get_credentials_api_base_url, get_credentials_api_client
+from openedx.core.lib.edx_api_utils import get_api_data
 from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -250,3 +256,18 @@ def get_preferred_certificate_name(user):
         name_to_use = ''
 
     return name_to_use
+
+
+def get_certificate_configuration_from_credentials(course_id: str, mode: str) -> Optional[Response]:
+    """
+    Makes a request to the credentials service to get a certificate configuration of the course.
+    """
+    credentials_client = get_credentials_api_client(User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME))
+    return get_api_data(
+        api_config=CredentialsApiConfig,
+        resource='course_certificates',
+        api_client=credentials_client,
+        base_api_url=get_credentials_api_base_url(),
+        querystring={'course_id': course_id, 'certificate_type': mode},
+        traverse_pagination=False,
+    )
