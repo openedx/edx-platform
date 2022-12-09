@@ -66,7 +66,7 @@ class StudentAnswersViewSet(viewsets.ViewSet):
                 students = list(students.values_list('gen_user__user', flat=True))
             else:
                 students.append(student_id)
-                
+
             course_id = request.query_params.get('course_id')
             course_key = CourseKey.from_string(course_id)
             problem_locations = request.query_params.get('problem_locations')
@@ -128,13 +128,13 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
             text_assessment_data = TextAssessmentSerializer(text_assessment, many=True).data
             rating_assessment_data = RatingAssessmentSerializer(rating_assessment, many=True).data
             raw_data = text_assessment_data + rating_assessment_data
-            
+
             if student_id == "all" or student_id is None:
                 response['aggregate_all_problem'] = self.get_aggregate_problems_result(raw_data, gen_class)
                 response['single_assessment_result'] = self.get_assessment_result(raw_data, gen_class)
             else:
                 response['single_assessment_result'] = self.get_user_assessment_result(raw_data, gen_class)
-                
+
             response['aggregate_skill'] = self.get_aggregate_skill_result(raw_data, gen_class, student_id)
         except Exception as ex:
             logger.exception(ex)
@@ -156,27 +156,27 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
         try:
             usage_key = UsageKey.from_string(start_year_usage_key)
             gen_class = Class.objects.get(pk=class_id)
+            total_students = gen_class.students.exclude(gen_user__user__isnull=True).count()
             response = {
                 'question_statement': store.get_item(usage_key).question_statement,
                 'assessment_type': assessment_type,
-                'total_respones': gen_class.students.count() * 2,
+                'total_respones': total_students * 2,
                 'available_responses': 0,
                 'student_response': {}
             }
+
             if assessment_type == "genz_text_assessment":
                 text_assessment = UserResponse.objects.filter(Q(program=gen_class.program) & Q(
                     gen_class=class_id) & (Q(usage_id=start_year_usage_key) | Q(usage_id=end_year_usage_key)))
-                text_assessment_data = TextAssessmentSerializer(
-                    text_assessment, many=True).data
+                text_assessment_data = TextAssessmentSerializer(text_assessment, many=True).data
                 raw_data = text_assessment_data
             else:
                 rating_assessment = UserRating.objects.filter(Q(program=gen_class.program) & Q(
                     gen_class=class_id) & (Q(usage_id=start_year_usage_key) | Q(usage_id=end_year_usage_key)))
-                rating_assessment_data = RatingAssessmentSerializer(
-                    rating_assessment, many=True).data
+                rating_assessment_data = RatingAssessmentSerializer(rating_assessment, many=True).data
                 raw_data = rating_assessment_data
 
-            students = gen_class.students.all()
+            students = gen_class.students.exclude(gen_user__user__isnull=True)
             # prepare response against all the students in a class
             for student in students:
                 user_id = 'user_' + str(student.gen_user.user_id)
@@ -208,8 +208,10 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 [Dict]: Returns a dictionaries
                 containing the students aggregate class base result data.
         """
+        students = gen_class.students.exclude(gen_user__user__isnull=True)
+        total_students = students.count()
         aggregate_result = {
-            'total_students': gen_class.students.count(),
+            'total_students': total_students,
             'accumulative_all_problem_score': 0,
             'average_score_start_of_year': 0,
             'average_score_end_of_year': 0,
@@ -221,22 +223,21 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
         intro_user = []
         # list of user id who complete all the assessment in the outro course
         outro_user = []
-        
-        for student in gen_class.students.all():
-            if student.gen_user.user:
-                user = student.gen_user.user
-                if gen_class.program.intro_unit:
-                    self.intro_assessments = get_assessment_problem_data(request, gen_class.program.intro_unit.id, user)
-                    intro_assessments_completion = get_assessment_completion(self.intro_assessments)
-                    if intro_assessments_completion:
-                        intro_user.append(user.id)
-                        aggregate_result['response_start_of_year'] += 1
-                if gen_class.program.outro_unit:
-                    self.outro_assessments = get_assessment_problem_data(request, gen_class.program.outro_unit.id, user)
-                    outro_assessments_completion = get_assessment_completion(self.outro_assessments)
-                    if outro_assessments_completion:
-                        outro_user.append(user.id)
-                        aggregate_result['response_end_of_year'] += 1
+
+        for student in students:
+            user = student.gen_user.user
+            if gen_class.program.intro_unit:
+                self.intro_assessments = get_assessment_problem_data(request, gen_class.program.intro_unit.id, user)
+                intro_assessments_completion = get_assessment_completion(self.intro_assessments)
+                if intro_assessments_completion:
+                    intro_user.append(user.id)
+                    aggregate_result['response_start_of_year'] += 1
+            if gen_class.program.outro_unit:
+                self.outro_assessments = get_assessment_problem_data(request, gen_class.program.outro_unit.id, user)
+                outro_assessments_completion = get_assessment_completion(self.outro_assessments)
+                if outro_assessments_completion:
+                    outro_user.append(user.id)
+                    aggregate_result['response_end_of_year'] += 1
 
         for data in raw_data:
             if data['assessment_time'] == "start_of_year" and data['user'] in intro_user:
@@ -244,9 +245,9 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
             elif data['assessment_time'] == "end_of_year" and data['user'] in outro_user:
                 aggregate_result['average_score_end_of_year'] += data['score'] if 'score' in data else data['rating']
 
+        total_problems = len(self.intro_assessments)
         aggregate_result['average_score_start_of_year'] /= aggregate_result['response_start_of_year'] if aggregate_result['response_start_of_year'] > 0 else 1
         aggregate_result['average_score_end_of_year'] /= aggregate_result['response_end_of_year'] if aggregate_result['response_end_of_year'] > 0 else 1
-        total_problems = len(self.intro_assessments)
         aggregate_result['accumulative_all_problem_score'] = total_problems * TOTAL_PROBLEM_SCORE
 
         return aggregate_result
@@ -280,7 +281,6 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 }
 
         for data in raw_data:
-            data = dict(data)
             if data['assessment_time'] == "start_of_year":
                 aggregate_result[data['skill']
                                     ]['score_start_of_year'] += data['score'] if 'score' in data else data['rating']
@@ -313,6 +313,7 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
         """
         request = self.request
         user = request.user
+        total_students = gen_class.students.exclude(gen_user__user__isnull=True).count()
         store = modulestore()
         assessments = []
         aggregate_result = {}
@@ -340,7 +341,7 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 aggregate_result[problem_id] = {
                     'problem_statement': assessment_xblock.question_statement,
                     'assessment_type': assessment.get('type'),
-                    'total_respones': gen_class.students.count() * 2,
+                    'total_respones': total_students * 2,
                     'skill': assessment_xblock.select_assessment_skill,
                     'total_problem_score': TOTAL_PROBLEM_SCORE,
                     'count_response_start_of_year': 0,
@@ -355,18 +356,14 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                     aggregate_result[problem_id]['score_start_of_year'] = 0
                     aggregate_result[problem_id]['score_end_of_year'] = 0
                 if assessment_xblock.select_assessment_time == "start_of_year":
-                    aggregate_result[problem_id]['usage_key_start_of_year'] = assessment.get(
-                        'id')
+                    aggregate_result[problem_id]['usage_key_start_of_year'] = assessment.get('id')
                 else:
-                    aggregate_result[problem_id]['usage_key_end_of_year'] = assessment.get(
-                        'id')
+                    aggregate_result[problem_id]['usage_key_end_of_year'] = assessment.get('id')
             else:
                 if assessment_xblock.select_assessment_time == "start_of_year":
-                    aggregate_result[problem_id]['usage_key_start_of_year'] = assessment.get(
-                        'id')
+                    aggregate_result[problem_id]['usage_key_start_of_year'] = assessment.get('id')
                 else:
-                    aggregate_result[problem_id]['usage_key_end_of_year'] = assessment.get(
-                        'id')
+                    aggregate_result[problem_id]['usage_key_end_of_year'] = assessment.get('id')
 
         for data in raw_data:
             problem_id = data['problem_id']
@@ -375,15 +372,13 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 if 'score' in data:
                     aggregate_result[problem_id]['score_start_of_year'] += data['score']
                 else:
-                    aggregate_result[problem_id]['rating_start_of_year'][str(
-                        data['rating'])] += 1
+                    aggregate_result[problem_id]['rating_start_of_year'][str(data['rating'])] += 1
             else:
                 aggregate_result[problem_id]['count_response_end_of_year'] += 1
                 if 'score' in data:
                     aggregate_result[problem_id]['score_end_of_year'] += data['score']
                 else:
-                    aggregate_result[problem_id]['rating_end_of_year'][str(
-                        data['rating'])] += 1
+                    aggregate_result[problem_id]['rating_end_of_year'][str(data['rating'])] += 1
 
         return aggregate_result
 
