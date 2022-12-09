@@ -24,7 +24,6 @@ from unittest.mock import ANY, MagicMock, Mock, patch
 
 import pytest
 import ddt
-import httpretty
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -38,7 +37,7 @@ from xblock.fields import ScopeIds
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.video_module import EXPORT_IMPORT_STATIC_DIR, VideoBlock, create_youtube_string
-from xmodule.video_module.transcripts_utils import download_youtube_subs, save_subs_to_store, save_to_store
+from xmodule.video_module.transcripts_utils import save_to_store
 
 from .test_import import DummySystem
 
@@ -964,78 +963,6 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         '''
         descriptor = instantiate_descriptor(data=xml_data)
         assert descriptor.index_dictionary() == {'content': {'display_name': 'Test Video'}, 'content_type': 'Video'}
-
-    @httpretty.activate
-    def test_video_with_youtube_subs_index_dictionary(self):
-        """
-        Test index dictionary of a video module with YouTube subtitles.
-        """
-        xml_data_sub = '''
-            <video display_name="Test Video"
-                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
-                   show_captions="false"
-                   download_track="false"
-                   sub="OEoXaMPEzfM"
-                   start_time="00:00:01"
-                   download_video="false"
-                   end_time="00:01:00">
-              <source src="http://www.example.com/source.mp4"/>
-              <track src="http://www.example.com/track"/>
-              <handout src="http://www.example.com/handout"/>
-            </video>
-        '''
-        yt_subs_id = 'OEoXaMPEzfM'
-        url = f'http://video.google.com/timedtext?lang=en&v={yt_subs_id}'
-        httpretty.register_uri(
-            method=httpretty.GET,
-            uri=url,
-            body=MOCKED_YOUTUBE_TRANSCRIPT_API_RESPONSE,
-            content_type='application/xml'
-        )
-        descriptor = instantiate_descriptor(data=xml_data_sub)
-        subs = download_youtube_subs(yt_subs_id, descriptor, settings)
-        save_subs_to_store(json.loads(subs), yt_subs_id, descriptor)
-        assert descriptor.index_dictionary() ==\
-               {'content': {'display_name': 'Test Video', 'transcript_en': YOUTUBE_SUBTITLES}, 'content_type': 'Video'}
-
-    @httpretty.activate
-    def test_video_with_subs_and_transcript_index_dictionary(self):
-        """
-        Test index dictionary of a video module with
-        YouTube subtitles and German transcript uploaded by a user.
-        """
-        xml_data_sub_transcript = '''
-            <video display_name="Test Video"
-                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
-                   show_captions="false"
-                   download_track="false"
-                   sub="OEoXaMPEzfM"
-                   start_time="00:00:01"
-                   download_video="false"
-                   end_time="00:01:00">
-                   end_time="00:01:00">
-              <source src="http://www.example.com/source.mp4"/>
-              <track src="http://www.example.com/track"/>
-              <handout src="http://www.example.com/handout"/>
-              <transcript language="ge" src="subs_grmtran1.srt" />
-            </video>
-        '''
-        yt_subs_id = 'OEoXaMPEzfM'
-        url = f'http://video.google.com/timedtext?lang=en&v={yt_subs_id}'
-        httpretty.register_uri(
-            method=httpretty.GET,
-            uri=url,
-            body=MOCKED_YOUTUBE_TRANSCRIPT_API_RESPONSE,
-            content_type='application/xml'
-        )
-        descriptor = instantiate_descriptor(data=xml_data_sub_transcript)
-        subs = download_youtube_subs(yt_subs_id, descriptor, settings)
-        save_subs_to_store(json.loads(subs), yt_subs_id, descriptor)
-        save_to_store(SRT_FILEDATA, "subs_grmtran1.srt", 'text/srt', descriptor.location)
-        assert descriptor.index_dictionary() ==\
-               {'content': {'display_name': 'Test Video', 'transcript_en': YOUTUBE_SUBTITLES,
-                            'transcript_ge': 'sprechen sie deutsch? Ja, ich spreche Deutsch'},
-                'content_type': 'Video'}
 
     def test_video_with_multiple_transcripts_index_dictionary(self):
         """
