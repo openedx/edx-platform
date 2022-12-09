@@ -17,7 +17,6 @@ from django.utils.deprecation import MiddlewareMixin
 from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.helpers import set_language_cookie
-from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 
 # If django 1.7 or higher is used, the right-side can be updated with new-style codes.
@@ -98,19 +97,9 @@ class DarkLangMiddleware(MiddlewareMixin):
         Apply user's dark lang preference as a cookie for future requests.
         """
         if DarkLangConfig.current().enabled:
-            self._set_site_or_microsite_language(request, response)
             self._activate_preview_language(request, response)
 
         return response
-
-    def _set_site_or_microsite_language(self, request, response):
-        """
-        Apply language specified in site configuration.
-        """
-        language = get_value('LANGUAGE_CODE', None)
-        if language:
-            request.session[LANGUAGE_SESSION_KEY] = language
-            set_language_cookie(request, response, language)
 
     def _fuzzy_match(self, lang_code):
         """Returns a fuzzy match for lang_code"""
