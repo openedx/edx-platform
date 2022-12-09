@@ -156,7 +156,8 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
         try:
             usage_key = UsageKey.from_string(start_year_usage_key)
             gen_class = Class.objects.get(pk=class_id)
-            total_students = gen_class.students.exclude(gen_user__user__isnull=True).count()
+            students = gen_class.students.exclude(gen_user__user__isnull=True)
+            total_students = students.count()
             response = {
                 'question_statement': store.get_item(usage_key).question_statement,
                 'assessment_type': assessment_type,
@@ -176,7 +177,6 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 rating_assessment_data = RatingAssessmentSerializer(rating_assessment, many=True).data
                 raw_data = rating_assessment_data
 
-            students = gen_class.students.exclude(gen_user__user__isnull=True)
             # prepare response against all the students in a class
             for student in students:
                 user_id = 'user_' + str(student.gen_user.user_id)
@@ -266,7 +266,10 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
         aggregate_result = {}
         response = {}
         units = Unit.objects.filter(program=gen_class.program)
-
+        # student who attempts start of year skill assessment problem
+        intro_user = set()
+        # student who attempts end of year skill assessment problem
+        outro_user = set()
         for unit in units:
             if unit.skill:
                 aggregate_result[unit.skill.name] = {
@@ -284,20 +287,21 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
             if data['assessment_time'] == "start_of_year":
                 aggregate_result[data['skill']
                                     ]['score_start_of_year'] += data['score'] if 'score' in data else data['rating']
-                response[data['skill']
-                                    ]['response_start_of_year'] += 1
+                intro_user.add(data['user'])
             else:
                 aggregate_result[data['skill']
                                     ]['score_end_of_year'] += data['score'] if 'score' in data else data['rating']
-                response[data['skill']
-                                    ]['response_end_of_year'] += 1
-
+                outro_user.add(data['user'])
+        
+        response_start_of_year = len(intro_user)
+        response_end_of_year = len(outro_user)
+        
         if student_id == 'all' or student_id is None:
             for key,_ in aggregate_result.items():
-                if response[key]['response_start_of_year'] > 0:
-                    aggregate_result[key]['score_start_of_year'] /= response[key]['response_start_of_year']
-                if response[key]['response_end_of_year'] > 0:
-                    aggregate_result[key]['score_end_of_year'] /= response[key]['response_end_of_year']
+                if response_start_of_year > 0:
+                    aggregate_result[key]['score_start_of_year'] /= response_start_of_year
+                if response_end_of_year > 0:
+                    aggregate_result[key]['score_end_of_year'] /= response_end_of_year
 
         return aggregate_result
 
