@@ -122,7 +122,7 @@ def send_course_certificate_configuration(course_id: str, config_data: dict, sig
         response = credentials_client.post(
             api_url,
             files=signature_assets,
-            json=config_data
+            data=config_data
         )
         response.raise_for_status()
         log.info(f'Course certificate config sent for course {course_id} to Credentials.')
