@@ -4,7 +4,7 @@ CLI command to generate survey report.
 
 from django.core.management.base import BaseCommand, CommandError
 
-from openedx.features.survey_report.api import generate_report
+from openedx.features.survey_report.api import generate_report, send_report
 
 
 class Command(BaseCommand):
@@ -22,12 +22,25 @@ class Command(BaseCommand):
         learners ever registered, and generated certificates.
         """
 
-    def handle(self, *_args, **_options):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--no-send',
+            action='store_true',
+            help='Not send the report after generated.'
+        )
+
+    def handle(self, *_args, **options):
         try:
-            generate_report()
+            report = generate_report()
+            self.stdout.write(self.style.SUCCESS('Survey report has been generated successfully.'))
         except Exception as error:
             raise CommandError(f'An error has occurred while survey report was generating. {error}') from error
 
-        self.stdout.write(
-            self.style.SUCCESS('Survey report has been generated successfully.')
-        )
+        if not options['no_send']:
+            try:
+                send_report(report_id=report)
+                self.stdout.write(self.style.SUCCESS('Survey report has been sent successfully.'))
+            except Exception as send_error:
+                raise CommandError(
+                    f'An error has occurred while survey report was sending. {send_error}'
+                ) from send_error
