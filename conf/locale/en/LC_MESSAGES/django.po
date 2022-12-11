@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-04 20:35+0000\n"
-"PO-Revision-Date: 2022-12-04 20:35:44.327629\n"
+"POT-Creation-Date: 2022-12-11 20:35+0000\n"
+"PO-Revision-Date: 2022-12-11 20:35:43.789635\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -1864,6 +1864,10 @@ msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Security"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -7721,6 +7725,12 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
@@ -17158,6 +17168,12 @@ msgid ""
 "Before you send your email, review the text carefully and send it to "
 "yourself first, so that you can preview the formatting and make sure "
 "embedded images and links work correctly."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
