@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-04 20:35+0000\n"
-"PO-Revision-Date: 2022-12-04 20:35:44.327629\n"
+"POT-Creation-Date: 2022-12-11 20:35+0000\n"
+"PO-Revision-Date: 2022-12-11 20:35:43.789635\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2073,6 +2073,10 @@ msgstr "Ȼønʇɐɔʇ Ʉs"
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
 msgstr "Ħǝld Ȼǝnʇǝɹ"
+
+#: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr "Sǝɔnɹᴉʇʎ"
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -8515,6 +8519,14 @@ msgstr "Søɯǝ ǝɹɹøɹ øɔɔnɹɹǝd dnɹᴉnƃ dɐssʍøɹd ɔɥɐnƃǝ. �
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "Nø ǝɯɐᴉl ɐddɹǝss dɹøʌᴉdǝd."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
+"Ⱥn ǝɹɹøɹ ɥɐs øɔɔnɹɹǝd. Ŧɹʎ ɹǝɟɹǝsɥᴉnƃ ʇɥǝ dɐƃǝ, øɹ ɔɥǝɔʞ ʎønɹ ᴉnʇǝɹnǝʇ "
+"ɔønnǝɔʇᴉøn."
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -19218,6 +19230,14 @@ msgstr ""
 "Ƀǝɟøɹǝ ʎøn sǝnd ʎønɹ ǝɯɐᴉl, ɹǝʌᴉǝʍ ʇɥǝ ʇǝxʇ ɔɐɹǝɟnllʎ ɐnd sǝnd ᴉʇ ʇø "
 "ʎønɹsǝlɟ ɟᴉɹsʇ, sø ʇɥɐʇ ʎøn ɔɐn dɹǝʌᴉǝʍ ʇɥǝ ɟøɹɯɐʇʇᴉnƃ ɐnd ɯɐʞǝ snɹǝ "
 "ǝɯbǝddǝd ᴉɯɐƃǝs ɐnd lᴉnʞs ʍøɹʞ ɔøɹɹǝɔʇlʎ."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
+"Ɏøn ɔɐn ᴉnɔlndǝ ʞǝʎʍøɹds ᴉn ʎønɹ ɯǝssɐƃǝs. Føɹ lᴉsʇ øɟ ɐʌɐᴉlɐblǝ ʞǝʎʍøɹds "
+"sǝǝ ʇɥǝ {start_link}døɔnɯǝnʇɐʇᴉøn{end_link}."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

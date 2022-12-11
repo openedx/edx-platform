@@ -32,7 +32,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Ali Işıngör <ali@artistanbul.io>, 2017-2021
+# Ali Işıngör <ali@artistanbul.io>, 2017-2022
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
@@ -825,6 +825,8 @@ msgid ""
 "{html_start}This {account_or_email} has already been "
 "{activated_or_confirmed}.{html_end}"
 msgstr ""
+"{html_start}Bu {account_or_email} hesabı daha önceden  "
+"{activated_or_confirmed}.{html_end}"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -2478,6 +2480,9 @@ msgid ""
 "the honor code established by {platform_name} and has completed all of the "
 "required tasks for this course under its guidelines. "
 msgstr ""
+"{cert_type} sertifikası bir öğrencinin {platform_name} tarafından belirlenen"
+" etik kurallarına uymayı kabul ettiğini ve dersin tüm yönergelerine uyarak "
+"gerekli görevlerin hepsini tamamladığını belirtir."
 
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
@@ -2485,6 +2490,8 @@ msgid ""
 "A {cert_type} certificate also indicates that the identity of the learner "
 "has been checked and is valid."
 msgstr ""
+"Bir {cert_type} sertifikası, öğrencinin kimliğinin kontrol edildiğini ve "
+"geçerli olduğunu gösterir."
 
 #. Translators:  This text describes the 'XSeries' course certificate type.
 #. An XSeries is a collection of
@@ -3260,17 +3267,19 @@ msgstr "Dahili Hizmet Tabanı URL'si"
 
 #: lms/djangoapps/courseware/models.py
 msgid "Financial Assistance Backend API Base URL."
-msgstr ""
+msgstr "Mali Yardım Backend API Tabanı URL'si"
 
 #: lms/djangoapps/courseware/models.py
 msgid ""
 "Username created for Financial Assistance Backend, e.g. "
 "financial_assistance_service_user."
 msgstr ""
+"Mali Yardım Backend'i için oluşturulan kullanıcı adı, örn. "
+"financial_assistance_service_user."
 
 #: lms/djangoapps/courseware/models.py
 msgid "Percentage of courses allowed to use edx-financial-assistance"
-msgstr ""
+msgstr "edx-mali-yardım kullanmaya izin verilen derslerin yüzdesel oranı"
 
 #: lms/djangoapps/courseware/plugins.py lms/djangoapps/courseware/tabs.py
 #: lms/templates/peer_grading/peer_grading.html
@@ -3606,6 +3615,9 @@ msgid ""
 "                        %(course_name)s: Reported content awaits review\n"
 "                    "
 msgstr ""
+"\n"
+"                        %(course_name)s: Bildirilen içerik incelenmeyi bekliyor\n"
+"                    "
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
@@ -3615,12 +3627,12 @@ msgstr "Tartışmalara Git"
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 #, python-format
 msgid "%(course_name)s: Reported content awaits review"
-msgstr ""
+msgstr "%(course_name)s: Bildirilen içerik incelenmeyi bekliyor"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/subject.txt
 #, python-format
 msgid " %(course_name)s %(course_id)s moderator content for review "
-msgstr ""
+msgstr " %(course_name)s %(course_id)s Moderatörde inceleme bekleyen içerik "
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #, python-format, python-brace-format
@@ -3753,12 +3765,16 @@ msgid ""
 "Course is not cohorted but cohort provided. Ignoring cohort assignment for "
 "all users."
 msgstr ""
+"Ders kohortlu değildir, ancak kohort sağlanır. Tüm kullanıcılar için kohort "
+"ataması yok sayılıyor."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
 "Cohort name not found: {cohort}. Ignoring cohort assignment for all users."
 msgstr ""
+"Kohort adı bulunamadı: {cohort}. Tüm kullanıcılar için kohort ataması yok "
+"sayılıyor."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -3825,13 +3841,15 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User-friendly text describing current status of report generation."
-msgstr ""
+msgstr "Rapor oluşturmanın mevcut durumunu açıklayan kullanıcı dostu metin."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A unique id for the report generation task. It can be used to query the "
 "latest report generation status."
 msgstr ""
+"Rapor oluşturma görevi için benzersiz bir kimlik. En son rapor oluşturma "
+"durumunu sorgulamak için kullanılabilir."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -4139,7 +4157,7 @@ msgstr "Rapor adı."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "HTML anchor tag that contains the name and link."
-msgstr ""
+msgstr "Adı ve bağlantıyı içeren HTML çapası etiketi."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "List of report downloads"
@@ -4147,13 +4165,15 @@ msgstr "Rapor indirmeleri listesi"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "ID for the course whose reports need to be listed."
-msgstr ""
+msgstr "Raporlarının listelenmesi gereken dersin kimliği."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Filter results to only return details of for the report with the specified "
 "name."
 msgstr ""
+"Belirtilen ada sahip raporun yalnızca ayrıntılarını döndürmek için sonuçları"
+" filtreleyin."
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -4297,7 +4317,7 @@ msgstr "Geçersiz veri, generate_for değeri \"new\" veya \"all\" olmalı."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Certificate generation started for students on the allowlist."
-msgstr ""
+msgstr "İzinliler listesindeki öğrenciler için sertifika oluşturma başladı."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -5140,15 +5160,15 @@ msgstr "Eğitmen tarafından yönetilen bir takımı terkedemezsiniz."
 
 #: lms/djangoapps/user_tours/models.py
 msgid "Show existing user tour"
-msgstr ""
+msgstr "Mevcut kullanıcı turunu göster"
 
 #: lms/djangoapps/user_tours/models.py
 msgid "Show new user tour"
-msgstr ""
+msgstr "Yeni kullanıcı turunu göster"
 
 #: lms/djangoapps/user_tours/models.py
 msgid "Do not show user tour"
-msgstr ""
+msgstr "Kullanıcı turunu gösterme"
 
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
@@ -5266,6 +5286,9 @@ msgid ""
 "            This email was automatically sent from %(platform_name)s.\n"
 "          "
 msgstr ""
+"\n"
+"            Bu e-posta %(platform_name)s platformu tarafından otomatik olarak gönderilmiştir.\n"
+"          "
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 #, python-format
@@ -5274,6 +5297,9 @@ msgid ""
 "            You are receiving this email at address %(email)s because you are enrolled in\n"
 "          "
 msgstr ""
+"\n"
+"            Kayıtlandığınız için %(email)s adresine e-posta gönderileri almaktasınız\n"
+"          "
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid ""
@@ -5281,6 +5307,9 @@ msgid ""
 "            To stop receiving email like this, update your course email settings\n"
 "          "
 msgstr ""
+"\n"
+"           Bunun gibi e-posta iletilerini almayı durdurmak için ders e-posta ayarlarınızı güncelleyin\n"
+"          "
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid "here"
@@ -5303,6 +5332,8 @@ msgid ""
 "You are receiving this email at address %(email)s because you are enrolled "
 "in %(course_title)s."
 msgstr ""
+"%(course_title)s dersine kaydolduğunuz için %(email)s adresine e-posta "
+"iletileri almaktasınız."
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.txt
 #, python-format
@@ -5310,11 +5341,13 @@ msgid ""
 "To stop receiving email like this, update your course email settings here "
 "%(email_settings_url)s"
 msgstr ""
+"Bunun gibi e-posta iletilerini almayı durdurmak için, ders e-posta "
+"ayarlarınızı buradan güncelleyin %(email_settings_url)s"
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.txt
 #, python-format
 msgid "To unsubscribe click here %(unsubscribe_link)s"
-msgstr ""
+msgstr "Abonelikten çıkmak için buraya tıklayın %(unsubscribe_link)s"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
@@ -6717,6 +6750,8 @@ msgid ""
 "Maximum number of records in paginated response of a single request to "
 "catalog service."
 msgstr ""
+"Katalog hizmetine yönelik tek bir isteğin sayfalandırılmış yanıtındaki "
+"maksimum kayıt sayısı."
 
 #: openedx/core/djangoapps/config_model_utils/admin.py
 #, python-brace-format
@@ -6921,7 +6956,7 @@ msgstr "durum"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "The state of the block import task."
-msgstr ""
+msgstr "Block içe aktarma görevinin durumu."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "progress"
@@ -6929,7 +6964,7 @@ msgstr "ilerleme"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "A float from 0.0 to 1.0 representing the task progress."
-msgstr ""
+msgstr "Görev ilerlemesini temsil eden 0,0'dan 1,0'a kayan nokta."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "course ID"
@@ -6950,7 +6985,7 @@ msgstr "lti platform tanımlayıcısı"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "The LTI platform identifier to which this profile belongs to."
-msgstr ""
+msgstr "Bu profilin ait olduğu LTI platform tanımlayıcısı."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "client identifier"
@@ -6958,21 +6993,22 @@ msgstr "müşteri tanımlayıcısı"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "The LTI client identifier generated by the LTI platform."
-msgstr ""
+msgstr "LTI platformu tarafından oluşturulan LTI istemci tanımlayıcısı."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "subject identifier"
-msgstr ""
+msgstr "konu tanımlayıcısı"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid ""
 "Identifies the entity that initiated the launch request, commonly a user."
 msgstr ""
+"Başlatma isteğini başlatan varlığı, genellikle bir kullanıcıyı tanımlar."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid ""
 "The authorized LTI profile that launched the resource (identifies the user)."
-msgstr ""
+msgstr "Kaynağı başlatan yetkili LTI profili (kullanıcıyı tanımlar)."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid ""
@@ -7309,11 +7345,15 @@ msgstr ""
 msgid ""
 "If enabled, discussion topics will be created for graded units as well."
 msgstr ""
+"Etkinleştirilirse, not verilen üniteler için de tartışma başlıkları "
+"oluşturulur."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
 "If enabled, discussions will need to be manually enabled for each unit."
 msgstr ""
+"Etkinleştirilirse, tartışmaların her ünite için elle etkinleştirilmesi "
+"gerekir."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The plugin configuration data for this context/provider."
@@ -7361,11 +7401,11 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Ordering of this topic in its learning context"
-msgstr ""
+msgstr "Bu başlığın öğrenme bağlamında sıralaması"
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Additional context for this topic, such as its section, and subsection"
-msgstr ""
+msgstr "Bu başlık için bölümü ve alt bölümü gibi ek bağlamlar"
 
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
@@ -7456,7 +7496,7 @@ msgstr "{course} dersi için {country} kara listede"
 
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
-msgstr ""
+msgstr "Öğrenci Patikaları"
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -12756,6 +12796,8 @@ msgid ""
 "Non writable git url provided. Expecting something like: "
 "git@github.com:openedx/openedx-demo-course.git"
 msgstr ""
+"Yazılamaz git url'si verildi. Bunun gibi bir şey bekliyoruz: "
+"git@github.com:openedx/openedx-demo-course.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -12815,15 +12857,15 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
 msgid "Marks a field as deprecated."
-msgstr ""
+msgstr "Bir alanı kullanımdan kaldırıldı olarak işaretler."
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
 msgid "User-friendly display name for the field"
-msgstr ""
+msgstr "Alan için kullanıcı-dostu görüntüleme adı"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
 msgid "Help text that describes the setting."
-msgstr ""
+msgstr "Ayarı açıklayan yardım metni."
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Tab type"
@@ -12831,15 +12873,15 @@ msgstr "Sekme türü"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Default name for the tab displayed to users"
-msgstr ""
+msgstr "Kullanıcılara gösterilen sekme için varsayılan ad"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True if it's possible to hide the tab for a course"
-msgstr ""
+msgstr "Bir ders için sekmeyi gizlemek mümkünse True olmalı"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True the tab is hidden for the course"
-msgstr ""
+msgstr "Sekme ders için gizliyse True"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True if it's possible to reorder the tab in the list of tabs"
@@ -12851,27 +12893,27 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Name of the tab displayed to users. Overrides title."
-msgstr ""
+msgstr "Kullanıcılara gösterilen sekmenin adı. Başlığı geçersiz kılar."
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Additional settings specific to the tab"
-msgstr ""
+msgstr "Sekmeye özel ek ayarlar"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "ID of tab to update"
-msgstr ""
+msgstr "Güncellenecek sekmenin kimliği"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Location (Usage Key) of tab to update"
-msgstr ""
+msgstr "Güncellenecek sekmenin konumu (Kullanım Anahtarı)"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Need to supply either a valid tab_id or a tab_location."
-msgstr ""
+msgstr "Geçerli bir tab_id veya tab_location sağlamanız gerekir."
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True to hide the tab, and False to show it."
-msgstr ""
+msgstr "Sekmeyi gizlemek için True, göstermek için False."
 
 #: cms/djangoapps/contentstore/rest_api/v0/views/tabs.py
 msgid "Change the visibility of tabs in a course."
@@ -13932,6 +13974,9 @@ msgid ""
 "activate your account. Can’t find it? Check your spam folder or "
 "{link_start}resend the email{link_end}."
 msgstr ""
+"Hesabınızı etkinleştirme bağlantısını {strong_start}{email}{strong_end} "
+"e-posta adresine gönderdik. Bulamadınız mı? Spam klasörünüzü kontrol edin ya"
+" da {link_start}tekrar e-posta gönder{link_end}."
 
 #: lms/templates/dashboard.html
 msgid "Continue to {platform_name}"
@@ -16235,11 +16280,11 @@ msgstr ""
 
 #: lms/templates/course_modes/error.html
 msgid "Unable to enroll in {course_name}"
-msgstr ""
+msgstr "{course_name} dersine kayıtlanılamadı"
 
 #: lms/templates/course_modes/error.html
 msgid "Sorry, we were unable to enroll you in"
-msgstr ""
+msgstr "Üzgünüz, sizi şuraya kaydedemedik "
 
 #: lms/templates/course_modes/error.html
 msgid "Explore all courses on edX"
@@ -16295,11 +16340,11 @@ msgstr ""
 
 #: lms/templates/course_modes/fbe.html
 msgid "Access expires and all progress will be lost on"
-msgstr ""
+msgstr "Erişimin süresi dolacak ve tüm ilerleme kaybolacak"
 
 #: lms/templates/course_modes/fbe.html
 msgid "Access expires and all progress will be lost"
-msgstr ""
+msgstr "Erişimin süresi dolacak ve tüm ilerleme kaybolacak"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Enroll In {course_name} | Upgrade Now"
@@ -16307,7 +16352,7 @@ msgstr "{course_name} Dersine Kaydol | Hemen Yükselt"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Choose a path for your course in"
-msgstr ""
+msgstr "Dersiniz için bir patika seçin"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Earn a certificate"
@@ -17988,7 +18033,7 @@ msgstr "Okullar"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
-msgstr ""
+msgstr "Ücretsiz kayıt olun"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
@@ -19071,8 +19116,8 @@ msgid ""
 "TA'. Only enrolled learners can be added as Community TAs."
 msgstr ""
 "Topluluk Asistanları, ders ekiplerinin tartışmaları yönetmesine yardımcı "
-"olan topluluk üyeleridir. Atandıkları grup veya kayıtlanma yolundaki "
-"öğrencilerin gönderileri görebilir ve düzenleyebilir veya silebilir, "
+"olan topluluk üyeleridir. Atandıkları kohort veya kayıtlanma yolundaki "
+"öğrencilerin gönderilerini görebilir ve düzenleyebilir veya silebilir, "
 "bayrakları temizleyebilir, konuları kapatabilir veya yeniden açabilir ve "
 "yanıtları onaylayabilirler. Gönderileri 'Topluluk Asistanı' olarak "
 "işaretlenir. Yalnızca kayıtlı öğrenciler Topluluk Asistanları olarak "
@@ -19130,7 +19175,7 @@ msgstr "Kohort: "
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "(Learners not explicitly assigned to a cohort)"
-msgstr "(Açıkça bir topluluğa üye olmamış tüm öğrenciler)"
+msgstr "(Açıkça bir kohorta üye olmamış tüm öğrenciler)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Learners in the {track_name} Track"

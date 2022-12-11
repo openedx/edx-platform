@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-04 20:35+0000\n"
-"PO-Revision-Date: 2022-12-04 20:35:44.327629\n"
+"POT-Creation-Date: 2022-12-11 20:35+0000\n"
+"PO-Revision-Date: 2022-12-11 20:35:43.789635\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2374,6 +2374,10 @@ msgstr "Çöntäçt Ûs Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
 msgstr "Hélp Çéntér Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr "Séçürïtý Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -9827,6 +9831,14 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "Nö émäïl äddréss prövïdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
+"Àn érrör häs öççürréd. Trý réfréshïng thé pägé, ör çhéçk ýöür ïntérnét "
+"çönnéçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -22098,6 +22110,14 @@ msgstr ""
 "∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
 "υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
 "∂σłσя ιη яєρяєнєη∂єяιт ι#"
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
+"Ýöü çän ïnçlüdé kéýwörds ïn ýöür méssägés. För lïst öf äväïläßlé kéýwörds "
+"séé thé {start_link}döçüméntätïön{end_link}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
