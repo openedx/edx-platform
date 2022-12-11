@@ -6,7 +6,7 @@ from io import StringIO
 from unittest import mock
 
 from django.core.management import call_command
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from openedx.features.survey_report.models import SurveyReport
 

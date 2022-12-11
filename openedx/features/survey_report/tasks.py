@@ -25,7 +25,7 @@ def generate_survey_report(survey_report_id: int):
     try:
         update_report(survey_report_id=survey_report_id, data=data)
         state = SURVEY_REPORT_GENERATED
-    except (Exception, ):
+    except (Exception, ):  # pylint: disable=broad-except
         state = SURVEY_REPORT_ERROR
     data = {"state": state}
     update_report(survey_report_id=survey_report_id, data=data)
