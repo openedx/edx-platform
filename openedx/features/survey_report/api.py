@@ -33,7 +33,9 @@ def get_report_data() -> dict:
         "enrollments": enrollments,
         "extra_data": extra_data,
     }
-def generate_report(defaults:bool=False) -> int:
+
+
+def generate_report(defaults: bool = False) -> int:
     """ Generate a report with relevant data."""
     data = {}
     if not defaults:
@@ -41,5 +43,7 @@ def generate_report(defaults:bool=False) -> int:
     survey_report = SurveyReport(**data)
     survey_report.save()
     return survey_report.id
-def update_report(survey_report_id: int, data:dict) -> None:
+
+
+def update_report(survey_report_id: int, data: dict) -> None:
     SurveyReport.objects.filter(id=survey_report_id).update(**data)

@@ -9,11 +9,12 @@ SURVEY_REPORT_PROCESSING = 'processing'
 SURVEY_REPORT_GENERATED = 'generated'
 SURVEY_REPORT_ERROR = 'error'
 
-SURVEY_REPORT_STATES= [
+SURVEY_REPORT_STATES = [
     (SURVEY_REPORT_PROCESSING, 'Processing'),
     (SURVEY_REPORT_GENERATED, 'Generated'),
     (SURVEY_REPORT_ERROR, 'Error'),
 ]
+
 
 class SurveyReport(models.Model):
     """

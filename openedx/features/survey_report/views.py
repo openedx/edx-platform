@@ -12,6 +12,7 @@ from common.djangoapps.util.views import ensure_valid_course_key
 from .tasks import generate_survey_report
 from .api import generate_report
 
+
 class SurveyReportView(View):
     """
     View for Survey Reports.
