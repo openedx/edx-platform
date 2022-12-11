@@ -15,30 +15,29 @@ class GenerateReportTest(TestCase):
     """
     Test for generate_report command.
     """
-    @override_settings(SURVEY_REPORT_EXTRA_DATA={'extra_data': 'extra_data'})
-    @mock.patch('openedx.features.survey_report.queries.get_course_enrollments')
-    @mock.patch('openedx.features.survey_report.queries.get_generated_certificates')
-    @mock.patch('openedx.features.survey_report.queries.get_registered_learners')
-    @mock.patch('openedx.features.survey_report.queries.get_recently_active_users')
-    @mock.patch('openedx.features.survey_report.queries.get_unique_courses_offered')
-    def test_generate_report(self, mock_get_unique_courses_offered, mock_get_recently_active_users,
-                             mock_get_registered_learners, mock_get_generated_certificates,
-                             mock_get_course_enrollments):
+
+    @mock.patch('openedx.features.survey_report.api.get_report_data')
+    def test_generate_report(self, mock_get_report_data):
         """
         Test that generate_report command creates a survey report.
         """
-        mock_get_unique_courses_offered.return_value = 1
-        mock_get_recently_active_users.return_value = 2
-        mock_get_registered_learners.return_value = 3
-        mock_get_generated_certificates.return_value = 4
-        mock_get_course_enrollments.return_value = 5
+        report_test_data = {
+            'courses_offered': 1,
+            'learners': 2,
+            'registered_learners': 3,
+            'generated_certificates': 4,
+            'enrollments': 5,
+            'extra_data': {'extra': 'data'},
+        }
+        mock_get_report_data.return_value = report_test_data
         out = StringIO()
         call_command('generate_report', stdout=out)
 
         survey_report = SurveyReport.objects.last()
-        assert survey_report.courses_offered == 1
-        assert survey_report.learners == 2
-        assert survey_report.registered_learners == 3
-        assert survey_report.generated_certificates == 4
-        assert survey_report.enrollments == 5
-        assert survey_report.extra_data == {'extra_data': 'extra_data'}
+
+        assert survey_report.courses_offered == report_test_data['courses_offered']
+        assert survey_report.learners == report_test_data['learners']
+        assert survey_report.registered_learners == report_test_data['registered_learners']
+        assert survey_report.generated_certificates == report_test_data['generated_certificates']
+        assert survey_report.enrollments == report_test_data['enrollments']
+        assert survey_report.extra_data == report_test_data['extra_data']
