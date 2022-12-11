@@ -4,6 +4,7 @@ Survey Report models.
 
 from django.db import models
 from jsonfield import JSONField
+from requests.models import Response
 
 SURVEY_REPORT_PROCESSING = 'processing'
 SURVEY_REPORT_GENERATED = 'generated'
@@ -58,3 +59,31 @@ class SurveyReport(models.Model):
     class Meta:
         ordering = ["-created_at"]
         get_latest_by = 'created_at'
+
+
+class SurveyReportUpload(models.Model):
+    """
+    This models stores information about send request of a survey report.
+
+    .. no_pii:
+
+    fields:
+    - sent_at: Date when the report was sent.
+    - report: The report that was sent.
+    - status: Request status code.
+    - request_details: Information about the send request.
+    """
+    sent_at = models.DateTimeField(auto_now=True, help_text="Date when the report was sent.")
+    report = models.ForeignKey(SurveyReport, on_delete=models.CASCADE, help_text="The report that was sent.")
+    status = models.IntegerField(help_text="Request status code.")
+    request_details = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Information about the send request."
+    )
+
+    def is_uploaded(self) -> bool:
+        response = Response()
+        response.status_code = self.status
+        return response.ok
