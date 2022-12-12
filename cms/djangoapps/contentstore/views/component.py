@@ -359,7 +359,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         if category == 'problem' and use_new_problem_editor():
             templates_for_category = [
                 template for template in templates_for_category if template['boilerplate_name'] == 'blank_common.yaml'
-                ]
+            ]
 
         # Add any advanced problem types. Note that these are different xblocks being stored as Advanced Problems,
         # currently not supported in libraries .
