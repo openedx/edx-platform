@@ -153,11 +153,16 @@ def get_accessible_discussion_xblocks_by_course_id(course_id, user=None, include
     Checks for the given user's access if include_all is False.
     """
     all_xblocks = modulestore().get_items(course_id, qualifiers={'category': 'discussion'}, include_orphans=False)
-
-    return [
+    all_xblocks2= modulestore().get_items(course_id, qualifiers={'category': 'eoldiscussion'}, include_orphans=False)
+    aux1 = [
         xblock for xblock in all_xblocks
         if has_required_keys(xblock) and (include_all or has_access(user, 'load', xblock, course_id))
     ]
+    aux2 = [
+        xblock for xblock in all_xblocks2
+        if has_required_keys(xblock) and (include_all or has_access(user, 'load', xblock, course_id))
+    ]
+    return aux1 + aux2
 
 
 def get_discussion_id_map_entry(xblock):
