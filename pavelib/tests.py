@@ -33,10 +33,6 @@ __test__ = False  # do not collect
     ("fail-fast", "x", "Fail suite on first failed test"),
     ("fasttest", "a", "Run without collectstatic"),
     make_option(
-        "--django_version", dest="django_version",
-        help="Run against which Django version (3.2)."
-    ),
-    make_option(
         "--eval-attr", dest="eval_attr",
         help="Only run tests matching given attribute expression."
     ),
@@ -106,10 +102,8 @@ def test_system(options, passthrough_options):
     """
     system = getattr(options, 'system', None)
     test_id = getattr(options, 'test_id', None)
-    django_version = getattr(options, 'django_version', None)
 
     assert system in (None, 'lms', 'cms')
-    assert django_version in (None, '3.2')
 
     if hasattr(options.test_system, 'with_wtw'):
         call_task('fetch_coverage_test_selection_data', options={
@@ -162,10 +156,6 @@ def test_system(options, passthrough_options):
     ("failed", "f", "Run only failed tests"),
     ("fail-fast", "x", "Run only failed tests"),
     make_option(
-        "--django_version", dest="django_version",
-        help="Run against which Django version (3.2)."
-    ),
-    make_option(
         "--eval-attr", dest="eval_attr",
         help="Only run tests matching given attribute expression."
     ),
@@ -201,9 +191,6 @@ def test_lib(options, passthrough_options):
     """
     lib = getattr(options, 'lib', None)
     test_id = getattr(options, 'test_id', lib)
-    django_version = getattr(options, 'django_version', None)
-
-    assert django_version in (None, '3.2')
 
     if test_id:
         # Testing a single test id.

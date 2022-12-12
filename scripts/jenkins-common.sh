@@ -48,9 +48,7 @@ source $VENV_PATH/edx-venv/bin/activate
 # Hack to fix up egg-link files given that the virtualenv is not relocatable
 sed -i "s|^/home/jenkins/shallow-clone|`pwd`|" -- \
     $VENV_PATH/edx-venv/lib/python*/site-packages/*.egg-link
-pip install pip==21.3
-pip install -qr requirements/edx/pip-tools.txt
-pip-sync -q requirements/edx/testing.txt requirements/edx/django.txt
+make test-requirements
 
 # add the node packages dir to PATH
 PATH=$PATH:node_modules/.bin
