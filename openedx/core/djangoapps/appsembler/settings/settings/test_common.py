@@ -29,11 +29,10 @@ def plugin_settings(settings):
     # TODO: Remove when AMC is removed: RED-2845
     settings.FEATURES['TAHOE_SITES_USE_ORGS_MODELS'] = getenv('TEST_TAHOE_SITES_USE_ORGS_MODELS', 'true') == 'true'
 
-    # TODO: Remove when AMC is removed: RED-2845
-    settings.TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
-    settings.INSTALLED_APPS += [
-        'tiers',
-    ]
+    if getenv('TEST_ENABLE_TIERS_APP', 'false') == 'true':
+        settings.INSTALLED_APPS += [
+            'tiers',
+        ]
 
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
         settings.INSTALLED_APPS += [

@@ -25,6 +25,7 @@ jobs:
           - lms-2
           - mte
           - legacy-amc-tests
+          - db-migrations
           - studio
 
     steps:
