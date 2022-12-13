@@ -545,7 +545,7 @@ class RegistrationView(APIView):
                             content_type="application/json")
 
     @method_decorator(csrf_exempt)
-    @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.REGISTRATION_RATELIMIT, method='POST'))
+    @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.REGISTRATION_RATELIMIT, method='POST', block=False))
     def post(self, request):
         """Create the user's account.
 
