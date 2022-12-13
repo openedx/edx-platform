@@ -78,8 +78,15 @@ def get_role_ids(course_id):
     """
     Returns a dictionary having role names as keys and a list of users as values
     """
+    ### EOL ###
+    from common.djangoapps.student.models import CourseAccessRole
+    course_roles = CourseAccessRole.objects.filter(course_id=course_id, role__in=['staff', 'instructor']).values('user')
+    course_roles = [x['user'] for x in course_roles]
     roles = Role.objects.filter(course_id=course_id).exclude(name=FORUM_ROLE_STUDENT)
-    return dict([(role.name, list(role.users.values_list('id', flat=True))) for role in roles])
+    response = dict([(role.name, list(role.users.values_list('id', flat=True))) for role in roles])
+    response['Administrator'] = response['Administrator'] + course_roles
+    response['Administrator'] = list(dict.fromkeys(response['Administrator']))
+    return response
 
 
 def has_discussion_privileges(user, course_id):
