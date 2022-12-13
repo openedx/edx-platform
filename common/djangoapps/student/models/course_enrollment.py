@@ -56,7 +56,6 @@ log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
 
-
 # ENROLL signal used for free enrollment only
 class EnrollStatusChange:
     """

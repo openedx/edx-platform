@@ -25,6 +25,7 @@ from .course_enrollment import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     CourseEnrollment,
     CourseEnrollmentAllowed,
+    CourseOverview,
     ManualEnrollmentAudit,
     segment
 )
@@ -949,8 +950,6 @@ class PendingSecondaryEmailChange(DeletableByUserValue, models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
     new_secondary_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
-
-
 
 
 class LoginFailures(models.Model):
