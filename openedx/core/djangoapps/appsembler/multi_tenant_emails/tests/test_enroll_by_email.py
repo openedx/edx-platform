@@ -21,7 +21,7 @@ def test_enroll_by_email_single_tenant(settings):
     """
     Ensure `enroll_by_email` works as upstream intended if APPSEMBLER_MULTI_TENANT_EMAILS is disabled.
     """
-    settings.FEATURES = {'APPSEMBLER_MULTI_TENANT_EMAILS': False}
+    settings.FEATURES = {**settings.FEATURES, 'APPSEMBLER_MULTI_TENANT_EMAILS': False}
     course = CourseOverviewFactory.create()
     course_key = course.id
 
@@ -43,7 +43,7 @@ def test_enroll_by_email_multi_tenant(settings):
     """
     Ensure `enroll_by_email` works with APPSEMBLER_MULTI_TENANT_EMAILS is enabled.
     """
-    settings.FEATURES = {'APPSEMBLER_MULTI_TENANT_EMAILS': True}
+    settings.FEATURES = {**settings.FEATURES, 'APPSEMBLER_MULTI_TENANT_EMAILS': True}
     course = CourseOverviewFactory.create()
     course_key = course.id
 

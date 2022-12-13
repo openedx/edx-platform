@@ -1,3 +1,9 @@
+"""
+Tests for the LMS part of the deprecated AMC trial signup.
+"""
+# TODO: RED-2845 Remove after migrating to Tahoe 2.0
+
+import unittest
 import json
 from mock import patch, Mock
 import uuid
@@ -8,6 +14,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from tahoe_sites.api import get_organization_for_user, is_active_admin_on_organization
+from tahoe_sites.zd_helpers import should_site_use_org_models
 
 from .test_utils import lms_multi_tenant_test, with_organization_context
 
@@ -98,6 +105,7 @@ class MultiTenantAMCSignupTest(APITestCase):
         assert site_response.status_code == status.HTTP_201_CREATED, '{}: {}'.format(color, site_response.content)
         return user_response, site_response
 
+    @unittest.skipUnless(should_site_use_org_models(), 'RED-2845 Remove with AMC')
     def test_new_admin_with_learner(self, mock_add_creator):
         """
         Test happy scenario regardless of APPSEMBLER_MULTI_TENANT_EMAILS.
@@ -110,6 +118,7 @@ class MultiTenantAMCSignupTest(APITestCase):
         with with_organization_context(site_color=red_site):
             self.register_learner('learner@example.com', 'learner')
 
+    @unittest.skipUnless(should_site_use_org_models(), 'RED-2845 Remove with AMC')
     def test_learner_registers_for_trial(self, mock_add_creator):
         """
         Test learner registers for a new Tahoe trial signup when APPSEMBLER_MULTI_TENANT_EMAILS is enabled.

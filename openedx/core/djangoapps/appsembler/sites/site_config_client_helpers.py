@@ -16,7 +16,7 @@ from site_config_client.openedx.features import (
 from site_config_client.openedx.adapter import SiteConfigAdapter
 from site_config_client.exceptions import SiteConfigurationError
 
-from tiers.tier_info import TierInfo
+from ..tahoe_tiers.tier_info import TierInfo
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
