@@ -57,7 +57,7 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory
 )
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.features.edly.validators import is_registered_user_limit_reached_for_plan
+from openedx.features.edly.validators import get_subscription_limit, handle_subscription_limit
 from openedx.features.edly.utils import (
     create_learner_link_with_permission_groups,
     create_user_link_with_edly_sub_organization,
@@ -489,8 +489,8 @@ class RegistrationView(APIView):
         """
         data = request.POST.copy()
         self._handle_terms_of_service(data)
-
-        errors = is_registered_user_limit_reached_for_plan(request)
+        remaining_limit = get_subscription_limit(request.site.edly_sub_org_for_lms)
+        errors = handle_subscription_limit(remaining_limit)
         if errors:
             response = self._create_response(request, errors, status_code=403)
             return response

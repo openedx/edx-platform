@@ -1,7 +1,6 @@
 from logging import getLogger
 
 from django.conf import settings
-from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -19,7 +18,6 @@ from openedx.features.edly.utils import (
     create_user_link_with_edly_sub_organization,
     user_can_login_on_requested_edly_organization
 )
-from student.models import User
 
 logger = getLogger(__name__)
 
@@ -98,30 +96,29 @@ def is_courses_limit_reached_for_plan():
     return False
 
 
-def is_registered_user_limit_reached_for_plan(request):
+def get_subscription_limit(edly_sub_org):
     """
     Checks if the limit for the current site for number of registered users is reached.
     """
+    site_config = configuration_helpers.get_current_site_configuration()
+    current_plan = site_config.get_value('DJANGO_SETTINGS_OVERRIDE', {}).get('CURRENT_PLAN', ESSENTIALS)
+    plan_features = settings.PLAN_FEATURES.get(current_plan)
+    registration_limit = plan_features.get(NUMBER_OF_REGISTERED_USERS)
+
+    user_records_count = EdlyUserProfile.objects.filter(edly_sub_organizations=edly_sub_org).count()
+
+    return registration_limit - user_records_count
+
+
+def handle_subscription_limit(remaining_limit):
+    """
+    Returns appropriate errors if the limit has reached.
+    """
     errors = {}
-    try:
-        site_config = configuration_helpers.get_current_site_configuration()
-        current_plan = site_config.get_value('DJANGO_SETTINGS_OVERRIDE').get('CURRENT_PLAN', ESSENTIALS)
-        plan_features = settings.PLAN_FEATURES.get(current_plan)
+    if remaining_limit <= 0:
+        errors['email'] = [{"user_message": _(
+            u"The maximum users limit for your plan has reached. "
+            u"Please upgrade your plan."
+        )}]
 
-        user_records_count = User.objects.select_related('profile').select_related('edly_profile').exclude(
-            groups__name=settings.ADMIN_CONFIGURATION_USERS_GROUP
-        ).filter(
-            Q(edly_profile__edly_sub_organizations=request.site.edly_sub_org_for_lms)
-        ).count()
-
-        if user_records_count >= plan_features.get(NUMBER_OF_REGISTERED_USERS):
-            errors['email'] = [{"user_message": _(
-                u"The maximum courses limit for your plan has reached. "
-                u"Please upgrade your plan."
-                )}]
-            return errors
-
-        return False
-
-    except AttributeError:
-        return False
+    return errors

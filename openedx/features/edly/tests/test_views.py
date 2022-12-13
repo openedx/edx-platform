@@ -5,7 +5,9 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from openedx.features.edly.tests.factories import EdlySubOrganizationFactory, SiteFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
+from openedx.features.edly.tests.factories import EdlySubOrganizationFactory
+
 
 
 class EdlyUserRegistrationTests(TestCase):
@@ -19,7 +21,8 @@ class EdlyUserRegistrationTests(TestCase):
         """
         super(EdlyUserRegistrationTests, self).setUp()
         self.url = reverse('user_api_registration')
-        self.site = SiteFactory()
+        self.site_config = SiteConfigurationFactory()
+        self.site = self.site_config.site
 
     def test_edly_profile_creation_with_user_registration(self):
         """
