@@ -335,7 +335,16 @@ class XMLModuleStore(ModuleStoreReadBase):
             self.default_class = None
         else:
             module_path, _, class_name = default_class.rpartition('.')
-            class_ = getattr(import_module(module_path), class_name)
+            try:
+                class_ = getattr(import_module(module_path), class_name)
+            except ImportError:
+                fallback_module_path = "xmodule.hidden_block"
+                fallback_class_name = "HiddenDescriptor"
+                log.exception(
+                    "Failed to import the default store class. "
+                    f"Falling back to {fallback_module_path}.{fallback_class_name}"
+                )
+                class_ = getattr(import_module(fallback_module_path), fallback_class_name)
             self.default_class = class_
 
         # All field data will be stored in an inheriting field data.
