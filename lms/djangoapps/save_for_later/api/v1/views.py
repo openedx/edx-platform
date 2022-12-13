@@ -33,7 +33,9 @@ class CourseSaveForLaterApiView(APIView):
     """
 
     @transaction.atomic
-    @method_decorator(ratelimit(key=POST_EMAIL_KEY, rate=settings.SAVE_FOR_LATER_EMAIL_RATE_LIMIT, method='POST', block=False))
+    @method_decorator(ratelimit(key=POST_EMAIL_KEY,
+                                rate=settings.SAVE_FOR_LATER_EMAIL_RATE_LIMIT,
+                                method='POST', block=False))
     @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.SAVE_FOR_LATER_IP_RATE_LIMIT, method='POST', block=False))
     def post(self, request):
         """
@@ -124,7 +126,9 @@ class ProgramSaveForLaterApiView(APIView):
     """
 
     @transaction.atomic
-    @method_decorator(ratelimit(key=POST_EMAIL_KEY, rate=settings.SAVE_FOR_LATER_EMAIL_RATE_LIMIT, method='POST', block=False))
+    @method_decorator(ratelimit(key=POST_EMAIL_KEY,
+                                rate=settings.SAVE_FOR_LATER_EMAIL_RATE_LIMIT,
+                                method='POST', block=False))
     @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.SAVE_FOR_LATER_IP_RATE_LIMIT, method='POST', block=False))
     def post(self, request):
         """
