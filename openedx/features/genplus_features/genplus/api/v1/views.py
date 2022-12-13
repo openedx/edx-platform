@@ -228,6 +228,11 @@ class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
                 results[i]['type'] = results[i]['journal_type']
         return results
 
+    def sort_results(self, results):
+        # Sorting on the basis of a common field in all the objects.
+        results.sort(key=lambda obj: obj['created'], reverse=True)
+        return results
+
     def get_querylist(self):
         query_params = self.request.query_params
         journal_posts = JournalPost.objects.select_related('student', 'teacher', 'skill')
