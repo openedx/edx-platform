@@ -6,7 +6,14 @@ data: |
     <div class="journals-xblock journal-responses multiple theme-pink">
       <problem class="journal_responses">
         <div class="journals-xblock-wapper">
-          <img class="asn-icon" src="https://dev.genplus.co.uk/asset-v1:genplus+GP414+2022_T1+type@asset+block@logo-black.svg" alt="Logo Left" />
+          <!-- <div class="asn-icon top-left">
+            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@asset-logo-black.svg" alt="Logo Left" />
+            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@Read.png" width="50" alt="Icon Read" />
+          </div> -->
+          <!-- <div class="asn-icon top-right">
+            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@Read.png" width="50" alt="Icon Read" />
+            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@asset-logo-black.svg" alt="Logo Left" />
+          </div> -->
           <div class="journal-entries journals-form">
             <div class="col order-sm-2">
               <img src="https://dev.genplus.co.uk/asset-v1:genplus+GP414+2022_T1+type@asset+block@journal-flipped.png" alt="journal" />
