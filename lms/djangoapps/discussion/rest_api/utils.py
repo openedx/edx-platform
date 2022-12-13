@@ -83,7 +83,7 @@ def get_usernames_for_course(course_id, page_number, page_size):
             matched_users_count (int): count of matched users in course
             matched_users_pages (int): pages of matched users in course
     """
-    matched_users_in_course = User.objects.filter(courseenrollment__course_id=course_id,)\
+    matched_users_in_course = User.objects.filter(courseenrollment__course_id=course_id, ) \
         .order_by(Length('username').asc()).values_list('username', flat=True)
     if not matched_users_in_course:
         return '', 0, 0
@@ -231,15 +231,42 @@ def create_topics_v3_structure(blocks, topics):
             value['courseware'] = True
             courseware_topics.append(value)
             value['children'] = create_discussion_children_from_ids(
-                value['children'],
+                value.get('children', []),
                 blocks,
                 topics,
             )
             subsections = value.get('children')
             for subsection in subsections:
                 subsection['children'] = create_discussion_children_from_ids(
-                    subsection['children'],
+                    subsection.get('children', []),
                     blocks,
                     topics,
                 )
-    return non_courseware_topics + courseware_topics
+
+    structured_topics = non_courseware_topics + courseware_topics
+    topic_ids = get_topic_ids_from_topics(topics)
+
+    for chapter in structured_topics:
+        for sequential in chapter.get('children', []):
+            for item in sequential['children']:
+                topic_ids.remove(item['id'])
+
+    archived_topics = {
+        'id': "archived",
+        'children': get_archived_topics(topic_ids, topics)
+    }
+    structured_topics.append(archived_topics)
+
+    return structured_topics
+
+
+def get_topic_ids_from_topics(topics):
+    return [topic['id'] for topic in topics]
+
+
+def get_archived_topics(filtered_topic_ids, topics):
+    archived_topics = []
+    for topic_id in filtered_topic_ids:
+        for topic in topics:
+            if topic['id'] == topic_id and topic['usage_key'] is not None:
+                archived_topics.append(topic)
