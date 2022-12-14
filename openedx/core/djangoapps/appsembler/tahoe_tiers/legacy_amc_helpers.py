@@ -90,6 +90,6 @@ def get_active_tiers_uuids_from_amc_postgres():  # pragma: no cover
     )
 
     return [
-        UUID(t.site_uuid)
+        UUID(str(t.site_uuid))
         for t in tiers
     ]

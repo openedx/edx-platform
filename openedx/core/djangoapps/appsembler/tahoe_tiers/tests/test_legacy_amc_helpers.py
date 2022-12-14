@@ -1,3 +1,5 @@
+from uuid import UUID
+
 import pytest
 
 from tahoe_sites.zd_helpers import should_site_use_org_models
@@ -8,8 +10,11 @@ from ..legacy_amc_helpers import (
 
 
 @pytest.mark.django_db
-def test_get_amc_tier_info_not_found():
-    assert not get_amc_tier_info('6229db46-76e7-11ed-bb20-37f3f60d0442'), 'Non-existent tier info'
+@pytest.mark.parametrize('uuid', [
+    '6229db46-76e7-11ed-bb20-37f3f60d0442', UUID('b29e2394-7baf-11ed-8efb-23999d1cbf5f')
+])
+def test_get_amc_tier_info_not_found(uuid):
+    assert not get_amc_tier_info(uuid), 'Non-existent tier info'
 
 
 @pytest.mark.django_db
