@@ -247,6 +247,7 @@ def create_topics_v3_structure(blocks, topics):
     structured_topics = non_courseware_topics + courseware_topics
     topic_ids = get_topic_ids_from_topics(topics)
 
+    # Remove all topic ids that are contained in the structured topics
     for chapter in structured_topics:
         for sequential in chapter.get('children', []):
             for item in sequential['children']:
@@ -264,14 +265,30 @@ def create_topics_v3_structure(blocks, topics):
 
 def get_topic_ids_from_topics(topics: List[Dict[str, str]]) -> List[str]:
     """
-    Generate list of ids form topics list
+    This function takes a list of topics and returns a list of the topic ids.
+
+    Args:
+    - topics (List[Dict[str, str]]): A list of topic dictionaries. Each dictionary should have an 'id' field.
+
+    Returns:
+    - A list of topic ids, extracted from the input list of topics.
     """
     return [topic['id'] for topic in topics]
 
 
 def get_archived_topics(filtered_topic_ids: List[str], topics: List[Dict[str, str]]) -> List[Dict[str, str]]:
     """
-    Filters out archived topics from topics list with provided topic ids.
+    This function takes a list of topic ids and a list of topics, and returns the list of archived topics.
+
+    A topic is considered archived if it has a non-null `usage_key` field.
+
+    Args:
+    - filtered_topic_ids (List[str]): A list of topic ids to filter on.
+    - topics (List[Dict[str, str]]): A list of topic dictionaries.
+    - Each dictionary should have a 'id' and a 'usage_key' field.
+
+    Returns:
+    - A list of archived topic dictionaries, with the same format as the input topics.
     """
     archived_topics = []
     for topic_id in filtered_topic_ids:
