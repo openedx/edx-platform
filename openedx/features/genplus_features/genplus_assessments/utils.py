@@ -122,7 +122,7 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
 
                 if responses['problem_type'] == 'short_answers' and len(user_short_answers) > 0:
                     responses['results'].update(user_short_answers)
-                        
+
                 if responses['problem_type'] in ('single_choice', 'multiple_choice') and filter_type == "aggregate_response":
                     for key, value in aggregate_result.items():
                         responses['results'].append({
@@ -130,7 +130,7 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                             'count': value['count'],
                             'is_correct': value['is_correct'],
                         })
-                        
+
                 if responses['problem_type'] in ('single_choice', 'multiple_choice', 'short_answers'):
                     if not single_problem:
                         student_data.append(responses)
@@ -386,3 +386,32 @@ def get_assessment_completion(assessments):
             return False
 
     return True
+
+
+def skills_assessment(request, student):
+    """
+    Evaluate if student has completed his skill assessment
+
+    Args:
+        request: request
+        student: genplus student
+
+    Returns: List[bool] of booleans
+
+    """
+
+    intro_assessments_completion = False
+    outro_assessments_completion = False
+    gen_program = student.active_class.program if student.active_class else None
+    if student.gen_user.user:
+        user = student.gen_user.user
+        if gen_program is not None and gen_program.intro_unit:
+            intro_unit_id = gen_program.intro_unit.id
+            intro_assessments = get_assessment_problem_data(request, intro_unit_id, user)
+            intro_assessments_completion = get_assessment_completion(intro_assessments)
+        if gen_program is not None and gen_program.outro_unit:
+            outro_unit_id = gen_program.outro_unit.id
+            outro_assessments = get_assessment_problem_data(request, outro_unit_id, user)
+            outro_assessments_completion = get_assessment_completion(outro_assessments)
+
+    return [intro_assessments_completion, outro_assessments_completion]
