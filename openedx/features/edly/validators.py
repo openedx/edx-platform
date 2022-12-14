@@ -96,12 +96,14 @@ def is_courses_limit_reached_for_plan():
     return False
 
 
-def get_subscription_limit(edly_sub_org):
+def get_subscription_limit(edly_sub_org, current_plan=None):
     """
     Checks if the limit for the current site for number of registered users is reached.
     """
     site_config = configuration_helpers.get_current_site_configuration()
-    current_plan = site_config.get_value('DJANGO_SETTINGS_OVERRIDE', {}).get('CURRENT_PLAN', ESSENTIALS)
+    if not current_plan and site_config:
+        current_plan = site_config.get_value('DJANGO_SETTINGS_OVERRIDE', {}).get('CURRENT_PLAN', ESSENTIALS)
+
     plan_features = settings.PLAN_FEATURES.get(current_plan)
     registration_limit = plan_features.get(NUMBER_OF_REGISTERED_USERS)
 
