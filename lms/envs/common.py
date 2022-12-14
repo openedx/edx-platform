@@ -60,6 +60,7 @@ from openedx.features.edly.constants import (
     MONTHLY_ACTIVE_USERS,
     NUMBER_OF_COURSES,
     NUMBER_OF_REGISTERED_USERS,
+    PANEL_ADMINS,
     STAFF_USERS,
     TRIAL,
     WP_ADMIN_USERS,
@@ -4021,6 +4022,7 @@ PLAN_FEATURES = {
         STAFF_USERS: 1,
         WP_ADMIN_USERS: 1,
         COURSE_AUTHORS: 1,
+        PANEL_ADMINS: 1,
     },
     ESSENTIALS: {
         ADDITIONAL_USER_PRICE: 2,
@@ -4030,6 +4032,7 @@ PLAN_FEATURES = {
         STAFF_USERS: 1,
         WP_ADMIN_USERS: 1,
         COURSE_AUTHORS: 3,
+        PANEL_ADMINS: 1,
     },
     ELITE: {
         ADDITIONAL_USER_PRICE: 2,
@@ -4039,5 +4042,6 @@ PLAN_FEATURES = {
         STAFF_USERS: 3,
         WP_ADMIN_USERS: 3,
         COURSE_AUTHORS: 10,
+        PANEL_ADMINS: 2,
     }
 }
