@@ -41,12 +41,24 @@ def get_docker_logger_config(log_dir='/var/tmp',
             'syslog_format': {'format': syslog_format},
             'raw': {'format': '%(message)s'},
         },
+        'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse',
+            },
+            'userid_context': {
+                '()': 'edx_django_utils.logging.UserIdFilter',
+            },
+            'remoteip_context': {
+                '()': 'edx_django_utils.logging.RemoteIpFilter',
+            }
+        },
         'handlers': {
             'console': {
                 'level': 'DEBUG' if debug else 'INFO',
                 'class': 'logging.StreamHandler',
                 'formatter': 'standard',
-                'stream': sys.stdout,
+                'filters': ['userid_context', 'remoteip_context'],
+                'stream': sys.stderr,
             },
             'tracking': {
                 'level': 'DEBUG',
@@ -81,11 +93,11 @@ def get_docker_logger_config(log_dir='/var/tmp',
             'django.request': {
                 'handlers': handlers,
                 'propagate': True,
-                'level': 'WARNING'
+                'level': 'ERROR'
             },
             '': {
                 'handlers': handlers,
-                'level': 'DEBUG',
+                'level': 'INFO',
                 'propagate': False
             },
         }
