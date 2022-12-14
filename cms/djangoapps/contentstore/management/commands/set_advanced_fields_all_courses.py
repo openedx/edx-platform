@@ -67,6 +67,7 @@ class Command(BaseCommand):
     user_help = '--user <email> required, needs to be a staff member'
     course_help = '--course <id> required, e.g. course-v1:ORG+COURSENUMBER+COURSERUN'
     force_update_catalog_visibility_about_help = '--force-update-catalog-visibility-about, To fix `There was an error loading this course` error when loading MFE learning this forces `catalog_visibility` from `none` to `about`.'
+    limit_bulk_update_operation_help = '--limit-bulk-update-operation {0-N}'
 
     _force_update_catalog_visibility_about = False
     _updated_catalog_visilibity_about = []
@@ -92,6 +93,16 @@ class Command(BaseCommand):
                             action='store_true',
                             help=self.force_update_catalog_visibility_about_help)
 
+        # WARNING
+        # Limiting the all courses bulk advanced setting update here to avoid consuming all 
+        # server memory. Defaulting bulk operations to 150 courses but you can use this argument
+        # to specify any value different than the default.
+        parser.add_argument('--limit-bulk-update-operation',
+                            dest='limit_bulk_update_operation',
+                            default=150,
+                            required=False,
+                            help=self.limit_bulk_update_operation_help)
+
     def handle(self, *args, **options):
         """
         Execute the command
@@ -103,10 +114,10 @@ class Command(BaseCommand):
             raise CommandError("Invalid JSON object")  # lint-amnesty, pylint: 
 
         # Update course(s) to push out `fields_json` of advanced setting changes.
-        self._set_courses_advanced_fields(update_fields, options['user_email'], options['course_id'])
+        self._set_courses_advanced_fields(update_fields, options['user_email'], options['course_id'], int(options['limit_bulk_update_operation']))
 
 
-    def _set_courses_advanced_fields(self, update_fields, user_email, course_id):
+    def _set_courses_advanced_fields(self, update_fields, user_email, course_id, limit_bulk_update_operation):
         """
         Export all courses to target directory and return the list of courses which failed to export
         """
@@ -141,7 +152,7 @@ class Command(BaseCommand):
             
             failed_update_advanced_fields_courses = []
 
-            for course_id in course_ids:
+            for course_id in course_ids[:limit_bulk_update_operation]:
                 try:
                     course_module = modulestore().get_course(CourseKey.from_string(str(course_id)))
 
@@ -164,7 +175,8 @@ class Command(BaseCommand):
 
             print("=" * 80)
             print("=" * 30 + "> Reset fields summary")
-            print(f"Total number of courses to update advanced fields: {len(courses)}")
+            print(f"Total number of courses needed to update advanced fields: {len(courses)}")
+            print(f"Limited the bulk update operation to {limit_bulk_update_operation} courses to avoid using all memory on server.")
             print(f"Total number of courses which failed to update advanced fields: {len(failed_update_advanced_fields_courses)}")
             print("List of updated advanced fields failed courses ids:")
             print("\n".join(failed_update_advanced_fields_courses))
