@@ -17,6 +17,15 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 
 
+class AttributeDict(dict):
+    """
+    Converts Dict Keys into Attributes
+    """
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+
+
 def discussion_open_for_user(course, user):
     """
     Check if course discussion are open or not for user.

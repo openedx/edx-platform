@@ -876,6 +876,47 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
             }
         )
 
+    @override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, True)
+    def test_new_course_structure_response(self):
+        """
+        Tests whether the new structure is available on old topics API
+        (For mobile compatibility)
+        """
+        chapter = ItemFactory.create(
+            parent_location=self.course.location,
+            category='chapter',
+            display_name="Week 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        sequential = ItemFactory.create(
+            parent_location=chapter.location,
+            category='sequential',
+            display_name="Lesson 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        ItemFactory.create(
+            parent_location=sequential.location,
+            category='vertical',
+            display_name='vertical',
+            start=datetime(2015, 4, 1, tzinfo=UTC),
+        )
+        DiscussionsConfiguration.objects.create(
+            context_key=self.course.id,
+            provider_type=Provider.OPEN_EDX
+        )
+        update_discussions_settings_from_course_task(str(self.course.id))
+        response = json.loads(self.client.get(self.url).content.decode())
+        keys = ['children', 'id', 'name', 'thread_counts', 'thread_list_url']
+        assert list(response.keys()) == ['courseware_topics', 'non_courseware_topics']
+        assert len(response['courseware_topics']) == 1
+        courseware_keys = list(response['courseware_topics'][0].keys())
+        courseware_keys.sort()
+        assert courseware_keys == keys
+        assert len(response['non_courseware_topics']) == 1
+        non_courseware_keys = list(response['non_courseware_topics'][0].keys())
+        non_courseware_keys.sort()
+        assert non_courseware_keys == keys
+
 
 @ddt.ddt
 @mock.patch('lms.djangoapps.discussion.rest_api.api._get_course', mock.Mock())
