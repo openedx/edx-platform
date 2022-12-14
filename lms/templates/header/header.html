@@ -43,13 +43,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 % endif
 
 <header class="global-header ${'slim' if course else ''}">
-    % if use_cookie_banner:
-        ${static.renderReact(
-            component="CookiePolicyBanner",
-            id="frontend-component-cookie-policy-banner",
-            props={}
-        )}
-    % endif
     <div class="main-header">
         <%include file="navbar-logo-header.html" args="online_help_token=online_help_token"/>
         <div class="hamburger-menu" role="button" aria-label=${_("Options Menu")} aria-expanded="false" aria-controls="mobile-menu" tabindex="0">
