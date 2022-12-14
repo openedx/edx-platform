@@ -1,6 +1,7 @@
 """
 Utils for discussion API.
 """
+from typing import List, Dict
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
@@ -261,13 +262,20 @@ def create_topics_v3_structure(blocks, topics):
     return structured_topics
 
 
-def get_topic_ids_from_topics(topics):
+def get_topic_ids_from_topics(topics: List[Dict[str, str]]) -> List[str]:
+    """
+    Generate list of ids form topics list
+    """
     return [topic['id'] for topic in topics]
 
 
-def get_archived_topics(filtered_topic_ids, topics):
+def get_archived_topics(filtered_topic_ids: List[str], topics: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    """
+    Filters out archived topics from topics list with provided topic ids.
+    """
     archived_topics = []
     for topic_id in filtered_topic_ids:
         for topic in topics:
             if topic['id'] == topic_id and topic['usage_key'] is not None:
                 archived_topics.append(topic)
+    return archived_topics
