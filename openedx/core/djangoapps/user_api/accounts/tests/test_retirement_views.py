@@ -1332,7 +1332,6 @@ class TestAccountRetirementPost(RetirementTestCase):
         self.sapsf_audit = SapSuccessFactorsLearnerDataTransmissionAudit.objects.create(
             sapsf_user_id=self.test_user.id,
             enterprise_course_enrollment_id=self.enterprise_enrollment.id,
-            completed_timestamp=1,
         )
         self.consent = DataSharingConsent.objects.create(
             username=self.test_user.username,
