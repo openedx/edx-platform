@@ -255,7 +255,8 @@ def create_topics_v3_structure(blocks, topics):
         'id': "archived",
         'children': get_archived_topics(topic_ids, topics)
     }
-    structured_topics.append(archived_topics)
+    if archived_topics['children']:
+        structured_topics.append(archived_topics)
 
     return structured_topics
 
