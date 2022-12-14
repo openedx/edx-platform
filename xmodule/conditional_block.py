@@ -287,7 +287,7 @@ class ConditionalBlock(
             html = self.runtime.service(self, 'mako').render_template('conditional_block.html', context)
             return json.dumps({'fragments': [{'content': html}], 'message': bool(self.conditional_message)})
 
-        fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_display_blocks()]
+        fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_children()]
 
         return json.dumps({'fragments': fragments})
 

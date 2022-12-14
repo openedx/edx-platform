@@ -57,7 +57,7 @@ class PersonalizedLearnerScheduleCallToAction:
         elif category == self.VERTICAL_BANNER and not completed and missed_deadlines:
             # xblock is a vertical, so we'll check all the problems inside it. If there are any that will show a
             # a "shift dates" CTA under CAPA_SUBMIT_DISABLED, then we'll also show the same CTA as a vertical banner.
-            if any(self._is_block_shiftable(item, category) for item in xblock.get_display_blocks()):
+            if any(self._is_block_shiftable(item, category) for item in xblock.get_children()):
                 ctas.append(self._make_reset_deadlines_cta(xblock, category, is_learning_mfe))
 
         return ctas

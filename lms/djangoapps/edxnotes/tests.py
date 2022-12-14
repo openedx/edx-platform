@@ -819,7 +819,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         mock_course_block = MagicMock()
         mock_course_block.position = 3
-        mock_course_block.get_display_blocks.return_value = []
+        mock_course_block.get_children.return_value = []
         assert helpers.get_course_position(mock_course_block) is None
 
     def test_get_course_position_to_chapter(self):
@@ -833,7 +833,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         mock_chapter.url_name = 'chapter_url_name'
         mock_chapter.display_name_with_default = 'Test Chapter Display Name'
 
-        mock_course_block.get_display_blocks.return_value = [mock_chapter]
+        mock_course_block.get_children.return_value = [mock_chapter]
 
         assert helpers.get_course_position(mock_course_block) == {
             'display_name': 'Test Chapter Display Name',
@@ -845,7 +845,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Returns `None` if no section found.
         """
         mock_course_block = MagicMock(id=self.course.id, position=None)
-        mock_course_block.get_display_blocks.return_value = [MagicMock()]
+        mock_course_block.get_children.return_value = [MagicMock()]
         assert helpers.get_course_position(mock_course_block) is None
 
     def test_get_course_position_to_section(self):
@@ -857,14 +857,14 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         mock_chapter = MagicMock()
         mock_chapter.url_name = 'chapter_url_name'
-        mock_course_block.get_display_blocks.return_value = [mock_chapter]
+        mock_course_block.get_children.return_value = [mock_chapter]
 
         mock_section = MagicMock()
         mock_section.url_name = 'section_url_name'
         mock_section.display_name_with_default = 'Test Section Display Name'
 
-        mock_chapter.get_display_blocks.return_value = [mock_section]
-        mock_section.get_display_blocks.return_value = [MagicMock()]
+        mock_chapter.get_children.return_value = [mock_section]
+        mock_section.get_children.return_value = [MagicMock()]
 
         assert helpers.get_course_position(mock_course_block) == {
             'display_name': 'Test Section Display Name',

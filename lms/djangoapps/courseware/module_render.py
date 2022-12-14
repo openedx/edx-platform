@@ -162,7 +162,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
             return None, None, None
 
         toc_chapters = []
-        chapters = course_block.get_display_blocks()
+        chapters = course_block.get_children()
 
         # Check for content which needs to be completed
         # before the rest of the content is made available
@@ -190,7 +190,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 continue
 
             sections = []
-            for section in chapter.get_display_blocks():
+            for section in chapter.get_children():
                 # skip the section if it is hidden from the user
                 if section.hide_from_toc:
                     continue

@@ -379,7 +379,7 @@ class SequenceBlock(
         prereq_met = True
         prereq_meta_info = {}
         banner_text = None
-        display_blocks = self.get_display_blocks()
+        display_blocks = self.get_children()
         course = self._get_course()
         is_hidden_after_due = False
 
@@ -606,7 +606,7 @@ class SequenceBlock(
         content.
         """
         _ = self.runtime.service(self, "i18n").ugettext
-        display_blocks = self.get_display_blocks()
+        display_blocks = self.get_children()
         self._update_position(context, len(display_blocks))
 
         fragment = Fragment()
