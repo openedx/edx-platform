@@ -150,8 +150,7 @@ class Class(TimeStampedModel):
 class Teacher(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
     profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True, blank=True)
-    # TODO : need to remove the through model
-    classes = models.ManyToManyField(Class, related_name='teachers', through="genplus.TeacherClass")
+    favorite_classes = models.ManyToManyField(Class, related_name='teachers', blank=True)
 
     @property
     def user(self):
@@ -161,12 +160,6 @@ class Teacher(models.Model):
         return self.gen_user.email
 
 
-class TeacherClass(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    gen_class = models.ForeignKey(Class, on_delete=models.CASCADE)
-    is_favorite = models.BooleanField(default=False)
-
-
 class ClassStudents(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     gen_class = models.ForeignKey(Class, on_delete=models.CASCADE)
@@ -174,6 +167,7 @@ class ClassStudents(models.Model):
 
 
 class JournalPost(TimeStampedModel):
+    id = models.CharField(primary_key=True, max_length=64, default=uuid.uuid4, editable=False)
     JOURNAL_TYPE_CHOICES = JournalTypes.__MODEL_CHOICES__
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="journal_posts")
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True, related_name="journal_feedbacks")
@@ -181,6 +175,7 @@ class JournalPost(TimeStampedModel):
     skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True)
     description = models.TextField()
     journal_type = models.CharField(max_length=32, choices=JOURNAL_TYPE_CHOICES)
+    is_editable = models.BooleanField(default=True)
 
 
 class ActivityManager(models.Manager):

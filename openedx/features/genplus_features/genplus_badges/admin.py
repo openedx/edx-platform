@@ -15,15 +15,6 @@ class BoosterBadgeAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(BoosterBadgeAward)
-class BoosterBadgeAwardAdmin(admin.ModelAdmin):
-    list_display = (
-        'user',
-        'awarded_by',
-        'badge',
-    )
-
-
 @admin.register(BoosterBadgeType)
 class BoosterBadgeType(admin.ModelAdmin):
     list_display = (

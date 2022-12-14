@@ -20,7 +20,7 @@ from openedx.features.genplus_features.genplus.models import Student, JournalPos
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
 from openedx.features.genplus_features.genplus.api.v1.serializers import TeacherSerializer
 from openedx.features.genplus_features.common.utils import get_generic_serializer
-from openedx.features.genplus_features.genplus_assessments.utils import skills_assessment
+from openedx.features.genplus_features.genplus_assessments.utils import get_student_skills_assessment_completion
 
 
 
@@ -60,10 +60,10 @@ class AssessmentUnitSerializer(serializers.ModelSerializer):
                   'is_complete')
 
     def get_is_locked(self, obj):
-        return self.context.get('is_locked', False)
+        return self.context.get('is_locked')
 
     def get_is_complete(self, obj):
-        return self.context.get('is_complete', False)
+        return self.context.get('is_complete')
 
     def get_course_image_url(self, obj):
         return f"{settings.LMS_ROOT_URL}{obj.course_image_url}"
@@ -127,11 +127,10 @@ class ProgramSerializer(serializers.ModelSerializer):
         gen_user = self.context.get('gen_user')
         context = {
             'is_locked': False,
-            'is_complete': False,
+            'is_complete': None,
         }
         if gen_user.is_student:
-            completion = UnitCompletion.objects.filter(user=gen_user.user, course_key=obj.intro_unit.id).first()
-            context['is_complete'] = completion.is_complete if completion else False
+            context['is_complete'] = get_student_skills_assessment_completion(gen_user.student, assessment_filter='intro')
 
         return AssessmentUnitSerializer(obj.intro_unit, read_only=True, context=context).data
 
@@ -142,11 +141,10 @@ class ProgramSerializer(serializers.ModelSerializer):
         gen_user = self.context.get('gen_user')
         context = {
             'is_locked': False,
-            'is_complete': False,
+            'is_complete': None,
         }
         if gen_user.is_student:
-            completion = UnitCompletion.objects.filter(user=gen_user.user, course_key=obj.outro_unit.id).first()
-            context['is_complete'] = completion.is_complete if completion else False
+            context['is_complete'] = get_student_skills_assessment_completion(gen_user.student, assessment_filter='outro')
 
         return AssessmentUnitSerializer(obj.outro_unit, read_only=True, context=context).data
 
@@ -192,7 +190,7 @@ class ClassStudentSerializer(serializers.ModelSerializer):
         return get_absolute_url(request, profile)
 
     def get_skills_assessment(self, obj):
-        return skills_assessment(request=self.context.get('request'), student=obj)
+        return get_student_skills_assessment_completion(student=obj)
 
     def get_unit_lesson_completion(self, obj):
         results = []

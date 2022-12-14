@@ -244,15 +244,10 @@ class ClassAdmin(admin.ModelAdmin):
         return super(ClassAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-@admin.register(TeacherClass)
-class TeacherClassAdmin(admin.ModelAdmin):
-    list_display = ('teacher', 'gen_class', 'is_favorite')
-
-
 # TODO: Remove after testing the login flow
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    filter_horizontal = ('classes',)
+    filter_horizontal = ('favorite_classes',)
 
 
 @admin.register(Student)
@@ -274,8 +269,3 @@ class StudentAdmin(admin.ModelAdmin):
         classes = ClassStudents.objects.filter(student=obj)
         return mark_safe('<a href="%s?id__in=%s">%s</a>' % (
             url, ','.join(map(str, classes.values_list('gen_class_id', flat=True))), classes.count()))
-
-
-admin.site.register(JournalPost)
-admin.site.register(Activity)
-admin.site.register(ClassStudents)
