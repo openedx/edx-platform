@@ -524,17 +524,6 @@ class XModuleMixin(XModuleFields, XBlock):
         not children of this module"""
         return []
 
-    def get_display_blocks(self):
-        """
-        Returns a list of descendent module instances that will display
-        immediately inside this module.
-        """
-        blocks = []
-        for child in self.get_children():
-            blocks.append(child)
-
-        return blocks
-
     def get_child_by(self, selector):
         """
         Return a child XBlock that matches the specified selector
