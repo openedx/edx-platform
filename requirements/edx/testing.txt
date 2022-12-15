@@ -1578,7 +1578,7 @@ yarl==1.8.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-zipp==3.10.0
+zipp==3.11.0
     # via
     #   -r requirements/edx/base.txt
     #   importlib-metadata

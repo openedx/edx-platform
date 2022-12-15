@@ -607,9 +607,9 @@ idna==3.4
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==5.0.0
+importlib-metadata==5.1.0
     # via markdown
-importlib-resources==5.10.0
+importlib-resources==5.10.1
     # via jsonschema
 inflection==0.5.1
     # via drf-yasg
@@ -1193,7 +1193,7 @@ xss-utils==0.4.0
     # via -r requirements/edx/base.in
 yarl==1.8.1
     # via aiohttp
-zipp==3.10.0
+zipp==3.11.0
     # via
     #   importlib-metadata
     #   importlib-resources
