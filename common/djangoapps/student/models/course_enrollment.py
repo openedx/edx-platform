@@ -237,6 +237,10 @@ class CourseEnrollmentManager(models.Manager):
 # is used to cache the state in the request cache.
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
 
+EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
+EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
+EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
+
 
 class CourseEnrollment(models.Model):
     """
