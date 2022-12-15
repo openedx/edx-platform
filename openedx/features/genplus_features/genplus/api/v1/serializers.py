@@ -5,7 +5,6 @@ from openedx.features.genplus_features.common.display_messages import ErrorMessa
 from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.forms import SetPasswordForm
 from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
-from openedx.features.genplus_features.genplus_assessments.utils import skills_assessment
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -28,8 +27,6 @@ class UserInfoSerializer(serializers.ModelSerializer):
                 'profile_image': request.build_absolute_uri(
                     gen_user.student.character.profile_pic.url)
                 if gen_user.student.character else None,
-                'skills_assessment': skills_assessment(request=request, student=gen_user.student)
-
             }
 
             user_info.update(student_profile)
@@ -144,7 +141,7 @@ class JournalListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = JournalPost
-        fields = ('id', 'title', 'skill', 'description', 'teacher', 'journal_type', 'created')
+        fields = ('id', 'title', 'skill', 'description', 'teacher', 'journal_type', 'is_editable', 'created')
 
 
 class StudentPostSerializer(serializers.ModelSerializer):

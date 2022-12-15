@@ -470,11 +470,10 @@ class CoursewareIndex(View):
                 request, str(self.course.id), request.user
             )
             try:
-                program = self.course_overview.unit.program
                 gen_user = request.user.gen_user
                 if gen_user.is_student:
-                    enrollment = ProgramEnrollment.objects.get(student=gen_user.student, program=program)
-                    lessons = ClassLesson.objects.filter(class_unit__gen_class=enrollment.gen_class, course_key=self.course.id)
+                    gen_class = gen_user.student.active_class
+                    lessons = ClassLesson.objects.filter(class_unit__gen_class=gen_class, course_key=self.course.id)
                     sections = course_block_tree.get('children')
                     for i, section in enumerate(sections):
                         lesson = lessons.get(usage_key=UsageKey.from_string(section.get('id')))

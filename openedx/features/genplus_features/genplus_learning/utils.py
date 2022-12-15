@@ -191,10 +191,6 @@ def process_pending_student_program_enrollments(gen_user):
 
 def process_pending_teacher_program_access(gen_user):
     user = User.objects.filter(gen_user=gen_user)
-    program_ids = gen_user.school.classes.exclude(program__isnull=True)\
-                                        .values_list('program', flat=True)\
-                                        .distinct()\
-                                        .order_by()
-    programs = Program.objects.filter(pk__in=program_ids)
+    programs = Program.get_active_programs()
     for program in programs:
         allow_access(program, ProgramStaffRole.ROLE_NAME, user)

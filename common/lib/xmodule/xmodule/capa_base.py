@@ -1367,6 +1367,10 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         if not self.correctness_available():
             success = 'submitted'
 
+        # save genplus student response
+        from openedx.features.genplus_features.genplus_assessments.utils import StudentResponse
+        StudentResponse().save_problem_response(self, data)
+
         return {
             'success': success,
             'contents': html

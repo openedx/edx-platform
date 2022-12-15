@@ -22,7 +22,7 @@ from drf_multiple_model.mixins import FlatMultipleModelMixin
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import (
-    GenUser, Character, Class, Teacher, Student, TeacherClass, JournalPost, Skill
+    GenUser, Character, Class, Teacher, Student, JournalPost, Skill
 )
 from openedx.features.genplus_features.genplus.constants import JournalTypes, EmailTypes
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
@@ -154,14 +154,14 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
         return Class.visible_objects.filter(school=self.school)
 
     def list(self, request, *args, **kwargs):  # pylint: disable=unused-argument
-        favourite_classes = self.gen_user.teacher.classes.filter(teacherclass__is_favorite=True)
-        favourite_classes_serializer = self.get_serializer(favourite_classes, many=True)
+        favorite_classes = self.gen_user.teacher.favorite_classes.all()
+        favorite_classes_serializer = self.get_serializer(favorite_classes, many=True)
         class_queryset = self.filter_queryset(self.get_queryset())
         class_serializer = self.get_serializer(
-            class_queryset.exclude(group_id__in=favourite_classes.values('group_id', )),
+            class_queryset.exclude(group_id__in=favorite_classes.values('group_id', )),
             many=True)
         data = {
-            'favourite_classes': favourite_classes_serializer.data,
+            'favourite_classes': favorite_classes_serializer.data,
             'classes': class_serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)
@@ -178,15 +178,12 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
         data = serializer.data
         gen_class = self.get_object()
         teacher = Teacher.objects.get(gen_user=self.gen_user)
-        teacher_class = TeacherClass.objects.get(teacher=teacher, gen_class=gen_class)
         if data['action'] == 'add':
-            teacher_class.is_favorite = True
-            teacher_class.save()
+            teacher.favorite_classes.add(gen_class)
             return Response(SuccessMessages.CLASS_ADDED_TO_FAVORITES.format(class_name=gen_class.name),
                             status=status.HTTP_204_NO_CONTENT)
         else:
-            teacher_class.is_favorite = False
-            teacher_class.save()
+            teacher.favorite_classes.remove(gen_class)
             return Response(SuccessMessages.CLASS_REMOVED_FROM_FAVORITES.format(class_name=gen_class.name),
                             status=status.HTTP_204_NO_CONTENT)
 

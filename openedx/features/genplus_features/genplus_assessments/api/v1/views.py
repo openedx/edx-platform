@@ -16,7 +16,7 @@ from openedx.features.genplus_features.genplus_learning.models import Unit
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher
 from .serializers import ClassSerializer, TextAssessmentSerializer, RatingAssessmentSerializer
 from openedx.features.genplus_features.genplus_assessments.constants import (
-    TOTAL_PROBLEM_SCORE, INTRO_RATING_ASSESSMENT_RESPONSE, 
+    TOTAL_PROBLEM_SCORE, INTRO_RATING_ASSESSMENT_RESPONSE,
     OUTRO_RATING_ASSESSMENT_RESPONSE, MAX_SKILLS_SCORE
 )
 from openedx.features.genplus_features.genplus_assessments.utils import (
@@ -218,7 +218,6 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
             'response_start_of_year': 0,
             'response_end_of_year': 0
         }
-        request = self.request
         # list of user id who complete all the assessment in the intro course
         intro_user = []
         # list of user id who complete all the assessment in the outro course
@@ -227,13 +226,13 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
         for student in students:
             user = student.gen_user.user
             if gen_class.program.intro_unit:
-                self.intro_assessments = get_assessment_problem_data(request, gen_class.program.intro_unit.id, user)
+                self.intro_assessments = get_assessment_problem_data(gen_class.program.intro_unit.id, user, self.request)
                 intro_assessments_completion = get_assessment_completion(self.intro_assessments)
                 if intro_assessments_completion:
                     intro_user.append(user.id)
                     aggregate_result['response_start_of_year'] += 1
             if gen_class.program.outro_unit:
-                self.outro_assessments = get_assessment_problem_data(request, gen_class.program.outro_unit.id, user)
+                self.outro_assessments = get_assessment_problem_data(gen_class.program.outro_unit.id, user, self.request)
                 outro_assessments_completion = get_assessment_completion(self.outro_assessments)
                 if outro_assessments_completion:
                     outro_user.append(user.id)
@@ -292,10 +291,10 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 aggregate_result[data['skill']
                                     ]['score_end_of_year'] += data['score'] if 'score' in data else data['rating']
                 outro_user.add(data['user'])
-        
+
         response_start_of_year = len(intro_user)
         response_end_of_year = len(outro_user)
-        
+
         if student_id == 'all' or student_id is None:
             for key,_ in aggregate_result.items():
                 if response_start_of_year > 0:
@@ -315,8 +314,7 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 [Dict]: Returns a dictionaries
                 containing the students aggregate result for single assessment.
         """
-        request = self.request
-        user = request.user
+        user = self.request.user
         total_students = gen_class.students.exclude(gen_user__user__isnull=True).count()
         store = modulestore()
         assessments = []
@@ -325,14 +323,14 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
         # get assessment usage key and type for program intro assessment course
         if self.intro_assessments is None:
             if gen_class.program.intro_unit:
-                assessments.extend(get_assessment_problem_data(request, gen_class.program.intro_unit.id, user))
+                assessments.extend(get_assessment_problem_data(gen_class.program.intro_unit.id, user, self.request))
         else:
             assessments.extend(self.intro_assessments)
 
         # get assessment usage key and type for program outro assessment course
         if self.outro_assessments is None:
             if gen_class.program.outro_unit:
-                assessments.extend(get_assessment_problem_data(request, gen_class.program.outro_unit.id, user))
+                assessments.extend(get_assessment_problem_data(gen_class.program.outro_unit.id, user, self.request))
         else:
             assessments.extend(self.outro_assessments)
 
@@ -429,8 +427,6 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 containing a student result for all single assessment.
         """
         store = modulestore()
-        request = self.request
-        user = request.user
         assessments = []
         aggregate_result = {}
         user = self.request.user
@@ -438,14 +434,14 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
         # get assessment usage key and type for program intro assessment course
         if self.intro_assessments is None:
             if gen_class.program.intro_unit:
-                assessments.extend(get_assessment_problem_data(request, gen_class.program.intro_unit.id, user))
+                assessments.extend(get_assessment_problem_data(gen_class.program.intro_unit.id, user, self.request))
         else:
             assessments.extend(self.intro_assessments)
 
         # get assessment usage key and type for program outro assessment course
         if self.outro_assessments is None:
             if gen_class.program.outro_unit:
-                assessments.extend(get_assessment_problem_data(request, gen_class.program.outro_unit.id, user))
+                assessments.extend(get_assessment_problem_data(gen_class.program.outro_unit.id, user, self.request))
         else:
             assessments.extend(self.outro_assessments)
 

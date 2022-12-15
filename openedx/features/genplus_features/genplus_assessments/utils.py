@@ -1,12 +1,95 @@
+import json
 from lxml import etree
+from django.test import RequestFactory
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from collections import defaultdict
 
 from django.contrib.auth import get_user_model
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
+from openedx.features.genplus_features.genplus.constants import JournalTypes
+from openedx.features.genplus_features.genplus.models import Student, JournalPost
+from openedx.features.genplus_features.genplus_learning.models import Unit
+from openedx.features.genplus_features.genplus_assessments.constants import ProblemTypes, JOURNAL_STYLE
+
+
+class StudentResponse:
+
+    def __init__(self):
+        self.problem_function_map = {
+            ProblemTypes.JOURNAL: self.__create_and_update_journal_post_from_lms,
+            ProblemTypes.SINGLE_CHOICE: lambda: None,
+            ProblemTypes.MULTIPLE_CHOICE: lambda: None,
+            ProblemTypes.SHORT_ANSWER: lambda: None
+        }
+
+    def save_problem_response(self, problem_block, student_response):
+        user_id = getattr(problem_block.scope_ids, 'user_id')
+        block_type = getattr(problem_block.scope_ids, 'block_type')
+        if not (block_type and block_type == 'problem') or not user_id:
+            return
+
+        student = Student.objects.filter(gen_user__user=user_id).first()
+        if not student:
+            return
+
+        parser = etree.XMLParser(remove_blank_text=True)
+        problem_xml = etree.XML(problem_block.data, parser=parser)
+
+        if problem_xml.tag == 'problem':
+            problem_element = problem_xml
+        else:
+            problem_element = problem_xml.find('.//problem')
+
+        if problem_element is not None:
+            problem_classes = problem_element.get('class', '').split()
+            if not problem_classes:
+                return
+
+            for problem_type in ProblemTypes.__ALL__:
+                if problem_type in problem_classes:
+                    self.problem_function_map[problem_type](student, problem_block, student_response)
+                    break
+
+    def __create_and_update_journal_post_from_lms(self, student, problem_block, student_response):
+        if not problem_block.is_journal_entry:
+            return
+
+        problem_html = problem_block.get_problem_html(encapsulate=True)
+        parser = etree.XMLParser(remove_blank_text=True)
+        problem = etree.XML(problem_html, parser=parser)
+        course_key = problem_block.scope_ids.usage_id.course_key
+        unit = Unit.objects.filter(course__id=course_key).first()
+        skill = unit.skill if unit else None
+
+        defaults = {
+            'skill': skill,
+            'student': student,
+            'journal_type': JournalTypes.STUDENT_POST,
+            'is_editable': False
+        }
+
+        for key, value in student_response.items():
+            if not value:
+                continue
+
+            answer = json.loads(JOURNAL_STYLE.format(value), strict=False)
+            journal_entry_values = {
+                'title': problem.find(f".//label[@for='{key}']").text,
+                'description': json.dumps(answer),
+            }
+            journal_entry_values.update(defaults)
+            try:
+                obj = JournalPost.objects.get(id=key)
+                for key, value in journal_entry_values.items():
+                    setattr(obj, key, value)
+                obj.save()
+            except JournalPost.DoesNotExist:
+                journal_entry_values['id'] = key
+                obj = JournalPost(**journal_entry_values)
+                obj.save()
 
 
 def build_problem_list(course_blocks, root, path=None):
@@ -89,7 +172,7 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                 responses = get_problem_attributes(block.data, block_key)
                 aggregate_result = {}
                 user_short_answers = {}
-                if responses['problem_type'] in ('single_choice', 'multiple_choice'):
+                if responses['problem_type'] in ProblemTypes.CHOICE_TYPE_PROBLEMS:
                     responses['results'] = []
                 else:
                     responses['results'] = {}
@@ -99,14 +182,14 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                     user_states = generated_report_data.get(user.username)
                     if user_states:
                         # For each response in the block, aggregate the result for the problem, and add in the responses
-                        if responses['problem_type'] in ('single_choice', 'multiple_choice'):
+                        if responses['problem_type'] in ProblemTypes.CHOICE_TYPE_PROBLEMS:
                             if filter_type == "aggregate_response":
                                 aggregate_result.update(students_aggregate_result(
                                     user_states, aggregate_result))
                             elif filter_type == "individual_response":
                                 responses['results'].append(
                                     students_multiple_choice_response(user_states, user))
-                        elif responses['problem_type'] == "short_answers":
+                        elif responses['problem_type'] == ProblemTypes.SHORT_ANSWER:
                             for user_state in user_states:
                                 answer_id = problem_id if problem_id is not None else user_state['Answer ID']
                                 if answer_id not in user_short_answers:
@@ -120,10 +203,10 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                                         user_short_answers[answer_id]['answers'].append(
                                             get_students_short_answer_response(user_state, user))
 
-                if responses['problem_type'] == 'short_answers' and len(user_short_answers) > 0:
+                if responses['problem_type'] == ProblemTypes.SHORT_ANSWER and len(user_short_answers) > 0:
                     responses['results'].update(user_short_answers)
 
-                if responses['problem_type'] in ('single_choice', 'multiple_choice') and filter_type == "aggregate_response":
+                if responses['problem_type'] in ProblemTypes.CHOICE_TYPE_PROBLEMS and filter_type == "aggregate_response":
                     for key, value in aggregate_result.items():
                         responses['results'].append({
                             'title': key,
@@ -131,7 +214,7 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                             'is_correct': value['is_correct'],
                         })
 
-                if responses['problem_type'] in ('single_choice', 'multiple_choice', 'short_answers'):
+                if responses['problem_type'] in ProblemTypes.SHOW_IN_STUDENT_ANSWERS_PROBLEMS:
                     if not single_problem:
                         student_data.append(responses)
                     else:
@@ -189,7 +272,7 @@ def get_problem_attributes(raw_data, block_key):
     for e in problem.iter("*"):
         if e.tag == 'problem':
             responses['problem_type'] = e.attrib.get('class')
-        elif e.text and e.attrib.get('class') == 'question-text' and responses['problem_type'] != "short_answers":
+        elif e.text and e.attrib.get('class') == 'question-text' and responses['problem_type'] != ProblemTypes.SHORT_ANSWER:
             responses['question_text'] = e.text
         elif e.text and e.tag == 'choice':
             choice_dict = {
@@ -199,7 +282,7 @@ def get_problem_attributes(raw_data, block_key):
             if e.attrib.get('correct') == 'true':
                 responses['selection'] += 1
             data_dict.update({e.attrib.get('class'): choice_dict})
-    if responses['problem_type'] != "short_answers":
+    if responses['problem_type'] != ProblemTypes.SHORT_ANSWER:
         responses['problem_choices'] = data_dict
     return responses
 
@@ -310,7 +393,7 @@ def build_course_report_for_students(user_id, course_key, student_list):
                     responses['results'] = []
                     student = get_user_model().objects.get(pk=student_id)
                     user_states = generated_report_data.get(student.username)
-                    if responses['problem_type'] == 'short_answers' and user_states:
+                    if responses['problem_type'] in ProblemTypes.STRING_TYPE_PROBLEMS and user_states:
                         for user_state in user_states:
                             responses['results'].append({
                                 'answer_id': user_state['Answer ID'],
@@ -328,7 +411,7 @@ def get_absolute_url(request, file):
     """
     return request.build_absolute_uri(file.url) if file else None
 
-def get_assessment_problem_data(request, course_key, user):
+def get_assessment_problem_data(course_key, user, request=None):
     """
     Generate skill assessment problem data from a course
     Args:
@@ -341,10 +424,13 @@ def get_assessment_problem_data(request, course_key, user):
         list[Dict]: Returns a list of dictionaries
     """
     assessments = []
+    if request is None:
+        request = RequestFactory().get(u'/')
+        request.user = user
+
     course_outline_blocks = get_course_outline_block_tree(request, str(course_key), user)
     if course_outline_blocks:
-        course_blocks_children = course_outline_blocks.get('children')
-        assessments = get_assessment_course_block(course_blocks_children)
+        assessments = get_assessment_course_block([course_outline_blocks])
 
     return assessments
 
@@ -381,37 +467,45 @@ def get_assessment_completion(assessments):
     Returns:
         Boolean: Return a boolean
     """
+    if not assessments:
+        return False
+
     for assessment in assessments:
-        if assessment.get('completion') == 0.0:
+        if assessment.get('completion') < 1.0:
             return False
 
     return True
 
 
-def skills_assessment(request, student):
+def get_student_skills_assessment_completion(student, assessment_filter=None):
     """
     Evaluate if student has completed his skill assessment
 
     Args:
-        request: request
         student: genplus student
+        filter: filter only intro or outro assessment i-e possible values = 'intro' or 'outro'
 
     Returns: List[bool] of booleans
 
     """
 
-    intro_assessments_completion = False
-    outro_assessments_completion = False
+    intro_assessments_completion = None
+    outro_assessments_completion = None
     gen_program = student.active_class.program if student.active_class else None
-    if student.gen_user.user:
-        user = student.gen_user.user
-        if gen_program is not None and gen_program.intro_unit:
+    user = student.gen_user.user
+    if user and gen_program is not None:
+        if gen_program.intro_unit:
             intro_unit_id = gen_program.intro_unit.id
-            intro_assessments = get_assessment_problem_data(request, intro_unit_id, user)
-            intro_assessments_completion = get_assessment_completion(intro_assessments)
-        if gen_program is not None and gen_program.outro_unit:
+            intro_assessments = get_assessment_problem_data(intro_unit_id, user)
+            intro_assessments_completion = get_assessment_completion(intro_assessments) if intro_assessments else None
+            if assessment_filter == 'intro':
+                return intro_assessments_completion
+
+        if gen_program.outro_unit:
             outro_unit_id = gen_program.outro_unit.id
-            outro_assessments = get_assessment_problem_data(request, outro_unit_id, user)
-            outro_assessments_completion = get_assessment_completion(outro_assessments)
+            outro_assessments = get_assessment_problem_data(outro_unit_id, user)
+            outro_assessments_completion = get_assessment_completion(outro_assessments) if outro_assessments else None
+            if assessment_filter == 'outro':
+                return outro_assessments_completion
 
     return [intro_assessments_completion, outro_assessments_completion]

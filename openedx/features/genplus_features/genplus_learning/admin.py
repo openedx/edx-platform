@@ -3,22 +3,11 @@ from adminsortable2.admin import SortableInlineAdminMixin
 from openedx.features.genplus_features.genplus_learning.models import *
 
 
-@admin.register(ClassLesson)
-class ClassLessonAdmin(admin.ModelAdmin):
-    list_display = (
-        'class_unit',
-        'usage_key',
-        'is_locked',
-    )
-    readonly_fields = ('class_unit', 'usage_key', 'course_key',)
-
-
 @admin.register(YearGroup)
 class YearGroupAdmin(admin.ModelAdmin):
     search_fields = ('name', 'program_name',)
 
 
-# TODO: Remove this after testing
 @admin.register(ProgramEnrollment)
 class ProgramEnrollmentAdmin(admin.ModelAdmin):
     list_display = ('student', 'gen_class', 'program', 'status',)
@@ -60,12 +49,4 @@ class ProgramAdmin(admin.ModelAdmin):
     readonly_fields = ('slug', 'uuid',)
 
 
-@admin.register(ClassUnit)
-class ClassUnitAdmin(admin.ModelAdmin):
-    list_display = ('gen_class', 'unit',)
-    readonly_fields = ('gen_class', 'unit',)
-
-
-admin.site.register(UnitCompletion)
-admin.site.register(UnitBlockCompletion)
 admin.site.register(ProgramAccessRole)

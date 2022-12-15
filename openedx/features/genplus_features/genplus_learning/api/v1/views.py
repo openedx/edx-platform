@@ -8,7 +8,7 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 from openedx.features.genplus_features.genplus.models import GenUser, Student, Class, Activity
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsStudentOrTeacher, IsTeacher, IsStudent
-from openedx.features.genplus_features.genplus_learning.models import (Program, ProgramEnrollment,
+from openedx.features.genplus_features.genplus_learning.models import (Program, ProgramEnrollment, ProgramAccessRole,
                                                                        ClassUnit, ClassLesson, UnitCompletion,
                                                                        UnitBlockCompletion)
 from openedx.features.genplus_features.genplus_learning.utils import get_absolute_url
@@ -26,12 +26,13 @@ class ProgramViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         gen_user = self.request.user.gen_user
+        qs = Program.get_active_programs()
         if gen_user.is_student:
-            enrollments = ProgramEnrollment.visible_objects.filter(student=gen_user.student)
-            program_ids = enrollments.values_list('program', flat=True)
-            qs = Program.objects.filter(id__in=program_ids)
+            program_ids = ProgramEnrollment.visible_objects.filter(student=gen_user.student).values_list('program', flat=True)
         else:
-            qs = Program.get_active_programs()
+            program_ids = ProgramAccessRole.objects.filter(user=gen_user.user).values_list('program', flat=True).distinct()
+
+        qs = qs.filter(id__in=program_ids)
         return qs
 
     def get_serializer_context(self):
