@@ -403,7 +403,7 @@ class XBlockShim:
         warnings.warn("get_display_blocks() is deprecated.", DeprecationWarning, stacklevel=2)
         blocks = []
         for child in self.get_children():
-            blocks.extend(child.displayable_blocks())
+            blocks.append(child)
         return blocks
 
     def displayable_items(self):

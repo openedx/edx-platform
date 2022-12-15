@@ -531,16 +531,9 @@ class XModuleMixin(XModuleFields, XBlock):
         """
         blocks = []
         for child in self.get_children():
-            blocks.extend(child.displayable_blocks())
+            blocks.append(child)
 
         return blocks
-
-    def displayable_blocks(self):
-        """
-        Returns list of displayable modules contained by this module. If this
-        module is visible, should return [self].
-        """
-        return [self]
 
     def get_child_by(self, selector):
         """
