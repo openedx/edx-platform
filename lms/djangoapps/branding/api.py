@@ -390,7 +390,9 @@ def _footer_more_info_links(language=settings.LANGUAGE_CODE):
     links = [
         ("terms_of_service_and_honor_code", (marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code"))),
         ("privacy_policy", (marketing_link("PRIVACY"), _("Privacy Policy"))),
+        ("cookie_policy_link", (marketing_link("COOKIE"), _("Cookie Policy"))),
         ("accessibility_policy", (marketing_link("ACCESSIBILITY"), _("Accessibility Policy"))),
+        ("ccpa_link", (marketing_link("CCPA"), _("Do Not Sell My Personal Data")))
     ]
 
     # Backwards compatibility: If a combined "terms of service and honor code"
