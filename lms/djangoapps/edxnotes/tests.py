@@ -79,11 +79,10 @@ class TestProblem:
     The purpose of this class is to imitate any problem.
     """
     def __init__(self, course, user=None):
-        self.system = MagicMock(is_author_mode=False)
-        self.scope_ids = MagicMock(usage_id="test_usage_id")
+        self.scope_ids = MagicMock(usage_id=course.id.make_usage_key('test_problem', 'test_usage_id'))
         user = user or UserFactory()
         user_service = StubUserService(user)
-        self.runtime = MagicMock(course_id=course.id, service=lambda _a, _b: user_service)
+        self.runtime = MagicMock(service=lambda _a, _b: user_service, is_author_mode=False)
         self.descriptor = MagicMock()
         self.descriptor.runtime.modulestore.get_course.return_value = course
 
@@ -104,9 +103,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         super().setUp()
 
         ApplicationFactory(name="edx-notes")
-        # Using old mongo because of locator comparison issues (see longer
-        # note below in EdxNotesHelpersTest setUp.
-        self.course = CourseFactory(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
+        self.course = CourseFactory(edxnotes=True, default_store=ModuleStoreEnum.Type.split)
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
         self.problem = TestProblem(self.course, self.user)
@@ -136,7 +133,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
             "uid": "uid",
             "edxnotes_visibility": "true",
             "params": {
-                "usageId": "test_usage_id",
+                "usageId": problem.scope_ids.usage_id,
                 "courseId": course.id,
                 "token": "token",
                 "tokenUrl": "/tokenUrl",
@@ -167,7 +164,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         """
         Tests that get_html is not wrapped when problem is rendered in Studio.
         """
-        self.problem.system.is_author_mode = True
+        self.problem.runtime.is_author_mode = True
         assert 'original_get_html' == self.problem.get_html()
 
     def test_edxnotes_blockstore_runtime(self):
@@ -205,11 +202,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         super().setUp()
 
-        # There are many tests that are comparing locators as returned from helper methods. When using
-        # the split modulestore, some of those locators have version and branch information, but the
-        # comparison values do not. This needs further investigation in order to enable these tests
-        # with the split modulestore.
-        with self.store.default_store(ModuleStoreEnum.Type.mongo):
+        with self.store.default_store(ModuleStoreEnum.Type.split):
             ApplicationFactory(name="edx-notes")
             self.course = CourseFactory.create()
             self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)

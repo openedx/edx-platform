@@ -87,6 +87,7 @@ class Thread(models.Model):
                 'edx.forum.searched',
                 {
                     'query': search_query,
+                    'search_type': 'Content',
                     'corrected_text': corrected_text,
                     'group_id': group_id,
                     'page': requested_page,

@@ -442,6 +442,9 @@ class StaticCourseTabView(EdxFragmentView):
         Displays a static course tab page with a given name
         """
         course_key = CourseKey.from_string(course_id)
+        if course_key.deprecated:
+            raise Http404
+
         course = get_course_with_access(request.user, 'load', course_key)
         tab = CourseTabList.get_tab_by_slug(course.tabs, tab_slug)
         if tab is None:
@@ -921,6 +924,8 @@ def dates(request, course_id):
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
     course_key = CourseKey.from_string(course_id)
+    if course_key.deprecated:
+        raise Http404
 
     if course_home_mfe_progress_tab_is_active(course_key) and not request.user.is_staff:
         end_of_redirect_url = 'progress' if not student_id else f'progress/{student_id}'

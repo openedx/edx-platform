@@ -17,6 +17,15 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 
 
+class AttributeDict(dict):
+    """
+    Converts Dict Keys into Attributes
+    """
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+
+
 def discussion_open_for_user(course, user):
     """
     Check if course discussion are open or not for user.
@@ -59,7 +68,32 @@ def get_usernames_from_search_string(course_id, search_string, page_number, page
     """
     matched_users_in_course = User.objects.filter(
         courseenrollment__course_id=course_id,
-        username__contains=search_string).order_by(Length('username').asc()).values_list('username', flat=True)
+        username__icontains=search_string).order_by(Length('username').asc()).values_list('username', flat=True)
+    if not matched_users_in_course:
+        return '', 0, 0
+    matched_users_count = len(matched_users_in_course)
+    paginator = Paginator(matched_users_in_course, page_size)
+    page_matched_users = paginator.page(page_number)
+    matched_users_pages = int(matched_users_count / page_size)
+    return ','.join(page_matched_users), matched_users_count, matched_users_pages
+
+
+def get_usernames_for_course(course_id, page_number, page_size):
+    """
+    Gets usernames for all users in course.
+
+    Args:
+            course_id (CourseKey): Course to check discussions for
+            page_number (int): Page numbers to fetch
+            page_size (int): Number of items in each page
+
+    Returns:
+            page_matched_users (str): comma seperated usernames for the page
+            matched_users_count (int): count of matched users in course
+            matched_users_pages (int): pages of matched users in course
+    """
+    matched_users_in_course = User.objects.filter(courseenrollment__course_id=course_id,)\
+        .order_by(Length('username').asc()).values_list('username', flat=True)
     if not matched_users_in_course:
         return '', 0, 0
     matched_users_count = len(matched_users_in_course)
@@ -93,22 +127,15 @@ def add_stats_for_users_with_no_discussion_content(course_stats, users_in_course
 def get_course_staff_users_list(course_id):
     """
     Gets user ids for Staff roles for course discussions.
-    Roles include Discussion Administrator, Discussion Moderator, Course Instructor and Course Staff.
+    Roles Course Instructor and Course Staff.
     """
-    # TODO: cache staff_user_ids if we need to improve perf
-    staff_user_ids = [
-        user.id
-        for role in Role.objects.filter(
-            name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR],
-            course_id=course_id
-        )
-        for user in role.users.all()
-    ]
+    # TODO: cache course_staff_user_ids if we need to improve perf
+    course_staff_user_ids = []
     staff = list(CourseStaffRole(course_id).users_with_role().values_list('id', flat=True))
     admins = list(CourseInstructorRole(course_id).users_with_role().values_list('id', flat=True))
-    staff_user_ids.extend(staff)
-    staff_user_ids.extend(admins)
-    return set(staff_user_ids)
+    course_staff_user_ids.extend(staff)
+    course_staff_user_ids.extend(admins)
+    return list(set(course_staff_user_ids))
 
 
 def get_course_ta_users_list(course_id):
@@ -116,11 +143,112 @@ def get_course_ta_users_list(course_id):
     Gets user ids for TA roles for course discussions.
     Roles include Community TA and Group Community TA.
     """
-    # TODO: cache ta_user_ids if we need to improve perf
-    ta_user_ids = {
+    # TODO: cache ta_users_ids if we need to improve perf
+    ta_users_ids = [
         user.id
-        for role in Role.objects.filter(name__in=[FORUM_ROLE_COMMUNITY_TA,
-                                                  FORUM_ROLE_GROUP_MODERATOR], course_id=course_id)
+        for role in Role.objects.filter(name__in=[FORUM_ROLE_GROUP_MODERATOR,
+                                                  FORUM_ROLE_COMMUNITY_TA], course_id=course_id)
         for user in role.users.all()
+    ]
+    return ta_users_ids
+
+
+def get_moderator_users_list(course_id):
+    """
+    Gets user ids for Moderator roles for course discussions.
+    Roles include Discussion Administrator and Discussion Moderator.
+    """
+    # TODO: cache moderator_user_ids if we need to improve perf
+    moderator_user_ids = [
+        user.id
+        for role in Role.objects.filter(
+            name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR],
+            course_id=course_id
+        )
+        for user in role.users.all()
+    ]
+    return moderator_user_ids
+
+
+def filter_topic_from_discussion_id(discussion_id, topics_list):
+    """
+    Returns topic based on discussion id
+    """
+    for topic in topics_list:
+        if topic.get("id") == discussion_id:
+            return topic
+    return {}
+
+
+def create_discussion_children_from_ids(children_ids, blocks, topics):
+    """
+    Takes ids of discussion and return discussion dictionary
+    """
+    discussions = []
+    for child_id in children_ids:
+        topic = blocks.get(child_id)
+        if topic.get('type') == 'vertical':
+            discussions_id = topic.get('discussions_id')
+            topic = filter_topic_from_discussion_id(discussions_id, topics)
+        if topic:
+            discussions.append(topic)
+    return discussions
+
+
+def create_blocks_params(course_usage_key, user):
+    """
+    Returns param dict that is needed to get blocks
+    """
+    return {
+        'usage_key': course_usage_key,
+        'user': user,
+        'depth': None,
+        'nav_depth': None,
+        'requested_fields': {
+            'display_name',
+            'student_view_data',
+            'children',
+            'discussions_id',
+            'type',
+            'block_types_filter'
+        },
+        'block_counts': set(),
+        'student_view_data': {'discussion'},
+        'return_type': 'dict',
+        'block_types_filter': {
+            'discussion',
+            'chapter',
+            'vertical',
+            'sequential',
+            'course'
+        }
     }
-    return ta_user_ids
+
+
+def create_topics_v3_structure(blocks, topics):
+    """
+    Create V3 topics structure from blocks and v2 topics
+    """
+    non_courseware_topics = [
+        dict({**topic, 'courseware': False})
+        for topic in topics
+        if topic.get('usage_key', '') is None
+    ]
+    courseware_topics = []
+    for key, value in blocks.items():
+        if value.get("type") == "chapter":
+            value['courseware'] = True
+            courseware_topics.append(value)
+            value['children'] = create_discussion_children_from_ids(
+                value['children'],
+                blocks,
+                topics,
+            )
+            subsections = value.get('children')
+            for subsection in subsections:
+                subsection['children'] = create_discussion_children_from_ids(
+                    subsection['children'],
+                    blocks,
+                    topics,
+                )
+    return non_courseware_topics + courseware_topics

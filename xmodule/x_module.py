@@ -14,7 +14,7 @@ from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_isdir, resource_string, resource_filename
+from pkg_resources import resource_isdir, resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
@@ -86,9 +86,11 @@ DEFAULT_PUBLIC_VIEW_MESSAGE = (
     'Sign in or register, and enroll in this course to view it.'
 )
 
+
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
-_ = lambda text: text
+def _(text):
+    return text
 
 
 class OpaqueKeyReader(IdReader):
@@ -203,49 +205,17 @@ class AsideKeyGenerator(IdGenerator):
         raise NotImplementedError("Specific Modulestores must provide implementations of create_definition")
 
 
-def dummy_track(_event_type, _event):
-    pass
-
-
 class HTMLSnippet:
     """
     A base class defining an interface for an object that is able to present an
     html snippet, along with associated javascript and css
     """
 
-    js = {}
-    js_module_name = None
-
     preview_view_js = {}
     studio_view_js = {}
 
-    css = {}
     preview_view_css = {}
     studio_view_css = {}
-
-    @classmethod
-    def get_javascript(cls):
-        """
-        Return a dictionary containing some of the following keys:
-
-            coffee: A list of coffeescript fragments that should be compiled and
-                    placed on the page
-
-            js: A list of javascript fragments that should be included on the
-            page
-
-        All of these will be loaded onto the page in the CMS
-        """
-        # cdodge: We've moved the xmodule.coffee script from an outside directory into the xmodule area of common
-        # this means we need to make sure that all xmodules include this dependency which had been previously implicitly
-        # fulfilled in a different area of code
-        coffee = cls.js.setdefault('coffee', [])  # lint-amnesty, pylint: disable=unused-variable
-        js = cls.js.setdefault('js', [])  # lint-amnesty, pylint: disable=unused-variable
-
-        # Added xmodule.js separately to enforce 000 prefix for this only.
-        cls.js.setdefault('xmodule_js', resource_string(__name__, 'js/src/xmodule.js'))
-
-        return cls.js
 
     @classmethod
     def get_preview_view_js(cls):
@@ -262,22 +232,6 @@ class HTMLSnippet:
     @classmethod
     def get_studio_view_js_bundle_name(cls):
         return cls.__name__ + 'Studio'
-
-    @classmethod
-    def get_css(cls):
-        """
-        Return a dictionary containing some of the following keys:
-
-            css: A list of css fragments that should be applied to the html
-                 contents of the snippet
-
-            sass: A list of sass fragments that should be applied to the html
-                  contents of the snippet
-
-            scss: A list of scss fragments that should be applied to the html
-                  contents of the snippet
-        """
-        return cls.css
 
     @classmethod
     def get_preview_view_css(cls):
@@ -325,6 +279,7 @@ class XModuleFields:
     )
 
 
+@XBlock.needs("i18n")
 class XModuleMixin(XModuleFields, XBlock):
     """
     Fields and methods used by XModules internally.
@@ -1073,25 +1028,11 @@ class MetricsMixin:
 
     def render(self, block, view_name, context=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         start_time = time.time()
-        status = "success"
         try:
             return super().render(block, view_name, context=context)
-        except:
-            status = "failure"
-            raise
-
         finally:
             end_time = time.time()
             duration = end_time - start_time
-            course_id = getattr(self, 'course_id', '')
-            tags = [  # lint-amnesty, pylint: disable=unused-variable
-                f'view_name:{view_name}',
-                'action:render',
-                f'action_status:{status}',
-                f'course_id:{course_id}',
-                f'block_type:{block.scope_ids.block_type}',
-                f'block_family:{block.entry_point}',
-            ]
             log.debug(
                 "%.3fs - render %s.%s (%s)",
                 duration,
@@ -1102,25 +1043,11 @@ class MetricsMixin:
 
     def handle(self, block, handler_name, request, suffix=''):  # lint-amnesty, pylint: disable=missing-function-docstring
         start_time = time.time()
-        status = "success"
         try:
             return super().handle(block, handler_name, request, suffix=suffix)
-        except:
-            status = "failure"
-            raise
-
         finally:
             end_time = time.time()
             duration = end_time - start_time
-            course_id = getattr(self, 'course_id', '')
-            tags = [  # lint-amnesty, pylint: disable=unused-variable
-                f'handler_name:{handler_name}',
-                'action:handle',
-                f'action_status:{status}',
-                f'course_id:{course_id}',
-                f'block_type:{block.scope_ids.block_type}',
-                f'block_family:{block.entry_point}',
-            ]
             log.debug(
                 "%.3fs - handle %s.%s (%s)",
                 duration,
@@ -1243,7 +1170,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def add_block_as_child_node(self, block, node):
-        child = etree.SubElement(node, "unknown")
+        child = etree.SubElement(node, block.category)
         child.set('url_name', block.url_name)
         block.add_xml_to_node(child)
 
@@ -1705,6 +1632,32 @@ class ModuleSystemShim:
         if rebind_user_service:
             return partial(rebind_user_service.rebind_noauth_module_to_user)
 
+    # noinspection PyPep8Naming
+    @property
+    def STATIC_URL(self):  # pylint: disable=invalid-name
+        """
+        Returns the base URL for static assets.
+        Deprecated in favor of the settings.STATIC_URL configuration.
+        """
+        warnings.warn(
+            'runtime.STATIC_URL is deprecated. Please use settings.STATIC_URL instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return settings.STATIC_URL
+
+    @property
+    def course_id(self):
+        """
+        Old API to get the course ID.
+
+        Deprecated in favor of `runtime.scope_ids.usage_id.context_key`.
+        """
+        warnings.warn(
+            "`runtime.course_id` is deprecated. Use `context_key` instead: `runtime.scope_ids.usage_id.context_key`.",
+            DeprecationWarning, stacklevel=3,
+        )
+        return self.descriptor_runtime.course_id.for_branch(None)
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1721,46 +1674,26 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
         self,
-        static_url,
-        track_function,
         get_module,
         descriptor_runtime,
-        publish=None,
-        course_id=None,
         **kwargs,
     ):
         """
         Create a closure around the system environment.
-
-        static_url - the base URL to static assets
-
-        track_function - function of (event_type, event), intended for logging
-                         or otherwise tracking the event.
-                         TODO: Not used, and has inconsistent args in different
-                         files.  Update or remove.
 
         get_module - function that takes a descriptor and returns a corresponding
                          module instance object.  If the current user does not have
                          access to that location, returns None.
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
-
-        course_id - the course_id containing this module
-
-        publish(event) - A function that allows XModules to publish events (such as grade changes)
         """
 
         kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
         kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
         super().__init__(**kwargs)
 
-        self.STATIC_URL = static_url
-        self.track_function = track_function
         self.get_module = get_module
-        self.course_id = course_id
 
-        if publish:
-            self.publish = publish
         self.xmodule_instance = None
 
         self.descriptor_runtime = descriptor_runtime
@@ -1796,7 +1729,12 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def publish(self, block, event_type, event):  # lint-amnesty, pylint: disable=arguments-differ
-        pass
+        """
+        Publish events through the `EventPublishingService`.
+        This ensures that the correct track method is used for Instructor tasks.
+        """
+        if publish_service := self._services.get('publish'):
+            publish_service.publish(block, event_type, event)
 
     def service(self, block, service_name):
         """
@@ -1854,7 +1792,7 @@ class CombinedSystem:
 
         """
         context = context or {}
-        return self.__getattr__('render')(block, view_name, context)
+        return self.__getattr__('render')(block, view_name, context)  # pylint: disable=unnecessary-dunder-call
 
     def service(self, block, service_name):
         """Return a service, or None.

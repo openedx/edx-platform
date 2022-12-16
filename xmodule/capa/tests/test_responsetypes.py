@@ -970,7 +970,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuestate = CodeResponseTest.make_queuestate(i, datetime.now(UTC))
-            cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
+            cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
         self.problem.correct_map.update(cmap)
 
         assert self.problem.is_queued() is True
@@ -986,7 +986,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
             queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now(UTC))
-            old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
+            old_cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
 
         # Message format common to external graders
         grader_msg = '<span>MESSAGE</span>'   # Must be valid XML
@@ -1102,7 +1102,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
             queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now(UTC))
-            old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
+            old_cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
 
         for grader_msg in valid_grader_msgs:
             correct_score_msg = json.dumps({'correct': True, 'score': 1, 'msg': grader_msg})

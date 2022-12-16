@@ -209,21 +209,16 @@ class Env:
 
     JS_REPORT_DIR = REPORT_DIR / 'javascript'
 
-    # Directories used for common/lib/tests
+    # Directories used for pavelib/ tests
     IGNORED_TEST_DIRS = ('__pycache__', '.cache', '.pytest_cache')
-    LIB_TEST_DIRS = []
-    for item in (REPO_ROOT / "common/lib").listdir():
-        dir_name = (REPO_ROOT / 'common/lib' / item)
-        if dir_name.isdir() and not dir_name.endswith(IGNORED_TEST_DIRS):
-            LIB_TEST_DIRS.append(path("common/lib") / item.basename())
-    LIB_TEST_DIRS.append(path("pavelib/paver_tests"))
-    LIB_TEST_DIRS.append(path("scripts/xsslint/tests"))
+    LIB_TEST_DIRS = [path("pavelib/paver_tests"), path("scripts/xsslint/tests")]
 
     # Directory for i18n test reports
     I18N_REPORT_DIR = REPORT_DIR / 'i18n'
 
-    # Directory for keeping src folder that comes with pip installation
-    PIP_SRC_DIR = os.environ.get("PIP_SRC_DIR")
+    # Directory for keeping src folder that comes with pip installation.
+    # Setting this is equivalent to passing `--src <dir>` to pip directly.
+    PIP_SRC = os.environ.get("PIP_SRC")
 
     # Service variant (lms, cms, etc.) configured with an environment variable
     # We use this to determine which envs.json file to load.

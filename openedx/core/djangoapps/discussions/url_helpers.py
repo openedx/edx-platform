@@ -7,8 +7,6 @@ from urllib.parse import urlencode
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.discussion.toggles import ENABLE_VIEW_MFE_IN_IFRAME
-
 
 def _get_url_with_view_query_params(path: str, view: Optional[str] = None) -> str:
     """
@@ -29,9 +27,6 @@ def _get_url_with_view_query_params(path: str, view: Optional[str] = None) -> st
     query_params = {}
     if view == "in_context":
         query_params.update({'inContext': True})
-
-    if ENABLE_VIEW_MFE_IN_IFRAME.is_enabled():
-        query_params.update({'inIframe': True})
 
     if query_params:
         url = f"{url}?{urlencode(query_params)}"

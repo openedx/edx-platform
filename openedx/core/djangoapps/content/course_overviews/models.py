@@ -62,7 +62,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 17
+    VERSION = 18
 
     # Cache entry versioning.
     version = models.IntegerField()
@@ -141,6 +141,8 @@ class CourseOverview(TimeStampedModel):
     entrance_exam_enabled = models.BooleanField(default=False)
     entrance_exam_id = models.CharField(max_length=255, blank=True)
     entrance_exam_minimum_score_pct = models.FloatField(default=0.65)
+
+    external_id = models.CharField(max_length=128, null=True, blank=True)
 
     language = models.TextField(null=True)
 
@@ -531,6 +533,12 @@ class CourseOverview(TimeStampedModel):
         Returns whether the course has ended.
         """
         return course_metadata_utils.has_course_ended(self.end)
+
+    def is_enrollment_open(self):
+        """
+        Returns True if course enrollment is open
+        """
+        return course_metadata_utils.is_enrollment_open(self.enrollment_start, self.enrollment_end)
 
     def has_marketing_url(self):
         """

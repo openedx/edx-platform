@@ -7,10 +7,10 @@ import json
 import logging
 import textwrap
 from collections import OrderedDict
+
 from functools import partial
 
-from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
-from completion.models import BlockCompletion
+from completion.services import CompletionService
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
@@ -22,7 +22,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
-from edx_django_utils.cache import RequestCache
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE, RequestCache
 from edx_django_utils.monitoring import set_custom_attributes_for_course_key, set_monitoring_transaction_name
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
@@ -39,15 +39,20 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
+from lms.djangoapps.badges.service import BadgingService
+from lms.djangoapps.badges.utils import badges_enabled
+from lms.djangoapps.teams.services import TeamsService
+from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import modulestore
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.partitions.partitions_service import PartitionService
 from xmodule.util.sandboxing import SandboxService
-from xmodule.services import RebindUserService
+from xmodule.services import EventPublishingService, RebindUserService, SettingsService, TeamsConfigurationService
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
-from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
 from xmodule.capa.xqueue_interface import XQueueService  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
@@ -61,9 +66,8 @@ from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataC
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
-from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, UserTagsService
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
@@ -88,7 +92,6 @@ from openedx.features.discounts.utils import offer_banner_wrapper
 from openedx.features.content_type_gating.services import ContentTypeGatingService
 from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.student.roles import CourseBetaTesterRole
-from common.djangoapps.track import contexts
 from common.djangoapps.util import milestones_helpers
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.edxmako.services import MakoService
@@ -492,22 +495,6 @@ def get_module_system_for_user(
             will_recheck_access=will_recheck_access,
         )
 
-    def get_event_handler(event_type):
-        """
-        Return an appropriate function to handle the event.
-
-        Returns None if no special processing is required.
-        """
-        handlers = {
-            'grade': handle_grade_event,
-        }
-        if ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
-            handlers.update({
-                'completion': handle_completion_event,
-                'progress': handle_deprecated_progress_event,
-            })
-        return handlers.get(event_type)
-
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with
     # the per-student anonymized id (as we have in the past),
@@ -527,85 +514,6 @@ def get_module_system_for_user(
         anonymous_user_id=anonymous_student_id,
         request_country_code=user_location,
     )
-
-    def publish(block, event_type, event):
-        """
-        A function that allows XModules to publish events.
-        """
-        handle_event = get_event_handler(event_type)
-        if handle_event and not is_masquerading_as_specific_student(user, course_id):
-            handle_event(block, event)
-        else:
-            context = contexts.course_context_from_course_id(course_id)
-            user_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
-            if user_id:
-                context['user_id'] = user_id
-
-            context['asides'] = {}
-            for aside in block.runtime.get_asides(block):
-                if hasattr(aside, 'get_event_context'):
-                    aside_event_info = aside.get_event_context(event_type, event)
-                    if aside_event_info is not None:
-                        context['asides'][aside.scope_ids.block_type] = aside_event_info
-            with tracker.get_tracker().context(event_type, context):
-                track_function(event_type, event)
-
-    def handle_completion_event(block, event):
-        """
-        Submit a completion object for the block.
-        """
-        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():  # lint-amnesty, pylint: disable=no-else-raise
-            raise Http404
-        else:
-            BlockCompletion.objects.submit_completion(
-                user=user,
-                block_key=block.scope_ids.usage_id,
-                completion=event['completion'],
-            )
-
-    def handle_grade_event(block, event):
-        """
-        Submit a grade for the block.
-        """
-        if not user.is_anonymous:
-            grades_signals.SCORE_PUBLISHED.send(
-                sender=None,
-                block=block,
-                user=user,
-                raw_earned=event['value'],
-                raw_possible=event['max_value'],
-                only_if_higher=event.get('only_if_higher'),
-                score_deleted=event.get('score_deleted'),
-                grader_response=event.get('grader_response')
-            )
-
-    def handle_deprecated_progress_event(block, event):
-        """
-        DEPRECATED: Submit a completion for the block represented by the
-        progress event.
-
-        This exists to support the legacy progress extension used by
-        edx-solutions.  New XBlocks should not emit these events, but instead
-        emit completion events directly.
-        """
-        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():  # lint-amnesty, pylint: disable=no-else-raise
-            raise Http404
-        else:
-            requested_user_id = event.get('user_id', user.id)
-            if requested_user_id != user.id:
-                log.warning(f"{user} tried to submit a completion on behalf of {requested_user_id}")
-                return
-
-            # If blocks explicitly declare support for the new completion API,
-            # we expect them to emit 'completion' events,
-            # and we ignore the deprecated 'progress' events
-            # in order to avoid duplicate work and possibly conflicting semantics.
-            if not getattr(block, 'has_custom_completion', False):
-                BlockCompletion.objects.submit_completion(
-                    user=user,
-                    block_key=block.scope_ids.usage_id,
-                    completion=1.0,
-                )
 
     # Rebind module service to deal with noauth modules getting attached to users
     rebind_user_service = RebindUserService(
@@ -678,13 +586,10 @@ def get_module_system_for_user(
     field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
     field_data = LmsFieldData(field_data, student_data)
 
+    store = modulestore()
+
     system = LmsModuleSystem(
-        track_function=track_function,
-        static_url=settings.STATIC_URL,
         get_module=inner_get_module,
-        user=user,
-        publish=publish,
-        course_id=course_id,
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
@@ -707,6 +612,19 @@ def get_module_system_for_user(
             'xqueue': xqueue_service,
             'replace_urls': replace_url_service,
             'rebind_user': rebind_user_service,
+            'completion': CompletionService(user=user, context_key=course_id)
+            if user and user.is_authenticated
+            else None,
+            'i18n': ModuleI18nService,
+            'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
+            'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
+            'settings': SettingsService(),
+            'user_tags': UserTagsService(user=user, course_id=course_id),
+            'badging': BadgingService(course_id=course_id, modulestore=store) if badges_enabled() else None,
+            'teams': TeamsService(),
+            'teams_configuration': TeamsConfigurationService(),
+            'call_to_action': CallToActionService(),
+            'publish': EventPublishingService(user, course_id, track_function),
         },
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         request_token=request_token,
@@ -911,7 +829,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
 
     # We are reusing DRF logic to provide support for JWT and Oauth2. We abandoned the idea of using DRF view here
     # to avoid introducing backwards-incompatible changes.
-    # You can see https://github.com/edx/XBlock/pull/383 for more details.
+    # You can see https://github.com/openedx/XBlock/pull/383 for more details.
     else:
         authentication_classes = (JwtAuthentication, BearerAuthenticationAllowInactiveUser)
         authenticators = [auth() for auth in authentication_classes]

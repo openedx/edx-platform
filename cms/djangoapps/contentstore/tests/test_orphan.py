@@ -5,7 +5,6 @@ Test finding orphans via the view and django config
 
 import json
 
-import ddt
 from opaque_keys.edx.locator import BlockUsageLocator
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -74,18 +73,16 @@ class TestOrphanBase(CourseTestCase):
         self.assertEqual(len(self.store.get_orphans(course_key)), number)
 
 
-@ddt.ddt
 class TestOrphan(TestOrphanBase):
     """
     Test finding orphans via view and django config
     """
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
-    def test_get_orphans(self, default_store):
+    def test_get_orphans(self):
         """
         Test that the orphan handler finds the orphans
         """
-        course = self.create_course_with_orphans(default_store)
+        course = self.create_course_with_orphans(ModuleStoreEnum.Type.split)
         orphan_url = reverse_course_url('orphan_handler', course.id)
 
         orphans = json.loads(
@@ -102,19 +99,14 @@ class TestOrphan(TestOrphanBase):
         location = course.location.replace(category='html', name='OrphanHtml')
         self.assertIn(str(location), orphans)
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.split, 5, 3),
-        (ModuleStoreEnum.Type.mongo, 34, 12),
-    )
-    @ddt.unpack
-    def test_delete_orphans(self, default_store, max_mongo_calls, min_mongo_calls):
+    def test_delete_orphans(self):
         """
         Test that the orphan handler deletes the orphans
         """
-        course = self.create_course_with_orphans(default_store)
+        course = self.create_course_with_orphans(ModuleStoreEnum.Type.split)
         orphan_url = reverse_course_url('orphan_handler', course.id)
 
-        with check_mongo_calls_range(max_mongo_calls, min_mongo_calls):
+        with check_mongo_calls_range(5, 3):
             self.client.delete(orphan_url)
 
         orphans = json.loads(
@@ -126,12 +118,11 @@ class TestOrphan(TestOrphanBase):
         # parent are not deleted
         self.assertTrue(self.store.has_item(course.id.make_usage_key('html', "multi_parent_html")))
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
-    def test_not_permitted(self, default_store):
+    def test_not_permitted(self):
         """
         Test that auth restricts get and delete appropriately
         """
-        course = self.create_course_with_orphans(default_store)
+        course = self.create_course_with_orphans(ModuleStoreEnum.Type.split)
         orphan_url = reverse_course_url('orphan_handler', course.id)
 
         test_user_client, test_user = self.create_non_staff_authed_user_client()
@@ -141,8 +132,7 @@ class TestOrphan(TestOrphanBase):
         response = test_user_client.delete(orphan_url)
         self.assertEqual(response.status_code, 403)
 
-    @ddt.data(ModuleStoreEnum.Type.split)
-    def test_path_to_location_for_orphan_vertical(self, module_store):
+    def test_path_to_location_for_orphan_vertical(self):
         r"""
         Make sure that path_to_location works with a component having multiple vertical parents,
         from which one of them is orphan.
@@ -156,7 +146,7 @@ class TestOrphan(TestOrphanBase):
               html
         """
         # Get a course with orphan modules
-        course = self.create_course_with_orphans(module_store)
+        course = self.create_course_with_orphans(ModuleStoreEnum.Type.split)
 
         # Fetch the required course components.
         vertical1 = self.store.get_item(BlockUsageLocator(course.id, 'vertical', 'Vertical1'))
@@ -190,8 +180,7 @@ class TestOrphan(TestOrphanBase):
         self.assertEqual(len(path), 6)
         self.assertEqual(path, expected_path)
 
-    @ddt.data(ModuleStoreEnum.Type.split)
-    def test_path_to_location_for_orphan_chapter(self, module_store):
+    def test_path_to_location_for_orphan_chapter(self):
         r"""
         Make sure that path_to_location works with a component having multiple chapter parents,
         from which one of them is orphan
@@ -206,7 +195,7 @@ class TestOrphan(TestOrphanBase):
 
         """
         # Get a course with orphan modules
-        course = self.create_course_with_orphans(module_store)
+        course = self.create_course_with_orphans(ModuleStoreEnum.Type.split)
         orphan_chapter = self.store.get_item(BlockUsageLocator(course.id, 'chapter', 'OrphanChapter'))
         chapter1 = self.store.get_item(BlockUsageLocator(course.id, 'chapter', 'Chapter1'))
         vertical1 = self.store.get_item(BlockUsageLocator(course.id, 'vertical', 'Vertical1'))

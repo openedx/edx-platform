@@ -39,10 +39,10 @@ class BlockCountsTransformer(BlockStructureTransformer):
 
         for block_key in block_structure.post_order_traversal():
             for block_type in self.block_types_to_count:
-                descendants_type_count = sum([
+                descendants_type_count = sum(
                     block_structure.get_transformer_block_field(child_key, self, block_type, 0)
                     for child_key in block_structure.get_children(block_key)
-                ])
+                )
                 block_structure.set_transformer_block_field(
                     block_key,
                     self,

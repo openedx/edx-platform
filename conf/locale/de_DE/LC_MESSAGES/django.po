@@ -10,6 +10,7 @@
 # Alexander Gropmann <alexander.gropmann@charite.de>, 2018
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2013-2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2016-2017
+# Alfredo Guillem, 2022
 # andreas.frey <andreas.frey@liip.ch>, 2014
 # Arno <transifex@senlogik.de>, 2013
 # Arno <transifex@senlogik.de>, 2013
@@ -51,6 +52,7 @@
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2013
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2017
+# Alfredo Guillem, 2022
 # andreas.frey <andreas.frey@liip.ch>, 2014
 # Arno <transifex@senlogik.de>, 2013
 # Christian Layr <Christian.Layr@unisg.ch>, 2014
@@ -79,6 +81,7 @@
 # Alexander Gropmann <alexander.gropmann@charite.de>, 2018
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2013-2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2016-2017
+# Alfredo Guillem, 2022
 # 9309a68e5ef70fb98095fd18e848e998_2d7fe4e, 2014
 # Bert Krohn <bert.krohn@tum.de>, 2018
 # derMarc <dasunuebliche@email.de>, 2014
@@ -173,7 +176,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-24 20:43+0000\n"
+"POT-Creation-Date: 2022-11-27 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -1674,476 +1677,6 @@ msgstr "Vorläufig unterstützt"
 msgid "Unsupported"
 msgstr "nicht unterstützt."
 
-#: common/lib/capa/capa/capa_problem.py
-msgid "Cannot rescore problems with possible file submissions"
-msgstr ""
-"Aufgaben mit möglichen Dateieinreichungen können nicht neubewertet werden"
-
-#: common/lib/capa/capa/capa_problem.py
-msgid "Question {}"
-msgstr "Frage {}"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Incorrect"
-msgstr "Falsch"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Correct"
-msgstr "richtig"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "correct"
-msgstr "richtig"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incorrect"
-msgstr "falsch"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr "Teilweise richtig"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incomplete"
-msgstr "unvollständig"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "unanswered"
-msgstr "unbeantwortet"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "submitted"
-msgstr "eingereicht"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "processing"
-msgstr "verarbeite"
-
-#. Translators: these are tooltips that indicate the state of an assessment
-#. question
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is correct."
-msgstr "Diese Antwort ist richtig. "
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is incorrect."
-msgstr "Diese Anwort ist falsch. "
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is partially correct."
-msgstr "Diese Antwort ist teilweise richtig. "
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is being processed."
-msgstr "Ihre Antwort wird verarbeitet"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Not yet answered."
-msgstr "Noch nicht beantwortet"
-
-#: common/lib/capa/capa/inputtypes.py wiki/forms.py
-msgid "Select an option"
-msgstr "Wählen Sie eine Option"
-
-#. Translators: 'ChoiceGroup' is an input type and should not be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "ChoiceGroup: unexpected tag {tag_name}"
-msgstr "Auswahlgruppe: unewartetes Schlagwort {tag_name}"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Answer received."
-msgstr "Antwort erhalten."
-
-#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
-#. be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
-msgstr ""
-"Hat ein <choice> or <compoundhint> Schlagwort erwartet; erhielt ein "
-"{given_tag} stattdessen"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your files have been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"Deine Dateien wurden erfolgreich übermittelt. Sobald deine Einreichung "
-"benotet wurde, wird diese Nachricht durch die Rückmeldung des Bewerters "
-"ersetzt."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your answer has been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"Deine Antwort wurde übermittelt. Sobald deine Einreichung benotet wurde, "
-"wird diese Nachricht durch die Rückmeldung des Bewerters ersetzt."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{programming_language} editor"
-msgstr "{programming_language} Editor"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Press ESC then TAB or click outside of the code editor to exit"
-msgstr ""
-"Klicken Sie die ESC- und TAP-Taste oder außerhalb des Codeeditors, um zu "
-"beenden."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Submitted. As soon as a response is returned, this message will be replaced "
-"by that feedback."
-msgstr ""
-"Übertragen. Sobald eine Antwort eingeht, wird diese Nachricht durch das "
-"Feedback ersetzt. "
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
-msgstr ""
-"Keine Antwort von Xqueue innerhalb von {xqueue_timeout} Sekunden. "
-"Abgebrochen."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error running code."
-msgstr "Fehler bei der Ausführung"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Cannot connect to the queue"
-msgstr "Kann nicht an die Warteschlange anschließen"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "No formula specified."
-msgstr "Keine Formel festgelegt"
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Couldn't parse formula: {error_msg}"
-msgstr "Kann die Formel nicht verarbeiten: {error_msg}"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error while rendering preview"
-msgstr "Fehler beim Erstellen der Vorschau"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Sorry, couldn't parse formula"
-msgstr "Es tut uns leid, Formel konnte nicht verarbeit werden."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{input_type}: unexpected tag {tag_name}"
-msgstr "{input_type}: unerwartetes Schlagwort {tag_name}"
-
-#. Translators: a "tag" is an XML element, such as "<b>" in HTML
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a {expected_tag} tag; got {given_tag} instead"
-msgstr ""
-"Habe ein {expected_tag} Schlagwort erwartet; erhielt ein {given_tag} "
-"stattdessen"
-
-#. Translators: index here could be 1,2,3 and so on
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Question {index}"
-msgstr "Frage {index} "
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Correct:"
-msgstr "Richtig:"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect:"
-msgstr "Falsch:"
-
-#: common/lib/capa/capa/responsetypes.py xmodule/capa_module.py
-msgid "Answer"
-msgstr "Antwort"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error {err} in evaluating hint function {hintfn}."
-msgstr "Fehler {err} bei der Auswertung der Hilfestellung {hintfn}."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "(Source code line unavailable)"
-msgstr "(Quellcodezeile nicht verfügbar)"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "See XML source line {sourcenum}."
-msgstr "Betrachte XML-Quellcodezeile {sourcenum}."
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Checkboxes"
-msgstr "Checkboxen"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Multiple Choice"
-msgstr "Multiple Choice"
-
-#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
-#. be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Do not use shuffle and answer-pool at the same time"
-msgstr "Benutze mischen und Antwort-Pool nicht zur gleichen Zeit"
-
-#. Translators: 'answer-pool' is an attribute name and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "answer-pool value should be an integer"
-msgstr "Der Antwort-Pool-Wert sollte eine Ganzzahl sein"
-
-#. Translators: 'Choicegroup' is an input type and should not be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
-msgstr ""
-"Die Auswahlgruppe muss wenigstens 1 korrekte und 1 nicht korrekte "
-"Auswahlmöglichkeit enthalten"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "True/False Choice"
-msgstr "Wahr oder Falsch"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Dropdown"
-msgstr "Dropdown"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Numerical Input"
-msgstr "Zahl Eingabefeld"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "There was a problem with the staff answer to this problem."
-msgstr ""
-"Es gab ein Problem mit der Mitarbeiterantwort zu dieser Fragestellung. "
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{student_answer}' as a number."
-msgstr "'{student_answer}' konnte nicht als Zahl interpretiert werden."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Factorial function evaluated outside its domain:'{student_answer}'"
-msgstr ""
-"Mathematische Beschreibung, die außerhalb ihrer Domain bewertet wurde: "
-"'{student_answer}'."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid math syntax: '{student_answer}'"
-msgstr "Ungültige mathematische Syntax: '{student_answer}'"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "You may not use complex numbers in range tolerance problems"
-msgstr ""
-"Komplexe Zahlen sollten nicht in Fragestellungen mit Näherungswerten "
-"verwendet werden."
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. provided a
-#. boundary (end limit) for a variable that is a complex number (a + bi), this
-#. message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: complex boundary."
-msgstr ""
-"Es gab ein Problem mit der Mitarbeiterantwort zu dieser Fragestellung: "
-"komplexe Randbedingungen."
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. did not
-#. provide a boundary (end limit) for a variable, this message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: empty boundary."
-msgstr ""
-"Es gab ein Problem mit der Mitarbeiterantwort zu dieser Fragestellung: leere"
-" Grenzen."
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: Separator used in NumericalResponse to display multiple
-#. answers.
-#. Translators: Separator used in StringResponse to display multiple answers.
-#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is the last choice of a number of choices of how to log
-#. in
-#. to the site.
-#: common/lib/capa/capa/responsetypes.py
-#: lms/templates/course_modes/choose.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "or"
-msgstr "oder"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "Texteingabefeld"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "Fehler"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Custom Evaluated Script"
-msgstr "Individuell ausgewertetes Skript"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error getting student answer from {student_answers}"
-msgstr "Fehler beim Empfang der Teilnehmerantwort von {student_answers}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer entered!"
-msgstr "Keine Antwort eingegeben!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "CustomResponse: check function returned an invalid dictionary!"
-msgstr ""
-"Individuelle Antwort: Die Überprüfungsfunktion lieferte ein ungültiges "
-"Wörterbuch zurück!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Symbolic Math Input"
-msgstr "symbolische Formel Eingabe"
-
-#. Translators: 'SymbolicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
-msgstr ""
-"Ein Fehler ist bei der Symbolantwort aufgetreten. Der Fehler war: "
-"{error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Code Input"
-msgstr "Code-Feld"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer provided."
-msgstr "Keine Antwort angegeben."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Error: No grader has been set up for this problem."
-msgstr "Fehler: Kein Bewerter wurde für diese Fragestellung eingerichtet."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
-"try again later."
-msgstr ""
-"Deine Einreichung an den Bewerter konnte nicht ausgeliefert werden (Ursache:"
-" {error_msg}). Bitte versuche es später nocheinmal."
-
-#. Translators: 'grader' refers to the edX automatic code grader.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Invalid grader reply. Please contact the course staff."
-msgstr ""
-"Ungültige Antwort des Bewerters. Bitte benachrichtige die Kursmitarbeiter."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "External Grader"
-msgstr "Externer Auswerter"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Math Expression Input"
-msgstr "Mathematische Eingabe"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Factorial function not permitted in answer for this problem. Provided answer"
-" was: {bad_input}"
-msgstr ""
-"Mathematische Beschreibung nicht erlaubt bei der Beantwortung dieses "
-"Problems. Die gegebene Antwort war: {bad_input}"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula."
-msgstr "Ungültige Eingabe: Konnte '{bad_input}' nicht als Formel verarbeiten."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula"
-msgstr "Ungültige Eingabe: Konnte '{bad_input}' nicht als Formel verarbeiten."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Circuit Schematic Builder"
-msgstr "Schaltplanerstellung"
-
-#. Translators: 'SchematicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
-msgstr ""
-"Fehler bei der Bewertung der schematischen Antwort. Der Fehler war: "
-"{error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Image Mapped Input"
-msgstr "Bildabhängige Eingabe"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error grading {image_input_id} (input={user_input})"
-msgstr "Fehler bei der Bewertung {image_input_id} (input={user_input})"
-
-#. Translators: {sr_coords} are the coordinates of a rectangle
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
-msgstr ""
-"Fehler in der Fragestellungsspezifikation! Kann kein Rechteck in {sr_coords}"
-" parsen"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Annotation Input"
-msgstr "Anmerkungseingabe"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Checkboxes With Text Input"
-msgstr "Checkboxes mit Texteingabe"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Answer not provided for {input_type}"
-msgstr "Antwort wurde für {input_type} nicht bereitgestellt"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "The Staff answer could not be interpreted as a number."
-msgstr "Die Mitarbeiterantwort konnte nicht als Zahl ausgewertet werden."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{given_answer}' as a number."
-msgstr "Kann '{given_answer}' nicht als Zahl auswerten."
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid ""
-"Codejail API Service is unavailable. Please try again in a few minutes."
-msgstr ""
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Codejail API Service invalid response."
-msgstr ""
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Invalid JSON response received from codejail api service."
-msgstr ""
-
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
 msgstr "Benutzerkonto freischalten"
@@ -3296,6 +2829,26 @@ msgstr ""
 " diese Anfrage zu bearbeiten, besuchen Sie bitte den/die untenstehenden "
 "Link(s)."
 
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Practice Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Proctored Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Timed Exam"
+msgstr ""
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Exam"
+msgstr ""
+
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
@@ -3494,6 +3047,18 @@ msgstr "Sie haben keinen Zugang zu diesem Kurs von einem mobilen Gerät."
 msgid "You must be enrolled in the course"
 msgstr ""
 "Sie müssen im Kurs eingeschrieben sein, um den Inhalt sehen zu können."
+
+#: lms/djangoapps/courseware/access_response.py
+#, python-brace-format
+msgid ""
+"You are enrolled in this course with '{enrollment_enterprise_name}'. "
+"However, you are currently logged in as a '{active_enterprise_name}' user. "
+"Please log in with '{enrollment_enterprise_name}' to access this course."
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must give Data Sharing Consent for the course"
+msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be logged in to see this course"
@@ -7832,6 +7397,10 @@ msgstr ""
 msgid "Ordering of this topic in its learning context"
 msgstr ""
 
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
+msgstr ""
+
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
 "Encourage participation and engagement in your course with discussions."
@@ -8426,11 +7995,6 @@ msgstr ""
 #. account using
 #. an invalid email format.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "\"{email}\" is not a valid email address."
-msgstr "\"{email}\" ist keine gültige E-Mail-Adresse."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
 msgstr ""
 
@@ -8488,60 +8052,60 @@ msgstr ""
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your full name."
-msgstr "Geben Sie Ihren vollen Namen ein"
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your first name."
+msgid "Enter your full name"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your last name."
+msgid "Enter your first name"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "The email addresses do not match."
-msgstr "Die E-Mail-Adressen stimmen nicht überein."
+msgid "Enter your last name"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "The email addresses do not match"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your confirm email"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your country or region of residence."
-msgstr "Wählen Sie Ihren aktuellen Wohnsitz."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your profession."
-msgstr "Wählen Sie Ihren Beruf aus."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your specialty."
-msgstr "Wählen Sie Ihr Spezialgebiet."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your profession."
-msgstr "Geben Sie Ihren Bildungsstand ein"
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your specialty."
-msgstr "Geben Sie Ihr Spezialgebiet ein."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your state."
+msgid "Select your country or region of residence"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your city."
-msgstr "Geben Sie die Stadt ein, in der Sie aktuell leben."
+msgid "Select your profession"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Tell us your goals."
-msgstr "Erzählen Sie von Ihren Zielen."
+msgid "Select your specialty"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select the highest level of education you have completed."
-msgstr "Wählen Sie den höchsten Bildungsgrad, den Sie abgeschlossen haben."
+msgid "Enter your profession"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your specialty"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your state"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your city"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Tell us your goals"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Select the highest level of education you have completed"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your year of birth"
@@ -8552,8 +8116,8 @@ msgid "Select your gender"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your mailing address."
-msgstr "Geben Sie Ihre E-Mail Adresse ein."
+msgid "Enter your mailing address"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
@@ -8936,7 +8500,6 @@ msgid ""
 " yet, click {register_label_strong} at the top of the page."
 msgstr ""
 
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -9727,6 +9290,470 @@ msgstr "Anzeigename für diese Komponente"
 msgid "Annotation"
 msgstr "Anmerkung"
 
+#: xmodule/capa/capa_problem.py
+msgid "Cannot rescore problems with possible file submissions"
+msgstr ""
+"Aufgaben mit möglichen Dateieinreichungen können nicht neubewertet werden"
+
+#: xmodule/capa/capa_problem.py
+msgid "Question {}"
+msgstr "Frage {}"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Incorrect"
+msgstr "Falsch"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Correct"
+msgstr "richtig"
+
+#: xmodule/capa/inputtypes.py
+msgid "correct"
+msgstr "richtig"
+
+#: xmodule/capa/inputtypes.py
+msgid "incorrect"
+msgstr "falsch"
+
+#: xmodule/capa/inputtypes.py
+msgid "partially correct"
+msgstr "Teilweise richtig"
+
+#: xmodule/capa/inputtypes.py
+msgid "incomplete"
+msgstr "unvollständig"
+
+#: xmodule/capa/inputtypes.py
+msgid "unanswered"
+msgstr "unbeantwortet"
+
+#: xmodule/capa/inputtypes.py
+msgid "submitted"
+msgstr "eingereicht"
+
+#: xmodule/capa/inputtypes.py
+msgid "processing"
+msgstr "verarbeite"
+
+#. Translators: these are tooltips that indicate the state of an assessment
+#. question
+#: xmodule/capa/inputtypes.py
+msgid "This answer is correct."
+msgstr "Diese Antwort ist richtig. "
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is incorrect."
+msgstr "Diese Anwort ist falsch. "
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is partially correct."
+msgstr "Diese Antwort ist teilweise richtig. "
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is being processed."
+msgstr "Ihre Antwort wird verarbeitet"
+
+#: xmodule/capa/inputtypes.py
+msgid "Not yet answered."
+msgstr "Noch nicht beantwortet"
+
+#: xmodule/capa/inputtypes.py wiki/forms.py
+msgid "Select an option"
+msgstr "Wählen Sie eine Option"
+
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr "Auswahlgruppe: unewartetes Schlagwort {tag_name}"
+
+#: xmodule/capa/inputtypes.py
+msgid "Answer received."
+msgstr "Antwort erhalten."
+
+#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
+#. be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
+msgstr ""
+"Hat ein <choice> or <compoundhint> Schlagwort erwartet; erhielt ein "
+"{given_tag} stattdessen"
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"Deine Dateien wurden erfolgreich übermittelt. Sobald deine Einreichung "
+"benotet wurde, wird diese Nachricht durch die Rückmeldung des Bewerters "
+"ersetzt."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your answer has been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"Deine Antwort wurde übermittelt. Sobald deine Einreichung benotet wurde, "
+"wird diese Nachricht durch die Rückmeldung des Bewerters ersetzt."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{programming_language} editor"
+msgstr "{programming_language} Editor"
+
+#: xmodule/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
+msgstr ""
+"Klicken Sie die ESC- und TAP-Taste oder außerhalb des Codeeditors, um zu "
+"beenden."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Submitted. As soon as a response is returned, this message will be replaced "
+"by that feedback."
+msgstr ""
+"Übertragen. Sobald eine Antwort eingeht, wird diese Nachricht durch das "
+"Feedback ersetzt. "
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+"Keine Antwort von Xqueue innerhalb von {xqueue_timeout} Sekunden. "
+"Abgebrochen."
+
+#: xmodule/capa/inputtypes.py
+msgid "Error running code."
+msgstr "Fehler bei der Ausführung"
+
+#: xmodule/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr "Kann nicht an die Warteschlange anschließen"
+
+#: xmodule/capa/inputtypes.py
+msgid "No formula specified."
+msgstr "Keine Formel festgelegt"
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Couldn't parse formula: {error_msg}"
+msgstr "Kann die Formel nicht verarbeiten: {error_msg}"
+
+#: xmodule/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr "Fehler beim Erstellen der Vorschau"
+
+#: xmodule/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr "Es tut uns leid, Formel konnte nicht verarbeit werden."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr "{input_type}: unerwartetes Schlagwort {tag_name}"
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+"Habe ein {expected_tag} Schlagwort erwartet; erhielt ein {given_tag} "
+"stattdessen"
+
+#. Translators: index here could be 1,2,3 and so on
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Question {index}"
+msgstr "Frage {index} "
+
+#: xmodule/capa/responsetypes.py
+msgid "Correct:"
+msgstr "Richtig:"
+
+#: xmodule/capa/responsetypes.py
+msgid "Incorrect:"
+msgstr "Falsch:"
+
+#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+msgid "Answer"
+msgstr "Antwort"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error {err} in evaluating hint function {hintfn}."
+msgstr "Fehler {err} bei der Auswertung der Hilfestellung {hintfn}."
+
+#: xmodule/capa/responsetypes.py
+msgid "(Source code line unavailable)"
+msgstr "(Quellcodezeile nicht verfügbar)"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "See XML source line {sourcenum}."
+msgstr "Betrachte XML-Quellcodezeile {sourcenum}."
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Checkboxes"
+msgstr "Checkboxen"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Multiple Choice"
+msgstr "Multiple Choice"
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr "Benutze mischen und Antwort-Pool nicht zur gleichen Zeit"
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr "Der Antwort-Pool-Wert sollte eine Ganzzahl sein"
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr ""
+"Die Auswahlgruppe muss wenigstens 1 korrekte und 1 nicht korrekte "
+"Auswahlmöglichkeit enthalten"
+
+#: xmodule/capa/responsetypes.py
+msgid "True/False Choice"
+msgstr "Wahr oder Falsch"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Dropdown"
+msgstr "Dropdown"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Numerical Input"
+msgstr "Zahl Eingabefeld"
+
+#: xmodule/capa/responsetypes.py
+msgid "There was a problem with the staff answer to this problem."
+msgstr ""
+"Es gab ein Problem mit der Mitarbeiterantwort zu dieser Fragestellung. "
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{student_answer}' as a number."
+msgstr "'{student_answer}' konnte nicht als Zahl interpretiert werden."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Factorial function evaluated outside its domain:'{student_answer}'"
+msgstr ""
+"Mathematische Beschreibung, die außerhalb ihrer Domain bewertet wurde: "
+"'{student_answer}'."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid math syntax: '{student_answer}'"
+msgstr "Ungültige mathematische Syntax: '{student_answer}'"
+
+#: xmodule/capa/responsetypes.py
+msgid "You may not use complex numbers in range tolerance problems"
+msgstr ""
+"Komplexe Zahlen sollten nicht in Fragestellungen mit Näherungswerten "
+"verwendet werden."
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. provided a
+#. boundary (end limit) for a variable that is a complex number (a + bi), this
+#. message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: complex boundary."
+msgstr ""
+"Es gab ein Problem mit der Mitarbeiterantwort zu dieser Fragestellung: "
+"komplexe Randbedingungen."
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. did not
+#. provide a boundary (end limit) for a variable, this message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: empty boundary."
+msgstr ""
+"Es gab ein Problem mit der Mitarbeiterantwort zu dieser Fragestellung: leere"
+" Grenzen."
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
+#. Translators: Separator used in StringResponse to display multiple answers.
+#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
+#: xmodule/capa/responsetypes.py lms/templates/course_modes/choose.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "or"
+msgstr "oder"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "Texteingabefeld"
+
+#: xmodule/capa/responsetypes.py
+msgid "error"
+msgstr "Fehler"
+
+#: xmodule/capa/responsetypes.py
+msgid "Custom Evaluated Script"
+msgstr "Individuell ausgewertetes Skript"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error getting student answer from {student_answers}"
+msgstr "Fehler beim Empfang der Teilnehmerantwort von {student_answers}"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr "Keine Antwort eingegeben!"
+
+#: xmodule/capa/responsetypes.py
+msgid "CustomResponse: check function returned an invalid dictionary!"
+msgstr ""
+"Individuelle Antwort: Die Überprüfungsfunktion lieferte ein ungültiges "
+"Wörterbuch zurück!"
+
+#: xmodule/capa/responsetypes.py
+msgid "Symbolic Math Input"
+msgstr "symbolische Formel Eingabe"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
+msgstr ""
+"Ein Fehler ist bei der Symbolantwort aufgetreten. Der Fehler war: "
+"{error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Code Input"
+msgstr "Code-Feld"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer provided."
+msgstr "Keine Antwort angegeben."
+
+#: xmodule/capa/responsetypes.py
+msgid "Error: No grader has been set up for this problem."
+msgstr "Fehler: Kein Bewerter wurde für diese Fragestellung eingerichtet."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
+"try again later."
+msgstr ""
+"Deine Einreichung an den Bewerter konnte nicht ausgeliefert werden (Ursache:"
+" {error_msg}). Bitte versuche es später nocheinmal."
+
+#. Translators: 'grader' refers to the edX automatic code grader.
+#: xmodule/capa/responsetypes.py
+msgid "Invalid grader reply. Please contact the course staff."
+msgstr ""
+"Ungültige Antwort des Bewerters. Bitte benachrichtige die Kursmitarbeiter."
+
+#: xmodule/capa/responsetypes.py
+msgid "External Grader"
+msgstr "Externer Auswerter"
+
+#: xmodule/capa/responsetypes.py
+msgid "Math Expression Input"
+msgstr "Mathematische Eingabe"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Factorial function not permitted in answer for this problem. Provided answer"
+" was: {bad_input}"
+msgstr ""
+"Mathematische Beschreibung nicht erlaubt bei der Beantwortung dieses "
+"Problems. Die gegebene Antwort war: {bad_input}"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula."
+msgstr "Ungültige Eingabe: Konnte '{bad_input}' nicht als Formel verarbeiten."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula"
+msgstr "Ungültige Eingabe: Konnte '{bad_input}' nicht als Formel verarbeiten."
+
+#: xmodule/capa/responsetypes.py
+msgid "Circuit Schematic Builder"
+msgstr "Schaltplanerstellung"
+
+#. Translators: 'SchematicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
+msgstr ""
+"Fehler bei der Bewertung der schematischen Antwort. Der Fehler war: "
+"{error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Image Mapped Input"
+msgstr "Bildabhängige Eingabe"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr "Fehler bei der Bewertung {image_input_id} (input={user_input})"
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+"Fehler in der Fragestellungsspezifikation! Kann kein Rechteck in {sr_coords}"
+" parsen"
+
+#: xmodule/capa/responsetypes.py
+msgid "Annotation Input"
+msgstr "Anmerkungseingabe"
+
+#: xmodule/capa/responsetypes.py
+msgid "Checkboxes With Text Input"
+msgstr "Checkboxes mit Texteingabe"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Answer not provided for {input_type}"
+msgstr "Antwort wurde für {input_type} nicht bereitgestellt"
+
+#: xmodule/capa/responsetypes.py
+msgid "The Staff answer could not be interpreted as a number."
+msgstr "Die Mitarbeiterantwort konnte nicht als Zahl ausgewertet werden."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{given_answer}' as a number."
+msgstr "Kann '{given_answer}' nicht als Zahl auswerten."
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid ""
+"Codejail API Service is unavailable. Please try again in a few minutes."
+msgstr ""
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Codejail API Service invalid response."
+msgstr ""
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Invalid JSON response received from codejail api service."
+msgstr ""
+
 #: xmodule/capa_module.py
 msgid "Blank Advanced Problem"
 msgstr "Leeres fortgeschrittenes Problem"
@@ -10440,20 +10467,6 @@ msgstr ""
 " angeben, indem Sie ihr Attribut \"default\" auf \"true\" setzen. Zum "
 "Beispiel, \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
 "MUS101-course-2015_T1\", \"default\": true}."
-
-#: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "Diskussionen alphabetisch sortieren"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr ""
-"Geben Sie wahr oder falsch ein. Wenn wahr, werden Diskussionskategorien und "
-"Unterkategorien alphabetisch sortiert. Wenn falsch, werden sie chronologisch"
-" nach Erstellungsdatum und -zeit sortiert."
 
 #: xmodule/course_module.py
 msgid "Discussions Plugin Settings"
@@ -12328,7 +12341,7 @@ msgstr ""
 
 #: xmodule/video_module/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
-msgstr "Wir unterstützen nur SubRip (*.srt) Transskriptformate."
+msgstr "Wir unterstützen nur SubRip (*.srt) Transkriptformate."
 
 #: xmodule/video_module/transcripts_utils.py
 #, python-brace-format
@@ -12336,20 +12349,20 @@ msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
 "is {error_message}"
 msgstr ""
-"Wärend des Parsens ist ein Fehler mit der SubRip-Transskriptdatei "
+"Wärend des Parsens ist ein Fehler mit der SubRip-Transkriptdatei "
 "aufgetreten. Interner Fehlerkode {error_message}"
 
 #: xmodule/video_module/transcripts_utils.py
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr ""
-"Wärend des Parsens ist ein Fehler mit der SubRip-Transskriptdatei "
+"Wärend des Parsens ist ein Fehler mit der SubRip-Transkriptdatei "
 "aufgetreten."
 
 #: xmodule/video_module/transcripts_utils.py
 #, python-brace-format
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
-"{exception_message}: Kann die hochgeladenen Transskripte nicht finden: "
+"{exception_message}: Kann die hochgeladenen Transkripte nicht finden: "
 "{user_filename}"
 
 #: xmodule/video_module/video_handlers.py
@@ -12670,6 +12683,14 @@ msgstr ""
 
 #: xmodule/video_module/video_xfields.py
 msgid "Public Access"
+msgstr ""
+
+#: xmodule/video_module/video_xfields.py
+msgid "Add a specific thumbnail for learners to see before playing the video."
+msgstr ""
+
+#: xmodule/video_module/video_xfields.py
+msgid "Thumbnail"
 msgstr ""
 
 #: xmodule/word_cloud_module.py lms/templates/annotatable.html
@@ -13109,6 +13130,10 @@ msgid "Open Response"
 msgstr "Antwort öffnen"
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Library Content"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Leer"
 
@@ -13368,7 +13393,7 @@ msgstr "Die von Ihnen eingegebene Information ist falsch."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" modules."
-msgstr "Transskripte sind nur für \"Video\" Module verfügbar."
+msgstr "Transkripte sind nur für \"Video\" Module verfügbar."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -13396,7 +13421,7 @@ msgstr "Kann kein Item mit diesem Locator finden."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "No such transcript."
-msgstr "Kein solches Transskript vorhanden"
+msgstr "Kein solches Transkript vorhanden"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "There is a problem with the chosen transcript file."
@@ -13855,10 +13880,6 @@ msgstr "name"
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
 msgstr "Abmelden"
-
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "Code Editor"
-msgstr "Code Editor"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
@@ -14895,7 +14916,7 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Downloads and transcripts"
-msgstr "Downloads und Transskripte"
+msgstr "Downloads und Transkripte"
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -14903,7 +14924,7 @@ msgstr "Videodatei herunterladen"
 
 #: lms/templates/video.html
 msgid "Transcripts"
-msgstr "Transskripte"
+msgstr "Transkripte"
 
 #: lms/templates/video.html
 msgid "Download {file}"
@@ -17740,6 +17761,12 @@ msgstr ""
 msgid "Discussion ID: {discussion_id}"
 msgstr "Diskussion ID: {discussion_id}"
 
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid ""
+"The discussion block is disabled for this course as it is not using a "
+"compatible discussion provider."
+msgstr ""
+
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"
 msgstr "Liste der Disskussionsthemen"
@@ -17759,29 +17786,6 @@ msgstr "Alle Diskussionen"
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Posts denen ich Folge"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Welcome to the new discussions experience. Please share your feedback."
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "View legacy experience"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid ""
-"You are currently using the old discussions experience that will be "
-"deprecated soon. If you are facing any issues with the new experience, "
-"please share using the feedback button."
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Switch to new experience"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Share feedback"
-msgstr ""
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -18407,6 +18411,10 @@ msgstr "Wie es funktioniert"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "Schulen"
+
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Register for free"
+msgstr ""
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
@@ -21125,6 +21133,10 @@ msgstr "Geben Sie hier Ihren Verhaltenskodex ein!"
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Copyright Text here!"
 msgstr "Geben Sie hier Ihren Copyright-Text ein!"
+
+#: xmodule/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr "Code Editor"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."

@@ -46,7 +46,7 @@ from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.views import item as item_module
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
     XBlockStudioConfiguration,
@@ -166,35 +166,6 @@ class GetItemTest(ItemTest):
         if content_contains:
             self.assertContains(resp, content_contains, status_code=expected_code)
         return resp
-
-    @ddt.data(
-        (1, 17, 15, 16, 12),
-        (2, 17, 15, 16, 12),
-        (3, 17, 15, 16, 12),
-    )
-    @ddt.unpack
-    def test_get_query_count(self, branching_factor, chapter_queries, section_queries, unit_queries, problem_queries):
-        self.populate_course(branching_factor)
-        # Retrieve it
-        with check_mongo_calls(chapter_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['chapter'][-1]))
-        with check_mongo_calls(section_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['sequential'][-1]))
-        with check_mongo_calls(unit_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['vertical'][-1]))
-        with check_mongo_calls(problem_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
-
-    @ddt.data(
-        (1, 30),
-        (2, 32),
-        (3, 34),
-    )
-    @ddt.unpack
-    def test_container_get_query_count(self, branching_factor, unit_queries,):
-        self.populate_course(branching_factor)
-        with check_mongo_calls(unit_queries):
-            self.client.get(reverse_usage_url('xblock_container_handler', self.populated_usage_keys['vertical'][-1]))
 
     def test_get_vertical(self):
         # Add a vertical
@@ -2159,9 +2130,7 @@ class TestComponentHandler(TestCase):
             CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name'
         )
         self.usage_key_string = str(self.usage_key)
-
-        self.user = UserFactory()
-
+        self.user = StaffFactory(course_key=CourseLocator('dummy_org', 'dummy_course', 'dummy_run'))
         self.request = self.request_factory.get('/dummy-url')
         self.request.user = self.user
 
@@ -2184,7 +2153,6 @@ class TestComponentHandler(TestCase):
         req_factory_method = getattr(self.request_factory, method.lower())
         request = req_factory_method('/dummy-url')
         request.user = self.user
-
         component_handler(request, self.usage_key_string, 'dummy_handler')
 
     @ddt.data(200, 404, 500)
@@ -2197,12 +2165,44 @@ class TestComponentHandler(TestCase):
         self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                          status_code)
 
+    @patch('cms.djangoapps.contentstore.views.component.log')
+    def test_submit_studio_edits_checks_author_permission(self, mock_logger):
+        """
+        Test logging a user without studio write permissions attempts to run a studio submit handler..
+
+        Arguments:
+            mock_logger (object):  A mock logger object.
+        """
+
+        def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
+            """create dummy response"""
+            return Response(status_code=200)
+
+        self.request.user = UserFactory()
+        mock_handler = 'dummy_handler'
+
+        self.descriptor.handle = create_response
+
+        with patch(
+            'cms.djangoapps.contentstore.views.component.is_xblock_aside',
+            return_value=False
+        ), patch("cms.djangoapps.contentstore.views.component.webob_to_django_response"):
+            component_handler(self.request, self.usage_key_string, mock_handler)
+
+        mock_logger.warning.assert_called_with(
+            "%s does not have have studio write permissions on course: %s. write operations not performed on %r",
+            self. request.user.id,
+            UsageKey.from_string(self.usage_key_string).course_key,
+            mock_handler
+        )
+
     @ddt.data((True, True), (False, False),)
     @ddt.unpack
     def test_aside(self, is_xblock_aside, is_get_aside_called):
         """
         test get_aside_from_xblock called
         """
+
         def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
             """create dummy response"""
             return Response(status_code=200)
@@ -2253,6 +2253,9 @@ class TestComponentTemplates(CourseTestCase):
         XBlockStudioConfiguration.objects.create(name='video', enabled=True, support_level="us")
         # ORA Block has it's own category.
         XBlockStudioConfiguration.objects.create(name='openassessment', enabled=True, support_level="us")
+        # Library Sourced Block and Library Content block has it's own category.
+        XBlockStudioConfiguration.objects.create(name='library_sourced', enabled=True, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='library_content', enabled=True, support_level="fs")
         # XBlock masquerading as a problem
         XBlockStudioConfiguration.objects.create(name='drag-and-drop-v2', enabled=True, support_level="fs")
         XBlockStudioConfiguration.objects.create(name='staffgradedxblock', enabled=True, support_level="us")
@@ -2295,6 +2298,7 @@ class TestComponentTemplates(CourseTestCase):
         self._verify_basic_component_display_name("discussion", "Discussion")
         self._verify_basic_component_display_name("video", "Video")
         self._verify_basic_component_display_name("openassessment", "Open Response")
+        self.assertGreater(len(self.get_templates_of_type('library')), 0)
         self.assertGreater(len(self.get_templates_of_type('html')), 0)
         self.assertGreater(len(self.get_templates_of_type('problem')), 0)
         self.assertIsNone(self.get_templates_of_type('advanced'))
@@ -2561,7 +2565,7 @@ class TestXBlockInfo(ItemTest):
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 3, 3),
-        (ModuleStoreEnum.Type.mongo, 5, 7),
+        (ModuleStoreEnum.Type.mongo, 8, 12),
     )
     @ddt.unpack
     def test_xblock_outline_handler_mongo_calls(self, store_type, chapter_queries, chapter_queries_1):

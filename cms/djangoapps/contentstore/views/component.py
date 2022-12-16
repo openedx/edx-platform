@@ -24,6 +24,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
+from cms.djangoapps.contentstore.toggles import use_new_problem_editor
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -41,11 +42,13 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'html', 'openassessment', 'problem', 'video']
+COMPONENT_TYPES = ['discussion', 'library', 'html', 'openassessment', 'problem', 'video']
 
 ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes()} - set(COMPONENT_TYPES))
 
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
+
+LIBRARY_BLOCK_TYPES = settings.LIBRARY_BLOCK_TYPES
 
 CONTAINER_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal",
@@ -93,7 +96,7 @@ def _load_mixed_class(category):
     """
     Load an XBlock by category name, and apply all defined mixins
     """
-    component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
+    component_class = XBlock.load_class(category)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
 
@@ -278,7 +281,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         'html': _("Text"),
         'problem': _("Problem"),
         'video': _("Video"),
-        'openassessment': _("Open Response")
+        'openassessment': _("Open Response"),
+        'library': _("Library Content"),
     }
 
     component_templates = []
@@ -287,8 +291,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     # by the components in the order listed in COMPONENT_TYPES.
     component_types = COMPONENT_TYPES[:]
 
-    # Libraries do not support discussions and openassessment
-    component_not_supported_by_library = ['discussion', 'openassessment']
+    # Libraries do not support discussions and openassessment and other libraries
+    component_not_supported_by_library = ['discussion', 'library', 'openassessment']
     if library:
         component_types = [component for component in component_types
                            if component not in set(component_not_supported_by_library)]
@@ -307,7 +311,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         templates_for_category = []
         component_class = _load_mixed_class(category)
 
-        if support_level_without_template:
+        if support_level_without_template and category != 'library':
             # add the default template with localized display name
             # TODO: Once mixins are defined per-application, rather than per-runtime,
             # this should use a cms mixed-in class. (cpennington)
@@ -350,9 +354,16 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
                             )
                         )
 
+        #If using new problem editor, we select problem type inside the editor
+        # because of this, we only show one problem.
+        if category == 'problem' and use_new_problem_editor():
+            templates_for_category = [
+                template for template in templates_for_category if template['boilerplate_name'] == 'blank_common.yaml'
+            ]
+
         # Add any advanced problem types. Note that these are different xblocks being stored as Advanced Problems,
         # currently not supported in libraries .
-        if category == 'problem' and not library:
+        if category == 'problem' and not library and not use_new_problem_editor():
             disabled_block_names = [block.name for block in disabled_xblocks()]
             advanced_problem_types = [advanced_problem_type for advanced_problem_type in ADVANCED_PROBLEM_TYPES
                                       if advanced_problem_type['component'] not in disabled_block_names]
@@ -379,6 +390,37 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
                                 advanced_component_support_level,
                                 boilerplate_name,
                                 'advanced'
+                            )
+                        )
+                        categories.add(component)
+
+        # Add library block types.
+        if category == 'library' and not library:
+            disabled_block_names = [block.name for block in disabled_xblocks()]
+            library_block_types = [problem_type for problem_type in LIBRARY_BLOCK_TYPES
+                                   if problem_type['component'] not in disabled_block_names]
+            for library_block_type in library_block_types:
+                component = library_block_type['component']
+                boilerplate_name = library_block_type['boilerplate_name']
+                authorable_variations = authorable_xblocks(allow_unsupported=allow_unsupported, name=component)
+                library_component_support_level = component_support_level(
+                    authorable_variations, component, boilerplate_name
+                )
+                if library_component_support_level:
+                    try:
+                        component_display_name = xblock_type_display_name(component, default_display_name=component)
+                    except PluginMissingError:
+                        log.warning(
+                            "Unable to load xblock type %s to read display_name",
+                            component
+                        )
+                    else:
+                        templates_for_category.append(
+                            create_template_dict(
+                                component_display_name,
+                                component,
+                                library_component_support_level,
+                                boilerplate_name
                             )
                         )
                         categories.add(component)
@@ -525,6 +567,18 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 
     # unintentional update to handle any side effects of handle call
     # could potentially be updating actual course data or simply caching its values
-    modulestore().update_item(descriptor, request.user.id, asides=asides)
+    # Addendum:
+    # TNL 101-62 studio write permission is also checked for editing content.
+
+    if has_course_author_access(request.user, usage_key.course_key):
+        modulestore().update_item(descriptor, request.user.id, asides=asides)
+    else:
+        #fail quietly if user is not course author.
+        log.warning(
+            "%s does not have have studio write permissions on course: %s. write operations not performed on %r",
+            request.user.id,
+            usage_key.course_key,
+            handler
+        )
 
     return webob_to_django_response(resp)

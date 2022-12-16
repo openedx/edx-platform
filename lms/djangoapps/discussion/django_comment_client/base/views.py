@@ -5,7 +5,6 @@ import logging
 import random
 import time
 
-import eventtracking
 import six
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -15,11 +14,13 @@ from django.utils.translation import gettext as _
 from django.views.decorators import csrf
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_GET, require_POST
+from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
 import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.util.file import store_uploaded_file
+from common.djangoapps.track import contexts
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_overview_with_access, get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -91,7 +92,9 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
         role.role for role in user.courseaccessrole_set.filter(course_id=course.id)
     ]
 
-    eventtracking.tracker.emit(event_name, data)
+    context = contexts.course_context_from_course_id(course.id)
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(event_name, data)
 
 
 def track_created_event(request, event_name, course, obj, data):
@@ -164,6 +167,17 @@ def track_voted_event(request, course, obj, vote_value, undo_vote=False):
     track_forum_event(request, event_name, course, obj, event_data)
 
 
+def track_forum_search_event(request, course, search_event_data):
+    """
+    Send analytics event for discussions related search.
+    """
+    event_name = 'edx.forum.searched'
+
+    context = contexts.course_context_from_course_id(course.id)
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(event_name, search_event_data)
+
+
 def track_thread_viewed_event(request, course, thread):
     """
     Send analytics event for a viewed thread.
@@ -175,6 +189,234 @@ def track_thread_viewed_event(request, course, thread):
         event_data['target_username'] = thread.get('username', '')
     add_truncated_title_to_event_data(event_data, thread.get('title', ''))
     track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_thread_lock_unlock_event(request, course, thread, close_reason_code, locked=True):
+    """
+    Triggers edx.forum.thread.locked  and edx.forum.thread.unlocked tracking event
+    """
+    event_name = f'edx.forum.thread.{"locked" if locked else "unlocked"}'
+    event_data = {
+        'target_username': thread.get('username'),
+        'lock_reason': close_reason_code,
+        'commentable_id': thread.get('commentable_id', ''),
+        'team_id': get_team(thread.commentable_id),
+    }
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_thread_edited_event(request, course, thread, edit_reason_code):
+    """
+    Send analytics event for an edited thread.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='edited')
+    own_content = str(request.user.id) == thread['user_id']
+    event_data = {
+        'target_username': thread.get('username'),
+        'content_type': 'Post',
+        'own_content': own_content,
+        'edit_reason': edit_reason_code,
+        'commentable_id': thread.get('commentable_id', ''),
+    }
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_comment_edited_event(request, course, comment, edit_reason_code):
+    """
+    Send analytics event for an edited response or comment.
+    """
+    obj_type = 'comment' if comment.get('parent_id') else 'response'
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='edited')
+    own_content = str(request.user.id) == comment['user_id']
+    event_data = {
+        'target_username': comment.get('username'),
+        'own_content': own_content,
+        'content_type': obj_type.capitalize(),
+        'edit_reason': edit_reason_code,
+        'commentable_id': comment.get('commentable_id', ''),
+    }
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
+def track_thread_deleted_event(request, course, thread):
+    """
+    Send analytics event for a deleted thread.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='deleted')
+    own_content = str(request.user.id) == thread['user_id']
+    event_data = {
+        'body': thread.body[:TRACKING_MAX_FORUM_BODY],
+        'content_type': 'Post',
+        'own_content': own_content,
+        'commentable_id': thread.get('commentable_id', ''),
+    }
+    if hasattr(thread, 'username'):
+        event_data['target_username'] = thread.get('username', '')
+    add_truncated_title_to_event_data(event_data, thread.get('title', ''))
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_comment_deleted_event(request, course, comment):
+    """
+    Send analytics event for a deleted response or comment.
+    """
+    obj_type = 'comment' if comment.get('parent_id') else 'response'
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='deleted')
+    own_content = str(request.user.id) == comment["user_id"]
+    event_data = {
+        'body': comment.body[:TRACKING_MAX_FORUM_BODY],
+        'commentable_id': comment.get('commentable_id', ''),
+        'content_type': obj_type.capitalize(),
+        'own_content': own_content,
+    }
+    if hasattr(comment, 'username'):
+        event_data['target_username'] = comment.get('username', '')
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
+def track_thread_reported_event(request, course, thread):
+    """
+    Send analytics event for a reported thread.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='reported')
+    event_data = {
+        'body': thread.body[:TRACKING_MAX_FORUM_BODY],
+        'truncated': len(thread.body) > TRACKING_MAX_FORUM_BODY,
+        'content_type': 'Post',
+        'commentable_id': thread.get('commentable_id', ''),
+        'thread_type': thread.get('thread_type', ''),
+        'group_id': thread.get('group_id', ''),
+    }
+    if hasattr(thread, 'username'):
+        event_data['target_username'] = thread.get('username', '')
+    add_truncated_title_to_event_data(event_data, thread.get('title', ''))
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_comment_reported_event(request, course, comment):
+    """
+    Send analytics event for a reported response or comment.
+    """
+    obj_type = 'comment' if comment.get('parent_id') else 'response'
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='reported')
+    event_data = {
+        'body': comment.body[:TRACKING_MAX_FORUM_BODY],
+        'truncated': len(comment.body) > TRACKING_MAX_FORUM_BODY,
+        'commentable_id': comment.get('commentable_id', ''),
+        'content_type': obj_type.capitalize(),
+    }
+    if hasattr(comment, 'username'):
+        event_data['target_username'] = comment.get('username', '')
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
+def track_thread_unreported_event(request, course, thread):
+    """
+    Send analytics event for a unreported thread.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='unreported')
+    event_data = {
+        'body': thread.body[:TRACKING_MAX_FORUM_BODY],
+        'truncated': len(thread.body) > TRACKING_MAX_FORUM_BODY,
+        'content_type': 'Post',
+        'commentable_id': thread.get('commentable_id', ''),
+        'reported_status_cleared': not bool(thread.get('abuse_flaggers', [])),
+        'thread_type': thread.get('thread_type', ''),
+        'group_id': thread.get('group_id', ''),
+
+    }
+    if hasattr(thread, 'username'):
+        event_data['target_username'] = thread.get('username', '')
+    add_truncated_title_to_event_data(event_data, thread.get('title', ''))
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_comment_unreported_event(request, course, comment):
+    """
+    Send analytics event for a unreported response or comment.
+    """
+    obj_type = 'comment' if comment.get('parent_id') else 'response'
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='unreported')
+    event_data = {
+        'body': comment.body[:TRACKING_MAX_FORUM_BODY],
+        'truncated': len(comment.body) > TRACKING_MAX_FORUM_BODY,
+        'commentable_id': comment.get('commentable_id', ''),
+        'content_type': obj_type.capitalize(),
+        'reported_status_cleared': not bool(comment.get('abuse_flaggers', [])),
+    }
+    if hasattr(comment, 'username'):
+        event_data['target_username'] = comment.get('username', '')
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
+def track_response_mark_event(request, course, comment, commentable_id, thread_type):
+    """
+    Send analytics event for response that is marked as endorsed or answered.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='response', action_name='mark')
+    if thread_type == 'question':
+        mark_type = 'Answer'
+    else:
+        mark_type = 'Endorse'
+    event_data = {
+        'discussion': {'id': comment.thread_id},
+        'commentable_id': commentable_id,
+        'mark_type': mark_type,
+        'target_username': comment.get('username')
+    }
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
+def track_response_unmark_event(request, course, comment, commentable_id, thread_type):
+    """
+    Send analytics event for response that is marked as unendorsed or unanswered.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='response', action_name='unmark')
+    if thread_type == 'question':
+        mark_type = 'Answer'
+    else:
+        mark_type = 'Endorse'
+    event_data = {
+        'discussion': {'id': comment.thread_id},
+        'commentable_id': commentable_id,
+        'mark_type': mark_type,
+        'target_username': comment.get('username'),
+    }
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
+def track_discussion_reported_event(request, course, cc_content):
+    """
+    Helper method for discussion reported events.
+    """
+    if cc_content.type == 'thread':
+        track_thread_reported_event(request, course, cc_content)
+    else:
+        track_comment_reported_event(request, course, cc_content)
+
+
+def track_discussion_unreported_event(request, course, cc_content):
+    """
+    Helper method for discussion unreported events.
+    """
+    if cc_content.type == 'thread':
+        track_thread_unreported_event(request, course, cc_content)
+    else:
+        track_comment_unreported_event(request, course, cc_content)
+
+
+def track_forum_response_mark_event(request, course, cc_content, value):
+    """
+    Helper method for discussions response mark event
+    """
+    thread = cc.Thread.find(cc_content.thread_id)
+    commentable_id = thread.get('commentable_id')
+    thread_type = thread.get('thread_type')
+
+    if value:
+        track_response_mark_event(request, course, cc_content, commentable_id, thread_type)
+    else:
+        track_response_unmark_event(request, course, cc_content, commentable_id, thread_type)
 
 
 def permitted(func):
@@ -332,11 +574,11 @@ def update_thread(request, course_id, thread_id):
     user = request.user
     # The following checks should avoid issues we've seen during deploys, where end users are hitting an updated server
     # while their browser still has the old client code. This will avoid erasing present values in those cases.
+    course = get_course_with_access(user, 'load', course_key)
     if "thread_type" in request.POST:
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
         commentable_id = request.POST["commentable_id"]
-        course = get_course_with_access(user, 'load', course_key)
         if thread_context == "course" and not discussion_category_id_access(course, user, commentable_id):
             return JsonError(_("Topic doesn't exist"))
         else:
@@ -346,6 +588,7 @@ def update_thread(request, course_id, thread_id):
 
     thread_edited.send(sender=None, user=user, post=thread)
 
+    track_thread_edited_event(request, course, thread, None)
     if request.is_ajax():
         return ajax_content_response(request, course_key, thread.to_dict())
     else:
@@ -424,9 +667,12 @@ def delete_thread(request, course_id, thread_id):
     this is ajax only
     """
     course_key = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     thread = cc.Thread.find(thread_id)
     thread.delete()
     thread_deleted.send(sender=None, user=request.user, post=thread)
+
+    track_thread_deleted_event(request, course, thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 
@@ -439,6 +685,7 @@ def update_comment(request, course_id, comment_id):
     handles static and ajax submissions
     """
     course_key = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     comment = cc.Comment.find(comment_id)
     if 'body' not in request.POST or not request.POST['body'].strip():
         return JsonError(_("Body can't be empty"))
@@ -447,6 +694,7 @@ def update_comment(request, course_id, comment_id):
 
     comment_edited.send(sender=None, user=request.user, post=comment)
 
+    track_comment_edited_event(request, course, comment, None)
     if request.is_ajax():
         return ajax_content_response(request, course_key, comment.to_dict())
     else:
@@ -463,11 +711,14 @@ def endorse_comment(request, course_id, comment_id):
     """
     course_key = CourseKey.from_string(course_id)
     comment = cc.Comment.find(comment_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     user = request.user
-    comment.endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
+    endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
+    comment.endorsed = endorsed
     comment.endorsement_user_id = user.id
     comment.save()
     comment_endorsed.send(sender=None, user=user, post=comment)
+    track_forum_response_mark_event(request, course, comment, endorsed)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
@@ -480,10 +731,13 @@ def openclose_thread(request, course_id, thread_id):
     ajax only
     """
     course_key = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     thread = cc.Thread.find(thread_id)
-    thread.closed = request.POST.get('closed', 'false').lower() == 'true'
+    close_thread = request.POST.get('closed', 'false').lower() == 'true'
+    thread.closed = close_thread
     thread.save()
 
+    track_thread_lock_unlock_event(request, course, thread, None, close_thread)
     return JsonResponse({
         'content': prepare_content(thread.to_dict(), course_key),
         'ability': get_ability(course_key, thread.to_dict(), request.user),
@@ -512,9 +766,11 @@ def delete_comment(request, course_id, comment_id):
     ajax only
     """
     course_key = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     comment = cc.Comment.find(comment_id)
     comment.delete()
     comment_deleted.send(sender=None, user=request.user, post=comment)
+    track_comment_deleted_event(request, course, comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
@@ -595,9 +851,10 @@ def flag_abuse_for_thread(request, course_id, thread_id):
     """
     course_key = CourseKey.from_string(course_id)
     user = cc.User.from_django_user(request.user)
+    course = get_course_by_id(course_key)
     thread = cc.Thread.find(thread_id)
     thread.flagAbuse(user, thread)
-
+    track_discussion_reported_event(request, course, thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 
@@ -618,7 +875,7 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
         has_access(request.user, 'staff', course)
     )
     thread.unFlagAbuse(user, thread, remove_all)
-
+    track_discussion_unreported_event(request, course, thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 
@@ -632,8 +889,10 @@ def flag_abuse_for_comment(request, course_id, comment_id):
     """
     course_key = CourseKey.from_string(course_id)
     user = cc.User.from_django_user(request.user)
+    course = get_course_by_id(course_key)
     comment = cc.Comment.find(comment_id)
     comment.flagAbuse(user, comment)
+    track_discussion_reported_event(request, course, comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
@@ -654,6 +913,7 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     )
     comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user, comment, remove_all)
+    track_discussion_unreported_event(request, course, comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 

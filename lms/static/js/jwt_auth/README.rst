@@ -1,8 +1,8 @@
 Responsibilities
 ================
-The code in the jwt_auth folder was pulled from https://github.com/edx/frontend-platform/tree/master/src/auth
+The code in the jwt_auth folder was pulled from https://github.com/openedx/frontend-platform/tree/master/src/auth
 
-Primarily the code required to use https://github.com/edx/frontend-platform/blob/master/src/auth/AxiosJwtTokenService.js
+Primarily the code required to use https://github.com/openedx/frontend-platform/blob/master/src/auth/AxiosJwtTokenService.js
 
 This code will require updates if changes are made in the AxiosJwtTokenService.
 

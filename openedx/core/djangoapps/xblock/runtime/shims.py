@@ -4,18 +4,16 @@ Code to implement backwards compatibility
 # pylint: disable=no-member
 
 import warnings
-
 from django.conf import settings
 from django.core.cache import cache
 from django.template import TemplateDoesNotExist
 from django.utils.functional import cached_property
 from fs.memoryfs import MemoryFS
 
-from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-
-from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.edxmako.shortcuts import render_to_string
+from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.student.models import anonymous_id_for_user
+from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
 
 class RuntimeShim:
@@ -156,7 +154,7 @@ class RuntimeShim:
 
     def process_xml(self, xml):
         """
-        Code to handle parsing of child XML for old blocks that use XmlParserMixin.
+        Code to handle parsing of child XML for old blocks that use XmlMixin.
         """
         # We can't parse XML in a vacuum - we need to know the parent block and/or the
         # OLX file that holds this XML in order to generate useful definition keys etc.
@@ -235,10 +233,12 @@ class RuntimeShim:
     def STATIC_URL(self):
         """
         Get the django STATIC_URL path.
-
-        Seems only to be used by capa. Remove this if capa can be refactored.
+        Deprecated in favor of the settings.STATIC_URL configuration.
         """
-        # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
+        warnings.warn(
+            'runtime.STATIC_URL is deprecated. Please use settings.STATIC_URL instead.',
+            DeprecationWarning, stacklevel=3,
+        )
         static_url = settings.STATIC_URL
         if static_url.startswith('/') and not static_url.startswith('//'):
             # This is not a full URL - should start with https:// to support loading assets from an iframe sandbox
@@ -296,19 +296,6 @@ class RuntimeShim:
         except KeyError:
             result['default_value'] = field.to_json(field.default)
         return result
-
-    def track_function(self, title, event_info):
-        """
-        Publish an event to the tracking log.
-
-        This is deprecated in favor of runtime.publish
-        See https://git.io/JeGLf and https://git.io/JeGLY for context.
-        """
-        warnings.warn(
-            "runtime.track_function is deprecated. Use runtime.publish() instead.",
-            DeprecationWarning, stacklevel=2,
-        )
-        self.publish(self._active_block, title, event_info)
 
     @property
     def user_location(self):

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-31 20:34+0000\n"
-"PO-Revision-Date: 2022-07-31 20:34:55.000738\n"
+"POT-Creation-Date: 2022-12-11 20:35+0000\n"
+"PO-Revision-Date: 2022-12-11 20:35:43.789635\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2075,6 +2075,10 @@ msgid "Help Center"
 msgstr "Ħǝld Ȼǝnʇǝɹ"
 
 #: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr "Sǝɔnɹᴉʇʎ"
+
+#: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "Mǝdᴉɐ Ꝁᴉʇ"
@@ -2687,6 +2691,26 @@ msgstr ""
 "Ⱥ ɹǝɟnnd ɹǝbnǝsʇ ɥɐs bǝǝn ᴉnᴉʇᴉɐʇǝd ɟøɹ {username} ({email}). Ŧø dɹøɔǝss "
 "ʇɥᴉs ɹǝbnǝsʇ, dlǝɐsǝ ʌᴉsᴉʇ ʇɥǝ lᴉnʞ(s) bǝløʍ."
 
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Practice Exam"
+msgstr "Ᵽɹɐɔʇᴉɔǝ Ɇxɐɯ"
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Proctored Exam"
+msgstr "Ᵽɹøɔʇøɹǝd Ɇxɐɯ"
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Timed Exam"
+msgstr "Ŧᴉɯǝd Ɇxɐɯ"
+
+#: lms/djangoapps/course_api/blocks/transformers/milestones.py
+#: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
+msgid "Exam"
+msgstr "Ɇxɐɯ"
+
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
@@ -2920,6 +2944,17 @@ msgstr "Ɏøn dø nøʇ ɥɐʌǝ ɐɔɔǝss ʇø ʇɥᴉs ɔønɹsǝ øn ɐ ɯø
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be enrolled in the course"
 msgstr "Ɏøn ɯnsʇ bǝ ǝnɹøllǝd ᴉn ʇɥǝ ɔønɹsǝ"
+
+#: lms/djangoapps/courseware/access_response.py
+#, python-brace-format
+msgid ""
+"You are enrolled in this course with '{enrollment_enterprise_name}'. "
+"However, you are currently logged in as a '{active_enterprise_name}' user. "
+"Please log in with '{enrollment_enterprise_name}' to access this course."
+msgstr ""
+"Ɏøn ɐɹǝ ǝnɹøllǝd ᴉn ʇɥᴉs ɔønɹsǝ ʍᴉʇɥ '{enrollment_enterprise_name}'. "
+"Ħøʍǝʌǝɹ, ʎøn ɐɹǝ ɔnɹɹǝnʇlʎ løƃƃǝd ᴉn ɐs ɐ '{active_enterprise_name}' nsǝɹ. "
+"Ᵽlǝɐsǝ løƃ ᴉn ʍᴉʇɥ '{enrollment_enterprise_name}' ʇø ɐɔɔǝss ʇɥᴉs ɔønɹsǝ."
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must give Data Sharing Consent for the course"
@@ -7275,6 +7310,11 @@ msgstr "Wɥǝʇɥǝɹ ʇɥᴉs ʇødᴉɔ sɥønld bǝ sɥøʍn ᴉn-ɔønʇǝx�
 msgid "Ordering of this topic in its learning context"
 msgstr "Øɹdǝɹᴉnƃ øɟ ʇɥᴉs ʇødᴉɔ ᴉn ᴉʇs lǝɐɹnᴉnƃ ɔønʇǝxʇ"
 
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
+msgstr ""
+"Ⱥddᴉʇᴉønɐl ɔønʇǝxʇ ɟøɹ ʇɥᴉs ʇødᴉɔ, snɔɥ ɐs ᴉʇs sǝɔʇᴉøn, ɐnd snbsǝɔʇᴉøn"
+
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
 "Encourage participation and engagement in your course with discussions."
@@ -7851,11 +7891,6 @@ msgstr ""
 #. account using
 #. an invalid email format.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "\"{email}\" is not a valid email address."
-msgstr "\"{email}\" ᴉs nøʇ ɐ ʌɐlᴉd ǝɯɐᴉl ɐddɹǝss."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
 msgstr "Ɇnʇǝɹ ɐ ʌɐlᴉd ǝɯɐᴉl ɐddɹǝss"
 
@@ -7915,60 +7950,60 @@ msgstr "Ɇnʇǝɹ ɐ ʌɐlᴉd ǝɯɐᴉl ɐddɹǝss ʇɥɐʇ ɔønʇɐᴉns ɐ�
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your full name."
-msgstr "Ɇnʇǝɹ ʎønɹ ɟnll nɐɯǝ."
+msgid "Enter your full name"
+msgstr "Ɇnʇǝɹ ʎønɹ ɟnll nɐɯǝ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your first name."
-msgstr "Ɇnʇǝɹ ʎønɹ ɟᴉɹsʇ nɐɯǝ."
+msgid "Enter your first name"
+msgstr "Ɇnʇǝɹ ʎønɹ ɟᴉɹsʇ nɐɯǝ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your last name."
-msgstr "Ɇnʇǝɹ ʎønɹ lɐsʇ nɐɯǝ."
+msgid "Enter your last name"
+msgstr "Ɇnʇǝɹ ʎønɹ lɐsʇ nɐɯǝ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "The email addresses do not match."
-msgstr "Ŧɥǝ ǝɯɐᴉl ɐddɹǝssǝs dø nøʇ ɯɐʇɔɥ."
+msgid "The email addresses do not match"
+msgstr "Ŧɥǝ ǝɯɐᴉl ɐddɹǝssǝs dø nøʇ ɯɐʇɔɥ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your confirm email"
 msgstr "Ɇnʇǝɹ ʎønɹ ɔønɟᴉɹɯ ǝɯɐᴉl"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your country or region of residence."
-msgstr "Sǝlǝɔʇ ʎønɹ ɔønnʇɹʎ øɹ ɹǝƃᴉøn øɟ ɹǝsᴉdǝnɔǝ."
+msgid "Select your country or region of residence"
+msgstr "Sǝlǝɔʇ ʎønɹ ɔønnʇɹʎ øɹ ɹǝƃᴉøn øɟ ɹǝsᴉdǝnɔǝ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your profession."
-msgstr "Sǝlǝɔʇ ʎønɹ dɹøɟǝssᴉøn."
+msgid "Select your profession"
+msgstr "Sǝlǝɔʇ ʎønɹ dɹøɟǝssᴉøn"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your specialty."
-msgstr "Sǝlǝɔʇ ʎønɹ sdǝɔᴉɐlʇʎ."
+msgid "Select your specialty"
+msgstr "Sǝlǝɔʇ ʎønɹ sdǝɔᴉɐlʇʎ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your profession."
-msgstr "Ɇnʇǝɹ ʎønɹ dɹøɟǝssᴉøn."
+msgid "Enter your profession"
+msgstr "Ɇnʇǝɹ ʎønɹ dɹøɟǝssᴉøn"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your specialty."
-msgstr "Ɇnʇǝɹ ʎønɹ sdǝɔᴉɐlʇʎ."
+msgid "Enter your specialty"
+msgstr "Ɇnʇǝɹ ʎønɹ sdǝɔᴉɐlʇʎ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your state."
-msgstr "Ɇnʇǝɹ ʎønɹ sʇɐʇǝ."
+msgid "Enter your state"
+msgstr "Ɇnʇǝɹ ʎønɹ sʇɐʇǝ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your city."
-msgstr "Ɇnʇǝɹ ʎønɹ ɔᴉʇʎ."
+msgid "Enter your city"
+msgstr "Ɇnʇǝɹ ʎønɹ ɔᴉʇʎ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Tell us your goals."
-msgstr "Ŧǝll ns ʎønɹ ƃøɐls."
+msgid "Tell us your goals"
+msgstr "Ŧǝll ns ʎønɹ ƃøɐls"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select the highest level of education you have completed."
-msgstr "Sǝlǝɔʇ ʇɥǝ ɥᴉƃɥǝsʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn ʎøn ɥɐʌǝ ɔøɯdlǝʇǝd."
+msgid "Select the highest level of education you have completed"
+msgstr "Sǝlǝɔʇ ʇɥǝ ɥᴉƃɥǝsʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn ʎøn ɥɐʌǝ ɔøɯdlǝʇǝd"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your year of birth"
@@ -7979,8 +8014,8 @@ msgid "Select your gender"
 msgstr "Sǝlǝɔʇ ʎønɹ ƃǝndǝɹ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your mailing address."
-msgstr "Ɇnʇǝɹ ʎønɹ ɯɐᴉlᴉnƃ ɐddɹǝss."
+msgid "Enter your mailing address"
+msgstr "Ɇnʇǝɹ ʎønɹ ɯɐᴉlᴉnƃ ɐddɹǝss"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
@@ -8371,7 +8406,6 @@ msgstr ""
 " ʎǝʇ, ɔlᴉɔʞ {register_label_strong} ɐʇ ʇɥǝ ʇød øɟ ʇɥǝ dɐƃǝ."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -8485,6 +8519,14 @@ msgstr "Søɯǝ ǝɹɹøɹ øɔɔnɹɹǝd dnɹᴉnƃ dɐssʍøɹd ɔɥɐnƃǝ. �
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "Nø ǝɯɐᴉl ɐddɹǝss dɹøʌᴉdǝd."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
+"Ⱥn ǝɹɹøɹ ɥɐs øɔɔnɹɹǝd. Ŧɹʎ ɹǝɟɹǝsɥᴉnƃ ʇɥǝ dɐƃǝ, øɹ ɔɥǝɔʞ ʎønɹ ᴉnʇǝɹnǝʇ "
+"ɔønnǝɔʇᴉøn."
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -10266,20 +10308,6 @@ msgstr ""
 "ɔɐʇǝƃøɹʎ ɐs ʇɥǝ dǝɟɐnlʇ ɟøɹ nǝʍ døsʇs ᴉn ʇɥǝ Đᴉsɔnssᴉøn dɐƃǝ bʎ sǝʇʇᴉnƃ ᴉʇs "
 "\"dǝɟɐnlʇ\" ɐʇʇɹᴉbnʇǝ ʇø ʇɹnǝ. Føɹ ǝxɐɯdlǝ, \"Łʎdᴉɐn Mødǝ\": {\"id\": "
 "\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
-
-#: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "Đᴉsɔnssᴉøn Søɹʇᴉnƃ Ⱥldɥɐbǝʇᴉɔɐl"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr ""
-"Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, dᴉsɔnssᴉøn ɔɐʇǝƃøɹᴉǝs ɐnd snbɔɐʇǝƃøɹᴉǝs ɐɹǝ "
-"søɹʇǝd ɐldɥɐbǝʇᴉɔɐllʎ. Ɨɟ ɟɐlsǝ, ʇɥǝʎ ɐɹǝ søɹʇǝd ɔɥɹønøløƃᴉɔɐllʎ bʎ ɔɹǝɐʇᴉøn"
-" dɐʇǝ ɐnd ʇᴉɯǝ."
 
 #: xmodule/course_module.py
 msgid "Discussions Plugin Settings"
@@ -12420,6 +12448,15 @@ msgstr "Sdǝɔᴉɟʎ ʍɥǝʇɥǝɹ ʇɥǝ ʌᴉdǝø ɔɐn bǝ ɐɔɔǝssǝd d
 msgid "Public Access"
 msgstr "Ᵽnblᴉɔ Ⱥɔɔǝss"
 
+#: xmodule/video_module/video_xfields.py
+msgid "Add a specific thumbnail for learners to see before playing the video."
+msgstr ""
+"Ⱥdd ɐ sdǝɔᴉɟᴉɔ ʇɥnɯbnɐᴉl ɟøɹ lǝɐɹnǝɹs ʇø sǝǝ bǝɟøɹǝ dlɐʎᴉnƃ ʇɥǝ ʌᴉdǝø."
+
+#: xmodule/video_module/video_xfields.py
+msgid "Thumbnail"
+msgstr "Ŧɥnɯbnɐᴉl"
+
 #: xmodule/word_cloud_module.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
@@ -12853,6 +12890,10 @@ msgstr "{platform_name} Snddøɹʇ Łǝʌǝls:"
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"
 msgstr "Ødǝn Ɍǝsdønsǝ"
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Library Content"
+msgstr "Łᴉbɹɐɹʎ Ȼønʇǝnʇ"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -17388,6 +17429,14 @@ msgstr ""
 msgid "Discussion ID: {discussion_id}"
 msgstr "Đᴉsɔnssᴉøn ƗĐ: {discussion_id}"
 
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid ""
+"The discussion block is disabled for this course as it is not using a "
+"compatible discussion provider."
+msgstr ""
+"Ŧɥǝ dᴉsɔnssᴉøn bløɔʞ ᴉs dᴉsɐblǝd ɟøɹ ʇɥᴉs ɔønɹsǝ ɐs ᴉʇ ᴉs nøʇ nsᴉnƃ ɐ "
+"ɔøɯdɐʇᴉblǝ dᴉsɔnssᴉøn dɹøʌᴉdǝɹ."
+
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"
 msgstr "Đᴉsɔnssᴉøn ʇødᴉɔs lᴉsʇ"
@@ -17407,33 +17456,6 @@ msgstr "Ⱥll Đᴉsɔnssᴉøns"
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Ᵽøsʇs Ɨ'ɯ Følløʍᴉnƃ"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Welcome to the new discussions experience. Please share your feedback."
-msgstr ""
-"Wǝlɔøɯǝ ʇø ʇɥǝ nǝʍ dᴉsɔnssᴉøns ǝxdǝɹᴉǝnɔǝ. Ᵽlǝɐsǝ sɥɐɹǝ ʎønɹ ɟǝǝdbɐɔʞ."
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "View legacy experience"
-msgstr "Vᴉǝʍ lǝƃɐɔʎ ǝxdǝɹᴉǝnɔǝ"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid ""
-"You are currently using the old discussions experience that will be "
-"deprecated soon. If you are facing any issues with the new experience, "
-"please share using the feedback button."
-msgstr ""
-"Ɏøn ɐɹǝ ɔnɹɹǝnʇlʎ nsᴉnƃ ʇɥǝ øld dᴉsɔnssᴉøns ǝxdǝɹᴉǝnɔǝ ʇɥɐʇ ʍᴉll bǝ "
-"dǝdɹǝɔɐʇǝd søøn. Ɨɟ ʎøn ɐɹǝ ɟɐɔᴉnƃ ɐnʎ ᴉssnǝs ʍᴉʇɥ ʇɥǝ nǝʍ ǝxdǝɹᴉǝnɔǝ, "
-"dlǝɐsǝ sɥɐɹǝ nsᴉnƃ ʇɥǝ ɟǝǝdbɐɔʞ bnʇʇøn."
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Switch to new experience"
-msgstr "Sʍᴉʇɔɥ ʇø nǝʍ ǝxdǝɹᴉǝnɔǝ"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Share feedback"
-msgstr "Sɥɐɹǝ ɟǝǝdbɐɔʞ"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -18040,6 +18062,10 @@ msgstr "Ħøʍ ᴉʇ Wøɹʞs"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "Sɔɥøøls"
+
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Register for free"
+msgstr "Ɍǝƃᴉsʇǝɹ ɟøɹ ɟɹǝǝ"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
@@ -19204,6 +19230,14 @@ msgstr ""
 "Ƀǝɟøɹǝ ʎøn sǝnd ʎønɹ ǝɯɐᴉl, ɹǝʌᴉǝʍ ʇɥǝ ʇǝxʇ ɔɐɹǝɟnllʎ ɐnd sǝnd ᴉʇ ʇø "
 "ʎønɹsǝlɟ ɟᴉɹsʇ, sø ʇɥɐʇ ʎøn ɔɐn dɹǝʌᴉǝʍ ʇɥǝ ɟøɹɯɐʇʇᴉnƃ ɐnd ɯɐʞǝ snɹǝ "
 "ǝɯbǝddǝd ᴉɯɐƃǝs ɐnd lᴉnʞs ʍøɹʞ ɔøɹɹǝɔʇlʎ."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
+"Ɏøn ɔɐn ᴉnɔlndǝ ʞǝʎʍøɹds ᴉn ʎønɹ ɯǝssɐƃǝs. Føɹ lᴉsʇ øɟ ɐʌɐᴉlɐblǝ ʞǝʎʍøɹds "
+"sǝǝ ʇɥǝ {start_link}døɔnɯǝnʇɐʇᴉøn{end_link}."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

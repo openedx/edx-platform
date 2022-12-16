@@ -15,9 +15,10 @@ from xblock.fields import UNIQUE_ID, Scope, String
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_utils import get_css_dependencies, get_js_dependencies
-from xmodule.xml_module import XmlParserMixin
+from xmodule.xml_module import XmlMixin
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
@@ -33,7 +34,7 @@ def _(text):
 @XBlock.needs('user')  # pylint: disable=abstract-method
 @XBlock.needs('i18n')
 @XBlock.needs('mako')
-class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
+class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     Provides a discussion forum that is inline with other content in the courseware.
     """
@@ -72,14 +73,15 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
 
     @property
     def course_key(self):
-        """
-        :return: int course id
-
-        NB: The goal is to move this XBlock out of edx-platform, and so we use
-        scope_ids.usage_id instead of runtime.course_id so that the code will
-        continue to work with workbench-based testing.
-        """
         return getattr(self.scope_ids.usage_id, 'course_key', None)
+
+    @property
+    def is_visible(self):
+        """
+        Discussion Xblock does not support new OPEN_EDX provider
+        """
+        provider = DiscussionsConfiguration.get(self.course_key)
+        return provider.provider_type == Provider.LEGACY
 
     @property
     def django_user(self):
@@ -162,8 +164,11 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         Renders student view for LMS.
         """
         fragment = Fragment()
-        self.add_resource_urls(fragment)
 
+        if not self.is_visible:
+            return fragment
+
+        self.add_resource_urls(fragment)
         login_msg = ''
 
         if not self.django_user.is_authenticated:
@@ -210,7 +215,10 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         fragment = Fragment()
         fragment.add_content(self.runtime.service(self, 'mako').render_template(
             'discussion/_discussion_inline_studio.html',
-            {'discussion_id': self.discussion_id}
+            {
+                'discussion_id': self.discussion_id,
+                'is_visible': self.is_visible,
+            }
         ))
         return fragment
 

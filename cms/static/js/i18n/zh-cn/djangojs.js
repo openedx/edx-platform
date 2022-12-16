@@ -1967,7 +1967,6 @@
     "Your entire face fits inside the frame.": "\u60a8\u7684\u6574\u5f20\u8138\u90fd\u5728\u6846\u5185\u3002",
     "Your export has failed.": "\u5bfc\u51fa\u5931\u8d25\u3002",
     "Your face is well-lit.": "\u60a8\u7684\u9762\u90e8\u5149\u7167\u5f88\u597d\u3002",
-    "Your file ": "\u60a8\u7684\u6587\u4ef6",
     "Your file '{file}' has been uploaded. Allow a few minutes for processing.": "\u60a8\u7684\u6587\u4ef6'{file}'\u5df2\u7ecf\u4e0a\u4f20\u3002\u9700\u8981\u51e0\u5206\u949f\u65f6\u95f4\u8fdb\u884c\u5904\u7406\u3002",
     "Your file could not be uploaded": "\u60a8\u7684\u6587\u4ef6\u65e0\u6cd5\u4e0a\u4f20\u3002",
     "Your file has been deleted.": "\u60a8\u7684\u6587\u4ef6\u5df2\u7ecf\u88ab\u5220\u9664",

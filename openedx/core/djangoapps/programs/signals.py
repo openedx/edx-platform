@@ -179,32 +179,29 @@ def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs)
 @receiver(COURSE_CERT_DATE_CHANGE, dispatch_uid='course_certificate_date_change_handler')
 def handle_course_cert_date_change(sender, course_key, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
-    If course is updated and the certificate_available_date is changed,
-    schedule a celery task to update visible_date for all certificates
-    within course.
+    If a course-run's `certificate_available_date` is updated, schedule a celery task to update the `visible_date`
+    attribute of all (course) credentials awarded in the Credentials service.
 
     Args:
-        course_key (CourseLocator): refers to the course whose certificate_available_date was updated.
-
-    Returns:
-        None
-
+        course_key(CourseLocator): refers to the course whose certificate_available_date was updated.
     """
-
-    # Import here instead of top of file since this module gets imported before
-    # the credentials app is loaded, resulting in a Django deprecation warning.
+    # Import here instead of top of file since this module gets imported before the credentials app is loaded, resulting
+    # in a Django deprecation warning.
     from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 
-    # Avoid scheduling new tasks if certification is disabled.
+    # Avoid scheduling new tasks if we're not using the Credentials IDA
     if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+        LOGGER.warning(
+            f"Skipping handling of COURSE_CERT_DATE_CHANGE for course {course_key}. Use of the Credentials service is "
+            "disabled."
+        )
         return
 
-    # schedule background task to process
-    LOGGER.info(
-        'handling COURSE_CERT_DATE_CHANGE for course %s',
-        course_key,
-    )
-
+    LOGGER.info(f"Handling COURSE_CERT_DATE_CHANGE for course {course_key}")
     # import here, because signal is registered at startup, but items in tasks are not yet loaded
     from openedx.core.djangoapps.programs.tasks import update_certificate_visible_date_on_course_update
+    from openedx.core.djangoapps.programs.tasks import update_certificate_available_date_on_course_update
+    # update the awarded credentials `visible_date` attribute in the Credentials service after a date update
     update_certificate_visible_date_on_course_update.delay(str(course_key))
+    # update the (course) certificate configuration in the Credentials service after a date update
+    update_certificate_available_date_on_course_update.delay(str(course_key))

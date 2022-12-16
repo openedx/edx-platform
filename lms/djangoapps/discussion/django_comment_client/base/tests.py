@@ -53,7 +53,7 @@ from openedx.core.lib.teams_config import TeamsConfig
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
@@ -138,7 +138,8 @@ class ThreadActionGroupIdTestCase(
                 "group_id": self.student_cohort.id,
                 "closed": False,
                 "type": "thread",
-                "commentable_id": "non_team_dummy_id"
+                "commentable_id": "non_team_dummy_id",
+                "body": "test body",
             }
         )
         request = RequestFactory().post("dummy_url", post_params or {})
@@ -237,7 +238,7 @@ class ViewsTestCaseMixin:
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('common.djangoapps.student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.user.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             self.password = 'test'
@@ -268,7 +269,9 @@ class ViewsTestCaseMixin:
         data = {
             "user_id": str(self.student.id),
             "closed": False,
-            "commentable_id": "non_team_dummy_id"
+            "commentable_id": "non_team_dummy_id",
+            "thread_id": "dummy",
+            "thread_type": "discussion"
         }
         if include_depth:
             data["depth"] = 0
@@ -411,7 +414,7 @@ class ViewsQueryCountTestCase(
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3, 6, 38),
+        (ModuleStoreEnum.Type.split, 3, 6, 42),
     )
     @ddt.unpack
     @count_queries
@@ -458,7 +461,7 @@ class ViewsTestCase(
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('common.djangoapps.student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.user.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             self.password = 'test'
@@ -527,6 +530,7 @@ class ViewsTestCase(
         self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
+            "body": "test body",
         })
         test_thread_id = "test_thread_id"
         request = RequestFactory().post("dummy_url", {"id": test_thread_id})
@@ -545,6 +549,7 @@ class ViewsTestCase(
         self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
+            "body": "test body",
         })
         test_comment_id = "test_comment_id"
         request = RequestFactory().post("dummy_url", {"id": test_comment_id})
@@ -1138,7 +1143,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
     def test_endorse_response_as_staff(self, mock_request):
         self._set_mock_request_thread_and_comment(
             mock_request,
-            {"type": "thread", "thread_type": "question", "user_id": str(self.student.id)},
+            {"type": "thread", "thread_type": "question", "user_id": str(self.student.id), "commentable_id": "course"},
             {"type": "comment", "thread_id": "dummy"}
         )
         self.client.login(username=self.moderator.username, password=self.password)
@@ -1150,7 +1155,8 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
     def test_endorse_response_as_student(self, mock_request):
         self._set_mock_request_thread_and_comment(
             mock_request,
-            {"type": "thread", "thread_type": "question", "user_id": str(self.moderator.id)},
+            {"type": "thread", "thread_type": "question",
+             "user_id": str(self.moderator.id), "commentable_id": "course"},
             {"type": "comment", "thread_id": "dummy"}
         )
         self.client.login(username=self.student.username, password=self.password)
@@ -1162,7 +1168,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
     def test_endorse_response_as_student_question_author(self, mock_request):
         self._set_mock_request_thread_and_comment(
             mock_request,
-            {"type": "thread", "thread_type": "question", "user_id": str(self.student.id)},
+            {"type": "thread", "thread_type": "question", "user_id": str(self.student.id), "commentable_id": "course"},
             {"type": "comment", "thread_id": "dummy"}
         )
         self.client.login(username=self.student.username, password=self.password)
@@ -1594,7 +1600,8 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             "commentable_id": commentable_id,
             "user_id": str(comment_author.id),
             "username": comment_author.username,
-            "course_id": str(self.course.id)
+            "course_id": str(self.course.id),
+            "body": "test body",
         })
 
         response = self.client.post(
@@ -1663,7 +1670,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user, mock_request,
-            {"closed": False, "commentable_id": commentable_id, "thread_id": "dummy_thread"},
+            {"closed": False, "commentable_id": commentable_id, "thread_id": "dummy_thread", "body": 'dummy body'},
         )
         for action in ["upvote_comment", "downvote_comment", "un_flag_abuse_for_comment", "flag_abuse_for_comment"]:
             response = self.client.post(
@@ -1684,7 +1691,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user, mock_request,
-            {"closed": False, "commentable_id": commentable_id},
+            {"closed": False, "commentable_id": commentable_id, "body": "dummy body"},
         )
         for action in ["upvote_thread", "downvote_thread", "un_flag_abuse_for_thread", "flag_abuse_for_thread",
                        "follow_thread", "unfollow_thread"]:
@@ -2031,7 +2038,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
     sources (e.g., a mobile app), we carefully test a myriad of cases, including
     those with incomplete and malformed events.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     CATEGORY_ID = 'i4x-edx-discussion-id'
     CATEGORY_NAME = 'Discussion 1'
@@ -2047,21 +2054,12 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
     @mock.patch.dict("common.djangoapps.student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
-        self.courses_by_store = {
-            ModuleStoreEnum.Type.mongo: CourseFactory.create(
-                org='TestX',
-                course='TR-101',
-                run='Event_Transform_Test',
-                default_store=ModuleStoreEnum.Type.mongo,
-            ),
-            ModuleStoreEnum.Type.split: CourseFactory.create(
-                org='TestX',
-                course='TR-101S',
-                run='Event_Transform_Test_Split',
-                default_store=ModuleStoreEnum.Type.split,
-            ),
-        }
-        self.course = self.courses_by_store['mongo']
+        self.course = CourseFactory.create(
+            org='TestX',
+            course='TR-101S',
+            run='Event_Transform_Test_Split',
+            default_store=ModuleStoreEnum.Type.split,
+        )
         self.student = UserFactory.create()
         self.staff = UserFactory.create(is_staff=True)
         UserBasedRole(user=self.staff, role=CourseStaffRole.ROLE).add_course(self.course.id)
@@ -2184,18 +2182,16 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
         assert 'title_truncated' in event_3_trans['event']
         assert event_3_trans['event']['title_truncated']
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_urls(self, store):
-        course = self.courses_by_store[store]
+    def test_urls(self):
         commentable_id = self.DUMMY_CATEGORY_ID
         thread_id = self.DUMMY_THREAD_ID
         _, event_trans = _create_and_transform_event(
-            course_id=course.id,
+            course_id=self.course.id,
             topic_id=commentable_id,
             thread_id=thread_id,
         )
         expected_path = '/courses/{}/discussion/forum/{}/threads/{}'.format(
-            course.id, commentable_id, thread_id
+            self.course.id, commentable_id, thread_id
         )
         assert event_trans['event'].get('url').endswith(expected_path)
 

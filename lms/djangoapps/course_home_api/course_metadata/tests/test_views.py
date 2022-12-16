@@ -5,18 +5,22 @@ Tests for the Course Home Course Metadata API in the Course Home API
 import ddt
 import mock
 from django.urls import reverse
-
 from edx_toggles.toggles.testutils import override_waffle_flag
+
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.roles import CourseInstructorRole
-from lms.djangoapps.courseware.toggles import (
-    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
-    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
-)
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
-from lms.djangoapps.courseware.toggles import COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT
+from lms.djangoapps.courseware.toggles import (
+    COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT,
+    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
+    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION
+)
+from openedx.features.enterprise_support.tests.factories import (
+    EnterpriseCourseEnrollmentFactory,
+    EnterpriseCustomerUserFactory
+)
 
 
 @ddt.ddt
@@ -82,11 +86,22 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         response = self.client.get(url)
         assert response.status_code == 404
 
+    def _assert_course_access_response(self, response, expect_course_access, expected_error_code):
+        """
+        Responsible to asset the course_access response with expected values.
+        """
+        assert response.status_code == 200
+        assert response.data['course_access']['has_access'] == expect_course_access
+        assert response.data['course_access']['error_code'] == expected_error_code
+        # Start date is used when handling some errors, so make sure it is present too
+        assert response.data['start'] == self.course.start.isoformat() + 'Z'
+
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=True):
-            with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
+            UPDATES_METHOD_NAME = 'common.djangoapps.student.models.user.UserCelebration.perform_streak_updates'
+            with mock.patch(UPDATES_METHOD_NAME, return_value=3):
                 response = self.client.get(self.url, content_type='application/json')
                 celebrations = response.json()['celebrations']
                 assert celebrations['streak_length_to_celebrate'] == 3
@@ -138,6 +153,15 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
             'dsc_required': True,
             'expect_course_access': False,
             'error_code': 'data_sharing_access_required'
+        },
+        {
+            # Data sharing Consent required staff should Not have access.
+            'enroll_user': True,
+            'instructor_role': True,
+            'masquerade_role': None,
+            'dsc_required': True,
+            'expect_course_access': False,
+            'error_code': 'data_sharing_access_required'
         }
     )
     @ddt.unpack
@@ -159,8 +183,43 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         with mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url', return_value=consent_url):
             response = self.client.get(self.url)
 
-        assert response.status_code == 200
-        assert response.data['course_access']['has_access'] == expect_course_access
-        assert response.data['course_access']['error_code'] == error_code
-        # Start date is used when handling some errors, so make sure it is present too
-        assert response.data['start'] == self.course.start.isoformat() + 'Z'
+        self._assert_course_access_response(response, expect_course_access, error_code)
+
+    @ddt.data(True, False)
+    def test_course_access_with_correct_active_enterprise(self, instructor_role):
+        """
+        Test that course_access is calculated correctly based on
+        access to MFE and access to the course itself.
+        """
+        if instructor_role:
+            CourseInstructorRole(self.course.id).add_users(self.user)
+
+        # Test with no EnterpriseCourseEnrollment
+        course_enrollment = CourseEnrollment.enroll(self.user, self.course.id, 'audit')
+        response = self.client.get(self.url)
+        self._assert_course_access_response(response, True, None)
+
+        # Test with EnterpriseCourseEnrollment and having correct active enterprise
+        course = course_enrollment.course
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)
+        EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user, course_id=course.id)
+        response = self.client.get(self.url)
+        self._assert_course_access_response(response, True, None)
+
+        # Test with incorrect active enterprise
+        enterprise_customer_user_2 = EnterpriseCustomerUserFactory(user_id=self.user.id, active=True)
+        enterprise_customer_user.refresh_from_db()
+        assert not enterprise_customer_user.active
+        assert enterprise_customer_user_2.active
+        response = self.client.get(self.url)
+        self._assert_course_access_response(response, False, 'incorrect_active_enterprise')
+
+        # test when no active enterprise at all (ideally this should never happen)
+        enterprise_customer_user_2.active = False
+        enterprise_customer_user_2.save()
+        enterprise_customer_user.refresh_from_db()
+        enterprise_customer_user_2.refresh_from_db()
+        assert not enterprise_customer_user.active
+        assert not enterprise_customer_user_2.active
+        response = self.client.get(self.url)
+        self._assert_course_access_response(response, False, 'incorrect_active_enterprise')

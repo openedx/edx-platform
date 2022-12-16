@@ -211,7 +211,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
 
     @ddt.data(
         *product(
-            (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
+            (ModuleStoreEnum.Type.split, ),
             (True, False),
         )
     )
@@ -226,8 +226,6 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 5, True, 24),
-        (ModuleStoreEnum.Type.mongo, 5, False, 14),
         (ModuleStoreEnum.Type.split, 2, True, 24),
         (ModuleStoreEnum.Type.split, 2, False, 14),
     )

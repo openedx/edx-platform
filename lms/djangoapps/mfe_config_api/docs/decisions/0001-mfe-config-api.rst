@@ -18,7 +18,7 @@ Decision
 - A lightweight API will be created that returns the mfe configuration variables from the site configuration or django settings. `PR Discussion about django settings`_
 - The API will be enabled or disabled using the setting ``ENABLE_MFE_CONFIG_API``.
 - The API will take the mfe configuration in the ``MFE_CONFIG`` keyset in the site configuration (admin > site configuration > your domain) or in django settings.
-- This API allows to consult the configurations by specific MFE. Making a request like ``api/v1/mfe_config?mfe=mymfe`` will return the configuration defined in ``MFE_CONFIG_MYMFE`` merged with the ``MFE_CONFIG`` configuration.
+- This API allows to consult the configurations by specific MFE. Making a request like ``/api/mfe_config/v1?mfe=mymfe`` will return the configuration defined in ``MFE_CONFIG_OVERRIDES["mymfe"]`` merged with the ``MFE_CONFIG`` configuration.
 - The API will have a mechanism to cache the response with ``MFE_CONFIG_API_CACHE_TIMEOUT`` variable.
 - The API will live in lms/djangoapps because this is not something Studio needs to serve and it is a lightweight API. `PR Discussion`_
 - The API will not require authentication or authorization.
@@ -26,7 +26,7 @@ Decision
 
 Request::
 
-    GET http://lms.base.com/api/v1/mfe_config?mfe=learning
+    GET http://lms.base.com/api/mfe_config/v1?mfe=learning
 
 Response::
 

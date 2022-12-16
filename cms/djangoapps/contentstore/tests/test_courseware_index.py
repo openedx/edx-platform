@@ -32,7 +32,7 @@ from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import SignalHandler, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     ModuleStoreTestCase,
-    TEST_DATA_MONGO_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -129,7 +129,6 @@ class MixedWithOptionsTestCase(ModuleStoreTestCase):
 class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
 
-    WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     ENABLED_SIGNALS = ['course_deleted']
 
     def setUp(self):
@@ -140,6 +139,8 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.sequential = None
         self.vertical = None
         self.html_unit = None
+
+        self.setup_course_base(self.store)
 
     def setup_course_base(self, store):
         """
@@ -463,66 +464,51 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         with self.assertRaises(SearchIndexingError):
             self.reindex_course(store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_indexing_course(self, store_type):
-        self._perform_test_using_store(store_type, self._test_indexing_course)
+    def test_indexing_course(self):
+        self._test_indexing_course(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_not_indexing_unpublished_content(self, store_type):
-        self._perform_test_using_store(store_type, self._test_not_indexing_unpublished_content)
+    def test_not_indexing_unpublished_content(self):
+        self._test_not_indexing_unpublished_content(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_deleting_item(self, store_type):
-        self._perform_test_using_store(store_type, self._test_deleting_item)
+    def test_deleting_item(self):
+        self._test_deleting_item(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_start_date_propagation(self, store_type):
-        self._perform_test_using_store(store_type, self._test_start_date_propagation)
+    def test_start_date_propagation(self):
+        self._test_start_date_propagation(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_search_disabled(self, store_type):
-        self._perform_test_using_store(store_type, self._test_search_disabled)
+    def test_search_disabled(self):
+        self._test_search_disabled(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_time_based_index(self, store_type):
-        self._perform_test_using_store(store_type, self._test_time_based_index)
+    def test_time_based_index(self):
+        self._test_time_based_index(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_exception(self, store_type):
-        self._perform_test_using_store(store_type, self._test_exception)
+    def test_exception(self):
+        self._test_exception(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_course_about_property_index(self, store_type):
-        self._perform_test_using_store(store_type, self._test_course_about_property_index)
+    def test_course_about_property_index(self):
+        self._test_course_about_property_index(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_course_about_store_index(self, store_type):
-        self._perform_test_using_store(store_type, self._test_course_about_store_index)
+    def test_course_about_store_index(self):
+        self._test_course_about_store_index(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_course_about_mode_index(self, store_type):
-        self._perform_test_using_store(store_type, self._test_course_about_mode_index)
+    def test_course_about_mode_index(self):
+        self._test_course_about_mode_index(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_course_location_info(self, store_type):
-        self._perform_test_using_store(store_type, self._test_course_location_info)
+    def test_course_location_info(self):
+        self._test_course_location_info(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_course_location_null(self, store_type):
-        self._perform_test_using_store(store_type, self._test_course_location_null)
+    def test_course_location_null(self):
+        self._test_course_location_null(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_delete_course_from_search_index_after_course_deletion(self, store_type):
+    def test_delete_course_from_search_index_after_course_deletion(self):
         """ Test for removing course from CourseAboutSearchIndexer """
-        self._perform_test_using_store(store_type, self._test_delete_course_from_search_index_after_course_deletion)
+        self._test_delete_course_from_search_index_after_course_deletion(self.store)
 
 
 @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ForceRefreshElasticSearchEngine')
 @ddt.ddt
 class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     """ Tests to excerise deleting items from a course """
-
-    WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
     def _clean_course_id(self):
         """
@@ -540,6 +526,7 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     def setUp(self):
         super().setUp()
         self.course_id = None
+        self.setup_course_base(self.store)
 
     def tearDown(self):
         super().tearDown()
@@ -594,9 +581,8 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
 
     @skip("This test is to see how we handle very large courses, to ensure that the delete"
           "procedure works smoothly - too long to run during the normal course of things")
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_large_course_deletion(self, store_type):
-        self._perform_test_using_store(store_type, self._test_large_course_deletion)
+    def test_large_course_deletion(self):
+        self._test_large_course_deletion(self.store)
 
 
 class TestTaskExecution(SharedModuleStoreTestCase):
@@ -868,6 +854,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
     """
     CREATE_USER = True
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
@@ -1358,10 +1345,3 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             self.assertIn(self._html_group_result(self.html_unit2, [1]), indexed_content)
             self.assertIn(self._html_group_result(self.html_unit3, [0]), indexed_content)
             mock_index.reset_mock()
-
-
-class GroupConfigurationSearchMongo(GroupConfigurationSearchSplit):  # pylint: disable=test-inherits-tests
-    """
-    Tests indexing of content groups on course modules using mongo modulestore.
-    """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE

@@ -2,11 +2,15 @@
 Functionality for generating grade reports.
 """
 
+import csv
 import logging
 import re
 from collections import OrderedDict, defaultdict
 from datetime import datetime
 from itertools import chain
+from tempfile import TemporaryFile
+
+from sys import getsizeof
 from time import time
 
 from django.conf import settings
@@ -31,7 +35,8 @@ from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor_task.config.waffle import (
     course_grade_report_verified_only,
     optimize_get_learners_switch_enabled,
-    problem_grade_report_verified_only
+    problem_grade_report_verified_only,
+    use_on_disk_grade_reporting,
 )
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -45,7 +50,7 @@ from xmodule.partitions.partitions_service import PartitionService  # lint-amnes
 from xmodule.split_test_module import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .runner import TaskProgress
-from .utils import upload_csv_to_report_store
+from .utils import upload_csv_to_report_store, upload_csv_file_to_report_store
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
@@ -168,9 +173,13 @@ class GradeReportBase:
         the given batched_rows and context.
         """
         # partition and chain successes and errors
+        self.log_additional_info_for_testing(context, "Begin Zipping Batched Rows")
         success_rows, error_rows = zip(*batched_rows)
+        self.log_additional_info_for_testing(context, "Evaluating Success Rows")
         success_rows = list(chain(*success_rows))
+        self.log_additional_info_for_testing(context, "Evaluating Error Rows")
         error_rows = list(chain(*error_rows))
+        self.log_additional_info_for_testing(context, "Compilation complete")
 
         # update metrics on task status
         context.task_progress.succeeded = len(success_rows)
@@ -742,8 +751,12 @@ class ProblemGradeReport(GradeReportBase):
         """
         with modulestore().bulk_operations(course_id):
             context = _ProblemGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
-            # pylint: disable=protected-access
-            return ProblemGradeReport()._generate(context)
+            if use_on_disk_grade_reporting(course_id):  # AU-926
+                # pylint: disable=protected-access
+                return TempFileProblemGradeReport()._generate(context)
+            else:
+                # pylint: disable=protected-access
+                return ProblemGradeReport()._generate(context)
 
     def _generate(self, context):
         """
@@ -790,6 +803,7 @@ class ProblemGradeReport(GradeReportBase):
         """
         self.log_additional_info_for_testing(context, 'ProblemGradeReport: Starting to process new user batch.')
         success_rows, error_rows = [], []
+        success_rows_size, error_rows_size = 0, 0
         for student, course_grade, error in CourseGradeFactory().iter(
             users,
             course=context.course,
@@ -797,6 +811,10 @@ class ProblemGradeReport(GradeReportBase):
             course_key=context.course_id,
         ):
             context.task_progress.attempted += 1
+            self.log_additional_info_for_testing(
+                context,
+                f'ProblemGradeReport: Attempt {context.task_progress.attempted}'
+            )
             if not course_grade:
                 err_msg = str(error)
                 # There was an error grading this student.
@@ -806,9 +824,15 @@ class ProblemGradeReport(GradeReportBase):
                     [student.id, student.email, student.username] +
                     [err_msg]
                 )
+                error_rows_size += getsizeof(error_rows[-1])
                 context.task_progress.failed += 1
+                self.log_additional_info_for_testing(
+                    context,
+                    f'ProblemGradeReport: Failed {context.task_progress.failed}'
+                )
                 continue
 
+            self.log_additional_info_for_testing(context, 'ProblemGradeReport: Succeeded in reading grade')
             earned_possible_values = []
             for block_location in context.graded_scorable_blocks_header:
                 try:
@@ -821,13 +845,27 @@ class ProblemGradeReport(GradeReportBase):
                     else:
                         earned_possible_values.append(['Not Attempted', problem_score.possible])
 
+            self.log_additional_info_for_testing(context, 'ProblemGradeReport: earned possible values done')
             context.task_progress.succeeded += 1
             enrollment_status = _user_enrollment_status(student, context.course_id)
+            self.log_additional_info_for_testing(
+                context,
+                f'ProblemGradeReport: Succeeded {context.task_progress.succeeded}'
+            )
             success_rows.append(
                 [student.id, student.email, student.username] +
                 [enrollment_status, course_grade.percent] +
                 _flatten(earned_possible_values)
             )
+            success_rows_size += getsizeof(success_rows[-1])
+            self.log_additional_info_for_testing(context, 'ProblemGradeReport: Added rows')
+
+        success_rows_size += getsizeof(success_rows)
+        error_rows_size += getsizeof(error_rows)
+        self.log_additional_info_for_testing(
+            context,
+            f'ProblemGradeReport memory usage: succeess {success_rows_size} error {error_rows_size}'
+        )
 
         return success_rows, error_rows
 
@@ -840,6 +878,81 @@ class ProblemGradeReport(GradeReportBase):
             # Clear the CourseEnrollment caches after each batch of users has been processed
             get_cache('get_enrollment').clear()
             get_cache(CourseEnrollment.MODE_CACHE_NAMESPACE).clear()
+
+
+class TempFileProblemGradeReport(ProblemGradeReport):
+    """
+    ProblemGradeReport that instead of holding all resultant file info in memory,
+    writes chunked data to disk.
+    """
+    def _generate(self, context):
+        """
+        Generate a CSV containing all students' problem grades within a given `course_id`.
+        """
+        context.update_status('TempFileProblemGradeReport - 1: Starting problem grades')
+        batched_rows = self._batched_rows(context)
+
+        with TemporaryFile('r+') as success_file, TemporaryFile('r+') as error_file:
+            context.update_status('TempFileProblemGradeReport - 2: Compiling grades into temp files')
+            has_errors = self.iter_and_write_batched_rows(context, success_file, error_file, batched_rows)
+
+            context.update_status('TempFileProblemGradeReport - 3: Uploading files')
+            self.upload_temp_files(context, success_file, error_file, has_errors)
+
+        return context.update_status('ProblemGradeReport - 4: Completed problem grades')
+
+    def iter_and_write_batched_rows(self, context, success_file, error_file, batched_rows):
+        """
+        Iterate through batched rows, writing returned chunks to disk as we go.
+        This should hopefully help us avoid out of memory errors.
+        """
+        context.task_progress.succeeded = 0
+        context.task_progress.failed = 0
+
+        success_writer = csv.writer(success_file)
+        error_writer = csv.writer(error_file)
+
+        # Write headers
+        success_writer.writerow(self._success_headers(context))
+        error_writer.writerow(self._error_headers())
+
+        # Iterate through batched rows, writing to temp file
+        for success_rows, error_rows in batched_rows:
+            context.task_progress.succeeded += len(success_rows)
+            success_writer.writerows(success_rows)
+            if len(error_rows) > 0:
+                context.task_progress.failed += len(error_rows)
+                error_writer.writerows(error_rows)
+
+        context.task_progress.attempted = context.task_progress.succeeded + context.task_progress.failed
+        context.task_progress.total = context.task_progress.attempted
+
+        return context.task_progress.failed > 0
+
+    def upload_temp_files(self, context, success_file, error_file, has_errors):
+        """
+        Uploads success and error csv files to report store
+        """
+        date = datetime.now(UTC)
+
+        success_file.seek(0)
+        upload_csv_file_to_report_store(
+            success_file,
+            context.upload_filename,
+            context.course_id,
+            date,
+            parent_dir=context.upload_parent_dir
+        )
+
+        if has_errors:
+            error_file.seek(0)
+            upload_csv_file_to_report_store(
+                error_file,
+                context.upload_filename + '_err',
+                context.course_id,
+                date,
+                parent_dir=context.upload_parent_dir
+            )
 
 
 class ProblemResponses:

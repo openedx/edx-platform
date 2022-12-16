@@ -14,8 +14,13 @@ from django.test.client import Client, RequestFactory
 from django.urls import reverse
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
+
 from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_KEY
 from openedx.core.djangoapps.lang_pref.middleware import LanguagePreferenceMiddleware
+from openedx.core.djangoapps.site_configuration.tests.test_util import (
+    with_site_configuration,
+    with_site_configuration_context,
+)
 from openedx.core.djangoapps.user_api.preferences.api import (
     delete_user_preference,
     get_user_preference,
@@ -267,3 +272,31 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         mock_is_mobile_request.return_value = True
         response = self.middleware.process_response(self.request, response)
         response.delete_cookie.assert_called()
+
+    @with_site_configuration(configuration={'LANGUAGE_CODE': 'eo'})
+    @ddt.data(None, 'es', 'en')
+    def test_site_language_ignores_user_preferences(self, user_preference):
+        """
+        Test that the language set in SiteConfiguration has a higher priority than user preferences.
+        It also does not create or update user preferences.
+        """
+        self.request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = user_preference
+        self.middleware.process_request(self.request)
+
+        # Do not alter user preferences.
+        assert get_user_preference(self.user, LANGUAGE_KEY) == user_preference
+        # Change the request's cookie instead.
+        assert self.request.COOKIES[settings.LANGUAGE_COOKIE_NAME] == 'eo'
+
+        # Use an actual call to determine the language of the response.
+        response = self.client.get('/')
+
+        assert get_user_preference(self.user, LANGUAGE_KEY) == user_preference
+        assert response['Content-Language'] == 'eo'
+        # `LocaleMiddleware` no longer looks for language in the session since Django 3.2. It checks the cookie instead.
+        # See: https://docs.djangoproject.com/en/3.2/releases/3.0/#miscellaneous
+        assert self.client.session.get(LANGUAGE_SESSION_KEY) is None
+
+        # Clean up by making a request to a Site without specific configuration.
+        with with_site_configuration_context():
+            self.client.get('/')

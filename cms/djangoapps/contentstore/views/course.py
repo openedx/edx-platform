@@ -34,6 +34,7 @@ from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
 
+from cms.djangoapps.contentstore.utils import mark_verticals_discussion_enabled
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -56,7 +57,9 @@ from common.djangoapps.util.milestones_helpers import (
     is_prerequisite_courses_enabled,
     is_valid_course_key,
     remove_prerequisite_course,
-    set_prerequisite_courses
+    set_prerequisite_courses,
+    get_namespace_choices,
+    generate_milestone_namespace
 )
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from common.djangoapps.xblock_django.api import deprecated_xblocks
@@ -64,6 +67,7 @@ from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
@@ -271,6 +275,11 @@ def course_handler(request, course_key_string=None):
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
     try:
+        if course_key_string:
+            course_key = CourseKey.from_string(course_key_string)
+            if course_key.deprecated:
+                logging.error(f"User {request.user.id} tried to access Studio for Old Mongo course {course_key}.")
+                return HttpResponseNotFound()
         response_format = request.GET.get('format') or request.POST.get('format') or 'html'
         if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
             if request.method == 'GET':
@@ -717,6 +726,11 @@ def course_index(request, course_key):
         advanced_dict = CourseMetadata.fetch(course_module)
         proctoring_errors = CourseMetadata.validate_proctoring_settings(course_module, advanced_dict, request.user)
 
+        configuration = DiscussionsConfiguration.get(course_key)
+        provider = configuration.provider_type
+        if provider == Provider.OPEN_EDX:
+            mark_verticals_discussion_enabled(course_structure, course_key)
+
         return render_to_response('course_outline.html', {
             'language_code': request.LANGUAGE_CODE,
             'context_course': course_module,
@@ -783,7 +797,7 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
         """
         Return a dict of the data which the view requires for each course
         """
-        return {
+        course_context = {
             'display_name': course.display_name,
             'course_key': str(course.location.course_key),
             'url': reverse_course_url('course_handler', course.id),
@@ -793,6 +807,13 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
             'number': course.display_number_with_default,
             'run': course.location.run
         }
+        if course.id.deprecated:
+            course_context.update({
+                'url': None,
+                'lms_link': None,
+                'rerun_link': None
+            })
+        return course_context
 
     in_process_action_course_keys = {uca.course_key for uca in in_process_course_actions}
     active_courses = []
@@ -1194,10 +1215,10 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
                 # exclude current course from the list of available courses
-                courses = (course for course in courses if course.id != course_key)
+                courses = [course for course in courses if course.id != course_key]
                 if courses:
                     courses, __ = _process_courses_list(courses, in_process_course_actions)
-                settings_context.update({'possible_pre_requisite_courses': list(courses)})
+                settings_context.update({'possible_pre_requisite_courses': courses})
 
             if credit_eligibility_enabled:
                 if is_credit_course(course_key):
@@ -1221,7 +1242,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                     )
 
             return render_to_response('settings.html', settings_context)
-        elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+        elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):  # pylint: disable=too-many-nested-blocks
             if request.method == 'GET':
                 course_details = CourseDetails.fetch(course_key)
                 return JsonResponse(
@@ -1240,9 +1261,17 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                         set_prerequisite_courses(course_key, prerequisite_course_keys)
                     else:
                         # None is chosen, so remove the course prerequisites
-                        course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="requires")  # lint-amnesty, pylint: disable=line-too-long
+                        course_milestones = milestones_api.get_course_milestones(
+                            course_key=course_key,
+                            relationship="requires",
+                        )
                         for milestone in course_milestones:
-                            remove_prerequisite_course(course_key, milestone)
+                            entrance_exam_namespace = generate_milestone_namespace(
+                                get_namespace_choices().get('ENTRANCE_EXAM'),
+                                course_key
+                            )
+                            if milestone["namespace"] != entrance_exam_namespace:
+                                remove_prerequisite_course(course_key, milestone)
 
                 # If the entrance exams feature has been enabled, we'll need to check for some
                 # feature-specific settings and handle them accordingly

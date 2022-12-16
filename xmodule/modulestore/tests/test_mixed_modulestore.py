@@ -518,7 +518,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #    find: definitions (calculator field), structures
     #    sends: 2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 7, 5), (ModuleStoreEnum.Type.split, 3, 2, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 5), (ModuleStoreEnum.Type.split, 3, 2, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -913,7 +913,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #   Find: active_versions, 2 structures (published & draft), definition (unnecessary)
     #   Sends: updated draft and published structures and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 7, 2), (ModuleStoreEnum.Type.split, 4, 2, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 6, 2), (ModuleStoreEnum.Type.split, 4, 2, 3))
     @ddt.unpack
     def test_delete_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -942,7 +942,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #    find: draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 9, 2), (ModuleStoreEnum.Type.split, 4, 3, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 8, 2), (ModuleStoreEnum.Type.split, 4, 3, 3))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -996,7 +996,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #   find: structure (cached)
     #   send: update structure and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 4, 1), (ModuleStoreEnum.Type.split, 4, 1, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 3, 1), (ModuleStoreEnum.Type.split, 4, 1, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1039,7 +1039,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #          executed twice, possibly unnecessarily)
     #   find: 2 reads of structure, definition (s/b lazy; so, unnecessary),
     #         plus 1 wildcard find in draft mongo which has none
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 2, 0), (ModuleStoreEnum.Type.split, 2, 3, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 3, 0), (ModuleStoreEnum.Type.split, 2, 3, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, num_mysql, max_find, max_send):
         self.initdb(default_ms)
@@ -1079,7 +1079,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     # draft is 2: find out which ms owns course, get item
     # split: active_versions (mysql), structure, definition (to load course wiki string)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 2, 0), (ModuleStoreEnum.Type.split, 1, 2, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 3, 0), (ModuleStoreEnum.Type.split, 1, 2, 0))
     @ddt.unpack
     def test_get_course(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1634,7 +1634,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    8-9. get vertical, compute inheritance
     #    10-11. get other vertical_x1b (why?) and compute inheritance
     # Split: loading structure from mongo (also loads active version from MySQL, not tracked here)
-    @ddt.data((ModuleStoreEnum.Type.mongo, [0, 0], [12, 3], 0), (ModuleStoreEnum.Type.split, [1, 0], [2, 1], 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, [0, 0], [15, 3], 0), (ModuleStoreEnum.Type.split, [1, 0], [2, 1], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_mysql, num_finds, num_sends):
         """
@@ -2510,7 +2510,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     @ddt.data(
         [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.mongo],
-        [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split],
         [ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.split]
     )
     @ddt.unpack

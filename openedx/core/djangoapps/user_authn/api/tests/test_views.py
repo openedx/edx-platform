@@ -197,7 +197,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         Test that when no required fields are configured in REGISTRATION_EXTRA_FIELDS
         settings, then API returns proper response.
         """
-        self.query_params.update({'is_registered': True})
+        self.query_params.update({'is_register_page': True})
         response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
         assert response.data['registration_fields']['fields'] == {}
@@ -216,7 +216,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         Test that order of required fields
         """
-        self.query_params.update({'is_registered': True})
+        self.query_params.update({'is_register_page': True})
         response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
         assert list(response.data['registration_fields']['fields'].keys()) == ['first_name', 'last_name', 'state']
@@ -240,7 +240,8 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'error_message': '',
             }
         }
-        response = self.client.get(self.url)
+        self.query_params.update({'is_register_page': True})
+        response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
         assert response.data['optional_fields']['fields'] == expected_response
 
@@ -274,7 +275,8 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'type': 'text',
             }
         }
-        response = self.client.get(self.url)
+        self.query_params.update({'is_register_page': True})
+        response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
         assert response.data['optional_fields']['fields'] == expected_response
 
@@ -292,7 +294,8 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         Test that order of optional fields
         """
-        response = self.client.get(self.url)
+        self.query_params.update({'is_register_page': True})
+        response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
         assert list(response.data['optional_fields']['fields'].keys()) == ['specialty', 'goals']
 
@@ -311,7 +314,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         Test that if the field is not available in extended_profile configuration then the field
         will not be sent in response.
         """
-        self.query_params.update({'is_registered': True})
+        self.query_params.update({'is_register_page': True})
         response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
         assert list(response.data['registration_fields']['fields'].keys()) == ['specialty']

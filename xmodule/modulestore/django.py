@@ -4,6 +4,7 @@ Module that provides a connection to the ModuleStore specified in the django set
 Passes settings.MODULESTORE as kwargs to MongoModuleStore
 """
 
+from contextlib import contextmanager
 from importlib import import_module
 import gettext
 import logging
@@ -86,6 +87,18 @@ class SwitchedSignal(django.dispatch.Signal):
         Calls to send/send_robust will behave like normal Django Signals.
         """
         self._allow_signals = True
+
+    @contextmanager
+    def for_state(self, *, is_enabled: bool):
+        """
+        Set signal handling to be on or off for the duration of the context.
+        """
+        old_state = self._allow_signals
+        try:
+            self._allow_signals = is_enabled
+            yield
+        finally:
+            self._allow_signals = old_state
 
     def send(self, *args, **kwargs):
         """
@@ -292,7 +305,6 @@ def create_modulestore_instance(
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
         request_cache=request_cache,
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
-        xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
         xblock_field_data_wrappers=xblock_field_data_wrappers,
         disabled_xblock_types=fetch_disabled_xblock_types,
         doc_store_config=doc_store_config,

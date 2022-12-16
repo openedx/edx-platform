@@ -93,10 +93,10 @@ class RegistrationFieldsContext(APIView):
         only stores those fields which are available in extended_profile configuration, so we only
         want to send those fields which can be saved.
         """
-        return (field in self.user_profile_fields or
+        return (field in self.user_profile_fields or field in ["terms_of_service", "honor_code"] or
                 field in configuration_helpers.get_value('extended_profile_fields', []))
 
-    def _get_fields(self):
+    def get_fields(self):
         """
         Returns the required or optional fields configured in REGISTRATION_EXTRA_FIELDS settings.
         """

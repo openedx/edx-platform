@@ -33,6 +33,10 @@ SESSION_COOKIE_NAME = 'lms_sessionid'
 
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
+# When the celery task is run eagerly, it is executed locally while sharing the
+# thread and its request cache with the active Django Request. In that case,
+# do not clear the cache.
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 HTTPS = 'off'
 
 LMS_ROOT_URL = f'http://{LMS_BASE}'
@@ -238,6 +242,9 @@ COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
+############## Exams CONFIGURATION SETTINGS ####################
+EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
@@ -258,6 +265,9 @@ WRITABLE_GRADEBOOK_URL = 'http://localhost:1994'
 ########################## ORA STAFF GRADING APP ##############################
 ORA_GRADING_MICROFRONTEND_URL = 'http://localhost:1993'
 
+########################## LEARNER HOME APP ##############################
+LEARNER_HOME_MICROFRONTEND_URL = 'http://localhost:1996'
+
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
@@ -275,6 +285,8 @@ LOGIN_REDIRECT_WHITELIST.extend([
     #   BASE_URL=http://localhost:$PORT
     # as opposed to:
     #   BASE_URL=localhost:$PORT
+    'localhost:18000',  # lms
+    'localhost:18130',  # ecommerce
     'localhost:1997',  # frontend-app-account
     'localhost:1976',  # frontend-app-program-console
     'localhost:1994',  # frontend-app-gradebook
@@ -283,6 +295,7 @@ LOGIN_REDIRECT_WHITELIST.extend([
     'localhost:3001',  # frontend-app-library-authoring
     'localhost:18400',  # frontend-app-publisher
     'localhost:1993',  # frontend-app-ora-grading
+    'localhost:1996',  # frontend-app-learner-dashboard
     ENTERPRISE_LEARNER_PORTAL_NETLOC,  # frontend-app-learner-portal-enterprise
     ENTERPRISE_ADMIN_PORTAL_NETLOC,  # frontend-app-admin-portal
 ])
@@ -356,6 +369,7 @@ ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
+LEARNER_RECORD_MICROFRONTEND_URL = 'http://localhost:1990'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
@@ -371,7 +385,7 @@ FEATURES.update({
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
 
     # Enable enterprise integration by default.
-    # See https://github.com/edx/edx-enterprise/blob/master/docs/development.rst for
+    # See https://github.com/openedx/edx-enterprise/blob/master/docs/development.rst for
     # more background on edx-enterprise.
     # Toggle this off if you don't want anything to do with enterprise in devstack.
     'ENABLE_ENTERPRISE_INTEGRATION': True,

@@ -35,8 +35,9 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTU
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
-from xmodule.editing_module import EditingMixin, TabsEditingMixin
+from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError
+from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_module import EmptyDataRawMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
@@ -66,7 +67,7 @@ from .video_xfields import VideoFields
 # edxval is a proper XBlock Runtime Service.
 #
 # Here's the deal: the VideoBlock should be able to take advantage of edx-val
-# (https://github.com/edx/edx-val) to figure out what URL to give for video
+# (https://github.com/openedx/edx-val) to figure out what URL to give for video
 # resources that have an edx_video_id specified. edx-val is a Django app, and
 # including it causes tests to fail because we run common/lib tests standalone
 # without Django dependencies. The alternatives seem to be:
@@ -112,9 +113,8 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 @XBlock.needs('mako', 'user')
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
-        TabsEditingMixin, EmptyDataRawMixin, XmlMixin, EditingMixin,
-        XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
-        LicenseMixin):
+        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin, HTMLSnippet,
+        ResourceTemplates, XModuleMixin, LicenseMixin):
     """
     XML source example:
         <video show_captions="true"
@@ -145,6 +145,9 @@ class VideoBlock(
             'template': "tabs/metadata-edit-tab.html"
         }
     ]
+
+    mako_template = "widgets/tabs-aggregator.html"
+    js_module_name = "TabsEditingDescriptor"
 
     uses_xmodule_styles_setup = True
     requires_per_student_anonymous_id = True
@@ -371,7 +374,7 @@ class VideoBlock(
         poster = None
         if edxval_api and self.edx_video_id:
             poster = edxval_api.get_course_video_image_url(
-                course_id=self.runtime.course_id.for_branch(None),
+                course_id=self.scope_ids.usage_id.context_key.for_branch(None),
                 edx_video_id=self.edx_video_id.strip()
             )
 
@@ -621,8 +624,7 @@ class VideoBlock(
     def parse_xml_new_runtime(cls, node, runtime, keys):
         """
         Implement the video block's special XML parsing requirements for the
-        new runtime only. For all other runtimes, use the existing XModule-style
-        methods like .from_xml().
+        new runtime only. For all other runtimes, use .parse_xml().
         """
         video_block = runtime.construct_xblock_from_class(cls, keys)
         field_data = cls.parse_video_xml(node)
@@ -635,28 +637,24 @@ class VideoBlock(
         return video_block
 
     @classmethod
-    def from_xml(cls, xml_data, system, id_generator):
+    def parse_xml(cls, node, runtime, _keys, id_generator):
         """
-        Creates an instance of this descriptor from the supplied xml_data.
-        This may be overridden by subclasses
-        xml_data: A string of xml that will be translated into data and children for
-            this module
-        system: A DescriptorSystem for interacting with external resources
-        id_generator is used to generate course-specific urls and identifiers
+        Use `node` to construct a new block.
+
+        See XmlMixin.parse_xml for the detailed description.
         """
-        xml_object = etree.fromstring(xml_data)
-        url_name = xml_object.get('url_name', xml_object.get('slug'))
+        url_name = node.get('url_name')
         block_type = 'video'
         definition_id = id_generator.create_definition(block_type, url_name)
         usage_id = id_generator.create_usage(definition_id)
-        if is_pointer_tag(xml_object):
-            filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
-            xml_object = cls.load_file(filepath, system.resources_fs, usage_id)
-            system.parse_asides(xml_object, definition_id, usage_id, id_generator)
-        field_data = cls.parse_video_xml(xml_object, id_generator)
+        if is_pointer_tag(node):
+            filepath = cls._format_filepath(node.tag, name_to_pathname(url_name))
+            node = cls.load_file(filepath, runtime.resources_fs, usage_id)
+            runtime.parse_asides(node, definition_id, usage_id, id_generator)
+        field_data = cls.parse_video_xml(node, id_generator)
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
-        video = system.construct_xblock_from_class(
+        video = runtime.construct_xblock_from_class(
             cls,
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
@@ -665,10 +663,10 @@ class VideoBlock(
             field_data,
         )
 
-        # Update VAL with info extracted from `xml_object`
+        # Update VAL with info extracted from `node`
         video.edx_video_id = video.import_video_info_into_val(
-            xml_object,
-            system.resources_fs,
+            node,
+            runtime.resources_fs,
             getattr(id_generator, 'target_course_id', None)
         )
 
@@ -741,12 +739,11 @@ class VideoBlock(
                 # (i.e. `self.transcripts`) on import and older open-releases (<= ginkgo),
                 # who do not have deprecated contentstore yet, can also import and use new-style
                 # transcripts into their openedX instances.
-
                 exported_metadata = edxval_api.export_to_xml(
                     video_id=edx_video_id,
                     resource_fs=resource_fs,
                     static_dir=EXPORT_IMPORT_STATIC_DIR,
-                    course_id=str(self.runtime.course_id.for_branch(None))
+                    course_id=self.scope_ids.usage_id.context_key.for_branch(None),
                 )
                 # Update xml with edxval metadata
                 xml.append(exported_metadata['xml'])
@@ -794,7 +791,12 @@ class VideoBlock(
         """
         Extend context by data for transcript basic tab.
         """
-        _context = super().get_context()
+        _context = MakoTemplateBlockBase.get_context(self)
+        _context.update({
+            'tabs': self.tabs,
+            'html_id': self.location.html_id(),  # element_id
+            'data': self.data,
+        })
 
         metadata_fields = copy.deepcopy(self.editable_metadata_fields)
 
@@ -832,7 +834,7 @@ class VideoBlock(
         if self.edx_video_id and edxval_api:
 
             val_profiles = ['youtube', 'desktop_webm', 'desktop_mp4']
-            if HLSPlaybackEnabledFlag.feature_enabled(self.runtime.course_id.for_branch(None)):
+            if HLSPlaybackEnabledFlag.feature_enabled(self.scope_ids.usage_id.context_key.for_branch(None)):
                 val_profiles.append('hls')
 
             # Get video encodings for val profiles.

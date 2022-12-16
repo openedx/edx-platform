@@ -18,7 +18,7 @@ LOG_PREFIX = 'Videos: '
 #   to YouTube as part of the video pipeline.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-08-03
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/18765
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/18765
 DEPRECATE_YOUTUBE = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.deprecate_youtube', __name__, LOG_PREFIX)
 
 # .. toggle_name: videos.enable_devstack_video_uploads
@@ -31,7 +31,7 @@ DEPRECATE_YOUTUBE = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.deprecate_youtube', __
 # .. toggle_creation_date: 2020-03-12
 # .. toggle_warning: Enabling this feature requires that the ROLE_ARN, MFA_SERIAL_NUMBER, MFA_TOKEN settings are
 #   properly defined.
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/23375
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/23375
 ENABLE_DEVSTACK_VIDEO_UPLOADS = WaffleFlag(f'{WAFFLE_NAMESPACE}.enable_devstack_video_uploads', __name__, LOG_PREFIX)
 
 ENABLE_VEM_PIPELINE = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation

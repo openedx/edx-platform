@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = (n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
+    const v = (n > 1);
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -136,7 +136,6 @@
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": " A ce stade vous devez suivre les <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">r\u00e9gles de surveillance</a> pour satisfaire les revues de votre examen surveill\u00e9. ",
     " Member": [
       "Membre",
-      "Membres",
       "Membres"
     ],
     " Your Proctoring Session Has Started ": "Votre session d'examen surveill\u00e9 a d\u00e9marr\u00e9",
@@ -164,7 +163,6 @@
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)scommentaires (%(unread_comments_count)s commentaires non lus)%(span_close)s",
     "%(errorCount)s error found in form.": [
       "%(errorCount)s erreur trouv\u00e9e dans le formulaire.",
-      "%(errorCount)s erreurs trouv\u00e9es dans le formulaire.",
       "%(errorCount)s erreurs trouv\u00e9es dans le formulaire."
     ],
     "%(field)s can only contain up to %(count)d characters.": "Les %(field)s ne peuvent pas d\u00e9passer %(count)d caract\u00e8res.",
@@ -173,43 +171,35 @@
     "%(programName)s Home Page.": "Page d'accueil %(programName)s.",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s sur %(cnt)s s\u00e9lectionn\u00e9",
-      "%(sel)s sur %(cnt)s s\u00e9lectionn\u00e9s",
-      ""
+      "%(sel)s sur %(cnt)s s\u00e9lectionn\u00e9s"
     ],
     "%(type)s Component Template Menu": "%(type)s Menu Mod\u00e8le de Composant",
     "%(value)s hour": [
       "%(value)s heure",
-      "%(value)s heures",
       "%(value)s heures"
     ],
     "%(value)s minute": [
       "%(value)s minute",
-      "%(value)s minutes",
       "%(value)s minutes"
     ],
     "%(value)s second": [
       "%(value)s seconde",
-      "%(value)s secondes",
       "%(value)s secondes"
     ],
     "%d day": [
       "%d jour",
-      "%d jours",
       "%d jours"
     ],
     "%d minute": [
       "%d minute",
-      "%d minutes",
       "%d minutes"
     ],
     "%d month": [
-      "%d mois",
       "%d mois",
       "%d mois"
     ],
     "%d year": [
       "%d an",
-      "%d ans",
       "%d ans"
     ],
     "%s ago": "il y a %s ",
@@ -226,7 +216,6 @@
     "(Staff)": "(\u00c9quipe p\u00e9dagogique)",
     "(contains %(student_count)s student)": [
       "(contient %(student_count)s \u00e9tudiant)",
-      "(contient %(student_count)s \u00e9tudiants)",
       "(contient %(student_count)s \u00e9tudiants)"
     ],
     "(optional)": "(optionnel)",
@@ -488,6 +477,7 @@
     "Certificate Signatories": "Signataires du certificat",
     "Certificate Signatory Configuration": "Configuration des signataires du certificat",
     "Certificate Status:": "\u00c9tat du certificat\u00a0:",
+    "Certificate exceptions group selection": "S\u00e9lection des groupes d\u2019exceptions au certificat",
     "Certificate has been successfully invalidated for <%= user %>.": "Invalidation r\u00e9ussie du certificat pour <%= user %>.",
     "Certificate name is required.": "Le nom du certificat est requis.",
     "Certificate of <%= user %> has already been invalidated. Please check your spelling and retry.": "Le certificat de <%= user %> a d\u00e9j\u00e0 \u00e9t\u00e9 invalid\u00e9. Veuillez v\u00e9rifier votre saisie et r\u00e9essayer.",
@@ -589,7 +579,6 @@
     "Contains staff only content": "Contient du contenu r\u00e9serv\u00e9 aux membres de l'\u00e9quipe enseignante",
     "Contains {count} group": [
       "Contient {count} groupe",
-      "Contient {count} groupes",
       "Contient {count} groupes"
     ],
     "Content Group ID": "ID du groupe de contenu",
@@ -623,7 +612,6 @@
     "Country of residence": "Pays de r\u00e9sidence",
     "Country or Region of Residence": "Pays ou r\u00e9gion de r\u00e9sidence",
     "Course": [
-      "Cours",
       "Cours",
       "Cours"
     ],
@@ -717,6 +705,7 @@
     "Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed.": "Supprimer un manuel est irr\u00e9versible et toute r\u00e9f\u00e9rence \u00e0 ce manuel sera \u00e9galement supprim\u00e9e dans le cours.",
     "Deleting this %(item_display_name)s is permanent and cannot be undone.": "Supprimer %(item_display_name)s est d\u00e9finitif et ne peut pas \u00eatre annul\u00e9.",
     "Deleting this {xblock_type} is permanent and cannot be undone.": "Supprimer ce {xblock_type} est permanent et ne peut \u00eatre annul\u00e9.",
+    "Demo the new Grading Experience": "D\u00e9monstration de la nouvelle exp\u00e9rience de notation",
     "Deprecated": "Obsol\u00e8te",
     "Describe ": "D\u00e9crire",
     "Description": "Description",
@@ -889,6 +878,7 @@
     "Error: User '<%- username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.": "Erreur : L'utilisateur \"<%- username %>\" n'a pas encore activ\u00e9 son compte. Les utilisateurs doivent cr\u00e9er et activer leurs comptes avant qu'ils ne puissent se voir attribuer un r\u00f4le.",
     "Error: You cannot remove yourself from the Instructor group!": "Erreur : Vous ne pouvez pas vous supprimer vous-m\u00eame du groupe des enseignants !",
     "Errors": "Erreurs",
+    "Errors detected on the following tabs: ": "Erreurs d\u00e9tect\u00e9es sur les onglets suivants\u00a0:",
     "Errors/Technical Issues": "Erreurs/probl\u00e8mes techniques",
     "Everyone who has staff privileges in this course": "Tous ceux qui ont un statut d'\u00e9quipe p\u00e9dagogique pour ce cours",
     "Exam Types": "Types d'examen",
@@ -1186,7 +1176,6 @@
     "Load next {numResponses} responses": "Charger les {numResponses} r\u00e9ponses suivantes",
     "Load next {num_items} result": [
       "Charger {num_items} resultat, le prochain",
-      "Charger les {num_items} prochains resultats",
       "Charger les {num_items} prochains resultats"
     ],
     "Loading": "Chargement",
@@ -1313,13 +1302,11 @@
     "Note: Learners can be in only one cohort. Adding learners to this group overrides any previous group assignment.": "Remarque: Les \u00e9tudiants peuvent \u00eatre dans une seule cohorte. L'ajout d'\u00e9tudiants \u00e0 ce groupe pr\u00e9vaut sur toute affectation pr\u00e9c\u00e9dente \u00e0 d'autres groupes.",
     "Note: You are %s hour ahead of server time.": [
       "Note\u00a0: l'heure du serveur pr\u00e9c\u00e8de votre heure de %s heure.",
-      "Note\u00a0: l'heure du serveur pr\u00e9c\u00e8de votre heure de %s heures.",
-      ""
+      "Note\u00a0: l'heure du serveur pr\u00e9c\u00e8de votre heure de %s heures."
     ],
     "Note: You are %s hour behind server time.": [
       "Note\u00a0: votre heure pr\u00e9c\u00e8de l'heure du serveur de %s heure.",
-      "Note\u00a0: votre heure pr\u00e9c\u00e8de l'heure du serveur de %s heures.",
-      ""
+      "Note\u00a0: votre heure pr\u00e9c\u00e8de l'heure du serveur de %s heures."
     ],
     "Noted in:": "Not\u00e9 dans :",
     "Notes": "Notes",
@@ -1350,7 +1337,6 @@
     "Once you complete one of the program requirements you have a program record. This record is marked complete once you meet all program requirements. A program record can be used to continue your learning journey and demonstrate your learning to others.": "Une fois que vous avez rempli l'une des exigences du programme, vous aurez un dossier de programme. Ce dossier est consid\u00e9r\u00e9 comme \u00e9tant complet \u00e0 partir du moment o\u00f9 vous avez atteint toutes les exigences. Le dossier de programme peut \u00eatre utilis\u00e9 pour prolonger vos \u00e9tudes et comme preuve de votre apprentissage.",
     "Once your account is deleted, you cannot use it to take courses on the {platformName} app, {siteName}, or any other site hosted by {platformName}.": "Une fois votre compte supprim\u00e9, vous ne pouvez plus l'utiliser pour suivre des cours sur l'application {platformName}, {siteName} ou sur tout autre site h\u00e9berg\u00e9 par {platformName}.",
     "One or more rescheduling tasks failed.": "Une ou plusieurs t\u00e2ches de r\u00e9\u00e9chelonnement ont \u00e9chou\u00e9.",
-    "Only ": "Seulement",
     "Only <%- fileTypes %> files can be uploaded. Please select a file ending in <%- (fileExtensions) %> to upload.": "Seuls les fichiers <%- fileTypes %> peuvent \u00eatre charg\u00e9s. Veuillez s\u00e9lectionner un fichier se terminant par <%- (fileExtensions) %> pour le charger.",
     "Only properly formatted .csv files will be accepted.": "Seuls les fichiers au format .csv seront accept\u00e9s.",
     "Only the parent course staff of a CCX can create content groups.": "Seule l'\u00e9quipe p\u00e9dagogique du cours d'origine d'un CCX peuvent cr\u00e9er des groupes de contenu.",
@@ -1548,7 +1534,7 @@
     "Released:": "Diffus\u00e9 :",
     "Remaining": "Restant",
     "Removal is in progress. To avoid errors, stay on this page until the process is complete.": "Suppression en cours. Pour \u00e9viter toute erreur, restez sur cette page jusqu'\u00e0 la fin du traitement.",
-    "Remove": "Supprimer",
+    "Remove": "Enlever",
     "Remove Transcript": "Supprimer la transcription",
     "Remove all": "Tout enlever",
     "Remove chapter %(chapterDisplayName)s": "Supprimer le chapitre %(chapterDisplayName)s",
@@ -1581,7 +1567,6 @@
     "Reset Your Password": "R\u00e9initialiser votre mot de passe",
     "Reset attempts for all students on problem '<%- problem_id %>'?": "R\u00e9initialiser les essais de tous les \u00e9tudiants pour l'exercice '<%- problem_id %>'?",
     "Resetting Onboarding Exam": "R\u00e9initialisation de l'examen d'int\u00e9gration",
-    "Response": "R\u00e9ponse",
     "Responses could not be loaded. Refresh the page and try again.": "Les r\u00e9actions n'ont pas pu \u00eatre charg\u00e9es. Veuillez actualiser la page et essayer \u00e0 nouveau.",
     "Restore enrollment code": "Restaurer le code d'inscription",
     "Restore last draft": "Restaurer le dernier brouillon",
@@ -1680,7 +1665,6 @@
     "Show Annotations": "Afficher les annotations",
     "Show Comment (%(num_comments)s)": [
       "Afficher (%(num_comments)s) Commentaires",
-      "Afficher (%(num_comments)s) Commentaires",
       "Afficher (%(num_comments)s) Commentaires"
     ],
     "Show Deprecated Settings": "Afficher les param\u00e8tres obsol\u00e8tes",
@@ -1700,7 +1684,6 @@
     "Showing all responses": "Afficher toutes les r\u00e9ponses",
     "Showing first response": [
       "Affiche la premi\u00e8re r\u00e9ponse",
-      "Affiche les {numResponses} premi\u00e8res r\u00e9ponses",
       "Affiche les {numResponses} premi\u00e8res r\u00e9ponses"
     ],
     "Showing results for \"{searchString}\"": "Affichage des r\u00e9sultats pour \"{searchString}\"",
@@ -1748,6 +1731,7 @@
     "Split cell": "Scinder la cellule",
     "Square": "Carr\u00e9",
     "Staff": "\u00c9quipe p\u00e9dagogique",
+    "Staff Grader": "Notation du personnel",
     "Staff Only": "R\u00e9serv\u00e9 \u00e0 l'\u00e9quipe p\u00e9dagogique",
     "Staff and Learners": "Equipe p\u00e9dagogique et apprenants",
     "Staff assessment": "\u00c9valuation par l'\u00e9quipe enseignante",
@@ -1898,6 +1882,7 @@
     "The grading process is still running. Refresh the page to see updates.": "Le processus d'\u00e9valuation est toujours en cours. Rafra\u00eechir la page pour mettre \u00e0 jour.",
     "The language that team members primarily use to communicate with each other.": "La langue principalement utilis\u00e9e par les membres de l'\u00e9quipe pour communiquer entre eux.",
     "The language used throughout this site. This site is currently available in a limited number of languages. Changing the value of this field will cause the page to refresh.": "La langue employ\u00e9e sur ce site. Ce site est disponible uniquement dans certaines langues. Si vous modifiez ce champ, cela provoquera automatiquement une actualisation de la page.",
+    "The maximum number files that can be saved is ": "Le nombre maximum de fichiers pouvant \u00eatre enregistr\u00e9s est",
     "The maximum number of weeks this subsection can be due in is 18 weeks from the learner enrollment date.": "Le nombre maximum de semaines dans lesquelles cette sous-section peut \u00eatre due est de 18 semaines \u00e0 compter de la date d'inscription de l'apprenant.",
     "The minimum completion percentage must be a whole number between 0 and 100.": "Le pourcentage minimum d'ach\u00e8vement doit \u00eatre un nombre entier entre 0 et 100.",
     "The minimum grade for course credit is not set.": "La note minimale d'obtention d'un cr\u00e9dit pour ce cours n'est pas fix\u00e9e.",
@@ -1951,7 +1936,6 @@
     "There was an error retrieving preview results for this catalog. Please check that your query is correct and try again.": "Il y a eu une erreur lors de la r\u00e9cup\u00e9ration de l'aper\u00e7u des r\u00e9sultats pour ce catalogue. Veuillez v\u00e9rifier que votre requ\u00eate est correcte et essayer de nouveau.",
     "There was an error when trying to add learners:": [
       "Il y a eu une erreur lors de la tentative d'ajout d'\u00e9tudiants",
-      "{numErrors} \u00e9tudiants n'ont pas pu \u00eatre ajout\u00e9s \u00e0 cette cohorte :",
       "{numErrors} \u00e9tudiants n'ont pas pu \u00eatre ajout\u00e9s \u00e0 cette cohorte :"
     ],
     "There was an error while importing the new course to our database.": "Une erreur est survenue pendant l'importation du nouveau cours dans notre base de donn\u00e9es.",
@@ -2199,7 +2183,6 @@
     "Used": "Utilis\u00e9",
     "Used in {count} location": [
       "Utilis\u00e9 dans {count} emplacement",
-      "Utilis\u00e9 dans {count} emplacements",
       "Utilis\u00e9 dans {count} emplacements"
     ],
     "User Email": "Email de l'utilisateur",
@@ -2253,7 +2236,6 @@
     "View {span_start} {team_name} {span_end}": "Voir {span_start} {team_name} {span_end}",
     "Viewing %s course": [
       "Voir %s cours",
-      "Voir %s cours",
       "Voir %s cours"
     ],
     "Visibility": "Visibilit\u00e9",
@@ -2279,7 +2261,6 @@
     "We use your verification photos to confirm your identity and ensure the validity of your certificate.": "Nous utilisons vos photos de v\u00e9rification pour confirmer votre identit\u00e9 et assurer la validit\u00e9 de votre certificat.",
     "We're sorry to see you go! Your account will be deleted shortly.": "Nous sommes d\u00e9sol\u00e9s de vous voir partir ! Votre compte sera supprim\u00e9 d'ici peu.",
     "We're sorry, there was an error": "D\u00e9sol\u00e9, il y a eu une erreur",
-    "We've detected errors on the following tabs: ": "Nous avons d\u00e9tect\u00e9 des erreurs dans les onglets suivants\u00a0:",
     "We've encountered an error. Refresh your browser and then try again.": "Nous avons rencontr\u00e9 une erreur. Rafra\u00eechissez votre navigateur puis r\u00e9essayer.",
     "We've sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.": "Un message de confirmation a \u00e9t\u00e9 envoy\u00e9 \u00e0 {new_email_address}. Cliquer le lien dans le message afin de mettre \u00e0 jour votre adresse email.",
     "We've sent a confirmation message to {new_secondary_email_address}. Click the link in the message to update your secondary email address.": "Un message de confirmation a \u00e9t\u00e9 envoy\u00e9 \u00e0 {new_secondary_email_address}. Cliquez sur le lien dans le message pour mettre \u00e0 jour votre adresse email secondaire.",
@@ -2410,9 +2391,9 @@
     "Your entire face fits inside the frame.": " Votre visage est enti\u00e8rement dans le cadre.",
     "Your export has failed.": "Votre exportation a \u00e9chou\u00e9.",
     "Your face is well-lit.": "Votre visage est bien \u00e9clair\u00e9",
-    "Your file ": "Votre fichier",
     "Your file '{file}' has been uploaded. Allow a few minutes for processing.": "Votre fichier '{file}' a \u00e9t\u00e9 import\u00e9. Merci d'attendre quelques minutes pour son traitement.",
     "Your file could not be uploaded": "Votre fichier n'a pas pu \u00eatre charg\u00e9",
+    "Your file has been deleted or path has been changed: ": "Votre fichier a \u00e9t\u00e9 supprim\u00e9 ou le chemin a \u00e9t\u00e9 modifi\u00e9\u00a0:",
     "Your file has been deleted.": "Votre fichier a \u00e9t\u00e9 supprim\u00e9.",
     "Your file {filename} is too large (max size: {maxSize}MB).": "Votre fichier {filename} est trop grand (taille maxi : {maxSize} Mo).",
     "Your import has failed.": "Votre importation a \u00e9chou\u00e9.",
@@ -2462,7 +2443,6 @@
     "abbrev. month September\u0004Sep": "sep",
     "about %d hour": [
       "environ %d heure",
-      "environ %d heures",
       "environ %d heures"
     ],
     "about a minute": "environ une minute",
@@ -2506,10 +2486,10 @@
     "endorsed %(time_ago)s by %(user)s": "approuv\u00e9 %(time_ago)s par %(user)s",
     "enter code here": "saisir du code ici",
     "enter link description here": "saisir une description du lien ici",
+    "error count: ": "nombre d'erreurs\u00a0:",
     "follow this post": "Suivre ce message",
     "for": "pour",
     "group configuration": "configuration des groupes",
-    "has ": "a",
     "image omitted": "image manquante",
     "incorrect": "incorrect",
     "internally reviewed": "revue interne",
@@ -2553,7 +2533,6 @@
     "text_word_{uniqueId} title_word_{uniqueId}": "text_word_{uniqueId} title_word_{uniqueId}",
     "there is currently {numVotes} vote": [
       "il y a actuellement {numVotes} vote",
-      "il y a actuellement {numVotes} votes",
       "il y a actuellement {numVotes} votes"
     ],
     "title_word_{uniqueId}": "title_word_{uniqueId}",
@@ -2565,7 +2544,6 @@
     "upload a PDF file or provide the path to a Studio asset file": "Chargez un PDF ou fournissez le chemin d'un fichier de ressource Studio",
     "user_info": "user_info",
     "username or email": "nom d'utilisateur ou email",
-    "ve detected errors on the following tabs: ${tabNames.join(": "Nous avons d\u00e9tect\u00e9 des erreurs dans les onglets suivants : ${tabNames.join(",
     "weeks from learner enrollment date": "semaines \u00e0 compter de la date d'inscription de l'apprenant",
     "with %(release_date_from)s": "avec %(release_date_from)s",
     "with %(section_or_subsection)s": "avec %(section_or_subsection)s",
@@ -2582,12 +2560,10 @@
     "{download_link_start}Download this image (right-click or option-click, save as){link_end} and then {upload_link_start}upload{link_end} it to your backpack.": "{download_link_start}T\u00e9l\u00e9chargez cette image (clic droit ou option-clic, enregistrer sous){link_end} puis {upload_link_start}upload{link_end} dans votre sac \u00e0 dos.",
     "{earned}/{possible} point (graded)": [
       "{earned}/{possible} point (not\u00e9)",
-      "{earned}/{possible} points (not\u00e9)",
       "{earned}/{possible} points (not\u00e9)"
     ],
     "{earned}/{possible} point (ungraded)": [
       "{earned}/{possible} point (pas not\u00e9)",
-      "{earned}/{possible} points (pas not\u00e9)",
       "{earned}/{possible} points (pas not\u00e9)"
     ],
     "{email}": "{email}",
@@ -2601,37 +2577,30 @@
     "{minutes} {unit}": "{minutes} {unit}",
     "{numMoved} learner was moved from {prevCohort}": [
       "{numMoved} a \u00e9t\u00e9 enlev\u00e9 de {prevCohort}",
-      "{numMoved} \u00e9tudiants ont \u00e9t\u00e9 enlev\u00e9s de {prevCohort}",
       "{numMoved} \u00e9tudiants ont \u00e9t\u00e9 enlev\u00e9s de {prevCohort}"
     ],
     "{numPreassigned} learner was pre-assigned for this cohort. This learner will automatically be added to the cohort when they enroll in the course.": [
       "{numPreassigned} \u00e9tudiant \u00e9tait affect\u00e9 d'avance dans cette cohorte. Cet \u00e9tudiant sera automatiquement ajout\u00e9 \u00e0 la cohorte quand il s'inscrira \u00e0 ce cours.",
-      "{numPreassigned} \u00e9tudiants \u00e9taient affect\u00e9s d'avance dans cette cohorte. Ces \u00e9tudiants seront automatiquement ajout\u00e9s \u00e0 la cohorte quand ils s'inscriront \u00e0 ce cours.",
       "{numPreassigned} \u00e9tudiants \u00e9taient affect\u00e9s d'avance dans cette cohorte. Ces \u00e9tudiants seront automatiquement ajout\u00e9s \u00e0 la cohorte quand ils s'inscriront \u00e0 ce cours."
     ],
     "{numPresent} learner was already in the cohort": [
       "{numPresent} \u00e9tudiant \u00e9tait d\u00e9j\u00e0 dans la cohorte",
-      "{numPresent} \u00e9tudiants \u00e9taient d\u00e9j\u00e0 dans la cohorte",
       "{numPresent} \u00e9tudiants \u00e9taient d\u00e9j\u00e0 dans la cohorte"
     ],
     "{numResponses} other response": [
       "{numResponses} autre r\u00e9ponse",
-      "{numResponses} autres r\u00e9ponses",
       "{numResponses} autres r\u00e9ponses"
     ],
     "{numResponses} response": [
       "{numResponses} r\u00e9ponse",
-      "{numResponses} r\u00e9ponses",
       "{numResponses} r\u00e9ponses"
     ],
     "{numUsersAdded} learner has been added to this cohort. ": [
       "{numUsersAdded} \u00e9tudiant a \u00e9t\u00e9 ajout\u00e9 \u00e0 cette cohorte.",
-      "{numUsersAdded} \u00e9tudiants ont \u00e9t\u00e9 ajout\u00e9s \u00e0 cette cohorte.",
       "{numUsersAdded} \u00e9tudiants ont \u00e9t\u00e9 ajout\u00e9s \u00e0 cette cohorte."
     ],
     "{numVotes} Vote": [
       "{numVotes} Vote",
-      "{numVotes} Votes",
       "{numVotes} Votes"
     ],
     "{num_of_hours} hour": "{num_of_hours} heure",
@@ -2640,22 +2609,18 @@
     "{num_of_minutes} minutes": "{num_of_minutes} minutes",
     "{num_points} point possible (graded)": [
       "{num_points} point possible (graded)",
-      "{num_points} points possibles (graded)",
       "{num_points} points possibles (graded)"
     ],
     "{num_points} point possible (graded, results hidden)": [
       "{num_points} point possible (not\u00e9, r\u00e9sultats cach\u00e9s)",
-      "{num_points} points possibles (not\u00e9, r\u00e9sultats cach\u00e9s)",
       "{num_points} points possibles (not\u00e9, r\u00e9sultats cach\u00e9s)"
     ],
     "{num_points} point possible (ungraded)": [
       "{num_points} point possible (pas not\u00e9)",
-      "{num_points} points possibles (pas not\u00e9)",
       "{num_points} points possibles (pas not\u00e9)"
     ],
     "{num_points} point possible (ungraded, results hidden)": [
       "{num_points} point possible (non not\u00e9, r\u00e9sultats cach\u00e9s)",
-      "{num_points} points possibles (non not\u00e9, r\u00e9sultats cach\u00e9s)",
       "{num_points} points possibles (non not\u00e9, r\u00e9sultats cach\u00e9s)"
     ],
     "{organization}\\'s logo": "logo {organization}",
@@ -2673,13 +2638,11 @@
     "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on {platformName}.{strongEnd}": "{strongStart}Avertissement : la suppression du compte est permanente. {strongEnd}Veuillez lire attentivement les informations ci-dessus avant de poursuivre. Ceci est une action irr\u00e9versible et {strongStart}vous ne pourrez plus utiliser la m\u00eame adresse courriel sur {platformName}.{strongEnd}",
     "{team_count} Team": [
       "{team_count} \u00c9quipe",
-      "{team_count} \u00c9quipes",
       "{team_count} \u00c9quipes"
     ],
     "{totalItems} total": "total de {totalItems}",
     "{total_results} result found for \"{search_term}\"": [
       "{total_results} r\u00e9sultat trouv\u00e9 pour le \"{search_term}\"",
-      "{total_results} r\u00e9sultats trouv\u00e9s pour le \"{search_term}\"",
       "{total_results} r\u00e9sultats trouv\u00e9s pour le \"{search_term}\""
     ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",

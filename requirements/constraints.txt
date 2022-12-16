@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.55.1
+edx-enterprise==3.59.2
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -46,24 +46,11 @@ python3-saml<1.10.0
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
 
-# Release 2.1.0 pulls declares `pact-python` as a base requirement, even though it should be
-# a testing requirement. Installing it would cause a bunch of new tool packages to become base
-# requirements of edx-platform. Pinning temporarily until this is resolved in edx-val.
-edxval<2.1
-
 # At the time of writing this comment, we do not know whether py2neo>=2022
 # will support our currently-deployed Neo4j version (3.5).
 # Feel free to loosen this constraint if/when it is confirmed that a later
 # version of py2neo will work with Neo4j 3.5.
 py2neo<2022
-
-# pylint==2.14.0 is causing test failures
-pylint==2.13.9
-
-# Sphinx requires docutils<0.18. This pin can be removed once https://github.com/sphinx-doc/sphinx/issues/9777 is closed.
-docutils<0.18
-# Sphinx docs build fails with new version. Will be fixed in https://github.com/openedx/public-engineering/issues/161
-sphinx<5.1.0
 
 # scipy version 1.8 requires numpy>=1.17.3, we've pinned numpy to <1.17.0 in requirements/edx-sandbox/py38.in
 scipy<1.8.0
@@ -85,6 +72,19 @@ charset-normalizer<2.1.0
 # pinning the version untill the issue gets resolved in the package itself
 markdown<3.4.0
 
-# pycodestyle==2.9.0 generates false positive error E275. 
+# pycodestyle==2.9.0 generates false positive error E275.
 # Constraint can be removed once the issue https://github.com/PyCQA/pycodestyle/issues/1090 is fixed.
 pycodestyle<2.9.0
+
+# pyopenssl>22.0.0 requires cryptography>=38.0 && conflicts with snowflak-connector-python requires cryptography<37
+# which causes the requirements upgrade job to fail due to constraint conflict
+# This constraint can be removed once https://github.com/snowflakedb/snowflake-connector-python/issues/1259 is resolved
+# and snowflake-connector-python>2.8.0 is released.
+pyopenssl==22.0.0
+
+# pytz>2022.2.1 causes test failures in edx-platform
+pytz==2022.2.1
+
+# docutils==0.19 has removed the docutils.core.ErrorString which is required by the sphinxcontrib-openapi
+# This constraint can be removed once sphinxcontrib-openapi is updated to resolve this issue.
+docutils<0.19

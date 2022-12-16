@@ -101,7 +101,7 @@ class CacheIsolationMixin:
 
         cls.__old_settings.append(copy.deepcopy(settings.CACHES))
         override = override_settings(CACHES=cache_settings)
-        override.__enter__()
+        override.__enter__()  # pylint: disable=unnecessary-dunder-call
         cls.__settings_overrides.append(override)
 
         assert settings.CACHES == cache_settings

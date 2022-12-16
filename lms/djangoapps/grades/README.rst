@@ -20,4 +20,4 @@ More Documentation
 
 `Architecture <https://openedx.atlassian.net/wiki/spaces/AC/pages/159458764/Grades+Architecture>`_
 
-`Decisions <https://github.com/edx/edx-platform/tree/master/lms/djangoapps/grades/docs/decisions>`_
+`Decisions <https://github.com/openedx/edx-platform/tree/master/lms/djangoapps/grades/docs/decisions>`_

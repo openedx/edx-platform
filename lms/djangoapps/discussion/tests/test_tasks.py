@@ -78,7 +78,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with mock.patch('common.djangoapps.student.models.cc.User.save'):
+        with mock.patch('common.djangoapps.student.models.user.cc.User.save'):
             cls.thread_author = UserFactory(
                 username='thread_author',
                 password='password',

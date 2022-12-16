@@ -40,7 +40,7 @@ def _directory_name(data_usage_key):
     # .. setting_default: ''
     # .. setting_description: Specifies the path in storage where block structures would be saved,
     #   for storage-backed block structure cache.
-    #   For more information, check https://github.com/edx/edx-platform/pull/14571.
+    #   For more information, check https://github.com/openedx/edx-platform/pull/14571.
     # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and on
     #   `block_structure.storage_backing_for_cache`.
     directory_prefix = settings.BLOCK_STRUCTURES_SETTINGS.get('DIRECTORY_PREFIX', '')
@@ -73,7 +73,7 @@ def _bs_model_storage():
     # .. setting_name: BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']
     # .. setting_default: None
     # .. setting_description: Specifies the storage used for storage-backed block structure cache.
-    #   For more information, check https://github.com/edx/edx-platform/pull/14571.
+    #   For more information, check https://github.com/openedx/edx-platform/pull/14571.
     # .. setting_warnings: Depends on `block_structure.storage_backing_for_cache`.
     storage_class = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS')
 
@@ -81,7 +81,7 @@ def _bs_model_storage():
     # .. setting_default: {}
     # .. setting_description: Specifies the keyword arguments needed to setup the storage, which
     #   would be used for storage-backed block structure cache.
-    #   For more information, check https://github.com/edx/edx-platform/pull/14571.
+    #   For more information, check https://github.com/openedx/edx-platform/pull/14571.
     # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and on
     #   `block_structure.storage_backing_for_cache`.
     storage_kwargs = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_KWARGS', {})

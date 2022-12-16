@@ -1,6 +1,6 @@
 {% load i18n %}
 {% autoescape off %}
-{{ course_email.text_message }}
+{{ formatted_text_message }}
 {% endautoescape %}
 
 

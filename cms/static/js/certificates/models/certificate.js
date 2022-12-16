@@ -43,7 +43,7 @@ define([
             initialize: function(attributes, options) {
                 // Set up the initial state of the attributes set for this model instance
                 this.canBeEmpty = options && options.canBeEmpty;
-                if (options.add) {
+                if (options.add && !attributes.signatories) {
                     // Ensure at least one child Signatory model is defined for any new Certificate model
                     attributes.signatories = new SignatoryModel({certificate: this});
                 }

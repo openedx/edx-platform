@@ -51,7 +51,16 @@ class TestSendGradeToCredentialTask(TestCase):
         api_client = mock.MagicMock()
         mock_get_api_client.return_value = api_client
 
-        tasks.send_grade_to_credentials.delay('user', 'course-v1:org+course+run', True, 'A', 1.0).get()
+        last_updated = datetime.now()
+
+        tasks.send_grade_to_credentials.delay(
+            'user',
+            'course-v1:org+course+run',
+            True,
+            'A',
+            1.0,
+            last_updated
+        ).get()
 
         assert mock_get_api_client.call_count == 1
         assert mock_get_api_client.call_args[0] == (self.user,)
@@ -63,6 +72,7 @@ class TestSendGradeToCredentialTask(TestCase):
             'letter_grade': 'A',
             'percent_grade': 1.0,
             'verified': True,
+            'lms_last_updated_at': last_updated.isoformat(),
         })
 
     def test_retry(self, mock_get_api_client):
@@ -71,7 +81,7 @@ class TestSendGradeToCredentialTask(TestCase):
         """
         mock_get_api_client.side_effect = boom
 
-        task = tasks.send_grade_to_credentials.delay('user', 'course-v1:org+course+run', True, 'A', 1.0)
+        task = tasks.send_grade_to_credentials.delay('user', 'course-v1:org+course+run', True, 'A', 1.0, None)
 
         pytest.raises(Exception, task.get)
         assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
@@ -482,18 +492,14 @@ class TestSendGradeIfInteresting(TestCase):
                                       _mock_is_learner_issuance_enabled):
         mock_is_course_run_in_a_program.return_value = True
 
-        with mock_passing_grade('B', 0.81):
+        last_updated = datetime.now()
+        with mock_passing_grade('B', 0.81, last_updated):
             tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
         assert mock_send_grade_to_credentials.delay.called
-        assert mock_send_grade_to_credentials.delay.call_args[0] == (self.user.username, str(self.key), True, 'B', 0.81)
+        assert mock_send_grade_to_credentials.delay.call_args[0] == (
+            self.user.username, str(self.key), True, 'B', 0.81, last_updated
+        )
         mock_send_grade_to_credentials.delay.reset_mock()
-
-    @mock.patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
-    def test_send_grade_without_grade(self, mock_is_course_run_in_a_program, mock_send_grade_to_credentials,
-                                      _mock_is_learner_issuance_enabled):
-        mock_is_course_run_in_a_program.return_value = True
-        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
-        assert not mock_send_grade_to_credentials.delay.called
 
     def test_send_grade_without_issuance_enabled(self, _mock_is_course_run_in_a_program,
                                                  mock_send_grade_to_credentials, mock_is_learner_issuance_enabled):

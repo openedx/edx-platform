@@ -24,11 +24,6 @@ class PytestSuite(TestSuite):
         self.failed_only = kwargs.get('failed_only', False)
         self.fail_fast = kwargs.get('fail_fast', False)
         self.run_under_coverage = kwargs.get('with_coverage', True)
-        django_version = kwargs.get('django_version', None)
-        if django_version is None:
-            self.django_toxenv = None
-        else:
-            self.django_toxenv = 'py27-django{}'.format(django_version.replace('.', ''))
         self.disable_courseenrollment_history = kwargs.get('disable_courseenrollment_history', '1')
         self.disable_capture = kwargs.get('disable_capture', None)
         self.report_dir = Env.REPORT_DIR / self.root
@@ -151,18 +146,14 @@ class SystemTestSuite(PytestSuite):
 
     @property
     def cmd(self):
-        if self.django_toxenv:
-            cmd = ['tox', '-e', self.django_toxenv, '--']
-        else:
-            cmd = []
-        cmd.extend([
+        cmd = [
             'python',
             '-Wd',
             '-m',
             'pytest',
             '--ds={}'.format(f'{self.root}.envs.{self.settings}'),
             f"--junitxml={self.xunit_report}",
-        ])
+        ]
         cmd.extend(self.test_options_flags)
         if self.verbosity < 1:
             cmd.append("--quiet")
@@ -260,7 +251,7 @@ class SystemTestSuite(PytestSuite):
 
 class LibTestSuite(PytestSuite):
     """
-    TestSuite for edx-platform/common/lib python unit tests
+    TestSuite for edx-platform/pavelib/paver_tests python unit tests
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -279,17 +270,13 @@ class LibTestSuite(PytestSuite):
 
     @property
     def cmd(self):
-        if self.django_toxenv:
-            cmd = ['tox', '-e', self.django_toxenv, '--']
-        else:
-            cmd = []
-        cmd.extend([
+        cmd = [
             'python',
             '-Wd',
             '-m',
             'pytest',
             f'--junitxml={self.xunit_report}',
-        ])
+        ]
         cmd.extend(self.passthrough_options + self.test_options_flags)
         if self.verbosity < 1:
             cmd.append("--quiet")
@@ -321,11 +308,7 @@ class LibTestSuite(PytestSuite):
             for rsync_dir in Env.rsync_dirs():
                 cmd.append(f'--rsyncdir {rsync_dir}')
             # "--rsyncdir" throws off the configuration root, set it explicitly
-            if 'common/lib' in self.test_id:
-                cmd.append('--rootdir=common/lib')
-                cmd.append('-c common/lib/pytest.ini')
-            elif 'pavelib/paver_tests' in self.test_id:
-                cmd.append('--rootdir=pavelib/paver_tests')
+            cmd.append('--rootdir=pavelib/paver_tests')
         else:
             if self.processes == -1:
                 cmd.append('-n auto')

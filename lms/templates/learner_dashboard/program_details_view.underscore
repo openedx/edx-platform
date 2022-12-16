@@ -1,8 +1,8 @@
 <header class="js-program-header program-header full-width-banner"></header>
 <!-- TODO: consider if article is the most appropriate element here -->
 
-<div class="col-md-12 d-md-flex">
-<article class="program-details-content col-md-8">
+<div class="col-12 flex-column flex-xl-row d-md-flex">
+<article class="program-details-content col-12 col-xl-8">
     <div class="program-heading">
             <% if (completedCount === totalCount) { %>
                 <h3 class="program-heading-title"><%- gettext('Congratulations!') %></h3>
@@ -76,5 +76,5 @@
         </div>
     </div>
 </article>
-<aside class="js-program-sidebar program-sidebar col-md-4"></aside>
+<aside class="js-program-sidebar program-sidebar col-12 col-xl-4"></aside>
 </div>

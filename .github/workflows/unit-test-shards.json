@@ -53,6 +53,7 @@
     "paths": [
       "lms/djangoapps/instructor_task/",
       "lms/djangoapps/learner_dashboard/",
+      "lms/djangoapps/learner_home/",
       "lms/djangoapps/lms_initialization/",
       "lms/djangoapps/lms_xblock/",
       "lms/djangoapps/lti_provider/",

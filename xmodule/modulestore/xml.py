@@ -493,7 +493,9 @@ class XMLModuleStore(ModuleStoreReadBase):
                 """
                 return policy.get(policy_key(usage_id), {})
 
-            services = {}
+            services = {
+                'field-data': self.field_data
+            }
             if self.i18n_service:
                 services['i18n'] = self.i18n_service
 
@@ -513,7 +515,6 @@ class XMLModuleStore(ModuleStoreReadBase):
                 mixins=self.xblock_mixins,
                 default_class=self.default_class,
                 select=self.xblock_select,
-                field_data=self.field_data,
                 services=services,
                 target_course_id=target_course_id,
             )

@@ -47,7 +47,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from xmodule.modulestore.tests.django_utils import ModuleStoreEnum, ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -464,18 +464,13 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         )))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_dashboard_metadata_caching(self, modulestore_type):
+    def test_dashboard_metadata_caching(self):
         """
         Check that the student dashboard makes use of course metadata caching.
 
         After creating a course, that course's metadata should be cached as a
         CourseOverview. The student dashboard should never have to make calls to
         the modulestore.
-
-        Arguments:
-            modulestore_type (ModuleStoreEnum.Type): Type of modulestore to create
-                test course in.
 
         Note to future developers:
             If you break this test so that the "check_mongo_calls(0)" fails,
@@ -486,7 +481,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         """
         # Create a course and log in the user.
         # Creating a new course will trigger a publish event and the course will be cached
-        test_course = CourseFactory.create(default_store=modulestore_type, emit_signals=True)
+        test_course = CourseFactory.create(emit_signals=True)
         self.client.login(username="jack", password="test")
 
         with check_mongo_calls(0):
@@ -629,8 +624,8 @@ class UserSettingsEventTestMixin(EventTestMixin):
 class EnrollmentEventTestMixin(EventTestMixin):
     """ Mixin with assertions for validating enrollment events. """
     def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
-        super().setUp('common.djangoapps.student.models.tracker')
-        segment_patcher = patch('common.djangoapps.student.models.segment')
+        super().setUp('common.djangoapps.student.models.course_enrollment.tracker')
+        segment_patcher = patch('common.djangoapps.student.models.course_enrollment.segment')
         self.mock_segment_tracker = segment_patcher.start()
         self.addCleanup(segment_patcher.stop)
 
@@ -995,7 +990,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
             mode_display_name='Honor Code',
         )
         self.user2 = UserFactory.create()
-        patcher = patch('common.djangoapps.student.models.tracker')
+        patcher = patch('common.djangoapps.student.models.course_enrollment.tracker')
         patcher.start()
         self.addCleanup(patcher.stop)
 

@@ -9,13 +9,14 @@ on:
 
 jobs:
   run-test:
-    if: github.repository != 'openedx/edx-platform' && github.repository != 'edx/edx-platform-private'
+    if: (github.repository != 'openedx/edx-platform' && github.repository != 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == true))
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
         python-version: [ '3.8' ]
-        django-version: [ "3.2" ]
+        django-version:
+          - "pinned"
         shard_name: [
             "lms-1",
             "lms-2",
@@ -60,25 +61,30 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/testing.txt') }}
           restore-keys: ${{ runner.os }}-pip-
 
       - name: Install Required Python Dependencies
+        env:
+          PIP_SRC: ${{ runner.temp }}
         run: |
-            pip install -r requirements/pip.txt
-            pip install -r requirements/edx/development.txt --src ${{ runner.temp }}
+          make test-requirements
+          if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
             pip install "django~=${{ matrix.django-version }}.0"
+            pip check # fail if this test-reqs/Django combination is broken
+          fi
 
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests
 
   collect-and-verify:
-    if: github.repository != 'openedx/edx-platform' && github.repository != 'edx/edx-platform-private'
+    if: (github.repository != 'openedx/edx-platform' && github.repository != 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == true))
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version: [ '3.8' ]
-        django-version: [ "3.2" ]
+        django-version:
+          - "pinned"
     steps:
       - uses: actions/checkout@v2
 
@@ -100,14 +106,16 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/testing.txt') }}
           restore-keys: ${{ runner.os }}-pip-
 
       - name: Install Required Python Dependencies
         run: |
-            pip install -r requirements/pip.txt
-            pip install -r requirements/edx/development.txt --src ${{ runner.temp }}
+          make test-requirements
+          if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
             pip install "django~=${{ matrix.django-version }}.0"
+            pip check # fail if this test-reqs/Django combination is broken
+          fi
 
       - name: verify unit tests count
         uses: ./.github/actions/verify-tests-count

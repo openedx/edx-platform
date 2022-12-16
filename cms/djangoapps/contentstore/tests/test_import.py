@@ -18,7 +18,6 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_number_of_calls
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -174,21 +173,6 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         _module_store, _content_store, course = self.load_test_import_course()
         print(f"course tabs = {course.tabs}")
         self.assertEqual(course.tabs[1]['name'], 'Syllabus')
-
-    def test_import_performance_mongo(self):
-        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-
-        # we try to refresh the inheritance tree for each update_item in the import
-        with check_exact_number_of_calls(store, 'refresh_cached_metadata_inheritance_tree', 28):
-
-            # _get_cached_metadata_inheritance_tree should be called once
-            with check_exact_number_of_calls(store, '_get_cached_metadata_inheritance_tree', 1):
-
-                # with bulk-edit in progress, the inheritance tree should be recomputed only at the end of the import
-                # NOTE: On Jenkins, with memcache enabled, the number of calls here is 1.
-                #       Locally, without memcache, the number of calls is 1 (publish no longer counted)
-                with check_number_of_calls(store, '_compute_metadata_inheritance_tree', 1):
-                    self.load_test_import_course(create_if_not_present=False, module_store=store)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_reimport(self, default_ms_type):

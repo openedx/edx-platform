@@ -21,5 +21,5 @@ jobs:
        requirements_bot_github_email: ${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}
        edx_smtp_username: ${{ secrets.EDX_SMTP_USERNAME }}
        edx_smtp_password: ${{ secrets.EDX_SMTP_PASSWORD }}
-    uses: edx/.github/.github/workflows/upgrade-python-requirements.yml@master
+    uses: openedx/.github/.github/workflows/upgrade-python-requirements.yml@master
 

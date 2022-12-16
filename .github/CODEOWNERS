@@ -17,24 +17,26 @@ openedx/features/course_experience/
 xmodule/
 
 # Core Extensions
-common/lib/xmodule/xmodule/capa_module.py
-common/lib/xmodule/xmodule/html_module.py
-common/lib/xmodule/xmodule/video_module
 lms/djangoapps/discussion/
 lms/djangoapps/edxnotes
 
 # Analytics
-common/djangoapps/track/                   @edx/edx-data-engineering
+common/djangoapps/track/
 
 # Credentials
-lms/djangoapps/certificates/               @edx/platform-credentials
+lms/djangoapps/certificates/
 
 # Discovery
-common/djangoapps/course_modes/            @edx/platform-discovery
-common/djangoapps/enrollment/              @edx/platform-discovery
-lms/djangoapps/commerce/                   @edx/rev-team
-lms/djangoapps/experiments/                @edx/rev-team
-lms/djangoapps/learner_dashboard/          @edx/platform-discovery
-openedx/features/content_type_gating/      @edx/rev-team
-openedx/features/course_duration_limits/   @edx/rev-team
-openedx/features/discounts/                @edx/rev-team
+common/djangoapps/course_modes/
+common/djangoapps/enrollment/
+lms/djangoapps/commerce/
+lms/djangoapps/experiments/
+lms/djangoapps/learner_dashboard/
+lms/djangoapps/learner_home/
+openedx/features/content_type_gating/
+openedx/features/course_duration_limits/
+openedx/features/discounts/
+
+# Ping tCRIL On-call if someone uses the QuickStart
+# https://docs.openedx.org/en/latest/developers/quickstarts/first_openedx_pr.html
+lms/templates/dashboard.html               @openedx/tcril-oncall

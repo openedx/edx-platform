@@ -36,9 +36,18 @@ def get_course_enrollment(student_id, course_id):
     return _get_fake_enrollment(student_id, course_id)
 
 
-def create_course_enrollment(student_id, course_id, mode='honor', is_active=True, enterprise_uuid=None):
+def create_course_enrollment(
+    student_id, course_id, mode='honor', is_active=True, enterprise_uuid=None, force_enrollment=False
+):
     """Stubbed out Enrollment creation request. """
-    return add_enrollment(student_id, course_id, mode=mode, is_active=is_active, enterprise_uuid=enterprise_uuid)
+    return add_enrollment(
+        student_id,
+        course_id,
+        mode=mode,
+        is_active=is_active,
+        enterprise_uuid=enterprise_uuid,
+        force_enrollment=force_enrollment
+    )
 
 
 def update_course_enrollment(student_id, course_id, mode=None, is_active=None):
@@ -74,7 +83,9 @@ def _get_fake_course_info(course_id, include_expired=False):
             return course
 
 
-def add_enrollment(student_id, course_id, is_active=True, mode='honor', enterprise_uuid=None):
+def add_enrollment(
+    student_id, course_id, is_active=True, mode='honor', enterprise_uuid=None, force_enrollment=False
+):
     """Append an enrollment to the enrollments array."""
     enrollment = {
         "created": datetime.datetime.now(),

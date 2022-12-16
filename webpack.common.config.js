@@ -98,6 +98,7 @@ module.exports = Merge.smart({
             AxiosJwtTokenService: './lms/static/js/jwt_auth/AxiosJwtTokenService.js',
             EnterpriseLearnerPortalModal: './lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx',
             RecommendationsPanel: './lms/static/js/learner_dashboard/RecommendationsPanel.jsx',
+            Static2UCallouts: './lms/static/js/learner_dashboard/Static2UCallouts.jsx',
 
             // Learner Dashboard
             EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',
@@ -173,7 +174,7 @@ module.exports = Merge.smart({
                 // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
                 // (I've tried every other suggestion solution on that page, this
                 // was the only one that worked.)
-                /\/sinon\.js|codemirror-compressed\.js|hls\.js|tinymce\.full\.min\.js/
+                /\/sinon\.js|codemirror-compressed\.js|hls\.js|tinymce.js/
             ],
             rules: [
                 {
@@ -377,7 +378,7 @@ module.exports = Merge.smart({
                 'jquery.timepicker': 'timepicker/jquery.timepicker',
                 'backbone.associations': 'backbone-associations/backbone-associations-min',
                 squire: 'Squire',
-                tinymce: 'tinymce.full.min',
+                tinymce: 'tinymce',
 
                 // See sinon/webpack interaction weirdness:
                 // https://github.com/webpack/webpack/issues/304#issuecomment-272150177

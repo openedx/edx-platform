@@ -21,6 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -199,7 +200,10 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'enable_in_context': True,
             'group_at_subsection': False,
             'provider': 'legacy',
-            'user_is_privileged': False,
+            'has_moderation_privileges': False,
+            "is_course_staff": False,
+            "is_course_admin": False,
+            'is_group_ta': False,
             'is_user_admin': False,
             'user_roles': {'Student'},
             'learners_tab_enabled': False,
@@ -219,7 +223,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role)
         course_meta = get_course(self.request, self.course.id)
-        assert course_meta["user_is_privileged"]
+        assert course_meta["has_moderation_privileges"]
         assert course_meta["user_roles"] == {FORUM_ROLE_STUDENT} | {role}
 
     @ddt.data(True, False)
@@ -407,17 +411,17 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 "B": {"id": "non-courseware-2"},
             }
             self.store.update_item(self.course, self.user.id)
-            self.make_discussion_xblock("courseware-1", "A", "1")
-            self.make_discussion_xblock("courseware-2", "A", "2")
-            self.make_discussion_xblock("courseware-3", "B", "1")
-            self.make_discussion_xblock("courseware-4", "B", "2")
-            self.make_discussion_xblock("courseware-5", "C", "1")
+            self.make_discussion_xblock("courseware-1", "Week 1", "1")
+            self.make_discussion_xblock("courseware-2", "Week 1", "2")
+            self.make_discussion_xblock("courseware-3", "Week 10", "1")
+            self.make_discussion_xblock("courseware-4", "Week 10", "2")
+            self.make_discussion_xblock("courseware-5", "Week 9", "1")
         actual = self.get_course_topics()
         expected = {
             "courseware_topics": [
                 self.make_expected_tree(
                     None,
-                    "A",
+                    "Week 1",
                     [
                         self.make_expected_tree("courseware-1", "1"),
                         self.make_expected_tree("courseware-2", "2"),
@@ -425,16 +429,16 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 ),
                 self.make_expected_tree(
                     None,
-                    "B",
+                    "Week 9",
+                    [self.make_expected_tree("courseware-5", "1")]
+                ),
+                self.make_expected_tree(
+                    None,
+                    "Week 10",
                     [
                         self.make_expected_tree("courseware-3", "1"),
                         self.make_expected_tree("courseware-4", "2"),
                     ]
-                ),
-                self.make_expected_tree(
-                    None,
-                    "C",
-                    [self.make_expected_tree("courseware-5", "1")]
                 ),
             ],
             "non_courseware_topics": [
@@ -444,7 +448,10 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         }
         assert actual == expected
 
-    def test_sort_key(self):
+    def test_sort_key_doesnot_work(self):
+        """
+        Test to check that providing sort_key doesn't change the sort order
+        """
         with self.store.bulk_operations(self.course.id, emit_signals=False):
             self.course.discussion_topics = {
                 "W": {"id": "non-courseware-1", "sort_key": "Z"},
@@ -485,10 +492,10 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 ),
             ],
             "non_courseware_topics": [
-                self.make_expected_tree("non-courseware-4", "Z"),
+                self.make_expected_tree("non-courseware-1", "W"),
                 self.make_expected_tree("non-courseware-2", "X"),
                 self.make_expected_tree("non-courseware-3", "Y"),
-                self.make_expected_tree("non-courseware-1", "W"),
+                self.make_expected_tree("non-courseware-4", "Z"),
             ],
         }
         assert actual == expected
@@ -499,7 +506,6 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         ways in which a user may not have access are:
 
         * Module is visible to staff only
-        * Module has a start date in the future
         * Module is accessible only to a group the user is not in
 
         Also, there is a case that ensures that a category with no accessible
@@ -571,12 +577,7 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                         self.make_expected_tree("courseware-3", "Cohort B"),
                         self.make_expected_tree("courseware-1", "Everybody"),
                     ]
-                ),
-                self.make_expected_tree(
-                    None,
-                    "Second",
-                    [self.make_expected_tree("courseware-5", "Future Start Date")]
-                ),
+                )
             ],
             "non_courseware_topics": [
                 self.make_expected_tree("non-courseware-topic-id", "Test Topic"),
@@ -601,8 +602,45 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                     None,
                     "Second",
                     [
-                        self.make_expected_tree("courseware-5", "Future Start Date"),
                         self.make_expected_tree("courseware-4", "Staff Only"),
+                    ]
+                ),
+            ],
+            "non_courseware_topics": [
+                self.make_expected_tree("non-courseware-topic-id", "Test Topic"),
+            ],
+        }
+        assert staff_actual == staff_expected
+
+    def test_un_released_discussion_topic(self):
+        """
+        Test discussion topics that have not yet started
+        """
+        staff = StaffFactory.create(course_key=self.course.id)
+        with self.store.bulk_operations(self.course.id, emit_signals=False):
+            self.store.update_item(self.course, self.user.id)
+            self.make_discussion_xblock(
+                "courseware-2",
+                "First",
+                "Released",
+                start=datetime.now(UTC) - timedelta(days=1)
+            )
+            self.make_discussion_xblock(
+                "courseware-3",
+                "First",
+                "Future release",
+                start=datetime.now(UTC) + timedelta(days=1)
+            )
+
+        self.request.user = staff
+        staff_actual = self.get_course_topics()
+        staff_expected = {
+            "courseware_topics": [
+                self.make_expected_tree(
+                    None,
+                    "First",
+                    [
+                        self.make_expected_tree("courseware-2", "Released"),
                     ]
                 ),
             ],
@@ -801,7 +839,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 "comment_count": 6,
                 "unread_comment_count": 3,
                 "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
-                "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+                "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
                 "has_endorsed": True,
                 "read": True,
                 "created_at": "2015-04-28T00:00:00Z",
@@ -831,7 +869,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 "non_endorsed_comment_list_url": (
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
                 ),
-                "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+                "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
                 "abuse_flagged_count": None,
                 "can_delete": False,
             }),
@@ -1892,7 +1930,7 @@ class CreateThreadTest(
                 "anonymous",
                 "close_reason_code",
                 "closed",
-                "edit_reason_code",
+                "copy_link",
                 "following",
                 "pinned",
                 "raw_body",
@@ -2247,14 +2285,13 @@ class CreateCommentTest(
         editable_fields = [
             "abuse_flagged",
             "anonymous",
-            "edit_reason_code",
             "raw_body",
             "voted",
         ]
         if parent_id:
             data["parent_id"] = parent_id
         else:
-            editable_fields.insert(3, "endorsed")
+            editable_fields.insert(2, "endorsed")
 
         _set_course_discussion_blackout(course=self.course, user_id=self.user.id)
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_MODERATOR)
@@ -2796,7 +2833,8 @@ class UpdateThreadTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_abuse_flagged(self, old_flagged, new_flagged):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_abuse_flagged(self, old_flagged, new_flagged, mock_emit):
         """
         Test attempts to edit the "abuse_flagged" field.
 
@@ -2823,12 +2861,36 @@ class UpdateThreadTest(
             assert httpretty.last_request().method == 'PUT'
             assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
 
+            expected_event_name = 'edx.forum.thread.reported' if new_flagged else 'edx.forum.thread.unreported'
+            expected_event_data = {
+                'body': 'Original body',
+                'id': 'test_thread',
+                'content_type': 'Post',
+                'commentable_id': 'original_topic',
+                'url': '',
+                'user_course_roles': [],
+                'user_forums_roles': [FORUM_ROLE_STUDENT],
+                'target_username': self.user.username,
+                'title_truncated': False,
+                'title': 'Original Title',
+                'thread_type': 'discussion',
+                'group_id': None,
+                'truncated': False,
+            }
+            if not new_flagged:
+                expected_event_data['reported_status_cleared'] = False
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
+
     @ddt.data(
         (False, True),
-        (True, False),
+        (True, True),
     )
     @ddt.unpack
-    def test_thread_un_abuse_flag_for_moderator_role(self, is_author, remove_all):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_thread_un_abuse_flag_for_moderator_role(self, is_author, remove_all, mock_emit):
         """
         Test un-abuse flag for moderator role.
 
@@ -2836,10 +2898,6 @@ class UpdateThreadTest(
         pass the "all" flag to the api. This will indicate
         to the api to clear all abuse_flaggers, and mark the
         thread as unreported.
-        If moderator is author of a thread, we want to restrict
-        the usage of the remove_all flag, so it cant be used
-        to remove all abuse_flaggers from a moderator post
-        by the moderator itself.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
         self.register_get_user_response(self.user)
@@ -2852,6 +2910,28 @@ class UpdateThreadTest(
         if remove_all:
             query_params.update({'all': ['True']})
         assert parsed_body(httpretty.last_request()) == query_params
+
+        expected_event_name = 'edx.forum.thread.unreported'
+        expected_event_data = {
+            'body': 'Original body',
+            'id': 'test_thread',
+            'content_type': 'Post',
+            'commentable_id': 'original_topic',
+            'url': '',
+            'user_course_roles': [],
+            'user_forums_roles': [FORUM_ROLE_STUDENT, FORUM_ROLE_ADMINISTRATOR],
+            'target_username': self.user.username,
+            'title_truncated': False,
+            'title': 'Original Title',
+            'reported_status_cleared': False,
+            'thread_type': 'discussion',
+            'group_id': None,
+            'truncated': False,
+        }
+
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
 
     def test_invalid_field(self):
         self.register_thread()
@@ -2868,12 +2948,13 @@ class UpdateThreadTest(
     @mock.patch("lms.djangoapps.discussion.rest_api.serializers.EDIT_REASON_CODES", {
         "test-edit-reason": "Test Edit Reason",
     })
-    def test_update_thread_with_edit_reason_code(self, role_name):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_update_thread_with_edit_reason_code(self, role_name, mock_emit):
         """
         Test editing comments, specifying and retrieving edit reason codes.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
-        self.register_thread()
+        self.register_thread({"user_id": str(self.user.id + 1)})
         try:
             result = update_thread(self.request, "test_thread", {
                 "raw_body": "Edited body",
@@ -2888,35 +2969,79 @@ class UpdateThreadTest(
             }
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
             assert request_body["edit_reason_code"] == ["test-edit-reason"]
+
+            expected_event_name = 'edx.forum.thread.edited'
+            expected_event_data = {
+                'id': 'test_thread',
+                'content_type': 'Post',
+                'own_content': False,
+                'url': '',
+                'user_course_roles': [],
+                'user_forums_roles': ['Student', role_name],
+                'target_username': self.user.username,
+                'edit_reason': 'test-edit-reason',
+                'commentable_id': 'original_topic'
+            }
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
+
         except ValidationError as error:
             assert role_name == FORUM_ROLE_STUDENT
-            assert error.message_dict == {"edit_reason_code": ["This field is not editable."]}
+            assert error.message_dict == {"edit_reason_code": ["This field is not editable."],
+                                          "raw_body": ["This field is not editable."]}
 
     @ddt.data(
-        FORUM_ROLE_ADMINISTRATOR,
-        FORUM_ROLE_MODERATOR,
-        FORUM_ROLE_COMMUNITY_TA,
-        FORUM_ROLE_STUDENT,
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False]
+        )
     )
+    @ddt.unpack
     @mock.patch("lms.djangoapps.discussion.rest_api.serializers.CLOSE_REASON_CODES", {
         "test-close-reason": "Test Close Reason",
     })
-    def test_update_thread_with_close_reason_code(self, role_name):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_update_thread_with_close_reason_code(self, role_name, closed, mock_emit):
         """
         Test editing comments, specifying and retrieving edit reason codes.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_thread()
         try:
+            self.request.META['HTTP_REFERER'] = 'https://example.com'
             result = update_thread(self.request, "test_thread", {
-                "closed": True,
+                "closed": closed,
                 "close_reason_code": "test-close-reason",
             })
+
             assert role_name != FORUM_ROLE_STUDENT
-            assert result["closed"]
+            assert result["closed"] == closed
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
             assert request_body["close_reason_code"] == ["test-close-reason"]
             assert request_body["closing_user_id"] == [str(self.user.id)]
+
+            expected_event_name = f'edx.forum.thread.{"locked" if closed else "unlocked"}'
+            expected_event_data = {
+                'id': 'test_thread',
+                'team_id': None,
+                'url': self.request.META['HTTP_REFERER'],
+                'user_course_roles': [],
+                'user_forums_roles': ['Student', role_name],
+                'target_username': self.user.username,
+                'lock_reason': 'test-close-reason',
+                'commentable_id': 'original_topic'
+            }
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
         except ValidationError as error:
             assert role_name == FORUM_ROLE_STUDENT
             assert error.message_dict == {
@@ -3281,7 +3406,8 @@ class UpdateCommentTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_abuse_flagged(self, old_flagged, new_flagged):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_abuse_flagged(self, old_flagged, new_flagged, mock_emit):
         """
         Test attempts to edit the "abuse_flagged" field.
 
@@ -3308,12 +3434,32 @@ class UpdateCommentTest(
             assert httpretty.last_request().method == 'PUT'
             assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
 
+            expected_event_name = 'edx.forum.response.reported' if new_flagged else 'edx.forum.response.unreported'
+            expected_event_data = {
+                'body': 'Original body',
+                'id': 'test_comment',
+                'content_type': 'Response',
+                'commentable_id': 'dummy',
+                'url': '',
+                'truncated': False,
+                'user_course_roles': [],
+                'user_forums_roles': [FORUM_ROLE_STUDENT],
+                'target_username': self.user.username,
+            }
+            if not new_flagged:
+                expected_event_data['reported_status_cleared'] = False
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
+
     @ddt.data(
         (False, True),
-        (True, False),
+        (True, True),
     )
     @ddt.unpack
-    def test_comment_un_abuse_flag_for_moderator_role(self, is_author, remove_all):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_comment_un_abuse_flag_for_moderator_role(self, is_author, remove_all, mock_emit):
         """
         Test un-abuse flag for moderator role.
 
@@ -3321,10 +3467,6 @@ class UpdateCommentTest(
         pass the "all" flag to the api. This will indicate
         to the api to clear all abuse_flaggers, and mark the
         comment as unreported.
-        If moderator is author of a comment, we want to restrict
-        the usage of the remove_all flag, so it cant be used
-        to remove all abuse_flaggers from a moderator post
-        by the moderator itself.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
         self.register_get_user_response(self.user)
@@ -3338,6 +3480,24 @@ class UpdateCommentTest(
             query_params.update({'all': ['True']})
         assert parsed_body(httpretty.last_request()) == query_params
 
+        expected_event_name = 'edx.forum.response.unreported'
+        expected_event_data = {
+            'body': 'Original body',
+            'id': 'test_comment',
+            'content_type': 'Response',
+            'commentable_id': 'dummy',
+            'truncated': False,
+            'url': '',
+            'user_course_roles': [],
+            'user_forums_roles': [FORUM_ROLE_STUDENT, FORUM_ROLE_ADMINISTRATOR],
+            'target_username': self.user.username,
+            'reported_status_cleared': False,
+        }
+
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
+
     @ddt.data(
         FORUM_ROLE_ADMINISTRATOR,
         FORUM_ROLE_MODERATOR,
@@ -3347,12 +3507,13 @@ class UpdateCommentTest(
     @mock.patch("lms.djangoapps.discussion.rest_api.serializers.EDIT_REASON_CODES", {
         "test-edit-reason": "Test Edit Reason",
     })
-    def test_update_comment_with_edit_reason_code(self, role_name):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_update_comment_with_edit_reason_code(self, role_name, mock_emit):
         """
         Test editing comments, specifying and retrieving edit reason codes.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
-        self.register_comment()
+        self.register_comment({"user_id": str(self.user.id + 1)})
         try:
             result = update_comment(self.request, "test_comment", {
                 "raw_body": "Edited body",
@@ -3367,6 +3528,24 @@ class UpdateCommentTest(
             }
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
             assert request_body["edit_reason_code"] == ["test-edit-reason"]
+
+            expected_event_name = 'edx.forum.response.edited'
+            expected_event_data = {
+                'id': 'test_comment',
+                'content_type': 'Response',
+                'own_content': False,
+                'url': '',
+                'user_course_roles': [],
+                'user_forums_roles': ['Student', role_name],
+                'target_username': self.user.username,
+                'edit_reason': 'test-edit-reason',
+                'commentable_id': 'dummy'
+            }
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
+
         except ValidationError:
             assert role_name == FORUM_ROLE_STUDENT
 
@@ -3416,12 +3595,32 @@ class DeleteThreadTest(
         self.register_get_thread_response(cs_data)
         self.register_delete_thread_response(cs_data["id"])
 
-    def test_basic(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_basic(self, mock_emit):
         self.register_thread()
         with self.assert_signal_sent(api, 'thread_deleted', sender=None, user=self.user, exclude_args=('post',)):
             assert delete_thread(self.request, self.thread_id) is None
         assert urlparse(httpretty.last_request().path).path == f"/api/v1/threads/{self.thread_id}"  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
+
+        expected_event_name = 'edx.forum.thread.deleted'
+        expected_event_data = {
+            'body': 'dummy',
+            'content_type': 'Post',
+            'own_content': True,
+            'commentable_id': 'dummy',
+            'target_username': 'dummy',
+            'title_truncated': False,
+            'title': 'dummy',
+            'id': 'test_thread',
+            'url': '',
+            'user_forums_roles': ['Student'],
+            'user_course_roles': []
+        }
+
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
 
     def test_thread_id_not_found(self):
         self.register_get_thread_error_response("missing_thread", 404)
@@ -3558,12 +3757,30 @@ class DeleteCommentTest(
         self.register_get_comment_response(cs_comment_data)
         self.register_delete_comment_response(self.comment_id)
 
-    def test_basic(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_basic(self, mock_emit):
         self.register_comment_and_thread()
         with self.assert_signal_sent(api, 'comment_deleted', sender=None, user=self.user, exclude_args=('post',)):
             assert delete_comment(self.request, self.comment_id) is None
         assert urlparse(httpretty.last_request().path).path == f"/api/v1/comments/{self.comment_id}"  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
+
+        expected_event_name = 'edx.forum.response.deleted'
+        expected_event_data = {
+            'body': 'dummy',
+            'content_type': 'Response',
+            'own_content': True,
+            'commentable_id': 'dummy',
+            'target_username': self.user.username,
+            'id': 'test_comment',
+            'url': '',
+            'user_forums_roles': ['Student'],
+            'user_course_roles': []
+        }
+
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
 
     def test_comment_id_not_found(self):
         self.register_get_comment_error_response("missing_comment", 404)
@@ -3725,7 +3942,7 @@ class RetrieveThreadTest(
         self.request.user = non_author_user
         assert get_thread(self.request, self.thread_id) == self.expected_thread_data({
             'can_delete': False,
-            'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
+            'editable_fields': ['abuse_flagged', 'copy_link', 'following', 'read', 'voted'],
             'unread_comment_count': 1
         })
         assert httpretty.last_request().method == 'GET'
@@ -3777,6 +3994,14 @@ class RetrieveThreadTest(
             assert not expected_error
         except ThreadNotFoundError:
             assert expected_error
+
+    def test_course_id_mismatch(self):
+        """
+            Test if the api throws not found exception if course_id from params mismatches course_id in thread
+        """
+        self.register_thread()
+        get_thread(self.request, self.thread_id, 'different_course_id')
+        assert ThreadNotFoundError
 
 
 @mock.patch('lms.djangoapps.discussion.rest_api.api._get_course', mock.Mock())
@@ -3832,7 +4057,7 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
         topic_ids.remove(self.staff_only_id)
         topic_ids_by_name = list(topic_id_query.order_by('title'))
         topic_ids_by_name.remove(self.staff_only_id)
-        deleted_topic_ids = [f'disabled-topic-{idx}' for idx in range(10)]
+        self.deleted_topic_ids = deleted_topic_ids = [f'disabled-topic-{idx}' for idx in range(10)]
         for idx, topic_id in enumerate(deleted_topic_ids):
             usage_key = course_key.make_usage_key('vertical', topic_id)
             topic_links.append(
@@ -3843,7 +4068,7 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
                     external_id=topic_id,
                     provider_id=Provider.OPEN_EDX,
                     ordering=idx,
-                    enabled_in_context=False
+                    enabled_in_context=False,
                 )
             )
         DiscussionTopicLink.objects.bulk_create(topic_links)
@@ -3851,9 +4076,14 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
         self.topic_ids_by_name = topic_ids_by_name
         self.user = UserFactory.create()
         self.staff = AdminFactory.create()
+        self.all_topic_ids = set(topic_ids) | set(deleted_topic_ids) | {self.staff_only_id}
+        # Set up topic stats for all topics, but have one deleted topic
+        # and one active topic return zero stats for testing.
         self.topic_stats = {
-            topic_id: dict(discussion=random.randint(0, 10), question=random.randint(0, 10))
-            for topic_id in self.topic_ids
+            **{topic_id: dict(discussion=random.randint(0, 10), question=random.randint(0, 10))
+               for topic_id in self.all_topic_ids},
+            deleted_topic_ids[0]: dict(discussion=0, question=0),
+            self.topic_ids[0]: dict(discussion=0, question=0),
         }
         patcher = mock.patch(
             'lms.djangoapps.discussion.rest_api.api.get_course_commentable_counts',
@@ -3867,15 +4097,15 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
         Test that the standard response contains the correct number of items
         """
         topics_list = get_course_topics_v2(course_key=self.course_key, user=self.user)
-        assert len(topics_list) == len(self.topic_ids)
+        assert {t['id'] for t in topics_list} == set(self.topic_ids)
 
     def test_staff_response(self):
         """
         Test that the standard response contains the correct number of items
         """
         topics_list = get_course_topics_v2(course_key=self.course_key, user=self.staff)
-        assert len(topics_list) == len(self.topic_ids) + 1
-        assert any(topic_data.get('id') == self.staff_only_id for topic_data in topics_list)
+        # All topic ids should be returned except for the first deleted topic id which has zero stats
+        assert {t['id'] for t in topics_list} == self.all_topic_ids - {self.deleted_topic_ids[0]}
 
     def test_filtering(self):
         """

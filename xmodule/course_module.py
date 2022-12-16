@@ -6,7 +6,6 @@ Django module container for classes and operations related to the "Course Module
 import json
 import logging
 from datetime import datetime, timedelta
-from io import BytesIO
 
 import dateutil.parser
 import requests
@@ -267,6 +266,7 @@ def get_available_providers():  # lint-amnesty, pylint: disable=missing-function
     )
 
     available_providers = [provider for provider in proctoring_backend_settings if provider != 'DEFAULT']
+    available_providers.append('lti_external')
     available_providers.sort()
     return available_providers
 
@@ -403,14 +403,6 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         ),
         scope=Scope.settings
     )
-    discussion_sort_alpha = Boolean(
-        display_name=_("Discussion Sorting Alphabetical"),
-        scope=Scope.settings, default=False,
-        help=_(
-            "Enter true or false. If true, discussion categories and subcategories are sorted alphabetically. "
-            "If false, they are sorted chronologically by creation date and time."
-        )
-    )
     discussions_settings = Dict(
         display_name=_("Discussions Plugin Settings"),
         scope=Scope.settings,
@@ -418,7 +410,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         default={
             "enable_in_context": True,
             "enable_graded_units": False,
-            "unit_level_visibility": False,
+            "unit_level_visibility": True,
         }
     )
     announcement = Date(
@@ -1135,18 +1127,11 @@ class CourseBlock(
         return policy_str
 
     @classmethod
-    def from_xml(cls, xml_data, system, id_generator):
-        instance = super().from_xml(xml_data, system, id_generator)
-
-        # bleh, have to parse the XML here to just pull out the url_name attribute
-        # I don't think it's stored anywhere in the instance.
-        if isinstance(xml_data, str):
-            xml_data = xml_data.encode('ascii', 'ignore')
-        course_file = BytesIO(xml_data)
-        xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
+    def parse_xml(cls, node, runtime, keys, id_generator):
+        instance = super().parse_xml(node, runtime, keys, id_generator)
 
         policy_dir = None
-        url_name = xml_obj.get('url_name', xml_obj.get('slug'))
+        url_name = node.get('url_name')
         if url_name:
             policy_dir = 'policies/' + url_name
 
@@ -1156,9 +1141,9 @@ class CourseBlock(
             paths = [policy_dir + '/grading_policy.json'] + paths
 
         try:
-            policy = json.loads(cls.read_grading_policy(paths, system))
+            policy = json.loads(cls.read_grading_policy(paths, runtime))
         except ValueError:
-            system.error_tracker("Unable to decode grading policy as json")
+            runtime.error_tracker("Unable to decode grading policy as json")
             policy = {}
 
         # now set the current instance. set_grading_policy() will apply some inheritance rules
@@ -1220,6 +1205,12 @@ class CourseBlock(
 
     def has_started(self):
         return course_metadata_utils.has_course_started(self.start)
+
+    def is_enrollment_open(self):
+        """
+        Returns True if course enrollment is open
+        """
+        return course_metadata_utils.is_enrollment_open(self.enrollment_start, self.enrollment_end)
 
     @property
     def grader(self):

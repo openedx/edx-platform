@@ -225,7 +225,7 @@ FEATURES = {
     #   Open edX Studio. Set to False if you want to disable the editing of the course short description.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-02-13
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2334
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2334
     'EDITABLE_SHORT_DESCRIPTION': True,
 
     # Hide any Personally Identifiable Information from application logs
@@ -272,7 +272,7 @@ FEATURES = {
     #    Studio can be used as an LTI 1.3 tool by external LTI platforms.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-08-17
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/27411
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/27411
     'ENABLE_CONTENT_LIBRARIES_LTI_TOOL': False,
 
     # Milestones application flag
@@ -304,7 +304,7 @@ FEATURES = {
     #   the studio home page.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-02-13
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6965
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6965
     'ALLOW_COURSE_RERUNS': True,
 
     # Certificates Web/HTML Views
@@ -380,7 +380,7 @@ FEATURES = {
     #   page else Mobile Course Available UI Flag will be available on Studio side.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-14
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/23073
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/23073
     'DISABLE_MOBILE_COURSE_AVAILABLE': False,
 
     # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
@@ -390,7 +390,7 @@ FEATURES = {
     #   default because enabling allows a method to bypass password policy.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
-    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
+    # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/21616'
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
     ### ORA Feature Flags ###
@@ -466,7 +466,7 @@ FEATURES = {
     # .. toggle_description: When True, a help link is displayed on the main navbar. Set False to hide it.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-03-05
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/26106
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26106
     'ENABLE_HELP_LINK': True,
 
     # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
@@ -500,7 +500,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-03-22
     # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28268
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/28268
     # .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
     #   in the LMS and CMS.
     'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
@@ -606,8 +606,6 @@ SOCIAL_SHARING_SETTINGS = {
     'DASHBOARD_TWITTER': False
 }
 
-SOCIAL_MEDIA_FOOTER_URLS = {}
-
 # This is just a placeholder image.
 # Site operators can customize this with their organization's image.
 FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
@@ -636,6 +634,10 @@ DJFS = {
 }
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
+
+######################## OPTIMIZELY ###########################
+OPTIMIZELY_PROJECT_ID = None
+OPTIMIZELY_FULLSTACK_SDK_KEY = None
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
@@ -924,7 +926,6 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
 # Import after sys.path fixup
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 
 # These are the Mixins that should be added to every XBlock.
@@ -938,8 +939,6 @@ XBLOCK_MIXINS = (
     AuthoringMixin,
 )
 XBLOCK_EXTRA_MIXINS = ()
-
-XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 # Paths to wrapper methods which should be applied to every XBlock's FieldData.
 XBLOCK_FIELD_DATA_WRAPPERS = ()
@@ -1073,7 +1072,7 @@ DEFAULT_HASHING_ALGORITHM = 'sha1'
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
-    # from https://github.com/edx/codejail/blob/master/codejail/django_integration.py#L24, '' should be same as None
+    # from https://github.com/openedx/codejail/blob/master/codejail/django_integration.py#L24, '' should be same as None
     'python_bin': '/edx/app/edxapp/venvs/edxapp-sandbox/bin/python',
     # User to run as in the sandbox.
     'user': 'sandbox',
@@ -1244,6 +1243,8 @@ EMBARGO_SITE_REDIRECT_URL = None
 ##### custom vendor plugin variables #####
 # JavaScript code can access this data using `process.env.JS_ENV_EXTRA_CONFIG`
 # One of the current use cases for this is enabling custom TinyMCE plugins
+# (TINYMCE_ADDITIONAL_PLUGINS) and overriding the TinyMCE configuration
+# (TINYMCE_CONFIG_OVERRIDES).
 JS_ENV_EXTRA_CONFIG = {}
 
 ############################### PIPELINE #######################################
@@ -1293,14 +1294,14 @@ PIPELINE['STYLESHEETS'] = {
     'style-vendor-tinymce-content': {
         'source_filenames': [
             'css/tinymce-studio-content-fonts.css',
-            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
+            'js/vendor/tinymce/js/tinymce/skins/ui/studio-tmce5/content.min.css',
             'css/tinymce-studio-content.css'
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-content.css',
     },
     'style-vendor-tinymce-skin': {
         'source_filenames': [
-            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+            'js/vendor/tinymce/js/tinymce/skins/ui/studio-tmce5/skin.min.css'
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
@@ -1515,14 +1516,10 @@ YOUTUBE = {
     # URL to get YouTube metadata
     'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos',
 
-    # Current youtube api for requesting transcripts.
-    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
-    'TEXT_API': {
-        'url': 'video.google.com/timedtext',
-        'params': {
-            'lang': 'en',
-            'v': 'set_youtube_id_of_11_symbols_here',
-        },
+    # Web page mechanism for scraping transcript information from youtube video pages
+    'TRANSCRIPTS': {
+        'CAPTION_TRACKS_REGEX': r"captionTracks\"\:\[(?P<caption_tracks>[^\]]+)",
+        'YOUTUBE_URL_BASE': 'https://www.youtube.com/watch?v=',
     },
 
     'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
@@ -1756,7 +1753,7 @@ INSTALLED_APPS = [
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
-    # Database-backed Organizations App (http://github.com/edx/edx-organizations)
+    # Database-backed Organizations App (http://github.com/openedx/edx-organizations)
     'organizations',
 
     # User and group management via edx-django-utils
@@ -1903,7 +1900,7 @@ OPTIONAL_APPS = (
     # edxval
     ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
-    # Enterprise App (http://github.com/edx/edx-enterprise)
+    # Enterprise App (http://github.com/openedx/edx-enterprise)
     ('enterprise', None),
     ('consent', None),
     ('integrated_channels.integrated_channel', None),
@@ -1971,6 +1968,15 @@ ADVANCED_PROBLEM_TYPES = [
     },
     {
         'component': 'staffgradedxblock',
+        'boilerplate_name': None
+    }
+]
+
+LIBRARY_BLOCK_TYPES = [
+    # Per https://github.com/openedx/build-test-release-wg/issues/231
+    # we removed the library source content block from defaults until complete.
+    {
+        'component': 'library_content',
         'boilerplate_name': None
     }
 ]
@@ -2273,11 +2279,6 @@ DEFAULT_MOBILE_AVAILABLE = False
 # How long to cache OpenAPI schemas and UI, in seconds.
 OPENAPI_CACHE_TIMEOUT = 0
 
-################# Mobile URLS ##########################
-
-# These are URLs to the app store for mobile.
-MOBILE_STORE_URLS = {}
-
 ############################# Persistent Grades ####################################
 
 # Queue to use for updating persistent grades
@@ -2405,6 +2406,9 @@ ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
 
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
+
+EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+EXAMS_SERVICE_USERNAME = 'edx_exams_worker'
 
 FINANCIAL_REPORTS = {
     'STORAGE_TYPE': 'localfs',
@@ -2642,7 +2646,7 @@ VERIFY_STUDENT = {
 #   the orgs referenced in Studio content, then leave it enabled.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-11-02
-# .. toggle_tickets: https://github.com/edx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
+# .. toggle_tickets: https://github.com/openedx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
 ORGANIZATIONS_AUTOCREATE = True
 
 ################# Settings for brand logos. #################
@@ -2678,3 +2682,19 @@ COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-s
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
 
 PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
+
+######################## Registration ########################
+
+# Social-core setting that allows inactive users to be able to
+# log in. The only case it's used is when user registering a new account through the LMS.
+INACTIVE_USER_LOGIN = True
+
+# Redirect URL for inactive user. If not set, user will be redirected to /login after the login itself (loop)
+INACTIVE_USER_URL = f'http://{CMS_BASE}'
+
+######################## BRAZE API SETTINGS ########################
+
+EDX_BRAZE_API_KEY = None
+EDX_BRAZE_API_SERVER = None
+
+BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''

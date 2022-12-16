@@ -93,7 +93,7 @@ def get_blocks(
     else:
         transformers += [course_blocks_api.visibility.VisibilityTransformer()]
 
-    # Note: A change to the BlockCompletionTransformer (https://github.com/edx/edx-platform/pull/27622/)
+    # Note: A change to the BlockCompletionTransformer (https://github.com/openedx/edx-platform/pull/27622/)
     # will be introducing a bug if hide_access_denials is True.  I'm accepting this risk because in
     # the AccessDeniedMessageFilterTransformer, there is note about deleting it and I believe it is
     # technically deprecated functionality. The only use case where hide_access_denials is True
@@ -152,3 +152,22 @@ def get_blocks(
 
     # return serialized data
     return serializer.data
+
+
+def get_block_metadata(block, includes=()):
+    """
+    Get metadata about the specified XBlock.
+
+    Args:
+        block (XModuleDescriptor): block object
+        includes (list|set): list or set of metadata keys to include. Valid keys are:
+            index_dictionary: a dictionary of data used to add this XBlock's content
+                to a search index.
+    """
+    data = {
+        "id": str(block.scope_ids.usage_id),
+        "type": block.scope_ids.block_type,
+    }
+    if "index_dictionary" in includes:
+        data["index_dictionary"] = block.index_dictionary()
+    return data

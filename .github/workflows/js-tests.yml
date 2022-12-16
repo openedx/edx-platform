@@ -28,7 +28,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-      
+
     - name: Setup npm
       run: npm i -g npm@8.5.x
 
@@ -63,8 +63,7 @@ jobs:
 
     - name: Install Required Python Dependencies
       run: |
-        pip install -r requirements/pip.txt
-        pip install -r requirements/edx/base.txt
+        make base-requirements
 
     - uses: c-hive/gha-npm-cache@v1
     - name: Run JS Tests

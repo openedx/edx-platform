@@ -24,9 +24,9 @@ be true at the time the certificate is generated:
   * The enrollment mode must be eligible for a certificate
   * The enrollment does not need to be active
 
-* The user must have an approved, unexpired, ID verification
 * The user must not have an invalidated certificate for the course run (see the *CertificateInvalidation* model)
 * HTML (web) certificates must be globally enabled, and also enabled for the course run
 * The user must have passed the course run
 * The user must not be a beta tester in the course run
 * The course run must not be a CCX (custom edX course)
+* If the `ENABLE_CERTIFICATES_IDV_REQUIREMENT` WaffleFlag is enabled, a user must have an approved and unexpired ID verification.

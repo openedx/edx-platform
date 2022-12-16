@@ -7,7 +7,6 @@ import shutil
 import unittest
 from tempfile import mkdtemp
 
-import ddt
 from django.core.management import CommandError, call_command
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -29,7 +28,6 @@ class TestArgParsingCourseExport(unittest.TestCase):
             call_command('export')
 
 
-@ddt.ddt
 class TestCourseExport(ModuleStoreTestCase):
     """
     Test exporting a course
@@ -45,16 +43,15 @@ class TestCourseExport(ModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, self.temp_dir_1)
         self.addCleanup(shutil.rmtree, self.temp_dir_2)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_export_course_with_directory_name(self, store):
+    def test_export_course_with_directory_name(self):
         """
         Create a new course try exporting in a path specified
         """
-        course = CourseFactory.create(default_store=store)
+        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         course_id = str(course.id)
         self.assertTrue(
             modulestore().has_course(course.id),
-            f"Could not find course in {store}"
+            f"Could not find course in {ModuleStoreEnum.Type.split}"
         )
         # Test `export` management command with invalid course_id
         errstring = "Invalid course_key: 'InvalidCourseID'."

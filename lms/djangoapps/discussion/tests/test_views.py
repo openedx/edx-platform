@@ -1,7 +1,6 @@
 """
 Tests the forum notification views.
 """
-import itertools
 import json
 import logging
 from datetime import datetime
@@ -9,6 +8,7 @@ from unittest.mock import ANY, Mock, call, patch
 
 import ddt
 import pytest
+from django.conf import settings
 from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
@@ -91,7 +91,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('common.djangoapps.student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.user.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             password = 'test'
@@ -110,8 +110,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         config.enabled = True
         config.save()
 
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.user.cc.User.active_threads')
     def test_user_profile_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -127,8 +127,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         response = self.client.get(url)
         assert response.status_code == 404
 
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.subscribed_threads')
+    @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.user.cc.User.subscribed_threads')
     def test_user_followed_threads_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -1468,11 +1468,6 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
     def test_html(self, mock_request):
         self.check_html(mock_request)
 
-    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
-    @override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True)
-    def test_html_with_mfe_enabled(self, mock_request):
-        self.check_html(mock_request)
-
     def test_ajax(self, mock_request):
         self.check_ajax(mock_request)
 
@@ -1666,7 +1661,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         assert self.client.login(username=username, password=password)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
     def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):
         """
         Test that XSS attack is prevented
@@ -1682,8 +1677,8 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         self.assertNotContains(resp, malicious_code)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.user.cc.User.active_threads')
     def test_forum_user_profile_xss_prevent(self, malicious_code, mock_threads, mock_from_django_user, mock_request):
         """
         Test that XSS attack is prevented
@@ -2191,7 +2186,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('eventtracking.tracker')
+        super().setUp('lms.djangoapps.discussion.django_comment_client.base.views.tracker')
 
         self.course = CourseFactory.create(
             teams_configuration=TeamsConfig({
@@ -2268,6 +2263,9 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
     'openedx.core.djangoapps.django_comment_common.comment_client.utils.perform_request',
     Mock(
         return_value={
+            "id": "test_thread",
+            "title": "Title",
+            "body": "<p></p>",
             "default_sort_key": "date",
             "upvoted_ids": [],
             "downvoted_ids": [],
@@ -2287,41 +2285,47 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
         self.staff_user = AdminFactory.create()
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
-    @ddt.data(*itertools.product(("http://test.url", None), (True, False), (True, True)))
-    @ddt.unpack
-    def test_staff_user(self, mfe_url, toggle_enabled, is_staff):
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    def test_redirect_from_legacy_base_url_to_new_experience(self):
         """
-        Verify that the banner is shown with the correct links if the user is staff and the
-        mfe url is configured.
+        Verify that the legacy url is redirected to MFE homepage when
+        ENABLE_DISCUSSIONS_MFE flag is enabled.
         """
-        with override_settings(DISCUSSIONS_MICROFRONTEND_URL=mfe_url):
-            with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, toggle_enabled):
-                username = self.staff_user.username if is_staff else self.user.username
-                self.client.login(username=username, password='test')
-                response = self.client.get(reverse("forum_form_discussion", args=[self.course.id]))
-                content = response.content.decode('utf8')
-        if mfe_url and toggle_enabled:
-            assert "Welcome to the new discussions experience. Please share your feedback." in content
-            assert "Switch to new experience" not in content
-        else:
-            assert "Welcome to the new discussions experience. Please share your feedback." not in content
+
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
+            self.client.login(username=self.user.username, password='test')
+            url = reverse("forum_form_discussion", args=[self.course.id])
+            response = self.client.get(url)
+            assert response.status_code == 302
+            expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}"
+            assert response.url == expected_url
 
     @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
-    @ddt.data(*itertools.product((True, False), ("legacy", "new", None)))
-    @ddt.unpack
-    def test_correct_experience_is_shown(self, toggle_enabled, experience):
+    def test_redirect_from_legacy_profile_url_to_new_experience(self):
         """
-        Verify that the correct experience is shown based on the MFE toggle flag and the query param.
+        Verify that the requested user profile is redirected to MFE learners tab when
+        ENABLE_DISCUSSIONS_MFE flag is enabled
         """
-        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, toggle_enabled):
-            self.client.login(username=self.staff_user.username, password='test')
-            url = reverse("forum_form_discussion", args=[self.course.id])
-            experience_in_url = ""
-            if experience is not None:
-                experience_in_url = f"discussions_experience={experience}"
-            response = self.client.get(f"{url}?{experience_in_url}")
-            content = response.content.decode('utf8')
-        if toggle_enabled and experience != "legacy":
-            assert "discussions-mfe-tab-embed" in content
-        else:
-            assert "discussions-mfe-tab-embed" not in content
+
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
+            self.client.login(username=self.user.username, password='test')
+            url = reverse("user_profile", args=[self.course.id, self.user.id])
+            response = self.client.get(url)
+            assert response.status_code == 302
+            expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}/learners"
+            assert response.url == expected_url
+
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    def test_redirect_from_legacy_single_thread_to_new_experience(self):
+        """
+        Verify that a legacy single url is redirected to corresponding MFE thread url when the ENABLE_DISCUSSIONS_MFE
+        flag is enabled
+        """
+
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
+            self.client.login(username=self.user.username, password='test')
+            url = reverse("single_thread", args=[self.course.id, "test_discussion", "test_thread"])
+            response = self.client.get(url)
+            assert response.status_code == 302
+            expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}/posts/test_thread"
+            assert response.url == expected_url
