@@ -20,9 +20,6 @@ class StudentResponse:
     def __init__(self):
         self.problem_function_map = {
             ProblemTypes.JOURNAL: self.__create_and_update_journal_post_from_lms,
-            ProblemTypes.SINGLE_CHOICE: lambda: None,
-            ProblemTypes.MULTIPLE_CHOICE: lambda: None,
-            ProblemTypes.SHORT_ANSWER: lambda: None
         }
 
     def save_problem_response(self, problem_block, student_response):
@@ -48,9 +45,9 @@ class StudentResponse:
             if not problem_classes:
                 return
 
-            for problem_type in ProblemTypes.__ALL__:
+            for problem_type, problem_function in self.problem_function_map.items():
                 if problem_type in problem_classes:
-                    self.problem_function_map[problem_type](student, problem_block, student_response)
+                    problem_function(student, problem_block, student_response)
                     break
 
     def __create_and_update_journal_post_from_lms(self, student, problem_block, student_response):
