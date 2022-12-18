@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-11 20:35+0000\n"
-"PO-Revision-Date: 2022-12-11 20:35:43.789635\n"
+"POT-Creation-Date: 2022-12-18 20:35+0000\n"
+"PO-Revision-Date: 2022-12-18 20:35:43.081821\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -407,104 +407,19 @@ msgstr ""
 msgid "Disabled Account"
 msgstr "Đᴉsɐblǝd Ⱥɔɔønnʇ"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "Mɐlǝ"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "Fǝɯɐlǝ"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "Øʇɥǝɹ/Ᵽɹǝɟǝɹ Nøʇ ʇø Sɐʎ"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "Đøɔʇøɹɐʇǝ"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "Mɐsʇǝɹ's øɹ dɹøɟǝssᴉønɐl dǝƃɹǝǝ"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "Ƀɐɔɥǝløɹ's dǝƃɹǝǝ"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "Ⱥssøɔᴉɐʇǝ dǝƃɹǝǝ"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "Sǝɔøndɐɹʎ/ɥᴉƃɥ sɔɥøøl"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "Ɉnnᴉøɹ sǝɔøndɐɹʎ/ɾnnᴉøɹ ɥᴉƃɥ/ɯᴉddlǝ sɔɥøøl"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "Ɇlǝɯǝnʇɐɹʎ/dɹᴉɯɐɹʎ sɔɥøøl"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "Nø ɟøɹɯɐl ǝdnɔɐʇᴉøn"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "Øʇɥǝɹ ǝdnɔɐʇᴉøn"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "{platform_name} Ħønøɹ Ȼødǝ Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "{platform_name} Vǝɹᴉɟᴉǝd Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr "{platform_name} Ᵽɹøɟǝssᴉønɐl Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-"Ɏønɹ øɹƃɐnᴉzɐʇᴉøn ƗĐ (ᴉɟ ʎønɹ øɹƃɐnᴉzɐʇᴉøn ɥɐs ɐn ǝxᴉsʇᴉnƃ dɐƃǝ øn ŁᴉnʞǝdƗn)"
-" ǝ.ƃ 1337. Ɨɟ nøʇ dɹøʌᴉdǝd, ʍᴉll dǝɟɐnlʇ ʇø sǝndᴉnƃ Ᵽlɐʇɟøɹɯ Nɐɯǝ (ǝ.ƃ. ǝdX)"
-" ᴉnsʇǝɐd."
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "{platform_name} Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "Ŧɥǝ ƗSØ 639-1 lɐnƃnɐƃǝ ɔødǝ ɟøɹ ʇɥᴉs lɐnƃnɐƃǝ."
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "Nɐɯǝsdɐɔǝ øɟ ǝnɹøllɯǝnʇ ɐʇʇɹᴉbnʇǝ"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "Nɐɯǝ øɟ ʇɥǝ ǝnɹøllɯǝnʇ ɐʇʇɹᴉbnʇǝ"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "Vɐlnǝ øɟ ʇɥǝ ǝnɹøllɯǝnʇ ɐʇʇɹᴉbnʇǝ"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
@@ -512,15 +427,7 @@ msgstr ""
 "Ŧɥǝ ʍᴉndøʍ øɟ ʇᴉɯǝ ɐɟʇǝɹ ǝnɹøllᴉnƃ dnɹᴉnƃ ʍɥᴉɔɥ nsǝɹs ɔɐn bǝ ƃɹɐnʇǝd ɐ "
 "ɹǝɟnnd, ɹǝdɹǝsǝnʇǝd ᴉn ɯᴉɔɹøsǝɔønds. Ŧɥǝ dǝɟɐnlʇ ᴉs 14 dɐʎs."
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "Nɐɯǝ øɟ ʇɥǝ ɄŦM ɔøøʞᴉǝ"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "Nɐɯǝ øɟ ʇɥǝ ɐɟɟᴉlᴉɐʇǝ ɔøøʞᴉǝ"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -532,7 +439,7 @@ msgstr ""
 "ɟølløʍs:                     nsǝɹ_ᴉd, nsǝɹnɐɯǝ, ǝɯɐᴉl, ɔønɹsǝ_ᴉd, "
 "ᴉs_ʌǝɹᴉɟᴉǝd, ʌǝɹᴉɟᴉɔɐʇᴉøn_dɐʇǝ"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -542,23 +449,116 @@ msgstr ""
 "                     ɟᴉɹsʇ ɹøʍ bǝᴉnƃ ʇɥǝ ɥǝɐdǝɹ ɐnd ɔølnɯns ʍᴉll bǝ ɐs "
 "ɟølløʍs:                     ɔønɹsǝ_ᴉd, nsǝɹnɐɯǝ, ɯødǝ"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "Mɐlǝ"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "Fǝɯɐlǝ"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "Øʇɥǝɹ/Ᵽɹǝɟǝɹ Nøʇ ʇø Sɐʎ"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "Đøɔʇøɹɐʇǝ"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "Mɐsʇǝɹ's øɹ dɹøɟǝssᴉønɐl dǝƃɹǝǝ"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "Ƀɐɔɥǝløɹ's dǝƃɹǝǝ"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "Ⱥssøɔᴉɐʇǝ dǝƃɹǝǝ"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "Sǝɔøndɐɹʎ/ɥᴉƃɥ sɔɥøøl"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "Ɉnnᴉøɹ sǝɔøndɐɹʎ/ɾnnᴉøɹ ɥᴉƃɥ/ɯᴉddlǝ sɔɥøøl"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "Ɇlǝɯǝnʇɐɹʎ/dɹᴉɯɐɹʎ sɔɥøøl"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "Nø ɟøɹɯɐl ǝdnɔɐʇᴉøn"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "Øʇɥǝɹ ǝdnɔɐʇᴉøn"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{platform_name} Ħønøɹ Ȼødǝ Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "{platform_name} Vǝɹᴉɟᴉǝd Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "{platform_name} Ᵽɹøɟǝssᴉønɐl Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+"Ɏønɹ øɹƃɐnᴉzɐʇᴉøn ƗĐ (ᴉɟ ʎønɹ øɹƃɐnᴉzɐʇᴉøn ɥɐs ɐn ǝxᴉsʇᴉnƃ dɐƃǝ øn ŁᴉnʞǝdƗn)"
+" ǝ.ƃ 1337. Ɨɟ nøʇ dɹøʌᴉdǝd, ʍᴉll dǝɟɐnlʇ ʇø sǝndᴉnƃ Ᵽlɐʇɟøɹɯ Nɐɯǝ (ǝ.ƃ. ǝdX)"
+" ᴉnsʇǝɐd."
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{platform_name} Ȼǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "Ŧɥǝ ƗSØ 639-1 lɐnƃnɐƃǝ ɔødǝ ɟøɹ ʇɥᴉs lɐnƃnɐƃǝ."
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "Nɐɯǝ øɟ ʇɥǝ ɄŦM ɔøøʞᴉǝ"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "Nɐɯǝ øɟ ʇɥǝ ɐɟɟᴉlᴉɐʇǝ ɔøøʞᴉǝ"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "Nɐɯǝ øɟ ʇɥᴉs nsǝɹ ɐʇʇɹᴉbnʇǝ."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "Vɐlnǝ øɟ ʇɥᴉs nsǝɹ ɐʇʇɹᴉbnʇǝ."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr "Sǝɔøndɐɹʎ ǝɯɐᴉl ɐddɹǝss"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr "Sǝɔøndɐɹʎ ǝɯɐᴉl ɐddɹǝss ʇø ɹǝɔøʌǝɹ lᴉnʞǝd ɐɔɔønnʇ."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -570,7 +570,7 @@ msgstr ""
 "ɐnd dɐssʍøɹd. Ⱥnd ᴉɟ ɐnʎ ǝɯdløʎǝǝ's ǝɯɐᴉl døǝsn'ʇ ǝxᴉsʇ ᴉn ʇɥᴉs ɯødǝl ʇɥǝn "
 "ʇɥɐʇ ǝɯdløʎǝǝ ɔɐn løƃᴉn ʌᴉɐ ʇɥᴉɹd dɐɹʇʎ ɐnʇɥǝnʇᴉɔɐʇᴉøn bɐɔʞǝnd ønlʎ."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -580,7 +580,7 @@ msgstr ""
 "                     ɟᴉɹsʇ ɹøʍ bǝᴉnƃ ʇɥǝ ɥǝɐdǝɹ ɐnd ɔølnɯns ʍᴉll bǝ ɐs "
 "ɟølløʍs:                     nsǝɹnɐɯǝ, ɔnɹɹǝnʇ_ǝɯɐᴉl, dǝsᴉɹǝd_ǝɯɐᴉl"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr "Ⱥdd ɐ ɹǝɐsøn"
 
@@ -2162,6 +2162,14 @@ msgstr "Ⱥɟɟᴉlᴉɐʇǝs"
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "Ødǝn ǝdX"
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr "Ȼøøʞᴉǝ Ᵽølᴉɔʎ"
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Data"
+msgstr "Đø Nøʇ Sǝll Mʎ Ᵽǝɹsønɐl Đɐʇɐ"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -12111,6 +12119,11 @@ msgstr "Ɇnɐblǝ ᴉn-ɔønʇǝxʇ dᴉsɔnssᴉøns ɟøɹ ʇɥǝ Ʉnᴉʇ"
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
 msgstr "Ⱥdd dᴉsɔnssᴉøn ɟøɹ ʇɥǝ Ʉnᴉʇ."
+
+#: xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
+msgstr "Ȼɐn'ʇ ƃǝʇ ʇɹɐnsɔɹᴉdʇ lᴉnʞ ɟɹøɯ Ɏønʇnbǝ ɟøɹ {youtube_id}."
 
 #: xmodule/video_module/transcripts_utils.py
 #, python-brace-format

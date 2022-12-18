@@ -2194,6 +2194,10 @@ msgid "Help Center"
 msgstr "Hilfe-Center"
 
 #: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "Pressemappe"
@@ -8624,6 +8628,12 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "Keine E-Mail-Adresse angegeben."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -19612,6 +19622,12 @@ msgstr ""
 "sorgfältig und senden Sie ihn zuerst an sich selbst, damit Sie eine Vorschau"
 " der Formatierung erhalten und sicherstellen können, dass eingebettete "
 "Bilder und Links korrekt funktionieren."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

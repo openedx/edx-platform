@@ -1978,6 +1978,10 @@ msgstr "聯繫我們"
 msgid "Help Center"
 msgstr "幫助中心"
 
+#: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
+
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "媒體工具箱"
@@ -7782,6 +7786,12 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "未提供電子郵件。"
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -17254,6 +17264,12 @@ msgid ""
 "embedded images and links work correctly."
 msgstr ""
 "我們建議您每週向學習者發送不超過一封的電子郵件。在發送郵件前，請先仔細查看是否有錯字、嵌入的圖片和連結是否能正常瀏覽，並將副本寄發給自己，以便您能預覽。"
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
