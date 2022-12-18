@@ -1947,6 +1947,10 @@ msgstr "Wasiliana Nasi"
 msgid "Help Center"
 msgstr "Kituo cha Usaidizi"
 
+#: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
+
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "Kinasa sauti"
@@ -7818,6 +7822,12 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "Hakuna anwani ya barua pepe iliyotolewa."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -17746,6 +17756,12 @@ msgstr ""
 "kutuma barua pepe yako, pitia tena maandishi kwa makini na yatume kwenye "
 "anwani yako kwanza kuangalia fomati na hakikisha picha na viungo-wavuti "
 "vimewekwa kwa usahihi. ."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

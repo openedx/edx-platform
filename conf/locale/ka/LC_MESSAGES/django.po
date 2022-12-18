@@ -1950,6 +1950,10 @@ msgid "Help Center"
 msgstr "დახმარების ცენტრი"
 
 #: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "მედია ფაილების ნაკრები"
@@ -7970,6 +7974,12 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "ელფოსტის მისამართი არ არის მითითებული."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -18227,6 +18237,12 @@ msgstr ""
 "თქვენს შეტყობინებას გააგზავნით, ყურადღებით გადახედეთ ტექსტს და პირველ რიგში "
 "საკუთარ თავს გაუგზავნეთ, ისე რომ შეძლოთ ფორმატირების წინასწარი დათვალიერება "
 "და დარწმუნდეთ, რომ ჩასმული გამოსახულებები და ბმულები სწორად მუშაობს."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

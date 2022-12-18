@@ -19,6 +19,7 @@
 # dfxedx <ah532@ya.ru>, 2014
 # DariaTkacheva <d.i.tkacheva@gmail.com>, 2014
 # Dmitri Polevoi <polevaiabrest@gmail.com>, 2014
+# Dmitry Broover, 2022
 # Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # Evgeniya <eugenia000@gmail.com>, 2013
 # elenapykhtina <elenapykhtina@mail.ru>, 2014
