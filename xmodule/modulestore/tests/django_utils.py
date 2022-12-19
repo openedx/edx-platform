@@ -76,7 +76,7 @@ def mixed_store_config(data_dir, mappings, store_order=None, modulestore_options
         store_order = [StoreConstructors.draft, StoreConstructors.split]
 
     options = {
-        'default_class': 'xmodule.hidden_block.HiddenDescriptor',
+        'default_class': 'xmodule.hidden_block.HiddenBlock',
         'fs_root': data_dir,
         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
     }

@@ -48,7 +48,7 @@ DB = 'test_mongo_%s' % uuid4().hex[:5]
 COLLECTION = 'modulestore'
 ASSET_COLLECTION = 'assetstore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
-DEFAULT_CLASS = 'xmodule.hidden_block.HiddenDescriptor'
+DEFAULT_CLASS = 'xmodule.hidden_block.HiddenBlock'
 RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
 

@@ -74,7 +74,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
     COLLECTION = 'modulestore'
     ASSET_COLLECTION = 'assetstore'
     FS_ROOT = DATA_DIR
-    DEFAULT_CLASS = 'xmodule.hidden_block.HiddenDescriptor'
+    DEFAULT_CLASS = 'xmodule.hidden_block.HiddenBlock'
     RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
     MONGO_COURSEID = 'MITx/999/2013_Spring'

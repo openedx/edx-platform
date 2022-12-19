@@ -523,9 +523,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             module_path, _, class_name = default_class.rpartition('.')
             try:
                 class_ = getattr(import_module(module_path), class_name)
-            except ImportError:
+            except (ImportError, AttributeError):
                 fallback_module_path = "xmodule.hidden_block"
-                fallback_class_name = "HiddenDescriptor"
+                fallback_class_name = "HiddenBlock"
                 log.exception(
                     "Failed to import the default store class. "
                     f"Falling back to {fallback_module_path}.{fallback_class_name}"

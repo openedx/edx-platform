@@ -72,7 +72,7 @@
                         "OPTIONS": {
                             "collection": "modulestore",
                             "db": "test",
-                            "default_class": "xmodule.hidden_block.HiddenDescriptor",
+                            "default_class": "xmodule.hidden_block.HiddenBlock",
                             "fs_root": "** OVERRIDDEN **",
                             "host": [
                                 "edx.devstack.mongo"
@@ -86,7 +86,7 @@
                         "ENGINE": "xmodule.modulestore.xml.XMLModuleStore",
                         "OPTIONS": {
                             "data_dir": "** OVERRIDDEN **",
-                            "default_class": "xmodule.hidden_block.HiddenDescriptor"
+                            "default_class": "xmodule.hidden_block.HiddenBlock"
                         }
                     }
                 ]

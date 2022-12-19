@@ -101,7 +101,7 @@ BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'default_class': 'xmodule.hidden_block.HiddenDescriptor',
+        'default_class': 'xmodule.hidden_block.HiddenBlock',
         'fs_root': TEST_ROOT / "data",
     },
     doc_store_settings={

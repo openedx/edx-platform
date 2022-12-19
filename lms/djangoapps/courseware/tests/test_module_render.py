@@ -2602,7 +2602,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
 
     def test_get_item(self):
         course = CourseFactory()
-        self._verify_descriptor('video', course, 'HiddenDescriptorWithMixins')
+        self._verify_descriptor('video', course, 'HiddenBlockWithMixins')
 
     def test_dynamic_updates(self):
         """Tests that the list of disabled xblocks can dynamically update."""
@@ -2615,7 +2615,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
 
         # Now simulate a new request cache.
         self.store.request_cache.data.clear()
-        self._verify_descriptor('problem', course, 'HiddenDescriptorWithMixins', item_usage_id)
+        self._verify_descriptor('problem', course, 'HiddenBlockWithMixins', item_usage_id)
 
     def _verify_descriptor(self, category, course, descriptor, item_id=None):
         """

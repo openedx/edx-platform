@@ -13,7 +13,7 @@ from xmodule.x_module import (
 
 
 @XBlock.needs("i18n")
-class HiddenDescriptor(
+class HiddenBlock(
     RawMixin,
     XmlMixin,
     XModuleToXBlockMixin,
@@ -22,9 +22,6 @@ class HiddenDescriptor(
     """
     XBlock class loaded by the runtime when another XBlock type has been disabled
     or an unknown XBlock type is included in a course import.
-
-    The class name includes 'Descriptor' because this used to be an XModule and the class path is specified in the
-    modulestore config in a number of places.
     """
     HIDDEN = True
     has_author_view = True

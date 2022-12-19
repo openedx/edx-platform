@@ -28,7 +28,7 @@ class ModuleStoreSettingsMigration(TestCase):
             "ENGINE": "xmodule.modulestore.xml.XMLModuleStore",
             "OPTIONS": {
                 "data_dir": "directory",
-                "default_class": "xmodule.hidden_block.HiddenDescriptor",
+                "default_class": "xmodule.hidden_block.HiddenBlock",
             },
             "DOC_STORE_CONFIG": {},
         }
@@ -40,7 +40,7 @@ class ModuleStoreSettingsMigration(TestCase):
             "OPTIONS": {
                 "collection": "modulestore",
                 "db": "edxapp",
-                "default_class": "xmodule.hidden_block.HiddenDescriptor",
+                "default_class": "xmodule.hidden_block.HiddenBlock",
                 "fs_root": mkdtemp_clean(),
                 "host": "localhost",
                 "password": "password",
@@ -64,7 +64,7 @@ class ModuleStoreSettingsMigration(TestCase):
                         "OPTIONS": {
                             "collection": "modulestore",
                             "db": "test",
-                            "default_class": "xmodule.hidden_block.HiddenDescriptor",
+                            "default_class": "xmodule.hidden_block.HiddenBlock",
                         }
                     },
                     "default": {
@@ -79,7 +79,7 @@ class ModuleStoreSettingsMigration(TestCase):
                         "ENGINE": "xmodule.modulestore.xml.XMLModuleStore",
                         "OPTIONS": {
                             "data_dir": "directory",
-                            "default_class": "xmodule.hidden_block.HiddenDescriptor"
+                            "default_class": "xmodule.hidden_block.HiddenBlock"
                         },
                         "DOC_STORE_CONFIG": {}
                     }
@@ -99,7 +99,7 @@ class ModuleStoreSettingsMigration(TestCase):
                         'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
                         'DOC_STORE_CONFIG': {},
                         'OPTIONS': {
-                            'default_class': 'xmodule.hidden_block.HiddenDescriptor',
+                            'default_class': 'xmodule.hidden_block.HiddenBlock',
                             'fs_root': "fs_root",
                             'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                         }
@@ -109,7 +109,7 @@ class ModuleStoreSettingsMigration(TestCase):
                         'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
                         'DOC_STORE_CONFIG': {},
                         'OPTIONS': {
-                            'default_class': 'xmodule.hidden_block.HiddenDescriptor',
+                            'default_class': 'xmodule.hidden_block.HiddenBlock',
                             'fs_root': "fs_root",
                             'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                         }

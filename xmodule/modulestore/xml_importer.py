@@ -260,7 +260,7 @@ class ImportManager:
 
     def __init__(
             self, store, user_id, data_dir, source_dirs=None,
-            default_class='xmodule.hidden_block.HiddenDescriptor',
+            default_class='xmodule.hidden_block.HiddenBlock',
             load_error_modules=True, static_content_store=None,
             target_id=None, verbose=False,
             do_import_static=True, do_import_python_lib=True,
@@ -1229,7 +1229,7 @@ def validate_course_policy(module_store, course_id):
 
 def perform_xlint(  # lint-amnesty, pylint: disable=missing-function-docstring
         data_dir, source_dirs,
-        default_class='xmodule.hidden_block.HiddenDescriptor',
+        default_class='xmodule.hidden_block.HiddenBlock',
         load_error_modules=True,
         xblock_mixins=(LocationMixin, XModuleMixin)):
     err_cnt = 0
