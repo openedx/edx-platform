@@ -8,6 +8,7 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 
 
 import os
+from pickletools import optimize
 import shutil
 import tempfile
 from collections import OrderedDict
@@ -369,7 +370,12 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         # verifies that verified passing learner is eligible for certificate
         self._verify_cell_data_for_user(verified_user.username, course.id, 'Certificate Eligible', 'Y', num_rows=2)
 
-    def test_query_counts(self):
+    @ddt.unpack
+    @ddt.data(
+        (False, 47),
+        (True, 48),
+    )
+    def test_query_counts(self, optimize_get_learners, expected_db_calls):
         experiment_group_a = Group(2, 'Expériment Group A')
         experiment_group_b = Group(3, 'Expériment Group B')
         experiment_partition = UserPartition(
@@ -394,10 +400,14 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_all_namespaces()
 
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            with check_mongo_calls(2):
-                with self.assertNumQueries(48):
-                    CourseGradeReport.generate(None, None, course.id, {}, 'graded')
+        with patch(
+            'lms.djangoapps.instructor_task.tasks_helper.grades.optimize_get_learners_switch_enabled',
+            return_value=optimize_get_learners
+        ):
+            with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
+                with check_mongo_calls(2):
+                    with self.assertNumQueries(expected_db_calls):
+                        CourseGradeReport.generate(None, None, course.id, {}, 'graded')
 
     def test_inactive_enrollments(self):
         """
