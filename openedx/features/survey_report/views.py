@@ -10,7 +10,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from common.djangoapps.util.views import ensure_valid_course_key
 from .tasks import generate_survey_report
-from .api import generate_report
 
 
 class SurveyReportView(View):
@@ -20,12 +19,11 @@ class SurveyReportView(View):
     @method_decorator(login_required)
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(ensure_valid_course_key)
-    def post(self, request):
+    def post(self, _request):
         """
         Generate a new survey report using the generate_report method in api.py
         Arguments:
-            request: HTTP request
+            _request: HTTP request
         """
-        survey_report_id = generate_report(defaults=True)
-        generate_survey_report.delay(survey_report_id)
+        generate_survey_report.delay()
         return redirect("admin:survey_report_surveyreport_changelist")

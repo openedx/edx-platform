@@ -12,6 +12,7 @@ from openedx.features.survey_report.queries import (
     get_registered_learners,
     get_unique_courses_offered
 )
+from .models import SURVEY_REPORT_ERROR, SURVEY_REPORT_GENERATED
 
 MAX_WEEKS_SINCE_LAST_LOGIN: int = 4
 
@@ -35,14 +36,19 @@ def get_report_data() -> dict:
     }
 
 
-def generate_report(defaults: bool = False) -> int:
+def generate_report() -> None:
     """ Generate a report with relevant data."""
     data = {}
-    if not defaults:
-        data = get_report_data()
     survey_report = SurveyReport(**data)
     survey_report.save()
-    return survey_report.id
+
+    try:
+        data = get_report_data()
+        data["state"] = SURVEY_REPORT_GENERATED
+        update_report(survey_report.id, data)
+    except (Exception, ) as update_report_error:
+        update_report(survey_report.id, {"state": SURVEY_REPORT_ERROR})
+        raise Exception(update_report_error)
 
 
 def update_report(survey_report_id: int, data: dict) -> None:
