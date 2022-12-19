@@ -90,9 +90,9 @@ def send_report(report_id: int) -> None:
     request.raise_for_status()
 
     SurveyReportUpload.objects.create(
-        report = report,
-        status = request.status_code,
-        request_details = request.content
+        report=report,
+        status=request.status_code,
+        request_details=request.content
     )
 
 
