@@ -1839,9 +1839,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             val_transcript_language_code=val_transcript_language_code,
             val_transcript_provider=val_transcript_provider
         )
+        xml_object = etree.fromstring(xml_data)
         id_generator = Mock()
         id_generator.target_course_id = "test_course_id"
-        video = self.descriptor.from_xml(xml_data, module_system, id_generator)
+        video = self.descriptor.parse_xml(xml_object, module_system, None, id_generator)
 
         assert video.edx_video_id == 'test_edx_video_id'
         video_data = get_video_info(video.edx_video_id)
@@ -1887,13 +1888,14 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         Test that importing a video with no video id, creates a new external video.
         """
         xml_data = """<video><video_asset></video_asset></video>"""
+        xml_object = etree.fromstring(xml_data)
         module_system = DummySystem(load_error_modules=True)
         id_generator = Mock()
 
         # Verify edx_video_id is empty before.
         assert self.descriptor.edx_video_id == ''
 
-        video = self.descriptor.from_xml(xml_data, module_system, id_generator)
+        video = self.descriptor.parse_xml(xml_object, module_system, None, id_generator)
 
         # Verify edx_video_id is populated after the import.
         assert video.edx_video_id != ''
@@ -1923,6 +1925,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             val_transcript_language_code=val_transcript_language_code,
             val_transcript_provider=val_transcript_provider
         )
+        xml_object = etree.fromstring(xml_data)
         module_system = DummySystem(load_error_modules=True)
         id_generator = Mock()
 
@@ -1940,7 +1943,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         # Verify edx_video_id is empty before.
         assert self.descriptor.edx_video_id == ''
 
-        video = self.descriptor.from_xml(xml_data, module_system, id_generator)
+        video = self.descriptor.parse_xml(xml_object, module_system, None, id_generator)
 
         # Verify edx_video_id is populated after the import.
         assert video.edx_video_id != ''
@@ -2077,11 +2080,12 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             xml_data += val_transcripts
 
         xml_data += '</video_asset></video>'
+        xml_object = etree.fromstring(xml_data)
 
         # Verify edx_video_id is empty before import.
         assert self.descriptor.edx_video_id == ''
 
-        video = self.descriptor.from_xml(xml_data, module_system, id_generator)
+        video = self.descriptor.parse_xml(xml_object, module_system, None, id_generator)
 
         # Verify edx_video_id is not empty after import.
         assert video.edx_video_id != ''
@@ -2107,8 +2111,9 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
                 </video_asset>
             </video>
         """
+        xml_object = etree.fromstring(xml_data)
         with pytest.raises(ValCannotCreateError):
-            VideoBlock.from_xml(xml_data, module_system, id_generator=Mock())
+            VideoBlock.parse_xml(xml_object, module_system, None, id_generator=Mock())
         with pytest.raises(ValVideoNotFoundError):
             get_video_info("test_edx_video_id")
 

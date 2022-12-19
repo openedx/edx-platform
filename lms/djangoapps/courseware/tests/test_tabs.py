@@ -705,7 +705,7 @@ class ProgressTestCase(TabTestCase):
             invalid_dict_tab=None,
         )
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_enrolled')
     def test_progress(self, is_enrolled):
         is_enrolled.return_value = True
         self.course.hide_progress_tab = False
@@ -761,7 +761,8 @@ class DiscussionLinkTestCase(TabTestCase):
             is_enrolled=True
     ):
         """Helper function to verify whether the discussion tab exists and can be displayed"""
-        with patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled') as check_is_enrolled:
+        IS_ENROLLED_METHOD_NAME = 'common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_enrolled'
+        with patch(IS_ENROLLED_METHOD_NAME) as check_is_enrolled:
             self.course.tabs = tab_list
             self.course.discussion_link = discussion_link_in_course
             discussion_tab = xmodule_tabs.CourseTabList.get_discussion(self.course)
@@ -849,7 +850,7 @@ class DiscussionLinkTestCase(TabTestCase):
 
 class DatesTabTestCase(TabListTestCase):
     """Test cases for dates tab"""
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_enrolled')
     def test_dates_tab_disabled_if_unenrolled(self, is_enrolled):
         tab = DatesTab({'type': DatesTab.type, 'name': 'dates'})
 

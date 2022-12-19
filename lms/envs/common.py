@@ -1018,6 +1018,16 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1458'
     'ENABLE_CERTIFICATES_IDV_REQUIREMENT': False,
+
+    # .. toggle_name: FEATURES['DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to disable enrollment for user invited to a course
+    # .. if user is registering before enrollment start date or after enrollment end date
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2022-06-06
+    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/29538'
+    'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -2906,14 +2916,10 @@ YOUTUBE = {
     # URL to get YouTube metadata
     'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos/',
 
-    # Current youtube api for requesting transcripts.
-    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
-    'TEXT_API': {
-        'url': 'video.google.com/timedtext',
-        'params': {
-            'lang': 'en',
-            'v': 'set_youtube_id_of_11_symbols_here',
-        },
+    # Web page mechanism for scraping transcript information from youtube video pages
+    'TRANSCRIPTS': {
+        'CAPTION_TRACKS_REGEX': r"captionTracks\"\:\[(?P<caption_tracks>[^\]]+)",
+        'YOUTUBE_URL_BASE': 'https://www.youtube.com/watch?v=',
     },
 
     'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
@@ -3338,6 +3344,13 @@ ID_VERIFICATION_SUPPORT_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
 LOGIN_ISSUE_SUPPORT_LINK = ''
+
+# .. setting_name: SECURITY_PAGE_URL
+# .. setting_default: None
+# .. setting_description: A link to the site's security disclosure/reporting policy,
+#   to display in the site footer. This will only appear for sites using themes that
+#   use the links produced by ``lms.djangoapps.branding.api.get_footer``.
+SECURITY_PAGE_URL = None
 
 # Days before the expired date that we warn the user
 ENTITLEMENT_EXPIRED_ALERT_PERIOD = 90
@@ -5144,6 +5157,7 @@ TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-runn
 TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
+COURSE_BULK_EMAIL_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_live_course/bulk_email.html"
 
 ################# Bulk Course Email Settings #################
 # If set, recipients of bulk course email messages will be filtered based on the last_login date of their User account.
@@ -5267,3 +5281,5 @@ URLS_2U_LOBS = {
 ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 
 ############## PLOTLY ##############
+
+ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []

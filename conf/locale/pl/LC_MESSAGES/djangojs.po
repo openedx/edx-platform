@@ -106,6 +106,7 @@
 # Jakub Kopczyk <kuba5566@gmail.com>, 2014
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020
 # Kamil Magryta <gryxon@gmail.com>, 2016
+# Klara Sielicka-Baryłka, 2022
 # Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021-2022
 # Marcin Miłek, 2022
 # Mateusz <blue90pl@gmail.com>, 2014
@@ -114,9 +115,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-06 20:42+0000\n"
+"POT-Creation-Date: 2022-12-11 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Aleks Ada, 2022\n"
+"Last-Translator: Klara Sielicka-Baryłka, 2022\n"
 "Language-Team: Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"

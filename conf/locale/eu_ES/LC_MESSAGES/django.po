@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-06 20:42+0000\n"
+"POT-Creation-Date: 2022-11-27 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2019\n"
 "Language-Team: Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/)\n"
@@ -1934,6 +1934,10 @@ msgstr "Jarri gurekin harremanetan"
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
 msgstr "Laguntza-zentroa"
+
+#: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -7742,7 +7746,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -7843,6 +7846,12 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "Ez da e-posta helbiderik eman."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -16426,6 +16435,10 @@ msgstr "Nola dabil"
 msgid "Schools"
 msgstr "Eskolak"
 
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Register for free"
+msgstr ""
+
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr ""
@@ -17458,6 +17471,12 @@ msgid ""
 "Before you send your email, review the text carefully and send it to "
 "yourself first, so that you can preview the formatting and make sure "
 "embedded images and links work correctly."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html

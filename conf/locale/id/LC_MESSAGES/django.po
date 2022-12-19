@@ -105,7 +105,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-06 20:42+0000\n"
+"POT-Creation-Date: 2022-11-27 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -2018,6 +2018,10 @@ msgstr "Hubungi Kami"
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
 msgstr "Pusat Bantuan"
+
+#: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -8000,7 +8004,6 @@ msgid ""
 " yet, click {register_label_strong} at the top of the page."
 msgstr ""
 
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -8104,6 +8107,12 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "Email belum dimasukkan."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -17516,6 +17525,10 @@ msgstr "Cara Kursus"
 msgid "Schools"
 msgstr "Kampus"
 
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Register for free"
+msgstr ""
+
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "Ringkas pelatihan terakhir Anda"
@@ -18669,6 +18682,12 @@ msgstr ""
 " minggu. Sebelum mengirim email, tinjau teks dengan saksama dan kirimkan ke "
 "diri Anda terlebih dahulu, sehingga Anda dapat melihat pratinjau format dan "
 "memastikan gambar dan tautan yang disematkan berfungsi dengan benar."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

@@ -124,7 +124,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-06 20:42+0000\n"
+"POT-Creation-Date: 2022-11-27 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Danylo Shcherbak <danylo.shcherbak@raccoongang.com>, 2020\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -2111,6 +2111,10 @@ msgstr "Зв'яжіться з нами"
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
 msgstr "Центр допомоги"
+
+#: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Media Kit"
@@ -8172,7 +8176,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -8281,6 +8284,12 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "Не надано електронну адресу."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -17241,6 +17250,10 @@ msgstr ""
 msgid "Schools"
 msgstr ""
 
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Register for free"
+msgstr ""
+
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr ""
@@ -18298,6 +18311,12 @@ msgstr ""
 "тиждень. Перед відправленням повідомлення уважно перегляньте текст і спершу "
 "надішліть його собі для попереднього перегляду та переконайтеся, що додані "
 "посилання та зображення відображаються коректно. "
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

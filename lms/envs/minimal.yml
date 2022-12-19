@@ -1,0 +1,25 @@
+# WARNING: Experimental
+#
+# This is the minimal settings you need to set to be able to get django to
+# load when using the production.py settings files. It's useful to point
+# LMS_CFG and CMS_CFG to this file to be able to run various paver commands
+# without needing a full docker setup.
+#
+# Follow up work will likely be done as a part of
+# https://github.com/openedx/wg-developer-experience/issues/136
+---
+
+SECRET_KEY: aseuothsaeotuhaseotisaotenihsaoetih
+FEATURES:
+  PREVIEW_LMS_BASE: "http://localhost"
+TRACKING_BACKENDS: {}
+EVENT_TRACKING_BACKENDS: {}
+JWT_AUTH: {}
+CELERY_QUEUES: {}
+MKTG_URL_LINK_MAP: {}
+MKTG_URL_OVERRIDES: {}
+REST_FRAMEWORK: {}
+
+# For just the CMS
+LMS_ROOT_URL: "http://localhost"
+LMS_INTERNAL_ROOT_URL: "http://localhost"

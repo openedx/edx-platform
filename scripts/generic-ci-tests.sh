@@ -70,7 +70,7 @@ if [ -z ${TOX_ENV+x} ] || [[ ${TOX_ENV} == 'null' ]]; then
     echo "TOX_ENV: ${TOX_ENV}"
     TOX=""
 elif tox -l |grep -q "${TOX_ENV}"; then
-    if [[ "${TOX_ENV}" == 'quality-django32' ]]; then
+    if [[ "${TOX_ENV}" == 'quality' ]]; then
         TOX=""
     else
         TOX="tox -r -e ${TOX_ENV} --"

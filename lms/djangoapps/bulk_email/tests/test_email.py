@@ -229,6 +229,33 @@ class AceEmailTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardT
             response = self.client.post(self.send_mail_url, test_email)
             self.assertEqual(email_sent_with_ace, mock_ace_email_send.called)
 
+    def test_keyword_substitution_in_message_body(self):
+        """
+        Make sure keywords like `%%USER_FULLNAME%%`, `%%COURSE_DISPLAY_NAME%%` are substituted in message body
+        """
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["staff"]',
+            'subject': 'test subject for staff',
+            'message': 'Hi %%USER_FULLNAME%%, Welcome to %%COURSE_DISPLAY_NAME%% course'
+        }
+        self.client.post(self.send_mail_url, test_email)
+        text_message_body = mail.outbox[0].body
+        html_message_body = ''
+        for content, mimetype in mail.outbox[0].alternatives:
+            if mimetype == 'text/html':
+                html_message_body = content
+                break
+
+        self.assertNotIn('%%USER_FULLNAME%%', text_message_body)
+        self.assertNotIn('%%COURSE_DISPLAY_NAME%%', text_message_body)
+        self.assertNotIn('%%USER_FULLNAME%%', html_message_body)
+        self.assertNotIn('%%COURSE_DISPLAY_NAME%%', html_message_body)
+        self.assertIn(f'Hi {self.instructor.get_full_name()}', text_message_body)
+        self.assertIn(f'Welcome to {self.course.display_name}', text_message_body)
+        self.assertIn(f'Hi {self.instructor.get_full_name()}', html_message_body)
+        self.assertIn(f'Welcome to {self.course.display_name}', html_message_body)
+
 
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 @ddt.ddt

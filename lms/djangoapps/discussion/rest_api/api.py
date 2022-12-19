@@ -21,7 +21,6 @@ from django.db.models import Q
 from django.http import Http404
 from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
-from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework import status
@@ -29,6 +28,12 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+)
+
+from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -84,6 +89,7 @@ from ..django_comment_client.base.views import (
     track_voted_event,
     track_discussion_reported_event,
     track_discussion_unreported_event,
+    track_forum_search_event
 )
 from ..django_comment_client.utils import (
     get_group_id_for_user,
@@ -111,12 +117,15 @@ from .serializers import (
     get_context
 )
 from .utils import (
+    AttributeDict,
     add_stats_for_users_with_no_discussion_content,
+    create_blocks_params,
     discussion_open_for_user,
     get_usernames_for_course,
     get_usernames_from_search_string,
     set_attribute
 )
+
 
 User = get_user_model()
 
@@ -340,6 +349,8 @@ def get_course(request, course_key):
         }),
         "is_group_ta": bool(user_roles & {FORUM_ROLE_GROUP_MODERATOR}),
         "is_user_admin": request.user.is_staff,
+        "is_course_staff": CourseStaffRole(course_key).has_user(request.user),
+        "is_course_admin": CourseInstructorRole(course_key).has_user(request.user),
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
@@ -520,6 +531,108 @@ def get_course_topics(request: Request, course_key: CourseKey, topic_ids: Option
                 "Discussion not found for '{}'.".format(", ".join(str(id) for id in not_found_topic_ids))
             )
 
+    return {
+        "courseware_topics": courseware_topics,
+        "non_courseware_topics": non_courseware_topics,
+    }
+
+
+def get_v2_non_courseware_topics_as_v1(request, course_key, topics):
+    """
+    Takes v2 topics list and returns v1 list of non courseware topics
+    """
+    non_courseware_topics = []
+    for topic in topics:
+        if topic.get('usage_key', '') is None:
+            for key in ['usage_key', 'enabled_in_context']:
+                topic.pop(key)
+            topic.update({
+                'children': [],
+                'thread_list_url': get_thread_list_url(
+                    request,
+                    course_key,
+                    topic.get('id'),
+                )
+            })
+            non_courseware_topics.append(topic)
+    return non_courseware_topics
+
+
+def get_v2_courseware_topics_as_v1(request, course_key, sequentials, topics):
+    """
+    Returns v2 courseware topics list as v1 structure
+    """
+    courseware_topics = []
+    for sequential in sequentials:
+        children = []
+        for child in sequential.get('children', []):
+            for topic in topics:
+                if child == topic.get('usage_key'):
+                    topic.update({
+                        'children': [],
+                        'thread_list_url': get_thread_list_url(
+                            request,
+                            course_key,
+                            [topic.get('id')],
+                        )
+                    })
+                    topic.pop('enabled_in_context')
+                    children.append(AttributeDict(topic))
+
+        discussion_topic = DiscussionTopic(
+            None,
+            sequential.get('display_name'),
+            get_thread_list_url(
+                request,
+                course_key,
+                [child.id for child in children],
+            ),
+            children,
+            None,
+        )
+        courseware_topics.append(DiscussionTopicSerializer(discussion_topic).data)
+    return courseware_topics
+
+
+def get_v2_course_topics_as_v1(
+    request: Request,
+    course_key: CourseKey,
+    topic_ids: Optional[Iterable[str]] = None,
+):
+    """
+    Returns v2 topics in v1 structure
+    """
+    course_usage_key = modulestore().make_course_usage_key(course_key)
+    blocks_params = create_blocks_params(course_usage_key, request.user)
+    blocks = get_blocks(
+        request,
+        blocks_params['usage_key'],
+        blocks_params['user'],
+        blocks_params['depth'],
+        blocks_params['nav_depth'],
+        blocks_params['requested_fields'],
+        blocks_params['block_counts'],
+        blocks_params['student_view_data'],
+        blocks_params['return_type'],
+        blocks_params['block_types_filter'],
+        hide_access_denials=False,
+    )['blocks']
+
+    sequentials = [value for _, value in blocks.items()
+                   if value.get('type') == "sequential"]
+
+    topics = get_course_topics_v2(course_key, request.user, topic_ids)
+    non_courseware_topics = get_v2_non_courseware_topics_as_v1(
+        request,
+        course_key,
+        topics,
+    )
+    courseware_topics = get_v2_courseware_topics_as_v1(
+        request,
+        course_key,
+        sequentials,
+        topics,
+    )
     return {
         "courseware_topics": courseware_topics,
         "non_courseware_topics": non_courseware_topics,
@@ -1465,7 +1578,7 @@ def update_comment(request, comment_id, update_data):
     return api_comment
 
 
-def get_thread(request, thread_id, requested_fields=None):
+def get_thread(request, thread_id, requested_fields=None, course_id=None):
     """
     Retrieve a thread.
 
@@ -1475,6 +1588,8 @@ def get_thread(request, thread_id, requested_fields=None):
           determining the requesting user.
 
         thread_id: The id for the thread to retrieve
+
+        course_id: the id of the course the threads belongs to
 
         requested_fields: Indicates which additional fields to return for
         thread. (i.e. ['profile_image'])
@@ -1489,6 +1604,8 @@ def get_thread(request, thread_id, requested_fields=None):
             "user_id": str(request.user.id),
         }
     )
+    if course_id and course_id != cc_thread.course_id:
+        raise ThreadNotFoundError("Thread not found.")
     return _serialize_discussion_entities(request, context, [cc_thread], requested_fields, DiscussionEntity.thread)[0]
 
 
@@ -1723,24 +1840,23 @@ def get_course_discussion_user_stats(
         comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_from_search_string(
             course_key, username_search_string, page, page_size
         )
-        if not comma_separated_usernames:
-            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
-                "results": [],
-            })
-        params['usernames'] = comma_separated_usernames
-
-    course_stats_response = get_course_user_stats(course_key, params)
-
-    tracker.emit(
-        'edx.forum.searched',
-        {
+        search_event_data = {
             'query': username_search_string,
             'search_type': 'Learner',
             'page': params.get('page'),
             'sort_key': params.get('sort_key'),
-            'total_results': course_stats_response.get('total_results'),
+            'total_results': matched_users_count,
         }
-    )
+        course = _get_course(course_key, request.user)
+        track_forum_search_event(request, course, search_event_data)
+        if not comma_separated_usernames:
+            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
+                "results": [],
+            })
+
+        params['usernames'] = comma_separated_usernames
+
+    course_stats_response = get_course_user_stats(course_key, params)
 
     if comma_separated_usernames:
         updated_course_stats = add_stats_for_users_with_no_discussion_content(

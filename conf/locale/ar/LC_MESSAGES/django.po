@@ -257,7 +257,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-06 20:42+0000\n"
+"POT-Creation-Date: 2022-11-27 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -2333,6 +2333,10 @@ msgstr "اتصل بنا"
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
 msgstr "مركز المساعدة"
+
+#: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -8518,7 +8522,6 @@ msgstr ""
 "{platform_name} حتى الآن، فانقر فوق {register_label_strong} في أعلى الصفحة."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -8634,6 +8637,12 @@ msgstr "حدث خطأ أثناء تغيير كلمة المرور. حاول مر
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "لم يُحدَّد عنوان بريد إلكتروني."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -18097,6 +18106,10 @@ msgstr "كيفية العمل"
 msgid "Schools"
 msgstr "المدارس"
 
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Register for free"
+msgstr ""
+
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "استئناف مساقك الأخير"
@@ -19242,6 +19255,12 @@ msgstr ""
 "يُفضّل أن لا ترسل للمتعلمين أكثر من رسالة واحدة أسبوعياً. ننصح قبل إرسالك "
 "لأي رسالة بمراجعة نصّها بدقة، ثم إرسالها لنفسك أولاً كي يتسنى لك معاينة "
 "التنسيق والتأكد من سلامة الصور والروابط المضمّنة."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

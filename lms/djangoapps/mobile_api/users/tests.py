@@ -501,21 +501,17 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         assert response.data['last_visited_block_id'] == str(self.unit.location)
 
     # Since we are testing an non atomic view in atomic test case, therefore we are expecting error on failures
-    def api_error_response(self, reverse_args=None, data=None, **kwargs):
+    def api_atomic_response(self, reverse_args=None, data=None, **kwargs):
         """
-            Same as api response from MobileAPITestCase but handle views which throw errors
+        Same as the api_response from MobileAPITestCase, but handles the view as an atomic transaction.
         """
         url = self.reverse_url(reverse_args, **kwargs)
-        try:
-            with transaction.atomic():
-                self.url_method(url, data=data, **kwargs)
-                assert False
-        except transaction.TransactionManagementError:
-            assert True
+        with transaction.atomic():
+            self.url_method(url, data=data, **kwargs)
 
     def test_invalid_user(self):
         self.login_and_enroll()
-        self.api_error_response(username='no_user')
+        self.api_atomic_response(username='no_user')
 
     def test_other_user(self):
         # login and enroll as the test user
@@ -530,22 +526,22 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
         # now login and call the API as the test user
         self.login()
-        self.api_error_response(username=other.username)
+        self.api_atomic_response(username=other.username)
 
     def test_course_not_found(self):
         non_existent_course_id = CourseKey.from_string('a/b/c')
         self.init_course_access(course_id=non_existent_course_id)
 
-        self.api_error_response(course_id=non_existent_course_id)
+        self.api_atomic_response(course_id=non_existent_course_id)
 
     def test_unenrolled_user(self):
         self.login()
         self.unenroll()
-        self.api_error_response(expected_response_code=None)
+        self.api_atomic_response(expected_response_code=None)
 
     def test_no_auth(self):
         self.logout()
-        self.api_error_response()
+        self.api_atomic_response()
 
 
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,

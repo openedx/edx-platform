@@ -67,7 +67,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-06 20:42+0000\n"
+"POT-Creation-Date: 2022-11-27 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Catalan (https://www.transifex.com/open-edx/teams/6205/ca/)\n"
@@ -1894,6 +1894,10 @@ msgstr "Contacteu amb nosaltres"
 
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Security"
 msgstr ""
 
 #: lms/templates/static_templates/media-kit.html
@@ -7602,7 +7606,6 @@ msgid ""
 " yet, click {register_label_strong} at the top of the page."
 msgstr ""
 
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -7701,6 +7704,12 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/register.py
@@ -16725,6 +16734,10 @@ msgstr "Com funciona"
 msgid "Schools"
 msgstr "Escoles"
 
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Register for free"
+msgstr ""
+
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "Reprèn el darrer curs"
@@ -17878,6 +17891,12 @@ msgstr ""
 "acuradament i envieu-lo per primer cop, de manera que pugueu fer una vista "
 "prèvia del format i assegureu-vos que les imatges i enllaços incrustats "
 "funcionin correctament."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

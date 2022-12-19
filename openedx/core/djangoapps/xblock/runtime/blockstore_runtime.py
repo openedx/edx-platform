@@ -63,7 +63,7 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
                 # This is a (former) XModule with messy XML parsing code; let its parse_xml() method continue to work
                 # as it currently does in the old runtime, but let this parse_xml_new_runtime() method parse the XML in
                 # a simpler way that's free of tech debt, if defined.
-                # In particular, XmlParserMixin doesn't play well with this new runtime, so this is mostly about
+                # In particular, XmlMixin doesn't play well with this new runtime, so this is mostly about
                 # bypassing that mixin's code.
                 # When a former XModule no longer needs to support the old runtime, its parse_xml_new_runtime method
                 # should be removed and its parse_xml() method should be simplified to just call the super().parse_xml()

@@ -11,6 +11,7 @@
 # Alexander Gropmann <alexander.gropmann@charite.de>, 2018
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2013-2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2016-2017
+# Alfredo Guillem, 2022
 # andreas.frey <andreas.frey@liip.ch>, 2014
 # 2b2d35a2693e2be4fb9cc6718ad20b07_8542ebf <37324aa543125a600265fedaa47d04f3_158329>, 2014
 # c377c1a4a254197c7969440fac89353f, 2014
@@ -116,6 +117,7 @@
 # Alexander Gropmann <alexander.gropmann@charite.de>, 2018
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2016-2017
+# Alfredo Guillem, 2022
 # Christian Layr <Christian.Layr@unisg.ch>, 2015
 # Donna Kl <donna@polarstern-education.com>, 2019
 # Donna Kl <donna@polarstern-education.com>, 2019
@@ -130,9 +132,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-06 20:42+0000\n"
+"POT-Creation-Date: 2022-11-27 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2021\n"
+"Last-Translator: Alfredo Guillem, 2022\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
@@ -5865,11 +5867,11 @@ msgstr "Geschlossene Überschriften anzeigen"
 
 #: xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
-msgstr "Transskripte aktivieren"
+msgstr "Transkripte aktivieren"
 
 #: xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
-msgstr "Transskripte deaktivieren"
+msgstr "Transkripte deaktivieren"
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
@@ -10994,7 +10996,7 @@ msgstr "Videokennung"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Transcripts"
-msgstr "Transskripte"
+msgstr "Transkripte"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video Status"

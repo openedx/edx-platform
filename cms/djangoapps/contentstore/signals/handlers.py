@@ -11,10 +11,10 @@ from django.core.cache import cache
 from django.db import transaction
 from django.dispatch import receiver
 from edx_toggles.toggles import SettingToggle
-from edx_event_bus_kafka import get_producer
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.content_authoring.data import CourseCatalogData, CourseScheduleData
 from openedx_events.content_authoring.signals import COURSE_CATALOG_INFO_CHANGED
+from openedx_events.event_bus import get_producer
 from pytz import UTC
 
 from cms.djangoapps.contentstore.courseware_index import (
@@ -125,9 +125,9 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
         dump_course_to_neo4j
     )
 
-    # register special exams asynchronously
+    # register special exams asynchronously after the data is ready
     course_key_str = str(course_key)
-    update_special_exams_and_publish.delay(course_key_str)
+    transaction.on_commit(lambda: update_special_exams_and_publish.delay(course_key_str))
 
     if key_supports_outlines(course_key):
         # Push the course outline to learning_sequences asynchronously.
@@ -159,6 +159,7 @@ def listen_for_course_catalog_info_changed(sender, signal, **kwargs):
     get_producer().send(
         signal=COURSE_CATALOG_INFO_CHANGED, topic='course-catalog-info-changed',
         event_key_field='catalog_info.course_key', event_data={'catalog_info': kwargs['catalog_info']},
+        event_metadata=kwargs['metadata'],
     )
 
 

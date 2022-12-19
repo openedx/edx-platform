@@ -199,7 +199,16 @@ def get_enrollment(username, course_id):
     return _data_api().get_course_enrollment(username, course_id)
 
 
-def add_enrollment(username, course_id, mode=None, is_active=True, enrollment_attributes=None, enterprise_uuid=None):
+def add_enrollment(
+    username,
+    course_id,
+    mode=None,
+    is_active=True,
+    enrollment_attributes=None,
+    enterprise_uuid=None,
+    force_enrollment=False,
+    include_expired=False
+):
     """Enrolls a user in a course.
 
     Enrolls a user in a course. If the mode is not specified, this will default to `CourseMode.DEFAULT_MODE_SLUG`.
@@ -213,6 +222,8 @@ def add_enrollment(username, course_id, mode=None, is_active=True, enrollment_at
             defaults to True.
         enrollment_attributes (list): Attributes to be set the enrollment.
         enterprise_uuid (str): Add course enterprise uuid
+        force_enrollment (bool): Enroll user even if course enrollment_end date is expired
+        include_expired (bool): Boolean denoting whether expired course modes should be included.
 
     Returns:
         A serializable dictionary of the new course enrollment.
@@ -250,8 +261,10 @@ def add_enrollment(username, course_id, mode=None, is_active=True, enrollment_at
     """
     if mode is None:
         mode = _default_course_mode(course_id)
-    validate_course_mode(course_id, mode, is_active=is_active)
-    enrollment = _data_api().create_course_enrollment(username, course_id, mode, is_active, enterprise_uuid)
+    validate_course_mode(course_id, mode, is_active=is_active, include_expired=include_expired)
+    enrollment = _data_api().create_course_enrollment(
+        username, course_id, mode, is_active, enterprise_uuid, force_enrollment=force_enrollment
+    )
 
     if enrollment_attributes is not None:
         set_enrollment_attributes(username, course_id, enrollment_attributes)
