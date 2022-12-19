@@ -29,5 +29,5 @@ class Command(BaseCommand):
             raise CommandError(f'An error has occurred while survey report was generating. {error}') from error
 
         self.stdout.write(
-            self.style.SUCCESS(f'Survey report has been generated successfully.')
+            self.style.SUCCESS('Survey report has been generated successfully.')
         )

@@ -48,7 +48,7 @@ def generate_report() -> None:
         update_report(survey_report.id, data)
     except (Exception, ) as update_report_error:
         update_report(survey_report.id, {"state": SURVEY_REPORT_ERROR})
-        raise Exception(update_report_error)
+        raise Exception(update_report_error) from update_report_error
 
 
 def update_report(survey_report_id: int, data: dict) -> None:
