@@ -12,7 +12,7 @@ from crum import get_current_user
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
 
-from . import app_variant
+from . import app_variant, utils
 
 
 logger = logging.getLogger(__name__)
@@ -170,10 +170,20 @@ class TahoeUserMetadataProcessor(object):
         if app_variant.is_not_lms():  # we don't care about user metadata for Studio, at this point
             return event
 
+        # eventtracking Processors are loaded before apps are ready
+        from django.contrib.auth.models import User
+
         user = get_current_user()
         if not user or not user.pk:
             # should be an AnonymousUser or in tests
-            return event
+            user_id = utils.get_user_id_from_event(event)
+            if user_id:
+                try:
+                    user = User.objects.get(id=user_id)
+                except User.DoesNotExist:
+                    return event
+            else:
+                return event
 
         # Add any Tahoe metadata context
         tahoe_user_metadata = self._get_user_tahoe_metadata(user.pk)
