@@ -63,7 +63,7 @@ class SurveyReport(models.Model):
 
 class SurveyReportUpload(models.Model):
     """
-    This models stores information about send request of a survey report.
+    This model stores the result of the POST request made to an external service after generating a survey report.
 
     .. no_pii:
 
