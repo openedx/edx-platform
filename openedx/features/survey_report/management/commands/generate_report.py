@@ -26,7 +26,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--no-send',
             action='store_true',
-            help='Not send the report after generated.'
+            help='Do not send the report after generated.'
         )
 
     def handle(self, *_args, **options):
