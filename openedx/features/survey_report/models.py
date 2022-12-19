@@ -85,5 +85,5 @@ class SurveyReportUpload(models.Model):
 
     def is_uploaded(self) -> bool:
         response = Response()
-        response.status_code = self.status
+        response.status_code = self.status_code
         return response.ok
