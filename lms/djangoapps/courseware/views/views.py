@@ -45,7 +45,7 @@ from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from web_fragments.fragment import Fragment
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
+from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
@@ -1262,7 +1262,7 @@ def get_static_tab_fragment(request, course, tab):
         request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, course=course
     )
 
-    logging.debug('course_module = %s', tab_module)
+    logging.debug('course_block = %s', tab_module)
 
     fragment = Fragment()
     if tab_module is not None:

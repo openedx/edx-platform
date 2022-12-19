@@ -149,7 +149,7 @@ def permission_blacked_out(course, role_names, permission_name):
     Returns true if a user in course with the given roles would have permission_name blacked out.
 
     This will return true if it is a permission that the user might have normally had for the course, but does not have
-    right this moment because we are in a discussion blackout period (as defined by the settings on the course module).
+    right this moment because we are in a discussion blackout period (as defined by the settings on the course block).
     Namely, they can still view, but they can't edit, update, or create anything. This only applies to students, as
     moderators of any kind still have posting privileges during discussion blackouts.
     """

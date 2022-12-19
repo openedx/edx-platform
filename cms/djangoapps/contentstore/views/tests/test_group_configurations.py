@@ -1169,7 +1169,7 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
     Tests for validation in Group Configurations.
     """
 
-    @patch('xmodule.split_test_module.SplitTestBlock.validate_split_test')
+    @patch('xmodule.split_test_block.SplitTestBlock.validate_split_test')
     def verify_validation_add_usage_info(self, expected_result, mocked_message, mocked_validation_messages):
         """
         Helper method for testing validation information present after add_usage_info.
@@ -1204,7 +1204,7 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
         )
         self.verify_validation_add_usage_info(expected_result, mocked_message)  # pylint: disable=no-value-for-parameter
 
-    @patch('xmodule.split_test_module.SplitTestBlock.validate_split_test')
+    @patch('xmodule.split_test_block.SplitTestBlock.validate_split_test')
     def verify_validation_update_usage_info(self, expected_result, mocked_message, mocked_validation_messages):
         """
         Helper method for testing validation information present after update_usage_info.

@@ -11,7 +11,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.exceptions import ValidationError
-from xmodule.course_module import CourseBlock
+from xmodule.course_block import CourseBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException, StaticTab
@@ -106,7 +106,7 @@ def update_tabs_handler(course_item: CourseBlock, tabs_data: Dict, user: User) -
     Helper to handle updates to course tabs based on API data.
 
     Args:
-        course_item (CourseBlock): Course module whose tabs need to be updated
+        course_item (CourseBlock): Course block whose tabs need to be updated
         tabs_data (Dict): JSON formatted data for updating or reordering tabs.
         user (User): The user performing the operation.
     """

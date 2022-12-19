@@ -224,28 +224,28 @@ def remove_markup(html):
     return HTML(bleach.clean(html, tags=[], strip=True))
 
 
-def get_course_id_from_capa_module(capa_module):
+def get_course_id_from_capa_block(capa_block):
     """
-    Extract a stringified course run key from a CAPA module (aka ProblemBlock).
+    Extract a stringified course run key from a CAPA block (aka ProblemBlock).
 
     This is a bit of a hack. Its intended use is to allow us to pass the course id
     (if available) to `safe_exec`, enabling course-run-specific resource limits
     in the safe execution environment (codejail).
 
     Arguments:
-        capa_module (ProblemBlock|None)
+        capa_block (ProblemBlock|None)
 
     Returns: str|None
         The stringified course run key of the module.
         If not available, fall back to None.
     """
-    if not capa_module:
+    if not capa_block:
         return None
     try:
-        return str(capa_module.scope_ids.usage_id.course_key)
+        return str(capa_block.scope_ids.usage_id.course_key)
     except (AttributeError, TypeError):
         # AttributeError:
-        #     If the capa module lacks scope ids or has unexpected scope ids, we
+        #     If the capa block lacks scope ids or has unexpected scope ids, we
         #     would rather fall back to `None` than let an AttributeError be raised
         #     here.
         # TypeError:

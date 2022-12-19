@@ -29,7 +29,7 @@ from xblock.fields import Reference, ReferenceList, ReferenceValueDict, ScopeIds
 from xmodule.capa.xqueue_interface import XQueueService
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.django import contentstore
-from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -183,7 +183,7 @@ class ModelsTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-cl
 
     def test_load_class(self):
         vc = XBlock.load_class('sequential')
-        vc_str = "<class 'xmodule.seq_module.SequenceBlock'>"
+        vc_str = "<class 'xmodule.seq_block.SequenceBlock'>"
         assert str(vc) == vc_str
 
 

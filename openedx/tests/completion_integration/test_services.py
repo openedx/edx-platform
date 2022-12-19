@@ -117,7 +117,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
             completion=0.75,
         )
 
-    def _bind_course_module(self, module):
+    def _bind_course_block(self, module):
         """
         Bind a module (part of self.course) so we can access student-specific data.
         """
@@ -222,7 +222,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
 
         library_content_block.refresh_children()
         lib_vertical = self.store.get_item(lib_vertical.location)
-        self._bind_course_module(lib_vertical)
+        self._bind_course_block(lib_vertical)
         # We need to refetch the library_content_block to retrieve the
         # fresh version from the call to get_item for lib_vertical
         library_content_block = [child for child in lib_vertical.get_children()
@@ -230,7 +230,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
 
         ## Ensure the library_content_block is properly set up
         # This is needed so we can call get_child_descriptors
-        self._bind_course_module(library_content_block)
+        self._bind_course_block(library_content_block)
         # Make sure the runtime knows that the block's children vary per-user:
         assert library_content_block.has_dynamic_children()
         assert len(library_content_block.children) == 3

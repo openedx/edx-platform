@@ -18,7 +18,7 @@ from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
-from xmodule.course_module import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
 

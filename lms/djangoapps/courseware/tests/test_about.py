@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from milestones.tests.utils import MilestonesTestCaseMixin
-from xmodule.course_module import (
+from xmodule.course_block import (
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_NONE,
     COURSE_VISIBILITY_PRIVATE,
@@ -103,7 +103,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
     @override_settings(COURSE_ABOUT_VISIBILITY_PERMISSION="see_about_page")
     def test_visible_about_page_settings(self):
         """
-        Verify that the About Page honors the permission settings in the course module
+        Verify that the About Page honors the permission settings in the course block
         """
         url = reverse('about_course', args=[str(self.course_with_about.id)])
         resp = self.client.get(url)
@@ -207,7 +207,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         Assert that anonymous or unenrolled users see View Course option
         when unenrolled access flag is set
         """
-        with mock.patch('xmodule.course_module.CourseBlock.course_visibility', course_visibility):
+        with mock.patch('xmodule.course_block.CourseBlock.course_visibility', course_visibility):
             with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True):
                 url = reverse('about_course', args=[str(self.course.id)])
                 resp = self.client.get(url)

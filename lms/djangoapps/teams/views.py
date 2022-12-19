@@ -418,7 +418,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         course_id_string = request.query_params['course_id']
         try:
             course_key = CourseKey.from_string(course_id_string)
-            course_module = modulestore().get_course(course_key)
+            course_block = modulestore().get_course(course_key)
         except InvalidKeyError:
             error = build_api_error(
                 gettext_noop("The supplied course id {course_id} is not valid."),
@@ -427,7 +427,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
         # Ensure the course exists
-        if course_module is None:
+        if course_block is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         result_filter.update({'course_id': course_key})
 
@@ -446,7 +446,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             result_filter.update({'membership__user__username': username})
         topic_id = request.query_params.get('topic_id', None)
         if topic_id is not None:
-            if topic_id not in course_module.teamsets_by_id:
+            if topic_id not in course_block.teamsets_by_id:
                 error = build_api_error(
                     gettext_noop('The supplied topic id {topic_id} is not valid'),
                     topic_id=topic_id
@@ -485,7 +485,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             # Non-staff users should not be able to see private_managed teams that they are not on.
             # Staff shouldn't have any excluded teams.
-            excluded_private_team_ids = self._get_private_team_ids_to_exclude(course_module)
+            excluded_private_team_ids = self._get_private_team_ids_to_exclude(course_block)
 
             search_results['results'] = [
                 result for result in search_results['results']
@@ -516,7 +516,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         }
 
         # hide private_managed courses from non-staff users that aren't members of those teams
-        excluded_private_team_ids = self._get_private_team_ids_to_exclude(course_module)
+        excluded_private_team_ids = self._get_private_team_ids_to_exclude(course_block)
 
         queryset = CourseTeam.objects.filter(**result_filter).exclude(team_id__in=excluded_private_team_ids)
         order_by_input = request.query_params.get('order_by', 'name')
@@ -552,8 +552,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         try:
             course_key = CourseKey.from_string(course_id)
             # Ensure the course exists
-            course_module = modulestore().get_course(course_key)
-            if not course_module:
+            course_block = modulestore().get_course(course_key)
+            if not course_block:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except InvalidKeyError:
             field_errors['course_id'] = build_api_error(
@@ -577,8 +577,8 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         if course_key and not has_team_api_access(request.user, course_key):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        if topic_id not in course_module.teams_configuration.teamsets_by_id or (
-            not has_specific_teamset_access(request.user, course_module, topic_id)
+        if topic_id not in course_block.teams_configuration.teamsets_by_id or (
+            not has_specific_teamset_access(request.user, course_block, topic_id)
         ):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -647,18 +647,18 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         page_query_param = self.request.query_params.get(self.paginator.page_query_param)
         return page_kwarg or page_query_param or 1
 
-    def _get_private_team_ids_to_exclude(self, course_module):
+    def _get_private_team_ids_to_exclude(self, course_block):
         """
         Get the list of team ids that should be excluded from the response.
         Staff can see all private teams.
         Users should not be able to see teams in private teamsets that they are not a member of.
         """
-        if has_access(self.request.user, 'staff', course_module.id):
+        if has_access(self.request.user, 'staff', course_block.id):
             return set()
 
-        private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
+        private_teamset_ids = [ts.teamset_id for ts in course_block.teamsets if ts.is_private_managed]
         excluded_team_ids = CourseTeam.objects.filter(
-            course_id=course_module.id,
+            course_id=course_block.id,
             topic_id__in=private_teamset_ids
         ).exclude(
             membership__user=self.request.user
@@ -1013,8 +1013,8 @@ class TopicListView(GenericAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         # Ensure the course exists
-        course_module = modulestore().get_course(course_id)
-        if course_module is None:  # course is None if not found
+        course_block = modulestore().get_course(course_id)
+        if course_block is None:  # course is None if not found
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not has_team_api_access(request.user, course_id):
@@ -1034,8 +1034,8 @@ class TopicListView(GenericAPIView):
         # Always sort alphabetically, as it will be used as secondary sort
         # in the case of "team_count".
         organization_protection_status = user_organization_protection_status(request.user, course_id)
-        topics = get_alphabetical_topics(course_module)
-        topics = _filter_hidden_private_teamsets(request.user, topics, course_module)
+        topics = get_alphabetical_topics(course_block)
+        topics = _filter_hidden_private_teamsets(request.user, topics, course_block)
 
         if ordering == 'team_count':
             add_team_count(request.user, topics, course_id, organization_protection_status)
@@ -1065,17 +1065,17 @@ class TopicListView(GenericAPIView):
         return response
 
 
-def _filter_hidden_private_teamsets(user, teamsets, course_module):
+def _filter_hidden_private_teamsets(user, teamsets, course_block):
     """
     Return a filtered list of teamsets, removing any private teamsets that a user doesn't have access to.
     Follows the same logic as `has_specific_teamset_access` but in bulk rather than for one teamset at a time
     """
-    if has_course_staff_privileges(user, course_module.id):
+    if has_course_staff_privileges(user, course_block.id):
         return teamsets
-    private_teamset_ids = [teamset.teamset_id for teamset in course_module.teamsets if teamset.is_private_managed]
+    private_teamset_ids = [teamset.teamset_id for teamset in course_block.teamsets if teamset.is_private_managed]
     teamset_ids_user_has_access_to = set(
         CourseTeam.objects.filter(
-            course_id=course_module.id,
+            course_id=course_block.id,
             topic_id__in=private_teamset_ids,
             membership__user=user
         ).values_list('topic_id', flat=True)
@@ -1086,17 +1086,17 @@ def _filter_hidden_private_teamsets(user, teamsets, course_module):
     ]
 
 
-def get_alphabetical_topics(course_module):
+def get_alphabetical_topics(course_block):
     """Return a list of team topics sorted alphabetically.
 
     Arguments:
-        course_module (xmodule): the course which owns the team topics
+        course_block (xblock): the course which owns the team topics
 
     Returns:
         list: a list of sorted team topics
     """
     return sorted(
-        course_module.teams_configuration.cleaned_data['team_sets'],
+        course_block.teams_configuration.cleaned_data['team_sets'],
         key=lambda t: t['name'].lower(),
     )
 
@@ -1159,19 +1159,19 @@ class TopicDetailView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         # Ensure the course exists
-        course_module = modulestore().get_course(course_id)
-        if course_module is None:
+        course_block = modulestore().get_course(course_id)
+        if course_block is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not has_team_api_access(request.user, course_id):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         try:
-            topic = course_module.teamsets_by_id[topic_id]
+            topic = course_block.teamsets_by_id[topic_id]
         except KeyError:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if not has_specific_teamset_access(request.user, course_module, topic_id):
+        if not has_specific_teamset_access(request.user, course_block, topic_id):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         organization_protection_status = user_organization_protection_status(request.user, course_id)
@@ -1371,11 +1371,11 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
             if not has_team_api_access(request.user, requested_course_key):
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
-            course_module = modulestore().get_course(requested_course_key)
-            if not course_module:
+            course_block = modulestore().get_course(requested_course_key)
+            if not course_block:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             specified_username_or_team = True
-            teamsets = course_module.teams_configuration.teamsets_by_id
+            teamsets = course_block.teams_configuration.teamsets_by_id
             teamset_id = request.query_params['teamset_id']
             teamset = teamsets.get(teamset_id, None)
             if not teamset:
@@ -1462,9 +1462,9 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        course_module = modulestore().get_course(team.course_id)
+        course_block = modulestore().get_course(team.course_id)
         # This should use `calc_max_team_size` instead of `default_max_team_size` (TODO MST-32).
-        max_team_size = course_module.teams_configuration.default_max_team_size
+        max_team_size = course_block.teams_configuration.default_max_team_size
         if max_team_size is not None and team.users.count() >= max_team_size:
             return Response(
                 build_api_error(gettext_noop("This team is already full.")),
@@ -1709,7 +1709,7 @@ class MembershipBulkManagementView(GenericAPIView):
             course_id = CourseKey.from_string(course_id_string)
         except InvalidKeyError:
             raise Http404(f'Invalid course key: {course_id_string}')  # lint-amnesty, pylint: disable=raise-missing-from
-        course_module = modulestore().get_course(course_id)
-        if not course_module:
+        course_block = modulestore().get_course(course_id)
+        if not course_block:
             raise Http404(f'Course not found: {course_id}')
-        return course_module
+        return course_block

@@ -35,7 +35,7 @@ def get_expected_duration(course_id):
 
 def spaced_out_sections(course):
     """
-    Generator that returns sections of the course module with a suggested time to complete for each
+    Generator that returns sections of the course block with a suggested time to complete for each
 
     Returns:
         index (int): index of section

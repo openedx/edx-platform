@@ -102,11 +102,11 @@ def _asset_index(request, course_key):
 
     Supports start (0-based index into the list of assets) and max query parameters.
     '''
-    course_module = modulestore().get_course(course_key)
+    course_block = modulestore().get_course(course_key)
 
     return render_to_response('asset_index.html', {
         'language_code': request.LANGUAGE_CODE,
-        'context_course': course_module,
+        'context_course': course_block,
         'max_file_size_in_mbs': settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
         'chunk_size_in_mbs': settings.UPLOAD_CHUNK_SIZE_IN_MB,
         'max_file_size_redirect_url': settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,

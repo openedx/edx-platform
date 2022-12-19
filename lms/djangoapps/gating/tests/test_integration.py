@@ -149,7 +149,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         # access to gating content (seq1) remains constant
         assert bool(has_access(user, 'load', self.seq1, self.course.id))
 
-        # access to gated content (seq2) remains constant, access is prevented in SeqModule loading
+        # access to gated content (seq2) remains constant, access is prevented in SeqBlock loading
         assert bool(has_access(user, 'load', self.seq2, self.course.id))
 
     def assert_user_has_prereq_milestone(self, user, expected_has_milestone):

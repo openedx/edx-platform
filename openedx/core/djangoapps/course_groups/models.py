@@ -238,7 +238,7 @@ class CourseCohortsSettings(models.Model):
 
     # Note that although a default value is specified here for always_cohort_inline_discussions (False),
     # in reality the default value at the time that cohorting is enabled for a course comes from
-    # course_module.always_cohort_inline_discussions (via `migrate_cohort_settings`).
+    # course_block.always_cohort_inline_discussions (via `migrate_cohort_settings`).
     # DEPRECATED-- DO NOT USE: Instead use `CourseDiscussionSettings.always_divide_inline_discussions`
     # via `CourseDiscussionSettings.get` or `CourseDiscussionSettings.update`.
     always_cohort_inline_discussions = models.BooleanField(default=False)

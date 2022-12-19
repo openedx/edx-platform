@@ -144,7 +144,7 @@ class Timedelta(JSONField):  # lint-amnesty, pylint: disable=missing-class-docst
 
 class RelativeTime(JSONField):
     """
-    Field for start_time and end_time video module properties.
+    Field for start_time and end_time video block properties.
 
     It was decided, that python representation of start_time and end_time
     should be python datetime.timedelta object, to be consistent with
@@ -152,7 +152,7 @@ class RelativeTime(JSONField):
 
     At the same time, serialized representation should be "HH:MM:SS"
     This format is convenient to use in XML (and it is used now),
-    and also it is used in frond-end studio editor of video module as format
+    and also it is used in frond-end studio editor of video block as format
     for start and end time fields.
 
     In database we previously had float type for start_time and end_time fields,

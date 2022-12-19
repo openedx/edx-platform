@@ -1005,7 +1005,7 @@ MODULESTORE = {
                     'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'default_class': 'xmodule.hidden_block.HiddenBlock',
                         'fs_root': DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
@@ -1015,7 +1015,7 @@ MODULESTORE = {
                     'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'default_class': 'xmodule.hidden_block.HiddenBlock',
                         'fs_root': DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
@@ -1578,7 +1578,7 @@ INSTALLED_APPS = [
     # Monitor the status of services
     'openedx.core.djangoapps.service_status',
 
-    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    # Video block configs (This will be moved to Video once it becomes an XBlock)
     'openedx.core.djangoapps.video_config',
 
     # edX Video Pipeline integration

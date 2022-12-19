@@ -137,7 +137,7 @@ FEATURES['ENTRANCE_EXAMS'] = True
 
 ################################ COURSE LICENSES ################################
 FEATURES['LICENSING'] = True
-# Needed to enable licensing on video modules
+# Needed to enable licensing on video blocks
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################

@@ -21,7 +21,7 @@ from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlock
 
-from xmodule.course_module import Textbook
+from xmodule.course_block import Textbook
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mixed import strip_key
 from xmodule.modulestore.tests.sample_courses import TOY_BLOCK_INFO_TREE, default_block_info_tree
@@ -419,7 +419,7 @@ class ItemFactory(XModuleFactory):
                 module.submission_end = submission_end
             store.update_item(module, user_id)
 
-            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course block, so
             # if we add one then we need to also add it to the policy information (i.e. metadata)
             # we should remove this once we can break this reference from the course to static tabs
             if category == 'static_tab':

@@ -42,10 +42,10 @@ from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong
 
 from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
 from xmodule.capa.xqueue_interface import XQueueInterface
-from xmodule.capa_module import ProblemBlock
+from xmodule.capa_block import ProblemBlock
 from xmodule.contentstore.django import contentstore
-from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
-from xmodule.lti_module import LTIBlock
+from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.lti_block import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -57,7 +57,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.services import RebindUserServiceError
-from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps import static_replace
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
@@ -920,7 +920,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         assert not mock_score_signal.called
 
     @ddt.data(
-        # See seq_module.py for the definition of these handlers
+        # See seq_block.py for the definition of these handlers
         ('get_completion', True),  # has the 'will_recheck_access' attribute set to True
         ('goto_position', False),  # does not set it
     )
@@ -2602,7 +2602,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
 
     def test_get_item(self):
         course = CourseFactory()
-        self._verify_descriptor('video', course, 'HiddenDescriptorWithMixins')
+        self._verify_descriptor('video', course, 'HiddenBlockWithMixins')
 
     def test_dynamic_updates(self):
         """Tests that the list of disabled xblocks can dynamically update."""
@@ -2615,7 +2615,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
 
         # Now simulate a new request cache.
         self.store.request_cache.data.clear()
-        self._verify_descriptor('problem', course, 'HiddenDescriptorWithMixins', item_usage_id)
+        self._verify_descriptor('problem', course, 'HiddenBlockWithMixins', item_usage_id)
 
     def _verify_descriptor(self, category, course, descriptor, item_id=None):
         """

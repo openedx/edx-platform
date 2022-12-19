@@ -21,7 +21,7 @@ from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from openedx.core.lib import tempdir
 from openedx.core.lib.tests import attr
-from xmodule.course_module import CourseBlock
+from xmodule.course_block import CourseBlock
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -67,7 +67,7 @@ class SplitModuleTest(unittest.TestCase):
         'collection': 'modulestore',
     }
     modulestore_options = {
-        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        'default_class': 'xmodule.hidden_block.HiddenBlock',
         'fs_root': tempdir.mkdtemp_clean(),
         'xblock_mixins': (InheritanceMixin, XModuleMixin, EditInfoMixin)
     }
@@ -1308,9 +1308,9 @@ class TestItemCrud(SplitModuleTest):
                 )
 
             # add new child to old parent in continued (leave off version_guid)
-            course_module_locator = new_course.location.version_agnostic()
+            course_block_locator = new_course.location.version_agnostic()
             new_ele = modulestore().create_child(
-                user, course_module_locator, 'chapter',
+                user, course_block_locator, 'chapter',
                 fields={'display_name': 'chapter 4'},
             )
             assert new_ele.update_version != course_block_update_version

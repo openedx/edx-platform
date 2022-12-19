@@ -36,8 +36,8 @@ from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
-from xmodule.video_module import EXPORT_IMPORT_STATIC_DIR, VideoBlock, create_youtube_string
-from xmodule.video_module.transcripts_utils import save_to_store
+from xmodule.video_block import EXPORT_IMPORT_STATIC_DIR, VideoBlock, create_youtube_string
+from xmodule.video_block.transcripts_utils import save_to_store
 
 from .test_import import DummySystem
 
@@ -98,7 +98,7 @@ def instantiate_descriptor(**field_data):
     )
 
 
-# Because of the way xmodule.video_module.video_module imports edxval.api, we
+# Because of the way xmodule.video_block.video_block imports edxval.api, we
 # must mock the entire module, which requires making mock exception classes.
 
 class _MockValVideoNotFoundError(Exception):
@@ -612,7 +612,7 @@ class VideoBlockImportTestCase(TestCase):
             'data': ''
         })
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xmodule.video_block.video_block.edxval_api')
     def test_import_val_data(self, mock_val_api):
         """
         Test that `parse_xml` works method works as expected.
@@ -658,7 +658,7 @@ class VideoBlockImportTestCase(TestCase):
             course_id='test_course_id'
         )
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xmodule.video_block.video_block.edxval_api')
     def test_import_val_data_invalid(self, mock_val_api):
         mock_val_api.ValCannotCreateError = _MockValCannotCreateError
         mock_val_api.import_from_xml = Mock(side_effect=mock_val_api.ValCannotCreateError)
@@ -686,7 +686,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         self.file_system = OSFS(self.temp_dir)
         self.addCleanup(shutil.rmtree, self.temp_dir)
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xmodule.video_block.video_block.edxval_api')
     def test_export_to_xml(self, mock_val_api):
         """
         Test that we write the correct XML on export.
@@ -744,7 +744,7 @@ class VideoExportTestCase(VideoBlockTestBase):
             course_id=self.descriptor.scope_ids.usage_id.context_key,
         )
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xmodule.video_block.video_block.edxval_api')
     def test_export_to_xml_val_error(self, mock_val_api):
         # Export should succeed without VAL data if video does not exist
         mock_val_api.ValVideoNotFoundError = _MockValVideoNotFoundError
@@ -757,7 +757,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_export_to_xml_empty_end_time(self):
         """
         Test that we write the correct XML on export.
@@ -786,7 +786,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_export_to_xml_empty_parameters(self):
         """
         Test XML export with defaults.
@@ -796,7 +796,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         expected = '<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"/>\n'
         assert expected == etree.tostring(xml, pretty_print=True).decode('utf-8')
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_export_to_xml_with_transcripts_as_none(self):
         """
         Test XML export with transcripts being overridden to None.
@@ -806,7 +806,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         expected = b'<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"/>\n'
         assert expected == etree.tostring(xml, pretty_print=True)
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_export_to_xml_invalid_characters_in_attributes(self):
         """
         Test XML export will *not* raise TypeError by lxml library if contains illegal characters.
@@ -816,7 +816,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         xml = self.descriptor.definition_to_xml(self.file_system)
         assert xml.get('display_name') == 'DisplayName'
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_export_to_xml_unicode_characters(self):
         """
         Test XML export handles the unicode characters.
@@ -840,7 +840,7 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
     VIDEO_URL_3 = 'http://www.example.com/source_high.mp4'
 
     @ddt.data(
-        # Ensure no extra data is returned if video module configured only for web display.
+        # Ensure no extra data is returned if video block configured only for web display.
         (
             {'only_on_web': True},
             {'only_on_web': True},
@@ -867,16 +867,16 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
     @ddt.unpack
     def test_student_view_data(self, field_data, expected_student_view_data):
         """
-        Ensure that student_view_data returns the expected results for video modules.
+        Ensure that student_view_data returns the expected results for video blocks.
         """
         descriptor = instantiate_descriptor(**field_data)
         student_view_data = descriptor.student_view_data()
         assert student_view_data == expected_student_view_data
 
-    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
-    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
+    @patch('xmodule.video_block.video_block.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xmodule.video_block.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
     @patch('edxval.api.get_video_info_for_course_and_profiles', Mock(return_value={}))
-    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
+    @patch('xmodule.video_block.transcripts_utils.get_video_transcript_content')
     @patch('edxval.api.get_video_info')
     def test_student_view_data_with_hls_flag(self, mock_get_video_info, mock_get_video_transcript_content):
         mock_get_video_info.return_value = {
@@ -958,7 +958,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
 
     def test_video_with_no_subs_index_dictionary(self):
         """
-        Test index dictionary of a video module without subtitles.
+        Test index dictionary of a video block without subtitles.
         """
         xml_data = '''
             <video display_name="Test Video"
@@ -978,7 +978,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
 
     def test_video_with_multiple_transcripts_index_dictionary(self):
         """
-        Test index dictionary of a video module with
+        Test index dictionary of a video block with
         two transcripts uploaded by a user.
         """
         xml_data_transcripts = '''
@@ -1007,7 +1007,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
 
     def test_video_with_multiple_transcripts_translation_retrieval(self):
         """
-        Test translation retrieval of a video module with
+        Test translation retrieval of a video block with
         multiple transcripts uploaded by a user.
         """
         xml_data_transcripts = '''
@@ -1032,7 +1032,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
 
     def test_video_with_no_transcripts_translation_retrieval(self):
         """
-        Test translation retrieval of a video module with
+        Test translation retrieval of a video block with
         no transcripts uploaded by a user- ie, that retrieval
         does not throw an exception.
         """
@@ -1049,7 +1049,7 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
     @override_settings(ALL_LANGUAGES=ALL_LANGUAGES)
     def test_video_with_language_do_not_have_transcripts_translation(self):
         """
-        Test translation retrieval of a video module with
+        Test translation retrieval of a video block with
         a language having no transcripts uploaded by a user.
         """
         xml_data_transcripts = '''

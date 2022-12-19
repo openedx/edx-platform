@@ -359,7 +359,7 @@ class SchematicResponseXMLFactory(ResponseXMLFactory):
 
         Although <schematic> can have several attributes,
         (*height*, *width*, *parts*, *analyses*, *submit_analysis*, and *initial_value*),
-        none of them are used in the capa module.
+        none of them are used in the capa block.
         For testing, we create a bare-bones version of <schematic>."""
         return etree.Element("schematic")
 

@@ -57,7 +57,7 @@ update_module_store_settings(
     default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
-# Needed to enable licensing on video modules
+# Needed to enable licensing on video blocks
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 # Capture the console log via template includes, until webdriver supports log capture again

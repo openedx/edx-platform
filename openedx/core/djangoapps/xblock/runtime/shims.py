@@ -221,7 +221,7 @@ class RuntimeShim:
     def seed(self):
         """
         A number to seed the random number generator. Used by capa and the
-        randomize module.
+        randomize block.
 
         Should be based on the user ID, per the existing implementation.
         """

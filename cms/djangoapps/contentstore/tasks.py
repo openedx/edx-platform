@@ -56,7 +56,7 @@ from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_sta
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_module import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import SerializationError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -167,7 +167,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
             # cleanup any remnants of the course
             modulestore().delete_course(destination_course_key, user_id)
         except ItemNotFoundError:
-            # it's possible there was an error even before the course module was created
+            # it's possible there was an error even before the course block was created
             pass
 
         return "exception: " + str(exc)
@@ -335,13 +335,13 @@ def export_olx(self, user_id, course_key_string, language):
         return
 
 
-def create_export_tarball(course_module, course_key, context, status=None):
+def create_export_tarball(course_block, course_key, context, status=None):
     """
     Generates the export tarball, or returns None if there was an error.
 
     Updates the context with any error information if applicable.
     """
-    name = course_module.url_name
+    name = course_block.url_name
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")  # lint-amnesty, pylint: disable=consider-using-with
     root_dir = path(mkdtemp())
 
@@ -349,7 +349,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
         if isinstance(course_key, LibraryLocator):
             export_library_to_xml(modulestore(), contentstore(), course_key, root_dir, name)
         else:
-            export_course_to_xml(modulestore(), contentstore(), course_module.id, root_dir, name)
+            export_course_to_xml(modulestore(), contentstore(), course_block.id, root_dir, name)
 
         if status:
             status.set_state('Compressing')

@@ -1,8 +1,8 @@
 """
-Model used by Video module for Branding configuration.
+Model used by Video block for Branding configuration.
 
 Includes:
-    BrandingInfoConfig: A ConfigurationModel for managing how Video Module will
+    BrandingInfoConfig: A ConfigurationModel for managing how Video Block will
         use Branding.
 """
 

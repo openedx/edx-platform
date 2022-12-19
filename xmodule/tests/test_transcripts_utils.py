@@ -7,7 +7,7 @@ These tests follow the following nomenclature:
  - among the fields found in a track descriptor is a caption URL (aka caption link)
         - use this link to obtain the track's caption data
 '''
-from ..video_module.transcripts_utils import get_transcript_link_from_youtube
+from ..video_block.transcripts_utils import get_transcript_link_from_youtube
 
 from unittest import mock, TestCase
 

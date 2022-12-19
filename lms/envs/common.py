@@ -94,7 +94,7 @@ FEATURES = {
     # .. toggle_name: FEATURES['DISPLAY_DEBUG_INFO_TO_STAFF']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
-    # .. toggle_description: Add a "Staff Debug" button to course modules for debugging
+    # .. toggle_description: Add a "Staff Debug" button to course blocks for debugging
     #   by course staff.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-09-04
@@ -1604,7 +1604,7 @@ MODULESTORE = {
                     'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'default_class': 'xmodule.hidden_block.HiddenBlock',
                         'fs_root': DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
@@ -1614,7 +1614,7 @@ MODULESTORE = {
                     'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'default_class': 'xmodule.hidden_block.HiddenBlock',
                         'fs_root': DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
@@ -2987,7 +2987,7 @@ INSTALLED_APPS = [
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
 
-    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    # Video block configs (This will be moved to Video once it becomes an XBlock)
     'openedx.core.djangoapps.video_config',
 
     # edX Video Pipeline integration

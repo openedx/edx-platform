@@ -127,7 +127,7 @@ class TestLTI(BaseTestXmodule):
 
 class TestLTIBlockListing(SharedModuleStoreTestCase):
     """
-    a test for the rest endpoint that lists LTI modules in a course
+    a test for the rest endpoint that lists LTI blocks in a course
     """
     # arbitrary constant
     COURSE_SLUG = "100"
@@ -154,7 +154,7 @@ class TestLTIBlockListing(SharedModuleStoreTestCase):
             display_name="section2",
             category='sequential')
 
-        # creates one draft and one published lti module, in different sections
+        # creates one draft and one published lti block, in different sections
         cls.lti_published = ItemFactory.create(
             parent_location=cls.section1.location,
             display_name="lti published",
@@ -189,7 +189,7 @@ class TestLTIBlockListing(SharedModuleStoreTestCase):
             assert 404 == response.status_code
 
     def test_lti_rest_listing(self):
-        """tests that the draft lti module is part of the endpoint response"""
+        """tests that the draft lti block is part of the endpoint response"""
         request = mock.Mock()
         request.method = 'GET'
         response = get_course_lti_endpoints(request, course_id=str(self.course.id))

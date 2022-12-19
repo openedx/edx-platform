@@ -61,8 +61,8 @@ from common.djangoapps.util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     is_prerequisite_courses_enabled
 )
-from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
@@ -108,7 +108,7 @@ def has_access(user, action, obj, course_key=None):
     - visible_to_staff_only for modules
     - DISABLE_START_DATES
     - different access for instructor, staff, course staff, and students.
-    - mobile_available flag for course modules
+    - mobile_available flag for course blocks
 
     user: a Django user object. May be anonymous. If none is passed,
                     anonymous is assumed

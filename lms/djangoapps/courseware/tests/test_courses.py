@@ -367,7 +367,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
 
     @ddt.data(*itertools.product(range(5), [None, 0, 5]))
     @ddt.unpack
-    def test_repeated_course_module_instantiation(self, loops, course_depth):
+    def test_repeated_course_block_instantiation(self, loops, course_depth):
 
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -385,7 +385,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
             field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course.id, self.user, course, depth=course_depth
             )
-            course_module = get_module_for_descriptor(
+            course_block = get_module_for_descriptor(
                 self.user,
                 fake_request,
                 course,
@@ -393,7 +393,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
                 course.id,
                 course=course
             )
-            for chapter in course_module.get_children():
+            for chapter in course_block.get_children():
                 for section in chapter.get_children():
                     for item in section.get_children():
                         assert item.graded

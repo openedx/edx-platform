@@ -10,7 +10,7 @@
 """
 Main module which shows problems (of "capa" type).
 
-This is used by capa_module.
+This is used by capa_block.
 """
 
 
@@ -34,7 +34,7 @@ import xmodule.capa.responsetypes as responsetypes
 import xmodule.capa.xqueue_interface as xqueue_interface
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.safe_exec import safe_exec
-from xmodule.capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_module
+from xmodule.capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_block
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.edx_six import get_gettext
 from xmodule.stringify import stringify_children
@@ -130,7 +130,7 @@ class LoncapaProblem(object):
     """
     Main class for capa Problems.
     """
-    def __init__(self, problem_text, id, capa_system, capa_module,  # pylint: disable=redefined-builtin
+    def __init__(self, problem_text, id, capa_system, capa_block,  # pylint: disable=redefined-builtin
                  state=None, seed=None, minimal_init=False, extract_tree=True):
         """
         Initializes capa Problem.
@@ -141,7 +141,7 @@ class LoncapaProblem(object):
             id (string): identifier for this problem, often a filename (no spaces).
             capa_system (LoncapaSystem): LoncapaSystem instance which provides OS,
                 rendering, user context, and other resources.
-            capa_module: instance needed to access runtime/logging
+            capa_block: instance needed to access runtime/logging
             state (dict): containing the following keys:
                 - `seed` (int) random number generator seed
                 - `student_answers` (dict) maps input id to the stored answer for that input
@@ -159,7 +159,7 @@ class LoncapaProblem(object):
         self.do_reset()
         self.problem_id = id
         self.capa_system = capa_system
-        self.capa_module = capa_module
+        self.capa_block = capa_block
 
         state = state or {}
 
@@ -190,12 +190,12 @@ class LoncapaProblem(object):
         try:
             self.make_xml_compatible(self.tree)
         except Exception:
-            capa_module = self.capa_module
+            capa_block = self.capa_block
             log.exception(
                 "CAPAProblemError: %s, id:%s, data: %s",
-                capa_module.display_name,
+                capa_block.display_name,
                 self.problem_id,
-                capa_module.data
+                capa_block.data
             )
             raise
 
@@ -421,7 +421,7 @@ class LoncapaProblem(object):
 
     def grade_answers(self, answers):
         """
-        Grade student responses.  Called by capa_module.submit_problem.
+        Grade student responses.  Called by capa_block.submit_problem.
 
         `answers` is a dict of all the entries from request.POST, but with the first part
         of each key removed (the string before the first "_").
@@ -501,7 +501,7 @@ class LoncapaProblem(object):
         Returns a dict of answer_ids to answer values. If we cannot generate
         an answer (this sometimes happens in customresponses), that answer_id is
         not included. Called by "show answers" button JSON request
-        (see capa_module)
+        (see capa_block)
         """
         # dict of (id, correct_answer)
         answer_map = {}
@@ -935,8 +935,8 @@ class LoncapaProblem(object):
                     python_path=python_path,
                     extra_files=extra_files,
                     cache=self.capa_system.cache,
-                    limit_overrides_context=get_course_id_from_capa_module(
-                        self.capa_module
+                    limit_overrides_context=get_course_id_from_capa_block(
+                        self.capa_block
                     ),
                     slug=self.problem_id,
                     unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -994,7 +994,7 @@ class LoncapaProblem(object):
 
                 # If we're withholding correctness, don't show adaptive hints either.
                 # Note that regular, "demand" hints will be shown, if the course author has added them to the problem.
-                if not self.capa_module.correctness_available():
+                if not self.capa_block.correctness_available():
                     status = 'submitted'
                 else:
                     # If the the problem has not been saved since the last submit set the status to the
@@ -1107,7 +1107,7 @@ class LoncapaProblem(object):
             # instantiate capa Response
             responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
             responder = responsetype_cls(
-                response, inputfields, self.context, self.capa_system, self.capa_module, minimal_init
+                response, inputfields, self.context, self.capa_system, self.capa_block, minimal_init
             )
             # save in list in self
             self.responders[response] = responder

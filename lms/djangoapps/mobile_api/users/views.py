@@ -117,7 +117,7 @@ class UserCourseStatus(views.APIView):
         * last_visited_module_id: The ID of the last module that the user
           visited in the course.
         * last_visited_module_path: The ID of the modules in the path from the
-          last visited module to the course module.
+          last visited module to the course block.
 
         For version v1 GET request response includes the following values.
 
@@ -137,18 +137,18 @@ class UserCourseStatus(views.APIView):
     def _last_visited_module_path(self, request, course):
         """
         Returns the path from the last module visited by the current user in the given course up to
-        the course module. If there is no such visit, the first item deep enough down the course
+        the course block. If there is no such visit, the first item deep enough down the course
         tree is used.
         """
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2)
 
-        course_module = get_module_for_descriptor(
+        course_block = get_module_for_descriptor(
             request.user, request, course, field_data_cache, course.id, course=course
         )
 
-        path = [course_module] if course_module else []
-        chapter = get_current_child(course_module, min_depth=2)
+        path = [course_block] if course_block else []
+        chapter = get_current_child(course_block, min_depth=2)
         if chapter is not None:
             path.append(chapter)
             section = get_current_child(chapter, min_depth=1)

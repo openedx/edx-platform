@@ -14,7 +14,7 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockAside
 
 from xmodule.contentstore.django import contentstore
-from xmodule.lti_module import LTIBlock
+from xmodule.lti_block import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -118,8 +118,8 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         self.assertNotRegex(html, r"data-block-type=[\"\']test_aside[\"\']")
         self.assertNotRegex(html, "Aside rendered")
 
-    @mock.patch('xmodule.conditional_module.ConditionalBlock.is_condition_satisfied')
-    def test_preview_conditional_module_children_context(self, mock_is_condition_satisfied):
+    @mock.patch('xmodule.conditional_block.ConditionalBlock.is_condition_satisfied')
+    def test_preview_conditional_block_children_context(self, mock_is_condition_satisfied):
         """
         Tests that when empty context is pass to children of ConditionalBlock it will not raise KeyError.
         """

@@ -47,7 +47,7 @@ from openedx.core.lib.cache_utils import get_cache
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.split_test_module import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.split_test_block import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store, upload_csv_file_to_report_store
