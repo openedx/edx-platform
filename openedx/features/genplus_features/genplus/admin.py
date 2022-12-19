@@ -29,7 +29,7 @@ class GenUserAdmin(admin.ModelAdmin):
         'year_of_entry',
         'registration_group'
     )
-    search_fields = ('user',)
+    search_fields = ('user__email', 'email')
 
 
 @admin.register(Skill)
