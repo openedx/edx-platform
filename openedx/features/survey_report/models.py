@@ -75,7 +75,7 @@ class SurveyReportUpload(models.Model):
     """
     sent_at = models.DateTimeField(auto_now=True, help_text="Date when the report was sent.")
     report = models.ForeignKey(SurveyReport, on_delete=models.CASCADE, help_text="The report that was sent.")
-    status = models.IntegerField(help_text="Request status code.")
+    status_code = models.IntegerField(help_text="Request status code.")
     request_details = models.CharField(
         max_length=255,
         null=True,
