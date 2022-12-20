@@ -122,6 +122,8 @@ class Command(BaseCommand):
             self._handle_all_goals()
         except BaseException:  # pylint: disable=broad-except
             log.exception("Error while sending course goals emails: ")
+            for h in log.handlers:
+                h.flush()
             raise
 
     def _handle_all_goals(self):
