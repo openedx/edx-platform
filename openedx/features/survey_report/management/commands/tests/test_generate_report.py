@@ -31,7 +31,7 @@ class GenerateReportTest(TestCase):
         }
         mock_get_report_data.return_value = report_test_data
         out = StringIO()
-        call_command('generate_report', stdout=out)
+        call_command('generate_report --no-send', stdout=out)
 
         survey_report = SurveyReport.objects.last()
 
