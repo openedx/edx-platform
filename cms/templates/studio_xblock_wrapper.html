@@ -64,6 +64,8 @@ block_is_unit = is_unit(xblock)
     use-new-editor-video = ${use_new_editor_video}
     use-new-editor-problem = ${use_new_editor_problem}
     authoring_MFE_base_url = ${get_editor_page_base_url(xblock.location.course_key)}
+    data-block-type = ${xblock.scope_ids.block_type}
+    data-usage-id = ${xblock.scope_ids.usage_id}
     >
         <div class="header-details">
             % if show_inline:
@@ -85,7 +87,7 @@ block_is_unit = is_unit(xblock)
                     % if can_edit:
                         % if not show_inline:
                             <li class="action-item action-edit">
-                                <button class="btn-default edit-button action-button">
+                                <button class="btn-default edit-button action-button" data-usage-id=${xblock.scope_ids.usage_id}>
                                     <span class="icon fa fa-pencil" aria-hidden="true"></span>
                                     <span class="action-button-text">${_("Edit")}</span>
                                 </button>

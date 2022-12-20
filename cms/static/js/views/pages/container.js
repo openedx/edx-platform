@@ -181,25 +181,32 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
             },
 
             editXBlock: function(event, options) {
-                var xblockElement = this.findXBlockElement(event.target),
-                    self = this,
-                    modal = new EditXBlockModal(options);
                 event.preventDefault();
 
+                debugger;
+
                 if(!options || options.view !== 'visibility_view' ){
-                    var useNewTextEditor = this.$('.xblock-header-primary').attr("use-new-editor-text"),
-                    useNewVideoEditor = this.$('.xblock-header-primary').attr("use-new-editor-video"),
-                    useNewProblemEditor = this.$('.xblock-header-primary').attr("use-new-editor-problem"),
-                    blockType = xblockElement.find('.xblock').attr("data-block-type");
+                    const primaryHeader = $(event.target).closest('.xblock-header-primary')
+
+                    var useNewTextEditor = primaryHeader.attr("use-new-editor-text"),
+                    useNewVideoEditor = primaryHeader.attr("use-new-editor-video"),
+                    useNewProblemEditor = primaryHeader.attr("use-new-editor-problem"),
+                    blockType = primaryHeader.attr("data-block-type");
                     if( (useNewTextEditor === "True" && blockType === "html") ||
                         (useNewVideoEditor === "True" && blockType === "video") ||
                         (useNewProblemEditor === "True" && blockType === "problem")
                     ) {
-                        var destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(xblockElement.find('.xblock').attr("data-usage-id"));
+                        var destinationUrl = primaryHeader.attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(primaryHeader.attr("data-usage-id"));
                         window.location.href = destinationUrl;
                         return;
                     }
                 }
+
+                // xblockElement is undefined when hiding previews in the Content Library
+                var xblockElement = this.findXBlockElement(event.target),
+                self = this,
+                modal = new EditXBlockModal(options);
+
                 modal.edit(xblockElement, this.model, {
                     readOnlyView: !this.options.canEdit,
                     refresh: function() {
