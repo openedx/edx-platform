@@ -15,12 +15,7 @@ from openedx.core.djangoapps.django_comment_common import signals
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from xmodule.modulestore.django import SignalHandler
-try:
-    from eol_forum_notifications.views import send_notification_always_comment, send_notification_always_thread
-    from eol_forum_notifications.models import EolForumNotifications
-    EOL_NOTIFICATION_ENABLED = True
-except ImportError:
-    EOL_NOTIFICATION_ENABLED = False
+
 log = logging.getLogger(__name__)
 
 
@@ -47,6 +42,14 @@ def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylin
 
 @receiver(signals.comment_created)
 def send_discussion_email_notification(sender, user, post, **kwargs):
+    EOL_NOTIFICATION_ENABLED = False
+    if settings.EOL_FORUMS_NOTIFICATIONS_ENABLE:
+        try:
+            from eol_forum_notifications.views import send_notification_always_comment
+            from eol_forum_notifications.models import EolForumNotifications
+            EOL_NOTIFICATION_ENABLED = True
+        except ImportError:
+            EOL_NOTIFICATION_ENABLED = False
     if EOL_NOTIFICATION_ENABLED and EolForumNotifications.objects.filter(discussion_id=post.thread.commentable_id).exists():
         send_notification_always_comment(post, user)
     else:
@@ -70,6 +73,13 @@ def send_discussion_email_notification(sender, user, post, **kwargs):
 
 @receiver(signals.thread_created)
 def eol_send_thread_created(sender, user, post, **kwargs):
+    EOL_NOTIFICATION_ENABLED = False
+    if settings.EOL_FORUMS_NOTIFICATIONS_ENABLE:
+        try:
+            from eol_forum_notifications.views import send_notification_always_thread
+            EOL_NOTIFICATION_ENABLED = True
+        except ImportError:
+            EOL_NOTIFICATION_ENABLED = False
     if EOL_NOTIFICATION_ENABLED:
         send_notification_always_thread(post, user)
     return
