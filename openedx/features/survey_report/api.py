@@ -54,7 +54,7 @@ def generate_report() -> None:
     return survey_report.id
 
 
-def send_report(report_id: int) -> None:
+def send_report_to_external_api(report_id: int) -> None:
     """
     Send a report to Openedx endpoint and save the response in the SurveyReportUpload model.
 
