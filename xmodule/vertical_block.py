@@ -164,8 +164,8 @@ class VerticalBlock(
 
         # .. filter_implemented_name: VerticalBlockRenderCompleted
         # .. filter_type: org.openedx.learning.vertical_block.render.completed.v1
-        fragment, context, view = VerticalBlockRenderCompleted.run_filter(
-            fragment=fragment, context=context, view=view
+        _, fragment, context, view = VerticalBlockRenderCompleted.run_filter(
+            block=self, fragment=fragment, context=context, view=view
         )
 
         return fragment
