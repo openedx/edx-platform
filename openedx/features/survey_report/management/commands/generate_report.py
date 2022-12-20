@@ -4,7 +4,7 @@ CLI command to generate survey report.
 
 from django.core.management.base import BaseCommand, CommandError
 
-from openedx.features.survey_report.api import generate_report, send_report
+from openedx.features.survey_report.api import generate_report, send_report_to_external_api
 
 
 class Command(BaseCommand):
@@ -38,7 +38,7 @@ class Command(BaseCommand):
 
         if not options['no_send']:
             try:
-                send_report(report_id=report)
+                send_report_to_external_api(report_id=report)
                 self.stdout.write(self.style.SUCCESS('Survey report has been sent successfully.'))
             except Exception as send_error:
                 raise CommandError(

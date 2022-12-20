@@ -73,7 +73,7 @@ class SurveyReportUpload(models.Model):
     - status: Request status code.
     - request_details: Information about the send request.
     """
-    sent_at = models.DateTimeField(auto_now=True, help_text="Date when the report was sent.")
+    sent_at = models.DateTimeField(auto_now=True, help_text="Date when the report was sent to external api.")
     report = models.ForeignKey(SurveyReport, on_delete=models.CASCADE, help_text="The report that was sent.")
     status_code = models.IntegerField(help_text="Request status code.")
     request_details = models.CharField(
