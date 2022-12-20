@@ -284,18 +284,18 @@ class InMemoryReportMixin:
         """
         Internal method for generating a grade report for the given context.
         """
-        self.context.update_status('Starting grades')
+        self.context.update_status('InMemoryReportMixin - 1: Starting grade report')
         success_headers = self._success_headers()
         error_headers = self._error_headers()
         batched_rows = self._batched_rows()
 
-        self.context.update_status('Compiling grades')
+        self.context.update_status('InMemoryReportMixin - 2: Compiling grades')
         success_rows, error_rows = self._compile(batched_rows)
 
-        self.context.update_status('Uploading grades')
+        self.context.update_status('InMemoryReportMixin - 3: Uploading grades')
         self._upload(success_headers, success_rows, error_headers, error_rows)
 
-        return self.context.update_status('Completed grades')
+        return self.context.update_status('InMemoryReportMixin - 4: Completed grades')
 
     def _upload(self, success_headers, success_rows, error_headers, error_rows):
         """
@@ -345,17 +345,17 @@ class TemporaryFileReportMixin:
         """
         Generate a CSV containing all students' problem grades within a given `course_id`.
         """
-        self.context.update_status('TempFileProblemGradeReport - 1: Starting problem grades')
+        self.context.update_status('TemporaryFileReportMixin - 1: Starting grade report')
         batched_rows = self._batched_rows()
 
         with TemporaryFile('r+') as success_file, TemporaryFile('r+') as error_file:
-            self.context.update_status('TempFileProblemGradeReport - 2: Compiling grades into temp files')
+            self.context.update_status('TemporaryFileReportMixin - 2: Compiling grades into temp files')
             has_errors = self.iter_and_write_batched_rows(batched_rows, success_file, error_file)
 
-            self.context.update_status('TempFileProblemGradeReport - 3: Uploading files')
+            self.context.update_status('TemporaryFileReportMixin - 3: Uploading files')
             self.upload_temp_files(success_file, error_file, has_errors)
 
-        return self.context.update_status('ProblemGradeReport - 4: Completed problem grades')
+        return self.context.update_status('TemporaryFileReportMixin - 4: Completed grades')
 
     def iter_and_write_batched_rows(self, batched_rows, success_file, error_file):
         """
@@ -457,10 +457,6 @@ class GradeReportBase:
             This generator method fetches & loads the enrolled user objects on demand which in chunk
             size defined. This method is a workaround to avoid out-of-memory errors.
             """
-            self.log_additional_info_for_testing(
-                'ProblemGradeReport: Starting batching of enrolled students'
-            )
-
             filter_kwargs = {
                 'courseenrollment__course_id': course_id,
             }
@@ -479,7 +475,6 @@ class GradeReportBase:
                     **filter_kwargs
                 ).select_related('profile')
 
-                self.log_additional_info_for_testing('ProblemGradeReport: user chunk yielded successfully')
                 yield users
 
         return get_enrolled_learners_for_course(
@@ -755,7 +750,6 @@ class ProblemGradeReport(GradeReportBase):
         """
         Returns a list of rows for the given users for this report.
         """
-        self.log_additional_info_for_testing('ProblemGradeReport: Starting to process new user batch.')
         success_rows, error_rows = [], []
         for student, course_grade, error in CourseGradeFactory().iter(
             users,
