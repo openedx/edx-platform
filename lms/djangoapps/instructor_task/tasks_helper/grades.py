@@ -524,7 +524,6 @@ class CourseGradeReport(GradeReportBase):
             else:
                 return InMemoryCourseGradeReport(context)._generate()  # pylint: disable=protected-access
 
-
     def _success_headers(self):
         """
         Returns a list of all applicable column headers for this grade report.
