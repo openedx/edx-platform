@@ -79,6 +79,7 @@ class GenUser(models.Model):
     ROLE_CHOICES = GenUserRoles.__MODEL_CHOICES__
 
     email = models.EmailField(unique=True)
+    identity_guid = models.CharField(null=True, max_length=1024)
     user = models.OneToOneField(USER_MODEL, on_delete=models.CASCADE, null=True, related_name='gen_user')
     role = models.CharField(blank=True, null=True, max_length=32, choices=ROLE_CHOICES)
     school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True)
