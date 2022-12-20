@@ -525,11 +525,10 @@ class CourseGradeReport(GradeReportBase):
         with modulestore().bulk_operations(course_id):
             context = _CourseGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
             if use_on_disk_grade_reporting(course_id):  # AU-926
-                # pylint: disable=protected-access
-                return TempFileCourseGradeReport(context)._generate()
+                return TempFileCourseGradeReport(context)._generate()  # pylint: disable=protected-access
             else:
-                # pylint: disable=protected-access
-                return InMemoryCourseGradeReport(context)._generate()
+                return InMemoryCourseGradeReport(context)._generate()  # pylint: disable=protected-access
+
 
     def _success_headers(self):
         """
@@ -726,11 +725,9 @@ class ProblemGradeReport(GradeReportBase):
         with modulestore().bulk_operations(course_id):
             context = _ProblemGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
             if use_on_disk_grade_reporting(course_id):  # AU-926
-                # pylint: disable=protected-access
-                return TempFileProblemGradeReport(context)._generate()
+                return TempFileProblemGradeReport(context)._generate()  # pylint: disable=protected-access
             else:
-                # pylint: disable=protected-access
-                return InMemoryProblemGradeReport(context)._generate()
+                return InMemoryProblemGradeReport(context)._generate()  # pylint: disable=protected-access
 
     def _success_headers(self):
         """
