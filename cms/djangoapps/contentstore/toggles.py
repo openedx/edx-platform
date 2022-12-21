@@ -116,7 +116,9 @@ ENABLE_NEW_VIDEO_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_video_editor
 
 
 def use_new_video_editor():
-    return True
+    # TODO: Remove next 2 lines
+    # uncomment next line to test new video editor redirect
+    # return True
     """
     Returns a boolean = true if new video editor is enabled
     """

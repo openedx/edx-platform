@@ -183,8 +183,6 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
             editXBlock: function(event, options) {
                 event.preventDefault();
 
-                debugger;
-
                 if(!options || options.view !== 'visibility_view' ){
                     const primaryHeader = $(event.target).closest('.xblock-header-primary')
 
@@ -192,6 +190,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                     useNewVideoEditor = primaryHeader.attr("use-new-editor-video"),
                     useNewProblemEditor = primaryHeader.attr("use-new-editor-problem"),
                     blockType = primaryHeader.attr("data-block-type");
+
                     if( (useNewTextEditor === "True" && blockType === "html") ||
                         (useNewVideoEditor === "True" && blockType === "video") ||
                         (useNewProblemEditor === "True" && blockType === "problem")
