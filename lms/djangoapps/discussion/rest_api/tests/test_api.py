@@ -4099,14 +4099,6 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
         topics_list = get_course_topics_v2(course_key=self.course_key, user=self.user)
         assert {t['id'] for t in topics_list} == set(self.topic_ids)
 
-    def test_staff_response(self):
-        """
-        Test that the standard response contains the correct number of items
-        """
-        topics_list = get_course_topics_v2(course_key=self.course_key, user=self.staff)
-        # All topic ids should be returned except for the first deleted topic id which has zero stats
-        assert {t['id'] for t in topics_list} == self.all_topic_ids - {self.deleted_topic_ids[0]}
-
     def test_filtering(self):
         """
         Tests that filtering by topic id works
