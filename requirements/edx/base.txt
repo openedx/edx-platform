@@ -429,7 +429,7 @@ edx-auth-backends==4.1.0
     #   blockstore
 edx-braze-client==0.1.5
     # via -r requirements/edx/base.in
-edx-bulk-grades==1.0.0
+edx-bulk-grades==1.0.1
     # via
     #   -r requirements/edx/base.in
     #   staff-graded-xblock
