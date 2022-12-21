@@ -43,6 +43,7 @@ def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylin
 @receiver(signals.comment_created)
 def send_discussion_email_notification(sender, user, post, **kwargs):
     EOL_NOTIFICATION_ENABLED = False
+    current_site = get_current_site()
     if settings.EOL_FORUMS_NOTIFICATIONS_ENABLE:
         try:
             from eol_forum_notifications.views import send_notification_always_comment
@@ -51,9 +52,8 @@ def send_discussion_email_notification(sender, user, post, **kwargs):
         except ImportError:
             EOL_NOTIFICATION_ENABLED = False
     if EOL_NOTIFICATION_ENABLED and EolForumNotifications.objects.filter(discussion_id=post.thread.commentable_id).exists():
-        send_notification_always_comment(post, user)
+        send_notification_always_comment(post, user, current_site)
     else:
-        current_site = get_current_site()
         if current_site is None:
             log.info(u'Discussion: No current site, not sending notification about post: %s.', post.id)
             return
@@ -74,6 +74,7 @@ def send_discussion_email_notification(sender, user, post, **kwargs):
 @receiver(signals.thread_created)
 def eol_send_thread_created(sender, user, post, **kwargs):
     EOL_NOTIFICATION_ENABLED = False
+    current_site = get_current_site()
     if settings.EOL_FORUMS_NOTIFICATIONS_ENABLE:
         try:
             from eol_forum_notifications.views import send_notification_always_thread
@@ -81,7 +82,7 @@ def eol_send_thread_created(sender, user, post, **kwargs):
         except ImportError:
             EOL_NOTIFICATION_ENABLED = False
     if EOL_NOTIFICATION_ENABLED:
-        send_notification_always_thread(post, user)
+        send_notification_always_thread(post, user, current_site)
     return
 
 def send_message(comment, site):
