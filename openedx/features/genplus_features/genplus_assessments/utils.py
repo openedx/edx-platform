@@ -474,7 +474,12 @@ def get_assessment_completion(assessments):
     return True
 
 
-def get_student_skills_assessment_completion(student, assessment_filter=None):
+def get_student_unit_skills_assessment(user, course):
+    assessment_data = get_assessment_problem_data(course.id, user)
+    return get_assessment_completion(assessment_data) if assessment_data else None
+
+
+def get_student_program_skills_assessment(student):
     """
     Evaluate if student has completed his skill assessment
 
@@ -492,17 +497,9 @@ def get_student_skills_assessment_completion(student, assessment_filter=None):
     user = student.gen_user.user
     if user and gen_program is not None:
         if gen_program.intro_unit:
-            intro_unit_id = gen_program.intro_unit.id
-            intro_assessments = get_assessment_problem_data(intro_unit_id, user)
-            intro_assessments_completion = get_assessment_completion(intro_assessments) if intro_assessments else None
-            if assessment_filter == 'intro':
-                return intro_assessments_completion
+            intro_assessments_completion = get_student_unit_skills_assessment(user, gen_program.intro_unit)
 
         if gen_program.outro_unit:
-            outro_unit_id = gen_program.outro_unit.id
-            outro_assessments = get_assessment_problem_data(outro_unit_id, user)
-            outro_assessments_completion = get_assessment_completion(outro_assessments) if outro_assessments else None
-            if assessment_filter == 'outro':
-                return outro_assessments_completion
+            outro_assessments_completion = get_student_unit_skills_assessment(user, gen_program.outro_unit)
 
     return [intro_assessments_completion, outro_assessments_completion]
