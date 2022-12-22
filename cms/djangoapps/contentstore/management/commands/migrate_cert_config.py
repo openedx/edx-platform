@@ -42,11 +42,13 @@ class Command(BaseCommand):
 
     Examples:
 
-        ./manage.py migrate_cert_config <course_id_1> <course_id_2> - transfer courses with provided keys
-        ./manage.py migrate_cert_config --all - transfer all available courses
-        ./manage.py migrate_cert_config --draft - transfer all mongo(old approach) modulestore available courses
-        ./manage.py migrate_cert_config --draft - transfer all split(new approach) modulestore available courses
-        ./manage.py migrate_cert_config --all --delete-after - transfer all available courses
+        ./manage.py cms migrate_cert_config <course_id_1> <course_id_2> - transfer courses with provided keys
+        ./manage.py cms migrate_cert_config --course_storage_type all - transfer all available courses
+        ./manage.py cms migrate_cert_config --course_storage_type draft - transfer all mongo(old approach) modulestore
+        available courses
+        ./manage.py cms migrate_cert_config --course_storage_type split - transfer all split(new approach) modulestore
+        available courses
+        ./manage.py cms migrate_cert_config --course_storage_type all --delete-after - transfer all available courses
         and delete course certificate configuration, signature assets from modulestore after successfull transfer.
     """
 
