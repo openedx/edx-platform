@@ -11,7 +11,6 @@ from openedx.features.genplus_features.genplus.models import GenUser, Student, S
 from openedx.features.genplus_features.genplus.constants import SchoolTypes, ClassTypes, GenUserRoles
 from .constants import RmUnifyUpdateTypes
 from django.db.models import Q
-import openedx.features.genplus_features.genplus.tasks as genplus_tasks
 from django.contrib.auth.models import User
 
 
@@ -81,7 +80,7 @@ class RmUnify(BaseRmUnify):
             fetch_type = re.sub(r'(?<!^)(?=[A-Z])', '_', class_type).upper()
             # get specific url based on class_type
             url_path = getattr(self, fetch_type)
-            url = self.generate_url(url_path)
+            url = self.generate_url(url_path.format(RmUnify.ORGANISATION, school.guid))
             classes = self.fetch(url)
             for gen_class in classes:
                 Class.objects.update_or_create(
@@ -98,7 +97,7 @@ class RmUnify(BaseRmUnify):
             fetch_type = re.sub(r'(?<!^)(?=[A-Z])', '_', gen_class.type).upper()
             # formatting url according to class type
             url_path = getattr(self, fetch_type).format(RmUnify.ORGANISATION,
-                                                   gen_class.school.guid)
+                                                        gen_class.school.guid)
             url = self.generate_url(url_path)
             data = self.fetch(f"{url}/{gen_class.group_id}")
             gen_user_ids = []
@@ -161,6 +160,7 @@ class RmUnifyProvisioning(BaseRmUnify):
                 )
             if len(updates_batch):
                 self.delete_batch(updates_batch)
+        logger.error('No Updates Found')
 
     def delete_batch(self, batch):
         headers = self.get_header()
