@@ -12,8 +12,11 @@ import sys
 
 
 def is_not_lms():
-    """Utility function: return False if not running in the LMS."""
-    return os.getenv("SERVICE_VARIANT") != 'lms'
+    """Utility function: return False if not running in the LMS unless testing."""
+    return (
+        os.getenv("SERVICE_VARIANT") != 'lms' and
+        'pytest ' not in ' '.join(sys.argv)
+    )
 
 
 def is_not_runserver():
