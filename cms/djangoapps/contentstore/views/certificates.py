@@ -369,6 +369,10 @@ def certificate_activation_handler(request, course_key_string):
 
     store.update_item(course, request.user.id)
     cert_event_type = 'activated' if is_active else 'deactivated'
+
+    for certificate in certificates:
+        emit_course_certificate_config_changed_signal(str(course.id), certificate)
+
     CertificateManager.track_event(cert_event_type, {
         'course_id': str(course.id),
     })

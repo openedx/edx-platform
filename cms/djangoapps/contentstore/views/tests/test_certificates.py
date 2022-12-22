@@ -20,7 +20,11 @@ from cms.djangoapps.contentstore.tests.utils import (
     C4X_SIGNATORY_PATH,
 )
 from cms.djangoapps.contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
-from cms.djangoapps.contentstore.views.certificates import certificates_list_handler, certificates_detail_handler
+from cms.djangoapps.contentstore.views.certificates import (
+    certificate_activation_handler,
+    certificates_list_handler,
+    certificates_detail_handler,
+)
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
@@ -408,8 +412,15 @@ class CertificatesDetailHandlerTestCase(
             content_type='application/json',
             HTTP_ACCEPT='application/json',
         )
+        self.activation_request = RequestFactory().post(
+            self._url(cid=0),
+            data=json.dumps({'is_active': True}),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json',
+        )
         self.edit_request.user = self.user
         self.delete_request.user = self.user
+        self.activation_request.user = self.user
         self.reset_urls()
 
     def _url(self, cid=-1):
@@ -786,6 +797,17 @@ class CertificatesDetailHandlerTestCase(
                 '.'.join(['edx.certificate.configuration', cert_event_type]),
                 course_id=str(self.course.id),
             )
+
+    def test_emit_course_certificate_config_signal_when_activation_happens(self):
+        """
+        Check that course certificate configuration signal was sent when activation/deactivation happens.
+        """
+        with mock.patch(
+            'cms.djangoapps.contentstore.views.certificates.emit_course_certificate_config_changed_signal',
+        ) as mocked_emit_course_certificate_config_changed_signal:
+            self._add_course_certificates()
+            certificate_activation_handler(self.activation_request, str(self.course.id))
+            self.assertTrue(mocked_emit_course_certificate_config_changed_signal.called)
 
     @ddt.data(*itertools.product([True, False], [C4X_SIGNATORY_PATH, SIGNATORY_PATH]))
     @ddt.unpack
