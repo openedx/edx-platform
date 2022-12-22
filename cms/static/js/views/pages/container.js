@@ -201,7 +201,6 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                     }
                 }
 
-                // xblockElement is undefined when hiding previews in the Content Library
                 var xblockElement = this.findXBlockElement(event.target),
                 self = this,
                 modal = new EditXBlockModal(options);
