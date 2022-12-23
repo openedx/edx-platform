@@ -20,7 +20,7 @@ from common.djangoapps.util.db import outer_atomic
 from lms.djangoapps.courseware.courses import get_problems_in_section
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor_internal
 from lms.djangoapps.grades.api import events as grades_events
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -335,7 +335,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     Fetches a StudentModule instance for a given `course_id`, `student` object, and `module_descriptor`.
 
     `xmodule_instance_args` is used to provide information for creating a track function and an XQueue callback.
-    These are passed, along with `grade_bucket_type`, to get_module_for_descriptor_internal, which sidesteps
+    These are passed, along with `grade_bucket_type`, to get_block_for_descriptor_internal, which sidesteps
     the need for a Request object when instantiating an xmodule instance.
     """
     # reconstitute the problem's corresponding XModule:
@@ -357,7 +357,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
         '''
         return lambda event_type, event: task_track(request_info, task_info, event_type, event, page='x_module_task')
 
-    return get_module_for_descriptor_internal(
+    return get_block_for_descriptor_internal(
         user=student,
         descriptor=module_descriptor,
         student_data=student_data,

@@ -233,10 +233,10 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
     @mock.patch('lms.djangoapps.instructor.tasks.log.error')
     def test_complete_student_attempt_failed_module(self, mock_logger):
         """
-        Assert complete_student_attempt with failed get_module raises error and returns None
+        Assert complete_student_attempt with failed get_block raises error and returns None
         """
         username = self.student.username
-        with mock.patch('lms.djangoapps.instructor.tasks.get_module_for_descriptor', return_value=None):
+        with mock.patch('lms.djangoapps.instructor.tasks.get_block_for_descriptor', return_value=None):
             self.service.complete_student_attempt(username, str(self.course.location))
         mock_logger.assert_called_once_with(
             self.complete_error_prefix.format(user=username, content_id=self.course.location) +

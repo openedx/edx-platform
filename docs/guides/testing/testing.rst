@@ -183,7 +183,7 @@ How to output coverage locally
 These are examples of how to run a single test and get coverage::
 
     pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-config=.coveragerc-local # cms example
-    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-config=.coveragerc-local # lms example
+    pytest lms/djangoapps/courseware/tests/test_block_render.py --cov --cov-config=.coveragerc-local # lms example
 
 That ``--cov-conifg=.coveragerc-local`` option is important - without it, the coverage
 tool will look for paths that exist on our jenkins test servers, but not on your local devstack.

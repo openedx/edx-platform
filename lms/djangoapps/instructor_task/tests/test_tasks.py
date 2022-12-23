@@ -292,7 +292,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         mock_instance = MagicMock()
         del mock_instance.set_score
         with patch(
-                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal'
+                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal'
         ) as mock_get_module:
             mock_get_module.return_value = mock_instance
             with pytest.raises(UpdateProblemModuleStateError):
@@ -313,7 +313,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         num_students = 1
         self._create_students_with_state(num_students, input_state)
         task_entry = self._create_input_entry(score=0)
-        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal',
+        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal',
                    return_value=None):
             self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
 
@@ -338,7 +338,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         self._create_students_with_state(num_students)
         task_entry = self._create_input_entry(score=0)
         with patch(
-                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal'
+                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal'
         ) as mock_get_module:
             mock_get_module.return_value = mock_instance
             mock_instance.max_score = MagicMock(return_value=99999.0)
@@ -425,7 +425,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         mock_instance = MagicMock()
         del mock_instance.rescore_problem
         del mock_instance.rescore
-        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal') as mock_get_module:  # lint-amnesty, pylint: disable=line-too-long
+        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal') as mock_get_module:  # lint-amnesty, pylint: disable=line-too-long
             mock_get_module.return_value = mock_instance
             with pytest.raises(UpdateProblemModuleStateError):
                 self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
@@ -448,7 +448,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         num_students = 1
         self._create_students_with_state(num_students, input_state)
         task_entry = self._create_input_entry()
-        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal', return_value=None):  # lint-amnesty, pylint: disable=line-too-long
+        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal', return_value=None):  # lint-amnesty, pylint: disable=line-too-long
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
 
         self.assert_task_output(
@@ -474,7 +474,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         self._create_students_with_state(num_students)
         task_entry = self._create_input_entry()
         with patch(
-                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal'
+                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal'
         ) as mock_get_module:
             mock_get_module.return_value = mock_instance
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)

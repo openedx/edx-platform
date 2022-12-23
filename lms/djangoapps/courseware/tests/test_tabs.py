@@ -280,8 +280,8 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         assert 'static_tab' in tab_content
 
         # Test when render raises an exception
-        with patch('lms.djangoapps.courseware.views.views.get_module') as mock_module_render:
-            mock_module_render.return_value = MagicMock(
+        with patch('lms.djangoapps.courseware.views.views.get_block') as mock_block_render:
+            mock_block_render.return_value = MagicMock(
                 render=Mock(side_effect=Exception('Render failed!'))
             )
             static_tab_content = get_static_tab_fragment(request, course, tab).content

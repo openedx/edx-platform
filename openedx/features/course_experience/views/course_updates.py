@@ -10,7 +10,7 @@ from django.views.decorators.cache import cache_control
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from lms.djangoapps.courseware.courses import get_course_info_section_module, get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_info_section_block, get_course_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url
@@ -76,7 +76,7 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         for older implementations and a few tests that store
         a single html object representing all the updates.
         """
-        info_module = get_course_info_section_module(request, request.user, course, 'updates')
+        info_module = get_course_info_section_block(request, request.user, course, 'updates')
         info_block = getattr(info_module, '_xmodule', info_module)
         return info_block.system.service(
             info_block, "replace_urls"

@@ -207,7 +207,7 @@ def _preview_module_system(request, descriptor, field_data):
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
 
     return PreviewModuleSystem(
-        get_module=partial(_load_preview_module, request),
+        get_block=partial(_load_preview_module, request),
         mixins=settings.XBLOCK_MIXINS,
 
         # Set up functions to modify the fragment produced by student_view

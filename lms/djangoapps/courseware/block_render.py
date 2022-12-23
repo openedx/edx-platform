@@ -1,5 +1,5 @@
 """
-Module rendering
+Block rendering
 """
 
 
@@ -107,7 +107,7 @@ log = logging.getLogger(__name__)
 
 class LmsModuleRenderError(Exception):
     """
-    An exception class for exceptions thrown by module_render that don't fit well elsewhere
+    An exception class for exceptions thrown by block_render that don't fit well elsewhere
     """
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
@@ -155,7 +155,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     field_data_cache must include data from the course blocks and 2 levels of its descendants
     '''
     with modulestore().bulk_operations(course.id):
-        course_block = get_module_for_descriptor(
+        course_block = get_block_for_descriptor(
             user, request, course, field_data_cache, course.id, course=course
         )
         if course_block is None:
@@ -276,17 +276,16 @@ def _add_timed_exam_info(user, course, section, section_context):
             })
 
 
-def get_module(user, request, usage_key, field_data_cache,
-               position=None, log_if_not_found=True, wrap_xmodule_display=True,
-               grade_bucket_type=None, depth=0,
-               static_asset_path='', course=None, will_recheck_access=False):
+def get_block(user, request, usage_key, field_data_cache, position=None, log_if_not_found=True,
+              wrap_xblock_display=True, grade_bucket_type=None, depth=0, static_asset_path='', course=None,
+              will_recheck_access=False):
     """
-    Get an instance of the xmodule class identified by location,
+    Get an instance of the XBlock class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
     exists.
 
     Arguments:
-      - user                  : User for whom we're getting the module
+      - user                  : User for whom we're getting the block
       - request               : current django HTTPrequest.  Note: request.user isn't used for anything--all auth
                                 and such works based on user.
       - usage_key             : A UsageKey object identifying the module to load
@@ -294,7 +293,7 @@ def get_module(user, request, usage_key, field_data_cache,
       - position              : extra information from URL for user-specified
                                 position within module
       - log_if_not_found      : If this is True, we log a debug message if we cannot find the requested xmodule.
-      - wrap_xmodule_display  : If this is True, wrap the output display in a single div to allow for the
+      - wrap_xblock_display   : If this is True, wrap the output display in a single div to allow for the
                                 XModule javascript to be bound correctly
       - depth                 : number of levels of descendents to cache when loading this module.
                                 None means cache all descendents
@@ -306,26 +305,26 @@ def get_module(user, request, usage_key, field_data_cache,
                                 before rendering the content in order to display access error messages
                                 to the user.
 
-    Returns: xmodule instance, or None if the user does not have access to the
-    module.  If there's an error, will try to return an instance of ErrorBlock
+    Returns: XBlock instance, or None if the user does not have access to the
+    block.  If there's an error, will try to return an instance of ErrorBlock
     if possible.  If not possible, return None.
     """
     try:
         descriptor = modulestore().get_item(usage_key, depth=depth)
-        return get_module_for_descriptor(user, request, descriptor, field_data_cache, usage_key.course_key,
-                                         position=position,
-                                         wrap_xmodule_display=wrap_xmodule_display,
-                                         grade_bucket_type=grade_bucket_type,
-                                         static_asset_path=static_asset_path,
-                                         course=course, will_recheck_access=will_recheck_access)
+        return get_block_for_descriptor(user, request, descriptor, field_data_cache, usage_key.course_key,
+                                        position=position,
+                                        wrap_xblock_display=wrap_xblock_display,
+                                        grade_bucket_type=grade_bucket_type,
+                                        static_asset_path=static_asset_path,
+                                        course=course, will_recheck_access=will_recheck_access)
     except ItemNotFoundError:
         if log_if_not_found:
-            log.debug("Error in get_module: ItemNotFoundError")
+            log.debug("Error in get_block: ItemNotFoundError")
         return None
 
     except:  # pylint: disable=W0702
         # Something has gone terribly wrong, but still not letting it turn into a 500.
-        log.exception("Error in get_module")
+        log.exception("Error in get_block")
         return None
 
 
@@ -366,16 +365,16 @@ def display_access_messages(user, block, view, frag, context):  # pylint: disabl
 
 
 # pylint: disable=too-many-statements
-def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_key,
-                              position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                              static_asset_path='', disable_staff_debug_info=False,
-                              course=None, will_recheck_access=False):
+def get_block_for_descriptor(user, request, descriptor, field_data_cache, course_key,
+                             position=None, wrap_xblock_display=True, grade_bucket_type=None,
+                             static_asset_path='', disable_staff_debug_info=False,
+                             course=None, will_recheck_access=False):
     """
-    Implements get_module, extracting out the request-specific functionality.
+    Implements get_block, extracting out the request-specific functionality.
 
-    disable_staff_debug_info : If this is True, exclude staff debug information in the rendering of the module.
+    disable_staff_debug_info : If this is True, exclude staff debug information in the rendering of the block.
 
-    See get_module() docstring for further details.
+    See get_block() docstring for further details.
     """
     track_function = make_track_function(request)
 
@@ -386,14 +385,14 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
         student_kvs = MasqueradingKeyValueStore(student_kvs, request.session)
     student_data = KvsFieldData(student_kvs)
 
-    return get_module_for_descriptor_internal(
+    return get_block_for_descriptor_internal(
         user=user,
         descriptor=descriptor,
         student_data=student_data,
         course_id=course_key,
         track_function=track_function,
         position=position,
-        wrap_xmodule_display=wrap_xmodule_display,
+        wrap_xblock_display=wrap_xblock_display,
         grade_bucket_type=grade_bucket_type,
         static_asset_path=static_asset_path,
         user_location=user_location,
@@ -413,7 +412,7 @@ def get_module_system_for_user(
         track_function,
         request_token,
         position=None,
-        wrap_xmodule_display=True,
+        wrap_xblock_display=True,
         grade_bucket_type=None,
         static_asset_path='',
         user_location=None,
@@ -425,16 +424,16 @@ def get_module_system_for_user(
     Helper function that returns a module system and student_data bound to a user and a descriptor.
 
     The purpose of this function is to factor out everywhere a user is implicitly bound when creating a module,
-    to allow an existing module to be re-bound to a user.  Most of the user bindings happen when creating the
+    to allow an existing block to be re-bound to a user.  Most of the user bindings happen when creating the
     closures that feed the instantiation of ModuleSystem.
 
     The arguments fall into two categories: those that have explicit or implicit user binding, which are user
     and student_data, and those don't and are just present so that ModuleSystem can be instantiated, which
-    are all the other arguments.  Ultimately, this isn't too different than how get_module_for_descriptor_internal
+    are all the other arguments.  Ultimately, this isn't too different than how get_block_for_descriptor_internal
     was before refactoring.
 
     Arguments:
-        see arguments for get_module()
+        see arguments for get_block()
         request_token (str): A token unique to the request use by xblock initialization
 
     Returns:
@@ -458,7 +457,7 @@ def get_module_system_for_user(
         return xqueue_callback_url_prefix + relative_xqueue_callback_url
 
     # Default queuename is course-specific and is derived from the course that
-    #   contains the current module.
+    #   contains the current block.
     # TODO: Queuename should be derived from 'course_settings.json' of each course
     xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
@@ -471,15 +470,15 @@ def get_module_system_for_user(
         waittime=settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS,
     )
 
-    def inner_get_module(descriptor):
+    def inner_get_block(descriptor):
         """
-        Delegate to get_module_for_descriptor_internal() with all values except `descriptor` set.
+        Delegate to get_block_for_descriptor_internal() with all values except `descriptor` set.
 
         Because it does an access check, it may return None.
         """
         # TODO: fix this so that make_xqueue_callback uses the descriptor passed into
-        # inner_get_module, not the parent's callback.  Add it as an argument....
-        return get_module_for_descriptor_internal(
+        # inner_get_block, not the parent's callback.  Add it as an argument....
+        return get_block_for_descriptor_internal(
             user=user,
             descriptor=descriptor,
             student_data=student_data,
@@ -487,7 +486,7 @@ def get_module_system_for_user(
             track_function=track_function,
             request_token=request_token,
             position=position,
-            wrap_xmodule_display=wrap_xmodule_display,
+            wrap_xblock_display=wrap_xblock_display,
             grade_bucket_type=grade_bucket_type,
             static_asset_path=static_asset_path,
             user_location=user_location,
@@ -522,7 +521,7 @@ def get_module_system_for_user(
         get_module_system_for_user,
         track_function=track_function,
         position=position,
-        wrap_xmodule_display=wrap_xmodule_display,
+        wrap_xblock_display=wrap_xblock_display,
         grade_bucket_type=grade_bucket_type,
         static_asset_path=static_asset_path,
         user_location=user_location,
@@ -541,9 +540,9 @@ def get_module_system_for_user(
     if settings.FEATURES.get("LICENSING", False):
         block_wrappers.append(partial(wrap_with_license, mako_service=mako_service))
 
-    # Wrap the output display in a single div to allow for the XModule
+    # Wrap the output display in a single div to allow for the XBlock
     # javascript to be bound correctly
-    if wrap_xmodule_display is True:
+    if wrap_xblock_display is True:
         block_wrappers.append(partial(
             wrap_xblock,
             'LmsRuntime',
@@ -589,7 +588,7 @@ def get_module_system_for_user(
     store = modulestore()
 
     system = LmsModuleSystem(
-        get_module=inner_get_module,
+        get_block=inner_get_block,
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
@@ -650,15 +649,14 @@ def get_module_system_for_user(
 
 # TODO: Find all the places that this method is called and figure out how to
 # get a loaded course passed into it
-def get_module_for_descriptor_internal(user, descriptor, student_data, course_id,
-                                       track_function, request_token,
-                                       position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                                       static_asset_path='', user_location=None, disable_staff_debug_info=False,
-                                       course=None, will_recheck_access=False):
+def get_block_for_descriptor_internal(user, descriptor, student_data, course_id, track_function, request_token,
+                                      position=None, wrap_xblock_display=True, grade_bucket_type=None,
+                                      static_asset_path='', user_location=None, disable_staff_debug_info=False,
+                                      course=None, will_recheck_access=False):
     """
-    Actually implement get_module, without requiring a request.
+    Actually implement get_block, without requiring a request.
 
-    See get_module() docstring for further details.
+    See get_block() docstring for further details.
 
     Arguments:
         request_token (str): A unique token for this request, used to isolate xblock rendering
@@ -671,7 +669,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         course_id=course_id,
         track_function=track_function,
         position=position,
-        wrap_xmodule_display=wrap_xmodule_display,
+        wrap_xblock_display=wrap_xblock_display,
         grade_bucket_type=grade_bucket_type,
         static_asset_path=static_asset_path,
         user_location=user_location,
@@ -729,7 +727,7 @@ def load_single_xblock(request, user_id, course_id, usage_key_string, course=Non
         modulestore().get_item(usage_key),
         depth=0,
     )
-    instance = get_module(
+    instance = get_block(
         user,
         request,
         usage_key,
@@ -910,10 +908,10 @@ def _get_descriptor_by_usage_key(usage_key):
     return descriptor, tracking_context
 
 
-def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None,
-                           will_recheck_access=False):
+def get_block_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None,
+                          will_recheck_access=False):
     """
-    Gets a module instance based on its `usage_id` in a course, for a given request/user
+    Gets a block instance based on its `usage_id` in a course, for a given request/user
 
     Returns (instance, tracking_context)
     """
@@ -928,7 +926,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         descriptor,
         read_only=CrawlersConfig.is_crawler(request),
     )
-    instance = get_module_for_descriptor(
+    instance = get_block_for_descriptor(
         user,
         request,
         descriptor,
@@ -991,12 +989,12 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         handler_method = getattr(descriptor, handler, False)
         will_recheck_access = handler_method and getattr(handler_method, 'will_recheck_access', False)
 
-        instance, tracking_context = get_module_by_usage_id(
+        instance, tracking_context = get_block_by_usage_id(
             request, course_id, str(block_usage_key), course=course, will_recheck_access=will_recheck_access,
         )
 
         # Name the transaction so that we can view XBlock handlers separately in
-        # New Relic. The suffix is necessary for XModule handlers because the
+        # New Relic. The suffix is necessary for XBlock handlers because the
         # "handler" in those cases is always just "xmodule_handler".
         nr_tx_name = f"{instance.__class__.__name__}.{handler}"
         nr_tx_name += f"/{suffix}" if (suffix and handler == "xmodule_handler") else ""
@@ -1025,12 +1023,12 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
             log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
             raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
-        # If we can't find the module, respond with a 404
+        # If we can't find the block, respond with a 404
         except NotFoundError:
             log.exception("Module indicating to user that request doesn't exist")
             raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
-        # For XModule-specific errors, we log the error and respond with an error message
+        # For XBlock-specific errors, we log the error and respond with an error message
         except ProcessingError as err:
             log.warning("Module encountered an error while processing AJAX call",
                         exc_info=True)
@@ -1067,7 +1065,7 @@ def xblock_view(request, course_id, usage_id, view_name):
 
     with modulestore().bulk_operations(course_key):
         course = modulestore().get_course(course_key)
-        instance, _ = get_module_by_usage_id(request, course_id, usage_id, course=course)
+        instance, _ = get_block_by_usage_id(request, course_id, usage_id, course=course)
 
         try:
             fragment = instance.render(view_name, context=request.GET)

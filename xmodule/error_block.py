@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 # way to tell if the module is being used in a staff context or not.  Errors that get discovered
 # at course load time are turned into ErrorBlock objects, and automatically hidden from students.
 # Unfortunately, we can also have errors when loading modules mid-request, and then we need to decide
-# what to show, and the logic for that belongs in the LMS (e.g. in get_module), so the error handler
+# what to show, and the logic for that belongs in the LMS (e.g. in get_block), so the error handler
 # decides whether to create a staff or not-staff module.
 
 

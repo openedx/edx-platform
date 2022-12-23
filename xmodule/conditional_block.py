@@ -317,7 +317,9 @@ class ConditionalBlock(
         """
         Returns a list of bound XBlocks instances upon which XBlock depends.
         """
-        return [self.system.get_module(descriptor) for descriptor in self.get_required_module_descriptors()]
+        return [
+            self.system.get_block_for_descriptor(descriptor) for descriptor in self.get_required_module_descriptors()
+        ]
 
     def get_required_module_descriptors(self):
         """

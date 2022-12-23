@@ -1,16 +1,16 @@
 """
 Dump the structure of a course as a JSON object.
 
-The resulting JSON object has one entry for each module in the course:
+The resulting JSON object has one entry for each block in the course:
 
 {
-  "$module_url": {
-    "category": "$module_category",
-    "children": [$module_children_urls... ],
-    "metadata": {$module_metadata}
+  "$block_url": {
+    "category": "$block_category",
+    "children": [$block_children_urls... ],
+    "metadata": {$block_metadata}
   },
 
-  "$module_url": ....
+  "$block_url": ....
   ...
 }
 
@@ -73,30 +73,30 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
         # Convert course data to dictionary and dump it as JSON to stdout
 
-        info = dump_module(course, inherited=options['inherited'], defaults=options['inherited_defaults'])
+        info = dump_block(course, inherited=options['inherited'], defaults=options['inherited_defaults'])
 
         return json.dumps(info, indent=2, sort_keys=True, default=str)
 
 
-def dump_module(module, destination=None, inherited=False, defaults=False):
+def dump_block(block, destination=None, inherited=False, defaults=False):
     """
-    Add the module and all its children to the destination dictionary in
+    Add the block and all its children to the destination dictionary in
     as a flat structure.
     """
 
     destination = destination if destination else {}
 
-    items = own_metadata(module)
+    items = own_metadata(block)
 
     # HACK: add discussion ids to list of items to export (AN-6696)
-    if isinstance(module, DiscussionXBlock) and 'discussion_id' not in items:
-        items['discussion_id'] = module.discussion_id
+    if isinstance(block, DiscussionXBlock) and 'discussion_id' not in items:
+        items['discussion_id'] = block.discussion_id
 
     filtered_metadata = {k: v for k, v in items.items() if k not in FILTER_LIST}
 
-    destination[str(module.location)] = {
-        'category': module.location.block_type,
-        'children': [str(child) for child in getattr(module, 'children', [])],
+    destination[str(block.location)] = {
+        'category': block.location.block_type,
+        'children': [str(child) for child in getattr(block, 'children', [])],
         'metadata': filtered_metadata,
     }
 
@@ -116,10 +116,10 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
             else:
                 return field.values != field.default
 
-        inherited_metadata = {field.name: field.read_json(module) for field in module.fields.values() if is_inherited(field)}  # lint-amnesty, pylint: disable=line-too-long
-        destination[str(module.location)]['inherited_metadata'] = inherited_metadata
+        inherited_metadata = {field.name: field.read_json(block) for field in block.fields.values() if is_inherited(field)}  # lint-amnesty, pylint: disable=line-too-long
+        destination[str(block.location)]['inherited_metadata'] = inherited_metadata
 
-    for child in module.get_children():
-        dump_module(child, destination, inherited, defaults)
+    for child in block.get_children():
+        dump_block(child, destination, inherited, defaults)
 
     return destination

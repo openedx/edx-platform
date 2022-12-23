@@ -25,7 +25,7 @@ from lms.djangoapps.courseware.access import is_mobile_available_for_user
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.courses import get_current_child
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from lms.djangoapps.mobile_api.models import MobileConfig
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2
@@ -143,7 +143,7 @@ class UserCourseStatus(views.APIView):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2)
 
-        course_block = get_module_for_descriptor(
+        course_block = get_block_for_descriptor(
             request.user, request, course, field_data_cache, course.id, course=course
         )
 
@@ -179,7 +179,7 @@ class UserCourseStatus(views.APIView):
             module_descriptor = modulestore().get_item(module_key)
         except ItemNotFoundError:
             return Response(errors.ERROR_INVALID_MODULE_ID, status=400)
-        module = get_module_for_descriptor(
+        module = get_block_for_descriptor(
             request.user, request, module_descriptor, field_data_cache, course.id, course=course
         )
 

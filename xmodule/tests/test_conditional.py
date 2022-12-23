@@ -130,9 +130,9 @@ class ConditionalFactory:
             ScopeIds(None, None, cond_location, cond_location)
         )
         cond_descriptor.xmodule_runtime = system
-        system.get_module = lambda desc: desc if visible_to_nonstaff_users(desc) else None
+        system.get_block_for_descriptor = lambda desc: desc if visible_to_nonstaff_users(desc) else None
         cond_descriptor.get_required_blocks = [
-            system.get_module(source_descriptor),
+            system.get_block_for_descriptor(source_descriptor),
         ]
 
         # return dict:
@@ -228,7 +228,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
 
     def get_module_for_location(self, location):
         descriptor = self.modulestore.get_item(location, depth=None)
-        return self.test_system.get_module(descriptor)
+        return self.test_system.get_block_for_descriptor(descriptor)
 
     @patch('xmodule.x_module.descriptor_global_local_resource_url')
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})

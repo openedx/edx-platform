@@ -23,7 +23,7 @@ from oauth2_provider.models import Application
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
@@ -962,7 +962,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         Returns the course block.
         """
         field_data_cache = FieldDataCache([self.course], self.course.id, self.user)  # lint-amnesty, pylint: disable=no-member
-        return get_module_for_descriptor(
+        return get_block_for_descriptor(
             self.user, MagicMock(), self.course, field_data_cache, self.course.id, course=self.course  # lint-amnesty, pylint: disable=no-member
         )
 

@@ -1188,7 +1188,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 @ddt.ddt
 class TestVideoBlockInitialization(BaseTestVideoXBlock):
     """
-    Make sure that module initialization works correctly.
+    Make sure that block initialization works correctly.
     """
     CATEGORY = "video"
     DATA = SOURCE_XML

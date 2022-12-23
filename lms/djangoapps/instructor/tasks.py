@@ -12,7 +12,7 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.student.models import get_user_by_username_or_email
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from openedx.core.lib.request_utils import get_request_or_stub
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -71,7 +71,7 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         root_descriptor.scope_ids.usage_id.context_key, user, root_descriptor, read_only=True,
     )
-    root_module = get_module_for_descriptor(
+    root_module = get_block_for_descriptor(
         user, request, root_descriptor, field_data_cache, root_descriptor.scope_ids.usage_id.context_key,
     )
     if not root_module:

@@ -62,15 +62,15 @@ class LibraryContentTest(MixedSplitTestCase):
         module_system.descriptor_runtime = module.runtime._descriptor_system  # pylint: disable=protected-access
         module_system._services['library_tools'] = self.tools  # pylint: disable=protected-access
 
-        def get_module(descriptor):
-            """Mocks module_system get_module function"""
+        def get_block(descriptor):
+            """Mocks module_system get_block function"""
             sub_module_system = get_test_system(course_id=module.location.course_key)
-            sub_module_system.get_module = get_module
+            sub_module_system.get_block_for_descriptor = get_block
             sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.bind_for_student(sub_module_system, self.user_id)
             return descriptor
 
-        module_system.get_module = get_module
+        module_system.get_block_for_descriptor = get_block
         module.xmodule_runtime = module_system
 
 

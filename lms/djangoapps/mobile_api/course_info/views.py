@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.static_replace import make_static_urls_absolute
-from lms.djangoapps.courseware.courses import get_course_info_section_module
+from lms.djangoapps.courseware.courses import get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
 from openedx.core.lib.xblock_utils import get_course_update_items
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
@@ -47,7 +47,7 @@ class CourseUpdatesList(generics.ListAPIView):
 
     @mobile_course_access()
     def list(self, request, course, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
-        course_updates_module = get_course_info_section_module(request, request.user, course, 'updates')
+        course_updates_module = get_course_info_section_block(request, request.user, course, 'updates')
         update_items = get_course_update_items(course_updates_module)
 
         updates_to_show = [
@@ -82,7 +82,7 @@ class CourseHandoutsList(generics.ListAPIView):
 
     @mobile_course_access()
     def list(self, request, course, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
-        course_handouts_module = get_course_info_section_module(request, request.user, course, 'handouts')
+        course_handouts_module = get_course_info_section_block(request, request.user, course, 'handouts')
         if course_handouts_module:
             if course_handouts_module.data == "<ol></ol>":
                 handouts_html = None

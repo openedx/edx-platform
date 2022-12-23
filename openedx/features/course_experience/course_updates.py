@@ -5,7 +5,7 @@ Utilities for course updates.
 import hashlib
 from datetime import datetime
 
-from lms.djangoapps.courseware.courses import get_course_info_section_module
+from lms.djangoapps.courseware.courses import get_course_info_section_block
 from openedx.core.djangoapps.user_api.course_tag.api import get_course_tag, set_course_tag
 
 STATUS_VISIBLE = 'visible'
@@ -59,7 +59,7 @@ def get_ordered_updates(request, course):
     """
     Returns all public course updates in reverse chronological order, including dismissed ones.
     """
-    info_module = get_course_info_section_module(request, request.user, course, 'updates')
+    info_module = get_course_info_section_block(request, request.user, course, 'updates')
     if not info_module:
         return []
 

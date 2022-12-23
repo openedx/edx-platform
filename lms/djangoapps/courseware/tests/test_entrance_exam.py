@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback, toc_for_course
+from lms.djangoapps.courseware.block_render import get_block, handle_xblock_callback, toc_for_course
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangolib.testing.utils import get_mock_request
 from common.djangoapps.student.models import CourseEnrollment
@@ -378,13 +378,13 @@ def answer_entrance_exam_problem(course, request, problem, user=None, value=1, m
         course,
         depth=2
     )
-    module = get_module(
+    block = get_block(
         user,
         request,
         problem.scope_ids.usage_id,
         field_data_cache,
     )
-    module.system.publish(problem, 'grade', grade_dict)
+    block.system.publish(problem, 'grade', grade_dict)
 
 
 def add_entrance_exam_milestone(course, entrance_exam):

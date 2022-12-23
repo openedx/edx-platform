@@ -1656,15 +1656,15 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
         self,
-        get_module,
+        get_block,
         descriptor_runtime,
-        **kwargs,
+        **kwargs
     ):
         """
         Create a closure around the system environment.
 
-        get_module - function that takes a descriptor and returns a corresponding
-                         module instance object.  If the current user does not have
+        get_block - function that takes a descriptor and returns a corresponding
+                         block instance object.  If the current user does not have
                          access to that location, returns None.
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
@@ -1674,7 +1674,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
         super().__init__(**kwargs)
 
-        self.get_module = get_module
+        self.get_block_for_descriptor = get_block
 
         self.xmodule_instance = None
 
@@ -1705,7 +1705,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
 
     def get_block(self, block_id, for_parent=None):  # lint-amnesty, pylint: disable=arguments-differ
-        return self.get_module(self.descriptor_runtime.get_block(block_id, for_parent=for_parent))
+        return self.get_block_for_descriptor(self.descriptor_runtime.get_block(block_id, for_parent=for_parent))
 
     def resource_url(self, resource):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
