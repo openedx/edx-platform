@@ -166,10 +166,10 @@ class TahoeUserMetadataProcessor(object):
         # WARNING:
         # We have to be careful to not add SQL queries that would require updating upstream tests
         # which count SQL queries; e.g., `cms.djangoapps.contentstore.views.tests.test_course_index)
-        # currently we can do this by only enabling the event processor for LMS
-        if app_variant.is_not_lms():  # we don't care about user metadata for Studio, at this point
+        # Currently we can do this by only enabling the event processor for LMS.
+        # We don't care about user metadata for Studio, at this point.
+        if not (app_variant.is_lms() or app_variant.is_lms_test()):
             return event
-
         # eventtracking Processors are loaded before apps are ready
         from django.contrib.auth.models import User
 

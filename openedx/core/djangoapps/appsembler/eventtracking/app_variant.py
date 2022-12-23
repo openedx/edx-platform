@@ -11,11 +11,22 @@ import os
 import sys
 
 
-def is_not_lms():
-    """Utility function: return False if not running in the LMS unless testing."""
+def is_lms():
+    """Utility function: return True if running in the LMS."""
+    return os.getenv("SERVICE_VARIANT") == 'lms'
+
+
+def is_lms_test():
+    """
+    Utility function: return False if this is in a test.
+
+    It's ugly but needed to run in LMS tests and not in CMS tests,
+    to keep SQL query counts as expected.
+    """
+    argstr = ' '.join(sys.argv)
     return (
-        os.getenv("SERVICE_VARIANT") != 'lms' and
-        'pytest ' not in ' '.join(sys.argv)
+        'pytest ' in argstr and
+        'cms/' not in argstr
     )
 
 
