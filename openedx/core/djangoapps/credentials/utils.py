@@ -142,7 +142,7 @@ def delete_course_certificate_configuration(course_id: str, config_data: dict):
         api_url = urljoin(f'{credentials_api_base_url}/', 'course_certificates/')
         response = credentials_client.delete(
             api_url,
-            json=config_data
+            data=config_data
         )
         response.raise_for_status()
         log.info(f'Course certificate config is deleted for course {course_id} from Credentials.')

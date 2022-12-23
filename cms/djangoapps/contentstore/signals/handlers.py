@@ -93,8 +93,9 @@ def get_certificate_signature_assets(certificate_config: CertificateConfigData) 
     """
     course_key = CourseKey.from_string(certificate_config.course_id)
     for signatory in certificate_config.signatories:
-        if content := get_asset_content_from_path(course_key, signatory.image):
-            yield signatory.image, content.data
+        if signatory.image:
+            if content := get_asset_content_from_path(course_key, signatory.image):
+                yield signatory.image, content.data
 
 
 def _create_catalog_data_for_signal(course_key: CourseKey) -> (Optional[datetime], Optional[CourseCatalogData]):
@@ -147,10 +148,9 @@ def create_course_certificate_config_data(
         organization=item['organization'],
         image=item['signature_image_path']
     ) for item in certificate_data['signatories']]
-
     return CertificateConfigData(
         course_id=course_id,
-        title=certificate_data['course_title'],
+        title=certificate_data.get('course_title'),
         is_active=certificate_data['is_active'],
         signatories=signatories,
         certificate_type=certificate_type
