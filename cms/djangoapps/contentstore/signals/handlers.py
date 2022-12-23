@@ -150,7 +150,7 @@ def create_course_certificate_config_data(
 
     return CertificateConfigData(
         course_id=course_id,
-        title=certificate_data['name'],
+        title=certificate_data['course_title'],
         is_active=certificate_data['is_active'],
         signatories=signatories,
         certificate_type=certificate_type
