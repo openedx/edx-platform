@@ -140,7 +140,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2022-12-18 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Cátia Lopes <catia.lopes@bridgelk.com>, 2019\n"
 "Language-Team: Portuguese (Portugal) (https://www.transifex.com/open-edx/teams/6205/pt_PT/)\n"
@@ -192,7 +192,7 @@ msgstr "Exame de Admissão"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
 msgid "Unit"
 msgstr "Unidade"
 
@@ -509,106 +509,19 @@ msgstr ""
 msgid "Disabled Account"
 msgstr "Conta desativada"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "Masculino"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "Feminino"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "Outro/Prefiro Não Responder"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "Doutoramento"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "Mestrado ou Grau Profissional"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "Licenciatura"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "Pós-graduação"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "Secundário"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "2ªciclo/3ºciclo"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "Primária"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "Sem estudos"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "Outra educação"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr ""
-"Código de Certificado de Honra de {platform_name} para o curso {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "Certificado Validado de {platform_name} para o curso {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr ""
-"Certificado Profissional de {platform_name} para o curso {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-"o seu ID de organização (se sua organização tiver uma página existente no "
-"LinkedIn) por exemplo 1337. Se não for fornecido, será enviado o Nome da "
-"Plataforma (por exemplo, edX)."
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "{platform_name} Certificado para {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "O código de idioma ISO 639-1 para este idioma."
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "Espaço do nome do atributo de matrícula"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "Nome do atributo de matrícula"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "Valor do atributo de matrícula"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
@@ -617,15 +530,7 @@ msgstr ""
 " reembolsados, representado em microssegundos. O prazo por defeito é de 14 "
 "dias."
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "Nome do cookie UTM"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "Nome do cookie afiliado"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -636,7 +541,7 @@ msgstr ""
 "com a primeira linha contendo o cabeçalho e as colunas sendo as seguintes: "
 "user_id, username, email, course_id, is_verified, verification_date"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -646,23 +551,118 @@ msgstr ""
 "                     a primeira linha sendo o cabeçalho e as colunas serão "
 "as seguintes:                     course_id, username, mode"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "Masculino"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "Feminino"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "Outro/Prefiro Não Responder"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "Doutoramento"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "Mestrado ou Grau Profissional"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "Licenciatura"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "Pós-graduação"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "Secundário"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "2ªciclo/3ºciclo"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "Primária"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "Sem estudos"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "Outra educação"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr ""
+"Código de Certificado de Honra de {platform_name} para o curso {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "Certificado Validado de {platform_name} para o curso {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr ""
+"Certificado Profissional de {platform_name} para o curso {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+"o seu ID de organização (se sua organização tiver uma página existente no "
+"LinkedIn) por exemplo 1337. Se não for fornecido, será enviado o Nome da "
+"Plataforma (por exemplo, edX)."
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{platform_name} Certificado para {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "O código de idioma ISO 639-1 para este idioma."
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "Nome do cookie UTM"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "Nome do cookie afiliado"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "Nome do atributo deste utilizador."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "Valor do atributo deste utilizador."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr "Endereço email Secundário"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr "Endereço de e-mail secundário para recuperar a conta vinculada."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -675,7 +675,7 @@ msgstr ""
 "funcionário não existir neste modelo, então esse funcionário pode fazer "
 "login apenas através de backend de autenticação de terceiros."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -685,7 +685,7 @@ msgstr ""
 "                     a primeira linha com o cabeçalho e as colunas as "
 "seguintes:                     username, current_email, desired_email"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr "Adicione uma razão"
 
@@ -2316,6 +2316,14 @@ msgstr "Afiliados"
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "Open edX"
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Data"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -10316,14 +10324,10 @@ msgstr "Componentes de origem"
 #: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional block. "
+"Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
-"As IDs de localização do componente de todos os componentes de origem que "
-"são utilizados para determinar se é mostrado ou não ao estudante, o conteúdo"
-" deste módulo condicional. Copie a componente da localização ID de um "
-"componente na sua janela de Configurações no Studio."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Attribute"
@@ -10332,10 +10336,8 @@ msgstr "Atributo condicional"
 #: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
+"shown the content of this conditional block."
 msgstr ""
-"O atributo dos componentes de origem que determina se é mostrado o conteúdo "
-"deste módulo condicional ao estudante."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Value"
@@ -10344,11 +10346,8 @@ msgstr "Valor condicional"
 #: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
+" before a learner is shown the content of this conditional block."
 msgstr ""
-"O valor a que o atributo condicional dos componentes de origem deve "
-"corresponder antes que seja mostrado o conteúdo deste módulo condicional a "
-"um estudante."
 
 #: xmodule/conditional_block.py
 msgid "Blocked Content Message"
@@ -10358,15 +10357,10 @@ msgstr "Conteúdo da mensagem bloqueado"
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
+"show the content of this conditional block. Include {link} in the text of "
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
-"A mensagem que é mostrada aos estudantes quando nem todas as condições são "
-"cumpridas para mostrar o conteúdo desse módulo condicional. Inclua {link} no"
-" texto da sua mensagem para dar aos estudantes um link direto para as "
-"unidades necessárias. Por exemplo, 'Deve completar {link} para poder aceder "
-"a esta unidade'."
 
 #: xmodule/conditional_block.py
 #, python-brace-format
@@ -12194,12 +12188,9 @@ msgstr "É Exame de Admissão"
 
 #: xmodule/seq_block.py
 msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
-"Identifique este módulo do curso como um Exame de Admissão. Note que deve "
-"ativar Exames de Admissão para que esta configuração do curso entre em "
-"vigor."
 
 #: xmodule/seq_block.py
 msgid "Is Time Limited"
@@ -12405,6 +12396,11 @@ msgstr ""
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
+msgstr ""
+
+#: xmodule/video_block/transcripts_utils.py
+#, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{status_code}."
@@ -12436,10 +12432,6 @@ msgstr ""
 "{exception_message}: Não foi possível encontrar as transcrições carregadas: "
 "{user_filename}"
 
-#: xmodule/video_block/video_handlers.py
-msgid "Language is required."
-msgstr "A linguagem é necessária."
-
 #: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr "Básico"
@@ -12466,6 +12458,10 @@ msgstr ""
 #: xmodule/video_block/video_block.py
 msgid "Default Video URL"
 msgstr "URL padrão do vídeo"
+
+#: xmodule/video_block/video_handlers.py
+msgid "Language is required."
+msgstr "A linguagem é necessária."
 
 #: xmodule/video_block/video_xfields.py
 msgid "Component Display Name"
@@ -13317,7 +13313,7 @@ msgstr "Vertical"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Section"
 msgstr "Secção"
 
@@ -14070,7 +14066,7 @@ msgid ""
 msgstr ""
 "Neste momento os debates estão em manutenção. Estarão disponíveis em breve!"
 
-#: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
 msgstr "Conteúdo Bloqueado"
 
@@ -14098,7 +14094,7 @@ msgstr "Discussão Guiada"
 msgid "Hide Annotations"
 msgstr "Ocultar Anotações"
 
-#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
 msgstr "Marcado como favorito"
 
@@ -14106,9 +14102,9 @@ msgstr "Marcado como favorito"
 msgid "Bookmark this page"
 msgstr "Marcar esta página como favorita"
 
-#: lms/templates/conditional_module.html
-msgid "You do not have access to this dependency module."
-msgstr "Não tem acesso a este módulo de dependência."
+#: lms/templates/conditional_block.html
+msgid "You do not have access to this dependency block."
+msgstr ""
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -14667,27 +14663,27 @@ msgstr ""
 "O seu e-mail secundário foi ativado. Por favor, entre no {link_start}painel "
 "de controlo{link_end} para aceder aos cursos."
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Important!"
 msgstr "Importante!"
 
 #. Translators: A button for showing the Previous Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
 msgstr "Anterior"
 
 #. Translators: A button for showing the Next Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
 msgstr "Seguinte"
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Sequence"
 msgstr "Sequência"
 
-#: lms/templates/seq_module.html lms/templates/vert_module.html
+#: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Concluído"
 

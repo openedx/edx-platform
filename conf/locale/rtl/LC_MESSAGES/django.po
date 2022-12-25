@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-18 20:35+0000\n"
-"PO-Revision-Date: 2022-12-18 20:35:43.081821\n"
+"POT-Creation-Date: 2022-12-25 20:53+0000\n"
+"PO-Revision-Date: 2022-12-25 20:53:33.758010\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -90,7 +90,7 @@ msgstr "Ɇnʇɹɐnɔǝ Ɇxɐɯ"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
 msgid "Unit"
 msgstr "Ʉnᴉʇ"
 
@@ -10080,13 +10080,13 @@ msgstr "Sønɹɔǝ Ȼøɯdønǝnʇs"
 #: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional block. "
+"Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
 "Ŧɥǝ ɔøɯdønǝnʇ løɔɐʇᴉøn ƗĐs øɟ ɐll sønɹɔǝ ɔøɯdønǝnʇs ʇɥɐʇ ɐɹǝ nsǝd ʇø "
-"dǝʇǝɹɯᴉnǝ ʍɥǝʇɥǝɹ ɐ lǝɐɹnǝɹ ᴉs sɥøʍn ʇɥǝ ɔønʇǝnʇ øɟ ʇɥᴉs ɔøndᴉʇᴉønɐl ɯødnlǝ."
-" Ȼødʎ ʇɥǝ ɔøɯdønǝnʇ løɔɐʇᴉøn ƗĐ øɟ ɐ ɔøɯdønǝnʇ ɟɹøɯ ᴉʇs Sǝʇʇᴉnƃs dᴉɐløƃ ᴉn "
+"dǝʇǝɹɯᴉnǝ ʍɥǝʇɥǝɹ ɐ lǝɐɹnǝɹ ᴉs sɥøʍn ʇɥǝ ɔønʇǝnʇ øɟ ʇɥᴉs ɔøndᴉʇᴉønɐl bløɔʞ. "
+"Ȼødʎ ʇɥǝ ɔøɯdønǝnʇ løɔɐʇᴉøn ƗĐ øɟ ɐ ɔøɯdønǝnʇ ɟɹøɯ ᴉʇs Sǝʇʇᴉnƃs dᴉɐløƃ ᴉn "
 "Sʇndᴉø."
 
 #: xmodule/conditional_block.py
@@ -10096,10 +10096,10 @@ msgstr "Ȼøndᴉʇᴉønɐl Ⱥʇʇɹᴉbnʇǝ"
 #: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
+"shown the content of this conditional block."
 msgstr ""
 "Ŧɥǝ ɐʇʇɹᴉbnʇǝ øɟ ʇɥǝ sønɹɔǝ ɔøɯdønǝnʇs ʇɥɐʇ dǝʇǝɹɯᴉnǝs ʍɥǝʇɥǝɹ ɐ lǝɐɹnǝɹ ᴉs "
-"sɥøʍn ʇɥǝ ɔønʇǝnʇ øɟ ʇɥᴉs ɔøndᴉʇᴉønɐl ɯødnlǝ."
+"sɥøʍn ʇɥǝ ɔønʇǝnʇ øɟ ʇɥᴉs ɔøndᴉʇᴉønɐl bløɔʞ."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Value"
@@ -10108,10 +10108,10 @@ msgstr "Ȼøndᴉʇᴉønɐl Vɐlnǝ"
 #: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
+" before a learner is shown the content of this conditional block."
 msgstr ""
 "Ŧɥǝ ʌɐlnǝ ʇɥɐʇ ʇɥǝ ɔøndᴉʇᴉønɐl ɐʇʇɹᴉbnʇǝ øɟ ʇɥǝ sønɹɔǝ ɔøɯdønǝnʇs ɯnsʇ ɯɐʇɔɥ"
-" bǝɟøɹǝ ɐ lǝɐɹnǝɹ ᴉs sɥøʍn ʇɥǝ ɔønʇǝnʇ øɟ ʇɥᴉs ɔøndᴉʇᴉønɐl ɯødnlǝ."
+" bǝɟøɹǝ ɐ lǝɐɹnǝɹ ᴉs sɥøʍn ʇɥǝ ɔønʇǝnʇ øɟ ʇɥᴉs ɔøndᴉʇᴉønɐl bløɔʞ."
 
 #: xmodule/conditional_block.py
 msgid "Blocked Content Message"
@@ -10121,12 +10121,12 @@ msgstr "Ƀløɔʞǝd Ȼønʇǝnʇ Mǝssɐƃǝ"
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
+"show the content of this conditional block. Include {link} in the text of "
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
 "Ŧɥǝ ɯǝssɐƃǝ ʇɥɐʇ ᴉs sɥøʍn ʇø lǝɐɹnǝɹs ʍɥǝn nøʇ ɐll ɔøndᴉʇᴉøns ɐɹǝ ɯǝʇ ʇø "
-"sɥøʍ ʇɥǝ ɔønʇǝnʇ øɟ ʇɥᴉs ɔøndᴉʇᴉønɐl ɯødnlǝ. Ɨnɔlndǝ {link} ᴉn ʇɥǝ ʇǝxʇ øɟ "
+"sɥøʍ ʇɥǝ ɔønʇǝnʇ øɟ ʇɥᴉs ɔøndᴉʇᴉønɐl bløɔʞ. Ɨnɔlndǝ {link} ᴉn ʇɥǝ ʇǝxʇ øɟ "
 "ʎønɹ ɯǝssɐƃǝ ʇø ƃᴉʌǝ lǝɐɹnǝɹs ɐ dᴉɹǝɔʇ lᴉnʞ ʇø ɹǝbnᴉɹǝd nnᴉʇs. Føɹ ǝxɐɯdlǝ, "
 "'Ɏøn ɯnsʇ ɔøɯdlǝʇǝ {link} bǝɟøɹǝ ʎøn ɔɐn ɐɔɔǝss ʇɥᴉs nnᴉʇ'."
 
@@ -11910,10 +11910,10 @@ msgstr "Ɨs Ɇnʇɹɐnɔǝ Ɇxɐɯ"
 
 #: xmodule/seq_block.py
 msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
-"Ŧɐƃ ʇɥᴉs ɔønɹsǝ ɯødnlǝ ɐs ɐn Ɇnʇɹɐnɔǝ Ɇxɐɯ. Nøʇǝ, ʎøn ɯnsʇ ǝnɐblǝ Ɇnʇɹɐnɔǝ "
+"Ŧɐƃ ʇɥᴉs ɔønɹsǝ bløɔʞ ɐs ɐn Ɇnʇɹɐnɔǝ Ɇxɐɯ. Nøʇǝ, ʎøn ɯnsʇ ǝnɐblǝ Ɇnʇɹɐnɔǝ "
 "Ɇxɐɯs ɟøɹ ʇɥᴉs ɔønɹsǝ sǝʇʇᴉnƃ ʇø ʇɐʞǝ ǝɟɟǝɔʇ."
 
 #: xmodule/seq_block.py
@@ -12125,7 +12125,7 @@ msgstr "Ⱥdd dᴉsɔnssᴉøn ɟøɹ ʇɥǝ Ʉnᴉʇ."
 msgid "Can't get transcript link from Youtube for {youtube_id}."
 msgstr "Ȼɐn'ʇ ƃǝʇ ʇɹɐnsɔɹᴉdʇ lᴉnʞ ɟɹøɯ Ɏønʇnbǝ ɟøɹ {youtube_id}."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
@@ -12156,10 +12156,6 @@ msgstr "Søɯǝʇɥᴉnƃ ʍɹønƃ ʍᴉʇɥ SnbɌᴉd ʇɹɐnsɔɹᴉdʇs ɟ�
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr "{exception_message}: Ȼɐn'ʇ ɟᴉnd ndløɐdǝd ʇɹɐnsɔɹᴉdʇs: {user_filename}"
 
-#: xmodule/video_block/video_handlers.py
-msgid "Language is required."
-msgstr "Łɐnƃnɐƃǝ ᴉs ɹǝbnᴉɹǝd."
-
 #: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr "Ƀɐsᴉɔ"
@@ -12184,6 +12180,10 @@ msgstr ""
 #: xmodule/video_block/video_block.py
 msgid "Default Video URL"
 msgstr "Đǝɟɐnlʇ Vᴉdǝø ɄɌŁ"
+
+#: xmodule/video_block/video_handlers.py
+msgid "Language is required."
+msgstr "Łɐnƃnɐƃǝ ᴉs ɹǝbnᴉɹǝd."
 
 #: xmodule/video_block/video_xfields.py
 msgid "Component Display Name"
@@ -13013,7 +13013,7 @@ msgstr "Vǝɹʇᴉɔɐl"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Section"
 msgstr "Sǝɔʇᴉøn"
 
@@ -13752,7 +13752,7 @@ msgstr ""
 "Ŧɥǝ dᴉsɔnssᴉøns ɐɹǝ ɔnɹɹǝnʇlʎ nndǝɹƃøᴉnƃ ɯɐᴉnʇǝnɐnɔǝ. Wǝ'll ɥɐʌǝ ʇɥǝɯ bɐɔʞ "
 "nd sɥøɹʇlʎ!"
 
-#: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
 msgstr "Ȼønʇǝnʇ Łøɔʞǝd"
 
@@ -13780,7 +13780,7 @@ msgstr "Ǥnᴉdǝd Đᴉsɔnssᴉøn"
 msgid "Hide Annotations"
 msgstr "Ħᴉdǝ Ⱥnnøʇɐʇᴉøns"
 
-#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
 msgstr "Ƀøøʞɯɐɹʞǝd"
 
@@ -13788,9 +13788,9 @@ msgstr "Ƀøøʞɯɐɹʞǝd"
 msgid "Bookmark this page"
 msgstr "Ƀøøʞɯɐɹʞ ʇɥᴉs dɐƃǝ"
 
-#: lms/templates/conditional_module.html
-msgid "You do not have access to this dependency module."
-msgstr "Ɏøn dø nøʇ ɥɐʌǝ ɐɔɔǝss ʇø ʇɥᴉs dǝdǝndǝnɔʎ ɯødnlǝ."
+#: lms/templates/conditional_block.html
+msgid "You do not have access to this dependency block."
+msgstr "Ɏøn dø nøʇ ɥɐʌǝ ɐɔɔǝss ʇø ʇɥᴉs dǝdǝndǝnɔʎ bløɔʞ."
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -14340,27 +14340,27 @@ msgstr ""
 "Ɏønɹ sǝɔøndɐɹʎ ǝɯɐᴉl ɥɐs bǝǝn ɐɔʇᴉʌɐʇǝd. Ᵽlǝɐsǝ ʌᴉsᴉʇ "
 "{link_start}dɐsɥbøɐɹd{link_end} ɟøɹ ɔønɹsǝs."
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Important!"
 msgstr "Ɨɯdøɹʇɐnʇ!"
 
 #. Translators: A button for showing the Previous Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
 msgstr "Ᵽɹǝʌᴉøns"
 
 #. Translators: A button for showing the Next Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
 msgstr "Nǝxʇ"
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Sequence"
 msgstr "Sǝbnǝnɔǝ"
 
-#: lms/templates/seq_module.html lms/templates/vert_module.html
+#: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Ȼøɯdlǝʇǝd"
 

@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2022-12-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Mongolian (https://www.transifex.com/open-edx/teams/6205/mn/)\n"
@@ -124,7 +124,7 @@ msgstr "Элсэлтийн шалгалт"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
 msgid "Unit"
 msgstr "Нэгж"
 
@@ -424,115 +424,25 @@ msgstr ""
 msgid "Disabled Account"
 msgstr "Идэвхгүй болсон данс"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "Эрэгтэй"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "Эмэгтэй"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr ""
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "Докторын"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "Магистрын эсвэл мэргэжлийн зэрэг"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "Бакалаврын зэрэг"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "Хавсарга зэрэг"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "Ахлах сургууль"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "Дунд сургууль"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "Бага сургууль"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "Албан ёсны боловсролгүй"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "Бусад боловсрол"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "{platform_name}  {course_name}-д ёс зүйн дүрмийн гэрчилгээ"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "{course_name}-н {platform_name} баталгаажсан гэрчилгээ"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr "{course_name}-н {platform_name} мэргэжлийн гэрчилгээ"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "{platform_name}  {course_name}-ийн гэрчилгээ"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "Энэ хэлний ISO 639-1 хэлний код. "
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
 msgstr ""
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr ""
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr ""
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -540,30 +450,120 @@ msgid ""
 "is_verified, verification_date"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     course_id, username, mode"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "Эрэгтэй"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "Эмэгтэй"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr ""
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "Докторын"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "Магистрын эсвэл мэргэжлийн зэрэг"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "Бакалаврын зэрэг"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "Хавсарга зэрэг"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "Ахлах сургууль"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "Дунд сургууль"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "Бага сургууль"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "Албан ёсны боловсролгүй"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "Бусад боловсрол"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{platform_name}  {course_name}-д ёс зүйн дүрмийн гэрчилгээ"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "{course_name}-н {platform_name} баталгаажсан гэрчилгээ"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "{course_name}-н {platform_name} мэргэжлийн гэрчилгээ"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{platform_name}  {course_name}-ийн гэрчилгээ"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "Энэ хэлний ISO 639-1 хэлний код. "
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr ""
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr ""
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -571,14 +571,14 @@ msgid ""
 "that employee can login via third party authentication backend only."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     username, current_email, desired_email"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr ""
 
@@ -2020,6 +2020,14 @@ msgstr ""
 #. Translators: 'Open edX' is a trademark, please keep this untranslated
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Data"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -9188,8 +9196,8 @@ msgstr "Эх бүрдэл"
 #: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional block. "
+"Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
 
@@ -9200,7 +9208,7 @@ msgstr "Нөхцөлт атрибут"
 #: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
+"shown the content of this conditional block."
 msgstr ""
 
 #: xmodule/conditional_block.py
@@ -9210,7 +9218,7 @@ msgstr "Нөхцөлт утга"
 #: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
+" before a learner is shown the content of this conditional block."
 msgstr ""
 
 #: xmodule/conditional_block.py
@@ -9221,7 +9229,7 @@ msgstr "Хориглосон агуулгын зурвас"
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
+"show the content of this conditional block. Include {link} in the text of "
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
@@ -10738,7 +10746,7 @@ msgstr ""
 
 #: xmodule/seq_block.py
 msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
 
@@ -10923,6 +10931,11 @@ msgstr ""
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
+msgstr ""
+
+#: xmodule/video_block/transcripts_utils.py
+#, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{status_code}."
@@ -10948,10 +10961,6 @@ msgstr ""
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 
-#: xmodule/video_block/video_handlers.py
-msgid "Language is required."
-msgstr ""
-
 #: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr ""
@@ -10972,6 +10981,10 @@ msgstr ""
 
 #: xmodule/video_block/video_block.py
 msgid "Default Video URL"
+msgstr ""
+
+#: xmodule/video_block/video_handlers.py
+msgid "Language is required."
 msgstr ""
 
 #: xmodule/video_block/video_xfields.py
@@ -11708,7 +11721,7 @@ msgid "Vertical"
 msgstr ""
 
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Section"
 msgstr "Хэсэг"
 
@@ -12416,7 +12429,7 @@ msgid ""
 "up shortly!"
 msgstr ""
 
-#: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
 msgstr "Агуулга түгжээтэй"
 
@@ -12442,7 +12455,7 @@ msgstr "Хөтөлсөн хэлэлцүүлэг"
 msgid "Hide Annotations"
 msgstr "Тэмдэглэгээнүүдийг нуух"
 
-#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
 msgstr "Хадгалагдсан"
 
@@ -12450,9 +12463,9 @@ msgstr "Хадгалагдсан"
 msgid "Bookmark this page"
 msgstr "Энэ хуудсыг хадгалах"
 
-#: lms/templates/conditional_module.html
-msgid "You do not have access to this dependency module."
-msgstr "Та энэ хамаарлын модульд хандах эрхгүй байна."
+#: lms/templates/conditional_block.html
+msgid "You do not have access to this dependency block."
+msgstr ""
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -12972,27 +12985,27 @@ msgid ""
 "{link_start}dashboard{link_end} for courses."
 msgstr ""
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Important!"
 msgstr "Чухал!"
 
 #. Translators: A button for showing the Previous Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
 msgstr ""
 
 #. Translators: A button for showing the Next Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
 msgstr ""
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Sequence"
 msgstr "Дараалал"
 
-#: lms/templates/seq_module.html lms/templates/vert_module.html
+#: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr ""
 

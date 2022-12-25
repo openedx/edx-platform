@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2022-12-18 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -184,7 +184,7 @@ msgstr "Giriş Sınavı"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
 msgid "Unit"
 msgstr "Ünite"
 
@@ -502,104 +502,19 @@ msgstr ""
 msgid "Disabled Account"
 msgstr "Etkin Olmayan Hesap"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "Erkek"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "Kadın"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "Diğer/Söylememeyi Tercih Eder"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "Doktora derecesi"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "Yüksek lisans veya profesyonel derece"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "Lisans derecesi"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "Ön Lisans derecesi"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "Orta Okul/Lise"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "Üçüncü sınıf ortaokul/üçüncü sınıf lise/orta okul"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "Temel/İlkokul"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "Örgün olmayan eğitim"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "Diğer eğitim"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "{course_name} eğitimi için {platform_name} Onur Öğrencisi Sertifikası"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "{course_name} dersi için {platform_name} Onaylı Sertifika"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr "{course_name} için {platform_name} Profesyonel Sertifika"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-"Kuruluş kimliğiniz (kuruluşunuzun LinkedIn'de mevcut bir sayfası varsa) ör. "
-"1337. Sağlanmazsa, bunun yerine öntanımlı olarak Platform Adı (ör. edX) "
-"gönderilecektir."
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "{platform_name} {course_name} için Sertifika"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "Bu dil için ISO 639-1 dil kodu."
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "Kayıtlanma özelliğinin ad alanı"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "Kayıtlanma özelliğinin adı"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "Kayıtlanma özelliğinin değeri"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
@@ -607,15 +522,7 @@ msgstr ""
 "Kullanıcıların kayıt yaptıktan sonra geri ödeme alabileceği zaman aralığı, "
 "mikrosaniyeler ile belirtilir. Öntanımlı süre 14 gündür."
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "UTM çerezinin adı"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "Satış ortağı çerezinin adı"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -626,7 +533,7 @@ msgstr ""
 "sağlanması beklenir ve sütunlar şu şekilde olacaktır:            user_id, "
 "username, email, course_id, is_verified, verification_date"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -636,23 +543,116 @@ msgstr ""
 "sağlanması beklenir ve sütunlar şu şekilde olacaktır:                      "
 "course_id, username, mode"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "Erkek"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "Kadın"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "Diğer/Söylememeyi Tercih Eder"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "Doktora derecesi"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "Yüksek lisans veya profesyonel derece"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "Lisans derecesi"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "Ön Lisans derecesi"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "Orta Okul/Lise"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "Üçüncü sınıf ortaokul/üçüncü sınıf lise/orta okul"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "Temel/İlkokul"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "Örgün olmayan eğitim"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "Diğer eğitim"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{course_name} eğitimi için {platform_name} Onur Öğrencisi Sertifikası"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "{course_name} dersi için {platform_name} Onaylı Sertifika"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "{course_name} için {platform_name} Profesyonel Sertifika"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+"Kuruluş kimliğiniz (kuruluşunuzun LinkedIn'de mevcut bir sayfası varsa) ör. "
+"1337. Sağlanmazsa, bunun yerine öntanımlı olarak Platform Adı (ör. edX) "
+"gönderilecektir."
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{platform_name} {course_name} için Sertifika"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "Bu dil için ISO 639-1 dil kodu."
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "UTM çerezinin adı"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "Satış ortağı çerezinin adı"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "Bu kullanıcı özelliğinin adı"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "Bu kullanıcı özelliğinin değeri"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr "İkincil e-posta adresi"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr "Bağlı hesabı kurtarmak için ikincil e-posta adresi."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -665,7 +665,7 @@ msgstr ""
 "yoksa, o çalışan yalnızca üçüncü taraf kimlik doğrulama arka ucu "
 "aracılığıyla oturum açabilir."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -675,7 +675,7 @@ msgstr ""
 "beklenir ve sütunlar şu şekilde olacaktır:                      username, "
 "current_email, desired_email"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr "Bir gerekçe ekleyin"
 
@@ -2258,6 +2258,14 @@ msgstr "Satış ortakları"
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "Open edX"
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Data"
+msgstr "Kişisel Verilerimi Satmayın"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -3860,6 +3868,8 @@ msgid ""
 "A list of problem/block types to generate the report for. This field can be "
 "omitted if the report should include details of allblock types. "
 msgstr ""
+"Raporun oluşturulacağı problem/block türlerinin listesi. Raporun tüm block "
+"türlerinin ayrıntılarını içermesi gerekiyorsa bu alan atlanabilir."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User-friendly text describing current status of report generation."
@@ -4002,7 +4012,7 @@ msgstr "Harici Kullanıcı Anahtarı"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
-msgstr "Topluluk"
+msgstr "Kohort"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -4036,8 +4046,7 @@ msgstr "kayıtlanma"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
-msgstr ""
-"Dosyada topluluk isimlerinin bulunduğu 'topluluk' sütunu bulunmalıdır."
+msgstr "Dosyada kohort isimlerinin bulunduğu 'kohort' sütunu bulunmalıdır."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'username' column, an 'email' column, or both."
@@ -4461,7 +4470,7 @@ msgstr "Üyelik"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Cohorts"
-msgstr "Topluluklar"
+msgstr "Kohortlar"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
@@ -4671,7 +4680,7 @@ msgstr "oluşturulan sertifikalar"
 #. {attempted} so far"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
-msgstr "topluluğa alındı"
+msgstr "kohorta alındı"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -5133,7 +5142,7 @@ msgstr "Eğitmen tarafından yönetilen konuda bir takım oluşturamazsınız."
 
 #: lms/djangoapps/teams/views.py
 msgid "You are already in a team in this teamset."
-msgstr ""
+msgstr "Bu takım yapılandırmasında zaten bir takıma ait görünüyorsunuz."
 
 #: lms/djangoapps/teams/views.py
 msgid "teamset_id and team_id are mutually exclusive options."
@@ -5171,6 +5180,7 @@ msgstr "Eğitmen tarafından yönetilen bir takıma katılamazsınız."
 #, python-brace-format
 msgid "The user {username} is already a member of a team in this teamset."
 msgstr ""
+"Bu takım yapılandırmasında {username} kullanıcısı zaten bir takımın üyesi."
 
 #: lms/djangoapps/teams/views.py
 #, python-brace-format
@@ -7078,16 +7088,16 @@ msgstr "Öntanımlı Grup"
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
-msgstr "Aynı isimle iki topluluk oluşturamazsınız"
+msgstr "Aynı isimle iki kohort oluşturamazsınız"
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid ""
 "There must be one cohort to which students can automatically be assigned."
-msgstr "Öğrencileri otomatik olarak atayabilen  bir tane topluluk olmalıdır."
+msgstr "Öğrencilerin otomatik olarak atanabildiği bir tane kohort olmalıdır."
 
 #: openedx/core/djangoapps/course_groups/views.py
 msgid "A cohort with the same name already exists."
-msgstr "Aynı isimli bir topluluk önceden oluşturulmuş."
+msgstr "Aynı isimli bir kohort önceden oluşturulmuş."
 
 #: openedx/core/djangoapps/course_live/models.py
 msgid "If disabled, the LTI in the associated course will be disabled."
@@ -8050,7 +8060,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "This email is associated to a retired account."
-msgstr ""
+msgstr "Bu e-posta emekliye ayrılan bir hesapla ilişkili."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
@@ -10223,14 +10233,10 @@ msgstr "Kaynak Bileşenler"
 #: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional block. "
+"Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
-"Bir öğrenciye bu koşullu modülün içeriğinin gösterilip gösterilmediğini "
-"belirlemek için kullanılan tüm kaynak bileşenlerin bileşen konum kimlikleri."
-" Studio'daki Ayarlar penceresinden bir bileşenin bileşen konumu kimliğini "
-"kopyalayın."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Attribute"
@@ -10239,10 +10245,8 @@ msgstr "Koşul Etiketleri"
 #: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
+"shown the content of this conditional block."
 msgstr ""
-"Bir öğrenciye bu koşullu modülün içeriğinin gösterilip gösterilmeyeceğini "
-"belirleyen kaynak bileşenlerin özelliği."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Value"
@@ -10251,10 +10255,8 @@ msgstr "Koşullu Değer"
 #: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
+" before a learner is shown the content of this conditional block."
 msgstr ""
-"Bir öğrenciye bu koşullu modülün içeriği gösterilmeden önce kaynak "
-"bileşenlerin koşullu özniteliğinin eşleşmesi gereken değer. "
 
 #: xmodule/conditional_block.py
 msgid "Blocked Content Message"
@@ -10264,15 +10266,10 @@ msgstr "Engellenmiş İçerik İletisi"
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
+"show the content of this conditional block. Include {link} in the text of "
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
-"Bu koşullu modülün içeriğini göstermek için tüm koşullar karşılanmadığında "
-"öğrencilere gösterilen ileti. Öğrencilere gerekli ünitelere doğrudan bir "
-"bağlantı vermek için iletinizin metnine {link} bağlantısını ekleyin. "
-"Örneğin, 'Bu üniteye erişebilmeniz için önce {link}' bağlantısını "
-"tamamlamalısınız'. "
 
 #: xmodule/conditional_block.py
 #, python-brace-format
@@ -10482,7 +10479,7 @@ msgstr "Dersinizi duyurma tarihini giriniz."
 
 #: xmodule/course_block.py
 msgid "Cohort Configuration"
-msgstr "Topluluk Ayarları"
+msgstr "Kohort Yapılandırması"
 
 #: xmodule/course_block.py
 msgid ""
@@ -10490,9 +10487,9 @@ msgid ""
 "student assignment to groups, or identify any course-wide discussion topics "
 "as private to cohort members."
 msgstr ""
-"Topluluk özelliğini etkinleştirmek için koşul anahtarı ve değerlerini girin,"
-" otomatikleştirilmiş gruplara öğrenci atamayı tanımla, ya da özel olarak "
-"ders çapında tartışma başlıklarını topluluk üyelerine tanımla."
+"Kohort özelliğini etkinleştirmek için koşul anahtarı ve değerlerini girin, "
+"gruplara otomatik öğrenci atamayı tanımlayın, ya da ders genelindeki "
+"tartışma başlıklarını kohort üyelerine özel yapın."
 
 #: xmodule/course_block.py
 msgid "Course Is New"
@@ -12080,11 +12077,9 @@ msgstr "Giriş Sınavı Mı"
 
 #: xmodule/seq_block.py
 msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
-"Bu ders modülünü Giriş Sınavı olarak etiketleyin. Bu ders ayarının geçerli "
-"olması için Giriş Sınavları'nı etkinleştirmeniz gerektiğine dikkat edin. "
 
 #: xmodule/seq_block.py
 msgid "Is Time Limited"
@@ -12291,6 +12286,11 @@ msgstr "Üniteye tartışma ekle."
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
+msgstr ""
+
+#: xmodule/video_block/transcripts_utils.py
+#, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{status_code}."
@@ -12320,10 +12320,6 @@ msgstr "SubRip altyazı dosyası okunurken bir şeyler yanlış gitti."
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr "{exception_message}: Yüklenmiş altyazılar bulunamadı: {user_filename}"
 
-#: xmodule/video_block/video_handlers.py
-msgid "Language is required."
-msgstr "Dil gerekmektedir."
-
 #: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr "Temel"
@@ -12347,6 +12343,10 @@ msgstr ""
 #: xmodule/video_block/video_block.py
 msgid "Default Video URL"
 msgstr "Varsayılan Video Bağlantısı"
+
+#: xmodule/video_block/video_handlers.py
+msgid "Language is required."
+msgstr "Dil gerekmektedir."
 
 #: xmodule/video_block/video_xfields.py
 msgid "Component Display Name"
@@ -13183,7 +13183,7 @@ msgstr "Dikey"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Section"
 msgstr "Bölüm"
 
@@ -13919,7 +13919,7 @@ msgid ""
 "up shortly!"
 msgstr "Forumda bakım yapılıyor. En kısa zamanda çalışır hale getireceğiz!"
 
-#: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
 msgstr "İçerik Kilitlendi"
 
@@ -13947,7 +13947,7 @@ msgstr "Rehberli Tartışma"
 msgid "Hide Annotations"
 msgstr "İpuçlarını Gizle"
 
-#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
 msgstr "Yer imi kondu"
 
@@ -13955,9 +13955,9 @@ msgstr "Yer imi kondu"
 msgid "Bookmark this page"
 msgstr "Bu sayfaya yer imi koy"
 
-#: lms/templates/conditional_module.html
-msgid "You do not have access to this dependency module."
-msgstr "Bu bağımlılık modülüne erişim hakkınız yok."
+#: lms/templates/conditional_block.html
+msgid "You do not have access to this dependency block."
+msgstr ""
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -14509,27 +14509,27 @@ msgstr ""
 "İkincil e-posta adresiniz etkinleştirildi. Lütfen dersler için "
 "{link_start}ana paneli{link_end} ziyaret edin."
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Important!"
 msgstr "Önemli!"
 
 #. Translators: A button for showing the Previous Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
 msgstr "Önceki"
 
 #. Translators: A button for showing the Next Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
 msgstr "Sonraki"
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Sequence"
 msgstr "Sıralı"
 
-#: lms/templates/seq_module.html lms/templates/vert_module.html
+#: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Tamamlandı"
 
@@ -15537,6 +15537,14 @@ msgid ""
 "{platform_name} Participants will have any liability to you for such an "
 "action."
 msgstr ""
+"{platform_name_capitalized} ve {platform_name} Katılımcıları, kendi "
+"takdirlerine bağlı olarak, {platform_name} aracılığıyla sunulan herhangi bir"
+" API'yi veya API İçeriği'ni herhangi bir zamanda iptal etme, geciktirme, "
+"yeniden planlama veya biçimini değiştirme veya herhangi bir kısmını veya "
+"tamamını sağlamayı durdurma hakkını saklı tutar. API'ler veya API İçeriği "
+"veya ilgili hizmetlere dair, ne {platform_name} platformunun ne de "
+"{platform_name} Katılımcılarından herhangi birinin bu tür bir eylem için "
+"size karşı herhangi bir yükümlülüğü olmayacağını baştan kabul edersiniz."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -16355,6 +16363,8 @@ msgid ""
 "Showcase a {link_start}verified certificate{link_end} of completion on your "
 "resumé to advance your career"
 msgstr ""
+"Kariyerinizi ilerletmek için özgeçmişinizde {link_start}doğrulanmış bir "
+"bitirme sertifikası{link_end} sergileyin"
 
 #: lms/templates/course_modes/fbe.html
 msgid ""
@@ -16518,7 +16528,7 @@ msgstr "Bunu ailen ve arkadaşlarınla paylaş!"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {account} {url}"
-msgstr ""
+msgstr "Ben {account} {url} hesabı ile {number}{title} dersine kaydoldum"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
@@ -17199,6 +17209,10 @@ msgid ""
 "assignments, and earn a {link_start}verified certificate{link_end} to "
 "showcase on your resumé."
 msgstr ""
+"{start_bold}Dersinizden en iyi şekilde yararlanın!{end_bold} Ders "
+"materyallerine tam erişim elde etmek için erişiminizi yükseltin, hem not "
+"verilen hem de not verilmeyen ödevlerin kilidini açın ve özgeçmişinizde "
+"gösterebileceğiniz bir {link_start}onaylanmış sertifika{link_end} kazanın."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -20428,6 +20442,9 @@ msgid ""
 "I have and that I have                             achieved something while "
 "I was unemployed."
 msgstr ""
+"Özgeçmişime ve profilime onaylı bir sertifikayı dahil etmek istedim ve bu "
+"hedefe doğru çalıştığımı ve işsizken bir şeyleri başardığımı göstermeyi "
+"istedim."
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Upgrade ({course_price})"

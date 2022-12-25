@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-18 20:35+0000\n"
-"PO-Revision-Date: 2022-12-18 20:35:43.081821\n"
+"POT-Creation-Date: 2022-12-25 20:53+0000\n"
+"PO-Revision-Date: 2022-12-25 20:53:33.758010\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -90,7 +90,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
 msgid "Unit"
 msgstr ""
 
@@ -9164,8 +9164,8 @@ msgstr ""
 #: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional block. "
+"Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
 
@@ -9176,7 +9176,7 @@ msgstr ""
 #: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
+"shown the content of this conditional block."
 msgstr ""
 
 #: xmodule/conditional_block.py
@@ -9186,7 +9186,7 @@ msgstr ""
 #: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
+" before a learner is shown the content of this conditional block."
 msgstr ""
 
 #: xmodule/conditional_block.py
@@ -9197,7 +9197,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
+"show the content of this conditional block. Include {link} in the text of "
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
@@ -10712,7 +10712,7 @@ msgstr ""
 
 #: xmodule/seq_block.py
 msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
 
@@ -10900,7 +10900,7 @@ msgstr ""
 msgid "Can't get transcript link from Youtube for {youtube_id}."
 msgstr ""
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
@@ -10927,10 +10927,6 @@ msgstr ""
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 
-#: xmodule/video_block/video_handlers.py
-msgid "Language is required."
-msgstr ""
-
 #: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr ""
@@ -10951,6 +10947,10 @@ msgstr ""
 
 #: xmodule/video_block/video_block.py
 msgid "Default Video URL"
+msgstr ""
+
+#: xmodule/video_block/video_handlers.py
+msgid "Language is required."
 msgstr ""
 
 #: xmodule/video_block/video_xfields.py
@@ -11689,7 +11689,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Section"
 msgstr ""
 
@@ -12398,7 +12398,7 @@ msgid ""
 "up shortly!"
 msgstr ""
 
-#: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
 msgstr ""
 
@@ -12424,7 +12424,7 @@ msgstr ""
 msgid "Hide Annotations"
 msgstr ""
 
-#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
 msgstr ""
 
@@ -12432,8 +12432,8 @@ msgstr ""
 msgid "Bookmark this page"
 msgstr ""
 
-#: lms/templates/conditional_module.html
-msgid "You do not have access to this dependency module."
+#: lms/templates/conditional_block.html
+msgid "You do not have access to this dependency block."
 msgstr ""
 
 #: lms/templates/course.html
@@ -12952,27 +12952,27 @@ msgid ""
 "{link_start}dashboard{link_end} for courses."
 msgstr ""
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Important!"
 msgstr ""
 
 #. Translators: A button for showing the Previous Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
 msgstr ""
 
 #. Translators: A button for showing the Next Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
 msgstr ""
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Sequence"
 msgstr ""
 
-#: lms/templates/seq_module.html lms/templates/vert_module.html
+#: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr ""
 

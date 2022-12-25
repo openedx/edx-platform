@@ -397,7 +397,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2022-12-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -447,7 +447,7 @@ msgstr "入学考试"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
 msgid "Unit"
 msgstr "单元"
 
@@ -739,115 +739,25 @@ msgstr "您账号已经被禁用。如果您有任何疑问请联系我们{suppo
 msgid "Disabled Account"
 msgstr "已停用的账号"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "男"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "女"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "其他/不想说"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "博士"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "硕士"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "学士"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "肄业证书"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "高中"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "初中"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "小学"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "未受正规教育"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "其他教育程度"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "{platform_name}免费证书{course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "经{platform_name}认证的{course_name}课程证书"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr "{platform_name}的{course_name}专业证书"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "{platform_name}  {course_name}课程证书"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "该语言的 ISO 639-1 代码"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "选课属性中的命名空间"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "选课属性中的名称"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "选课属性中的值"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
 msgstr "注册课程后用户可以退款的期限，以微秒表示。默认值是14天。"
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "UTM cookie名称"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "附属cookie名称"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -855,30 +765,120 @@ msgid ""
 "is_verified, verification_date"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     course_id, username, mode"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "男"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "女"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "其他/不想说"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "博士"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "硕士"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "学士"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "肄业证书"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "高中"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "初中"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "小学"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "未受正规教育"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "其他教育程度"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{platform_name}免费证书{course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "经{platform_name}认证的{course_name}课程证书"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "{platform_name}的{course_name}专业证书"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{platform_name}  {course_name}课程证书"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "该语言的 ISO 639-1 代码"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "UTM cookie名称"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "附属cookie名称"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "用户属性名称。"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "此用户属性值。"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr "备选邮箱"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr "用于恢复关联账号的备选邮箱。"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -886,14 +886,14 @@ msgid ""
 "that employee can login via third party authentication backend only."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     username, current_email, desired_email"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr ""
 
@@ -2311,6 +2311,14 @@ msgstr "附属机构"
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "Open edX"
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Data"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -9541,10 +9549,10 @@ msgstr "来源组件"
 #: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional block. "
+"Copy the component location ID of a component from its Settings dialog in "
 "Studio."
-msgstr "所有源组件的组件位置ID，用于确定是否向学员显示此条件模块的内容。从Studio的“设置”对话框中复制组件的组件位置ID。"
+msgstr ""
 
 #: xmodule/conditional_block.py
 msgid "Conditional Attribute"
@@ -9553,8 +9561,8 @@ msgstr "条件属性"
 #: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
-msgstr "决定学员是否可见此条件模块内容的源组件的属性。"
+"shown the content of this conditional block."
+msgstr ""
 
 #: xmodule/conditional_block.py
 msgid "Conditional Value"
@@ -9563,8 +9571,8 @@ msgstr "条件值"
 #: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
-msgstr "在向学员显示此条件模块的内容之前，源组件的条件属性必须匹配的值。"
+" before a learner is shown the content of this conditional block."
+msgstr ""
 
 #: xmodule/conditional_block.py
 msgid "Blocked Content Message"
@@ -9574,11 +9582,10 @@ msgstr "已屏蔽内容信息"
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
+"show the content of this conditional block. Include {link} in the text of "
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
-"当无法满足显示此条件模块的所有条件时，则显示此条消息。在邮件文本中加入{link}，以便直接为学员提供所需单元的链接。例如，“您必须先完成{link}才能访问此单元。”"
 
 #: xmodule/conditional_block.py
 #, python-brace-format
@@ -11135,9 +11142,9 @@ msgstr "是入学考试"
 
 #: xmodule/seq_block.py
 msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
-msgstr "标记该课程模块作为入学考试。注意，您必须开启此课程设置的入学考试功能才可生效。"
+msgstr ""
 
 #: xmodule/seq_block.py
 msgid "Is Time Limited"
@@ -11320,6 +11327,11 @@ msgstr ""
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
+msgstr ""
+
+#: xmodule/video_block/transcripts_utils.py
+#, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{status_code}."
@@ -11345,10 +11357,6 @@ msgstr "解析SubRip字幕文件时出错。"
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr "{exception_message}: 找不到上传的成绩单: {user_filename}"
 
-#: xmodule/video_block/video_handlers.py
-msgid "Language is required."
-msgstr "语言项必填"
-
 #: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr "基本"
@@ -11370,6 +11378,10 @@ msgstr ""
 #: xmodule/video_block/video_block.py
 msgid "Default Video URL"
 msgstr "默认的视频 URL"
+
+#: xmodule/video_block/video_handlers.py
+msgid "Language is required."
+msgstr "语言项必填"
 
 #: xmodule/video_block/video_xfields.py
 msgid "Component Display Name"
@@ -12127,7 +12139,7 @@ msgid "Vertical"
 msgstr "纵列块"
 
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Section"
 msgstr "章"
 
@@ -12837,7 +12849,7 @@ msgid ""
 "up shortly!"
 msgstr "讨论板块正在进行维护。我们会很快备份内容！"
 
-#: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
 msgstr "未解锁内容"
 
@@ -12863,7 +12875,7 @@ msgstr "指导性讨论"
 msgid "Hide Annotations"
 msgstr "隐藏批注"
 
-#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
 msgstr "已收藏"
 
@@ -12871,9 +12883,9 @@ msgstr "已收藏"
 msgid "Bookmark this page"
 msgstr "收藏此页"
 
-#: lms/templates/conditional_module.html
-msgid "You do not have access to this dependency module."
-msgstr "您无权访问此依赖模块。"
+#: lms/templates/conditional_block.html
+msgid "You do not have access to this dependency block."
+msgstr ""
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -13394,27 +13406,27 @@ msgid ""
 "{link_start}dashboard{link_end} for courses."
 msgstr "您的辅助电子邮件已激活。请访问{link_start}面板{link_end}查看课程。"
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Important!"
 msgstr "重要事项！"
 
 #. Translators: A button for showing the Previous Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
 msgstr ""
 
 #. Translators: A button for showing the Next Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
 msgstr ""
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Sequence"
 msgstr "序列"
 
-#: lms/templates/seq_module.html lms/templates/vert_module.html
+#: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr ""
 

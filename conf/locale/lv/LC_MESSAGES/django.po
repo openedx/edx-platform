@@ -49,7 +49,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2022-12-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Latvian (https://www.transifex.com/open-edx/teams/6205/lv/)\n"
@@ -99,7 +99,7 @@ msgstr "Sākuma eksāmens"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
 msgid "Unit"
 msgstr "Aktivitāte"
 
@@ -407,101 +407,19 @@ msgstr ""
 msgid "Disabled Account"
 msgstr "Atspējots profils"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "Vīrietis"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "Sieviete"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "Cits/Nevēlos teikt"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "Doktora"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "Maģistra vai profesionālais grāds"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "Bakalaura grāds"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "Asociētais grāds"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "Vidusskola"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "Vidusskola (5. - 9. klase)"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "Pamatskola"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "Bez formālas izglītības"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "Cita izglītība"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "{platform_name} Goda kodeksa sertifikāts par  kursu {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "{platform_name} Verificēts sertifikāts par kursu {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr "{platform_name} Profesionāls sertifikāts par kursu {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "{platform_name} Sertifikāts par kursu {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "Šīs valodas ISO 639-1 valodas kods."
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "Reģistrēšanas atribūta nosaukumvieta"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "Reģistrēšanas atribūta nosaukums"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "Reģistrēšanas atribūta vērtība"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
@@ -509,15 +427,7 @@ msgstr ""
 "Laika periods pēc reģistrēšanās, kura laikā lietotājiem var tikt piešķirta "
 "atmaksa, atspoguļots mikrosekundēs. Noklusējuma vērtība - 14 dienas."
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "UTM sīkdatnes nosaukums"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "Sadarbības partnera sīkdatnes nosaukums"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -525,30 +435,120 @@ msgid ""
 "is_verified, verification_date"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     course_id, username, mode"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "Vīrietis"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "Sieviete"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "Cits/Nevēlos teikt"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "Doktora"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "Maģistra vai profesionālais grāds"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "Bakalaura grāds"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "Asociētais grāds"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "Vidusskola"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "Vidusskola (5. - 9. klase)"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "Pamatskola"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "Bez formālas izglītības"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "Cita izglītība"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{platform_name} Goda kodeksa sertifikāts par  kursu {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "{platform_name} Verificēts sertifikāts par kursu {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "{platform_name} Profesionāls sertifikāts par kursu {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{platform_name} Sertifikāts par kursu {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "Šīs valodas ISO 639-1 valodas kods."
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "UTM sīkdatnes nosaukums"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "Sadarbības partnera sīkdatnes nosaukums"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "Šī lietotāja atribūta nosaukums."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "Šī lietotāja atribūta vērtība."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -556,14 +556,14 @@ msgid ""
 "that employee can login via third party authentication backend only."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     username, current_email, desired_email"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr ""
 
@@ -2073,6 +2073,14 @@ msgstr "Sadarbības partneri"
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "Open edX"
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Data"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -9661,13 +9669,10 @@ msgstr "Avota komponenti"
 #: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional block. "
+"Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
-"Komponentu atrašanās vietas ID visiem avota komponentiem, kuri tiek lietoti,"
-" lai noteiktu, vai audzēknis ir parādīts šī nosacījuma moduļa saturā. "
-"Nokopējiet komponenta vietas ID no Studio komponentu iestatījumu dialoga."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Attribute"
@@ -9676,10 +9681,8 @@ msgstr "Nosacījuma atribūts"
 #: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
+"shown the content of this conditional block."
 msgstr ""
-"Avota komponentu atribūts, kas nosaka, vai audzēknim tiek parādīts šī "
-"nosacījuma moduļa saturs."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Value"
@@ -9688,10 +9691,8 @@ msgstr "Nosacījuma vērtība"
 #: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
+" before a learner is shown the content of this conditional block."
 msgstr ""
-"Vērtība, ar kuru ir jāsakrīt avota komponentu nosacījuma atribūtam, pirms "
-"audzēknim tiek parādīts šī nosacījuma moduļa saturs."
 
 #: xmodule/conditional_block.py
 msgid "Blocked Content Message"
@@ -9701,15 +9702,10 @@ msgstr "Ziņojums par bloķētu saturu"
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
+"show the content of this conditional block. Include {link} in the text of "
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
-"Ziņojums, kas tiek parādīts audzēkņiem, kad netiek izpildīti visi "
-"nosacījumi, lai parādītu nosacījuma moduļa saturu. Iekļaujiet {link} Jūsu "
-"ziņojuma tekstā, lai dotu audzēkņiem tiešu saiti uz nepieciešamajiem "
-"elementiem. Piemēram, ‘Jums ir nepieciešams pabeigt {link}, pirms Jūs varat "
-"piekļūt šim elementam’."
 
 #: xmodule/conditional_block.py
 #, python-brace-format
@@ -11464,11 +11460,9 @@ msgstr "Ir iestājpārbaudījums"
 
 #: xmodule/seq_block.py
 msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
-"Atzīmējiet šo kursa moduli kā iestājpārbaudījumu. Ņemiet vērā, ka Jums ir "
-"jāiespējo iestāšanās pārbaudījumi šim kursam, lai iestatījums stātos spēkā."
 
 #: xmodule/seq_block.py
 msgid "Is Time Limited"
@@ -11676,6 +11670,11 @@ msgstr ""
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
+msgstr ""
+
+#: xmodule/video_block/transcripts_utils.py
+#, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{status_code}."
@@ -11707,10 +11706,6 @@ msgstr ""
 "{exception_message}: Nav iespējams atrast augšupielādētos norakstus: "
 "{user_filename}"
 
-#: xmodule/video_block/video_handlers.py
-msgid "Language is required."
-msgstr "Jānorāda valoda"
-
 #: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr "Pamata"
@@ -11735,6 +11730,10 @@ msgstr ""
 #: xmodule/video_block/video_block.py
 msgid "Default Video URL"
 msgstr "Noklusētais video URL"
+
+#: xmodule/video_block/video_handlers.py
+msgid "Language is required."
+msgstr "Jānorāda valoda"
 
 #: xmodule/video_block/video_xfields.py
 msgid "Component Display Name"
@@ -12517,7 +12516,7 @@ msgid "Vertical"
 msgstr "Vertikāls"
 
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Section"
 msgstr "Segments"
 
@@ -13231,7 +13230,7 @@ msgid ""
 "up shortly!"
 msgstr "Diskusijās pašreiz notiek apkope. Mēs tās drīz atkal aktivizēsim!"
 
-#: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
 msgstr "Slēgts saturs"
 
@@ -13259,7 +13258,7 @@ msgstr "Diskusijas ar padomdevējiem"
 msgid "Hide Annotations"
 msgstr "Paslēpt anotācijas"
 
-#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
 msgstr "Grāmatzīme pievienota"
 
@@ -13267,9 +13266,9 @@ msgstr "Grāmatzīme pievienota"
 msgid "Bookmark this page"
 msgstr "Pievienot grāmatzīmi"
 
-#: lms/templates/conditional_module.html
-msgid "You do not have access to this dependency module."
-msgstr "Jums nav pieejas šim atkarības modulim."
+#: lms/templates/conditional_block.html
+msgid "You do not have access to this dependency block."
+msgstr ""
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -13822,27 +13821,27 @@ msgid ""
 "{link_start}dashboard{link_end} for courses."
 msgstr ""
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Important!"
 msgstr "Svarīgi!"
 
 #. Translators: A button for showing the Previous Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
 msgstr "Iepriekšējais"
 
 #. Translators: A button for showing the Next Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
 msgstr "Nākamais"
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Sequence"
 msgstr "Secība"
 
-#: lms/templates/seq_module.html lms/templates/vert_module.html
+#: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr ""
 
