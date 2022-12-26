@@ -117,8 +117,8 @@ class TestCourseCertificateConfigSignal(ModuleStoreTestCase):
         )
         self.course_key = self.course.id
         self.expected_data = CertificateConfigData(
-            course_id=str(self.course_key),
-            title=CERTIFICATE_JSON_WITH_SIGNATORIES['name'],
+            course_key=self.course.id,
+            title=CERTIFICATE_JSON_WITH_SIGNATORIES['course_title'],
             is_active=CERTIFICATE_JSON_WITH_SIGNATORIES['is_active'],
             certificate_type='verified',
             signatories=[
@@ -137,7 +137,7 @@ class TestCourseCertificateConfigSignal(ModuleStoreTestCase):
         Test that the change event is fired when course is in state where a certificate is available.
         """
         CourseModeFactory.create(mode_slug='verified', course_id=self.course.id)
-        sh.emit_course_certificate_config_changed_signal(str(self.course_key), CERTIFICATE_JSON_WITH_SIGNATORIES)
+        sh.emit_course_certificate_config_changed_signal(self.course_key, CERTIFICATE_JSON_WITH_SIGNATORIES)
         mock_signal.assert_called_once_with(certificate_config=self.expected_data)
 
     @patch('cms.djangoapps.contentstore.signals.handlers.COURSE_CERTIFICATE_CONFIG_CHANGED.send_event', autospec=True)
@@ -146,7 +146,7 @@ class TestCourseCertificateConfigSignal(ModuleStoreTestCase):
         Test that the change event is not fired when course is in state where a certificate is not available.
         """
         CourseModeFactory.create(mode_slug='audit', course_id=self.course.id)
-        sh.emit_course_certificate_config_changed_signal(str(self.course_key), CERTIFICATE_JSON_WITH_SIGNATORIES)
+        sh.emit_course_certificate_config_changed_signal(self.course_key, CERTIFICATE_JSON_WITH_SIGNATORIES)
         mock_signal.assert_not_called()
 
     @patch('cms.djangoapps.contentstore.signals.handlers.COURSE_CERTIFICATE_CONFIG_DELETED.send_event', autospec=True)
@@ -155,7 +155,7 @@ class TestCourseCertificateConfigSignal(ModuleStoreTestCase):
         Test that the delete event is fired when course is in state where a certificate is available.
         """
         CourseModeFactory.create(mode_slug='verified', course_id=self.course.id)
-        sh.emit_course_certificate_config_deleted_signal(str(self.course_key), CERTIFICATE_JSON_WITH_SIGNATORIES)
+        sh.emit_course_certificate_config_deleted_signal(self.course_key, CERTIFICATE_JSON_WITH_SIGNATORIES)
         mock_signal.assert_called_once_with(certificate_config=self.expected_data)
 
     @patch('cms.djangoapps.contentstore.signals.handlers.COURSE_CERTIFICATE_CONFIG_DELETED.send_event', autospec=True)
@@ -164,7 +164,7 @@ class TestCourseCertificateConfigSignal(ModuleStoreTestCase):
         Test that the delete event is not fired when course is in state where a certificate is not available.
         """
         CourseModeFactory.create(mode_slug='audit', course_id=self.course.id)
-        sh.emit_course_certificate_config_deleted_signal(str(self.course_key), CERTIFICATE_JSON_WITH_SIGNATORIES)
+        sh.emit_course_certificate_config_deleted_signal(self.course_key, CERTIFICATE_JSON_WITH_SIGNATORIES)
         mock_signal.assert_not_called()
 
 
@@ -180,8 +180,8 @@ class SignalCourseCertificateConfigurationListenerTestCase(TestCase):
         self.user = UserFactory(username='cred-user')
         self.course_key = CourseLocator(org='TestU', course='sig101', run='Summer2022', branch=None, version_guid=None)
         self.expected_data = CertificateConfigData(
-            course_id=str(self.course_key),
-            title=CERTIFICATE_JSON_WITH_SIGNATORIES['name'],
+            course_key=self.course_key,
+            title=CERTIFICATE_JSON_WITH_SIGNATORIES['course_title'],
             is_active=CERTIFICATE_JSON_WITH_SIGNATORIES['is_active'],
             certificate_type='verified',
             signatories=[

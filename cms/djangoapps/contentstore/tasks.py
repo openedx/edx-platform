@@ -677,7 +677,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
             if certificates := course.certificates.get('certificates'):
                 for certificate in certificates:
-                    emit_course_certificate_config_changed_signal(str(courselike_key), certificate)
+                    emit_course_certificate_config_changed_signal(courselike_key, certificate)
 
 
 @shared_task

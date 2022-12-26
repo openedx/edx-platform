@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from edx_rest_api_client.auth import SuppliedJwtAuth
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.credentials.config import USE_LEARNER_RECORD_MFE
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
@@ -119,6 +118,7 @@ def send_course_certificate_configuration(course_id: str, config_data: dict, sig
         )
         credentials_api_base_url = get_credentials_api_base_url()
         api_url = urljoin(f'{credentials_api_base_url}/', 'course_certificates/')
+        config_data['course_id'] = str(config_data.pop('course_key'))
         response = credentials_client.post(
             api_url,
             files=signature_assets,
@@ -140,6 +140,7 @@ def delete_course_certificate_configuration(course_id: str, config_data: dict):
         )
         credentials_api_base_url = get_credentials_api_base_url()
         api_url = urljoin(f'{credentials_api_base_url}/', 'course_certificates/')
+        config_data['course_id'] = str(config_data.pop('course_key'))
         response = credentials_client.delete(
             api_url,
             data=config_data
