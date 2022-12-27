@@ -257,7 +257,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2022-12-18 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -624,104 +624,19 @@ msgstr ""
 msgid "Disabled Account"
 msgstr "حساب معطَّل "
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "ذكر"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "أنثى"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "أخرى/ أفضّل عدم الإفصاح"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "دكتوراه"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "ماجستير أو شهادة مهنيّة"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "درجة البكالوريوس"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "درجة زميل"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "شهادة الثانوية العامة"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "شهادة الثانوية الصغرى/الإعدادية/المرحلة المتوسّطة"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "المدرسة الابتدائية"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "لا يوجد تعليم رسمي"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "تعليم آخر"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "شهادة ميثاق الشرف الأكاديمي من {platform_name} للمساق {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "شهادة موثَّقة من {platform_name} للمساق {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr "شهادة مهنيّة من {platform_name} للمساق {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-"معرّف مؤسستك (إذا كانت مؤسستك تملك صفحة على لينكدإن) على سبيل المثال، 1337. "
-"في حال لم يتم توفيرها، سيتم بشكل افتراضي إرسال اسم النظام الأساسي (مثلاً "
-"edX) بدلاً من ذلك."
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "شهادة من {platform_name} للمساق {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "رمز اللغة أيزو-639-1 لهذه اللغة"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "مساحة الاسم لخاصيّة التسجيل"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "اسم خاصيّة التسجيل"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "قيمة خاصيّة التسجيل"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
@@ -729,15 +644,7 @@ msgstr ""
 "الإطار الزمني التالي للتسجيل والذي يُقبل خلاله إعادة المبلغ المدفوع "
 "للمستخدمين، ممثلًا بأجزاء الثواني. الفترة الافتراضية هي 14 يومًا."
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "اسم ملف تعريف ارتباط UTM"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "اسم ملف تعريف الارتباط التابع"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -748,7 +655,7 @@ msgstr ""
 "العنوان وستكون الأعمدة على النحو التالي: معرف المستخدم ، اسم المستخدم ، "
 "البريد الإلكتروني ، معرف الدورة ، تم التحقق منه ، تاريخ التحقق"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -757,23 +664,116 @@ msgstr ""
 "تتوقع أن يتم توفير البيانات بتنسيق ملف csv مع        سيكون الصف الأول هو "
 "الرأس والأعمدة كما يلي: معرف_الدورة، اسم المستخدم، الوضع"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "ذكر"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "أنثى"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "أخرى/ أفضّل عدم الإفصاح"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "دكتوراه"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "ماجستير أو شهادة مهنيّة"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "درجة البكالوريوس"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "درجة زميل"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "شهادة الثانوية العامة"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "شهادة الثانوية الصغرى/الإعدادية/المرحلة المتوسّطة"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "المدرسة الابتدائية"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "لا يوجد تعليم رسمي"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "تعليم آخر"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "شهادة ميثاق الشرف الأكاديمي من {platform_name} للمساق {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "شهادة موثَّقة من {platform_name} للمساق {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "شهادة مهنيّة من {platform_name} للمساق {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+"معرّف مؤسستك (إذا كانت مؤسستك تملك صفحة على لينكدإن) على سبيل المثال، 1337. "
+"في حال لم يتم توفيرها، سيتم بشكل افتراضي إرسال اسم النظام الأساسي (مثلاً "
+"edX) بدلاً من ذلك."
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "شهادة من {platform_name} للمساق {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "رمز اللغة أيزو-639-1 لهذه اللغة"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "اسم ملف تعريف ارتباط UTM"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "اسم ملف تعريف الارتباط التابع"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "اسم سمة هذا المستخدم."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "قيمة سمة هذا المستخدم."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr "عنوان البريد الإلكتروني الثانوي"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr "عنوان البريد الإلكتروني الثانوي لاسترداد الحساب المرتبط."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -786,7 +786,7 @@ msgstr ""
 "الإلكتروني لأي موظف غير موجود في هذا النموذج ، فيمكن لهذا الموظف تسجيل "
 "الدخول عبر الواجهة الخلفية للمصادقة من جهة خارجية فقط."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -795,7 +795,7 @@ msgstr ""
 "تتوقع أن يتم توفير البيانات بتنسيق ملف csv مع               سيكون الصف الأول"
 " هو الرأس والأعمدة كما يلي: اسم المستخدم، االبريد_الحالي، بريد_الاستعادة"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr "أضف سببًا"
 
@@ -2335,6 +2335,10 @@ msgid "Help Center"
 msgstr "مركز المساعدة"
 
 #: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
@@ -2418,6 +2422,14 @@ msgstr "الشركات التابعة"
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "Open edX"
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Data"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -8634,6 +8646,12 @@ msgstr "حدث خطأ أثناء تغيير كلمة المرور. حاول مر
 msgid "No email address provided."
 msgstr "لم يُحدَّد عنوان بريد إلكتروني."
 
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
 msgid "Registration using {provider} has timed out."
@@ -12215,6 +12233,11 @@ msgstr ""
 
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
+msgstr ""
+
+#: xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
 msgstr ""
 
 #: xmodule/video_module/transcripts_utils.py
@@ -19245,6 +19268,12 @@ msgstr ""
 "يُفضّل أن لا ترسل للمتعلمين أكثر من رسالة واحدة أسبوعياً. ننصح قبل إرسالك "
 "لأي رسالة بمراجعة نصّها بدقة، ثم إرسالها لنفسك أولاً كي يتسنى لك معاينة "
 "التنسيق والتأكد من سلامة الصور والروابط المضمّنة."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

@@ -45,7 +45,6 @@ from lms.djangoapps.instructor_task.tasks_helper.grades import (
     CourseGradeReport,
     ProblemGradeReport,
     ProblemResponses,
-    TempFileProblemGradeReport,
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
@@ -79,17 +78,21 @@ _TEAMS_CONFIG = TeamsConfig({
     'max_size': 2,
     'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}],
 })
+USE_ON_DISK_GRADE_REPORT = 'lms.djangoapps.instructor_task.tasks_helper.grades.use_on_disk_grade_reporting'
 
 
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
     """ Base class for grade report tests. """
 
-    def _verify_cell_data_for_user(self, username, course_id, column_header, expected_cell_content, num_rows=2):
+    def _verify_cell_data_for_user(
+        self, username, course_id, column_header, expected_cell_content, num_rows=2, use_tempfile=False
+    ):
         """
         Verify cell data in the grades CSV for a particular user.
         """
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = CourseGradeReport.generate(None, None, course_id, {}, 'graded')
+            with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
+                result = CourseGradeReport.generate(None, None, course_id, {}, 'graded')
             self.assertDictContainsSubset({'attempted': num_rows, 'succeeded': num_rows, 'failed': 0}, result)
             report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
             report_csv_filename = report_store.links_for(course_id)[0][0]
@@ -112,25 +115,28 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         super().setUp()
         self.course = CourseFactory.create()
 
-    @ddt.data(['student@example.com', 'ni\xf1o@example.com'])
-    def test_unicode_emails(self, emails):
+    @ddt.data(True, False)
+    def test_unicode_emails(self, use_tempfile):
         """
         Test that students with unicode characters in emails is handled.
         """
-        for i, email in enumerate(emails):
+        emails = ['student@example.com', 'ni\xf1o@example.com']
+        for i, email in enumerate(['student@example.com', 'ni\xf1o@example.com']):
             self.create_student(f'student{i}', email)
 
         self.current_task = Mock()  # pylint: disable=attribute-defined-outside-init
         self.current_task.update_state = Mock()
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
-            result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
+            with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
+                result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
         num_students = len(emails)
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
+    @ddt.data(True, False)
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
     @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
-    def test_grading_failure(self, mock_grades_iter, _mock_current_task):
+    def test_grading_failure(self, use_tempfile, mock_grades_iter, _mock_current_task):
         """
         Test that any grading errors are properly reported in the
         progress dict and uploaded to the report store.
@@ -138,7 +144,8 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         mock_grades_iter.return_value = [
             (self.create_student('username', 'student@example.com'), None, TypeError('Cannot grade student'))
         ]
-        result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
+        with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
+            result = CourseGradeReport.generate(None, None, self.course.id, {}, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
 
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
@@ -396,7 +403,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(2):
-                with self.assertNumQueries(48):
+                with self.assertNumQueries(51):
                     CourseGradeReport.generate(None, None, course.id, {}, 'graded')
 
     def test_inactive_enrollments(self):
@@ -422,6 +429,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         )
 
 
+@ddt.ddt
 class TestTeamGradeReport(InstructorGradeReportTestCase):
     """ Test that teams appear correctly in the grade report when it is enabled for the course. """
 
@@ -433,8 +441,11 @@ class TestTeamGradeReport(InstructorGradeReportTestCase):
         self.student2 = UserFactory.create()
         CourseEnrollment.enroll(self.student2, self.course.id)
 
-    def test_team_in_grade_report(self):
-        self._verify_cell_data_for_user(self.student1.username, self.course.id, 'Team Name', '')
+    @ddt.data(True, False)
+    def test_team_in_grade_report(self, use_tempfile):
+        self._verify_cell_data_for_user(
+            self.student1.username, self.course.id, 'Team Name', '', use_tempfile=use_tempfile
+        )
 
     def test_correct_team_name_in_grade_report(self):
         team1 = CourseTeamFactory.create(course_id=self.course.id)
@@ -477,7 +488,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         Temporarily removes the generate_report_data method so we can test
         report generation when it's absent.
         """
-        from xmodule.capa_module import ProblemBlock
+        from xmodule.capa_block import ProblemBlock
         generate_report_data = ProblemBlock.generate_report_data
         del ProblemBlock.generate_report_data
         try:
@@ -532,7 +543,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         assert student_data_keys_list == ['username', 'title', 'location', 'block_key', 'state']
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
-    @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
+    @patch('xmodule.capa_block.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_mock_generate_report_data(self, mock_generate_report_data):
         """
         Ensure that building student data for a block that supports the
@@ -571,7 +582,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         assert student_data[0]['state'] == student_data[1]['state']
         assert student_data_keys_list == ['username', 'title', 'location', 'more', 'some', 'block_key', 'state']
 
-    @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
+    @patch('xmodule.capa_block.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_ordered_generate_report_data(self, mock_generate_report_data):
         """
         Ensure that building student data for a block that returns OrderedDicts from the
@@ -698,7 +709,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         assert len(student_data) == filtered_count
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
-    @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
+    @patch('xmodule.capa_block.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_generate_report_data_not_implemented(
             self,
             mock_generate_report_data,
@@ -794,13 +805,14 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.csv_header_row = ['Student ID', 'Email', 'Username', 'Enrollment Status', 'Grade']
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @ddt.data(ProblemGradeReport, TempFileProblemGradeReport)
-    def test_no_problems(self, problem_grade_report_class, _):
+    @ddt.data(True, False)
+    def test_no_problems(self, use_tempfile, _):
         """
         Verify that we see no grade information for a course with no graded
         problems.
         """
-        result = problem_grade_report_class.generate(None, None, self.course.id, {}, 'graded')
+        with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
+            result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv([
             dict(list(zip(
@@ -814,8 +826,8 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @ddt.data(ProblemGradeReport, TempFileProblemGradeReport)
-    def test_single_problem(self, problem_grade_report_class, _):
+    @ddt.data(True, False)
+    def test_single_problem(self, use_tempfile, _):
         vertical = ItemFactory.create(
             parent_location=self.problem_section.location,
             category='vertical',
@@ -825,7 +837,8 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.define_option_problem('Problem1', parent=vertical)
 
         self.submit_student_answer(self.student_1.username, 'Problem1', ['Option 1'])
-        result = problem_grade_report_class.generate(None, None, self.course.id, {}, 'graded')
+        with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
+            result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         problem_name = 'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
@@ -853,8 +866,8 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @ddt.data(ProblemGradeReport, TempFileProblemGradeReport)
-    def test_single_problem_verified_student_only(self, problem_grade_report_class, _):
+    @ddt.data(True, False)
+    def test_single_problem_verified_student_only(self, use_tempfile, _):
         with patch(
             'lms.djangoapps.instructor_task.tasks_helper.grades.problem_grade_report_verified_only',
             return_value=True,
@@ -870,14 +883,15 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 
             self.submit_student_answer(self.student_1.username, 'Problem1', ['Option 1'])
             self.submit_student_answer(student_verified.username, 'Problem1', ['Option 1'])
-            result = problem_grade_report_class.generate(None, None, self.course.id, {}, 'graded')
+            with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
+                result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
             )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @ddt.data(ProblemGradeReport, TempFileProblemGradeReport)
-    def test_inactive_enrollment_included(self, problem_grade_report_class, _):
+    @ddt.data(True, False)
+    def test_inactive_enrollment_included(self, use_tempfile, _):
         """
         Students with inactive enrollments in a course should be included in Problem Grade Report.
         """
@@ -891,7 +905,8 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.define_option_problem('Problem1', parent=vertical)
 
         self.submit_student_answer(self.student_1.username, 'Problem1', ['Option 1'])
-        result = problem_grade_report_class.generate(None, None, self.course.id, {}, 'graded')
+        with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
+            result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 3, 'succeeded': 3, 'failed': 0}, result)
         problem_name = 'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
@@ -929,6 +944,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
 
+@ddt.ddt
 class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent, InstructorTaskModuleTestCase):
     """
     Test the problem report on a course that has split tests.
@@ -943,7 +959,8 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
         self.define_option_problem(self.problem_a_url, parent=self.vertical_a)
         self.define_option_problem(self.problem_b_url, parent=self.vertical_b)
 
-    def test_problem_grade_report(self):
+    @ddt.data(True, False)
+    def test_problem_grade_report(self, use_tempfile):
         """
         Test that we generate the correct grade report when dealing with A/B tests.
 
@@ -962,7 +979,8 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
         self.submit_student_answer(self.student_b.username, self.problem_b_url, [self.OPTION_1, self.OPTION_2])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
+            with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
+                result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result
             )
@@ -1061,6 +1079,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
         assert self.get_csv_row_with_headers() == header_row
 
 
+@ddt.ddt
 class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, InstructorTaskModuleTestCase):
     """
     Test the problem report on a course that has cohorted content.
@@ -1104,7 +1123,8 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
             ] + grade
         )))
 
-    def test_cohort_content(self):
+    @ddt.data(True, False)
+    def test_cohort_content(self, use_tempfile):
         self.submit_student_answer(self.alpha_user.username, 'Problem0', ['Option 1', 'Option 1'])
         resp = self.submit_student_answer(self.alpha_user.username, 'Problem1', ['Option 1', 'Option 1'])
         assert resp.status_code == 404
@@ -1114,7 +1134,8 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         self.submit_student_answer(self.beta_user.username, 'Problem1', ['Option 1', 'Option 2'])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
+            with patch(USE_ON_DISK_GRADE_REPORT, return_value=use_tempfile):
+                result = ProblemGradeReport.generate(None, None, self.course.id, {}, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 5, 'succeeded': 5, 'failed': 0}, result
             )

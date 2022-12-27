@@ -19,6 +19,7 @@
 # dfxedx <ah532@ya.ru>, 2014
 # DariaTkacheva <d.i.tkacheva@gmail.com>, 2014
 # Dmitri Polevoi <polevaiabrest@gmail.com>, 2014
+# Dmitry Broover, 2022
 # Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # Evgeniya <eugenia000@gmail.com>, 2013
 # elenapykhtina <elenapykhtina@mail.ru>, 2014
@@ -191,7 +192,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2022-12-25 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: ashed <craysy@gmail.com>, 2022\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"

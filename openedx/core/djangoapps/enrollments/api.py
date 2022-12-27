@@ -582,8 +582,8 @@ def is_enrollment_valid_for_proctoring(username, course_id):
         return False
 
     # Check that the course has proctored exams enabled
-    course_module = modulestore().get_course(course_id)
-    if not course_module or not course_module.enable_proctored_exams:
+    course_block = modulestore().get_course(course_id)
+    if not course_block or not course_block.enable_proctored_exams:
         return False
 
     # Only allow verified modes
@@ -592,7 +592,7 @@ def is_enrollment_valid_for_proctoring(username, course_id):
     ]
 
     # If the proctoring provider allows learners in honor mode to take exams, include it
-    if settings.PROCTORING_BACKENDS.get(course_module.proctoring_provider, {}).get('allow_honor_mode'):
+    if settings.PROCTORING_BACKENDS.get(course_block.proctoring_provider, {}).get('allow_honor_mode'):
         appropriate_modes.append(CourseMode.HONOR)
 
     if enrollment['mode'] not in appropriate_modes:

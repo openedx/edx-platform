@@ -14,7 +14,7 @@ from xblock.fields import Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 
-from xmodule.course_module import CourseSummary
+from xmodule.course_block import CourseSummary
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError

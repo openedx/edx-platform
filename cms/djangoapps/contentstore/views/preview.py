@@ -240,7 +240,7 @@ class StudioPartitionService(PartitionService):
     """
     def get_user_group_id_for_partition(self, user, user_partition_id):
         """
-        Override this method to return None, as the split_test_module calls this
+        Override this method to return None, as the split_test_block calls this
         to determine which group a user should see, but is robust to getting a return
         value of None meaning that all groups should be shown.
         """

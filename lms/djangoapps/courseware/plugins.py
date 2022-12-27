@@ -42,14 +42,14 @@ class ProgressCourseApp(CourseApp):
     @classmethod
     def is_enabled(cls, course_key: CourseKey) -> bool:
         """
-        The progress course status is stored in the course module.
+        The progress course status is stored in the course block.
         """
         return not CourseOverview.get_from_id(course_key).hide_progress_tab
 
     @classmethod
     def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
         """
-        The progress course enabled/disabled status is stored in the course module.
+        The progress course enabled/disabled status is stored in the course block.
         """
         course = get_course_by_id(course_key)
         course.hide_progress_tab = not enabled

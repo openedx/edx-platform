@@ -24,7 +24,7 @@ from edx_django_utils.monitoring import set_custom_attributes_for_course_key
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.course_block import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
@@ -561,17 +561,17 @@ def render_accordion(request, course, table_of_contents):
     return render_to_string('courseware/accordion.html', context)
 
 
-def save_child_position(seq_module, child_name):
+def save_child_position(seq_block, child_name):
     """
     child_name: url_name of the child
     """
-    for position, child in enumerate(seq_module.get_display_items(), start=1):
+    for position, child in enumerate(seq_block.get_display_items(), start=1):
         if child.location.block_id == child_name:
             # Only save if position changed
-            if position != seq_module.position:
-                seq_module.position = position
+            if position != seq_block.position:
+                seq_block.position = position
     # Save this new position to the underlying KeyValueStore
-    seq_module.save()
+    seq_block.save()
 
 
 def save_positions_recursively_up(user, request, field_data_cache, xmodule, course=None):

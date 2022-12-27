@@ -48,10 +48,10 @@ class TextInputHintsTest(HintTest):
 
     def test_tracking_log(self):
         """Test that the tracking log comes out right."""
-        self.problem.capa_module.reset_mock()
+        self.problem.capa_block.reset_mock()
         self.get_hint('1_3_1', 'Blue')
-        self.problem.capa_module.runtime.publish.assert_called_with(
-            self.problem.capa_module,
+        self.problem.capa_block.runtime.publish.assert_called_with(
+            self.problem.capa_block,
             'edx.problem.hint.feedback_displayed',
             {'module_id': 'i4x://Foo/bar/mock/abc',
              'problem_part_id': '1_2',
@@ -224,8 +224,8 @@ class NumericInputHintsTest(HintTest):
 
     def test_tracking_log(self):
         self.get_hint('1_2_1', '1.141')
-        self.problem.capa_module.runtime.publish.assert_called_with(
-            self.problem.capa_module,
+        self.problem.capa_block.runtime.publish.assert_called_with(
+            self.problem.capa_block,
             'edx.problem.hint.feedback_displayed',
             {'module_id': 'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_1', 'trigger_type': 'single',
              'hint_label': 'Nice',
@@ -363,8 +363,8 @@ class CheckboxHintsTestTracking(HintTest):
         """Test checkbox tracking log - by far the most complicated case"""
         # A -> 1 hint
         self.get_hint('1_2_1', ['choice_0'])
-        self.problem.capa_module.runtime.publish.assert_called_with(
-            self.problem.capa_module,
+        self.problem.capa_block.runtime.publish.assert_called_with(
+            self.problem.capa_block,
             'edx.problem.hint.feedback_displayed',
             {'hint_label': 'Incorrect:',
              'module_id': 'i4x://Foo/bar/mock/abc',
@@ -378,10 +378,10 @@ class CheckboxHintsTestTracking(HintTest):
         )
 
         # B C -> 2 hints
-        self.problem.capa_module.runtime.publish.reset_mock()
+        self.problem.capa_block.runtime.publish.reset_mock()
         self.get_hint('1_2_1', ['choice_1', 'choice_2'])
-        self.problem.capa_module.runtime.publish.assert_called_with(
-            self.problem.capa_module,
+        self.problem.capa_block.runtime.publish.assert_called_with(
+            self.problem.capa_block,
             'edx.problem.hint.feedback_displayed',
             {'hint_label': 'Incorrect:',
              'module_id': 'i4x://Foo/bar/mock/abc',
@@ -398,10 +398,10 @@ class CheckboxHintsTestTracking(HintTest):
         )
 
         # A C -> 1 Compound hint
-        self.problem.capa_module.runtime.publish.reset_mock()
+        self.problem.capa_block.runtime.publish.reset_mock()
         self.get_hint('1_2_1', ['choice_0', 'choice_2'])
-        self.problem.capa_module.runtime.publish.assert_called_with(
-            self.problem.capa_module,
+        self.problem.capa_block.runtime.publish.assert_called_with(
+            self.problem.capa_block,
             'edx.problem.hint.feedback_displayed',
             {'hint_label': 'Correct:',
              'module_id': 'i4x://Foo/bar/mock/abc',
@@ -428,10 +428,10 @@ class MultpleChoiceHintsTest(HintTest):
 
     def test_tracking_log(self):
         """Test that the tracking log comes out right."""
-        self.problem.capa_module.reset_mock()
+        self.problem.capa_block.reset_mock()
         self.get_hint('1_3_1', 'choice_2')
-        self.problem.capa_module.runtime.publish.assert_called_with(
-            self.problem.capa_module,
+        self.problem.capa_block.runtime.publish.assert_called_with(
+            self.problem.capa_block,
             'edx.problem.hint.feedback_displayed',
             {'module_id': 'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_2', 'trigger_type': 'single',
              'student_answer': ['choice_2'], 'correctness': False, 'question_type': 'multiplechoiceresponse',
@@ -469,10 +469,10 @@ class MultpleChoiceHintsWithHtmlTest(HintTest):
 
     def test_tracking_log(self):
         """Test that the tracking log comes out right."""
-        self.problem.capa_module.reset_mock()
+        self.problem.capa_block.reset_mock()
         self.get_hint('1_2_1', 'choice_0')
-        self.problem.capa_module.runtime.publish.assert_called_with(
-            self.problem.capa_module,
+        self.problem.capa_block.runtime.publish.assert_called_with(
+            self.problem.capa_block,
             'edx.problem.hint.feedback_displayed',
             {'module_id': 'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_1', 'trigger_type': 'single',
              'student_answer': ['choice_0'], 'correctness': False, 'question_type': 'multiplechoiceresponse',
@@ -503,10 +503,10 @@ class DropdownHintsTest(HintTest):
 
     def test_tracking_log(self):
         """Test that the tracking log comes out right."""
-        self.problem.capa_module.reset_mock()
+        self.problem.capa_block.reset_mock()
         self.get_hint('1_3_1', 'FACES')
-        self.problem.capa_module.runtime.publish.assert_called_with(
-            self.problem.capa_module,
+        self.problem.capa_block.runtime.publish.assert_called_with(
+            self.problem.capa_block,
             'edx.problem.hint.feedback_displayed',
             {'module_id': 'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_2', 'trigger_type': 'single',
              'student_answer': ['FACES'], 'correctness': True, 'question_type': 'optionresponse',

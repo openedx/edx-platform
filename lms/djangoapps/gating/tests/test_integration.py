@@ -11,7 +11,7 @@ from edx_toggles.toggles.testutils import override_waffle_switch
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -28,7 +28,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
     Base TestCase class for setting up a basic course structure
     and testing the gating feature
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -48,14 +48,14 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         """
         Set up a course for testing gated content.
         """
-        cls.course = CourseFactory.create(
+        course = CourseFactory.create(
             org='edX',
             number='EDX101',
             run='EDX101_RUN1',
             display_name='edX 101'
         )
-        with modulestore().bulk_operations(cls.course.id):
-            cls.course.enable_subsection_gating = True
+        with modulestore().bulk_operations(course.id):
+            course.enable_subsection_gating = True
             grading_policy = {
                 "GRADER": [{
                     "type": "Homework",
@@ -65,34 +65,33 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
                     "weight": 1.0
                 }]
             }
-            cls.course.grading_policy = grading_policy
-            cls.course.save()
-            cls.store.update_item(cls.course, 0)
+            course.grading_policy = grading_policy
+            course.save()
 
             # create chapter
             cls.chapter1 = ItemFactory.create(
-                parent_location=cls.course.location,
+                parent=course,
                 category='chapter',
                 display_name='chapter 1'
             )
 
             # create sequentials
             cls.seq1 = ItemFactory.create(
-                parent_location=cls.chapter1.location,
+                parent=cls.chapter1,
                 category='sequential',
                 display_name='gating sequential 1',
                 graded=True,
                 format='Homework',
             )
             cls.seq2 = ItemFactory.create(
-                parent_location=cls.chapter1.location,
+                parent=cls.chapter1,
                 category='sequential',
                 display_name='gated sequential 2',
                 graded=True,
                 format='Homework',
             )
             cls.seq3 = ItemFactory.create(
-                parent_location=cls.chapter1.location,
+                parent=cls.chapter1,
                 category='sequential',
                 display_name='sequential 3',
                 graded=True,
@@ -101,7 +100,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
 
             # create problem
             cls.gating_prob1 = ItemFactory.create(
-                parent_location=cls.seq1.location,
+                parent=cls.seq1,
                 category='problem',
                 display_name='gating problem 1',
             )
@@ -109,7 +108,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
             # this should give us ability to test gating with blocks
             # which needs to be excluded from completion tracking
             ItemFactory.create(
-                parent_location=cls.seq1.location,
+                parent=cls.seq1,
                 category="discussion",
                 discussion_id="discussion 1",
                 discussion_category="discussion category",
@@ -117,15 +116,17 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
             )
 
             cls.gated_prob2 = ItemFactory.create(
-                parent_location=cls.seq2.location,
+                parent=cls.seq2,
                 category='problem',
                 display_name='gated problem 2',
             )
             cls.prob3 = ItemFactory.create(
-                parent_location=cls.seq3.location,
+                parent=cls.seq3,
                 category='problem',
                 display_name='problem 3',
             )
+        # get updated course
+        cls.course = cls.store.get_item(course.location)
 
     def setup_gating_milestone(self, min_score, min_completion):
         """
@@ -149,7 +150,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         # access to gating content (seq1) remains constant
         assert bool(has_access(user, 'load', self.seq1, self.course.id))
 
-        # access to gated content (seq2) remains constant, access is prevented in SeqModule loading
+        # access to gated content (seq2) remains constant, access is prevented in SeqBlock loading
         assert bool(has_access(user, 'load', self.seq2, self.course.id))
 
     def assert_user_has_prereq_milestone(self, user, expected_has_milestone):

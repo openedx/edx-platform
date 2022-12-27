@@ -312,7 +312,7 @@ class SplitTestPosition(SharedModuleStoreTestCase):
         self.client.login(username=self.student.username, password='test')
 
     def test_changing_position_works(self):
-        # Make a mock FieldDataCache for this course, so we can get the course module
+        # Make a mock FieldDataCache for this course, so we can get the course block
         mock_field_data_cache = FieldDataCache([self.course], self.course.id, self.student)
         course = get_module_for_descriptor(
             self.student,

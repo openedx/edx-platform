@@ -876,6 +876,47 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
             }
         )
 
+    @override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, True)
+    def test_new_course_structure_response(self):
+        """
+        Tests whether the new structure is available on old topics API
+        (For mobile compatibility)
+        """
+        chapter = ItemFactory.create(
+            parent_location=self.course.location,
+            category='chapter',
+            display_name="Week 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        sequential = ItemFactory.create(
+            parent_location=chapter.location,
+            category='sequential',
+            display_name="Lesson 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        ItemFactory.create(
+            parent_location=sequential.location,
+            category='vertical',
+            display_name='vertical',
+            start=datetime(2015, 4, 1, tzinfo=UTC),
+        )
+        DiscussionsConfiguration.objects.create(
+            context_key=self.course.id,
+            provider_type=Provider.OPEN_EDX
+        )
+        update_discussions_settings_from_course_task(str(self.course.id))
+        response = json.loads(self.client.get(self.url).content.decode())
+        keys = ['children', 'id', 'name', 'thread_counts', 'thread_list_url']
+        assert list(response.keys()) == ['courseware_topics', 'non_courseware_topics']
+        assert len(response['courseware_topics']) == 1
+        courseware_keys = list(response['courseware_topics'][0].keys())
+        courseware_keys.sort()
+        assert courseware_keys == keys
+        assert len(response['non_courseware_topics']) == 1
+        non_courseware_keys = list(response['non_courseware_topics'][0].keys())
+        non_courseware_keys.sort()
+        assert non_courseware_keys == keys
+
 
 @ddt.ddt
 @mock.patch('lms.djangoapps.discussion.rest_api.api._get_course', mock.Mock())
@@ -1331,7 +1372,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "topic_id": "test_topic",
             "type": "discussion",
             "title": "Test Title",
-            "raw_body": "# Test \n This is a very long body that will be truncated for the preview.",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
         }
         response = self.client.post(
             self.url,
@@ -1342,16 +1383,17 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == self.expected_thread_data({
             "read": True,
-            "raw_body": "# Test \n This is a very long body that will be truncated for the preview.",
-            "preview_body": "Test This is a very long body that…",
-            "rendered_body": "<h1>Test</h1>\n<p>This is a very long body that will be truncated for the preview.</p>",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+            "preview_body": "Test This is a very long body but will not be truncated for the preview.",
+            "rendered_body": "<h1>Test</h1>\n<p>This is a very long body but will not be truncated for"
+                             " the preview.</p>",
         })
         assert parsed_body(httpretty.last_request()) == {
             'course_id': [str(self.course.id)],
             'commentable_id': ['test_topic'],
             'thread_type': ['discussion'],
             'title': ['Test Title'],
-            'body': ['# Test \n This is a very long body that will be truncated for the preview.'],
+            'body': ['# Test \n This is a very long body but will not be truncated for the preview.'],
             'user_id': [str(self.user.id)],
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],

@@ -11,7 +11,7 @@ from opaque_keys.edx.locator import CourseLocator
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
-from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 

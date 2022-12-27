@@ -13,8 +13,8 @@ from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.conditional_module import ConditionalBlock
-from xmodule.error_module import ErrorBlock
+from xmodule.conditional_block import ConditionalBlock
+from xmodule.error_block import ErrorBlock
 from xmodule.modulestore.xml import CourseLocationManager, ImportSystem, XMLModuleStore
 from xmodule.tests import DATA_DIR, get_test_descriptor_system, get_test_system
 from xmodule.tests.xml import XModuleXmlImportTest
@@ -54,7 +54,7 @@ class ConditionalBlockFactory(xml.XmlImportFactory):
 
 class ConditionalFactory:
     """
-    A helper class to create a conditional module and associated source and child modules
+    A helper class to create a conditional block and associated source and child blocks
     to allow for testing.
     """
     @staticmethod
@@ -114,7 +114,7 @@ class ConditionalFactory:
 
         system.descriptor_runtime = descriptor_system
 
-        # construct conditional module:
+        # construct conditional block:
         cond_location = BlockUsageLocator(CourseLocator("edX", "conditional_test", "test_run", deprecated=True),
                                           "conditional", "SampleConditional", deprecated=True)
         field_data = DictFieldData({
@@ -144,8 +144,8 @@ class ConditionalFactory:
 
 class ConditionalBlockBasicTest(unittest.TestCase):
     """
-    Make sure that conditional module works, using mocks for
-    other modules.
+    Make sure that conditional block works, using mocks for
+    other blocks.
     """
 
     def setUp(self):
@@ -200,7 +200,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         fragments = ajax['fragments']
         assert not any(('This is a secret' in item['content']) for item in fragments)
 
-    @patch('xmodule.conditional_module.log')
+    @patch('xmodule.conditional_block.log')
     def test_conditional_with_staff_only_source_module(self, mock_log):
         modules = ConditionalFactory.create(
             self.test_system,
@@ -233,8 +233,8 @@ class ConditionalBlockXmlTest(unittest.TestCase):
 
     @patch('xmodule.x_module.descriptor_global_local_resource_url')
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})
-    def test_conditional_module(self, _):
-        """Make sure that conditional module works"""
+    def test_conditional_block(self, _):
+        """Make sure that conditional block works"""
         # edx - HarvardX
         # cond_test - ER22x
         location = BlockUsageLocator(CourseLocator("HarvardX", "ER22x", "2013_Spring", deprecated=True),
@@ -268,7 +268,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         fragments = ajax['fragments']
         assert any(('This is a secret' in item['content']) for item in fragments)
 
-    def test_conditional_module_with_empty_sources_list(self):
+    def test_conditional_block_with_empty_sources_list(self):
         """
         If a ConditionalBlock is initialized with an empty sources_list, we assert that the sources_list is set
         via generating UsageKeys from the values in xml_attributes['sources']
@@ -292,7 +292,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         assert conditional.sources_list[0] == BlockUsageLocator.from_string(conditional.xml_attributes['sources'])\
             .replace(run=dummy_location.course_key.run)
 
-    def test_conditional_module_parse_sources(self):
+    def test_conditional_block_parse_sources(self):
         dummy_system = Mock()
         dummy_location = BlockUsageLocator(CourseLocator("edX", "conditional_test", "test_run"),
                                            "conditional", "SampleConditional")
@@ -310,7 +310,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         assert conditional.parse_sources(conditional.xml_attributes) == ['i4x://HarvardX/ER22x/poll_question/T15_poll',
                                                                          'i4x://HarvardX/ER22x/poll_question/T16_poll']
 
-    def test_conditional_module_parse_attr_values(self):
+    def test_conditional_block_parse_attr_values(self):
         root = '<conditional attempted="false"></conditional>'
         xml_object = etree.XML(root)
         definition = ConditionalBlock.definition_from_xml(xml_object, Mock())[0]

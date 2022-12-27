@@ -17,8 +17,8 @@ dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-
 @patch(
     'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
 )
-@patch('xmodule.html_module.HtmlBlock.author_view', dummy_render, create=True)
-@patch('xmodule.html_module.HtmlBlock.has_author_view', True, create=True)
+@patch('xmodule.html_block.HtmlBlock.author_view', dummy_render, create=True)
+@patch('xmodule.html_block.HtmlBlock.has_author_view', True, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
 class TestLibraryRoot(MixedSplitTestCase):
     """

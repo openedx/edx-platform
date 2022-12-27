@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2022-12-18 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -416,101 +416,19 @@ msgstr ""
 msgid "Disabled Account"
 msgstr "გაუქმებული ანგარიში"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "მამრობითი"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "მდედრობითი"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "სხვა/მირჩევნია არ მივუთითო"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "დოქტორის ხარისხი"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "მაგისტრის ან პროფესორის ხარისხი"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "ბაკალავრის ხარისხი"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "ასოციაციის ხარისხი"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "საშუალო/უმაღლესი სკოლა"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "დაუსრულებელი საშუალო"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "დაწყებითი სკოლა"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "არაფორმალური განათლება"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "სხვა განათლება"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "{platform_name} ღირსების კოდექსის სერტიფიკატი {course_name}-სთვის"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "{platform_name} დამოწმებული სერტიფიკატი {course_name}-სთვის"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr "{platform_name} პროფესიული სერტიფიკატი {course_name}-სთვის"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "{platform_name} სერტიფიკატი {course_name}-სთვის"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "ISO 639-1 ენის კოდი ამ ენისთვის."
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "ჩარიცხვის ატრიბუტის სახელთა სივრცე"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "ჩარიცხვის ატრიბურტის სახელი"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "ჩარიცხვის ატრიბუტის მნიშვნელობა"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
@@ -518,15 +436,7 @@ msgstr ""
 "რეგისტრაციის შემდეგ მომხმარებლებისთვის თანხის ანაზღაურების დროის ფანჯარა "
 "გამოსახულია მიკროწამებში. სტანდარტული ვადა არის 14 დღე."
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "UTM ქუქი ჩანაწერის სახელი"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "აფილირებული ქუქის დასახელება"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -534,30 +444,120 @@ msgid ""
 "is_verified, verification_date"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     course_id, username, mode"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "მამრობითი"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "მდედრობითი"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "სხვა/მირჩევნია არ მივუთითო"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "დოქტორის ხარისხი"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "მაგისტრის ან პროფესორის ხარისხი"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "ბაკალავრის ხარისხი"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "ასოციაციის ხარისხი"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "საშუალო/უმაღლესი სკოლა"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "დაუსრულებელი საშუალო"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "დაწყებითი სკოლა"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "არაფორმალური განათლება"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "სხვა განათლება"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{platform_name} ღირსების კოდექსის სერტიფიკატი {course_name}-სთვის"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "{platform_name} დამოწმებული სერტიფიკატი {course_name}-სთვის"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "{platform_name} პროფესიული სერტიფიკატი {course_name}-სთვის"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{platform_name} სერტიფიკატი {course_name}-სთვის"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "ISO 639-1 ენის კოდი ამ ენისთვის."
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "UTM ქუქი ჩანაწერის სახელი"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "აფილირებული ქუქის დასახელება"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "მოცემული მომხმარებლის ატრიბუტის სახელი"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "მოცემული მომხმარებლის ატრიბუტის მნიშვნელობა"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -565,14 +565,14 @@ msgid ""
 "that employee can login via third party authentication backend only."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     username, current_email, desired_email"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr ""
 
@@ -1950,6 +1950,10 @@ msgid "Help Center"
 msgstr "დახმარების ცენტრი"
 
 #: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "მედია ფაილების ნაკრები"
@@ -2032,6 +2036,14 @@ msgstr ""
 #. Translators: 'Open edX' is a trademark, please keep this untranslated
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Data"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -7971,6 +7983,12 @@ msgstr ""
 msgid "No email address provided."
 msgstr "ელფოსტის მისამართი არ არის მითითებული."
 
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
 msgid "Registration using {provider} has timed out."
@@ -11438,6 +11456,11 @@ msgstr ""
 
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
+msgstr ""
+
+#: xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
 msgstr ""
 
 #: xmodule/video_module/transcripts_utils.py
@@ -18227,6 +18250,12 @@ msgstr ""
 "თქვენს შეტყობინებას გააგზავნით, ყურადღებით გადახედეთ ტექსტს და პირველ რიგში "
 "საკუთარ თავს გაუგზავნეთ, ისე რომ შეძლოთ ფორმატირების წინასწარი დათვალიერება "
 "და დარწმუნდეთ, რომ ჩასმული გამოსახულებები და ბმულები სწორად მუშაობს."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

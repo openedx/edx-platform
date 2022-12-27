@@ -114,7 +114,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2022-12-18 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -458,115 +458,25 @@ msgstr "このアカウントは無効です。エラーと思われる場合に
 msgid "Disabled Account"
 msgstr "アカウント失効"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "男性"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "女性"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "その他/言いたくない"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "大学院卒（博士課程修了）"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "大学院卒（修士課程修了）"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "大学学部卒"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "短大・専門学校卒"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "高校卒"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "中学校卒"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "小学校卒"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "学歴なし"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "その他"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "{course_name}講座の{platform_name} Honor Code修了証"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "{course_name}講座の{platform_name} 認証付き修了証"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr "{course_name}講座の{platform_name} Professional Certificate"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "{course_name}講座の{platform_name} 修了証"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "この言語の言語コード ISO 639-1 。"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "受講登録属性の名称スペース"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "受講登録属性の名称"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "受講登録属性の値"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
 msgstr "受講申込後に受講者が払い戻しできる期間をマイクロセカンドの単位で指定してください。既定値は14日間です。"
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "UTM クッキーの名称"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "アフェリエイトクッキーの名称"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -574,30 +484,120 @@ msgid ""
 "is_verified, verification_date"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     course_id, username, mode"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "男性"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "女性"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "その他/言いたくない"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "大学院卒（博士課程修了）"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "大学院卒（修士課程修了）"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "大学学部卒"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "短大・専門学校卒"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "高校卒"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "中学校卒"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "小学校卒"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "学歴なし"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "その他"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{course_name}講座の{platform_name} Honor Code修了証"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "{course_name}講座の{platform_name} 認証付き修了証"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "{course_name}講座の{platform_name} Professional Certificate"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{course_name}講座の{platform_name} 修了証"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "この言語の言語コード ISO 639-1 。"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "UTM クッキーの名称"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "アフェリエイトクッキーの名称"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "このユーザーの属性の名称。"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "このユーザーの属性の値。"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -605,14 +605,14 @@ msgid ""
 "that employee can login via third party authentication backend only."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     username, current_email, desired_email"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr ""
 
@@ -1940,6 +1940,10 @@ msgid "Help Center"
 msgstr "ヘルプセンター"
 
 #: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "メディアキット"
@@ -2022,6 +2026,14 @@ msgstr ""
 #. Translators: 'Open edX' is a trademark, please keep this untranslated
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Data"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -7766,6 +7778,12 @@ msgstr ""
 msgid "No email address provided."
 msgstr "メールアドレスが指定されていません。"
 
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
 msgid "Registration using {provider} has timed out."
@@ -10968,6 +10986,11 @@ msgstr ""
 
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
+msgstr ""
+
+#: xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
 msgstr ""
 
 #: xmodule/video_module/transcripts_utils.py
@@ -17336,6 +17359,12 @@ msgid ""
 "embedded images and links work correctly."
 msgstr ""
 "受講者に対して週2通以上メールを送信しないことを推奨します。メール送る前に文章を丁寧に読み返して、まずはご自身宛に送信し、フォーマットを事前確認したり画像やリンクが正しいか確認してください。"
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

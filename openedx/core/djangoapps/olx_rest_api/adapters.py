@@ -14,7 +14,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore as store
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.xml_module import XmlMixin
+from xmodule.xml_block import XmlMixin
 
 from common.djangoapps.static_replace import replace_static_urls
 

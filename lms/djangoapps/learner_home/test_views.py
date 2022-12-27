@@ -325,6 +325,18 @@ class TestGetCourseOverviewsForPseudoSessions(SharedModuleStoreTestCase):
         # Then I should get an empty dict
         self.assertDictEqual(course_overviews, {})
 
+    def test_entitlement_without_pseudo_session(self):
+        # Given an unfulfilled entitlement which does not have a psuedo session
+        pseudo_sessions = {
+            uuid4(): None,
+        }
+
+        # When I query course overviews
+        course_overviews = get_course_overviews_for_pseudo_sessions(pseudo_sessions)
+
+        # Then I should gracefully return none for that entitlement
+        self.assertDictEqual(course_overviews, {})
+
 
 class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
     """Tests for get_email_settings_info"""

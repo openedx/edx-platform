@@ -49,6 +49,6 @@ class CCXCourseSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_course_modules(obj):
         """
-        Getter for the Course Modules. The list is stored in a compressed field.
+        Getter for the Course Blocks. The list is stored in a compressed field.
         """
         return obj.structure or []

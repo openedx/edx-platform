@@ -65,13 +65,13 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.client = Client()
         cache.clear()
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.refund_cutoff_date')
     def test_refundable(self, cutoff_date):
         """ Assert base case is refundable"""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
         assert self.enrollment.refundable()
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.refund_cutoff_date')
     def test_refundable_expired_verification(self, cutoff_date):
         """ Assert that enrollment is refundable if course mode has expired."""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
@@ -79,7 +79,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.verified_mode.save()
         assert self.enrollment.refundable()
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.refund_cutoff_date')
     def test_refundable_when_certificate_exists(self, cutoff_date):
         """ Assert that enrollment is not refundable once a certificat has been generated."""
 
@@ -108,7 +108,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.enrollment.can_refund = True
         assert self.enrollment.refundable()
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.refund_cutoff_date')
     def test_refundable_with_cutoff_date(self, cutoff_date):
         """ Assert enrollment is refundable before cutoff and not refundable after."""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
@@ -156,7 +156,8 @@ class RefundableTest(SharedModuleStoreTestCase):
             value=self.ORDER_NUMBER
         )
 
-        with patch('common.djangoapps.student.models.EnrollmentRefundConfiguration.current') as config:
+        CONFIG_METHOD_NAME = 'common.djangoapps.student.models.course_enrollment.EnrollmentRefundConfiguration.current'
+        with patch(CONFIG_METHOD_NAME) as config:
             instance = config.return_value
             instance.refund_window = refund_period
             assert self.enrollment.refund_cutoff_date() == (expected_date + refund_period)

@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from pyquery import PyQuery as pq
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -1123,7 +1123,7 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
     to check whether a sequence contains content type gated blocks
     The content_type_gate_for_block can be used to return the content type gate for a given block
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
@@ -1153,6 +1153,8 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
                 category='vertical',
                 display_name='Lesson 1 Vertical - Unit 1'
             )
+        # get updated course
+        course = self.store.get_item(course.location)
         return {
             'course': course,
             'blocks': blocks_dict,
@@ -1206,6 +1208,9 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
             graded=False,
             metadata=METADATA,
         )
+        # get updated course
+        course['course'] = self.store.get_item(course['course'].location)
+        blocks_dict['vertical'] = self.store.get_item(blocks_dict['vertical'].location)
 
         # The method returns a content type gate for blocks that should be gated
         assert ContentTypeGatingService().check_children_for_content_type_gating_paywall(
@@ -1218,6 +1223,9 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
             graded=True,
             metadata=METADATA,
         )
+        # get updated course
+        course['course'] = self.store.get_item(course['course'].location)
+        blocks_dict['vertical'] = self.store.get_item(blocks_dict['vertical'].location)
 
         # The method returns None for blocks that should not be gated
         assert 'content-paywall' in ContentTypeGatingService().check_children_for_content_type_gating_paywall(

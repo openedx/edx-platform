@@ -1109,7 +1109,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
     def test_backwards_compatibility(self):
         # The test course being used has show_timezone = False in the policy file
         # (and no due_date_display_format set). This is to test our backwards compatibility--
-        # in course_module's init method, the date_display_format will be set accordingly to
+        # in course_block's init method, the date_display_format will be set accordingly to
         # remove the timezone.
         course = self.set_up_course(due_date_display_format=None, show_timezone=False)
         response = self.get_response(course)

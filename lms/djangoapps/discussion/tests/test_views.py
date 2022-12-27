@@ -19,7 +19,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_AMNESTY_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
@@ -91,7 +91,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('common.djangoapps.student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.user.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             password = 'test'
@@ -110,8 +110,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         config.enabled = True
         config.save()
 
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.user.cc.User.active_threads')
     def test_user_profile_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -127,8 +127,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         response = self.client.get(url)
         assert response.status_code == 404
 
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.subscribed_threads')
+    @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.user.cc.User.subscribed_threads')
     def test_user_followed_threads_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -1661,7 +1661,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         assert self.client.login(username=username, password=password)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
     def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):
         """
         Test that XSS attack is prevented
@@ -1677,8 +1677,8 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         self.assertNotContains(resp, malicious_code)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.user.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.user.cc.User.active_threads')
     def test_forum_user_profile_xss_prevent(self, malicious_code, mock_threads, mock_from_django_user, mock_request):
         """
         Test that XSS attack is prevented
@@ -1905,6 +1905,8 @@ class DividedDiscussionsTestCase(CohortViewsTestCase):  # lint-amnesty, pylint: 
             discussion_target="Discussion",
             start=datetime.now()
         )
+        # get updated course
+        self.course = self.store.get_item(self.course.location)
         # course-wide discussion
         discussion_topics = {
             "Topic B": {"id": "Topic B"},
@@ -1927,7 +1929,7 @@ class CourseDiscussionTopicsTestCase(DividedDiscussionsTestCase):
     """
     Tests the `divide_discussion_topics` view.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def test_non_staff(self):
         """
@@ -1983,7 +1985,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
     """
     Tests the course_discussion_settings_handler
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def get_expected_response(self):
         """

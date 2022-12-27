@@ -850,7 +850,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
 
 class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
     """
-    Tests indexing of content groups on course modules using split modulestore.
+    Tests indexing of content groups on course blocks using split modulestore.
     """
     CREATE_USER = True
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
@@ -860,7 +860,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         super().setUp()
 
         self._setup_course_with_content()
-        self._setup_split_test_module()
+        self._setup_split_test_block()
         self._setup_content_groups()
         self.reload_course()
 
@@ -950,9 +950,9 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit3.parent = self.vertical2
 
-    def _setup_split_test_module(self):
+    def _setup_split_test_block(self):
         """
-        Set up split test module.
+        Set up split test block.
         """
         c0_url = self.course.id.make_usage_key("vertical", "condition_0_vertical")
         c1_url = self.course.id.make_usage_key("vertical", "condition_1_vertical")

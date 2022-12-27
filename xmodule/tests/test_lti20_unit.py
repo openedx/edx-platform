@@ -10,14 +10,14 @@ from pytz import UTC
 from xblock.field_data import DictFieldData
 
 from xmodule.lti_2_util import LTIError
-from xmodule.lti_module import LTIBlock
+from xmodule.lti_block import LTIBlock
 from xmodule.tests.helpers import StubUserService
 
 from . import get_test_system
 
 
 class LTI20RESTResultServiceTest(unittest.TestCase):
-    """Logic tests for LTI module. LTI2.0 REST ResultService"""
+    """Logic tests for LTI block. LTI2.0 REST ResultService"""
 
     USER_STANDIN = Mock()
     USER_STANDIN.id = 999

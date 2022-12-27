@@ -60,7 +60,7 @@
 # Mariana Baroni <maribaroni@gmail.com>, 2014
 # Matheus Andrade <matheusflkandrade@hotmail.com>, 2014
 # Matheus Gomes Correia, 2017
-# Matheus Gomes Correia, 2017
+# Matheus Gomes, 2017
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Nayse Hillesheim <nayse.hillesheim@gmail.com>, 2016
 # Ned Batchelder <ned@edx.org>, 2016
@@ -246,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2022-12-25 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Rodrigo Rocha <prof.rodrigorocha@yahoo.com>, 2020\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"

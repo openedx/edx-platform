@@ -23,14 +23,14 @@ class LmsUtilsTest(ModuleStoreTestCase):
         self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
         self.sequential = ItemFactory.create(category="sequential", parent_location=self.chapter.location)
         self.vertical = ItemFactory.create(category="vertical", parent_location=self.sequential.location)
-        self.html_module_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
+        self.html_block_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
         self.vertical_with_container = ItemFactory.create(
             category="vertical", parent_location=self.sequential.location
         )
         self.child_container = ItemFactory.create(
             category="split_test", parent_location=self.vertical_with_container.location)
         self.child_vertical = ItemFactory.create(category="vertical", parent_location=self.child_container.location)
-        self.child_html_module = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
+        self.child_html_block = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
 
         # Read again so that children lists are accurate
         self.course = self.store.get_item(self.course.location)
@@ -41,16 +41,16 @@ class LmsUtilsTest(ModuleStoreTestCase):
         self.vertical_with_container = self.store.get_item(self.vertical_with_container.location)
         self.child_container = self.store.get_item(self.child_container.location)
         self.child_vertical = self.store.get_item(self.child_vertical.location)
-        self.child_html_module = self.store.get_item(self.child_html_module.location)
+        self.child_html_block = self.store.get_item(self.child_html_block.location)
 
     def test_get_parent_unit(self):
         """
         Tests `get_parent_unit` method for the successful result.
         """
-        parent = utils.get_parent_unit(self.html_module_1)
+        parent = utils.get_parent_unit(self.html_block_1)
         assert parent.location == self.vertical.location
 
-        parent = utils.get_parent_unit(self.child_html_module)
+        parent = utils.get_parent_unit(self.child_html_block)
         assert parent.location == self.vertical_with_container.location
 
         assert utils.get_parent_unit(None) is None
@@ -63,6 +63,6 @@ class LmsUtilsTest(ModuleStoreTestCase):
         """
         Tests `is_unit` method for the successful result.
         """
-        assert not utils.is_unit(self.html_module_1)
+        assert not utils.is_unit(self.html_block_1)
         assert not utils.is_unit(self.child_vertical)
         assert utils.is_unit(self.vertical)

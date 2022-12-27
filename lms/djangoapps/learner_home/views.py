@@ -182,6 +182,8 @@ def get_course_overviews_for_pseudo_sessions(unfulfilled_entitlement_pseudo_sess
 
     # Get course IDs from unfulfilled entitlement pseudo sessions
     for pseudo_session in unfulfilled_entitlement_pseudo_sessions.values():
+        if not pseudo_session:
+            continue
         course_id = pseudo_session.get("key")
         if course_id:
             course_ids.append(CourseKey.from_string(course_id))

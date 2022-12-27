@@ -24,11 +24,11 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locations import CourseLocator
 from path import Path as path
-from xmodule.capa_module import ProblemBlock
+from xmodule.capa_block import ProblemBlock
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.utils import empty_asset_trashcan, restore_asset_from_trashcan
-from xmodule.course_module import CourseBlock, Textbook
+from xmodule.course_block import CourseBlock, Textbook
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -37,8 +37,8 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
-from xmodule.seq_module import SequenceBlock
-from xmodule.video_module import VideoBlock
+from xmodule.seq_block import SequenceBlock
+from xmodule.video_block import VideoBlock
 
 from cms.djangoapps.contentstore.config import waffle
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
@@ -283,14 +283,14 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         # first check a static asset link
         course_key = self.store.make_course_key('edX', 'toy', 'run')
-        html_module_location = course_key.make_usage_key('html', 'nonportable')
-        html_module = self.store.get_item(html_module_location)
-        self.assertIn('/static/foo.jpg', html_module.data)
+        html_block_location = course_key.make_usage_key('html', 'nonportable')
+        html_block = self.store.get_item(html_block_location)
+        self.assertIn('/static/foo.jpg', html_block.data)
 
         # then check a intra courseware link
-        html_module_location = course_key.make_usage_key('html', 'nonportable_link')
-        html_module = self.store.get_item(html_module_location)
-        self.assertIn('/jump_to_id/nonportable_link', html_module.data)
+        html_block_location = course_key.make_usage_key('html', 'nonportable_link')
+        html_block = self.store.get_item(html_block_location)
+        self.assertIn('/jump_to_id/nonportable_link', html_block.data)
 
     def verify_content_existence(self, store, root_dir, course_id, dirname, category_name, filename_suffix=''):  # lint-amnesty, pylint: disable=missing-function-docstring
         filesystem = OSFS(root_dir / 'test_export')
@@ -302,7 +302,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
             self.assertTrue(filesystem.exists(item.location.block_id + filename_suffix))
 
-    @mock.patch('xmodule.course_module.requests.get')
+    @mock.patch('xmodule.course_block.requests.get')
     def test_export_course_roundtrip(self, mock_get):
         mock_get.return_value.text = dedent("""
             <?xml version="1.0"?><table_of_contents>
@@ -348,7 +348,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         # check for policy.json
         self.assertTrue(filesystem.exists('policy.json'))
 
-        # compare what's on disk to what we have in the course module
+        # compare what's on disk to what we have in the course block
         with filesystem.open('policy.json', 'r') as course_policy:
             on_disk = loads(course_policy.read())
             self.assertIn('course/2012_Fall', on_disk)
@@ -403,7 +403,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_if_not_present=True)
         course_id = self.store.make_course_key('edX', 'toy', '2012_Fall')
 
-        # create a new video module and add it as a child to a vertical
+        # create a new video block and add it as a child to a vertical
         # this re-creates a bug whereby since the video template doesn't have
         # anything in 'data' field, the export was blowing up
         verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
@@ -525,12 +525,12 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         import_course_from_xml(self.store, self.user.id, root_dir, create_if_not_present=True)
 
         # get the sample HTML with styling information
-        html_module = self.store.get_item(course_id.make_usage_key('html', 'with_styling'))
-        self.assertIn('<p style="font:italic bold 72px/30px Georgia, serif; color: red; ">', html_module.data)
+        html_block = self.store.get_item(course_id.make_usage_key('html', 'with_styling'))
+        self.assertIn('<p style="font:italic bold 72px/30px Georgia, serif; color: red; ">', html_block.data)
 
         # get the sample HTML with just a simple <img> tag information
-        html_module = self.store.get_item(course_id.make_usage_key('html', 'just_img'))
-        self.assertIn('<img src="/static/foo_bar.jpg" />', html_module.data)
+        html_block = self.store.get_item(course_id.make_usage_key('html', 'just_img'))
+        self.assertIn('<img src="/static/foo_bar.jpg" />', html_block.data)
 
     def test_export_course_without_content_store(self):
         # Create toy course
@@ -912,7 +912,7 @@ class MiscCourseTests(ContentStoreTestCase):
         num_drafts = self._get_draft_counts(course)
         self.assertEqual(num_drafts, 1)
 
-    @mock.patch('xmodule.course_module.requests.get')
+    @mock.patch('xmodule.course_block.requests.get')
     def test_import_textbook_as_content_element(self, mock_get):
         mock_get.return_value.text = dedent("""
             <?xml version="1.0"?><table_of_contents>
@@ -1195,8 +1195,8 @@ class ContentStoreTest(ContentStoreTestCase):
         """Test new course creation and verify default language"""
         test_course_data = self.assert_created_course()
         course_id = _get_course_id(self.store, test_course_data)
-        course_module = self.store.get_course(course_id)
-        self.assertEqual(course_module.language, 'hr')
+        course_block = self.store.get_course(course_id)
+        self.assertEqual(course_block.language, 'hr')
 
     def test_create_course_with_dots(self):
         """Test new course creation with dots in the name"""
@@ -1518,7 +1518,7 @@ class ContentStoreTest(ContentStoreTestCase):
         retarget = str(course.id.make_usage_key('chapter', 'REPLACE')).replace('REPLACE', r'([0-9]|[a-f]){3,}')
         self.assertRegex(data['locator'], retarget)
 
-    def test_capa_module(self):
+    def test_capa_block(self):
         """Test that a problem treats markdown specially."""
         course = CourseFactory.create()
 
@@ -1617,12 +1617,12 @@ class ContentStoreTest(ContentStoreTestCase):
         #
 
         # first check PDF textbooks, to make sure the url paths got updated
-        course_module = self.store.get_course(target_id)
+        course_block = self.store.get_course(target_id)
 
-        self.assertEqual(len(course_module.pdf_textbooks), 1)
-        self.assertEqual(len(course_module.pdf_textbooks[0]["chapters"]), 2)
-        self.assertEqual(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/static/Chapter1.pdf')
-        self.assertEqual(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/static/Chapter2.pdf')
+        self.assertEqual(len(course_block.pdf_textbooks), 1)
+        self.assertEqual(len(course_block.pdf_textbooks[0]["chapters"]), 2)
+        self.assertEqual(course_block.pdf_textbooks[0]["chapters"][0]["url"], '/static/Chapter1.pdf')
+        self.assertEqual(course_block.pdf_textbooks[0]["chapters"][1]["url"], '/static/Chapter2.pdf')
 
     def test_import_into_new_course_id_wiki_slug_renamespacing(self):
         # If reimporting into the same course do not change the wiki_slug.
@@ -1634,14 +1634,14 @@ class ContentStoreTest(ContentStoreTestCase):
             'run': target_id.run
         }
         _create_course(self, target_id, course_data)
-        course_module = self.store.get_course(target_id)
-        course_module.wiki_slug = 'toy'
-        course_module.save()
+        course_block = self.store.get_course(target_id)
+        course_block.wiki_slug = 'toy'
+        course_block.save()
 
         # Import a course with wiki_slug == location.course
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], target_id=target_id)
-        course_module = self.store.get_course(target_id)
-        self.assertEqual(course_module.wiki_slug, 'toy')
+        course_block = self.store.get_course(target_id)
+        self.assertEqual(course_block.wiki_slug, 'toy')
 
         # But change the wiki_slug if it is a different course.
         target_id = self.store.make_course_key('MITx', '111', '2013_Spring')
@@ -1655,13 +1655,13 @@ class ContentStoreTest(ContentStoreTestCase):
 
         # Import a course with wiki_slug == location.course
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], target_id=target_id)
-        course_module = self.store.get_course(target_id)
-        self.assertEqual(course_module.wiki_slug, 'MITx.111.2013_Spring')
+        course_block = self.store.get_course(target_id)
+        self.assertEqual(course_block.wiki_slug, 'MITx.111.2013_Spring')
 
         # Now try importing a course with wiki_slug == '{0}.{1}.{2}'.format(location.org, location.course, location.run)
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['two_toys'], target_id=target_id)
-        course_module = self.store.get_course(target_id)
-        self.assertEqual(course_module.wiki_slug, 'MITx.111.2013_Spring')
+        course_block = self.store.get_course(target_id)
+        self.assertEqual(course_block.wiki_slug, 'MITx.111.2013_Spring')
 
     def test_import_metadata_with_attempts_empty_string(self):
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['simple'], create_if_not_present=True)
@@ -1797,8 +1797,8 @@ class ContentStoreTest(ContentStoreTestCase):
 
         course_key = _get_course_id(self.store, self.course_data)
         _create_course(self, course_key, self.course_data)
-        course_module = self.store.get_course(course_key)
-        self.assertEqual(course_module.wiki_slug, 'MITx.111.2013_Spring')
+        course_block = self.store.get_course(course_key)
+        self.assertEqual(course_block.wiki_slug, 'MITx.111.2013_Spring')
 
     def test_course_handler_with_invalid_course_key_string(self):
         """Test viewing the course overview page with invalid course id"""
