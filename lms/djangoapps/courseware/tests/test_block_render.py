@@ -1918,7 +1918,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
             descriptor=descriptor,
             student_data=Mock(spec=FieldData, name='student_data'),
             course_id=course_id,
-            track_function=Mock(name='track_function'), # Track Function
+            track_function=Mock(name='track_function'),  # Track Function
             request_token='request_token',
             course=self.course,
         )

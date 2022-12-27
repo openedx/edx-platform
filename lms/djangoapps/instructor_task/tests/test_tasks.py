@@ -78,7 +78,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         )
         return instructor_task
 
-    def _get_xmodule_instance_args(self):
+    def _get_block_instance_args(self):
         """
         Calculate dummy values for parameters needed for instantiating xmodule instances.
         """
@@ -97,7 +97,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.current_task.update_state = Mock()
         if expected_failure_message is not None:
             self.current_task.update_state.side_effect = TestTaskFailure(expected_failure_message)
-        task_args = [entry_id, self._get_xmodule_instance_args()]
+        task_args = [entry_id, self._get_block_instance_args()]
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_get_task:
             mock_get_task.return_value = self.current_task
@@ -107,7 +107,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         """Check that a task_class fails when celery doesn't provide a current_task."""
         task_entry = self._create_input_entry()
         with pytest.raises(ValueError):
-            task_class(task_entry.id, self._get_xmodule_instance_args())
+            task_class(task_entry.id, self._get_block_instance_args())
 
     def _test_undefined_course(self, task_class):
         """Run with celery, but with no course defined."""
@@ -293,8 +293,8 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         del mock_instance.set_score
         with patch(
                 'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal'
-        ) as mock_get_module:
-            mock_get_module.return_value = mock_instance
+        ) as mock_get_block:
+            mock_get_block.return_value = mock_instance
             with pytest.raises(UpdateProblemModuleStateError):
                 self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
         # check values stored in table:
@@ -339,8 +339,8 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         task_entry = self._create_input_entry(score=0)
         with patch(
                 'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal'
-        ) as mock_get_module:
-            mock_get_module.return_value = mock_instance
+        ) as mock_get_block:
+            mock_get_block.return_value = mock_instance
             mock_instance.max_score = MagicMock(return_value=99999.0)
             mock_instance.weight = 99999.0
             self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
@@ -425,8 +425,8 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         mock_instance = MagicMock()
         del mock_instance.rescore_problem
         del mock_instance.rescore
-        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal') as mock_get_module:  # lint-amnesty, pylint: disable=line-too-long
-            mock_get_module.return_value = mock_instance
+        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal') as mock_get_block:  # lint-amnesty, pylint: disable=line-too-long
+            mock_get_block.return_value = mock_instance
             with pytest.raises(UpdateProblemModuleStateError):
                 self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
         # check values stored in table:
@@ -475,8 +475,8 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         task_entry = self._create_input_entry()
         with patch(
                 'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal'
-        ) as mock_get_module:
-            mock_get_module.return_value = mock_instance
+        ) as mock_get_block:
+            mock_get_block.return_value = mock_instance
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
 
         self.assert_task_output(
@@ -671,10 +671,10 @@ class TestOra2ResponsesInstructorTask(TestInstructorTasks):
 
     def test_ora2_runs_task(self):
         task_entry = self._create_input_entry()
-        task_xmodule_args = self._get_xmodule_instance_args()
+        task_xblock_args = self._get_block_instance_args()
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
-            export_ora2_data(task_entry.id, task_xmodule_args)
+            export_ora2_data(task_entry.id, task_xblock_args)
             action_name = gettext_noop('generated')
 
             assert mock_main_task.call_count == 1
@@ -701,10 +701,10 @@ class TestOra2ExportSubmissionFilesInstructorTask(TestInstructorTasks):
 
     def test_ora2_runs_task(self):
         task_entry = self._create_input_entry()
-        task_xmodule_args = self._get_xmodule_instance_args()
+        task_xblock_args = self._get_block_instance_args()
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
-            export_ora2_submission_files(task_entry.id, task_xmodule_args)
+            export_ora2_submission_files(task_entry.id, task_xblock_args)
             action_name = gettext_noop('compressed')
 
             assert mock_main_task.call_count == 1
@@ -731,10 +731,10 @@ class TestOra2SummaryInstructorTask(TestInstructorTasks):
 
     def test_ora2_runs_task(self):
         task_entry = self._create_input_entry()
-        task_xmodule_args = self._get_xmodule_instance_args()
+        task_xblock_args = self._get_block_instance_args()
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
-            export_ora2_summary(task_entry.id, task_xmodule_args)
+            export_ora2_summary(task_entry.id, task_xblock_args)
             action_name = gettext_noop('generated')
 
             assert mock_main_task.call_count == 1

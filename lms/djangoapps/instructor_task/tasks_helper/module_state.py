@@ -39,7 +39,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     The student modules are fetched for update the `update_fcn` is called on each StudentModule
     that passes the resulting filtering. It is passed four arguments:  the module_descriptor for
     the module pointed to by the module_state_key, the particular StudentModule to update, the
-    xmodule_instance_args, and the task_input being passed through.  If the value returned by the
+    xblock_instance_args, and the task_input being passed through.  If the value returned by the
     update function evaluates to a boolean True, the update is successful; False indicates the update
     on the particular student module failed.
     A raised exception indicates a fatal condition -- that no other student modules should be considered.
@@ -110,7 +110,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
 
 
 @outer_atomic
-def rescore_problem_module_state(xmodule_instance_args, module_descriptor, student_module, task_input):
+def rescore_problem_module_state(xblock_instance_args, module_descriptor, student_module, task_input):
     '''
     Takes an XModule descriptor and a corresponding StudentModule object, and
     performs rescoring on the student's problem submission.
@@ -136,7 +136,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
             course_id,
             student,
             module_descriptor,
-            xmodule_instance_args,
+            xblock_instance_args,
             grade_bucket_type='rescore',
             course=course
         )
@@ -208,7 +208,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
 
 
 @outer_atomic
-def override_score_module_state(xmodule_instance_args, module_descriptor, student_module, task_input):
+def override_score_module_state(xblock_instance_args, module_descriptor, student_module, task_input):
     '''
     Takes an XModule descriptor and a corresponding StudentModule object, and
     performs an override on the student's problem score.
@@ -233,7 +233,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
             course_id,
             student,
             module_descriptor,
-            xmodule_instance_args,
+            xblock_instance_args,
             course=course
         )
 
@@ -288,7 +288,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
 
 
 @outer_atomic
-def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, student_module, _task_input):
+def reset_attempts_module_state(xblock_instance_args, _module_descriptor, student_module, _task_input):
     """
     Resets problem attempts to zero for specified `student_module`.
 
@@ -306,7 +306,7 @@ def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, stude
             student_module.save()
             # get request-related tracking information from args passthrough,
             # and supplement with task-specific information:
-            track_function = _get_track_function_for_task(student_module.student, xmodule_instance_args)
+            track_function = _get_track_function_for_task(student_module.student, xblock_instance_args)
             event_info = {"old_attempts": old_number_of_attempts, "new_attempts": 0}
             track_function('problem_reset_attempts', event_info)
             update_status = UPDATE_STATUS_SUCCEEDED
@@ -315,7 +315,7 @@ def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, stude
 
 
 @outer_atomic
-def delete_problem_module_state(xmodule_instance_args, _module_descriptor, student_module, _task_input):
+def delete_problem_module_state(xblock_instance_args, _module_descriptor, student_module, _task_input):
     """
     Delete the StudentModule entry.
 
@@ -324,19 +324,19 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
     student_module.delete()
     # get request-related tracking information from args passthrough,
     # and supplement with task-specific information:
-    track_function = _get_track_function_for_task(student_module.student, xmodule_instance_args)
+    track_function = _get_track_function_for_task(student_module.student, xblock_instance_args)
     track_function('problem_delete_state', {})
     return UPDATE_STATUS_SUCCEEDED
 
 
-def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule_instance_args=None,
+def _get_module_instance_for_task(course_id, student, module_descriptor, xblock_instance_args=None,
                                   grade_bucket_type=None, course=None):
     """
     Fetches a StudentModule instance for a given `course_id`, `student` object, and `module_descriptor`.
 
-    `xmodule_instance_args` is used to provide information for creating a track function and an XQueue callback.
+    `xblock_instance_args` is used to provide information for creating a track function and an XQueue callback.
     These are passed, along with `grade_bucket_type`, to get_block_for_descriptor_internal, which sidesteps
-    the need for a Request object when instantiating an xmodule instance.
+    the need for a Request object when instantiating an xblock instance.
     """
     # reconstitute the problem's corresponding XModule:
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course_id, student, module_descriptor)
@@ -344,8 +344,8 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
 
     # get request-related tracking information from args passthrough, and supplement with task-specific
     # information:
-    request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
-    task_info = {"student": student.username, "task_id": _get_task_id_from_xmodule_args(xmodule_instance_args)}
+    request_info = xblock_instance_args.get('request_info', {}) if xblock_instance_args is not None else {}
+    task_info = {"student": student.username, "task_id": _get_task_id_from_xblock_args(xblock_instance_args)}
 
     def make_track_function():
         '''
@@ -371,7 +371,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     )
 
 
-def _get_track_function_for_task(student, xmodule_instance_args=None, source_page='x_module_task'):
+def _get_track_function_for_task(student, xblock_instance_args=None, source_page='x_module_task'):
     """
     Make a tracking function that logs what happened.
 
@@ -381,18 +381,18 @@ def _get_track_function_for_task(student, xmodule_instance_args=None, source_pag
     """
     # get request-related tracking information from args passthrough, and supplement with task-specific
     # information:
-    request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
-    task_info = {'student': student.username, 'task_id': _get_task_id_from_xmodule_args(xmodule_instance_args)}
+    request_info = xblock_instance_args.get('request_info', {}) if xblock_instance_args is not None else {}
+    task_info = {'student': student.username, 'task_id': _get_task_id_from_xblock_args(xblock_instance_args)}
 
     return lambda event_type, event: task_track(request_info, task_info, event_type, event, page=source_page)
 
 
-def _get_task_id_from_xmodule_args(xmodule_instance_args):
-    """Gets task_id from `xmodule_instance_args` dict, or returns default value if missing."""
-    if xmodule_instance_args is None:
+def _get_task_id_from_xblock_args(xblock_instance_args):
+    """Gets task_id from `xblock_instance_args` dict, or returns default value if missing."""
+    if xblock_instance_args is None:
         return UNKNOWN_TASK_ID
     else:
-        return xmodule_instance_args.get('task_id', UNKNOWN_TASK_ID)
+        return xblock_instance_args.get('task_id', UNKNOWN_TASK_ID)
 
 
 def _get_modules_to_update(course_id, usage_keys, student_identifier, filter_fcn, override_score_task=False):
