@@ -15,4 +15,7 @@ urlpatterns = [
     re_path(
         r"^recommendation/", include("lms.djangoapps.learner_home.recommendations.urls")
     ),
+    re_path(
+        r"^twou_widget_context/", include("lms.djangoapps.learner_home.twou_widgets.urls")
+    ),
 ]
