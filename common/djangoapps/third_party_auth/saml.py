@@ -49,33 +49,33 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         except KeyError:
             return self.setting(name, default)
 
-    def auth_complete(self, *args, **kwargs):
-        """
-        The user has been redirected back from the IdP and we should
-        now log them in, if everything checks out.
-        """
-        log.info('strategy.request_data')
-        log.info(self.strategy.request_data())
-        idp_name = 'default'
-        idp = self.get_idp(idp_name)
-        auth = self._create_saml_auth(idp)
-        auth.process_response()
-        errors = auth.get_errors()
-        if errors or not auth.is_authenticated():
-            reason = auth.get_last_error_reason()
-            raise AuthFailed(self, f"SAML login failed: {errors} ({reason})")
+    # def auth_complete(self, *args, **kwargs):
+    #     """
+    #     The user has been redirected back from the IdP and we should
+    #     now log them in, if everything checks out.
+    #     """
+    #     log.info('strategy.request_data')
+    #     log.info(self.strategy.request_data())
+    #     idp_name = 'default'
+    #     idp = self.get_idp(idp_name)
+    #     auth = self._create_saml_auth(idp)
+    #     auth.process_response()
+    #     errors = auth.get_errors()
+    #     if errors or not auth.is_authenticated():
+    #         reason = auth.get_last_error_reason()
+    #         raise AuthFailed(self, f"SAML login failed: {errors} ({reason})")
 
-        attributes = auth.get_attributes()
-        attributes["name_id"] = auth.get_nameid()
-        self._check_entitlements(idp, attributes)
-        response = {
-            "idp_name": idp_name,
-            "attributes": attributes,
-            "session_index": auth.get_session_index(),
-        }
-        kwargs.update({"response": response, "backend": self})
-        return self.strategy.authenticate(*args, **kwargs)
-        
+    #     attributes = auth.get_attributes()
+    #     attributes["name_id"] = auth.get_nameid()
+    #     self._check_entitlements(idp, attributes)
+    #     response = {
+    #         "idp_name": idp_name,
+    #         "attributes": attributes,
+    #         "session_index": auth.get_session_index(),
+    #     }
+    #     kwargs.update({"response": response, "backend": self})
+    #     return self.strategy.authenticate(*args, **kwargs)
+
     def generate_saml_config(self, idp=None):
         """
         Override of SAMLAuth.generate_saml_config to use an idp's configured saml_sp_configuration if given.
