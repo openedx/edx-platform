@@ -635,7 +635,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         courselike_items = import_func(
             modulestore(), user.id,
             settings.GITHUB_REPO_ROOT, [dirpath],
-            load_error_modules=False,
+            load_error_blocks=False,
             static_content_store=contentstore(),
             target_id=courselike_key,
             verbose=True,

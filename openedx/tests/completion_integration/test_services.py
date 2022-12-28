@@ -117,24 +117,24 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
             completion=0.75,
         )
 
-    def _bind_course_block(self, module):
+    def _bind_course_block(self, block):
         """
-        Bind a module (part of self.course) so we can access student-specific data.
+        Bind a block (part of self.course) so we can access student-specific data.
         """
-        module_system = get_test_system(course_id=module.location.course_key)
-        module_system.descriptor_runtime = module.runtime._descriptor_system  # pylint: disable=protected-access
+        module_system = get_test_system(course_id=block.location.course_key)
+        module_system.descriptor_runtime = block.runtime._descriptor_system  # pylint: disable=protected-access
         module_system._services['library_tools'] = LibraryToolsService(self.store, self.user.id)  # pylint: disable=protected-access
 
         def get_block(descriptor):
             """Mocks module_system get_block_for_descriptor function"""
-            sub_module_system = get_test_system(course_id=module.location.course_key)
+            sub_module_system = get_test_system(course_id=block.location.course_key)
             sub_module_system.get_block_for_descriptor = get_block
             sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.bind_for_student(sub_module_system, self.user.id)
             return descriptor
 
         module_system.get_block_for_descriptor = get_block
-        module.xmodule_runtime = module_system
+        block.xmodule_runtime = module_system
 
     def test_completion_service(self):
         # Only the completions for the user and course specified for the CompletionService

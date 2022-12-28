@@ -42,14 +42,14 @@ class RandomizeBlock(
 
     User notes:
 
-      - If you're randomizing amongst graded modules, each of them MUST be worth the same
+      - If you're randomizing amongst graded blocks, each of them MUST be worth the same
         number of points.  Otherwise, the earth will be overrun by monsters from the
         deeps.  You have been warned.
 
     Technical notes:
       - There is more dark magic in this code than I'd like.  The whole varying-children +
         grading interaction is a tangle between super and subclasses of descriptors and
-        modules.
+        blocks.
 """
     choice = Integer(help="Which random child was chosen", scope=Scope.user_state)
 
@@ -120,6 +120,6 @@ class RandomizeBlock(
     def has_dynamic_children(self):
         """
         Grading needs to know that only one of the children is actually "real".  This
-        makes it use module.get_child_descriptors().
+        makes it use block.get_child_descriptors().
         """
         return True

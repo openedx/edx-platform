@@ -1,5 +1,5 @@
 """
-Module for running content split tests
+Block for running content split tests
 """
 
 
@@ -107,7 +107,7 @@ class SplitTestFields:
     # Block.  (expected invariant that we'll need to test, and handle
     # authoring tools that mess this up)
     group_id_to_child = ReferenceValueDict(
-        help=_("Which child module students in a particular group_id should see"),
+        help=_("Which child block students in a particular group_id should see"),
         scope=Scope.content
     )
 
@@ -115,7 +115,7 @@ class SplitTestFields:
 def get_split_user_partitions(user_partitions):
     """
     Helper method that filters a list of user_partitions and returns just the
-    ones that are suitable for the split_test module.
+    ones that are suitable for the split_test block.
     """
     return [user_partition for user_partition in user_partitions if user_partition.scheme.name == "random"]
 
@@ -148,7 +148,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     Technical notes:
       - There is more dark magic in this code than I'd like.  The whole varying-children +
         grading interaction is a tangle between super and subclasses of descriptors and
-        modules.
+        blocks.
     """
     resources_dir = 'assets/split_test'
 
@@ -467,7 +467,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
                 descriptor = system.process_xml(etree.tostring(child))
                 children.append(descriptor.scope_ids.usage_id)
             except Exception:  # lint-amnesty, pylint: disable=broad-except
-                msg = "Unable to load child when parsing split_test module."
+                msg = "Unable to load child when parsing split_test block."
                 log.exception(msg)
                 system.error_tracker(msg)
 
@@ -486,7 +486,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     def has_dynamic_children(self):
         """
         Grading needs to know that only one of the children is actually "real".  This
-        makes it use module.get_child_descriptors().
+        makes it use block.get_child_descriptors().
         """
         return True
 
@@ -540,7 +540,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
     def get_selected_partition(self):
         """
-        Returns the partition that this split module is currently using, or None
+        Returns the partition that this split block is currently using, or None
         if the currently selected partition ID does not match any of the defined partitions.
         """
         for user_partition in self.user_partitions:  # lint-amnesty, pylint: disable=not-an-iterable
@@ -637,7 +637,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
                     )
                 )
             else:
-                # If the user_partition selected is not valid for the split_test module, error.
+                # If the user_partition selected is not valid for the split_test block, error.
                 # This can only happen via XML and import/export.
                 if not get_split_user_partitions([user_partition]):
                     split_validation.add(

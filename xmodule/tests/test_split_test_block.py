@@ -1,5 +1,5 @@
 """
-Tests for the Split Testing Module
+Tests for the Split Testing Block
 """
 import json
 from unittest.mock import Mock, patch
@@ -35,7 +35,7 @@ class SplitTestBlockFactory(xml.XmlImportFactory):
 
 class SplitTestUtilitiesTest(PartitionTestCase):
     """
-    Tests for utility methods related to split_test module.
+    Tests for utility methods related to split_test block.
     """
 
     def test_split_user_partitions(self):
@@ -585,7 +585,7 @@ class SplitTestBlockExportImportTest(MixedSplitTestCase):
         # And compare.
         assert exported_olx == expected_olx
 
-        runtime = TestImportSystem(load_error_modules=True, course_id=split_test_block.location.course_key)
+        runtime = TestImportSystem(load_error_blocks=True, course_id=split_test_block.location.course_key)
         runtime.resources_fs = export_fs
 
         # Now import it.

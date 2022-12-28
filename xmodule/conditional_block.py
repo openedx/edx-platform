@@ -60,18 +60,18 @@ class ConditionalBlock(
         </conditional>
 
         <conditional> tag attributes:
-            sources - location id of required modules, separated by ';'
+            sources - location id of required blocks, separated by ';'
 
-            submitted - map to `is_submitted` module method.
+            submitted - map to `is_submitted` block method.
             (pressing RESET button makes this function to return False.)
 
-            attempted - map to `is_attempted` module method
-            correct - map to `is_correct` module method
-            poll_answer - map to `poll_answer` module attribute
-            voted - map to `voted` module attribute
+            attempted - map to `is_attempted` block method
+            correct - map to `is_correct` block method
+            poll_answer - map to `poll_answer` block attribute
+            voted - map to `voted` block attribute
 
         <show> tag attributes:
-            sources - location id of required modules, separated by ';'
+            sources - location id of required blocks, separated by ';'
 
         You can add you own rules for <conditional> tag, like
         "completed", "attempted" etc. To do that yo must extend
@@ -83,7 +83,7 @@ class ConditionalBlock(
                 ...
             </conditional>
 
-        And my_property/my_method will be called for required modules.
+        And my_property/my_method will be called for required blocks.
 
     """
 
@@ -170,7 +170,7 @@ class ConditionalBlock(
 
     # Map
     # key: <tag attribute in xml>
-    # value: <name of module attribute>
+    # value: <name of block attribute>
     conditions_map = {
         'poll_answer': 'poll_answer',  # poll_question attr
 
@@ -210,20 +210,20 @@ class ConditionalBlock(
         attr_name = self.conditions_map[self.conditional_attr]
 
         if self.conditional_value and self.get_required_blocks:
-            for module in self.get_required_blocks:
-                if not hasattr(module, attr_name):
+            for block in self.get_required_blocks:
+                if not hasattr(block, attr_name):
                     # We don't throw an exception here because it is possible for
-                    # the descriptor of a required module to have a property but
+                    # the descriptor of a required block to have a property but
                     # for the resulting module to be a (flavor of) ErrorBlock.
                     # So just log and return false.
-                    if module is not None:
-                        # We do not want to log when module is None, and it is when requester
-                        # does not have access to the requested required module.
+                    if block is not None:
+                        # We do not want to log when block is None, and it is when requester
+                        # does not have access to the requested required block.
                         log.warning('Error in conditional block: \
-                            required module {module} has no {module_attr}'.format(module=module, module_attr=attr_name))
+                            required module {block} has no {block_attr}'.format(block=block, block_attr=attr_name))
                     return False
 
-                attr = getattr(module, attr_name)
+                attr = getattr(block, attr_name)
                 if callable(attr):
                     attr = attr()
 
@@ -278,7 +278,7 @@ class ConditionalBlock(
         return fragment
 
     def handle_ajax(self, _dispatch, _data):
-        """This is called by courseware.moduleodule_render, to handle
+        """This is called by courseware.block_render, to handle
         an AJAX call.
         """
         if not self.is_condition_satisfied():
@@ -318,10 +318,10 @@ class ConditionalBlock(
         Returns a list of bound XBlocks instances upon which XBlock depends.
         """
         return [
-            self.system.get_block_for_descriptor(descriptor) for descriptor in self.get_required_module_descriptors()
+            self.system.get_block_for_descriptor(descriptor) for descriptor in self.get_required_block_descriptors()
         ]
 
-    def get_required_module_descriptors(self):
+    def get_required_block_descriptors(self):
         """
         Returns a list of unbound XBlocks instances upon which this XBlock depends.
         """

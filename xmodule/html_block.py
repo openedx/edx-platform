@@ -60,7 +60,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         # use display_name_with_default for those
         default=_("Text")
     )
-    data = String(help=_("Html contents to display for this module"), default="", scope=Scope.content)
+    data = String(help=_("Html contents to display for this block"), default="", scope=Scope.content)
     source_code = String(
         help=_("Source code for LaTeX documents. This feature is not well-supported."),
         scope=Scope.settings
@@ -389,7 +389,7 @@ class AboutFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         default="overview",
     )
     data = String(
-        help=_("Html contents to display for this module"),
+        help=_("Html contents to display for this block"),
         default="",
         scope=Scope.content
     )
@@ -449,7 +449,7 @@ class CourseInfoFields:
         scope=Scope.content
     )
     data = String(
-        help=_("Html contents to display for this module"),
+        help=_("Html contents to display for this block"),
         default="<ol></ol>",
         scope=Scope.content
     )

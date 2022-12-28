@@ -519,9 +519,13 @@ class XModuleMixin(XModuleFields, XBlock):
         child.runtime.export_fs = self.runtime.export_fs
         return child
 
-    def get_required_module_descriptors(self):
-        """Returns a list of XModuleDescriptor instances upon which this module depends, but are
-        not children of this module"""
+    def get_required_block_descriptors(self):
+        """
+        Return a list of XBlock instances upon which this block depends but are
+        not children of this block.
+
+        TODO: Move this method directly to the ConditionalBlock.
+        """
         return []
 
     def get_child_by(self, selector):
@@ -1658,7 +1662,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         self,
         get_block,
         descriptor_runtime,
-        **kwargs
+        **kwargs,
     ):
         """
         Create a closure around the system environment.

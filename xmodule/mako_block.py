@@ -32,7 +32,7 @@ class MakoDescriptorSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=a
 class MakoTemplateBlockBase:
     """
     XBlock intended as a mixin that uses a mako template
-    to specify the module html.
+    to specify the block html.
 
     Expects the descriptor to have the `mako_template` attribute set
     with the name of the template to render, and it will pass

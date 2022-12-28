@@ -89,7 +89,7 @@ def mock_capa_block():
     """
     def mock_location_text(self):  # lint-amnesty, pylint: disable=unused-argument
         """
-        Mock implementation of __unicode__ or __str__ for the module's location.
+        Mock implementation of __unicode__ or __str__ for the block's location.
         """
         return 'i4x://Foo/bar/mock/abc'
 

@@ -561,7 +561,7 @@ class VideoBlock(
 
     def save_with_metadata(self, user):
         """
-        Save module with updated metadata to database."
+        Save block with updated metadata to database."
         """
         self.save()
         self.runtime.modulestore.update_item(self, user.id)
@@ -674,7 +674,7 @@ class VideoBlock(
 
     def definition_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=too-many-statements
         """
-        Returns an xml string representing this module.
+        Returns an xml string representing this block.
         """
         xml = etree.Element('video')
         youtube_string = create_youtube_string(self)

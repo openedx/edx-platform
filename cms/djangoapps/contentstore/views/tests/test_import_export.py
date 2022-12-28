@@ -51,7 +51,7 @@ from xmodule.modulestore.xml_importer import (  # lint-amnesty, pylint: disable=
     ErrorReadingFileException,
     import_course_from_xml,
     import_library_from_xml,
-    ModuleFailedToImport,
+    BlockFailedToImport,
 )
 
 TASK_LOGGER = 'cms.djangoapps.contentstore.tasks.LOGGER'
@@ -460,7 +460,7 @@ class ImportTestCase(CourseTestCase):
                 self.user.id,
                 settings.GITHUB_REPO_ROOT,
                 [extract_dir_relative / 'library'],
-                load_error_modules=False,
+                load_error_blocks=False,
                 static_content_store=contentstore(),
                 target_id=lib_key
             )
@@ -505,7 +505,7 @@ class ImportTestCase(CourseTestCase):
                     self.user.id,
                     settings.GITHUB_REPO_ROOT,
                     [extract_dir_relative / 'library'],
-                    load_error_modules=False,
+                    load_error_blocks=False,
                     static_content_store=contentstore(),
                     target_id=lib_key
                 )
@@ -540,7 +540,7 @@ class ImportTestCase(CourseTestCase):
                             [extract_dir_relative / 'library'],
                             static_content_store=source_content,
                             target_id=source_library_key,
-                            load_error_modules=False,
+                            load_error_blocks=False,
                             raise_on_failure=True,
                             create_if_not_present=True,
                         )
@@ -639,7 +639,7 @@ class ImportTestCase(CourseTestCase):
         ),
         (DuplicateCourseError("foo", "foobar"), 'Cannot create course foo, which duplicates foobar'),
         (ErrorReadingFileException("assets.xml"), "Error while reading assets.xml. Check file for XML errors."),
-        (ModuleFailedToImport("Unit 1", "foo/bar"), "Failed to import module: Unit 1 at location: foo/bar"),
+        (BlockFailedToImport("Unit 1", "foo/bar"), "Failed to import block: Unit 1 at location: foo/bar"),
     )
     @ddt.unpack
     def test_import_failure_is_descriptive_for_known_failures(self, exc, expected_mesg, mocked_import, mocked_log):
@@ -840,7 +840,7 @@ class ExportTestCase(CourseTestCase):
         self.assertNotIn('ExportOutput', result)
         self.assertIn('ExportError', result)
         error = result['ExportError']
-        self.assertIn('Unable to create xml for module', error['raw_error_msg'])
+        self.assertIn('Unable to create xml for block', error['raw_error_msg'])
         self.assertIn(expected_text, error['edit_unit_url'])
 
     def test_library_export(self):
@@ -1033,7 +1033,7 @@ class TestLibraryImportExport(CourseTestCase):
             ['library_empty_problem'],
             static_content_store=contentstore(),
             target_id=source_library1_key,
-            load_error_modules=False,
+            load_error_blocks=False,
             raise_on_failure=True,
             create_if_not_present=True,
         )
@@ -1057,7 +1057,7 @@ class TestLibraryImportExport(CourseTestCase):
             ['exported_source_library'],
             static_content_store=contentstore(),
             target_id=source_library2_key,
-            load_error_modules=False,
+            load_error_blocks=False,
             raise_on_failure=True,
             create_if_not_present=True,
         )
@@ -1184,7 +1184,7 @@ class TestCourseExportImport(LibraryTestCase):
             ['exported_source_course'],
             static_content_store=contentstore(),
             target_id=dest_course.location.course_key,
-            load_error_modules=False,
+            load_error_blocks=False,
             raise_on_failure=True,
             create_if_not_present=True,
         )
@@ -1314,7 +1314,7 @@ class TestCourseExportImportProblem(CourseTestCase):
             ['exported_source_course'],
             static_content_store=contentstore(),
             target_id=dest_course.location.course_key,
-            load_error_modules=False,
+            load_error_blocks=False,
             raise_on_failure=True,
             create_if_not_present=True,
         )

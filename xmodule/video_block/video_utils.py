@@ -14,18 +14,18 @@ from django.core.validators import URLValidator
 log = logging.getLogger(__name__)
 
 
-def create_youtube_string(module):
+def create_youtube_string(block):
     """
-    Create a string of Youtube IDs from `module`'s metadata
+    Create a string of Youtube IDs from `block`'s metadata
     attributes. Only writes a speed if an ID is present in the
-    module.  Necessary for backwards compatibility with XML-based
+    block.  Necessary for backwards compatibility with XML-based
     courses.
     """
     youtube_ids = [
-        module.youtube_id_0_75,
-        module.youtube_id_1_0,
-        module.youtube_id_1_25,
-        module.youtube_id_1_5
+        block.youtube_id_0_75,
+        block.youtube_id_1_0,
+        block.youtube_id_1_25,
+        block.youtube_id_1_5
     ]
     youtube_speeds = ['0.75', '1.00', '1.25', '1.50']
     return ','.join([

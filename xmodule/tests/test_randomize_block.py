@@ -80,7 +80,7 @@ class RandomizeBlockTest(MixedSplitTestCase):
         # And compare.
         assert exported_olx == expected_olx
 
-        runtime = TestImportSystem(load_error_modules=True, course_id=randomize_block.location.course_key)
+        runtime = TestImportSystem(load_error_blocks=True, course_id=randomize_block.location.course_key)
         runtime.resources_fs = export_fs
 
         # Now import it.

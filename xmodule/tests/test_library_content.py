@@ -54,24 +54,24 @@ class LibraryContentTest(MixedSplitTestCase):
             source_library_id=str(self.library.location.library_key)
         )
 
-    def _bind_course_block(self, module):
+    def _bind_course_block(self, block):
         """
-        Bind a module (part of self.course) so we can access student-specific data.
+        Bind a block (part of self.course) so we can access student-specific data.
         """
-        module_system = get_test_system(course_id=module.location.course_key)
-        module_system.descriptor_runtime = module.runtime._descriptor_system  # pylint: disable=protected-access
+        module_system = get_test_system(course_id=block.location.course_key)
+        module_system.descriptor_runtime = block.runtime._descriptor_system  # pylint: disable=protected-access
         module_system._services['library_tools'] = self.tools  # pylint: disable=protected-access
 
         def get_block(descriptor):
             """Mocks module_system get_block function"""
-            sub_module_system = get_test_system(course_id=module.location.course_key)
+            sub_module_system = get_test_system(course_id=block.location.course_key)
             sub_module_system.get_block_for_descriptor = get_block
             sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.bind_for_student(sub_module_system, self.user_id)
             return descriptor
 
         module_system.get_block_for_descriptor = get_block
-        module.xmodule_runtime = module_system
+        block.xmodule_runtime = module_system
 
 
 class TestLibraryContentExportImport(LibraryContentTest):
@@ -102,7 +102,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
         self.lc_block.runtime._descriptor_system.export_fs = self.export_fs  # pylint: disable=protected-access
 
         # Prepare runtime for the import.
-        self.runtime = TestImportSystem(load_error_modules=True, course_id=self.lc_block.location.course_key)
+        self.runtime = TestImportSystem(load_error_blocks=True, course_id=self.lc_block.location.course_key)
         self.runtime.resources_fs = self.export_fs
         self.id_generator = Mock()
 
@@ -207,7 +207,7 @@ class LibraryContentBlockTestMixin:
         # Normally the children get added when the "source_libraries" setting
         # is updated, but the way we do it through a factory doesn't do that.
         assert len(self.lc_block.children) == 0
-        # Update the LibraryContent module:
+        # Update the LibraryContent block:
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         # Check that all blocks from the library are now children of the block:

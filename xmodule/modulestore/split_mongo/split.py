@@ -1,5 +1,5 @@
 """
-Provides full versioning CRUD and representation for collections of xblocks (e.g., courses, modules, etc).
+Provides full versioning CRUD and representation for collections of xblocks (e.g., courses, blocks, etc).
 
 Representation:
 * course_index: a dictionary:
@@ -140,7 +140,7 @@ class SplitBulkWriteRecord(BulkOpsRecord):  # lint-amnesty, pylint: disable=miss
         self.index = None
         self.structures = {}
         self.structures_in_db = set()
-        # dict(version_guid, dict(BlockKey, module))
+        # dict(version_guid, dict(BlockKey, block))
         self.modules = defaultdict(dict)
         self.definitions = {}
         self.definitions_in_db = set()
@@ -363,7 +363,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
     def get_cached_block(self, course_key, version_guid, block_id):
         """
-        If there's an active bulk_operation, see if it's cached this module and just return it
+        If there's an active bulk_operation, see if it's cached this block and just return it
         Don't do any extra work to get the ones which are not cached. Make the caller do the work & cache them.
         """
         bulk_write_record = self._get_bulk_ops_record(course_key)
@@ -723,13 +723,13 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             lazy: whether to load definitions now or later
         """
         with self.bulk_operations(course_key, emit_signals=False):
-            new_module_data = {}
+            new_block_data = {}
             for block_id in base_block_ids:
-                new_module_data = self.descendants(
+                new_block_data = self.descendants(
                     system.course_entry.structure['blocks'],
                     block_id,
                     depth,
-                    new_module_data
+                    new_block_data
                 )
 
             # This method supports lazy loading, where the descendent definitions aren't loaded
@@ -740,21 +740,21 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     course_key,
                     [
                         block.definition
-                        for block in new_module_data.values()
+                        for block in new_block_data.values()
                     ]
                 )
                 # Turn definitions into a map.
                 definitions = {definition['_id']: definition
                                for definition in descendent_definitions}
 
-                for block in new_module_data.values():
+                for block in new_block_data.values():
                     if block.definition in definitions:
                         definition = definitions[block.definition]
                         # convert_fields gets done later in the runtime's xblock_from_json
                         block.fields.update(definition.get('fields'))
                         block.definition_loaded = True
 
-            system.module_data.update(new_module_data)
+            system.module_data.update(new_block_data)
             return system.module_data
 
     def _load_items(self, course_entry, block_keys, depth=0, **kwargs):
@@ -1168,7 +1168,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     def get_item(self, usage_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         depth (int): An argument that some module stores may use to prefetch
-            descendants of the queried modules for more efficient results later
+            descendants of the queried blocks for more efficient results later
             in the request. The depth is counted in the number of
             calls to get_children() to cache. None indicates to cache all
             descendants.
@@ -1311,8 +1311,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         :param block_key: BlockKey of the component whose path is to be checked
         :param course: actual db json of course from structures
-        :param path_cache: a dictionary that records which modules have a path to the root so that we don't have to
-        double count modules if we're computing this for a list of modules in a course.
+        :param path_cache: a dictionary that records which blocks have a path to the root so that we don't have to
+        double count blocks if we're computing this for a list of blocks in a course.
         :param parents_cache: a dictionary containing mapping of block_key to list of its parents. Optionally, this
         should be built for course structure to make this method faster.
 
@@ -1700,7 +1700,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Returns the newly created item.
 
         Args:
-            user_id: ID of the user creating and saving the xmodule
+            user_id: ID of the user creating and saving the xblock
             parent_usage_key: a :class:`~opaque_key.edx.UsageKey` identifying the
                 block that this item should be parented under
             block_type: The typo of block to create
@@ -2080,7 +2080,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         parent_xblock is used to compute inherited metadata as well as to append the new xblock.
 
         json_data:
-        - 'block_type': the xmodule block_type
+        - 'block_type': the xblock block_type
         - 'fields': a dict of locally set fields (not inherited) in json format not pythonic typed format!
         - 'definition': the object id of the existing definition
         """
