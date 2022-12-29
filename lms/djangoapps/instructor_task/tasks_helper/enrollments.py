@@ -404,7 +404,7 @@ def _upload_exec_summary_to_store(data_dict, report_name, course_id, generated_a
     tracker_emit(report_name)
 
 
-def enroll_user_to_course(request_info, course_id, username_or_email):
+def enroll_user_to_course(request_info, course_id, username_or_email, site_name=None, context_vars=None):
     """
     Look up the given user, and if successful, enroll them to the specified course.
 
@@ -447,9 +447,10 @@ def enroll_user_to_course(request_info, course_id, username_or_email):
         course = get_course_by_id(course_id, depth=0)
         try:
             with emulate_http_request(site=thread_site, user=thread_author):
-                email_params = get_email_params(course, auto_enroll)
+                email_params = get_email_params(course=course, auto_enroll=auto_enroll, site_name=site_name)
                 __ = enroll_email(
-                    course_id, email, auto_enroll, email_students, email_params, language=language
+                    course_id, email, auto_enroll, email_students,
+                    email_params, language=language, context_vars=context_vars,
                 )
                 if user:
                     TASK_LOG.info(

@@ -58,6 +58,7 @@ log = logging.getLogger(__name__)
 
 class EmailEnrollmentState(object):
     """ Store the complete enrollment state of an email in a class """
+
     def __init__(self, course_id, email):
         # N.B. retired users are not a concern here because they should be
         # handled at a higher level (i.e. in enroll_email).  Besides, this
@@ -121,7 +122,10 @@ def get_user_email_language(user):
     return UserPreference.get_value(user, LANGUAGE_KEY)
 
 
-def enroll_email(course_id, student_email, auto_enroll=False, email_students=False, email_params=None, language=None):
+def enroll_email(
+        course_id, student_email, auto_enroll=False, email_students=False,
+        email_params=None, language=None, context_vars=None
+):
     """
     Enroll a student by email.
 
@@ -161,7 +165,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
             email_params['message_type'] = 'enrolled_enroll'
             email_params['email_address'] = student_email
             email_params['full_name'] = previous_state.full_name
-            send_mail_to_student(student_email, email_params, language=language)
+            send_mail_to_student(student_email, email_params, language=language, context_vars=context_vars)
 
     elif not is_email_retired(student_email):
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
@@ -170,7 +174,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         if email_students:
             email_params['message_type'] = 'allowed_enroll'
             email_params['email_address'] = student_email
-            send_mail_to_student(student_email, email_params, language=language)
+            send_mail_to_student(student_email, email_params, language=language, context_vars=context_vars)
 
     after_state = EmailEnrollmentState(course_id, student_email)
 
@@ -366,7 +370,7 @@ def _fire_score_changed_for_block(
             )
 
 
-def get_email_params(course, auto_enroll, secure=True, course_key=None, display_name=None):
+def get_email_params(course, auto_enroll, secure=True, course_key=None, display_name=None, site_name=None):
     """
     Generate parameters used when parsing email templates.
 
@@ -378,20 +382,21 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     course_key = course_key or text_type(course.id)
     display_name = display_name or Text(course.display_name_with_default)
 
-    stripped_site_name = configuration_helpers.get_value(
-        'SITE_NAME',
-        settings.SITE_NAME
-    )
+    if not site_name:
+        site_name = configuration_helpers.get_value(
+            'SITE_NAME',
+            settings.SITE_NAME
+        )
     # TODO: Use request.build_absolute_uri rather than '{proto}://{site}{path}'.format
     # and check with the Services team that this works well with microsites
     registration_url = u'{proto}://{site}{path}'.format(
         proto=protocol,
-        site=stripped_site_name,
+        site=site_name,
         path=reverse('register_user')
     )
     course_url = u'{proto}://{site}{path}'.format(
         proto=protocol,
-        site=stripped_site_name,
+        site=site_name,
         path=reverse('course_root', kwargs={'course_id': course_key})
     )
 
@@ -400,7 +405,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     if not settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         course_about_url = u'{proto}://{site}{path}'.format(
             proto=protocol,
-            site=stripped_site_name,
+            site=site_name,
             path=reverse('about_course', kwargs={'course_id': course_key})
         )
 
@@ -408,7 +413,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
 
     # Composition of email
     email_params = {
-        'site_name': stripped_site_name,
+        'site_name': site_name,
         'registration_url': registration_url,
         'course': course,
         'display_name': display_name,
@@ -420,7 +425,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     return email_params
 
 
-def send_mail_to_student(student, param_dict, language=None):
+def send_mail_to_student(student, param_dict, language=None, context_vars=None):
     """
     Construct the email using templates and then send it.
     `student` is the student's email address (a `str`),
@@ -452,13 +457,14 @@ def send_mail_to_student(student, param_dict, language=None):
     elif 'course' in param_dict:
         param_dict['course_name'] = Text(param_dict['course'].display_name_with_default)
 
-    param_dict['site_name'] = configuration_helpers.get_value(
-        'SITE_NAME',
-        param_dict['site_name']
-    )
+    if not context_vars:
+        param_dict['site_name'] = configuration_helpers.get_value(
+            'SITE_NAME',
+            param_dict['site_name']
+        )
+        # Get other required context variables for current site
+        context_vars = get_base_template_context(param_dict['site_name'])
 
-    # Get other required context variables for current site
-    context_vars = get_base_template_context(param_dict['site_name'])
     param_dict.update(context_vars)
 
     # see if there is an activation email template definition available as configuration,
