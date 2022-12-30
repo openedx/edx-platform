@@ -76,8 +76,8 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         for older implementations and a few tests that store
         a single html object representing all the updates.
         """
-        info_module = get_course_info_section_block(request, request.user, course, 'updates')
-        info_block = getattr(info_module, '_xmodule', info_module)
+        info_block = get_course_info_section_block(request, request.user, course, 'updates')
+        info_block = getattr(info_block, '_xmodule', info_block)
         return info_block.system.service(
             info_block, "replace_urls"
-        ).replace_urls(info_module.data) if info_module else ''
+        ).replace_urls(info_block.data) if info_block else ''

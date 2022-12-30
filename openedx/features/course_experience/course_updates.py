@@ -59,12 +59,12 @@ def get_ordered_updates(request, course):
     """
     Returns all public course updates in reverse chronological order, including dismissed ones.
     """
-    info_module = get_course_info_section_block(request, request.user, course, 'updates')
-    if not info_module:
+    info_block = get_course_info_section_block(request, request.user, course, 'updates')
+    if not info_block:
         return []
 
-    info_block = getattr(info_module, '_xmodule', info_module)
-    ordered_updates = [update for update in info_module.items if update.get('status') == STATUS_VISIBLE]
+    info_block = getattr(info_block, '_xmodule', info_block)
+    ordered_updates = [update for update in info_block.items if update.get('status') == STATUS_VISIBLE]
     ordered_updates.sort(
         key=lambda item: (_safe_parse_date(item['date']), item['id']),
         reverse=True
