@@ -510,7 +510,7 @@ class VideoBlock(
         Used to update video values during `self`:save method from CMS.
         old_metadata: dict, values of fields of `self` with scope=settings which were explicitly set by user.
         old_content, same as `old_metadata` but for scope=content.
-        Due to nature of code flow in item.py::_save_item, before current function is called,
+        Due to nature of code flow in block.py::_save_item, before current function is called,
         fields of `self` instance have been already updated, but not yet saved.
         To obtain values, which were changed by user input,
         one should compare own_metadata(self) and old_medatada.

@@ -102,7 +102,7 @@ class BaseTranscripts(CourseTestCase):
         modulestore().update_item(self.item, self.user.id)
 
         self.item = modulestore().get_item(self.video_usage_key)
-        # Remove all transcripts for current module.
+        # Remove all transcripts for current block.
         self.clear_subs_content()
 
     def _get_usage_key(self, resp):
@@ -331,7 +331,7 @@ class TestUploadTranscripts(BaseTranscripts):
         self.assert_response(
             response,
             expected_status_code=400,
-            expected_message='Transcripts are supported only for "video" modules.'
+            expected_message='Transcripts are supported only for "video" blocks.'
         )
 
     def test_transcript_upload_non_existent_item(self):
@@ -496,7 +496,7 @@ class TestChooseTranscripts(BaseTranscripts):
         self.assert_response(
             response,
             expected_status_code=400,
-            expected_message='Transcripts are supported only for "video" modules.'
+            expected_message='Transcripts are supported only for "video" blocks.'
         )
 
 
@@ -618,7 +618,7 @@ class TestRenameTranscripts(BaseTranscripts):
         self.assert_response(
             response,
             expected_status_code=400,
-            expected_message='Transcripts are supported only for "video" modules.'
+            expected_message='Transcripts are supported only for "video" blocks.'
         )
 
 
@@ -753,7 +753,7 @@ class TestReplaceTranscripts(BaseTranscripts):
         self.assert_response(
             response,
             expected_status_code=400,
-            expected_message='Transcripts are supported only for "video" modules.'
+            expected_message='Transcripts are supported only for "video" blocks.'
         )
 
 
@@ -1077,7 +1077,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(
             json.loads(resp.content.decode('utf-8')).get('status'),
-            'Transcripts are supported only for "video" modules.',
+            'Transcripts are supported only for "video" blocks.',
         )
 
     @patch('xmodule.video_block.transcripts_utils.get_video_transcript_content')

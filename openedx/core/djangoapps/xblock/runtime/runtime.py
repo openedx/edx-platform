@@ -22,7 +22,7 @@ from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
 
 from xmodule.errortracker import make_error_tracker
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.django import ModuleI18nService
+from xmodule.modulestore.django import XBlockI18nService
 from xmodule.services import EventPublishingService, RebindUserService
 from xmodule.util.sandboxing import SandboxService
 from common.djangoapps.edxmako.services import MakoService
@@ -247,7 +247,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
                 return MakoService(namespace_prefix='lms.')
             return MakoService()
         elif service_name == "i18n":
-            return ModuleI18nService(block=block)
+            return XBlockI18nService(block=block)
         elif service_name == 'sandbox':
             context_key = block.scope_ids.usage_id.context_key
             return SandboxService(contentstore=contentstore, course_id=context_key)

@@ -204,12 +204,12 @@ def handle_item_deleted(**kwargs):
         # Strip branch info
         usage_key = usage_key.for_branch(None)
         course_key = usage_key.course_key
-        deleted_module = modulestore().get_item(usage_key)
-        for module in yield_dynamic_descriptor_descendants(deleted_module, kwargs.get('user_id')):
+        deleted_block = modulestore().get_item(usage_key)
+        for block in yield_dynamic_descriptor_descendants(deleted_block, kwargs.get('user_id')):
             # Remove prerequisite milestone data
-            gating_api.remove_prerequisite(module.location)
+            gating_api.remove_prerequisite(block.location)
             # Remove any 'requires' course content milestone relationships
-            gating_api.set_required_content(course_key, module.location, None, None, None)
+            gating_api.set_required_content(course_key, block.location, None, None, None)
 
 
 @receiver(GRADING_POLICY_CHANGED)

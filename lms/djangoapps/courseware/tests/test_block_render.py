@@ -47,7 +47,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.lti_block import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import ModuleI18nService, modulestore
+from xmodule.modulestore.django import XBlockI18nService, modulestore
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
@@ -2415,7 +2415,7 @@ class TestBadgingService(LMSXBlockServiceMixin):
 
 
 class TestI18nService(LMSXBlockServiceMixin):
-    """ Test ModuleI18nService """
+    """ Test XBlockI18nService """
 
     def test_module_i18n_lms_service(self):
         """
@@ -2423,7 +2423,7 @@ class TestI18nService(LMSXBlockServiceMixin):
         """
         i18n_service = self.runtime.service(self.descriptor, 'i18n')
         assert i18n_service is not None
-        assert isinstance(i18n_service, ModuleI18nService)
+        assert isinstance(i18n_service, XBlockI18nService)
 
     def test_no_service_exception_with_none_declaration_(self):
         """

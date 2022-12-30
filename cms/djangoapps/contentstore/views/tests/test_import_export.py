@@ -124,7 +124,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.post(exam_url, {'entrance_exam_minimum_score_pct': 0.5}, http_accept='application/json')
         self.assertEqual(resp.status_code, 201)
 
-        # Reload the test course now that the exam module has been added
+        # Reload the test course now that the exam block has been added
         self.course = modulestore().get_course(self.course.id)
         metadata = CourseMetadata.fetch_all(self.course)
         self.assertTrue(metadata['entrance_exam_enabled'])

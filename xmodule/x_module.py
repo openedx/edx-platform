@@ -1180,7 +1180,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         """
         # getting the service from parent module. making sure of block service declarations.
         service = super().service(block=block, service_name=service_name)
-        # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
+        # Passing the block to service if it is callable e.g. XBlockI18nService. It is the responsibility of calling
         # service to handle the passing argument.
         if callable(service):
             return service(block)
@@ -1738,7 +1738,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         """
         # getting the service from parent module. making sure of block service declarations.
         service = super().service(block=block, service_name=service_name)
-        # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
+        # Passing the block to service if it is callable e.g. XBlockI18nService. It is the responsibility of calling
         # service to handle the passing argument.
         if callable(service):
             return service(block)
