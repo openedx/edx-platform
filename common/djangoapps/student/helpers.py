@@ -688,7 +688,8 @@ def do_create_account(form, custom_form=None):
     user = User(
         username=proposed_username,
         email=form.cleaned_data["email"],
-        is_active=False
+        # ..FX Custom .. FP1 set to True ( Create new account without registration e-mail)
+        is_active=True
     )
     password = normalize_password(form.cleaned_data["password"])
     user.set_password(password)

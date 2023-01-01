@@ -59,10 +59,39 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params  # lint-amnesty, pylint: disable=unused-import
 from openedx.features.enterprise_support.api import activate_learner_enterprise, get_enterprise_learner_data_from_api
 
+#=================== CUSTOM FOR PP1: IMPORT =====================
+from django.contrib.auth.models import User
+from openedx.core.djangoapps.user_authn.views.registration_form import (
+    AccountCreationForm,
+    get_registration_extension_form
+)
+from common.djangoapps.student.helpers import (
+    do_create_account
+)
+from common.djangoapps.student.models import (
+    email_exists_or_retired
+)
+import random
+import string
+import time
+#=================== END OF CUSTOM ==============================
+
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 USER_MODEL = get_user_model()
 
+
+# .. FX Custom ===================== CUSTOM FOR PP1 FUNCTION ========================
+def _is_funix_email(email):
+    _funix_email_tail = '@funix.edu.vn'
+    if not email[-13:].__eq__(_funix_email_tail):
+        return False
+    return True
+
+def _create_random_password(length):
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
 
 def _do_third_party_auth(request):
     """
@@ -78,29 +107,73 @@ def _do_third_party_auth(request):
     try:
         return pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
     except USER_MODEL.DoesNotExist:
-        AUDIT_LOG.info(
-            "Login failed - user with username {username} has no social auth "
-            "with backend_name {backend_name}".format(
-                username=username, backend_name=backend_name)
-        )
-        message = Text(_(
-            "You've successfully signed in to your {provider_name} account, "
-            "but this account isn't linked with your {platform_name} account yet. {blank_lines}"
-            "Use your {platform_name} username and password to sign in to {platform_name} below, "
-            "and then link your {platform_name} account with {provider_name} from your dashboard. {blank_lines}"
-            "If you don't have an account on {platform_name} yet, "
-            "click {register_label_strong} at the top of the page."
-        )).format(
-            blank_lines=HTML('<br/><br/>'),
-            platform_name=platform_name,
-            provider_name=requested_provider.name,
-            register_label_strong=HTML('<strong>{register_text}</strong>').format(
-                register_text=_('Register')
+        if not _is_funix_email(email=third_party_uid):
+            AUDIT_LOG.info(
+                "Login failed - user with username {username} has no social auth "
+                "with backend_name {backend_name}".format(
+                    username=username, backend_name=backend_name)
             )
-        )
+            message = Text(_(
+                "YOU ARE NOT USE FUNiX ACCOUNT "
+            )).format(
+                blank_lines=HTML('<br/><br/>'),
+                platform_name=platform_name,
+                provider_name=requested_provider.name,
+                register_label_strong=HTML('<strong>{register_text}</strong>').format(
+                    register_text=_('Register')
+                )
+            )
+            raise AuthFailedError(message, error_code='third-party-auth-with-no-linked-account')  # lint-amnesty, pylint: disable=raise-missing-from
+        
+        elif email_exists_or_retired(third_party_uid):
+            # Fix Bug #29122022
+            print('INFO: ','FX Custom ','PP1:', '=== ', 'Account: ', third_party_uid, 'existed!')
+            user = User.objects.get(email=third_party_uid)
+        else:
+            # If do not existing user profile of this account, we want to create new one
+            print('INFO: ','FX Custom ','PP1:', '=== ', 'Create new account for user:', username)
+            modified_username = username + str(int(time.time())) 
+            generate_pw = _create_random_password(8)
+            params = {
+                'next': '/', 
+                'email': third_party_uid, 
+                'name': username, 
+                'username': modified_username, 
+                'level_of_education': '', 
+                'gender': '', 
+                'year_of_birth': '', 
+                'mailing_address': '', 
+                'goals': '', 
+                'terms_of_service': 'true', 
+                'password': "{}".format(generate_pw)
+            }
+            extra_fields=  {
+                'confirm_email': 'hidden', 
+                'level_of_education': 'optional', 
+                'gender': 'optional', 
+                'year_of_birth': 'optional', 
+                'mailing_address': 'optional', 
+                'goals': 'optional', 
+                'honor_code': 'hidden', 
+                'terms_of_service': 'required', 
+                'city': 'hidden', 
+                'country': 'hidden'
+            }
+            extended_profile_fields= {}
+            tos_required = True
 
-        raise AuthFailedError(message, error_code='third-party-auth-with-no-linked-account')  # lint-amnesty, pylint: disable=raise-missing-from
+            form = AccountCreationForm(
+                data=params,
+                extra_fields=extra_fields,
+                extended_profile_fields=extended_profile_fields,
+                do_third_party_auth=False,
+                tos_required=tos_required,
+            )
+            custom_form = get_registration_extension_form(data=params)
+            (user, profile, registration) = do_create_account(form, custom_form)
 
+        user.backend = 'social_core.backends.google.GoogleOAuth2'
+        return user
 
 def _get_user_by_email(request):
     """

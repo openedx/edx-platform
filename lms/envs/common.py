@@ -800,7 +800,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-07-15
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15006
-    'ENABLE_BULK_ENROLLMENT_VIEW': False,
+    'ENABLE_BULK_ENROLLMENT_VIEW': True,
 
     # Set to enable Enterprise integration
     'ENABLE_ENTERPRISE_INTEGRATION': False,
