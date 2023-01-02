@@ -926,7 +926,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     )
     @ddt.unpack
     @patch('lms.djangoapps.courseware.block_render.get_block_for_descriptor', wraps=get_block_for_descriptor)
-    def test_will_recheck_access_handler_attribute(self, handler, will_recheck_access, mock_get_module):
+    def test_will_recheck_access_handler_attribute(self, handler, will_recheck_access, mock_get_block):
         """Confirm that we pay attention to any 'will_recheck_access' attributes on handler methods"""
         course = CourseFactory.create()
         descriptor_kwargs = {
@@ -941,8 +941,8 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
 
         render.handle_xblock_callback(request, str(course.id), usage_id, handler)
-        assert mock_get_module.call_count == 1
-        assert mock_get_module.call_args[1]['will_recheck_access'] == will_recheck_access
+        assert mock_get_block.call_count == 1
+        assert mock_get_block.call_args[1]['will_recheck_access'] == will_recheck_access
 
 
 @ddt.ddt
