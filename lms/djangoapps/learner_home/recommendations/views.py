@@ -52,6 +52,7 @@ class CourseRecommendationApiView(APIView):
         if not should_show_learner_home_amplitude_recommendations():
             return Response(status=404)
 
+        recommended_courses = []
         general_recommendations_response = Response(
             CourseRecommendationSerializer(
                 {
@@ -64,24 +65,17 @@ class CourseRecommendationApiView(APIView):
 
         try:
             user_id = request.user.id
-            is_control, course_keys = get_personalized_course_recommendations(user_id)
+            is_control, has_is_control, course_keys = get_personalized_course_recommendations(user_id)
         except Exception as ex:  # pylint: disable=broad-except
             logger.warning(f"Cannot get recommendations from Amplitude: {ex}")
             return general_recommendations_response
 
-        # Emits an event to track student dashboard page visits.
-        segment.track(
-            user_id,
-            "edx.bi.user.recommendations.viewed",
-            {
-                "is_personalized_recommendation": not is_control,
-            },
-        )
-
         if is_control or not course_keys:
+            self._emit_recommendations_viewed_event(
+                user_id, is_control, has_is_control, recommended_courses
+            )
             return general_recommendations_response
 
-        recommended_courses = []
         user_enrolled_course_keys = set()
         fields = ["title", "owners", "marketing_url"]
 
@@ -105,6 +99,9 @@ class CourseRecommendationApiView(APIView):
                         "marketing_url": course_data.get("marketing_url"),
                     }
                 )
+        self._emit_recommendations_viewed_event(
+            user_id, is_control, has_is_control, recommended_courses
+        )
 
         # If no courses are left after filtering already enrolled courses from
         # the list of amplitude recommendations, show general recommendations
@@ -120,4 +117,16 @@ class CourseRecommendationApiView(APIView):
                 }
             ).data,
             status=200,
+        )
+
+    def _emit_recommendations_viewed_event(self, user_id, is_control, has_is_control, recommended_courses):
+        """Emits an event to track Learner Home page visits."""
+        segment.track(
+            user_id,
+            "edx.bi.user.recommendations.viewed",
+            {
+                "is_personalized_recommendation": not is_control,
+                "is_control": is_control if has_is_control else None,
+                "course_key_array": [course["course_key"] for course in recommended_courses],
+            },
         )

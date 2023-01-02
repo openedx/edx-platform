@@ -357,22 +357,14 @@ class CourseRecommendationApiView(APIView):
 
     def get(self, request):
         """ Retrieves course recommendations details of a user in a specified course. """
+        recommended_courses = []
         user_id = request.user.id
-        is_control, course_keys = get_personalized_course_recommendations(user_id)
-
-        # Emits an event to track student dashboard page visits.
-        segment.track(
-            user_id,
-            'edx.bi.user.recommendations.viewed',
-            {
-                'is_personalized_recommendation': not is_control,
-            }
-        )
+        is_control, has_is_control, course_keys = get_personalized_course_recommendations(user_id)
 
         if is_control or not course_keys:
+            self._emit_recommendations_viewed_event(user_id, is_control, has_is_control, recommended_courses)
             return Response(status=400)
 
-        recommended_courses = []
         user_enrolled_course_keys = set()
         fields = ['title', 'owners', 'marketing_url']
 
@@ -392,5 +384,18 @@ class CourseRecommendationApiView(APIView):
                     'logo_image_url': course_data['owners'][0]['logo_image_url'],
                     'marketing_url': course_data.get('marketing_url')
                 })
+        self._emit_recommendations_viewed_event(user_id, is_control, has_is_control, recommended_courses)
 
         return Response({'courses': recommended_courses, 'is_personalized_recommendation': not is_control}, status=200)
+
+    def _emit_recommendations_viewed_event(self, user_id, is_control, has_is_control, recommended_courses):
+        """Emits an event to track student dashboard page visits."""
+        segment.track(
+            user_id,
+            'edx.bi.user.recommendations.viewed',
+            {
+                'is_personalized_recommendation': not is_control,
+                'is_control': is_control if has_is_control else None,
+                'course_key_array': [course['course_key'] for course in recommended_courses],
+            }
+        )

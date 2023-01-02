@@ -5,6 +5,7 @@ Unit tests for Learner Dashboard REST APIs and Views
 from unittest import mock
 from uuid import uuid4
 
+import ddt
 from django.core.cache import cache
 from django.urls import reverse_lazy
 from enterprise.models import EnterpriseCourseEnrollment
@@ -232,6 +233,7 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
         self.assertEqual(response.data, [])
 
 
+@ddt.ddt
 class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
     """Unit tests for the course recommendations on dashboard page."""
 
@@ -259,7 +261,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         """
         Verify API returns 400 if no course recommendations from amplitude.
         """
-        mocked_get_personalized_course_recommendations.return_value = [False, []]
+        mocked_get_personalized_course_recommendations.return_value = [False, True, []]
         mocked_get_course_data.return_value = self.course_data
 
         response = self.client.get(self.url)
@@ -273,7 +275,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         """
         Verify API returns course recommendations.
         """
-        mocked_get_personalized_course_recommendations.return_value = [False, self.recommended_courses]
+        mocked_get_personalized_course_recommendations.return_value = [False, True, self.recommended_courses]
         mocked_get_course_data.return_value = self.course_data
         expected_recommendations = 5
 
@@ -289,7 +291,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         """
         Verify API returns course recommendations for courses in which user is not enrolled.
         """
-        mocked_get_personalized_course_recommendations.return_value = [False, self.recommended_courses]
+        mocked_get_personalized_course_recommendations.return_value = [False, True, self.recommended_courses]
         mocked_get_course_data.return_value = self.course_data
         course_keys = ['course-v1:IBM+PY0101EN+Run_0', 'course-v1:UQx+IELTSx+Run_0', 'course-v1:MITx+6.00.1x+Run_0',
                        'course-v1:HarvardX+CS50P+Run_0', 'course-v1:Harvard+CS50z+Run_0', 'course-v1:TUMx+QPLS2x+Run_0']
@@ -302,3 +304,34 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data.get('is_personalized_recommendation'), True)
         self.assertEqual(len(response.data.get('courses')), expected_recommendations)
+
+    @ddt.data(
+        (True, False, None),
+        (False, True, False),
+        (False, False, None),
+        (True, True, True),
+    )
+    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.segment.track')
+    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_course_data')
+    @mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations')
+    @ddt.unpack
+    def test_recommendations_viewed_segment_event(
+        self,
+        is_control,
+        has_is_control,
+        expected_is_control,
+        mocked_get_personalized_course_recommendations,
+        mocked_get_course_data,
+        segment_track_mock
+    ):
+        mocked_get_personalized_course_recommendations.return_value = [
+            is_control,
+            has_is_control,
+            self.recommended_courses,
+        ]
+        mocked_get_course_data.return_value = self.course_data
+        self.client.get(self.url)
+
+        assert segment_track_mock.call_count == 1
+        assert segment_track_mock.call_args[0][1] == 'edx.bi.user.recommendations.viewed'
+        self.assertEqual(segment_track_mock.call_args[0][2]['is_control'], expected_is_control)
