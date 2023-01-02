@@ -22,6 +22,8 @@ aiosignal==1.3.1
     #   aiohttp
 alabaster==0.7.13
     # via sphinx
+algoliasearch==2.6.2
+    # via -r requirements/edx/testing.txt
 amqp==5.1.1
     # via
     #   -r requirements/edx/testing.txt
@@ -1337,6 +1339,7 @@ regex==2022.10.31
 requests==2.28.2
     # via
     #   -r requirements/edx/testing.txt
+    #   algoliasearch
     #   analytics-python
     #   coreapi
     #   django-oauth-toolkit
