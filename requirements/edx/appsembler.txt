@@ -23,7 +23,7 @@ https://github.com/appsembler/edx-proctoring/archive/v2.4.0-appsembler1.tar.gz
 django-tiers==0.2.7
 fusionauth-client==1.36.0
 google-cloud-storage==1.32.0
-tahoe-idp==2.1.0
+tahoe-idp==2.2.0
 tahoe-sites==1.3.2
 tahoe-lti==0.3.0
 site-configuration-client==0.2.3
