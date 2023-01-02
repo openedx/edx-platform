@@ -71,11 +71,11 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         root_descriptor.scope_ids.usage_id.context_key, user, root_descriptor, read_only=True,
     )
-    root_module = get_block_for_descriptor(
+    root_block = get_block_for_descriptor(
         user, request, root_descriptor, field_data_cache, root_descriptor.scope_ids.usage_id.context_key,
     )
-    if not root_module:
-        err_msg = err_msg_prefix + 'Module unable to be created from descriptor!'
+    if not root_block:
+        err_msg = err_msg_prefix + 'Block unable to be created from descriptor!'
         log.error(err_msg)
         return
 
@@ -99,4 +99,4 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
             for child in block_children:
                 _submit_completions(child, user, completion)
 
-    _submit_completions(root_module, user, completion)
+    _submit_completions(root_block, user, completion)

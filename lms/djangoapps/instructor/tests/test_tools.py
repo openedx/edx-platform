@@ -357,7 +357,7 @@ class TestDataDumps(ModuleStoreTestCase):
                                      extended)
         tools.set_due_date_extension(self.course, self.week1, self.user2,
                                      extended)
-        report = tools.dump_module_extensions(self.course, self.week1)
+        report = tools.dump_block_extensions(self.course, self.week1)
         assert (
             report['title'] == 'Users with due date extensions for ' +
             self.week1.display_name)

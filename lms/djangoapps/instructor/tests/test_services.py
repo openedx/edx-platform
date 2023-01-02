@@ -240,7 +240,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             self.service.complete_student_attempt(username, str(self.course.location))
         mock_logger.assert_called_once_with(
             self.complete_error_prefix.format(user=username, content_id=self.course.location) +
-            'Module unable to be created from descriptor!'
+            'Block unable to be created from descriptor!'
         )
 
     def test_is_user_staff(self):
