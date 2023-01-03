@@ -612,7 +612,7 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
 
     # Generate the certificate context in the correct language, then render the template.
     with translation.override(certificate_language):
-        context = {'user_language': user_language}
+        context = {'user_language': user_language, 'certificate_type': preview_mode or user_certificate.mode}
 
         _update_context_with_basic_info(context, course_id, platform_name, configuration)
 
