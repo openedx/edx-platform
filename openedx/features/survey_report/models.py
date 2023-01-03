@@ -84,6 +84,4 @@ class SurveyReportUpload(models.Model):
     )
 
     def is_uploaded(self) -> bool:
-        response = Response()
-        response.status_code = self.status_code
-        return response.ok
+        return 200 <= self.status_code < 300
