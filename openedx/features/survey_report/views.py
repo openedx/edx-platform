@@ -18,7 +18,6 @@ class SurveyReportView(View):
     """
     @method_decorator(login_required)
     @method_decorator(ensure_csrf_cookie)
-    @method_decorator(ensure_valid_course_key)
     def post(self, _request):
         """
         Generate a new survey report using the generate_report method in api.py
