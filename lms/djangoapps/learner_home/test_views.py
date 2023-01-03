@@ -650,6 +650,42 @@ class TestDashboardView(BaseTestDashboardView):
         )
 
     @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
+    @patch("lms.djangoapps.learner_home.views.cert_info")
+    def test_get_cert_statuses_exception(self, mock_get_cert_info):
+        """Test that cert information gets loaded correctly"""
+
+        # Given I am logged in
+        self.log_in()
+
+        # (and we have tons of mocks to avoid integration tests)
+        mock_enrollment = create_test_enrollment(
+            self.user, course_mode=CourseMode.VERIFIED
+        )
+
+        # but have an issue with a particular certificate
+        mock_get_cert_info.side_effect = Exception("test exception")
+
+        # When I request the dashboard
+        response = self.client.get(self.view_url)
+
+        # Then I get the expected success response
+        assert response.status_code == 200
+        response_data = json.loads(response.content)
+
+        empty_cert_data = {
+            "availableDate": None,
+            "isRestricted": False,
+            "isEarned": False,
+            "isDownloadable": False,
+            "certPreviewUrl": None,
+        }
+
+        # with empty cert data instead of a break
+        self.assertDictEqual(
+            response_data["courses"][0]["certificate"], empty_cert_data
+        )
+
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     @patch("openedx.core.djangoapps.programs.utils.get_programs")
     def test_get_for_one_of_course_programs(self, mock_get_programs):
         """Test that course programs get loaded correctly"""
