@@ -793,7 +793,7 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):  # l
 class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTestCase):
     """
     Tests `forum_form_discussion api` works with different content groups.
-    Discussion modules are setup in ContentGroupTestCase class i.e
+    Discussion blocks are setup in ContentGroupTestCase class i.e
     alpha_block => alpha_group_discussion => alpha_cohort => alpha_user/community_ta
     beta_block => beta_group_discussion => beta_cohort => beta_user
     """
@@ -813,7 +813,7 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
     def assert_has_access(self, response, expected_discussion_threads):
         """
         Verify that a users have access to the threads in their assigned
-        cohorts and non-cohorted modules.
+        cohorts and non-cohorted blocks.
         """
         discussion_data = json.loads(response.content.decode('utf-8'))['discussion_data']
         assert len(discussion_data) == expected_discussion_threads
@@ -902,7 +902,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
     def test_staff_user(self, mock_request):
         """
         Verify that the staff user can access threads in the alpha,
-        beta, and global discussion modules.
+        beta, and global discussion blocks.
         """
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
@@ -913,7 +913,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
     def test_alpha_user(self, mock_request):
         """
         Verify that the alpha user can access threads in the alpha and
-        global discussion modules.
+        global discussion blocks.
         """
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
@@ -926,7 +926,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
     def test_beta_user(self, mock_request):
         """
         Verify that the beta user can access threads in the beta and
-        global discussion modules.
+        global discussion blocks.
         """
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
@@ -939,7 +939,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
     def test_non_cohorted_user(self, mock_request):
         """
         Verify that the non-cohorted user can access threads in just the
-        global discussion module.
+        global discussion blocks.
         """
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
@@ -966,7 +966,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
         """
         Verify that standalone threads don't go through discussion_category_id_access method.
         """
-        # For this rather pathological test, we are assigning the alpha module discussion_id (commentable_id)
+        # For this rather pathological test, we are assigning the alpha block discussion_id (commentable_id)
         # to a team so that we can verify that standalone threads don't go through discussion_category_id_access.
         thread_id = "test_thread_id"
         CourseTeamFactory(
@@ -981,7 +981,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
         )
 
         # If a thread returns context other than "course", the access check is not done, and the beta user
-        # can see the alpha discussion module.
+        # can see the alpha discussion block.
         self.assert_can_access(self.beta_user, self.alpha_block.discussion_id, thread_id, True)
 
 

@@ -177,7 +177,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
 
     def test_empty_discussion_subcategory_title(self):
         """
-        Test that for empty subcategory inline discussion modules,
+        Test that for empty subcategory inline discussion blocks,
         the divider " / " is not rendered on a post or inline discussion topic label.
         """
         discussion = BlockFactory.create(

@@ -88,7 +88,7 @@ class TestProblem:
 
     def get_html(self):
         """
-        Imitate get_html in module.
+        Imitate get_html in block.
         """
         return "original_get_html"
 
@@ -547,7 +547,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
     def test_preprocess_collection_no_item(self):
         """
-        Tests the result if appropriate module is not found.
+        Tests the result if appropriate block is not found.
         """
         initial_collection = [
             {
@@ -590,7 +590,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
     def test_preprocess_collection_has_access(self):
         """
-        Tests the result if the user does not have access to some of the modules.
+        Tests the result if the user does not have access to some of the blocks.
         """
         initial_collection = [
             {
@@ -702,9 +702,9 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 }
             ]) == len(helpers.preprocess_collection(self.user, self.course, initial_collection))
 
-    def test_get_module_context_sequential(self):
+    def test_get_block_context_sequential(self):
         """
-        Tests `get_module_context` method for the sequential.
+        Tests `get_block_context` method for the sequential.
         """
         self.assertDictEqual(
             {
@@ -712,24 +712,24 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "location": str(self.sequential.location),
                 "children": [str(self.vertical.location), str(self.vertical_with_container.location)],
             },
-            helpers.get_module_context(self.course, self.sequential)
+            helpers.get_block_context(self.course, self.sequential)
         )
 
-    def test_get_module_context_html_component(self):
+    def test_get_block_context_html_component(self):
         """
-        Tests `get_module_context` method for the components.
+        Tests `get_block_context` method for the components.
         """
         self.assertDictEqual(
             {
                 "display_name": self.html_block_1.display_name_with_default,
                 "location": str(self.html_block_1.location),
             },
-            helpers.get_module_context(self.course, self.html_block_1)
+            helpers.get_block_context(self.course, self.html_block_1)
         )
 
-    def test_get_module_context_chapter(self):
+    def test_get_block_context_chapter(self):
         """
-        Tests `get_module_context` method for the chapters.
+        Tests `get_block_context` method for the chapters.
         """
         self.assertDictEqual(
             {
@@ -738,7 +738,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "location": str(self.chapter.location),
                 "children": [str(self.sequential.location)],
             },
-            helpers.get_module_context(self.course, self.chapter)
+            helpers.get_block_context(self.course, self.chapter)
         )
         self.assertDictEqual(
             {
@@ -747,7 +747,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "location": str(self.chapter_2.location),
                 "children": [],
             },
-            helpers.get_module_context(self.course, self.chapter_2)
+            helpers.get_block_context(self.course, self.chapter_2)
         )
 
     @override_settings(EDXNOTES_PUBLIC_API="http://example.com")

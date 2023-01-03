@@ -79,10 +79,10 @@ def answer_problem(course, request, problem, score=1, max_value=1):
         course,
         depth=2
     )
-    module = get_block(
+    block = get_block(
         user,
         request,
         problem.scope_ids.usage_id,
         field_data_cache,
     )
-    module.system.publish(problem, 'grade', grade_dict)
+    block.system.publish(problem, 'grade', grade_dict)

@@ -134,9 +134,9 @@ class UserCourseStatus(views.APIView):
             with transaction.atomic():
                 return super().dispatch(request, *args, **kwargs)
 
-    def _last_visited_module_path(self, request, course):
+    def _last_visited_block_path(self, request, course):
         """
-        Returns the path from the last module visited by the current user in the given course up to
+        Returns the path from the last block visited by the current user in the given course up to
         the course block. If there is no such visit, the first item deep enough down the course
         tree is used.
         """
@@ -162,8 +162,8 @@ class UserCourseStatus(views.APIView):
         """
         Returns the course status
         """
-        path = self._last_visited_module_path(request, course)
-        path_ids = [str(module.location) for module in path]
+        path = self._last_visited_block_path(request, course)
+        path_ids = [str(block.location) for block in path]
         return Response({
             "last_visited_module_id": path_ids[0],
             "last_visited_module_path": path_ids,
@@ -176,11 +176,11 @@ class UserCourseStatus(views.APIView):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2)
         try:
-            module_descriptor = modulestore().get_item(module_key)
+            block_descriptor = modulestore().get_item(module_key)
         except ItemNotFoundError:
             return Response(errors.ERROR_INVALID_MODULE_ID, status=400)
-        module = get_block_for_descriptor(
-            request.user, request, module_descriptor, field_data_cache, course.id, course=course
+        block = get_block_for_descriptor(
+            request.user, request, block_descriptor, field_data_cache, course.id, course=course
         )
 
         if modification_date:
@@ -195,7 +195,7 @@ class UserCourseStatus(views.APIView):
                 # old modification date so skip update
                 return self._get_course_info(request, course)
 
-        save_positions_recursively_up(request.user, request, field_data_cache, module, course=course)
+        save_positions_recursively_up(request.user, request, field_data_cache, block, course=course)
         return self._get_course_info(request, course)
 
     @mobile_course_access(depth=2)

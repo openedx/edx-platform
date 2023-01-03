@@ -730,7 +730,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         }
         self.register_get_course_commentable_counts_response(self.course.id, self.thread_counts_map)
 
-    def create_course(self, modules_count, module_store, topics):
+    def create_course(self, blocks_count, module_store, topics):
         """
         Create a course in a specified module store with discussion xblocks and topics
         """
@@ -745,7 +745,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
         course_url = reverse("course_topics", kwargs={"course_id": str(course.id)})
         # add some discussion xblocks
-        for i in range(modules_count):
+        for i in range(blocks_count):
             BlockFactory.create(
                 parent_location=course.location,
                 category='discussion',
@@ -804,8 +804,8 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         (10, ModuleStoreEnum.Type.split, 2, {"Test Topic 1": {"id": "test_topic_1"}}),
     )
     @ddt.unpack
-    def test_bulk_response(self, modules_count, module_store, mongo_calls, topics):
-        course_url, course_id = self.create_course(modules_count, module_store, topics)
+    def test_bulk_response(self, blocks_count, module_store, mongo_calls, topics):
+        course_url, course_id = self.create_course(blocks_count, module_store, topics)
         self.register_get_course_commentable_counts_response(course_id, {})
         with check_mongo_calls(mongo_calls):
             with modulestore().default_store(module_store):

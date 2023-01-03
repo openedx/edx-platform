@@ -505,8 +505,8 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         Test that only topics that a user has access to are returned. The
         ways in which a user may not have access are:
 
-        * Module is visible to staff only
-        * Module is accessible only to a group the user is not in
+        * Block is visible to staff only
+        * Block is accessible only to a group the user is not in
 
         Also, there is a case that ensures that a category with no accessible
         subcategories does not appear in the result.
