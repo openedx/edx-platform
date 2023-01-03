@@ -1713,17 +1713,17 @@ class MetadataSaveTestCase(ContentStoreTestCase):
         """
         video_data = VideoBlock.parse_video_xml(video_sample_xml)
         video_data.pop('source')
-        self.video_descriptor = BlockFactory.create(
+        self.video_block = BlockFactory.create(
             parent_location=course.location, category='video',
             **video_data
         )
 
     def test_metadata_not_persistence(self):
         """
-        Test that descriptors which set metadata fields in their
+        Test that blocks which set metadata fields in their
         constructor are correctly deleted.
         """
-        self.assertIn('html5_sources', own_metadata(self.video_descriptor))
+        self.assertIn('html5_sources', own_metadata(self.video_block))
         attrs_to_strip = {
             'show_captions',
             'youtube_id_1_0',
@@ -1736,13 +1736,13 @@ class MetadataSaveTestCase(ContentStoreTestCase):
             'track'
         }
 
-        location = self.video_descriptor.location
+        location = self.video_block.location
 
         for field_name in attrs_to_strip:
-            delattr(self.video_descriptor, field_name)
+            delattr(self.video_block, field_name)
 
-        self.assertNotIn('html5_sources', own_metadata(self.video_descriptor))
-        self.store.update_item(self.video_descriptor, self.user.id)
+        self.assertNotIn('html5_sources', own_metadata(self.video_block))
+        self.store.update_item(self.video_block, self.user.id)
         block = self.store.get_item(location)
 
         self.assertNotIn('html5_sources', own_metadata(block))
@@ -2047,12 +2047,12 @@ class ContentLicenseTest(ContentStoreTestCase):
     def test_video_license_export(self):
         content_store = contentstore()
         root_dir = path(mkdtemp_clean())
-        video_descriptor = BlockFactory.create(
+        video_block = BlockFactory.create(
             parent_location=self.course.location, category='video',
             license="all-rights-reserved"
         )
         export_course_to_xml(self.store, content_store, self.course.id, root_dir, 'test_license')
-        fname = f"{video_descriptor.scope_ids.usage_id.block_id}.xml"
+        fname = f"{video_block.scope_ids.usage_id.block_id}.xml"
         video_file_path = root_dir / "test_license" / "video" / fname
         with video_file_path.open() as f:
             video_xml = etree.parse(f)
