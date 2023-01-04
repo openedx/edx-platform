@@ -355,8 +355,13 @@ def adapt_references(subtree, destination_course_key, export_fs):
     Map every reference in the subtree into destination_course_key and set it back into the xblock fields
     """
     subtree.runtime.export_fs = export_fs  # ensure everything knows where it's going!
+    # TODO: Remove logging statements after export issue is resolved (INF-667)
+    node_id = subtree.scope_ids.usage_id.html_id()
+    logging.info(f"Exporting {destination_course_key} node {node_id}")
     for field_name, field in subtree.fields.items():
+        logging.info(f"Exporting {destination_course_key} node {node_id} field {field_name}")
         if field.is_set_on(subtree):
+            logging.info(f"Exporting {destination_course_key} node {node_id} field_on {field_name}")
             if isinstance(field, Reference):
                 value = field.read_from(subtree)
                 if value is not None:
@@ -375,6 +380,9 @@ def adapt_references(subtree, destination_course_key, export_fs):
                         key: ele.map_into_course(destination_course_key) for key, ele in field.read_from(subtree).items()  # lint-amnesty, pylint: disable=line-too-long
                     }
                 )
+            logging.info(f"Export_successful {destination_course_key} node {node_id} field_on {field_name}")
+        logging.info(f"Export_successful {destination_course_key} node {node_id} field {field_name}")
+    logging.info(f"Export_successful {destination_course_key} node {node_id}")
 
 
 def _export_field_content(xblock_item, item_dir):
