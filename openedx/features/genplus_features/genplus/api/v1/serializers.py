@@ -24,6 +24,8 @@ class UserInfoSerializer(serializers.ModelSerializer):
                 'has_access_to_lessons': gen_user.student.has_access_to_lessons,
                 'character_id': gen_user.student.character.id
                 if gen_user.student.character else None,
+                'class_id': gen_user.student.active_class.id
+                if gen_user.student.active_class else None,
                 'profile_image': request.build_absolute_uri(
                     gen_user.student.character.profile_pic.url)
                 if gen_user.student.character else None,
