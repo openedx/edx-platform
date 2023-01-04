@@ -14,6 +14,7 @@ from lms.djangoapps.user_tours.v1.serializers import UserTourSerializer, UserDis
 
 from rest_framework.views import APIView
 
+
 class UserTourView(RetrieveUpdateAPIView):
     """
     Supports retrieving and patching the UserTour model
