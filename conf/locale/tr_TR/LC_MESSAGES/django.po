@@ -2261,7 +2261,7 @@ msgstr "Open edX"
 
 #: lms/djangoapps/branding/api.py
 msgid "Cookie Policy"
-msgstr ""
+msgstr "Çerez Politikası"
 
 #: lms/djangoapps/branding/api.py
 msgid "Do Not Sell My Personal Data"
@@ -3171,7 +3171,7 @@ msgstr "Bu derse ilerlemeniz dahil, tüm erişiminizi kaybedeceksiniz."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Audit Access Expires"
-msgstr "Denetçi Erişimi Sonu"
+msgstr "Gözlemci Erişimi Sonu"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Certificate Available"
@@ -3399,15 +3399,15 @@ msgstr "kaydol"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Audit track"
-msgstr "Kayıtlanmanız: Dinleyici"
+msgstr "Kayıtlanmanız: Gözlemci"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "You are enrolled in the audit track for this course. The audit track does "
 "not include a certificate."
 msgstr ""
-"Bu derse dinleyici kayıtlanma yoluyla kaydoldunuz. Dinleyici kayıtlanma yolu"
-" sertifika içermez."
+"Bu derse gözlemci kayıtlanma yoluyla kaydoldunuz. Gözlemci kayıtlanma yolu "
+"sertifika içermez."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Honor track"
@@ -3812,6 +3812,8 @@ msgid ""
 "Invalid course mode: {mode}. Falling back to the default mode, or keeping "
 "the current mode in case the user is already enrolled."
 msgstr ""
+"Geçersiz ders modu: {mode}. Varsayılan moda geri dönmek veya kullanıcının "
+"zaten kayıtlı olması durumunda mevcut modu korumak."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -3819,6 +3821,8 @@ msgid ""
 "Invalid course mode: {mode}.  Failling back to {default_mode}, or resetting "
 "to {default_mode} in case the user is already enrolled."
 msgstr ""
+"Geçersiz ders modu: {mode}. {default_mode} moda geri dönmek veya "
+"kullanıcının zaten kayıtlı olması durumunda {default_mode} moda sıfırlamak."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -9107,6 +9111,9 @@ msgid ""
 "{expiration_date}{strong_close}{line_break}You lose all access to this "
 "course, including your progress, on {expiration_date}."
 msgstr ""
+"{strong_open}Gözlemci Erişimi Sonu "
+"{expiration_date}{strong_close}{line_break}Bu derse erişiminiz, tüm "
+"ilerlemenizle beraber {expiration_date} tarihinde sonlanır."
 
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
@@ -13572,7 +13579,7 @@ msgstr ""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Grant the user the permission to create courses in ALL organizations"
-msgstr ""
+msgstr "Kullanıcıya TÜM kuruluşlarda ders oluşturma izni verin"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Dump courses to CourseGraph (respect cache)"
@@ -13588,7 +13595,7 @@ msgstr ""
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Skipped all {} course(s), as they were unchanged."
-msgstr ""
+msgstr "Tüm {} ders(ler) değişmediği için atlandı."
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Dump courses to CourseGraph (override cache)"
@@ -13957,7 +13964,7 @@ msgstr "Bu sayfaya yer imi koy"
 
 #: lms/templates/conditional_block.html
 msgid "You do not have access to this dependency block."
-msgstr ""
+msgstr "Bu bağımlılık block'una erişim hakkınız yok."
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -16401,6 +16408,8 @@ msgid ""
 "Get temporary access to  {start_bold}non-graded{end_bold} activities, "
 "including discussion forums and non-graded assignments"
 msgstr ""
+"Tartışma forumları ve not verilmeyen ödevler dahil {start_bold}not "
+"verilmeyen{end_bold} etkinliklere geçici erişim elde edin"
 
 #: lms/templates/course_modes/fbe.html
 msgid ""
@@ -16440,7 +16449,7 @@ msgstr "Bu derse erişin"
 
 #: lms/templates/course_modes/unfbe.html
 msgid "Get access to the course material, including videos and readings"
-msgstr ""
+msgstr "Videolar ve okumalar dahil olmak üzere ders materyallerine erişin"
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
@@ -18322,7 +18331,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
-msgstr "Denetçi"
+msgstr "Gözlemci"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
@@ -21544,7 +21553,7 @@ msgstr "Bir örnek görün"
 
 #: cms/templates/edit-tabs.html
 msgid "What are custom pages?"
-msgstr ""
+msgstr "Özel yapım sayfalar neye yarar?"
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -21552,10 +21561,13 @@ msgid ""
 "course content. For example, you can create pages for the grading policy, "
 "course syllabus, and a course calendar. "
 msgstr ""
+"Öğrencilere ek ders içeriği sunmak için özel yapım sayfalar oluşturabilir ve"
+" var olanları değiştirebilirsiniz. Örneğin, notlandırma yöntemi, ders "
+"izlencesi ve ders takvimi gibi sayfaları bu şekilde oluşturabilirsiniz."
 
 #: cms/templates/edit-tabs.html
 msgid "How do custom pages look to students in my course?"
-msgstr ""
+msgstr "Özel yapım sayfalar öğrencilerime dersimde nasıl gözükecek?"
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -23362,7 +23374,7 @@ msgstr "Ders bitiş tarihinden sonra"
 
 #: cms/templates/settings.html
 msgid "Certificates are awarded at the end of a course run"
-msgstr ""
+msgstr "Sertifikalar bir ders çalışmasının sonunda verilir"
 
 #: cms/templates/settings.html
 msgid "Read more about this setting"
