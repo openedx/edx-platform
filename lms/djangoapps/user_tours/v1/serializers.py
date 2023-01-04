@@ -12,6 +12,9 @@ class UserTourSerializer(serializers.ModelSerializer):
 
 
 class UserDiscussionsToursSerializer(serializers.ModelSerializer):
+    """
+    Serializer for UserDiscussionsTours model.
+    """
 
     id = serializers.IntegerField(read_only=True)
     tour_name = serializers.CharField(read_only=True)
