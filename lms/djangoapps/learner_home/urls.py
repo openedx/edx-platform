@@ -11,8 +11,6 @@ urlpatterns = [
     re_path(r"^init/?", views.InitializeView.as_view(), name="initialize"),
     re_path(r"^mock/", include("lms.djangoapps.learner_home.mock.urls")),
     re_path(
-        r"^recommendation/courses/$",
-        views.CourseRecommendationApiView.as_view(),
-        name="courses",
+        r"^recommendation/", include("lms.djangoapps.learner_home.recommendations.urls")
     ),
 ]
