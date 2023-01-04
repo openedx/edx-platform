@@ -1,6 +1,7 @@
 """
-Views for the learner dashboard.
+Views for Learner Home
 """
+
 import logging
 from collections import OrderedDict
 

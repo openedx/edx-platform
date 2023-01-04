@@ -1,6 +1,5 @@
 """
-This module contains various configuration settings via
-waffle switches for the teams app.
+Configuration for features of Learner Home
 """
 
 from edx_toggles.toggles import WaffleFlag

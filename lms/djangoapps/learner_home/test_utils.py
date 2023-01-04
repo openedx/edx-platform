@@ -1,6 +1,7 @@
 """
-Various utilities used for testing/test data.
+Various utilities used for creating test data
 """
+
 import datetime
 from random import choice, getrandbits, randint
 from time import time

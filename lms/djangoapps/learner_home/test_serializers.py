@@ -1,4 +1,6 @@
-"""Tests for serializers for the Learner Dashboard"""
+"""
+Tests for serializers for the Learner Home
+"""
 
 from datetime import date, datetime, timedelta, timezone
 from itertools import product

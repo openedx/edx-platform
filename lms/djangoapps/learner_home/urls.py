@@ -1,4 +1,6 @@
-"""Learner home URL routing configuration"""
+"""
+Learner Home URL routing configuration
+"""
 
 from django.urls import include, re_path
 

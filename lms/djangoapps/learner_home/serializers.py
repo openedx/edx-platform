@@ -1,6 +1,7 @@
 """
-Serializers for the Learner Dashboard
+Serializers for Learner Home
 """
+
 from datetime import date, timedelta
 from urllib.parse import urljoin
 

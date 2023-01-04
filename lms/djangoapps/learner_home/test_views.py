@@ -1,4 +1,6 @@
-"""Test for learner views and related functions"""
+"""
+Test for Learner Home views and related functions
+"""
 
 from contextlib import contextmanager
 import json

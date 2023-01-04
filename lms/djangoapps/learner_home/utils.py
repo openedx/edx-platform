@@ -1,4 +1,6 @@
-"""API utils"""
+"""
+Additional utilities for Learner Home
+"""
 
 import logging
 
