@@ -87,10 +87,10 @@ def get_user_id_from_event(event_props):
     """
 
     user_id = None
-    if event_props.get('user_id')is not None:
+    if event_props.get('user_id') is not None:
         user_id = event_props['user_id']
     else:
         context = event_props.get('context')
-        if context.get('user_id') is not None:
-            user_id = context['user_id']
+        if context is not None:
+            user_id = context.get('user_id')
     return user_id
