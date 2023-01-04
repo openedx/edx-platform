@@ -1,4 +1,5 @@
 """ API for User Tours. """
+from django.conf import settings
 from django.db import transaction, IntegrityError
 from django.shortcuts import get_object_or_404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -12,7 +13,6 @@ from lms.djangoapps.user_tours.models import UserTour, UserDiscussionsTours
 from lms.djangoapps.user_tours.v1.serializers import UserTourSerializer, UserDiscussionsToursSerializer
 
 from rest_framework.views import APIView
-
 
 class UserTourView(RetrieveUpdateAPIView):
     """
@@ -83,11 +83,6 @@ class UserTourView(RetrieveUpdateAPIView):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-AVAILABLE_TOURS = [
-    'discussions',
-]
-
-
 class UserDiscussionsToursView(APIView):
     """
     Supports retrieving and patching the UserDiscussionsTours model
@@ -111,22 +106,32 @@ class UserDiscussionsToursView(APIView):
     authentication_classes = (JwtAuthentication, SessionAuthentication)
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
+    def get(self, request, tour_id=None):
         """
         Return a list of all tours in the database.
 
         Parameters:
             request (Request): The request object
+            tour_id (int): The ID of the tour to be retrieved.
 
         Returns:
             200: A list of tours, serialized using the UserDiscussionsToursSerializer
+            [
+                {
+                    "id": 1,
+                    "tour_name": "discussions",
+                    "show_tour": true,
+                    "user": 1
+                }
+             ]
+
         """
         try:
             with transaction.atomic():
                 tours = UserDiscussionsTours.objects.filter(user=request.user)
 
                 tours_to_create = []
-                for tour_name in AVAILABLE_TOURS:
+                for tour_name in settings.AVAILABLE_DISCUSSION_TOURS:
                     if tour_name not in [tour.tour_name for tour in tours]:
                         tours_to_create.append(UserDiscussionsTours(
                             tour_name=tour_name,
@@ -136,7 +141,6 @@ class UserDiscussionsToursView(APIView):
 
                 UserDiscussionsTours.objects.bulk_create(tours_to_create)
                 tours = UserDiscussionsTours.objects.filter(user=request.user)
-
                 serializer = UserDiscussionsToursSerializer(tours, many=True)
                 return Response(serializer.data)
         except IntegrityError:

@@ -3,7 +3,7 @@
 import ddt
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework import status
 
@@ -150,6 +150,7 @@ class TestUserTourView(TestCase):
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
+@override_settings(AVAILABLE_DISCUSSION_TOURS=['not_responded_filter'])
 class UserDiscussionsToursViewTestCase(TestCase):
     """
     Tests for the UserDiscussionsToursView view.
@@ -184,7 +185,7 @@ class UserDiscussionsToursViewTestCase(TestCase):
         self.assertEqual(response.data[0]['tour_name'], 'Test Tour')
         self.assertFalse(response.data[0]['show_tour'])
 
-        self.assertEqual(response.data[1]['tour_name'], 'discussions')
+        self.assertEqual(response.data[1]['tour_name'], 'not_responded_filter')
         self.assertTrue(response.data[1]['show_tour'])
 
     def test_get_tours_unauthenticated(self):
@@ -205,7 +206,7 @@ class UserDiscussionsToursViewTestCase(TestCase):
 
         # Send a PUT request to the view with the updated tour data
         updated_data = {'show_tour': False}
-        url = reverse('update-discussion-tour', args=[self.tour.id])
+        url = reverse('discussion-tours', args=[self.tour.id])
         response = self.client.put(url, updated_data, content_type='application/json', **headers)
 
         # Check that the response status code is correct
