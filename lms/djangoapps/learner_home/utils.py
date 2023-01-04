@@ -2,7 +2,6 @@
 
 import logging
 import requests
-from time import time
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -15,31 +14,6 @@ from common.djangoapps.student.models import (
 
 log = logging.getLogger(__name__)
 User = get_user_model()
-
-
-def exec_time_logged(func):
-    """Wrap the function and return result and execution time"""
-
-    def wrap_func(*args, **kwargs):
-        # Time the function operation
-        t1 = time()
-        result = func(*args, **kwargs)
-        t2 = time()
-
-        # Display lists / sets as their lengths instead of actual items
-        debug_args = []
-        for arg in args:
-            if isinstance(arg, (list, set)):
-                debug_args.append(f"<list: (len {len(arg)})>")
-            else:
-                debug_args.append(arg)
-
-        # Log the output
-        log.info(f"{func.__name__!r} args:{debug_args} completed in {(t2-t1):.4f}s")
-
-        return result
-
-    return wrap_func
 
 
 def get_masquerade_user(request):
