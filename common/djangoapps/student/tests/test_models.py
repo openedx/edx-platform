@@ -9,7 +9,6 @@ from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
 from django.conf import settings
-from django.db.models import signals  # pylint: disable=unused-import
 from django.db.models.functions import Lower
 from django.test import TestCase, override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -832,7 +831,7 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
             'username': 'some_user',
             'name': 'Student Person',
             'age': -1,
-            'yearOfBirth': 2022,
+            'yearOfBirth': datetime.datetime.today().year,
             'education': None,
             'address': None,
             'gender': 'Male',

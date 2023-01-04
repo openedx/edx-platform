@@ -27,6 +27,7 @@ from edx_django_utils.monitoring import set_custom_attribute, set_custom_attribu
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
+from storages.backends.s3boto import S3BotoStorage
 from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
@@ -380,6 +381,14 @@ def export_status_handler(request, course_key_string):
         artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
         if isinstance(artifact.file.storage, FileSystemStorage):
             output_url = reverse_course_url('export_output_handler', course_key)
+        elif isinstance(artifact.file.storage, S3BotoStorage):
+            filename = os.path.basename(artifact.file.name)
+            disposition = f'attachment; filename="{filename}"'
+            output_url = artifact.file.storage.url(artifact.file.name, response_headers={
+                'response-content-disposition': disposition,
+                'response-content-encoding': 'application/octet-stream',
+                'response-content-type': 'application/x-tgz'
+            })
         elif isinstance(artifact.file.storage, S3Boto3Storage):
             filename = os.path.basename(artifact.file.name)
             disposition = f'attachment; filename="{filename}"'
