@@ -33,7 +33,7 @@ class StudentViewTransformer(BlockStructureTransformer):
         for block_key in block_structure.topological_traversal():
             block = block_structure.get_xblock(block_key)
 
-            # We're iterating through descriptors (not bound to a user) that are
+            # We're iterating through blocks (not bound to a user) that are
             # given to us by the modulestore. The reason we look at
             # block.__class__ is to avoid the XModuleDescriptor -> XModule
             # proxying that would happen if we just examined block directly,
