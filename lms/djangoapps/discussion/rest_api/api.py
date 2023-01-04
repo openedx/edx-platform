@@ -166,7 +166,7 @@ class DiscussionEntity(Enum):
 
 def _get_course(course_key: CourseKey, user: User, check_tab: bool = True) -> CourseBlock:
     """
-    Get the course descriptor, raising CourseNotFoundError if the course is not found or
+    Get the course block, raising CourseNotFoundError if the course is not found or
     the user cannot access forums for the course, and DiscussionDisabledError if the
     discussion tab is disabled for the course.
 

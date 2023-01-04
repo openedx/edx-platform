@@ -50,7 +50,7 @@ def grading_context(course, course_structure):
     all_graded_blocks - This contains a list of all blocks that can
         affect grading a student. This is used to efficiently fetch
         all the xmodule state for a FieldDataCache without walking
-        the descriptor tree again.
+        the block tree again.
 
     """
     count_all_graded_blocks = 0
