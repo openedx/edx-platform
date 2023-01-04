@@ -151,6 +151,9 @@ class TestUserTourView(TestCase):
 
 
 class UserDiscussionsToursViewTestCase(TestCase):
+    """
+    Tests for the UserDiscussionsToursView view.
+    """
     def setUp(self):
         # Create a user and a tour for testing
         self.user = User.objects.create_user(
