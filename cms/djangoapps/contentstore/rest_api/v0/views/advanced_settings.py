@@ -111,9 +111,9 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
         course_key = CourseKey.from_string(course_id)
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
-        course_module = modulestore().get_course(course_key)
+        course_block = modulestore().get_course(course_key)
         return Response(CourseMetadata.fetch_all(
-            course_module,
+            course_block,
             filter_fields=filter_query_data.cleaned_data['filter_fields'],
         ))
 
@@ -174,6 +174,6 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
         course_key = CourseKey.from_string(course_id)
         if not has_studio_write_access(request.user, course_key):
             self.permission_denied(request)
-        course_module = modulestore().get_course(course_key)
-        updated_data = update_course_advanced_settings(course_module, request.data, request.user)
+        course_block = modulestore().get_course(course_key)
+        updated_data = update_course_advanced_settings(course_block, request.data, request.user)
         return Response(updated_data)

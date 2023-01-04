@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 from cms.djangoapps.contentstore.management.commands.utils import user_from_str
 from cms.djangoapps.contentstore.views.course import create_new_course_in_store
 from openedx.core.djangoapps.credit.models import CreditProvider
-from xmodule.course_module import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import DuplicateCourseError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTabList  # lint-amnesty, pylint: disable=wrong-import-order

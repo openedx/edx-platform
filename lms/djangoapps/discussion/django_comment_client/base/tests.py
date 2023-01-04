@@ -238,7 +238,7 @@ class ViewsTestCaseMixin:
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('common.djangoapps.student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.user.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             self.password = 'test'
@@ -461,7 +461,7 @@ class ViewsTestCase(
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('common.djangoapps.student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.user.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             self.password = 'test'

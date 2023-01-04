@@ -182,6 +182,8 @@ def get_course_overviews_for_pseudo_sessions(unfulfilled_entitlement_pseudo_sess
 
     # Get course IDs from unfulfilled entitlement pseudo sessions
     for pseudo_session in unfulfilled_entitlement_pseudo_sessions.values():
+        if not pseudo_session:
+            continue
         course_id = pseudo_session.get("key")
         if course_id:
             course_ids.append(CourseKey.from_string(course_id))
@@ -236,10 +238,24 @@ def get_ecommerce_payment_page(user):
 @function_trace("get_cert_statuses")
 def get_cert_statuses(user, course_enrollments):
     """Get cert status by course for user enrollments"""
-    return {
-        enrollment.course_id: cert_info(user, enrollment)
-        for enrollment in course_enrollments
-    }
+
+    cert_statuses = {}
+
+    for enrollment in course_enrollments:
+        # APER-2171 - trying to get a cert for a deleted course can throw an exception
+        # Wrap in exception handling to avoid this issue.
+        try:
+            certificate_for_course = cert_info(user, enrollment)
+
+            if certificate_for_course:
+                cert_statuses[enrollment.course_id] = certificate_for_course
+
+        except Exception as ex:  # pylint: disable=broad-except
+            logger.exception(
+                f"Error getting certificate status for (user, course) ({user}, {enrollment.course_id}): {ex}"
+            )
+
+    return cert_statuses
 
 
 @function_trace("get_org_block_and_allow_lists")

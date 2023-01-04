@@ -48,7 +48,7 @@ class TestXMLModuleStore(TestCase):
             with pytest.raises(UnicodeDecodeError):
                 xml.decode('ascii')
 
-        # Load the course, but don't make error modules.  This will succeed,
+        # Load the course, but don't make error blocks.  This will succeed,
         # but will record the errors.
         modulestore = XMLModuleStore(
             DATA_DIR,

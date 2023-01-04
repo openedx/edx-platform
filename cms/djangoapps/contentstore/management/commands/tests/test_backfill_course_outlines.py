@@ -71,7 +71,7 @@ class BackfillCourseOutlinesTest(SharedModuleStoreTestCase):
                 ItemFactory.create(
                     parent=unit,
                     category="html",
-                    display_name="An HTML Module"
+                    display_name="An HTML Block"
                 )
 
     def test_end_to_end(self):

@@ -57,10 +57,12 @@ class CookieTests(TestCase):
     def _get_expected_header_urls(self):
         expected_header_urls = {
             'logout': reverse('logout'),
-            'resume_block': retrieve_last_sitewide_block_completed(self.user),
             'account_settings': reverse('account_settings'),
             'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
         }
+        block_url = retrieve_last_sitewide_block_completed(self.user)
+        if block_url:
+            expected_header_urls['resume_block'] = block_url
 
         expected_header_urls = self._convert_to_absolute_uris(self.request, expected_header_urls)
 

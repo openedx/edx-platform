@@ -325,6 +325,18 @@ class TestGetCourseOverviewsForPseudoSessions(SharedModuleStoreTestCase):
         # Then I should get an empty dict
         self.assertDictEqual(course_overviews, {})
 
+    def test_entitlement_without_pseudo_session(self):
+        # Given an unfulfilled entitlement which does not have a psuedo session
+        pseudo_sessions = {
+            uuid4(): None,
+        }
+
+        # When I query course overviews
+        course_overviews = get_course_overviews_for_pseudo_sessions(pseudo_sessions)
+
+        # Then I should gracefully return none for that entitlement
+        self.assertDictEqual(course_overviews, {})
+
 
 class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
     """Tests for get_email_settings_info"""
@@ -635,6 +647,42 @@ class TestDashboardView(BaseTestDashboardView):
                 "isDownloadable": True,
                 "certPreviewUrl": mock_cert_info["cert_web_view_url"],
             },
+        )
+
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
+    @patch("lms.djangoapps.learner_home.views.cert_info")
+    def test_get_cert_statuses_exception(self, mock_get_cert_info):
+        """Test that cert information gets loaded correctly"""
+
+        # Given I am logged in
+        self.log_in()
+
+        # (and we have tons of mocks to avoid integration tests)
+        mock_enrollment = create_test_enrollment(
+            self.user, course_mode=CourseMode.VERIFIED
+        )
+
+        # but have an issue with a particular certificate
+        mock_get_cert_info.side_effect = Exception("test exception")
+
+        # When I request the dashboard
+        response = self.client.get(self.view_url)
+
+        # Then I get the expected success response
+        assert response.status_code == 200
+        response_data = json.loads(response.content)
+
+        empty_cert_data = {
+            "availableDate": None,
+            "isRestricted": False,
+            "isEarned": False,
+            "isDownloadable": False,
+            "certPreviewUrl": None,
+        }
+
+        # with empty cert data instead of a break
+        self.assertDictEqual(
+            response_data["courses"][0]["certificate"], empty_cert_data
         )
 
     @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)

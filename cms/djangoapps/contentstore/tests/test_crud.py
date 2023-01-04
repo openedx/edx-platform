@@ -2,14 +2,14 @@
 
 
 from xmodule import templates
-from xmodule.capa_module import ProblemBlock
-from xmodule.course_module import CourseBlock
-from xmodule.html_module import HtmlBlock
+from xmodule.capa_block import ProblemBlock
+from xmodule.course_block import CourseBlock
+from xmodule.html_block import HtmlBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.seq_module import SequenceBlock
+from xmodule.seq_block import SequenceBlock
 
 
 class TemplateTests(ModuleStoreTestCase):

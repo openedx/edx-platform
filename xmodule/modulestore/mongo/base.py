@@ -35,11 +35,11 @@ from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope, S
 from xblock.runtime import KvsFieldData
 
 from xmodule.assetstore import AssetMetadata, CourseAssetsFromStorage
-from xmodule.course_module import CourseSummary
-from xmodule.error_module import ErrorBlock
+from xmodule.course_block import CourseSummary
+from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import exc_info_to_str, null_error_tracker
 from xmodule.exceptions import HeartbeatFailure
-from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore import BulkOperationsMixin, ModuleStoreEnum, ModuleStoreWriteBase
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
@@ -521,7 +521,16 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         if default_class is not None:
             module_path, _, class_name = default_class.rpartition('.')
-            class_ = getattr(import_module(module_path), class_name)
+            try:
+                class_ = getattr(import_module(module_path), class_name)
+            except (ImportError, AttributeError):
+                fallback_module_path = "xmodule.hidden_block"
+                fallback_class_name = "HiddenBlock"
+                log.exception(
+                    "Failed to import the default store class. "
+                    f"Falling back to {fallback_module_path}.{fallback_class_name}"
+                )
+                class_ = getattr(import_module(fallback_module_path), fallback_class_name)
             self.default_class = class_
         else:
             self.default_class = None

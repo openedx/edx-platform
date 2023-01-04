@@ -17,6 +17,7 @@ from lms.djangoapps.discussion.rest_api.utils import (
     get_course_ta_users_list,
     get_course_staff_users_list,
     get_moderator_users_list,
+    get_archived_topics
 )
 
 
@@ -71,3 +72,25 @@ class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
     def test_course_ta_users_list(self):
         ta_user_list = get_course_ta_users_list(self.course.id)
         assert len(ta_user_list) == 2
+
+    def test_get_archived_topics(self):
+        # Define some example inputs
+        filtered_topic_ids = ['t1', 't2', 't3', 't4']
+        topics = [
+            {'id': 't1', 'usage_key': 'u1', 'title': 'Topic 1'},
+            {'id': 't2', 'usage_key': None, 'title': 'Topic 2'},
+            {'id': 't3', 'usage_key': 'u3', 'title': 'Topic 3'},
+            {'id': 't4', 'usage_key': 'u4', 'title': 'Topic 4'},
+            {'id': 't5', 'usage_key': None, 'title': 'Topic 5'},
+        ]
+        expected_output = [
+            {'id': 't1', 'usage_key': 'u1', 'title': 'Topic 1'},
+            {'id': 't3', 'usage_key': 'u3', 'title': 'Topic 3'},
+            {'id': 't4', 'usage_key': 'u4', 'title': 'Topic 4'},
+        ]
+
+        # Call the function with the example inputs
+        output = get_archived_topics(filtered_topic_ids, topics)
+
+        # Assert that the output matches the expected output
+        assert output == expected_output

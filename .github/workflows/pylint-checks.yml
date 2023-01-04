@@ -56,9 +56,13 @@ jobs:
 
       - name: Install required Python dependencies
         run: |
+          # dev-requirements is needed because the linter will otherwise
+          # trip over some dev-only things like django-debug-toolbar
+          # (import debug_toolbar) that aren't in testing.txt.
           make dev-requirements
           pip uninstall -y mysqlclient
           pip install --no-binary mysqlclient mysqlclient
+          pip check
 
       - name: Run quality tests
         run: |

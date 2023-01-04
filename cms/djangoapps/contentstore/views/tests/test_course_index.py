@@ -525,9 +525,9 @@ class TestCourseOutline(CourseTestCase):
                 self.assert_correct_json_response(child_response, is_concise)
 
     def test_course_outline_initial_state(self):
-        course_module = modulestore().get_item(self.course.location)
+        course_block = modulestore().get_item(self.course.location)
         course_structure = create_xblock_info(
-            course_module,
+            course_block,
             include_child_info=True,
             include_children_predicate=lambda xblock: not xblock.category == 'vertical'
         )
@@ -543,7 +543,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertIn(str(self.sequential.location), expanded_locators)
         self.assertIn(str(self.vertical.location), expanded_locators)
 
-    def _create_test_data(self, course_module, create_blocks=False, publish=True, block_types=None):
+    def _create_test_data(self, course_block, create_blocks=False, publish=True, block_types=None):
         """
         Create data for test.
         """
@@ -558,7 +558,7 @@ class TestCourseOutline(CourseTestCase):
             if not publish:
                 self.store.unpublish(self.vertical.location, self.user.id)
 
-        course_module.advanced_modules.extend(block_types)
+        course_block.advanced_modules.extend(block_types)
 
     def _verify_deprecated_info(self, course_id, advanced_modules, info, deprecated_block_types):
         """
@@ -594,12 +594,12 @@ class TestCourseOutline(CourseTestCase):
         """
         Verify deprecated warning info.
         """
-        course_module = modulestore().get_item(self.course.location)
-        self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
-        info = _deprecated_blocks_info(course_module, block_types)
+        course_block = modulestore().get_item(self.course.location)
+        self._create_test_data(course_block, create_blocks=True, block_types=block_types, publish=publish)
+        info = _deprecated_blocks_info(course_block, block_types)
         self._verify_deprecated_info(
-            course_module.id,
-            course_module.advanced_modules,
+            course_block.id,
+            course_block.advanced_modules,
             info,
             block_types
         )
@@ -611,17 +611,17 @@ class TestCourseOutline(CourseTestCase):
         (["a", "b", "c"], ["d", "e", "f"])
     )
     @ddt.unpack
-    def test_verify_warn_only_on_enabled_modules(self, enabled_block_types, deprecated_block_types):
+    def test_verify_warn_only_on_enabled_blocks(self, enabled_block_types, deprecated_block_types):
         """
         Verify that we only warn about block_types that are both deprecated and enabled.
         """
         expected_block_types = list(set(enabled_block_types) & set(deprecated_block_types))
-        course_module = modulestore().get_item(self.course.location)
-        self._create_test_data(course_module, create_blocks=True, block_types=enabled_block_types)
-        info = _deprecated_blocks_info(course_module, deprecated_block_types)
+        course_block = modulestore().get_item(self.course.location)
+        self._create_test_data(course_block, create_blocks=True, block_types=enabled_block_types)
+        info = _deprecated_blocks_info(course_block, deprecated_block_types)
         self._verify_deprecated_info(
-            course_module.id,
-            course_module.advanced_modules,
+            course_block.id,
+            course_block.advanced_modules,
             info,
             expected_block_types
         )
@@ -728,7 +728,7 @@ class TestCourseReIndex(CourseTestCase):
         self.assertContains(response, self.SUCCESSFUL_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
-    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
+    @mock.patch('xmodule.html_block.HtmlBlock.index_dictionary')
     def test_reindex_course_search_index_error(self, mock_index_dictionary):
         """
         Test json response with mocked error data for html
@@ -769,7 +769,7 @@ class TestCourseReIndex(CourseTestCase):
             course_id=str(self.course.id))
         self.assertEqual(response['total'], 1)
 
-    @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
+    @mock.patch('xmodule.video_block.VideoBlock.index_dictionary')
     def test_reindex_video_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for video
@@ -791,7 +791,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             reindex_course_and_check_access(self.course.id, self.user)
 
-    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
+    @mock.patch('xmodule.html_block.HtmlBlock.index_dictionary')
     def test_reindex_html_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for html
@@ -813,7 +813,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             reindex_course_and_check_access(self.course.id, self.user)
 
-    @mock.patch('xmodule.seq_module.SequenceBlock.index_dictionary')
+    @mock.patch('xmodule.seq_block.SequenceBlock.index_dictionary')
     def test_reindex_seq_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for sequence
@@ -879,7 +879,7 @@ class TestCourseReIndex(CourseTestCase):
             course_id=str(self.course.id))
         self.assertEqual(response['total'], 1)
 
-    @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
+    @mock.patch('xmodule.video_block.VideoBlock.index_dictionary')
     def test_indexing_video_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for video
@@ -901,7 +901,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
-    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
+    @mock.patch('xmodule.html_block.HtmlBlock.index_dictionary')
     def test_indexing_html_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for html
@@ -923,7 +923,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
-    @mock.patch('xmodule.seq_module.SequenceBlock.index_dictionary')
+    @mock.patch('xmodule.seq_block.SequenceBlock.index_dictionary')
     def test_indexing_seq_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for sequence

@@ -1005,7 +1005,7 @@ MODULESTORE = {
                     'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'default_class': 'xmodule.hidden_block.HiddenBlock',
                         'fs_root': DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
@@ -1015,7 +1015,7 @@ MODULESTORE = {
                     'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'default_class': 'xmodule.hidden_block.HiddenBlock',
                         'fs_root': DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
@@ -1516,14 +1516,10 @@ YOUTUBE = {
     # URL to get YouTube metadata
     'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos',
 
-    # Current youtube api for requesting transcripts.
-    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
-    'TEXT_API': {
-        'url': 'video.google.com/timedtext',
-        'params': {
-            'lang': 'en',
-            'v': 'set_youtube_id_of_11_symbols_here',
-        },
+    # Web page mechanism for scraping transcript information from youtube video pages
+    'TRANSCRIPTS': {
+        'CAPTION_TRACKS_REGEX': r"captionTracks\"\:\[(?P<caption_tracks>[^\]]+)",
+        'YOUTUBE_URL_BASE': 'https://www.youtube.com/watch?v=',
     },
 
     'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
@@ -1582,7 +1578,7 @@ INSTALLED_APPS = [
     # Monitor the status of services
     'openedx.core.djangoapps.service_status',
 
-    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    # Video block configs (This will be moved to Video once it becomes an XBlock)
     'openedx.core.djangoapps.video_config',
 
     # edX Video Pipeline integration

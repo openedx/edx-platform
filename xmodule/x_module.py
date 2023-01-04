@@ -1620,7 +1620,7 @@ class ModuleSystemShim:
     def rebind_noauth_module_to_user(self):
         """
         A function that was used to bind modules initialized by AnonymousUsers to real users. Mainly used
-        by the LTI Module to connect the right users with the requests from LTI tools.
+        by the LTI Block to connect the right users with the requests from LTI tools.
 
         Deprecated in favour of the "rebind_user" service.
         """

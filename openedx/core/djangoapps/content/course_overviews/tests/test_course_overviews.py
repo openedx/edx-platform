@@ -28,12 +28,12 @@ from xmodule.assetstore.assetmgr import AssetManager  # lint-amnesty, pylint: di
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_metadata_utils import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_module import (  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import (  # lint-amnesty, pylint: disable=wrong-import-order
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
-from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -141,6 +141,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             ('clean_id', ('#',)),
             ('has_ended', ()),
             ('has_started', ()),
+            ('is_enrollment_open', ()),
         ]
         for method_name, method_args in methods_to_test:
             course_value = getattr(course, method_name)(*method_args)
@@ -160,7 +161,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         time_field_accessor = lambda object, field_name: get_seconds_since_epoch(getattr(object, field_name))
 
         # The course about fields are accessed through the CourseDetail
-        # class for the course module, and stored as attributes on the
+        # class for the course block, and stored as attributes on the
         # CourseOverview objects.
         course_about_accessor = lambda object, field_name: CourseDetails.fetch_about_attribute(object.id, field_name)
 

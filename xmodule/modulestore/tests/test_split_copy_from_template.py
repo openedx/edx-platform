@@ -59,7 +59,7 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         problem_block_course = self.store.get_item(vertical_block_course.children[0])
         assert problem_block_course.display_name == problem_library_display_name
 
-        # Check that when capa modules are copied, their "markdown" fields (Scope.settings) are removed.
+        # Check that when capa blocks are copied, their "markdown" fields (Scope.settings) are removed.
         # (See note in split.py:copy_from_template())
         assert problem_block.markdown is not None
         assert problem_block_course.markdown is None

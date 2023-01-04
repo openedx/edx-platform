@@ -63,12 +63,12 @@ LOGGER = logging.getLogger(__name__)
 def _get_course_and_check_access(course_key, user, depth=0):
     """
     Internal method used to calculate and return the locator and
-    course module for the view functions in this file.
+    course block for the view functions in this file.
     """
     if not has_studio_write_access(user, course_key):
         raise PermissionDenied()
-    course_module = modulestore().get_course(course_key, depth=depth)
-    return course_module
+    course_block = modulestore().get_course(course_key, depth=depth)
+    return course_block
 
 
 def _delete_asset(course_key, asset_key_string):

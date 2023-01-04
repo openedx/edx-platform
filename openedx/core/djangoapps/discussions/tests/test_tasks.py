@@ -84,7 +84,7 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase, Discussio
                 display_name="Non-Discussable Unit",
                 discussion_enabled=False,
             )
-            ItemFactory.create(parent=self.unit, category="html", display_name="An HTML Module")
+            ItemFactory.create(parent=self.unit, category="html", display_name="An HTML Block")
             graded_sequence = ItemFactory.create(
                 parent=self.section,
                 category="sequential",
@@ -111,7 +111,7 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase, Discussio
             ItemFactory.create(
                 parent=graded_unit,
                 category="html",
-                display_name="Graded HTML Module",
+                display_name="Graded HTML Block",
             )
         discussion_config = DiscussionsConfiguration.get(course_key)
         discussion_config.provider_type = Provider.OPEN_EDX

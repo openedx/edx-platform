@@ -22,7 +22,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin, compute_inherited_
 from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
-from xmodule.xml_module import is_pointer_tag
+from xmodule.xml_block import is_pointer_tag
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -288,7 +288,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         # pylint: disable=protected-access
         assert original_unwrapped is not descriptor._unwrapped_field_data
         compute_inherited_metadata(descriptor)
-        # Check the course module, since it has inheritance
+        # Check the course block, since it has inheritance
         descriptor = descriptor.get_children()[0]
         self.course_descriptor_inheritance_check(descriptor, from_date_string, unicorn_color)
 

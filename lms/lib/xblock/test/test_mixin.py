@@ -47,14 +47,14 @@ class LmsXBlockMixinTestCase(ModuleStoreTestCase):
         video = ItemFactory.create(parent=vertical, category='video', display_name='Test Video 1')
         split_test = ItemFactory.create(parent=vertical, category='split_test', display_name='Test Content Experiment')
         child_vertical = ItemFactory.create(parent=split_test, category='vertical')
-        child_html_module = ItemFactory.create(parent=child_vertical, category='html')
+        child_html_block = ItemFactory.create(parent=child_vertical, category='html')
         self.section_location = section.location
         self.subsection_location = subsection.location
         self.vertical_location = vertical.location
         self.video_location = video.location
         self.split_test_location = split_test.location
         self.child_vertical_location = child_vertical.location
-        self.child_html_module_location = child_html_module.location
+        self.child_html_block_location = child_html_block.location
 
     def set_group_access(self, block_location, access_dict):
         """
@@ -180,14 +180,14 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
         self.set_group_access(self.split_test_location, {self.user_partition.id: [self.group2.id]})
         self.set_group_access(self.child_vertical_location, {self.user_partition.id: [self.group2.id]})
-        self.set_group_access(self.child_html_module_location, {self.user_partition.id: [self.group2.id]})
-        validation = self.store.get_item(self.child_html_module_location).validate()
+        self.set_group_access(self.child_html_block_location, {self.user_partition.id: [self.group2.id]})
+        validation = self.store.get_item(self.child_html_block_location).validate()
         assert len(validation.messages) == 0
 
         # Test that a validation message is displayed on split_test child when the child contradicts the parent,
         # even though the child agrees with the grandparent unit.
-        self.set_group_access(self.child_html_module_location, {self.user_partition.id: [self.group1.id]})
-        validation = self.store.get_item(self.child_html_module_location).validate()
+        self.set_group_access(self.child_html_block_location, {self.user_partition.id: [self.group1.id]})
+        validation = self.store.get_item(self.child_html_block_location).validate()
         assert len(validation.messages) == 1
         self.verify_validation_message(
             validation.messages[0],

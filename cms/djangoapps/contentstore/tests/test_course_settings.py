@@ -40,7 +40,6 @@ from openedx.core.djangoapps.discussions.config.waffle import (
 )
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -602,10 +601,9 @@ class CourseGradingTest(CourseTestCase):
     @mock.patch('common.djangoapps.track.event_transaction_utils.uuid4')
     @mock.patch('cms.djangoapps.models.settings.course_grading.tracker')
     @mock.patch('cms.djangoapps.contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_update_from_json(self, store, send_signal, tracker, uuid):
+    def test_update_from_json(self, send_signal, tracker, uuid):
         uuid.return_value = "mockUUID"
-        self.course = CourseFactory.create(default_store=store)
+        self.course = CourseFactory.create()
         test_grader = CourseGradingModel.fetch(self.course.id)
         # there should be no event raised after this call, since nothing got modified
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
@@ -660,14 +658,13 @@ class CourseGradingTest(CourseTestCase):
             )
         ])
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_must_fire_grading_event_and_signal_multiple_type(self, store):
+    def test_must_fire_grading_event_and_signal_multiple_type(self):
         """
         Verifies that 'must_fire_grading_event_and_signal' ignores (returns False) if we modify
         short_label and or name
         use test_must_fire_grading_event_and_signal_multiple_type_2_split to run this test only
         """
-        self.course = CourseFactory.create(default_store=store)
+        self.course = CourseFactory.create()
         # .raw_grader approximates what our UI sends down. It uses decimal representation of percent
         # without it, the  weights would be percentages
         raw_grader_list = modulestore().get_course(self.course.id).raw_grader
@@ -686,14 +683,13 @@ class CourseGradingTest(CourseTestCase):
         self.assertTrue(result)
 
     @override_waffle_flag(MATERIAL_RECOMPUTE_ONLY_FLAG, True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_must_fire_grading_event_and_signal_multiple_type_waffle_on(self, store):
+    def test_must_fire_grading_event_and_signal_multiple_type_waffle_on(self):
         """
         Verifies that 'must_fire_grading_event_and_signal' ignores (returns False) if we modify
         short_label and or name
         use test_must_fire_grading_event_and_signal_multiple_type_2_split to run this test only
         """
-        self.course = CourseFactory.create(default_store=store)
+        self.course = CourseFactory.create()
         # .raw_grader approximates what our UI sends down. It uses decimal representation of percent
         # without it, the  weights would be percentages
         raw_grader_list = modulestore().get_course(self.course.id).raw_grader
@@ -711,14 +707,13 @@ class CourseGradingTest(CourseTestCase):
         )
         self.assertFalse(result)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_must_fire_grading_event_and_signal_return_true(self, store):
+    def test_must_fire_grading_event_and_signal_return_true(self):
         """
         Verifies that 'must_fire_grading_event_and_signal' ignores (returns False) if we modify
         short_label and or name
         use _2_split suffix to run this test only
         """
-        self.course = CourseFactory.create(default_store=store)
+        self.course = CourseFactory.create()
         # .raw_grader approximates what our UI sends down. It uses decimal representation of percent
         # without it, the  weights would be percentages
         raw_grader_list = modulestore().get_course(self.course.id).raw_grader

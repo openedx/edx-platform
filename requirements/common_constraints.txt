@@ -3,11 +3,6 @@
 # See BOM-2721 for more details.
 # Below is the copied and edited version of common_constraints
 
-# This is a temporary solution to override the real common_constraints.txt
-# In edx-lint, until the pyjwt constraint in edx-lint has been removed.
-# See BOM-2721 for more details.
-# Below is the copied and edited version of common_constraints
-
 # A central location for most common version constraints
 # (across edx repos) for pip-installation.
 #
@@ -35,3 +30,7 @@ setuptools<60
 
 # django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
 django-simple-history==3.0.0
+
+# tox>4.0.0 isn't yet compatible with many tox plugins, causing CI failures in almost all repos.
+# Details can be found in this discussion: https://github.com/tox-dev/tox/discussions/1810
+tox<4.0.0

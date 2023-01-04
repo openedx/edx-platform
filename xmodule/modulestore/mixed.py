@@ -392,7 +392,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     @strip_key
     def get_course(self, course_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
-        returns the course module associated with the course_id. If no such course exists,
+        returns the course block associated with the course_id. If no such course exists,
         it returns None
 
         :param course_key: must be a CourseKey

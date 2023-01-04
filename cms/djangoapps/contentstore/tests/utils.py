@@ -4,8 +4,6 @@ Utilities for contentstore tests
 
 
 import json
-import textwrap
-from unittest.mock import Mock
 
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -19,6 +17,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.tests.test_transcripts_utils import YoutubeVideoHTMLResponse
 
 from cms.djangoapps.contentstore.utils import reverse_url
 from common.djangoapps.student.models import Registration
@@ -193,15 +192,15 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         content_store.set_attr(self.LOCKED_ASSET_KEY, 'locked', True)
 
         # create a non-portable link - should be rewritten in new courses
-        html_module = self.store.get_item(course_id.make_usage_key('html', 'nonportable'))
-        new_data = html_module.data = html_module.data.replace(
+        html_block = self.store.get_item(course_id.make_usage_key('html', 'nonportable'))
+        new_data = html_block.data = html_block.data.replace(
             '/static/',
             f'/c4x/{course_id.org}/{course_id.course}/asset/'
         )
-        self.store.update_item(html_module, self.user.id)
+        self.store.update_item(html_block, self.user.id)
 
-        html_module = self.store.get_item(html_module.location)
-        self.assertEqual(new_data, html_module.data)
+        html_block = self.store.get_item(html_block.location)
+        self.assertEqual(new_data, html_block.data)
 
         return course_id
 
@@ -273,8 +272,8 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         self.assertAssetsEqual(self.LOCKED_ASSET_KEY, self.LOCKED_ASSET_KEY.course_key, course_id)
 
         # verify non-portable links are rewritten
-        html_module = self.store.get_item(course_id.make_usage_key('html', 'nonportable'))
-        self.assertIn('/static/foo.jpg', html_module.data)
+        html_block = self.store.get_item(course_id.make_usage_key('html', 'nonportable'))
+        self.assertIn('/static/foo.jpg', html_block.data)
 
         return course
 
@@ -365,33 +364,31 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
                 self.assertEqual(value, course2_asset_attrs[key])
 
 
-def mock_requests_get(*args, **kwargs):
+class HTTPGetResponse:
     """
-    Returns mock responses for the youtube API.
+    Generic object used to return results from a mock patch to an HTTP GET request
     """
-    # pylint: disable=unused-argument
-    response_transcript_list = """
-    <transcript_list>
-        <track id="1" name="Custom" lang_code="en" />
-        <track id="0" name="Custom1" lang_code="en-GB"/>
-    </transcript_list>
-    """
-    response_transcript = textwrap.dedent("""
-    <transcript>
-        <text start="100" dur="100">subs #1</text>
-        <text start="200" dur="40">subs #2</text>
-        <text start="240" dur="140">subs #3</text>
-    </transcript>
-    """)
+    def __init__(self, status_code, response_string):
+        self.status_code = status_code
+        self.text = response_string
+        self.content = response_string.encode('utf-8')
 
-    if kwargs == {'params': {'lang': 'en', 'v': 'good_id_2'}}:
-        return Mock(status_code=200, text='')
-    elif kwargs == {'params': {'type': 'list', 'v': 'good_id_2'}}:
-        return Mock(status_code=200, text=response_transcript_list, content=response_transcript_list)
-    elif kwargs == {'params': {'lang': 'en', 'v': 'good_id_2', 'name': 'Custom'}}:
-        return Mock(status_code=200, text=response_transcript, content=response_transcript)
 
-    return Mock(status_code=404, text='')
+def setup_caption_responses(mock_get, language_code, caption_response_string, track_status_code=200):
+    """
+    When fetching youtube captions, two calls to requests.get() are required. The first fetches a
+    captions URL (link) from the video page, applicable to the selected language track. The second
+    fetches caption timing information from that track's captions URL.
+
+    This helper method assumes that the two operations are performed in order, and is used in conjunction
+    with mock patch() operations to return appropriate results for each of the two get operations.
+    """
+    caption_link_response = YoutubeVideoHTMLResponse.with_caption_track(language_code)
+    caption_track_response = HTTPGetResponse(track_status_code, caption_response_string)
+    mock_get.side_effect = [
+        caption_link_response,
+        caption_track_response,
+    ]
 
 
 def get_url(handler_name, key_value, key_name='usage_key_string', kwargs=None):

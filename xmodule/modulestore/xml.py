@@ -23,9 +23,9 @@ from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore
 
 from common.djangoapps.util.monitoring import monitor_import_failure
-from xmodule.error_module import ErrorBlock
+from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import exc_info_to_str, make_error_tracker
-from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.tabs import CourseTabList
@@ -335,7 +335,16 @@ class XMLModuleStore(ModuleStoreReadBase):
             self.default_class = None
         else:
             module_path, _, class_name = default_class.rpartition('.')
-            class_ = getattr(import_module(module_path), class_name)
+            try:
+                class_ = getattr(import_module(module_path), class_name)
+            except (ImportError, AttributeError):
+                fallback_module_path = "xmodule.hidden_block"
+                fallback_class_name = "HiddenBlock"
+                log.exception(
+                    "Failed to import the default store class. "
+                    f"Falling back to {fallback_module_path}.{fallback_class_name}"
+                )
+                class_ = getattr(import_module(fallback_module_path), fallback_class_name)
             self.default_class = class_
 
         # All field data will be stored in an inheriting field data.

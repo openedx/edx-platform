@@ -9,7 +9,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from openedx.core.lib.safe_lxml import etree
-from xmodule.poll_module import PollBlock
+from xmodule.poll_block import PollBlock
 from . import get_test_system
 from .test_import import DummySystem
 
@@ -58,7 +58,7 @@ class PollBlockTest(unittest.TestCase):
 
     def test_poll_export_with_unescaped_characters_xml(self):
         """
-        Make sure that poll_module will export fine if its xml contains
+        Make sure that poll_block will export fine if its xml contains
         unescaped characters.
         """
         module_system = DummySystem(load_error_modules=True)

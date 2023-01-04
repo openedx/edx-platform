@@ -163,7 +163,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         """Confirm that we send the external updates experiment bucket with the activation signal"""
         with patch('openedx.core.djangoapps.schedules.config.set_up_external_updates_for_enrollment',
                    return_value=value):
-            with patch('common.djangoapps.student.models.segment') as mock_segment:
+            with patch('common.djangoapps.student.models.course_enrollment.segment') as mock_segment:
                 CourseEnrollment.enroll(self.user, self.course.id)
 
         assert mock_segment.track.call_count == 1
@@ -171,7 +171,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         assert mock_segment.track.call_args[0][2]['external_course_updates'] == value
 
     def test_enrollment_properties_in_segment_traits(self):
-        with patch('common.djangoapps.student.models.segment') as mock_segment:
+        with patch('common.djangoapps.student.models.course_enrollment.segment') as mock_segment:
             enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         assert mock_segment.track.call_count == 1
         assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.activated'
@@ -180,7 +180,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         assert traits['mode'] == 'audit'
         assert traits['email'] == self.EMAIL
 
-        with patch('common.djangoapps.student.models.segment') as mock_segment:
+        with patch('common.djangoapps.student.models.course_enrollment.segment') as mock_segment:
             enrollment.update_enrollment(mode='verified')
         assert mock_segment.track.call_count == 1
         assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.mode_changed'
@@ -242,7 +242,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         requirements should be sent. The email should not be sent for non-verified modes.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             # First enroll in a non-proctored course. This should not trigger the email.
@@ -259,7 +259,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         any proctored exams, they should not receive a proctoring requirements email.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             CourseEnrollment.enroll(
@@ -274,7 +274,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         should be sent.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             enrollment = CourseEnrollment.enroll(
@@ -293,7 +293,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         enroll in honor mode for a course with proctored exams.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             course_honor_mode = CourseFactory(

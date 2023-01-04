@@ -34,7 +34,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         r"""
-        Creates two courses; one that's just a course module, and one that
+        Creates two courses; one that's just a course block, and one that
         looks like:
                         course
                            |
