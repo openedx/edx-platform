@@ -479,16 +479,9 @@
         };
 
         DiscussionUtil.convertMath = function(element) {
-          debugger;
-          console.log('here I am ')
-          console.log(element)
-          let text = element.text()
-          let red =  this.markdownWithHighlight(text)
-          console.log(text)
-          console.log(red)
             edx.HtmlUtils.setHtml(
                 element,
-                this.postMathJaxProcessor(red)
+                this.postMathJaxProcessor(this.markdownWithHighlight(element.text()))
             );
 
         };

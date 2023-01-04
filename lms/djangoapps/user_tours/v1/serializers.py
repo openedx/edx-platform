@@ -25,4 +25,3 @@ class UserDiscussionsToursSerializer(serializers.ModelSerializer):
         # Convert the status field to a boolean value
         instance.show_tour = bool(instance.show_tour)
         return super().to_representation(instance)
-
