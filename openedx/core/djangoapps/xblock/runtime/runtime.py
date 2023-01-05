@@ -304,7 +304,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
                 self.django_field_data_caches[context_key] = field_data_cache
             else:
                 field_data_cache = self.django_field_data_caches[context_key]
-                field_data_cache.add_descriptors_to_cache([block])
+                field_data_cache.add_blocks_to_cache([block])
             student_data_store = KvsFieldData(kvs=DjangoKeyValueStore(field_data_cache))
 
         return SplitFieldData({
