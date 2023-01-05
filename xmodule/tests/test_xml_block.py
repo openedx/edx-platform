@@ -251,8 +251,8 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         )
 
     def test_integer_field(self):
-        descriptor = self.get_descriptor(DictFieldData({'max_attempts': '7'}))
-        editable_fields = descriptor.editable_metadata_fields
+        block = self.get_block(DictFieldData({'max_attempts': '7'}))
+        editable_fields = block.editable_metadata_fields
         assert 8 == len(editable_fields)
         self.assert_field_values(
             editable_fields, 'max_attempts', TestFields.max_attempts,
@@ -264,7 +264,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
             explicitly_set=False, value='local default', default_value='local default'
         )
 
-        editable_fields = self.get_descriptor(DictFieldData({})).editable_metadata_fields
+        editable_fields = self.get_block(DictFieldData({})).editable_metadata_fields
         self.assert_field_values(
             editable_fields, 'max_attempts', TestFields.max_attempts,
             explicitly_set=False, value=1000, default_value=1000, type='Integer',
@@ -274,8 +274,8 @@ class EditableMetadataFieldsTest(unittest.TestCase):
     def test_inherited_field(self):
         kvs = InheritanceKeyValueStore(initial_values={}, inherited_settings={'showanswer': 'inherited'})
         model_data = KvsFieldData(kvs)
-        descriptor = self.get_descriptor(model_data)
-        editable_fields = descriptor.editable_metadata_fields
+        block = self.get_block(model_data)
+        editable_fields = block.editable_metadata_fields
         self.assert_field_values(
             editable_fields, 'showanswer', InheritanceMixin.showanswer,
             explicitly_set=False, value='inherited', default_value='inherited'
@@ -287,8 +287,8 @@ class EditableMetadataFieldsTest(unittest.TestCase):
             inherited_settings={'showanswer': 'inheritable value'}
         )
         model_data = KvsFieldData(kvs)
-        descriptor = self.get_descriptor(model_data)
-        editable_fields = descriptor.editable_metadata_fields
+        block = self.get_block(model_data)
+        editable_fields = block.editable_metadata_fields
         self.assert_field_values(
             editable_fields, 'showanswer', InheritanceMixin.showanswer,
             explicitly_set=True, value='explicit', default_value='inheritable value'
@@ -298,8 +298,8 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         # test_display_name_field verifies that a String field is of type "Generic".
         # test_integer_field verifies that a Integer field is of type "Integer".
 
-        descriptor = self.get_descriptor(DictFieldData({}))
-        editable_fields = descriptor.editable_metadata_fields
+        block = self.get_block(DictFieldData({}))
+        editable_fields = block.editable_metadata_fields
 
         # Tests for select
         self.assert_field_values(
@@ -343,16 +343,16 @@ class EditableMetadataFieldsTest(unittest.TestCase):
             field_data=field_data,
         ).editable_metadata_fields
 
-    def get_descriptor(self, field_data):
-        class TestModuleDescriptor(TestFields, self.TestableXmlXBlock):  # lint-amnesty, pylint: disable=abstract-method
+    def get_block(self, field_data):
+        class TestModuleBlock(TestFields, self.TestableXmlXBlock):  # lint-amnesty, pylint: disable=abstract-method
             @property
             def non_editable_metadata_fields(self):
                 non_editable_fields = super().non_editable_metadata_fields
-                non_editable_fields.append(TestModuleDescriptor.due)
+                non_editable_fields.append(TestModuleBlock.due)
                 return non_editable_fields
 
         system = get_test_descriptor_system(render_template=Mock())
-        return system.construct_xblock_from_class(TestModuleDescriptor, field_data=field_data, scope_ids=Mock())
+        return system.construct_xblock_from_class(TestModuleBlock, field_data=field_data, scope_ids=Mock())
 
     def assert_field_values(self, editable_fields, name, field, explicitly_set, value, default_value,  # lint-amnesty, pylint: disable=dangerous-default-value
                             type='Generic', options=[]):  # lint-amnesty, pylint: disable=redefined-builtin

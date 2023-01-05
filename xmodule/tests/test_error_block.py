@@ -31,14 +31,14 @@ class TestErrorBlock(SetupTestErrorBlock):
     """
 
     def test_error_block_xml_rendering(self):
-        descriptor = ErrorBlock.from_xml(
+        block = ErrorBlock.from_xml(
             self.valid_xml,
             self.system,
             CourseLocationManager(self.course_id),
             self.error_msg
         )
-        assert isinstance(descriptor, ErrorBlock)
-        descriptor.runtime = self.system
-        context_repr = self.system.render(descriptor, STUDENT_VIEW).content
+        assert isinstance(block, ErrorBlock)
+        block.runtime = self.system
+        context_repr = self.system.render(block, STUDENT_VIEW).content
         assert self.error_msg in context_repr
         assert repr(self.valid_xml) in context_repr
