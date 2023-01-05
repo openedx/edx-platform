@@ -190,7 +190,7 @@ class RebindUserService(Service):
             log.error(err_msg)
             raise RebindUserServiceError(err_msg)
 
-        field_data_cache_real_user = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache_real_user = FieldDataCache.cache_for_block_descendents(
             self.course_id,
             real_user,
             block,
