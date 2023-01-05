@@ -747,6 +747,7 @@ def get_course_data(course_key_str, fields):
 
     Arguments:
         course_key_str: key for the course about which we are retrieving information.
+        fields (List, string): The given fields that you want to retrieve from API response.
 
     Returns:
         dict with details about specified course.
