@@ -1177,10 +1177,26 @@ class ModuleSystemShim:
             'Use MakoService.render_template or a JavaScript-based template instead.',
             DeprecationWarning, stacklevel=2,
         )
+        if hasattr(self, '_deprecated_render_template'):
+            return self._deprecated_render_template
         render_service = self._services.get('mako')
         if render_service:
             return render_service.render_template
         return None
+
+    @render_template.setter
+    def render_template(self, render_template):
+        """
+        Set render_template.
+
+        Deprecated in favor of the mako service.
+        """
+        warnings.warn(
+            'Use of runtime.render_template is deprecated. '
+            'Use MakoService.render_template or a JavaScript-based template instead.',
+            DeprecationWarning, stacklevel=2,
+        )
+        self._deprecated_render_template = render_template
 
     @property
     def xqueue(self):
@@ -1382,15 +1398,39 @@ class ModuleSystemShim:
             "`runtime.course_id` is deprecated. Use `context_key` instead: `runtime.scope_ids.usage_id.context_key`.",
             DeprecationWarning, stacklevel=3,
         )
+        if hasattr(self, '_deprecated_course_id'):
+            return self._deprecated_course_id
         return self.descriptor_runtime.course_id.for_branch(None)
 
+    @course_id.setter
+    def course_id(self, course_id):
+        """
+        Set course_id.
 
-class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
+        Deprecated in favor of `runtime.scope_ids.usage_id.context_key`.
+        """
+        warnings.warn(
+            "`runtime.course_id` is deprecated. Use `context_key` instead: `runtime.scope_ids.usage_id.context_key`.",
+            DeprecationWarning, stacklevel=3,
+        )
+        self._deprecated_course_id = course_id
+
+
+class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
     """
+
+    def get(self, attr):
+        """	provide uniform access to attributes (like etree)."""
+        return self.__dict__.get(attr)
+
+    def set(self, attr, val):
+        """provide uniform access to attributes (like etree)"""
+        self.__dict__[attr] = val
+
     def __init__(
-        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=lambda: [], **kwargs
+        self, load_item, resources_fs, error_tracker, descriptor_runtime=None, get_policy=None, disabled_xblock_types=lambda: [], get_module=None, **kwargs
     ):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -1426,9 +1466,23 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
             self.get_policy = lambda u: {}
 
         self.disabled_xblock_types = disabled_xblock_types
+        self.get_module = get_module
+        self.descriptor_runtime = descriptor_runtime
+
+    def get(self, attr):
+        """	provide uniform access to attributes (like etree)."""
+        return self.__dict__.get(attr)
+
+    def set(self, attr, val):
+        """provide uniform access to attributes (like etree)"""
+        self.__dict__[attr] = val
 
     def get_block(self, usage_id, for_parent=None):
         """See documentation for `xblock.runtime:Runtime.get_block`"""
+        if self.get_module:
+            # return self.get_module(block)
+            return self.get_module(self.descriptor_runtime.get_block(usage_id, for_parent=for_parent))
+
         return self.load_item(usage_id, for_parent=for_parent)
 
     def load_block_type(self, block_type):
@@ -1503,8 +1557,12 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         block.add_xml_to_node(child)
 
     def publish(self, block, event_type, event):  # lint-amnesty, pylint: disable=arguments-differ
-        # A stub publish method that doesn't emit any events from XModuleDescriptors.
-        pass
+        """
+        Publish events through the `EventPublishingService`.
+        This ensures that the correct track method is used for Instructor tasks.
+        """
+        if publish_service := self._services.get('publish'):
+            publish_service.publish(block, event_type, event)
 
     def service(self, block, service_name):
         """
@@ -1643,107 +1701,6 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
                         assert isinstance(subvalue, str)
                         field_value[key] = self._make_usage_key(course_key, subvalue)
                     setattr(xblock, field.name, field_value)
-
-
-class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
-    """
-    This is an abstraction such that x_modules can function independent
-    of the courseware (e.g. import into other types of courseware, LMS,
-    or if we want to have a sandbox server for user-contributed content)
-
-    ModuleSystem objects are passed to x_modules to provide access to system
-    functionality.
-
-    Note that these functions can be closures over e.g. a django request
-    and user, or other environment-specific info.
-    """
-
-    def __init__(
-        self,
-        get_block,
-        descriptor_runtime,
-        **kwargs,
-    ):
-        """
-        Create a closure around the system environment.
-
-        get_block - function that takes a descriptor and returns a corresponding
-                         block instance object.  If the current user does not have
-                         access to that location, returns None.
-
-        descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
-        """
-
-        kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
-        kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
-        super().__init__(**kwargs)
-
-        self.get_block_for_descriptor = get_block
-
-        self.xmodule_instance = None
-
-        self.descriptor_runtime = descriptor_runtime
-
-    def get(self, attr):
-        """	provide uniform access to attributes (like etree)."""
-        return self.__dict__.get(attr)
-
-    def set(self, attr, val):
-        """provide uniform access to attributes (like etree)"""
-        self.__dict__[attr] = val
-
-    def __repr__(self):
-        kwargs = self.__dict__.copy()
-
-        # Remove value set transiently by XBlock
-        kwargs.pop('_view_name')
-
-        return f"{self.__class__.__name__}{kwargs}"
-
-    @property
-    def ajax_url(self):
-        """
-        The url prefix to be used by XModules to call into handle_ajax
-        """
-        assert self.xmodule_instance is not None
-        return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
-
-    def get_block(self, block_id, for_parent=None):  # lint-amnesty, pylint: disable=arguments-differ
-        return self.get_block_for_descriptor(self.descriptor_runtime.get_block(block_id, for_parent=for_parent))
-
-    def resource_url(self, resource):
-        raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
-
-    def publish(self, block, event_type, event):  # lint-amnesty, pylint: disable=arguments-differ
-        """
-        Publish events through the `EventPublishingService`.
-        This ensures that the correct track method is used for Instructor tasks.
-        """
-        if publish_service := self._services.get('publish'):
-            publish_service.publish(block, event_type, event)
-
-    def service(self, block, service_name):
-        """
-        Runtime-specific override for the XBlock service manager.  If a service is not currently
-        instantiated and is declared as a critical requirement, an attempt is made to load the
-        module.
-
-        Arguments:
-            block (an XBlock): this block's class will be examined for service
-                decorators.
-            service_name (string): the name of the service requested.
-
-        Returns:
-            An object implementing the requested service, or None.
-        """
-        # getting the service from parent module. making sure of block service declarations.
-        service = super().service(block=block, service_name=service_name)
-        # Passing the block to service if it is callable e.g. XBlockI18nService. It is the responsibility of calling
-        # service to handle the passing argument.
-        if callable(service):
-            return service(block)
-        return service
-
 
 class CombinedSystem:
     """

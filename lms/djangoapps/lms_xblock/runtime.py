@@ -9,7 +9,7 @@ from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
-from xmodule.x_module import ModuleSystem  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import DescriptorSystem  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
@@ -116,7 +116,7 @@ class UserTagsService:
         )
 
 
-class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+class LmsModuleSystem(DescriptorSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """

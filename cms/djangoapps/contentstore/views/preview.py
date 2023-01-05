@@ -24,7 +24,7 @@ from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.studio_editable import has_author_view
 from xmodule.util.sandboxing import SandboxService
 from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, DescriptorSystem
 from cms.djangoapps.xblock_config.models import StudioConfig
 from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id, ENABLE_COPY_PASTE_FEATURE
 from cms.lib.xblock.field_data import CmsFieldData
@@ -94,7 +94,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     return webob_to_django_response(resp)
 
 
-class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+class PreviewModuleSystem(DescriptorSystem):  # pylint: disable=abstract-method
     """
     An XModule ModuleSystem for use in Studio previews
     """
@@ -207,6 +207,9 @@ def _preview_module_system(request, descriptor, field_data):
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
 
     return PreviewModuleSystem(
+        load_item=descriptor._runtime.load_item,
+        resources_fs=descriptor._runtime.resources_fs,
+        error_tracker=descriptor._runtime.error_tracker,
         get_block=partial(_load_preview_block, request),
         mixins=settings.XBLOCK_MIXINS,
 

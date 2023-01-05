@@ -588,6 +588,9 @@ def get_module_system_for_user(
     store = modulestore()
 
     system = LmsModuleSystem(
+        load_item=descriptor._runtime.load_item,
+        resources_fs=descriptor._runtime.resources_fs,
+        error_tracker=descriptor._runtime.error_tracker,
         get_block=inner_get_block,
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
