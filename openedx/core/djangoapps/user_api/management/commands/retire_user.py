@@ -34,67 +34,72 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--username',
+            '--user_file',
             required=True,
             type=str,
-            help='Username to be retired'
-        )
-        parser.add_argument(
-            '--user_email',
-            required=True,
-            type=str,
-            help='User email address.'
+            help='Comma separated file that have username and user_email of the users that needs to be retired'
         )
 
     def handle(self, *args, **options):
         """
         Execute the command.
         """
-
-        username = options['username']
-        user_email = options['user_email']
         try:
-            user = User.objects.get(username=username, email=user_email)
-        except:
-            error_message = (
-                'Could not find a user with specified username and email '
-                'address. Make sure you have everything correct before '
-                'trying again'
-            )
+            userfile = options['user_file']
+            userinfo = open(userfile, 'r')
+        except Exception as exc:
+            error_message = f'Error while reading file: {exc}'
             logger.error(error_message)
             raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
 
-        user_model = get_user_model()
+        for record in userinfo:
 
-        try:
-            with transaction.atomic():
-                # Add user to retirement queue.
-                UserRetirementStatus.create_retirement(user)
-                # Unlink LMS social auth accounts
-                UserSocialAuth.objects.filter(user_id=user.id).delete()
-                # Change LMS password & email
-                user.email = get_retired_email_by_email(user.email)
-                user.set_unusable_password()
-                user.save()
+            userdata = record.split(',')
+            username = userdata[0].strip()
+            user_email = userdata[1].strip()
 
-                # TODO: Unlink social accounts & change password on each IDA.
-                # Remove the activation keys sent by email to the user for account activation.
-                Registration.objects.filter(user=user).delete()
+            try:
+                user = User.objects.get(username=username, email=user_email)
+            except Exception as ex:
+                error_message = (
+                    'Could not find a user with specified username and email '
+                    'address. Make sure you have everything correct before '
+                    'trying again'
+                )
+                logger.error(error_message)
+                raise CommandError(error_message + f': {username} {user_email} {ex}')  # lint-amnesty, pylint: disable=raise-missing-from
 
-                # Delete OAuth tokens associated with the user.
-                retire_dot_oauth2_models(user)
-                AccountRecovery.retire_recovery_email(user.id)
-        except KeyError:
-            error_message = f'Username not specified {user}'
-            logger.error(error_message)
-            raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
-        except user_model.DoesNotExist:
-            error_message = f'The user "{user.username}" does not exist.'
-            logger.error(error_message)
-            raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
-        except Exception as exc:  # pylint: disable=broad-except
-            error_message = f'500 error deactivating account {exc}'
-            logger.error(error_message)
-            raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
+            user_model = get_user_model()
 
-        logger.info("User succesfully moved to the retirment pipeline")
+            try:
+                with transaction.atomic():
+                    # Add user to retirement queue.
+                    UserRetirementStatus.create_retirement(user)
+                    # Unlink LMS social auth accounts
+                    UserSocialAuth.objects.filter(user_id=user.id).delete()
+                    # Change LMS password & email
+                    user.email = get_retired_email_by_email(user.email)
+                    user.set_unusable_password()
+                    user.save()
+
+                    # TODO: Unlink social accounts & change password on each IDA.
+                    # Remove the activation keys sent by email to the user for account activation.
+                    Registration.objects.filter(user=user).delete()
+
+                    # Delete OAuth tokens associated with the user.
+                    retire_dot_oauth2_models(user)
+                    AccountRecovery.retire_recovery_email(user.id)
+            except KeyError:
+                error_message = f'Username not specified {user}'
+                logger.error(error_message)
+                raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
+            except user_model.DoesNotExist:
+                error_message = f'The user "{user.username}" does not exist.'
+                logger.error(error_message)
+                raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
+            except Exception as exc:  # pylint: disable=broad-except
+                error_message = f'500 error deactivating account: {exc}'
+                logger.error(error_message)
+                raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
+
+            logger.info(f"User {user.username} succesfully moved to the retirment pipeline")
