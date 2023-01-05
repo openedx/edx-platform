@@ -794,7 +794,7 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
             'username': 'some_user',
             'name': 'Student Person',
             'age': -1,
-            'yearOfBirth': 2022,
+            'yearOfBirth': datetime.datetime.today().year,
             'education': None,
             'address': None,
             'gender': 'Male',
