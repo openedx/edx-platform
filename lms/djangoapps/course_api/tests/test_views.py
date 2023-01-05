@@ -2,7 +2,7 @@
 Tests for Course API views.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from hashlib import md5
 from unittest import TestCase
 
@@ -186,6 +186,21 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         # With filtering.
         filtered_response = self.verify_response(params={'org': self.course.org, 'username': self.staff_user.username})
         assert all((course['org'] == self.course.org) for course in filtered_response.data['results'])
+
+    def test_filter_active_courses_only(self):
+        """
+        Verify that CourseOverviews are filtered by end date if active_courses_only filter is provided.
+        """
+        self.setup_user(self.staff_user)
+        active_course = self.create_course(org='org1', end=datetime.now() + timedelta(days=1))
+        missing_end_date = self.create_course(org='org2', end=None)
+
+        response = self.verify_response(params={'username': self.staff_user.username, 'active_courses_only': True})
+        output_ids = {course['id'] for course in response.data['results']}
+
+        assert len(output_ids) == 2
+        assert str(self.course.id) not in output_ids
+        assert {str(active_course.id), str(missing_end_date.id)} == output_ids
 
     def test_filter(self):
         self.setup_user(self.staff_user)
