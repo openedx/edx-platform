@@ -46,39 +46,6 @@ COMMON_LOOKUP_PATHS = [
     path('node_modules'),
 ]
 
-# A list of NPM installed libraries that should be copied into the common
-# static directory.
-# If string ends with '/' then all file in the directory will be copied.
-NPM_INSTALLED_LIBRARIES = [
-    'backbone.paginator/lib/backbone.paginator.js',
-    'backbone/backbone.js',
-    'bootstrap/dist/js/bootstrap.bundle.js',
-    'hls.js/dist/hls.js',
-    'jquery-migrate/dist/jquery-migrate.js',
-    'jquery.scrollto/jquery.scrollTo.js',
-    'jquery/dist/jquery.js',
-    'moment-timezone/builds/moment-timezone-with-data.js',
-    'moment/min/moment-with-locales.js',
-    'picturefill/dist/picturefill.js',
-    'requirejs/require.js',
-    'underscore.string/dist/underscore.string.js',
-    'underscore/underscore.js',
-    '@edx/studio-frontend/dist/',
-    'which-country/index.js'
-]
-
-# A list of NPM installed developer libraries that should be copied into the common
-# static directory only in development mode.
-NPM_INSTALLED_DEVELOPER_LIBRARIES = [
-    'sinon/pkg/sinon.js',
-    'squirejs/src/Squire.js',
-]
-
-# Directory to install static vendor files
-NPM_JS_VENDOR_DIRECTORY = path('common/static/common/js/vendor')
-NPM_CSS_VENDOR_DIRECTORY = path("common/static/common/css/vendor")
-NPM_CSS_DIRECTORY = path("common/static/common/css")
-
 # system specific lookup path additions, add sass dirs if one system depends on the sass files for other systems
 SASS_LOOKUP_DEPENDENCIES = {
     'cms': [path('lms') / 'static' / 'sass' / 'partials', ],
@@ -604,60 +571,11 @@ def process_npm_assets():
     """
     Process vendor libraries installed via NPM.
     """
-    def copy_vendor_library(library, skip_if_missing=False):
-        """
-        Copies a vendor library to the shared vendor directory.
-        """
-        if library.startswith('node_modules/'):
-            library_path = library
-        else:
-            library_path = f'node_modules/{library}'
-
-        if library.endswith('.css') or library.endswith('.css.map'):
-            vendor_dir = NPM_CSS_VENDOR_DIRECTORY
-        else:
-            vendor_dir = NPM_JS_VENDOR_DIRECTORY
-        if os.path.exists(library_path):
-            sh('/bin/cp -rf {library_path} {vendor_dir}'.format(
-                library_path=library_path,
-                vendor_dir=vendor_dir,
-            ))
-        elif not skip_if_missing:
-            raise Exception(f'Missing vendor file {library_path}')
-
-    def copy_vendor_library_dir(library_dir, skip_if_missing=False):
-        """
-        Copies all vendor libraries in directory to the shared vendor directory.
-        """
-        library_dir_path = f'node_modules/{library_dir}'
-        print(f'Copying vendor library dir: {library_dir_path}')
-        if os.path.exists(library_dir_path):
-            for dirpath, _, filenames in os.walk(library_dir_path):
-                for filename in filenames:
-                    copy_vendor_library(os.path.join(dirpath, filename), skip_if_missing=skip_if_missing)
-
     # Skip processing of the libraries if this is just a dry run
     if tasks.environment.dry_run:
         tasks.environment.info("install npm_assets")
         return
-
-    # Ensure that the vendor directory exists
-    NPM_JS_VENDOR_DIRECTORY.mkdir_p()
-    NPM_CSS_DIRECTORY.mkdir_p()
-    NPM_CSS_VENDOR_DIRECTORY.mkdir_p()
-
-    # Copy each file to the vendor directory, overwriting any existing file.
-    print("Copying vendor files into static directory")
-    for library in NPM_INSTALLED_LIBRARIES:
-        if library.endswith('/'):
-            copy_vendor_library_dir(library)
-        else:
-            copy_vendor_library(library)
-
-    # Copy over each developer library too if they have been installed
-    print("Copying developer vendor files into static directory")
-    for library in NPM_INSTALLED_DEVELOPER_LIBRARIES:
-        copy_vendor_library(library, skip_if_missing=True)
+    sh(cmd('/bin/sh', 'scripts/assets/copy-node-modules.sh'))
 
 
 @task
