@@ -342,9 +342,12 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         ).order_by('created').reverse()
         org = self.request.query_params.get('org', None)
 
-        ## .. filter_implemented_name: CourseEnrollmentQuerysetRequested
-        ## .. filter_type: org.openedx.learning.course_enrollment_queryset.requested.v1
-        enrollments = CourseEnrollmentQuerysetRequested.run_filter(context=enrollments)
+        try:
+            ## .. filter_implemented_name: CourseEnrollmentQuerysetRequested
+            ## .. filter_type: org.openedx.learning.course_enrollment_queryset.requested.v1
+            enrollments = CourseEnrollmentQuerysetRequested.run_filter(enrollments=enrollments)
+        except CourseEnrollmentQuerysetRequested.PreventEnrollmentQuerysetRequest as exc:
+            raise EnrollmentRequestNotAllowed(str(exc)) from exc
 
         same_org = (
             enrollment for enrollment in enrollments
@@ -378,6 +381,14 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             return Response(enrollment_data)
 
         return response
+
+
+class EnrollmentRequestException(Exception):
+    pass
+
+
+class EnrollmentRequestNotAllowed(EnrollmentRequestException):
+    pass
 
 
 @api_view(["GET"])

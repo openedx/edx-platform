@@ -55,9 +55,12 @@ def get_course_enrollments(username, include_inactive=False):
     if not include_inactive:
         qset = qset.filter(is_active=True)
 
-    ## .. filter_implemented_name: CourseEnrollmentQuerysetRequested
-    ## .. filter_type: org.openedx.learning.course_enrollment_queryset.requested.v1
-    qset = CourseEnrollmentQuerysetRequested.run_filter(enrollments=qset)
+    try:
+        ## .. filter_implemented_name: CourseEnrollmentQuerysetRequested
+        ## .. filter_type: org.openedx.learning.course_enrollment_queryset.requested.v1
+        qset = CourseEnrollmentQuerysetRequested.run_filter(enrollments=qset)
+    except CourseEnrollmentQuerysetRequested.PreventEnrollmentQuerysetRequest as exc:
+        raise EnrollmentRequestNotAllowed(str(exc)) from exc
 
     enrollments = CourseEnrollmentSerializer(qset, many=True).data
 
@@ -79,6 +82,14 @@ def get_course_enrollments(username, include_inactive=False):
         )
 
     return valid
+
+
+class EnrollmentRequestException(Exception):
+    pass
+
+
+class EnrollmentRequestNotAllowed(EnrollmentRequestException):
+    pass
 
 
 def get_course_enrollment(username, course_id):
