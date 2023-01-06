@@ -101,6 +101,16 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
                 draft_node.module.add_xml_to_node(node)
 
 
+def add_course_logs(course_key_string, course_like):
+    """
+    Add logs for course export
+    TODO: To be removed after export issue is resolved (INF-667)
+    """
+    logging.info(f'{course_key_string} {course_like.url_name}  {course_like.display_name}')
+    for child in course_like.get_children():
+        add_course_logs(course_key_string, child)
+
+
 class ExportManager:
     """
     Manages XML exporting for courselike objects.
@@ -161,6 +171,9 @@ class ExportManager:
             # export only the published content
             with self.modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, self.courselike_key):
                 courselike = self.get_courselike()
+                # TODO: Remove function call after export issue is resolved (INF-667)
+                add_course_logs(str(self.courselike_key), courselike)
+
                 export_fs = courselike.runtime.export_fs = fsm.makedir(self.target_dir, recreate=True)
 
                 # change all of the references inside the course to use the xml expected key type w/o version & branch
@@ -355,13 +368,8 @@ def adapt_references(subtree, destination_course_key, export_fs):
     Map every reference in the subtree into destination_course_key and set it back into the xblock fields
     """
     subtree.runtime.export_fs = export_fs  # ensure everything knows where it's going!
-    # TODO: Remove logging statements after export issue is resolved (INF-667)
-    node_id = subtree.scope_ids.usage_id.html_id()
-    logging.info(f"Exporting {destination_course_key} node {node_id}")
     for field_name, field in subtree.fields.items():
-        logging.info(f"Exporting {destination_course_key} node {node_id} field {field_name}")
         if field.is_set_on(subtree):
-            logging.info(f"Exporting {destination_course_key} node {node_id} field_on {field_name}")
             if isinstance(field, Reference):
                 value = field.read_from(subtree)
                 if value is not None:
@@ -380,9 +388,6 @@ def adapt_references(subtree, destination_course_key, export_fs):
                         key: ele.map_into_course(destination_course_key) for key, ele in field.read_from(subtree).items()  # lint-amnesty, pylint: disable=line-too-long
                     }
                 )
-            logging.info(f"Export_successful {destination_course_key} node {node_id} field_on {field_name}")
-        logging.info(f"Export_successful {destination_course_key} node {node_id} field {field_name}")
-    logging.info(f"Export_successful {destination_course_key} node {node_id}")
 
 
 def _export_field_content(xblock_item, item_dir):
