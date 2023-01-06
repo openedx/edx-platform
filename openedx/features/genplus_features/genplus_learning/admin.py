@@ -50,3 +50,6 @@ class ProgramAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ProgramAccessRole)
+@admin.register(ClassLesson)
+class ClassLessonAdmin(admin.ModelAdmin):
+    list_display = ('class_unit', 'course_key', 'usage_key')
