@@ -4,7 +4,6 @@ Survey Report models.
 
 from django.db import models
 from jsonfield import JSONField
-from requests.models import Response
 
 SURVEY_REPORT_PROCESSING = 'processing'
 SURVEY_REPORT_GENERATED = 'generated'
