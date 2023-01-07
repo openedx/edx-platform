@@ -6,6 +6,7 @@ from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
 from django.urls import include, re_path
 from django.conf.urls.static import static
+from django.conf.urls import url
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
@@ -33,6 +34,7 @@ from lms.djangoapps.instructor.views import instructor_dashboard as instructor_d
 from lms.djangoapps.instructor_task import views as instructor_task_views
 from lms.djangoapps.staticbook import views as staticbook_views
 from lms.djangoapps.static_template_view import views as static_template_view_views
+from lms.djangoapps.feedback import views as feedback_views
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -1015,3 +1017,9 @@ if getattr(settings, 'PROVIDER_STATES_URL', None):
             name='courseware_xblock_handler_provider_state',
         )
     ]
+
+
+# FUNiX Feedback
+urlpatterns += [
+    url(r'^feedback/$', feedback_views.index, name='feedback_index')
+]

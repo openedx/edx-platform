@@ -570,7 +570,7 @@ FEATURES = {
     # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch. You will
     #   see the search widget on the courseware page only if the DISABLE_COURSE_OUTLINE_PAGE_FLAG is set.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
-    'ENABLE_COURSEWARE_SEARCH': False,
+    'ENABLE_COURSEWARE_SEARCH': True,
 
     # .. toggle_name: FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF']
     # .. toggle_implementation: DjangoSetting
@@ -595,7 +595,7 @@ FEATURES = {
     # .. toggle_creation_date: 2015-01-29
     # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
-    'ENABLE_DASHBOARD_SEARCH': False,
+    'ENABLE_DASHBOARD_SEARCH': True,
 
     # log all information from cybersource callbacks
     'LOG_POSTPAY_CALLBACKS': True,
@@ -645,7 +645,7 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_warnings: The COURSE_DISCOVERY_MEANINGS setting should be properly defined.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7845
-    'ENABLE_COURSE_DISCOVERY': False,
+    'ENABLE_COURSE_DISCOVERY': True,
 
     # .. toggle_name: FEATURES['ENABLE_COURSE_FILENAME_CCX_SUFFIX']
     # .. toggle_implementation: DjangoSetting
@@ -3191,6 +3191,9 @@ INSTALLED_APPS = [
 
     # Content Library LTI 1.3 Support.
     'pylti1p3.contrib.django.lti1p3_tool_config',
+
+    # FUNiX Feedback
+    'lms.djangoapps.feedback',
 ]
 
 ######################### CSRF #########################################

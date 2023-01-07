@@ -1,45 +1,45 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2021 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2023.
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2021 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2023.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2021 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2023.
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2021 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2023.
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2021 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2023.
 #
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2021 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-22 16:11+0000\n"
-"PO-Revision-Date: 2021-09-22 16:11:47.772359\n"
+"POT-Creation-Date: 2023-01-06 23:20+0000\n"
+"PO-Revision-Date: 2023-01-06 23:20:24.289734\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -47,7 +47,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.9.1\n"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -1841,6 +1841,19 @@ msgstr ""
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr ""
 
+#: common/lib/capa/capa/safe_exec/remote_exec.py
+msgid ""
+"Codejail API Service is unavailable. Please try again in a few minutes."
+msgstr ""
+
+#: common/lib/capa/capa/safe_exec/remote_exec.py
+msgid "Codejail API Service invalid response."
+msgstr ""
+
+#: common/lib/capa/capa/safe_exec/remote_exec.py
+msgid "Invalid JSON response received from codejail api service."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "XML data for the annotation"
 msgstr ""
@@ -2120,7 +2133,7 @@ msgstr ""
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
-#: lms/templates/manage_user_standing.html
+#: lms/templates/feedback_form.html lms/templates/manage_user_standing.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: lms/templates/widgets/footer-language-selector.html
@@ -3145,6 +3158,26 @@ msgstr ""
 msgid ""
 "Enter true or false. If true, any highlights associated with content in the "
 "course will be messaged to learners at their scheduled time."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course-wide Custom JS"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter Javascript resource URLs you want to be loaded globally throughout the"
+" course pages."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course-wide Custom CSS"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter CSS resource URLs you want to be loaded globally throughout the course"
+" pages."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py cms/templates/certificates.html
@@ -5413,6 +5446,81 @@ msgstr ""
 msgid "Not sure yet"
 msgstr ""
 
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                        There's still time to reach your goal\n"
+"                    "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+#, python-format, python-brace-format
+msgid ""
+"\n"
+"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\"\n"
+"                            "
+msgid_plural ""
+"\n"
+"                            You set a goal of learning {start_bold}%(days_per_week)s times a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\n"
+"                        "
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                            Jump back in\n"
+"                        "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                        Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
+"                    "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                            Adjust my goal\n"
+"                        "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                        Unsubscribe from goal reminder emails to this course\n"
+"                    "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+msgid "You’re almost there!"
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+msgid "There's still time to reach your goal"
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+#, python-format
+msgid ""
+"You set a goal of learning %(days_per_week)s times a week in "
+"%(course_name)s. You're not quite there, but there's still time to reach "
+"that goal!"
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+msgid ""
+"Remember, you can always change your learning goal. The best goal is one "
+"that you can stick to.  "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/subject.txt
+#, python-format
+msgid "You've almost reached your goal in %(course_name)s"
+msgstr ""
+
 #: lms/djangoapps/course_home_api/admin.py
 msgid ""
 "These define the context to disable the frontend-app-learning progress "
@@ -5472,14 +5580,14 @@ msgstr ""
 msgid "Course goal updated successfully."
 msgstr ""
 
-#: lms/djangoapps/course_wiki/plugins/__init__.py
+#: lms/djangoapps/course_wiki/plugins/course_app.py
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Wiki"
 msgstr ""
 
-#: lms/djangoapps/course_wiki/plugins/__init__.py
+#: lms/djangoapps/course_wiki/plugins/course_app.py
 msgid ""
 "Enable learners to access, and collaborate on course-related information."
 msgstr ""
@@ -7550,6 +7658,13 @@ msgstr ""
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #, python-format
 msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
+msgstr ""
+
+#: lms/templates/goal_reminder_banner.html
+msgid ""
+"\n"
+"                You’re almost there!\n"
+"            "
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
@@ -10144,14 +10259,7 @@ msgid "Account creation not allowed."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"You've successfully signed in to your {provider_name} account, but this "
-"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
-" your {platform_name} username and password to sign in to {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
-" yet, click {register_label_strong} at the top of the page."
+msgid "YOU ARE NOT USE FUNiX ACCOUNT "
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -12398,6 +12506,55 @@ msgstr ""
 
 #: lms/templates/extauth_failure.html
 msgid "External Authentication failed"
+msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid "Feedback"
+msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid "Technical Error"
+msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid "Overall Content Error"
+msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid "Quiz Content Error"
+msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid "Ask Mentor Error"
+msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid "Error explanation"
+msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid "Type Here"
+msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid "Error snapshot"
+msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid "Image files: jpg, jpeg, png. Maximum size 5MB"
+msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid ""
+"<p>In case you have problems with the mentor Q&A function, please see the "
+"instructions below to handle it:</p> <p><strong>A. In case you sent a "
+"question but couldn't find a mentor</strong></p> <ol> <li> Please try again "
+"in a few minutes, or try during direct hours from <strong>8h-23h</strong>. "
+"If not, go to step 2. </li> <li>Text to hannah in charge for support</li> "
+"</ol> <p><strong>B. In case you do not see the Ask Mentors section or do not"
+" see the full content of the question input</strong></p> <ol> <li>Please "
+"press <strong>F5</strong> after a few minutes. If not, go to step 2</li> "
+"<li>Text to hannah in charge for support</li> </ol>"
 msgstr ""
 
 #: lms/templates/footer.html
@@ -18400,7 +18557,7 @@ msgstr ""
 msgid ""
 "{link_start}edX{link_end} offers interactive online classes and MOOCs from "
 "the world's best universities, including MIT, Harvard, Berkeley, University "
-"of Texas, and many others. edX is a non-profit online initiative created by "
+"of Texas, and many others. edX is a mission driven initiative created by "
 "founding partners Harvard and MIT."
 msgstr ""
 
@@ -18449,8 +18606,8 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
-"certificates to help fund affordable education to everyone globally."
+"{b_start}Support our Mission: {b_end}EdX relies on verified certificates to "
+"help fund affordable education to everyone globally."
 msgstr ""
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
