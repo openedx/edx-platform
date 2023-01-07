@@ -4,6 +4,7 @@ from xmodule.modulestore.django import modulestore
 from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from django.urls import reverse
 from openedx.features.genplus_features.genplus_learning.models import (
     Program,
     ProgramEnrollment,
@@ -16,6 +17,7 @@ from openedx.features.genplus_features.genplus_learning.models import (
 from openedx.features.genplus_features.genplus_learning.utils import (
     calculate_class_lesson_progress,
     get_absolute_url,
+    get_next_problem_url,
 )
 from openedx.features.genplus_features.genplus.models import Student, JournalPost, Activity, Teacher
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
@@ -32,6 +34,7 @@ class UnitSerializer(serializers.ModelSerializer):
     is_locked = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
     completion_badge_url = serializers.SerializerMethodField()
+    lms_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Unit
@@ -53,6 +56,31 @@ class UnitSerializer(serializers.ModelSerializer):
     def get_completion_badge_url(self, obj):
         units_context = self.context.get("units_context")
         return units_context.get(obj.pk, {}).get('completion_badge_url', None)
+
+    def get_lms_url(self, obj):
+        gen_user = self.context.get('gen_user')
+        course_id = obj.course.id
+        next_block_id = get_next_problem_url(course_id, gen_user.user)
+        if next_block_id:
+            url_to_block = reverse(
+                'jump_to',
+                kwargs={'course_id': course_id, 'location': next_block_id}
+            )
+        else:
+            course = modulestore().get_course(course_id)
+            sections = getattr(course, 'children')
+            if sections:
+                url_to_block = reverse(
+                    'jump_to',
+                    kwargs={'course_id': course_id, 'location': sections[0]}
+                )
+            else:
+                url_to_block = reverse(
+                    'jump_to',
+                    kwargs={'course_id': course_id, 'location': modulestore().make_course_usage_key(course_id)}
+                )
+
+        return f"{settings.LMS_ROOT_URL}{url_to_block}"
 
 
 class AssessmentUnitSerializer(serializers.ModelSerializer):
@@ -128,7 +156,7 @@ class ProgramSerializer(serializers.ModelSerializer):
                     'completion_badge_url': get_absolute_url(request, badge.badge_class.image) if badge else None,
                 }
 
-        return UnitSerializer(units, many=True, read_only=True, context={'units_context': units_context}).data
+        return UnitSerializer(units, many=True, read_only=True, context={'units_context': units_context, 'gen_user': gen_user}).data
 
 
 class ClassLessonSerializer(serializers.ModelSerializer):
