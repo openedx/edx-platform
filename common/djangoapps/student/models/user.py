@@ -15,13 +15,12 @@ import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
 import uuid  # lint-amnesty, pylint: disable=wrong-import-order
-from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
-from urllib.parse import unquote, urlencode
+from urllib.parse import unquote, urlencode, urljoin
 
 import crum
-
 from .course_enrollment import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     CourseEnrollment,
@@ -29,7 +28,6 @@ from .course_enrollment import (
     CourseOverview,
     ManualEnrollmentAudit
 )
-
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
@@ -37,10 +35,10 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import IntegrityError, models
-from django.db.models import Q
+from django.db.models import Count, Index, Q
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
@@ -48,14 +46,14 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 from django_countries.fields import CountryField
 from edx_django_utils import monitoring
-from edx_django_utils.cache import RequestCache
+from edx_django_utils.cache import RequestCache, TieredCache, get_cache_key
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 from pytz import UTC, timezone
 from user_util import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from common.djangoapps.track import segment
+from common.djangoapps.track import contexts, segment
 from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from lms.djangoapps.courseware.toggles import streak_celebration_is_active
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
@@ -1050,6 +1048,8 @@ class LoginFailures(models.Model):
     class Meta:
         verbose_name = 'Login Failure'
         verbose_name_plural = 'Login Failures'
+
+
 
 
 @total_ordering

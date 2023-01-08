@@ -11,8 +11,8 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.core.validators import FileExtensionValidator
-from django.db import models
+from django.core.validators import FileExtensionValidator, RegexValidator
+from django.db import IntegrityError, models
 from django.db.models import Count, Index, Q
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -20,7 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from edx_django_utils.cache import RequestCache, TieredCache, get_cache_key
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
-from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
 from openedx_events.learning.signals import (
@@ -29,7 +29,7 @@ from openedx_events.learning.signals import (
     COURSE_UNENROLLMENT_COMPLETED,
 )
 from openedx_filters.learning.filters import CourseEnrollmentStarted, CourseUnenrollmentStarted
-from pytz import UTC
+from pytz import UTC, timezone
 from requests.exceptions import HTTPError, RequestException
 from simple_history.models import HistoricalRecords
 
@@ -607,7 +607,6 @@ class CourseEnrollment(models.Model):
                 segment_properties['course_start'] = self.course.start
                 segment_properties['course_pacing'] = self.course.pacing
 
-                from .user import is_personalized_recommendation_for_user
                 course_key = f'{self.course_id.org}+{self.course_id.course}'
                 is_personalized_recommendation = is_personalized_recommendation_for_user(course_key)
                 if is_personalized_recommendation is not None:

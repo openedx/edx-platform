@@ -156,8 +156,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         assert json.loads(response.content.decode('utf-8')) == {'course_refundable_status': True}
         assert response.status_code == 200
 
-        REFUNDABLE_METHOD_NAME = 'common.djangoapps.student.models.course_enrollment.CourseEnrollment.refundable'
-        with patch(REFUNDABLE_METHOD_NAME, return_value=False):
+        with patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.refundable', return_value=False):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
         assert json.loads(response.content.decode('utf-8')) == {'course_refundable_status': False}
