@@ -48,7 +48,7 @@ class CourseLiveTabTestCase(TabTestCase):
         )
 
     @ddt.data(True, False)
-    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_enrolled', Mock(return_value=True))
+    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled', Mock(return_value=True))
     def test_user_can_access_course_live_tab(self, course_live_config_enabled):
         """
         Test if tab is accessible to users with different roles
