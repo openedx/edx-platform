@@ -34,6 +34,11 @@ from requests.exceptions import HTTPError, RequestException
 from simple_history.models import HistoricalRecords
 
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from common.djangoapps.student.email_helpers import (
+    generate_proctoring_requirements_email_context,
+    should_send_proctoring_requirements_email,
+)
+from common.djangoapps.student.emails import send_proctoring_requirements_email
 from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from common.djangoapps.track import contexts, segment
 from common.djangoapps.util.query import use_read_replica_if_available
@@ -506,12 +511,6 @@ class CourseEnrollment(models.Model):
                 )
 
         if mode_changed:
-            from common.djangoapps.student.email_helpers import (
-                generate_proctoring_requirements_email_context,
-                should_send_proctoring_requirements_email,
-            )
-            from common.djangoapps.student.emails import send_proctoring_requirements_email
-
             # If mode changed to one that requires proctoring, send proctoring requirements email
             if should_send_proctoring_requirements_email(self.user.username, self.course_id):
                 email_context = generate_proctoring_requirements_email_context(self.user, self.course_id)

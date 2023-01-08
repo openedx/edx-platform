@@ -11,7 +11,6 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 
-import crum
 import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
@@ -21,13 +20,14 @@ from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-impo
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
 from urllib.parse import unquote, urlencode
 
+import crum
+
 from .course_enrollment import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     CourseEnrollment,
     CourseEnrollmentAllowed,
     CourseOverview,
-    ManualEnrollmentAudit,
-    segment
+    ManualEnrollmentAudit
 )
 
 from config_models.models import ConfigurationModel
@@ -55,6 +55,7 @@ from pytz import UTC, timezone
 from user_util import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from common.djangoapps.track import segment
 from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from lms.djangoapps.courseware.toggles import streak_celebration_is_active
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
