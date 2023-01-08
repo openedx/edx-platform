@@ -72,6 +72,64 @@ def local_resource_url(block, uri):
     return xblock_local_resource_url(block, uri)
 
 
+def lms_wrappers_aside(block, aside, view, frag, context, request_token=None):
+    """
+    Creates a div which identifies the aside, points to the original block,
+    and writes out the json_init_args into a script tag.
+
+    The default implementation creates a frag to wraps frag w/ a div identifying the xblock. If you have
+    javascript, you'll need to override this impl
+    """
+    if not frag.content:
+        return frag
+
+    runtime_class = 'LmsRuntime'
+    extra_data = {
+        'block-id': quote_slashes(str(block.scope_ids.usage_id)),
+        'course-id': quote_slashes(str(block.scope_ids.usage_id.context_key)),
+        'url-selector': 'asideBaseUrl',
+        'runtime-class': runtime_class,
+    }
+    if request_token:
+        extra_data['request-token'] = request_token
+
+    return wrap_xblock_aside(
+        runtime_class,
+        aside,
+        view,
+        frag,
+        context,
+        usage_id_serializer=str,
+        request_token=request_token,
+        extra_data=extra_data,
+    )
+
+
+def lms_applicable_aside_types(block, applicable_aside_types=None):
+    """
+    Return all of the asides which might be decorating this `block`.
+
+    Arguments:
+        block (:class:`.XBlock`): The block to render retrieve asides for.
+    """
+
+    config = XBlockAsidesConfig.current()
+
+    if not config.enabled:
+        return []
+
+    if block.scope_ids.block_type in config.disabled_blocks.split():
+        return []
+
+    # TODO: aside_type != 'acid_aside' check should be removed once AcidBlock is only installed during tests
+    # (see https://openedx.atlassian.net/browse/TE-811)
+    return [
+        aside_type
+        for aside_type in applicable_aside_types(block)
+        if aside_type != 'acid_aside'
+    ]
+
+
 class UserTagsService:
     """
     A runtime class that provides an interface to the user service.  It handles filling in
@@ -121,85 +179,114 @@ class LmsModuleSystem(DescriptorSystem):  # pylint: disable=abstract-method
     ModuleSystem specialized to the LMS
     """
     def __init__(self, **kwargs):
-        self.request_token = kwargs.pop('request_token', None)
+        #######################
+        #######################
+        ## Set Directly from module_render
+        #######################
+        #######################
+        # self.request_token = kwargs.pop('request_token', None)
         super().__init__(**kwargs)
 
-    def handler_url(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
-        """
-        Implement the XBlock runtime handler_url interface.
+    #######################
+    #######################
+    ## Being monkey patched in Descriptor system from lms.djangoapps.lms_xblock.apps.py
+    #######################
+    #######################
 
-        This is mostly just proxying to the module level `handler_url` function
-        defined higher up in this file.
+    # def handler_url(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
+    #     """
+    #     Implement the XBlock runtime handler_url interface.
 
-        We're doing this indirection because the module level `handler_url`
-        logic is also needed by the `DescriptorSystem`. The particular
-        `handler_url` that a `DescriptorSystem` needs will be different when
-        running an LMS process or a CMS/Studio process. That's accomplished by
-        monkey-patching a global. It's a long story, but please know that you
-        can't just refactor and fold that logic into here without breaking
-        things.
+    #     This is mostly just proxying to the module level `handler_url` function
+    #     defined higher up in this file.
 
-        https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
+    #     We're doing this indirection because the module level `handler_url`
+    #     logic is also needed by the `DescriptorSystem`. The particular
+    #     `handler_url` that a `DescriptorSystem` needs will be different when
+    #     running an LMS process or a CMS/Studio process. That's accomplished by
+    #     monkey-patching a global. It's a long story, but please know that you
+    #     can't just refactor and fold that logic into here without breaking
+    #     things.
 
-        See :method:`xblock.runtime:Runtime.handler_url`
-        """
-        return handler_url(*args, **kwargs)
+    #     https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
 
-    def local_resource_url(self, *args, **kwargs):
-        return local_resource_url(*args, **kwargs)
+    #     See :method:`xblock.runtime:Runtime.handler_url`
+    #     """
+    #     return handler_url(*args, **kwargs)
 
-    def wrap_aside(self, block, aside, view, frag, context):
-        """
-        Creates a div which identifies the aside, points to the original block,
-        and writes out the json_init_args into a script tag.
+    #######################
+    #######################
+    ## Being monkey patched in Descriptor system from lms.djangoapps.lms_xblock.apps.py
+    #######################
+    #######################
 
-        The default implementation creates a frag to wraps frag w/ a div identifying the xblock. If you have
-        javascript, you'll need to override this impl
-        """
-        if not frag.content:
-            return frag
+    # def local_resource_url(self, *args, **kwargs):
+    #     return local_resource_url(*args, **kwargs)
 
-        runtime_class = 'LmsRuntime'
-        extra_data = {
-            'block-id': quote_slashes(str(block.scope_ids.usage_id)),
-            'course-id': quote_slashes(str(block.course_id)),
-            'url-selector': 'asideBaseUrl',
-            'runtime-class': runtime_class,
-        }
-        if self.request_token:
-            extra_data['request-token'] = self.request_token
+    #######################
+    #######################
+    ## Implemented as lms_wrappers_aside above
+    #######################
+    #######################
 
-        return wrap_xblock_aside(
-            runtime_class,
-            aside,
-            view,
-            frag,
-            context,
-            usage_id_serializer=str,
-            request_token=self.request_token,
-            extra_data=extra_data,
-        )
+    # def wrap_aside(self, block, aside, view, frag, context):
+    #     """
+    #     Creates a div which identifies the aside, points to the original block,
+    #     and writes out the json_init_args into a script tag.
 
-    def applicable_aside_types(self, block):
-        """
-        Return all of the asides which might be decorating this `block`.
+    #     The default implementation creates a frag to wraps frag w/ a div identifying the xblock. If you have
+    #     javascript, you'll need to override this impl
+    #     """
+    #     if not frag.content:
+    #         return frag
 
-        Arguments:
-            block (:class:`.XBlock`): The block to render retrieve asides for.
-        """
+    #     runtime_class = 'LmsRuntime'
+    #     extra_data = {
+    #         'block-id': quote_slashes(str(block.scope_ids.usage_id)),
+    #         'course-id': quote_slashes(str(block.course_id)),
+    #         'url-selector': 'asideBaseUrl',
+    #         'runtime-class': runtime_class,
+    #     }
+    #     if self.request_token:
+    #         extra_data['request-token'] = self.request_token
 
-        config = XBlockAsidesConfig.current()
+    #     return wrap_xblock_aside(
+    #         runtime_class,
+    #         aside,
+    #         view,
+    #         frag,
+    #         context,
+    #         usage_id_serializer=str,
+    #         request_token=self.request_token,
+    #         extra_data=extra_data,
+    #     )
 
-        if not config.enabled:
-            return []
+    #######################
+    #######################
+    ## Implemented as lms_applicable_aside_types above
+    #######################
+    #######################
 
-        if block.scope_ids.block_type in config.disabled_blocks.split():
-            return []
+    # def applicable_aside_types(self, block):
+    #     """
+    #     Return all of the asides which might be decorating this `block`.
 
-        # TODO: aside_type != 'acid_aside' check should be removed once AcidBlock is only installed during tests
-        # (see https://openedx.atlassian.net/browse/TE-811)
-        return [
-            aside_type
-            for aside_type in super().applicable_aside_types(block)
-            if aside_type != 'acid_aside'
-        ]
+    #     Arguments:
+    #         block (:class:`.XBlock`): The block to render retrieve asides for.
+    #     """
+
+    #     config = XBlockAsidesConfig.current()
+
+    #     if not config.enabled:
+    #         return []
+
+    #     if block.scope_ids.block_type in config.disabled_blocks.split():
+    #         return []
+
+    #     # TODO: aside_type != 'acid_aside' check should be removed once AcidBlock is only installed during tests
+    #     # (see https://openedx.atlassian.net/browse/TE-811)
+    #     return [
+    #         aside_type
+    #         for aside_type in super().applicable_aside_types(block)
+    #         if aside_type != 'acid_aside'
+    #     ]

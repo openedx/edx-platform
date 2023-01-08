@@ -67,7 +67,7 @@ from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, UserTagsService
+from lms.djangoapps.lms_xblock.runtime import UserTagsService, lms_wrappers_aside, lms_applicable_aside_types
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.api import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
@@ -587,50 +587,94 @@ def get_module_system_for_user(
 
     store = modulestore()
 
-    system = LmsModuleSystem(
-        load_item=descriptor._runtime.load_item,
-        resources_fs=descriptor._runtime.resources_fs,
-        error_tracker=descriptor._runtime.error_tracker,
-        get_block=inner_get_block,
-        # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
-        mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
-        wrappers=block_wrappers,
-        services={
-            'fs': FSService(),
-            'field-data': field_data,
-            'mako': mako_service,
-            'user': user_service,
-            'verification': XBlockVerificationService(),
-            'proctoring': ProctoringService(),
-            'milestones': milestones_helpers.get_service(),
-            'credit': CreditService(),
-            'bookmarks': BookmarksService(user=user),
-            'gating': GatingService(),
-            'grade_utils': GradesUtilService(course_id=course_id),
-            'user_state': UserStateService(),
-            'content_type_gating': ContentTypeGatingService(),
-            'cache': CacheService(cache),
-            'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
-            'xqueue': xqueue_service,
-            'replace_urls': replace_url_service,
-            'rebind_user': rebind_user_service,
-            'completion': CompletionService(user=user, context_key=course_id)
-            if user and user.is_authenticated
-            else None,
-            'i18n': XBlockI18nService,
-            'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
-            'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
-            'settings': SettingsService(),
-            'user_tags': UserTagsService(user=user, course_id=course_id),
-            'badging': BadgingService(course_id=course_id, modulestore=store) if badges_enabled() else None,
-            'teams': TeamsService(),
-            'teams_configuration': TeamsConfigurationService(),
-            'call_to_action': CallToActionService(),
-            'publish': EventPublishingService(user, course_id, track_function),
-        },
-        descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
-        request_token=request_token,
-    )
+    services={
+        'fs': FSService(),
+        'field-data': field_data,
+        'mako': mako_service,
+        'user': user_service,
+        'verification': XBlockVerificationService(),
+        'proctoring': ProctoringService(),
+        'milestones': milestones_helpers.get_service(),
+        'credit': CreditService(),
+        'bookmarks': BookmarksService(user=user),
+        'gating': GatingService(),
+        'grade_utils': GradesUtilService(course_id=course_id),
+        'user_state': UserStateService(),
+        'content_type_gating': ContentTypeGatingService(),
+        'cache': CacheService(cache),
+        'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
+        'xqueue': xqueue_service,
+        'replace_urls': replace_url_service,
+        'rebind_user': rebind_user_service,
+        'completion': CompletionService(user=user, context_key=course_id)
+        if user and user.is_authenticated
+        else None,
+        'i18n': XBlockI18nService,
+        'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
+        'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
+        'settings': SettingsService(),
+        'user_tags': UserTagsService(user=user, course_id=course_id),
+        'badging': BadgingService(course_id=course_id, modulestore=store) if badges_enabled() else None,
+        'teams': TeamsService(),
+        'teams_configuration': TeamsConfigurationService(),
+        'call_to_action': CallToActionService(),
+        'publish': EventPublishingService(user, course_id, track_function),
+    }
+
+
+    # system = LmsModuleSystem(
+    #     load_item=descriptor._runtime.load_item,
+    #     resources_fs=descriptor._runtime.resources_fs,
+    #     error_tracker=descriptor._runtime.error_tracker,
+    #     # get_module=inner_get_module,
+    #     # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
+    #     # mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
+    #     # wrappers=block_wrappers,
+    #     # services={
+    #     #     'fs': FSService(),
+    #     #     'field-data': field_data,
+    #     #     'mako': mako_service,
+    #     #     'user': user_service,
+    #     #     'verification': XBlockVerificationService(),
+    #     #     'proctoring': ProctoringService(),
+    #     #     'milestones': milestones_helpers.get_service(),
+    #     #     'credit': CreditService(),
+    #     #     'bookmarks': BookmarksService(user=user),
+    #     #     'gating': GatingService(),
+    #     #     'grade_utils': GradesUtilService(course_id=course_id),
+    #     #     'user_state': UserStateService(),
+    #     #     'content_type_gating': ContentTypeGatingService(),
+    #     #     'cache': CacheService(cache),
+    #     #     'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
+    #     #     'xqueue': xqueue_service,
+    #     #     'replace_urls': replace_url_service,
+    #     #     'rebind_user': rebind_user_service,
+    #     #     'completion': CompletionService(user=user, context_key=course_id)
+    #     #     if user and user.is_authenticated
+    #     #     else None,
+    #     #     'i18n': ModuleI18nService,
+    #     #     'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
+    #     #     'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
+    #     #     'settings': SettingsService(),
+    #     #     'user_tags': UserTagsService(user=user, course_id=course_id),
+    #     #     'badging': BadgingService(course_id=course_id, modulestore=store) if badges_enabled() else None,
+    #     #     'teams': TeamsService(),
+    #     #     'teams_configuration': TeamsConfigurationService(),
+    #     #     'call_to_action': CallToActionService(),
+    #     #     'publish': EventPublishingService(user, course_id, track_function),
+    #     # },
+    #     # descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
+    #     # request_token=request_token,
+    # )
+
+    descriptor._runtime.get_block = inner_get_block
+    descriptor._runtime.mixins = descriptor.runtime.mixologist._mixins
+    descriptor._runtime.wrappers = block_wrappers
+    descriptor._runtime._services.update(services)
+    descriptor._runtime.request_token = request_token
+
+    descriptor._runtime.wrap_asides_override = lms_wrappers_aside
+    descriptor._runtime.applicable_aside_types_override = lms_applicable_aside_types
 
     # pass position specified in URL to module through ModuleSystem
     if position is not None:
@@ -640,14 +684,14 @@ def get_module_system_for_user(
             log.exception('Non-integer %r passed as position.', position)
             position = None
 
-    system.set('position', position)
+    descriptor._runtime.set('position', position)
 
-    system.set('user_is_staff', user_is_staff)
-    system.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
-    system.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
-    system.set('days_early_for_beta', descriptor.days_early_for_beta)
+    descriptor._runtime.set('user_is_staff', user_is_staff)
+    descriptor._runtime.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
+    descriptor._runtime.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
+    descriptor._runtime.set('days_early_for_beta', descriptor.days_early_for_beta)
 
-    return system, field_data
+    return descriptor._runtime, field_data
 
 
 # TODO: Find all the places that this method is called and figure out how to

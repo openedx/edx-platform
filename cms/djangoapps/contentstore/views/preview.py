@@ -41,8 +41,7 @@ from openedx.core.lib.xblock_utils import (
     request_token,
     wrap_fragment,
     wrap_xblock,
-    wrap_xblock_aside,
-    xblock_local_resource_url
+    wrap_xblock_aside
 )
 
 from ..utils import get_visibility_partition_info
@@ -94,61 +93,144 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     return webob_to_django_response(resp)
 
 
+def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
+    """
+    Handler URL function for Preview
+    """
+    return reverse('preview_handler', kwargs={
+        'usage_key_string': str(block.scope_ids.usage_id),
+        'handler': handler_name,
+        'suffix': suffix,
+    }) + '?' + query
+
+
+def preview_applicable_aside_types(block, applicable_aside_types=None):
+    """
+    Remove acid_aside and honor the config record
+    """
+    if not StudioConfig.asides_enabled(block.scope_ids.block_type):
+        return []
+
+    # TODO: aside_type != 'acid_aside' check should be removed once AcidBlock is only installed during tests
+    # (see https://openedx.atlassian.net/browse/TE-811)
+    return [
+        aside_type
+        for aside_type in applicable_aside_types(block)
+        if aside_type != 'acid_aside'
+    ]
+
+
+def render_child_placeholder(block, view_name, context, wrap_xblock=None):
+    """
+    Renders a placeholder XBlock.
+    """
+    return wrap_xblock(block, view_name, Fragment(), context)
+
+
+def preview_layout_asides(block, context, frag, view_name, aside_frag_fns, wrap_aside=None):
+    position_for_asides = '<!-- footer for xblock_aside -->'
+    result = Fragment()
+    result.add_fragment_resources(frag)
+
+    for aside, aside_fn in aside_frag_fns:
+        aside_frag = aside_fn(block, context)
+        if aside_frag.content != '':
+            aside_frag_wrapped = wrap_aside(block, aside, view_name, aside_frag, context)
+            aside.save()
+            result.add_fragment_resources(aside_frag_wrapped)
+            replacement = position_for_asides + aside_frag_wrapped.content
+            frag.content = frag.content.replace(position_for_asides, replacement)
+
+    result.add_content(frag.content)
+    return result
+
+
 class PreviewModuleSystem(DescriptorSystem):  # pylint: disable=abstract-method
     """
     An XModule ModuleSystem for use in Studio previews
     """
     # xblocks can check for this attribute during rendering to determine if
     # they are being rendered for preview (i.e. in Studio)
-    is_author_mode = True
+    #######################
+    #######################
+    ## Set directly to system below
+    #######################
+    #######################
+    # is_author_mode = True
 
-    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        return reverse('preview_handler', kwargs={
-            'usage_key_string': str(block.scope_ids.usage_id),
-            'handler': handler_name,
-            'suffix': suffix,
-        }) + '?' + query
+    #######################
+    #######################
+    ## Implemented as handler_url above
+    #######################
+    #######################
+    # def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
+    #     return reverse('preview_handler', kwargs={
+    #         'usage_key_string': str(block.scope_ids.usage_id),
+    #         'handler': handler_name,
+    #         'suffix': suffix,
+    #     }) + '?' + query
 
-    def local_resource_url(self, block, uri):
-        return xblock_local_resource_url(block, uri)
+    #######################
+    #######################
+    ## Being monkey patched in Descriptor system from cms.djangoapps.xblock_config.apps.py
+    #######################
+    #######################
+    # def local_resource_url(self, block, uri):
+    #     return xblock_local_resource_url(block, uri)
 
-    def applicable_aside_types(self, block):
-        """
-        Remove acid_aside and honor the config record
-        """
-        if not StudioConfig.asides_enabled(block.scope_ids.block_type):
-            return []
+    #######################
+    #######################
+    ## Implemented as preview_applicable_aside_types above
+    #######################
+    #######################
+    # def applicable_aside_types(self, block):
+    #     """
+    #     Remove acid_aside and honor the config record
+    #     """
+    #     if not StudioConfig.asides_enabled(block.scope_ids.block_type):
+    #         return []
 
-        # TODO: aside_type != 'acid_aside' check should be removed once AcidBlock is only installed during tests
-        # (see https://openedx.atlassian.net/browse/TE-811)
-        return [
-            aside_type
-            for aside_type in super().applicable_aside_types(block)
-            if aside_type != 'acid_aside'
-        ]
+    #     # TODO: aside_type != 'acid_aside' check should be removed once AcidBlock is only installed during tests
+    #     # (see https://openedx.atlassian.net/browse/TE-811)
+    #     return [
+    #         aside_type
+    #         for aside_type in super().applicable_aside_types(block)
+    #         if aside_type != 'acid_aside'
+    #     ]
 
-    def render_child_placeholder(self, block, view_name, context):
-        """
-        Renders a placeholder XBlock.
-        """
-        return self.wrap_xblock(block, view_name, Fragment(), context)
+    #######################
+    #######################
+    ## Implemented as render_child_placeholder above
+    #######################
+    #######################
+    # def render_child_placeholder(self, block, view_name, context):
+    #     """
+    #     Renders a placeholder XBlock.
+    #     """
+    #     return self.wrap_xblock(block, view_name, Fragment(), context)
 
-    def layout_asides(self, block, context, frag, view_name, aside_frag_fns):
-        position_for_asides = '<!-- footer for xblock_aside -->'
-        result = Fragment()
-        result.add_fragment_resources(frag)
+    
+    #######################
+    #######################
+    ## Implemented as preview_layout_asides above
+    #######################
+    #######################
+    # def layout_asides(self, block, context, frag, view_name, aside_frag_fns):
+    #     position_for_asides = '<!-- footer for xblock_aside -->'
+    #     result = Fragment()
+    #     result.add_fragment_resources(frag)
 
-        for aside, aside_fn in aside_frag_fns:
-            aside_frag = aside_fn(block, context)
-            if aside_frag.content != '':
-                aside_frag_wrapped = self.wrap_aside(block, aside, view_name, aside_frag, context)
-                aside.save()
-                result.add_fragment_resources(aside_frag_wrapped)
-                replacement = position_for_asides + aside_frag_wrapped.content
-                frag.content = frag.content.replace(position_for_asides, replacement)
+    #     for aside, aside_fn in aside_frag_fns:
+    #         aside_frag = aside_fn(block, context)
+    #         if aside_frag.content != '':
+    #             aside_frag_wrapped = self.wrap_aside(block, aside, view_name, aside_frag, context)
+    #             aside.save()
+    #             result.add_fragment_resources(aside_frag_wrapped)
+    #             replacement = position_for_asides + aside_frag_wrapped.content
+    #             frag.content = frag.content.replace(position_for_asides, replacement)
 
-        result.add_content(frag.content)
-        return result
+    #     result.add_content(frag.content)
+    #     return result
 
 
 def _preview_module_system(request, descriptor, field_data):
@@ -206,35 +288,74 @@ def _preview_module_system(request, descriptor, field_data):
         else:
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
 
-    return PreviewModuleSystem(
-        load_item=descriptor._runtime.load_item,
-        resources_fs=descriptor._runtime.resources_fs,
-        error_tracker=descriptor._runtime.error_tracker,
-        get_block=partial(_load_preview_block, request),
-        mixins=settings.XBLOCK_MIXINS,
+    services={
+        "field-data": field_data,
+        "i18n": XBlockI18nService,
+        'mako': mako_service,
+        "settings": SettingsService(),
+        "user": DjangoXBlockUserService(
+            request.user,
+            user_role=get_user_role(request.user, course_id),
+            anonymous_user_id=preview_anonymous_user_id,
+        ),
+        "partitions": StudioPartitionService(course_id=course_id),
+        "teams_configuration": TeamsConfigurationService(),
+        "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
+        "cache": CacheService(cache),
+        'replace_urls': replace_url_service
+    }
 
-        # Set up functions to modify the fragment produced by student_view
-        wrappers=wrappers,
-        wrappers_asides=wrappers_asides,
-        # Get the raw DescriptorSystem, not the CombinedSystem
-        descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
-        services={
-            "field-data": field_data,
-            "i18n": XBlockI18nService,
-            'mako': mako_service,
-            "settings": SettingsService(),
-            "user": DjangoXBlockUserService(
-                request.user,
-                user_role=get_user_role(request.user, course_id),
-                anonymous_user_id=preview_anonymous_user_id,
-            ),
-            "partitions": StudioPartitionService(course_id=course_id),
-            "teams_configuration": TeamsConfigurationService(),
-            "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
-            "cache": CacheService(cache),
-            'replace_urls': replace_url_service
-        },
+    # system = PreviewModuleSystem(
+    #     load_item=descriptor._runtime.load_item,
+    #     resources_fs=descriptor._runtime.resources_fs,
+    #     error_tracker=descriptor._runtime.error_tracker,
+    #     # get_module=partial(_load_preview_module, request),
+    #     # mixins=settings.XBLOCK_MIXINS,
+
+    #     # Set up functions to modify the fragment produced by student_view
+    #     # wrappers=wrappers,
+    #     # wrappers_asides=wrappers_asides,
+    #     # Get the raw DescriptorSystem, not the CombinedSystem
+    #     # descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
+    #     # services={
+    #     #     "field-data": field_data,
+    #     #     "i18n": ModuleI18nService,
+    #     #     'mako': mako_service,
+    #     #     "settings": SettingsService(),
+    #     #     "user": DjangoXBlockUserService(
+    #     #         request.user,
+    #     #         user_role=get_user_role(request.user, course_id),
+    #     #         anonymous_user_id=preview_anonymous_user_id,
+    #     #     ),
+    #     #     "partitions": StudioPartitionService(course_id=course_id),
+    #     #     "teams_configuration": TeamsConfigurationService(),
+    #     #     "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
+    #     #     "cache": CacheService(cache),
+    #     #     'replace_urls': replace_url_service
+    #     # },
+    # )
+
+    descriptor._runtime.get_block = partial(_load_preview_block, request),
+    descriptor._runtime.mixins = settings.XBLOCK_MIXINS
+
+    # Set up functions to modify the fragment produced by student_view
+    descriptor._runtime.wrappers = wrappers
+    descriptor._runtime.wrappers_asides=wrappers_asides
+    descriptor._runtime._services.update(services)
+
+    descriptor._runtime.is_author_mode = True
+    descriptor._runtime.handler_url_override = handler_url
+    descriptor._runtime.applicable_aside_types_override = preview_applicable_aside_types
+    descriptor._runtime.render_child_placeholder = partial(
+        render_child_placeholder,
+        wrap_xblock = descriptor._runtime.wrap_xblock
     )
+    descriptor._runtime.layout_asides_override = partial(
+        preview_layout_asides,
+        wrap_aside = descriptor._runtime.wrap_aside
+    )
+
+    return descriptor._runtime
 
 
 class StudioPartitionService(PartitionService):

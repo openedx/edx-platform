@@ -1420,17 +1420,8 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
     """
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
     """
-
-    def get(self, attr):
-        """	provide uniform access to attributes (like etree)."""
-        return self.__dict__.get(attr)
-
-    def set(self, attr, val):
-        """provide uniform access to attributes (like etree)"""
-        self.__dict__[attr] = val
-
     def __init__(
-        self, load_item, resources_fs, error_tracker, descriptor_runtime=None, get_policy=None, disabled_xblock_types=lambda: [], get_module=None, **kwargs
+        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=lambda: [], get_module=None, **kwargs
     ):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -1467,7 +1458,10 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
 
         self.disabled_xblock_types = disabled_xblock_types
         self.get_module = get_module
-        self.descriptor_runtime = descriptor_runtime
+        # self.handler_url_override = None
+        # self.applicable_aside_types_override = None
+        # self.wrap_asides_override = None
+        # self.layout_asides_override = None
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""
@@ -1479,11 +1473,10 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
 
     def get_block(self, usage_id, for_parent=None):
         """See documentation for `xblock.runtime:Runtime.get_block`"""
+        block = self.load_item(usage_id, for_parent=for_parent)
         if self.get_module:
-            # return self.get_module(block)
-            return self.get_module(self.descriptor_runtime.get_block(usage_id, for_parent=for_parent))
-
-        return self.load_item(usage_id, for_parent=for_parent)
+            return self.get_module(block)
+        return block
 
     def load_block_type(self, block_type):
         """
@@ -1522,6 +1515,8 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
         # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
         # that implements the correct handler url. So, for now, instead, we will reference a
         # global function that the application can override.
+        if getattr(self, 'handler_url_override', None):
+            return self.handler_url_override(block, handler_name, suffix, query, thirdparty)
         return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
 
     def local_resource_url(self, block, uri):
@@ -1538,6 +1533,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
         """
         See :meth:`xblock.runtime.Runtime:applicable_aside_types` for documentation.
         """
+        if getattr(self, 'applicable_aside_types_override', None):
+            return self.applicable_aside_types_override(block, applicable_aside_types=super().applicable_aside_types)
+
         potential_set = set(super().applicable_aside_types(block))
         if getattr(block, 'xmodule_runtime', None) is not None:
             if hasattr(block.xmodule_runtime, 'applicable_aside_types'):
@@ -1585,6 +1583,16 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
         if callable(service):
             return service(block)
         return service
+
+    def wrap_aside(self, block, aside, view, frag, context):
+        if getattr(self, 'wrap_asides_override', None):
+            return self.wrap_asides_override(block, aside, view, frag, context, request_token=self.request_token)
+        return super().wrap_aside(block, aside, view, frag, context)
+
+    def layout_asides(self, block, context, frag, view_name, aside_frag_fns):
+        if getattr(self, 'layout_asides_override', None):
+            return self.layout_asides_override(block, context, frag, view_name, aside_frag_fns)
+        return super().layout_asides(block, context, frag, view_name, aside_frag_fns)
 
 
 class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
@@ -1701,6 +1709,7 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
                         assert isinstance(subvalue, str)
                         field_value[key] = self._make_usage_key(course_key, subvalue)
                     setattr(xblock, field.name, field_value)
+
 
 class CombinedSystem:
     """
