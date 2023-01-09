@@ -6,6 +6,7 @@ Constants for Edly feature app.
 TRIAL = 'trial'
 ESSENTIALS = 'essentials'
 ELITE = 'elite'
+LEGACY = 'legacy'
 TRIAL_EXPIRED = 'trial expired'
 DEACTIVATED = 'deactivated'
 
