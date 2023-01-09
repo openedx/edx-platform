@@ -1,0 +1,9 @@
+<div class="course" role="region">
+      <div class="course-img">
+          <a href="/courses/<%- course %>/about" >
+              <img src="<%- image_url %>" alt="<%- content.display_name %> <%- content.number %>" />
+          </a>
+      </div>
+      <h3 class="course-title"><a style="text-decoration: none;" ><%- content.display_name %></a></h3>
+      <a style="text-decoration: none;" class="course-link"><%- content.number %> <i class="fas fa-long-arrow-right"></i></a>
+</div>
