@@ -1643,10 +1643,26 @@ a.fade-cover {
 #unenroll-modal {
   margin-top: -60px;
 
+  @media (max-width: 640px) {
+    width: 82% !important;
+    margin-left: -41% !important;
+    box-sizing: border-box;
+  }
+
   .modal-form-error {
     background: tint($red, 95%);
     margin-left: $baseline;
     margin-right: $baseline;
+  }
+}
+
+#email-settings-modal {
+  margin-top: -60px;
+
+  @media (max-width: 640px) {
+    width: 82% !important;
+    margin-left: -41% !important;
+    box-sizing: border-box;
   }
 }
 
