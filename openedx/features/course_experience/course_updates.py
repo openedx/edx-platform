@@ -70,7 +70,7 @@ def get_ordered_updates(request, course):
         reverse=True
     )
     for update in ordered_updates:
-        update['content'] = info_block.system.service(info_block, "replace_urls").replace_urls(update['content'])
+        update['content'] = info_block.runtime.service(info_block, "replace_urls").replace_urls(update['content'])
     return ordered_updates
 
 

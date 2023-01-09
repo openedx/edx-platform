@@ -306,10 +306,10 @@ class SequenceBlock(
         # and needs to be read here after the ModuleSystem has been set on the XBlock.
         super().bind_for_student(xmodule_runtime, user_id, wrappers)
         # If position is specified in system, then use that instead.
-        position = getattr(self.system, 'position', None)
+        position = getattr(self.runtime, 'position', None)
         if position is not None:
             assert isinstance(position, int)
-            self.position = self.system.position
+            self.position = self.runtime.position
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.

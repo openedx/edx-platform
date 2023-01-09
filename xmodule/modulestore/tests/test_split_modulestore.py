@@ -704,7 +704,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
         course = modulestore().get_course(locator)
         block_map = modulestore().cache_items(
-            course.system, [BlockKey.from_usage_key(child) for child in course.children], course.id, depth=3
+            course.runtime, [BlockKey.from_usage_key(child) for child in course.children], course.id, depth=3
         )
         assert BlockKey('chapter', 'chapter1') in block_map
         assert BlockKey('problem', 'problem3_2') in block_map
@@ -719,14 +719,14 @@ class SplitModuleCourseTests(SplitModuleTest):
             master_branch=ModuleStoreEnum.BranchName.draft
         )
         test_chapter = modulestore().create_xblock(
-            test_course.system, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
+            test_course.runtime, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
             parent_xblock=test_course
         )
         assert test_chapter.display_name == 'chapter n'
         test_def_content = '<problem>boo</problem>'
         # create child
         new_block = modulestore().create_xblock(
-            test_course.system, test_course.id,
+            test_course.runtime, test_course.id,
             'problem',
             fields={
                 'data': test_def_content,

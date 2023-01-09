@@ -384,7 +384,7 @@ def answer_entrance_exam_problem(course, request, problem, user=None, value=1, m
         problem.scope_ids.usage_id,
         field_data_cache,
     )
-    block.system.publish(problem, 'grade', grade_dict)
+    block.runtime.publish(problem, 'grade', grade_dict)
 
 
 def add_entrance_exam_milestone(course, entrance_exam):

@@ -85,4 +85,4 @@ def answer_problem(course, request, problem, score=1, max_value=1):
         problem.scope_ids.usage_id,
         field_data_cache,
     )
-    block.system.publish(problem, 'grade', grade_dict)
+    block.runtime.publish(problem, 'grade', grade_dict)

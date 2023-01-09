@@ -1944,7 +1944,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
 
         # Submit the given score/max_score to the problem xmodule
         grade_dict = {'value': value, 'max_value': max_value, 'user_id': self.user.id}
-        block.system.publish(self.problem, 'grade', grade_dict)
+        block.runtime.publish(self.problem, 'grade', grade_dict)
 
     def assert_progress_page_show_grades(self, response, show_correctness, due_date, graded,
                                          show_grades, score, max_score, avg):  # lint-amnesty, pylint: disable=unused-argument

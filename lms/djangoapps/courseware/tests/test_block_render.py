@@ -2108,7 +2108,7 @@ class TestXBlockRuntimeEvent(TestSubmittingProblems):
     def set_block_grade_using_publish(self, grade_dict):
         """Publish the user's grade, takes grade_dict as input"""
         block = self.get_block_for_user(self.student_user)
-        block.system.publish(block, 'grade', grade_dict)
+        block.runtime.publish(block, 'grade', grade_dict)
         return block
 
     def test_xblock_runtime_publish(self):
@@ -2121,7 +2121,7 @@ class TestXBlockRuntimeEvent(TestSubmittingProblems):
     def test_xblock_runtime_publish_delete(self):
         """Test deleting the grade using the publish mechanism"""
         block = self.set_block_grade_using_publish(self.grade_dict)
-        block.system.publish(block, 'grade', self.delete_dict)
+        block.runtime.publish(block, 'grade', self.delete_dict)
         student_module = StudentModule.objects.get(student=self.student_user, module_state_key=self.problem.location)
         assert student_module.grade is None
         assert student_module.max_grade is None
@@ -2185,7 +2185,7 @@ class TestRebindBlock(TestSubmittingProblems):
         # Bind the block to another student, which will remove "correct_map"
         # from the block's _field_data_cache and _dirty_fields.
         user2 = UserFactory.create()
-        block.bind_for_student(block.system, user2.id)
+        block.bind_for_student(block.runtime, user2.id)
 
         # XBlock's save method assumes that if a field is in _dirty_fields,
         # then it's also in _field_data_cache. If this assumption
@@ -2194,7 +2194,7 @@ class TestRebindBlock(TestSubmittingProblems):
         # _field_data cache, but not _dirty_fields, when we bound
         # this block to the second student. (TNL-2640)
         user3 = UserFactory.create()
-        block.bind_for_student(block.system, user3.id)
+        block.bind_for_student(block.runtime, user3.id)
 
     def test_rebind_noauth_block_to_user_not_anonymous(self):
         """
@@ -2220,7 +2220,7 @@ class TestRebindBlock(TestSubmittingProblems):
         user2.id = 2
         block.runtime.service(block, 'rebind_user').rebind_noauth_module_to_user(block, user2)
         assert block
-        assert block.system.anonymous_student_id == anonymous_id_for_user(user2, self.course.id)
+        assert block.runtime.anonymous_student_id == anonymous_id_for_user(user2, self.course.id)
         assert block.scope_ids.user_id == user2.id
         assert block.scope_ids.user_id == user2.id
 

@@ -731,7 +731,7 @@ def get_course_syllabus_section(course, section_key):
 
     if section_key in ['syllabus', 'guest_syllabus']:
         try:
-            filesys = course.system.resources_fs
+            filesys = course.runtime.resources_fs
             # first look for a run-specific version
             dirs = [path("syllabus") / course.url_name, path("syllabus")]
             filepath = find_file(filesys, dirs, section_key + ".html")

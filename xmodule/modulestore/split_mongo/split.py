@@ -2191,7 +2191,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if xblock.has_children:
             for child in xblock.children:
                 if isinstance(child.block_id, LocalId):
-                    child_block = xblock.system.get_block(child)
+                    child_block = xblock.runtime.get_block(child)
                     is_updated = self._persist_subdag(course_key, child_block, user_id, structure_blocks, new_id) or is_updated  # lint-amnesty, pylint: disable=line-too-long
                     children.append(BlockKey.from_usage_key(child_block.location))
                 else:

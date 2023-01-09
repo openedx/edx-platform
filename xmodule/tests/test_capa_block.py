@@ -1734,7 +1734,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         error_msg = "Superterrible error happened: ☠"
         block.lcp.get_html = Mock(side_effect=Exception(error_msg))
 
-        block.system.is_author_mode = True
+        block.runtime.is_author_mode = True
 
         # Try to render the block with the author mode turned on
         html = block.get_problem_html()

@@ -662,11 +662,11 @@ def _section_send_email(course, access):
     with patch.object(course.runtime, 'applicable_aside_types', null_applicable_aside_types):
         # This HtmlBlock is only being used to generate a nice text editor.
         html_block = HtmlBlock(
-            course.system,
+            course.runtime,
             DictFieldData({'data': ''}),
             ScopeIds(None, None, None, course_key.make_usage_key('html', 'fake'))
         )
-        fragment = course.system.render(html_block, 'studio_view')
+        fragment = course.runtime.render(html_block, 'studio_view')
     fragment = wrap_xblock(
         'LmsRuntime', html_block, 'studio_view', fragment, None,
         extra_data={"course-id": str(course_key)},

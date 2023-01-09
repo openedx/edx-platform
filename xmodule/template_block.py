@@ -118,7 +118,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 
     @property
     def rendered_html(self):
-        return self.render_template(self.system, self.data)
+        return self.render_template(self.runtime, self.data)
 
     def student_view(self, _context):
         """

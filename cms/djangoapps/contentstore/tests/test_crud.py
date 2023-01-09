@@ -90,7 +90,7 @@ class TemplateTests(ModuleStoreTestCase):
         )
 
         test_chapter = self.store.create_xblock(
-            test_course.system, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
+            test_course.runtime, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
             parent_xblock=test_course
         )
         self.assertIsInstance(test_chapter, SequenceBlock)
@@ -100,7 +100,7 @@ class TemplateTests(ModuleStoreTestCase):
         # test w/ a definition (e.g., a problem)
         test_def_content = '<problem>boo</problem>'
         test_problem = self.store.create_xblock(
-            test_course.system, test_course.id, 'problem', fields={'data': test_def_content},
+            test_course.runtime, test_course.id, 'problem', fields={'data': test_def_content},
             parent_xblock=test_chapter
         )
         self.assertIsInstance(test_problem, ProblemBlock)

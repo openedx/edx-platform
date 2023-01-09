@@ -1056,10 +1056,10 @@ class CourseBlock(
 
         # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
         #   disable the syllabus content for courses that do not provide a syllabus
-        if self.system.resources_fs is None:
+        if self.runtime.resources_fs is None:
             self.syllabus_present = False
         else:
-            self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
+            self.syllabus_present = self.runtime.resources_fs.exists(path('syllabus'))
 
         self._grading_policy = {}
         self.set_grading_policy(self.grading_policy)

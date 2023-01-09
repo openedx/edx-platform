@@ -192,7 +192,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         Return the user bound child block for the partition or None.
         """
         if self.child_descriptor is not None:
-            return self.system.get_block_for_descriptor(self.child_descriptor)
+            return self.runtime.get_block_for_descriptor(self.child_descriptor)
         else:
             return None
 
@@ -272,7 +272,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
         for child_location in self.children:  # pylint: disable=no-member
             child_descriptor = self.get_child_descriptor_by_location(child_location)
-            child = self.system.get_block_for_descriptor(child_descriptor)
+            child = self.runtime.get_block_for_descriptor(child_descriptor)
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_fragment_resources(rendered_child)
             group_name, updated_group_id = self.get_data_for_vertical(child)
@@ -347,7 +347,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         """
         html = ""
         for active_child_descriptor in children:
-            active_child = self.system.get_block_for_descriptor(active_child_descriptor)
+            active_child = self.runtime.get_block_for_descriptor(active_child_descriptor)
             rendered_child = active_child.render(StudioEditableBlock.get_preview_view_name(active_child), context)
             if active_child.category == 'vertical':
                 group_name, group_id = self.get_data_for_vertical(active_child)
@@ -381,7 +381,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             # raise error instead?  In fact, could complain on descriptor load...
             return Fragment(content="<div>Nothing here.  Move along.</div>")
 
-        if self.system.user_is_staff:
+        if self.runtime.user_is_staff:
             return self._staff_view(context)
         else:
             child_fragment = self.child.render(STUDENT_VIEW, context)
@@ -704,15 +704,15 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
         if changed:
             # user.id - to be fixed by Publishing team
-            self.system.modulestore.update_item(self, None)
+            self.runtime.modulestore.update_item(self, None)
         return Response()
 
     @property
     def group_configuration_url(self):  # lint-amnesty, pylint: disable=missing-function-docstring
-        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'get_course'), \
+        assert hasattr(self.runtime, 'modulestore') and hasattr(self.runtime.modulestore, 'get_course'), \
             "modulestore has to be available"
 
-        course_block = self.system.modulestore.get_course(self.location.course_key)
+        course_block = self.runtime.modulestore.get_course(self.location.course_key)
         group_configuration_url = None
         if 'split_test' in course_block.advanced_modules:
             user_partition = self.get_selected_partition()
@@ -732,9 +732,9 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         A mutable modulestore is needed to call this method (will need to update after mixed
         modulestore work, currently relies on mongo's create_item method).
         """
-        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_item'), \
+        assert hasattr(self.runtime, 'modulestore') and hasattr(self.runtime.modulestore, 'create_item'), \
             "editor_saved should only be called when a mutable modulestore is available"
-        modulestore = self.system.modulestore
+        modulestore = self.runtime.modulestore
         dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
         metadata = {'display_name': DEFAULT_GROUP_NAME.format(group_id=group.id)}
         modulestore.create_item(
@@ -744,7 +744,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             block_id=dest_usage_key.block_id,
             definition_data=None,
             metadata=metadata,
-            runtime=self.system,
+            runtime=self.runtime,
         )
         self.children.append(dest_usage_key)  # pylint: disable=no-member
         self.group_id_to_child[str(group.id)] = dest_usage_key

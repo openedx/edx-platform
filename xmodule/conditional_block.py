@@ -318,7 +318,7 @@ class ConditionalBlock(
         Returns a list of bound XBlocks instances upon which XBlock depends.
         """
         return [
-            self.system.get_block_for_descriptor(descriptor) for descriptor in self.get_required_block_descriptors()
+            self.runtime.get_block_for_descriptor(descriptor) for descriptor in self.get_required_block_descriptors()
         ]
 
     def get_required_block_descriptors(self):
@@ -333,7 +333,7 @@ class ConditionalBlock(
             except ItemNotFoundError:
                 msg = "Invalid module by location."
                 log.exception(msg)
-                self.system.error_tracker(msg)
+                self.runtime.error_tracker(msg)
 
         return descriptors
 

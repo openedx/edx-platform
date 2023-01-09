@@ -1015,10 +1015,10 @@ class MiscCourseTests(ContentStoreTestCase):
                 course = self.store.get_course(self.course.id, depth=2, lazy=False)
 
             # make sure we pre-fetched a known sequential which should be at depth=2
-            self.assertIn(BlockKey.from_usage_key(self.seq_loc), course.system.module_data)
+            self.assertIn(BlockKey.from_usage_key(self.seq_loc), course.runtime.module_data)
 
             # make sure we don't have a specific vertical which should be at depth=3
-            self.assertNotIn(BlockKey.from_usage_key(self.vert_loc), course.system.module_data)
+            self.assertNotIn(BlockKey.from_usage_key(self.vert_loc), course.runtime.module_data)
 
         # Now, test with the branch set to draft. No extra round trips b/c it doesn't go deep enough to get
         # beyond direct only categories

@@ -2460,7 +2460,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         # verify store used for creating a course
         course = self.store.create_course("org", "course{}".format(uuid4().hex[:5]), "run", self.user_id)
-        assert course.system.modulestore.get_modulestore_type() == store_type
+        assert course.runtime.modulestore.get_modulestore_type() == store_type
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_default_store(self, default_ms):

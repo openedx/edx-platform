@@ -111,7 +111,7 @@ def apply_wrappers_to_content(content, block, request):
     Returns: A piece of html content containing the original content updated by each wrapper.
 
     """
-    content = block.system.service(block, "replace_urls").replace_urls(content)
+    content = block.runtime.service(block, "replace_urls").replace_urls(content)
 
     return make_static_urls_absolute(request, content)
 

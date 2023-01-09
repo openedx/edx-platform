@@ -71,8 +71,8 @@ class RandomizeBlock(
         if self.choice is None:
             # choose one based on the system seed, or randomly if that's not available
             if num_choices > 0:
-                if self.system.seed is not None:
-                    self.choice = self.system.seed % num_choices
+                if self.runtime.seed is not None:
+                    self.choice = self.runtime.seed % num_choices
                 else:
                     self.choice = random.randrange(0, num_choices)
 

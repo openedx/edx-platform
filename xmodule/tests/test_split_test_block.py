@@ -124,7 +124,7 @@ class SplitTestBlockTest(XModuleXmlImportTest, PartitionTestCase):
         # view, since mock services exist and the rendering code will not short-circuit.
         mocked_modulestore = Mock()
         mocked_modulestore.get_course.return_value = self.course
-        self.split_test_block.system.modulestore = mocked_modulestore
+        self.split_test_block.runtime.modulestore = mocked_modulestore
 
 
 @ddt.ddt
@@ -239,7 +239,7 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
         mocked_course = Mock(advanced_modules=['split_test'])
         mocked_modulestore = Mock()
         mocked_modulestore.get_course.return_value = mocked_course
-        self.split_test_block.system.modulestore = mocked_modulestore
+        self.split_test_block.runtime.modulestore = mocked_modulestore
 
         self.split_test_block.user_partitions = [
             UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')])

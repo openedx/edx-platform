@@ -67,7 +67,7 @@ class MakoTemplateBlockBase:
         """
         # pylint: disable=no-member
         fragment = Fragment(
-            self.system.render_template(self.mako_template, self.get_context())
+            self.runtime.render_template(self.mako_template, self.get_context())
         )
         shim_xmodule_js(fragment, self.js_module_name)
         return fragment
