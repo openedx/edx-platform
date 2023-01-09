@@ -17,7 +17,7 @@ from openedx.features.genplus_features.genplus_learning.models import (
 from openedx.features.genplus_features.genplus_learning.utils import (
     calculate_class_lesson_progress,
     get_absolute_url,
-    get_next_problem_url,
+    get_user_next_course_lesson,
 )
 from openedx.features.genplus_features.genplus.models import Student, JournalPost, Activity, Teacher
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
@@ -58,29 +58,8 @@ class UnitSerializer(serializers.ModelSerializer):
         return units_context.get(obj.pk, {}).get('completion_badge_url', None)
 
     def get_lms_url(self, obj):
-        gen_user = self.context.get('gen_user')
-        course_id = obj.course.id
-        next_block_id = get_next_problem_url(course_id, gen_user.user)
-        if next_block_id:
-            url_to_block = reverse(
-                'jump_to',
-                kwargs={'course_id': course_id, 'location': next_block_id}
-            )
-        else:
-            course = modulestore().get_course(course_id)
-            sections = getattr(course, 'children')
-            if sections:
-                url_to_block = reverse(
-                    'jump_to',
-                    kwargs={'course_id': course_id, 'location': sections[0]}
-                )
-            else:
-                url_to_block = reverse(
-                    'jump_to',
-                    kwargs={'course_id': course_id, 'location': modulestore().make_course_usage_key(course_id)}
-                )
-
-        return f"{settings.LMS_ROOT_URL}{url_to_block}"
+        gen_user = self.context.get("gen_user")
+        return get_user_next_course_lesson(gen_user.user, obj.course.id)
 
 
 class AssessmentUnitSerializer(serializers.ModelSerializer):
@@ -108,15 +87,8 @@ class AssessmentUnitSerializer(serializers.ModelSerializer):
         return f"{settings.LMS_ROOT_URL}{obj.course_image_url}"
 
     def get_lms_url(self, obj):
-        course = modulestore().get_course(obj.id)
-        course_key_str = str(obj.id)
-        sections = course.children
-        if sections:
-            usage_key_str = str(sections[0])
-        else:
-            usage_key_str = str(modulestore().make_course_usage_key(course.id))
-
-        return f"{settings.LMS_ROOT_URL}/courses/{course_key_str}/jump_to/{usage_key_str}"
+        gen_user = self.context.get("gen_user")
+        return get_user_next_course_lesson(gen_user.user, obj.id)
 
 
 class ProgramSerializer(serializers.ModelSerializer):
