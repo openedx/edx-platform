@@ -5,8 +5,10 @@ Declaration of CourseOverview model
 
 import json
 import logging
+from datetime import datetime
 from urllib.parse import urlparse, urlunparse
 
+import pytz
 from ccx_keys.locator import CCXLocator
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -655,7 +657,7 @@ class CourseOverview(TimeStampedModel):
         log.info('Finished generating course overviews.')
 
     @classmethod
-    def get_all_courses(cls, orgs=None, filter_=None):
+    def get_all_courses(cls, orgs=None, filter_=None, active_only=False):
         """
         Return a queryset containing all CourseOverview objects in the database.
 
@@ -663,6 +665,7 @@ class CourseOverview(TimeStampedModel):
             orgs (list[string]): Optional parameter that allows case-insensitive
                 filtering by organization.
             filter_ (dict): Optional parameter that allows custom filtering.
+            active_only (bool): If provided, only the courses that have not ended will be returned.
         """
         # Note: If a newly created course is not returned in this QueryList,
         # make sure the "publish" signal was emitted when the course was
@@ -680,6 +683,10 @@ class CourseOverview(TimeStampedModel):
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
+        if active_only:
+            course_overviews = course_overviews.filter(
+                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=pytz.UTC))
+            )
 
         return course_overviews
 

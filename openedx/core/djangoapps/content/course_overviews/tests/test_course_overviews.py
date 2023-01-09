@@ -554,6 +554,20 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             assert {course_overview.id for course_overview in CourseOverview.get_all_courses(filter_=filter_)} ==\
                    expected_courses, f'testing CourseOverview.get_all_courses with filter_={filter_}'
 
+    def test_get_all_active_courses(self):
+        """
+        Verify active courses or courses with null end date are returned if active_only is provided.
+        """
+        active_course = CourseFactory.create(emit_signals=True, end=self.DATES[self.NEXT_MONTH])
+        missing_end_date = CourseFactory.create(emit_signals=True, end=None)
+        inactive_course = CourseFactory.create(emit_signals=True, end=self.DATES[self.LAST_MONTH])
+
+        output_ids = {course.id for course in CourseOverview.get_all_courses(active_only=True)}
+
+        assert len(output_ids) == 2
+        assert inactive_course.id not in output_ids
+        assert {active_course.id, missing_end_date.id} == output_ids
+
     def test_get_from_ids(self):
         """
         Assert that CourseOverviews.get_from_ids works as expected.
