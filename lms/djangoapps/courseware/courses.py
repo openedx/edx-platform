@@ -753,7 +753,7 @@ def get_course_syllabus_section(course, section_key):
 
 
 @function_trace('get_courses')
-def get_courses(user, org=None, filter_=None, permissions=None, **kwargs):
+def get_courses(user, org=None, filter_=None, permissions=None, active_only=False):
     """
     Return a LazySequence of courses available, optionally filtered by org code
     (case-insensitive) or a set of permissions to be satisfied for the specified
@@ -763,7 +763,7 @@ def get_courses(user, org=None, filter_=None, permissions=None, **kwargs):
     courses = branding.get_visible_courses(
         org=org,
         filter_=filter_,
-        **kwargs
+        active_only=active_only
     ).prefetch_related(
         'modes',
     ).select_related(

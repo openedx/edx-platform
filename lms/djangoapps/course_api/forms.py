@@ -62,7 +62,7 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
         filter_type(param_name='mobile', field_name='mobile_available'),
     ]
     mobile = ExtendedNullBooleanField(required=False)
-    active_courses_only = ExtendedNullBooleanField(required=False)
+    active_only = ExtendedNullBooleanField(required=False)
     permissions = MultiValueField(required=False)
 
     def clean(self):

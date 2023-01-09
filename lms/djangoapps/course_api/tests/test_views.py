@@ -189,13 +189,13 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
 
     def test_filter_active_courses_only(self):
         """
-        Verify that CourseOverviews are filtered by end date if active_courses_only filter is provided.
+        Verify that CourseOverviews are filtered by end date if active_only filter is provided.
         """
         self.setup_user(self.staff_user)
         active_course = self.create_course(org='org1', end=datetime.now() + timedelta(days=1))
         missing_end_date = self.create_course(org='org2', end=None)
 
-        response = self.verify_response(params={'username': self.staff_user.username, 'active_courses_only': True})
+        response = self.verify_response(params={'username': self.staff_user.username, 'active_only': True})
         output_ids = {course['id'] for course in response.data['results']}
 
         assert len(output_ids) == 2

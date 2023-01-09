@@ -657,7 +657,7 @@ class CourseOverview(TimeStampedModel):
         log.info('Finished generating course overviews.')
 
     @classmethod
-    def get_all_courses(cls, orgs=None, filter_=None, **kwargs):
+    def get_all_courses(cls, orgs=None, filter_=None, active_only=False):
         """
         Return a queryset containing all CourseOverview objects in the database.
 
@@ -665,9 +665,7 @@ class CourseOverview(TimeStampedModel):
             orgs (list[string]): Optional parameter that allows case-insensitive
                 filtering by organization.
             filter_ (dict): Optional parameter that allows custom filtering.
-            kwargs (dict): Optional key value pairs usable for performing complex lookups on course listing.
-                * Possible values:
-                    * active_courses_only (bool): If provided, only the courses that have not ended will be returned.
+            active_only (bool): If provided, only the courses that have not ended will be returned.
         """
         # Note: If a newly created course is not returned in this QueryList,
         # make sure the "publish" signal was emitted when the course was
@@ -685,7 +683,7 @@ class CourseOverview(TimeStampedModel):
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
-        if kwargs.get('active_courses_only'):
+        if active_only:
             course_overviews = course_overviews.filter(
                 Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=pytz.UTC))
             )
