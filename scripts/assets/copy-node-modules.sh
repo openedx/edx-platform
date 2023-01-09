@@ -37,6 +37,7 @@ NODE_MODULES_PATH="./node_modules"
 # These are not configurable yet, but that could be changed if necessary.
 JS_VENDOR_PATH="./common/static/common/js/vendor"
 CSS_VENDOR_PATH="./common/static/common/css/vendor"
+EDX_UI_TOOLKIT_VENDOR_PATH="./common/static/edx-ui-toolkit"
 
 # Enable stricter sh behavior.
 set -eu  
@@ -72,6 +73,7 @@ echo "  Working directory          == '$(pwd)'"
 echo "  NODE_MODULES_PATH          == '$NODE_MODULES_PATH'"
 echo "  CSS_VENDOR_PATH            == '$CSS_VENDOR_PATH'"
 echo "  JS_VENDOR_PATH             == '$JS_VENDOR_PATH'"
+echo "  EDX_UI_TOOLKIT_VENDOR_PATH == '$EDX_UI_TOOLKIT_VENDOR_PATH'"
 echo "-------------------------------------------------------------------------"
 
 # Input validation
@@ -89,8 +91,9 @@ fi
 set -x
 
 # Create vendor directories.
-mkdir -p common/static/common/js/vendor
-mkdir -p common/static/common/css/vendor
+mkdir -p "$JS_VENDOR_PATH"
+mkdir -p "$CSS_VENDOR_PATH"
+mkdir -p "$EDX_UI_TOOLKIT_VENDOR_PATH"
 
 # Copy studio-frontend assets into into vendor directory.
 find "$NODE_MODULES_PATH/@edx/studio-frontend/dist" \
@@ -99,6 +102,16 @@ find "$NODE_MODULES_PATH/@edx/studio-frontend/dist" \
 find "$NODE_MODULES_PATH/@edx/studio-frontend/dist" \
 	-type f \( -name \*.css -o -name \*.css.map \) -print0 | \
 	xargs --null cp --target-directory="$CSS_VENDOR_PATH"
+
+# Copy edx-ui-toolkit's JS to into its own special directory.
+# Note: $EDX_UI_TOOLKIT_VENDOR_PATH/js used to be a git-managed symlink.
+#       To avoid confusing behavior for folks who still have the js/ symlink
+#       hanging around in their repo, the safest thing to do is to remove
+#       the target js/ before copying in js/ fresh from the source.
+rm -rf "$EDX_UI_TOOLKIT_VENDOR_PATH/js"
+cp --recursive \
+	"$NODE_MODULES_PATH/edx-ui-toolkit/src/js" \
+	"$EDX_UI_TOOLKIT_VENDOR_PATH"
 
 # Copy certain node_modules scripts into "vendor" directory.
 cp --force \
