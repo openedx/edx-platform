@@ -25,9 +25,10 @@ def get_personalized_course_recommendations(user_id):
             recommendations = response.get('userData', {}).get('recommendations', [])
             if recommendations:
                 is_control = recommendations[0].get('is_control')
+                has_is_control = recommendations[0].get('has_is_control')
                 recommended_course_keys = recommendations[0].get('items')
-                return is_control, recommended_course_keys
+                return is_control, has_is_control, recommended_course_keys
     except Exception as ex:  # pylint: disable=broad-except
         log.warning(f'Cannot get recommendations from Amplitude: {ex}')
 
-    return True, []
+    return True, False, []
