@@ -186,7 +186,7 @@ class RmUnifyProvisioning(BaseRmUnify):
     def delete_user(guid):
         try:
             gen_user = GenUser.objects.get(identity_guid=guid)
-            if hasattr(gen_user, 'user'):
+            if gen_user.user is not None:
                 user_pk = gen_user.user.pk
                 # first delete gen_user so it can delete the related Enrollments
                 gen_user.delete()
