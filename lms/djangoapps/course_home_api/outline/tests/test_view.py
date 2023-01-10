@@ -437,3 +437,25 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.update_course_and_overview()
         CourseEnrollment.enroll(UserFactory(), self.course.id)  # grr, some rando took our spot!
         self.assert_can_enroll(False)
+
+    def test_view_home_page_empty_course(self):
+        """
+        Correct response if the course does not contain sections.
+
+        Test the correct response of the course home page if the course does not contain
+        any blocks (sections/subsections).
+        """
+        test_empty_course = CourseFactory.create(
+            start=datetime(2023, 1, 1),
+            end=datetime(2028, 1, 1),
+            enrollment_start=datetime(2022, 1, 1),
+            enrollment_end=datetime(2025, 1, 1),
+            emit_signals=True,
+            modulestore=self.store,
+        )
+
+        CourseEnrollment.enroll(self.user, test_empty_course.id)
+        url = reverse('course-home:outline-tab', args=[test_empty_course.id])
+        response = self.client.get(url)
+
+        assert response.status_code == 200
