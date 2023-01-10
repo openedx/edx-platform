@@ -18,6 +18,10 @@ from django.conf.urls import url
 from .constants import GenUserRoles
 from django.contrib.auth.models import User
 from openedx.features.genplus_features.genplus.rmunify import RmUnify
+from openedx.features.genplus_features.genplus_learning.utils import (
+    process_pending_student_program_enrollments,
+    process_pending_teacher_program_access
+)
 
 
 @admin.register(GenUser)
@@ -40,6 +44,7 @@ class SkillAdmin(admin.ModelAdmin):
 class CsvImportForm(forms.Form):
     csv_file = forms.FileField()
 
+
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
     change_list_template = get_template("genplus/extended/schools_changelist.html")
@@ -49,10 +54,12 @@ class SchoolAdmin(admin.ModelAdmin):
         'type',
         'external_id',
         'classes',
-        'students'
+        'total_students',
+        'registered_students',
+        'enrolled_students'
     )
     search_fields = ('name',)
-    list_filter = ('type', )
+    list_filter = ('type',)
     actions = ['sync_registration_group_classes', 'sync_teaching_group_classes']
 
     def get_urls(self):
@@ -74,30 +81,36 @@ class SchoolAdmin(admin.ModelAdmin):
                     first_name = non_empty_row['firstname']
                     last_name = non_empty_row['secondname']
                     email = non_empty_row['email']
-                    username = non_empty_row['username'] if non_empty_row['username'] else email
                     password = non_empty_row['password']
-                    role = GenUserRoles.STUDENT if non_empty_row['role'] == GenUserRoles.STUDENT else GenUserRoles.TEACHING_STAFF
                     school, gen_class = self.get_school_and_class(non_empty_row['school'],
                                                                   non_empty_row['classname'],
                                                                   non_empty_row['classcode'])
+                    if non_empty_row['role'] == GenUserRoles.STUDENT:
+                        role = GenUserRoles.STUDENT
+                    elif non_empty_row['role'] == GenUserRoles.TEACHING_STAFF:
+                        role = GenUserRoles.TEACHING_STAFF
                     user, created = User.objects.get_or_create(
-                                username=username,
-                                email=email,
-                                first_name=first_name,
-                                last_name=last_name,
-                        )
+                        username=email,
+                        email=email,
+                        first_name=first_name,
+                        last_name=last_name,
+                    )
                     user.set_password(password)
                     user.save()
                     gen_user, created = GenUser.objects.get_or_create(
-                            role=role,
-                            user=user,
-                            school=school,
-                            email=user.email,
-                        )
+                        role=role,
+                        user=user,
+                        school=school,
+                        email=user.email,
+                    )
                     if role == GenUserRoles.STUDENT:
                         gen_student = gen_user.student
                         gen_user.refresh_from_db()
                         gen_class.students.add(gen_student)
+                    if gen_user.is_student:
+                        process_pending_student_program_enrollments(gen_user)
+                    elif gen_user.is_teacher:
+                        process_pending_teacher_program_access(gen_user)
                 except KeyError as e:
                     print(e)
                     self.message_user(request, 'An Error occurred while parsing the csv', level=messages.ERROR)
@@ -117,27 +130,41 @@ class SchoolAdmin(admin.ModelAdmin):
 
     @staticmethod
     def get_school_and_class(school_name, class_name, class_code):
+        gen_class = None
         school, created = School.objects.get_or_create(
             type=SchoolTypes.PRIVATE,
             name=school_name
         )
-        gen_class, created = Class.objects.get_or_create(
-            name=class_name,
-            group_id=class_code,
-            school=school
-        )
+        if class_name and class_code:
+            gen_class, created = Class.objects.get_or_create(
+                name=class_name,
+                group_id=class_code,
+                school=school
+            )
         return school, gen_class
-
-
 
     def classes(self, obj):
         url = reverse('admin:genplus_class_changelist')
         return mark_safe('<a href="%s?school__guid__exact=%s">%s</a>' % (url, obj.pk, obj.classes.count()))
 
-    def students(self, obj):
+    def total_students(self, obj):
         url = reverse('admin:genplus_student_changelist')
         student_count = Student.objects.filter(gen_user__school=obj).count()
         return mark_safe('<a href="%s?gen_user__school__guid__exact=%s">%s</a>' % (url, obj.pk, student_count))
+
+    def registered_students(self, obj):
+        url = reverse('admin:genplus_student_changelist')
+        students = Student.objects.filter(gen_user__school=obj, gen_user__user__isnull=False)
+        return mark_safe('<a href="%s?gen_user__school__guid__exact=%s&id__in=%s">%s</a>' % (
+            url, obj.pk, ','.join(map(str, students.values_list('id', flat=True))), students.count()))
+
+    def enrolled_students(self, obj):
+        url = reverse('admin:genplus_student_changelist')
+        Student.objects.filter(program_enrollments__isnull=True)
+        students = Student.objects.filter(gen_user__school=obj, gen_user__user__isnull=False,
+                                          program_enrollments__isnull=False)
+        return mark_safe('<a href="%s?gen_user__school__guid__exact=%s&id__in=%s">%s</a>' % (
+            url, obj.pk, ','.join(map(str, students.values_list('id', flat=True))), students.count()))
 
     def sync_registration_group_classes(modeladmin, request, queryset):
         schools_ids = queryset.values_list('guid', flat=True)
@@ -208,24 +235,35 @@ class ClassAdmin(admin.ModelAdmin):
     def enrolled_students(self, obj):
         url = reverse('admin:genplus_student_changelist')
         students_ids = obj.students.values_list('id', flat=True)
-        return mark_safe('<a href="%s?id__in=%s">%s</a>' % (url, ','.join(map(str, students_ids)), obj.students.count()))
+        return mark_safe(
+            '<a href="%s?id__in=%s">%s</a>' % (url, ','.join(map(str, students_ids)), obj.students.count()))
 
     def mark_visible(modeladmin, request, queryset):
         queryset.update(is_visible=True)
         messages.add_message(request, messages.INFO, 'Marked Visible')
 
+    def mark_invisible(modeladmin, request, queryset):
+        queryset.update(is_visible=False)
+        messages.add_message(request, messages.INFO, 'Marked Invisible')
+
     def get_actions(self, request):
         def func_maker(value):
             # this function will be your update function, just mimic the traditional bulk update function
             def update_func(self, request, queryset):
-                queryset.update(program=value)
+                # iterating it for saving and trigger the gen_class_changed signal.
+                for obj in queryset:
+                    obj.program = value
+                    obj.save()
+
             return update_func
+
         actions = super(ClassAdmin, self).get_actions(request)
         for value in Program.objects.all():
             func = func_maker(value)
             name = 'attach_{}'.format(value.year_group.name.strip())
             actions['attach_{}'.format(value.year_group.name.strip())] = (func, name,
-                                                                          'attach to Program: {}'.format(value.year_group.name))
+                                                                          'attach to Program: {}'.format(
+                                                                              value.year_group.name))
 
         return actions
 
@@ -248,19 +286,32 @@ class ClassAdmin(admin.ModelAdmin):
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
     filter_horizontal = ('favorite_classes',)
-
-
-@admin.register(Student)
-class StudentAdmin(admin.ModelAdmin):
-    list_filter = (MoreThanOneClassFilter, 'gen_user__school', )
-    list_display = ('username', 'school', 'enrolled_classes', )
+    search_fields = ('gen_user__user__email', 'gen_user__email')
+    list_filter = ('gen_user__school', 'gen_user__school__type')
+    list_display = ('username', 'school')
 
     def username(self, obj):
         return obj.__str__()
 
     def school(self, obj):
         try:
-            return obj.gen_user.school.name
+            return f"{obj.gen_user.school.name} ({obj.gen_user.school.type})"
+        except:
+            return '-'
+
+
+@admin.register(Student)
+class StudentAdmin(admin.ModelAdmin):
+    search_fields = ('gen_user__user__email', 'gen_user__email')
+    list_filter = (MoreThanOneClassFilter, 'gen_user__school',)
+    list_display = ('username', 'school', 'enrolled_classes',)
+
+    def username(self, obj):
+        return obj.__str__()
+
+    def school(self, obj):
+        try:
+            return f"{obj.gen_user.school.name} ({obj.gen_user.school.type})"
         except:
             return '-'
 
@@ -268,4 +319,5 @@ class StudentAdmin(admin.ModelAdmin):
         url = reverse('admin:genplus_class_changelist')
         classes = ClassStudents.objects.filter(student=obj)
         return mark_safe('<a href="%s?id__in=%s">%s</a>' % (
-            url, ','.join(map(str, classes.values_list('gen_class_id', flat=True))), classes.count()))
+            url, ','.join(map(str, classes.values_list('gen_class_id', flat=True))),
+            ','.join(classes.values_list('gen_class__name', flat=True))))
