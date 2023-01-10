@@ -48,17 +48,20 @@ class LearnerSkillLevelsUtilsTests(SharedModuleStoreTestCase, CatalogIntegration
         self.catalog_integration = self.create_catalog_integration()
 
     @mock.patch('openedx.core.djangoapps.user_api.learner_skill_levels.utils.get_course_run_ids')
+    @mock.patch('openedx.core.djangoapps.user_api.learner_skill_levels.utils.get_course_run_data')
     @mock.patch('openedx.core.djangoapps.user_api.learner_skill_levels.utils.get_course_data')
     def test_generate_skill_score_mapping(
         self,
         mock_get_course_data,
+        mock_get_course_run_data,
         mock_get_course_run_ids,
     ):
         """
         Test that skill-score mapping is returned in correct format.
         """
         user = UserFactory(username='edX')
-        mock_get_course_run_ids.return_value = ['AWS+OTP-AWSD12']
+        mock_get_course_run_ids.return_value = ['course-v1:AWS+OTP-AWSD12']
+        mock_get_course_run_data.return_value = {'course': 'AWS+OTP'}
         mock_get_course_data.return_value = DUMMY_COURSE_DATA_RESPONSE
         result = generate_skill_score_mapping(user)
         expected_response = {"python": 3, "MongoDB": 3, "Data Science": 3}

@@ -10,7 +10,7 @@ from openedx.core.djangoapps.catalog.utils import (
     get_catalog_api_base_url,
 
 )
-from openedx.core.djangoapps.catalog.utils import get_course_data
+from openedx.core.djangoapps.catalog.utils import get_course_data, get_course_run_data
 from openedx.core.lib.edx_api_utils import get_api_data
 
 from .constants import LEVEL_TYPE_SCORE_MAPPING
@@ -37,13 +37,17 @@ def generate_skill_score_mapping(user):
 
     skill_score_mapping = {}
     for course_run_id in course_run_ids:
-        course_data = get_course_data(course_run_id, ['skill_names', 'level_type'])
+        # fetch course details from course run id to get course key
+        course_run_data = get_course_run_data(course_run_id, ['course'])
+
+        # fetch course details to get level type and skills
+        course_data = get_course_data(course_run_data['course'], ['skill_names', 'level_type'])
         skill_names = course_data['skill_names']
-        level_type = course_data['level_type'].capitalize()
+        level_type = course_data['level_type']
 
         # if a level_type is None for a course, we should skip that course.
         if level_type:
-            score = LEVEL_TYPE_SCORE_MAPPING[level_type]
+            score = LEVEL_TYPE_SCORE_MAPPING[level_type.capitalize()]
             for skill in skill_names:
                 if skill in skill_score_mapping:
                     # assign scores b/w 1-3 based on level type
