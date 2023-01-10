@@ -102,7 +102,7 @@ DUMMY_USERNAMES_RESPONSE = {
 }
 
 DUMMY_COURSE_DATA_RESPONSE = {
-    "key": "AWS+OTP-AWSD12",
+    "key": "AWS+OTP",
     "uuid": "fe1a9ad4-a452-45cd-80e5-9babd3d43f96",
     "title": "Demonstration Course",
     "level_type": 'Advanced',
