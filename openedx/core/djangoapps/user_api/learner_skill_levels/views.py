@@ -5,7 +5,7 @@ from collections import defaultdict
 from copy import deepcopy
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from rest_framework import permissions
+from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -93,6 +93,11 @@ class LearnerSkillLevelsView(APIView):
         """
         # get top categories for the given job
         job_skill_categories = get_top_skill_categories_for_job(job_id)
+        if not job_skill_categories:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+                data={'message': "The job id doesn't exist, enter a valid job id."}
+            )
 
         # assign scores for every skill request user has learned
         top_categories = deepcopy(job_skill_categories['skill_categories'])

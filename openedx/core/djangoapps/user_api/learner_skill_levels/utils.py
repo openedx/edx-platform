@@ -1,6 +1,7 @@
 """
 Utilities for learner_skill_levels.
 """
+from logging import getLogger
 from urllib.parse import urlparse
 
 from lms.djangoapps.grades.models import PersistentCourseGrade  # lint-amnesty, pylint: disable=unused-import
@@ -10,10 +11,12 @@ from openedx.core.djangoapps.catalog.utils import (
     get_catalog_api_base_url,
 
 )
-from openedx.core.djangoapps.catalog.utils import get_course_data
+from openedx.core.djangoapps.catalog.utils import get_course_data, get_course_run_data
 from openedx.core.lib.edx_api_utils import get_api_data
 
 from .constants import LEVEL_TYPE_SCORE_MAPPING
+
+LOGGER = getLogger(__name__)  # pylint: disable=invalid-name
 
 
 def get_course_run_ids(user):
@@ -37,20 +40,27 @@ def generate_skill_score_mapping(user):
 
     skill_score_mapping = {}
     for course_run_id in course_run_ids:
-        course_data = get_course_data(course_run_id, ['skill_names', 'level_type'])
-        skill_names = course_data['skill_names']
-        level_type = course_data['level_type'].capitalize()
+        # fetch course details from course run id to get course key
+        course_run_data = get_course_run_data(course_run_id, ['course'])
+        if course_run_data:
+            # fetch course details to get level type and skills
+            course_data = get_course_data(course_run_data['course'], ['skill_names', 'level_type'])
+            skill_names = course_data['skill_names']
+            level_type = course_data['level_type']
 
-        # if a level_type is None for a course, we should skip that course.
-        if level_type:
-            score = LEVEL_TYPE_SCORE_MAPPING[level_type]
-            for skill in skill_names:
-                if skill in skill_score_mapping:
-                    # assign scores b/w 1-3 based on level type
-                    # assign the larger score if skill is repeated in 2 courses
-                    skill_score_mapping[skill] = max(score, skill_score_mapping[skill])
-                else:
-                    skill_score_mapping.update({skill: score})
+            # if a level_type is None for a course, we should skip that course.
+            if level_type:
+                score = LEVEL_TYPE_SCORE_MAPPING[level_type.capitalize()]
+                for skill in skill_names:
+                    if skill in skill_score_mapping:
+                        # assign scores b/w 1-3 based on level type
+                        # assign the larger score if skill is repeated in 2 courses
+                        skill_score_mapping[skill] = max(score, skill_score_mapping[skill])
+                    else:
+                        skill_score_mapping.update({skill: score})
+        LOGGER.info(
+            "Could not find course_key for course run id [%s].", course_run_id
+        )
     return skill_score_mapping
 
 
