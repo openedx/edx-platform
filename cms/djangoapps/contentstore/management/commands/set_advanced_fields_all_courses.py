@@ -110,8 +110,8 @@ class Command(BaseCommand):
         self._force_update_catalog_visibility_about = options.get('force_update_catalog_visibility_about', False)
         try:
             update_fields = json.loads(options["fields_json"])
-        except ValueError:
-            raise CommandError("Invalid JSON object")  # lint-amnesty, pylint: 
+        except ValueError as err:
+            raise CommandError("Invalid JSON object") from err
 
         # Update course(s) to push out `fields_json` of advanced setting changes.
         self._set_courses_advanced_fields(update_fields, options['user_email'], options['course_id'], int(options['limit_bulk_update_operation']))
@@ -152,7 +152,7 @@ class Command(BaseCommand):
             
             failed_update_advanced_fields_courses = []
 
-            for course_id in course_ids[:limit_bulk_update_operation]:
+            for course_id in course_ids[:limit_bulk_update_operation]:  # pylint: disable=redefined-argument-from-local
                 try:
                     course_module = modulestore().get_course(CourseKey.from_string(str(course_id)))
 
@@ -205,7 +205,7 @@ class Command(BaseCommand):
 
         revised_update_fields = copy.deepcopy(update_fields)
 
-        if hasattr(course_module, 'catalog_visibility') and getattr(course_module, 'catalog_visibility') == 'none':
+        if hasattr(course_module, 'catalog_visibility') and getattr(course_module, 'catalog_visibility', 'none') == 'none':  # pylint: disable=line-too-long
             print(f"Found course `{course_module.id}` that has `catalog_visibility` set to `none`.")
 
             # Set `catalog_visibility`=`none` to `about` in `revised_update_fields` values.
