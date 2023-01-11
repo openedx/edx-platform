@@ -68,6 +68,7 @@ def edly_app_context(request):  # pylint: disable=unused-argument
             'gtm_id': configuration_helpers.get_value('GTM_ID'),
             'ga_id': configuration_helpers.get_value('GA_ID'),
             'hotjar_id': settings.HOTJAR_TRACKING_ID,
+            'usetiful_token': settings.USETIFUL_TOKEN,
             'is_mobile_app': is_request_from_mobile_app(request)
         }
     )
