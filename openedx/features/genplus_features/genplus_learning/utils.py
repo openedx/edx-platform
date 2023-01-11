@@ -228,6 +228,9 @@ def get_course_block_completion(course_block, include_block_children, block_id=N
             include_block_children,
             block_id
         )
+        if block.get('is_completion_tracked') == False:
+            child_completion['total_blocks'] = 0
+            child_completion['total_completed_blocks'] = 0
 
         completion['total_blocks'] += child_completion['total_blocks']
         completion['total_completed_blocks'] += child_completion['total_completed_blocks']

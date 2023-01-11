@@ -68,6 +68,7 @@ class CourseMetadata:
         'hide_after_due',
         'self_paced',
         'show_correctness',
+        'is_completion_tracked',
         'chrome',
         'default_tab',
         'highlights_enabled_for_messaging',

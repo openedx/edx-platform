@@ -17,7 +17,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
-        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor;
+        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor, CompletionTrackingEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -909,6 +909,41 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    CompletionTrackingEditor = AbstractEditor.extend({
+        templateName: 'completion-tracking-editor',
+        className: 'edit-completion-tracking',
+
+        afterRender: function() {
+            AbstractEditor.prototype.afterRender.call(this);
+            this.setValue(this.model.get('is_completion_tracked'));
+        },
+
+        setValue: function(value) {
+            this.$('input[name=completion-tracking][value=' + value + ']').prop('checked', true);
+        },
+
+        currentValue: function() {
+            return this.$('input[name=completion-tracking]:checked').val();
+        },
+
+        hasChanges: function() {
+            return this.model.get('is_completion_tracked') !== this.currentValue();
+        },
+
+        getRequestData: function() {
+            if (this.hasChanges()) {
+                return {
+                    publish: 'republish',
+                    metadata: {
+                        is_completion_tracked: this.currentValue()
+                    }
+                };
+            } else {
+                return {};
+            }
+        }
+    });
+
     ShowCorrectnessEditor = AbstractEditor.extend({
         templateName: 'show-correctness-editor',
         className: 'edit-show-correctness',
@@ -1078,6 +1113,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                     tabs[0].editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
                     tabs[1].editors = [ContentVisibilityEditor, ShowCorrectnessEditor];
 
+                    advancedTab.editors.push(CompletionTrackingEditor);
                     if (options.enable_proctored_exams || options.enable_timed_exams) {
                         advancedTab.editors.push(TimedExaminationPreferenceEditor);
                     }
