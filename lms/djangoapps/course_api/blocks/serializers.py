@@ -56,6 +56,7 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('has_scheduled_content'),
     SupportedFieldType('weight'),
     SupportedFieldType('show_correctness'),
+    SupportedFieldType('is_completion_tracked'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
     # 'student_view_multi_device'

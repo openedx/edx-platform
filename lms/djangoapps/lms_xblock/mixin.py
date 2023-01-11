@@ -92,6 +92,11 @@ class LmsBlockMixin(XBlockMixin):
         default=False,
         scope=Scope.settings,
     )
+    is_completion_tracked = Boolean(
+        help=_("If true, problems completion will be tracked"),
+        default=True,
+        scope=Scope.settings,
+    )
     group_access = GroupAccessDict(
         help=_(
             "A dictionary that maps which groups can be shown this block. The keys "

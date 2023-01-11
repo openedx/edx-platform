@@ -1,0 +1,21 @@
+<form>
+<h3 class="modal-section-title" id="completion_tracking_label"><%- gettext('Completion Tracking') %></h3>
+<div class="modal-section-content completion-tracking">
+    <div role="group" class="list-fields" aria-labelledby="completion_tracking_label">
+        <label class="label">
+            <input class="input input-radio" name="completion-tracking" type="radio" value="true"/>
+            <%- gettext('Enable') %>
+        </label>
+        <p class='field-message' id='enable_completion_tracking'>
+            <%- gettext('Learner progress for this subsection will tracked.') %>
+        </p>
+        <label class="label">
+            <input class="input input-radio" name="completion-tracking" type="radio" value="false"/>
+            <%- gettext('Disable') %>
+        </label>
+        <p class='field-message' id='disable_completion_tracking'>
+            <%- gettext('Learner progress for this subsection will not be tracked.') %>
+        </p>
+    </div>
+</div>
+</form>
