@@ -20,6 +20,20 @@ pytestmark = pytest.mark.django_db
 user_file = 'userfile.csv'
 
 
+def generate_users():
+    """
+    Function to generate dummy users that needs to be retired
+    """
+    users = []
+    emails = []
+    for i in range(1000):
+        user = UserFactory.create(username=f"user{i}", email=f"user{i}@example.com")
+        users.append(user.username)
+        emails.append(user.email)
+    users_list = [{'username': user, 'email': email} for user, email in zip(users, emails)]
+    return users_list
+
+
 def create_user_file(other_email=False):
     """
     Function to create a comma spearated file with username and password
@@ -27,17 +41,20 @@ def create_user_file(other_email=False):
     Args:
         other_email (bool, optional): test user with email mimatch. Defaults to False.
     """
-    user1 = UserFactory.create(username='user1', email="user1@example.com")
-    user2 = UserFactory.create(username='user2', email="user2@example.com")
-    user3 = UserFactory.create(username='user3', email="user3@example.com")
+    #user1 = UserFactory.create(username='user1', email="user1@example.com")
+    #user2 = UserFactory.create(username='user2', email="user2@example.com")
+    #user3 = UserFactory.create(username='user3', email="user3@example.com")
+    #if other_email:
+    #    user3.email = "other@edx.org"
+    #user_list = [{'username': user1.username, 'email': user1.email},
+    #             {'username': user2.username, 'email': user2.email},
+    #             {'username': user3.username, 'email': user3.email}]
+    users_to_retire = generate_users()
     if other_email:
-        user3.email = "other@edx.org"
-    user_list = [{'username': user1.username, 'email': user1.email},
-                 {'username': user2.username, 'email': user2.email},
-                 {'username': user3.username, 'email': user3.email}]
+        users_to_retire[0]['email'] = "other@edx.org"
     with open(user_file, 'w', newline='') as file:
         write = csv.writer(file)
-        for user in user_list:
+        for user in users_to_retire:
             write.writerow(user.values())
 
 
@@ -51,7 +68,7 @@ def remove_user_file():
 
 @skip_unless_lms
 def test_successful_retire(setup_retirement_states):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
-    user = UserFactory.create(username='user1', email="user1@example.com")
+    user = UserFactory.create(username='user0', email="user0@example.com")
     username = user.username
     user_email = user.email
     create_user_file()
