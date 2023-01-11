@@ -12,6 +12,8 @@ class YearGroupAdmin(admin.ModelAdmin):
 class ProgramEnrollmentAdmin(admin.ModelAdmin):
     list_display = ('student', 'gen_class', 'program', 'status',)
     readonly_fields = ('student', 'gen_class', 'program', 'status',)
+    list_filter = ('gen_class__name',)
+    search_fields = ('student__gen_user__user__email', 'student__gen_user__email')
 
 
 class UnitInline(SortableInlineAdminMixin, admin.TabularInline):
@@ -47,9 +49,11 @@ class ProgramAdmin(admin.ModelAdmin):
         'status',
     )
     readonly_fields = ('slug', 'uuid',)
-
-
-admin.site.register(ProgramAccessRole)
+    
+    
 @admin.register(ClassLesson)
 class ClassLessonAdmin(admin.ModelAdmin):
     list_display = ('class_unit', 'course_key', 'usage_key')
+
+admin.site.register(ProgramAccessRole)
+
