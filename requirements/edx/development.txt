@@ -597,7 +597,7 @@ edx-drf-extensions==8.4.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.60.9
+edx-enterprise==3.60.10
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
