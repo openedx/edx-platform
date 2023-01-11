@@ -2,7 +2,7 @@ import csv
 import codecs
 from django.contrib import admin
 from openedx.features.genplus_features.genplus.models import *
-from openedx.features.genplus_features.genplus_learning.models import Program
+from openedx.features.genplus_features.genplus_learning.models import Program, UnitCompletion, ProgramEnrollment
 from django import forms
 from django.contrib import messages
 from openedx.features.genplus_features.genplus.constants import ClassTypes, SchoolTypes
@@ -15,7 +15,7 @@ from .filters import MoreThanOneClassFilter
 from django.template.loader import get_template
 from django.shortcuts import redirect, render
 from django.conf.urls import url
-from .constants import GenUserRoles
+from .constants import GenUserRoles, SchoolTypes
 from django.contrib.auth.models import User
 from openedx.features.genplus_features.genplus.rmunify import RmUnify
 from openedx.features.genplus_features.genplus_learning.utils import (
@@ -55,7 +55,7 @@ class SchoolAdmin(admin.ModelAdmin):
         'external_id',
         'classes',
         'total_students',
-        'registered_students',
+        'logged_in_students',
         'enrolled_students'
     )
     search_fields = ('name',)
@@ -152,9 +152,11 @@ class SchoolAdmin(admin.ModelAdmin):
         student_count = Student.objects.filter(gen_user__school=obj).count()
         return mark_safe('<a href="%s?gen_user__school__guid__exact=%s">%s</a>' % (url, obj.pk, student_count))
 
-    def registered_students(self, obj):
+    def logged_in_students(self, obj):
         url = reverse('admin:genplus_student_changelist')
-        students = Student.objects.filter(gen_user__school=obj, gen_user__user__isnull=False)
+        students = Student.objects.filter(gen_user__school=obj, gen_user__user__last_login__isnull=False)
+        if obj.type == SchoolTypes.RM_UNIFY:
+            students = Student.objects.filter(gen_user__school=obj, gen_user__user__isnull=False)
         return mark_safe('<a href="%s?gen_user__school__guid__exact=%s&id__in=%s">%s</a>' % (
             url, obj.pk, ','.join(map(str, students.values_list('id', flat=True))), students.count()))
 
@@ -304,7 +306,7 @@ class TeacherAdmin(admin.ModelAdmin):
 class StudentAdmin(admin.ModelAdmin):
     search_fields = ('gen_user__user__email', 'gen_user__email')
     list_filter = (MoreThanOneClassFilter, 'gen_user__school',)
-    list_display = ('username', 'school', 'enrolled_classes',)
+    list_display = ('username', 'school', 'enrolled_classes', 'progress')
 
     def username(self, obj):
         return obj.__str__()
@@ -321,3 +323,27 @@ class StudentAdmin(admin.ModelAdmin):
         return mark_safe('<a href="%s?id__in=%s">%s</a>' % (
             url, ','.join(map(str, classes.values_list('gen_class_id', flat=True))),
             ','.join(classes.values_list('gen_class__name', flat=True))))
+
+    def progress(self, obj):
+        if obj.gen_user.user is None:
+            return 'Not logged in yet.'
+        program_data = {}
+        for program in Program.get_active_programs():
+            units = program.units.all()
+            completions = UnitCompletion.objects.filter(
+                user=obj.gen_user.user,
+                course_key__in=units.values_list('course', flat=True)
+            )
+            unit_data = {}
+            for unit in units:
+                try:
+                    completion = completions.filter(user=obj.gen_user.user, course_key=unit.course.id).first()
+                    progress = completion.progress if completion else 0
+                    unit_data[unit.display_name] = f"{int(progress)}%"
+                except ProgramEnrollment.DoesNotExist:
+                    continue
+            if unit_data:
+                program_data[program.year_group.name] = unit_data
+            else:
+                program_data[program.year_group.name] = "Not enrolled yet"
+        return str(program_data)
