@@ -3170,7 +3170,11 @@ TINYMCE_DEFAULT_CONFIG = {
     'cleanup_on_startup': True,
     'custom_undo_redo_levels': 10,
     'width': '100%',
-    'height': 750
+    'height': 750,
+    'relative_urls': False,
+    'remove_script_host': False,
+    'convert_urls': False,
+
 }
 
 ######################### CSRF #########################################
