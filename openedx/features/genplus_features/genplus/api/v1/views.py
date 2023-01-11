@@ -355,9 +355,12 @@ class ContactAPIView(views.APIView):
             email = request.user.email
 
             data = {
-                'name': request.user.profile.name,
+                'first_name': request.user.first_name,
+                'full_name': request.user.profile.name,
                 'school': request.user.gen_user.school.name,
                 'message': message,
+                'date_time': record.created.strftime("%d %B %Y %-I:%M %p"),
+                'contact_email': settings.CONTACT_EMAIL
             }
 
             plain_message = get_template('genplus/contact_us_email.txt')

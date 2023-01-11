@@ -15,6 +15,13 @@ class GenUserRoles:
     )
 
 
+class RmUnifyUpdateTypes:
+    USER = 'User',
+    DELETE_USER = 'DeleteUser'
+    ORGANIZATION = 'Organization'
+    ORGANIZATION_DELETE = 'OrganizationDelete'
+
+
 class ClassColors:
 
     """

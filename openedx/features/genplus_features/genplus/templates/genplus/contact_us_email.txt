@@ -1,3 +1,12 @@
-Teacher name: {{name}}
-Teacher school: {{school}}
-Teacher message: {{message}}
+Hello {{first_name}},
+
+Just to let you know that the Gen+ Support team have received your message. Someone will be in touch soon to get this sorted for you - hang tight!
+
+We're going to get to this as quick as we can, but if you need an update then email: {{contact_email}}
+
+Your Name: {{full_name}}
+Your School: {{school}}
+Time and Date sent: {{date_time}}
+Message: {{message}}
+
+The Gen+ Support Team

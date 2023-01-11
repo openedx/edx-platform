@@ -49,7 +49,11 @@ class ProgramAdmin(admin.ModelAdmin):
         'status',
     )
     readonly_fields = ('slug', 'uuid',)
-
+    
+    
+@admin.register(ClassLesson)
+class ClassLessonAdmin(admin.ModelAdmin):
+    list_display = ('class_unit', 'course_key', 'usage_key')
 
 admin.site.register(ProgramAccessRole)
 

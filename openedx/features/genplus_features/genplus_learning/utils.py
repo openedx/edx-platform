@@ -4,8 +4,10 @@ from collections import defaultdict
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.apps import apps
+from django.urls import reverse
 from django.test import RequestFactory
 
+from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.course_modes.models import CourseMode
@@ -13,11 +15,14 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.genplus_features.genplus.models import Student
 from openedx.features.genplus_features.genplus_learning.models import (
-    Program, ProgramEnrollment, ClassLesson, ClassUnit, UnitCompletion, UnitBlockCompletion
+    Program, ProgramEnrollment, Unit, ClassLesson, ClassUnit, UnitCompletion, UnitBlockCompletion
 )
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
 from openedx.features.genplus_features.genplus_learning.access import allow_access
 from openedx.features.genplus_features.genplus_learning.roles import ProgramStaffRole, ProgramInstructorRole
+from openedx.features.genplus_features.genplus_assessments.utils import (
+    get_student_unit_skills_assessment,
+)
 
 
 def calculate_class_lesson_progress(course_key, usage_key, gen_class):
@@ -56,6 +61,112 @@ def calculate_class_unit_progress(course_key, gen_class):
     students_unit_progress = list(students_unit_progress)
     students_unit_progress += [0 for i in range(count)]
     return round(statistics.fmean(students_unit_progress))
+
+
+def get_next_problem_block(user, course_key, request=None):
+    if request is None:
+        request = RequestFactory().get(u'/')
+        request.user = user
+
+    exclude_block_types = ['course', 'chapter', 'sequential', 'vertical']
+    course_outline_blocks = get_course_outline_block_tree(
+        request, str(course_key), request.user
+    )
+    unit = Unit.objects.filter(course=course_key).first()
+    student = Student.objects.filter(gen_user__user=user).first()
+    if unit and student:
+        enrollment = ProgramEnrollment.objects.filter(student=student, program=unit.program).first()
+        if enrollment:
+            lessons = ClassLesson.objects.filter(class_unit__gen_class=enrollment.gen_class, course_key=course_key)
+            sections = course_outline_blocks.get('children')
+            for i, section in enumerate(sections):
+                lesson = lessons.get(usage_key=UsageKey.from_string(section.get('id')))
+                sections[i]['is_locked'] = lesson.is_locked if lesson else True
+            course_outline_blocks['children'] = sections
+
+    if not course_outline_blocks:
+        return None
+
+    return get_next_problem_block_helper(course_outline_blocks, exclude_block_types)
+
+
+def get_next_problem_block_helper(course_block, exclude_block_types):
+    block_type = course_block.get('type')
+    next_block = {}
+    if block_type not in exclude_block_types:
+        if not course_block.get('complete'):
+            return {
+                'problem_block': course_block,
+            }
+    else:
+        course_block_children = course_block.get('children', [])
+        for block in course_block_children:
+            if block.get('type') == 'chapter' and block.get('is_locked'):
+                continue
+            next_block = next_block or get_next_problem_block_helper(block, exclude_block_types)
+
+            if next_block and course_block.get('type') == 'chapter':
+                next_block['lesson_block'] = course_block
+
+    return next_block
+
+
+def get_user_next_program_lesson(user, program):
+    courses = []
+
+    if program.intro_unit and not get_student_unit_skills_assessment(user, program.intro_unit):
+        courses.append(program.intro_unit)
+
+    for unit in program.units.all():
+        courses.append(unit.course)
+
+    if program.outro_unit and not get_student_unit_skills_assessment(user, program.outro_unit):
+        courses.append(program.outro_unit)
+
+    for course in courses:
+        next_problem_block = get_next_problem_block(user, str(course.id))
+        if not next_problem_block:
+            continue
+
+        problem_block = next_problem_block.get('problem_block')
+        lesson_block = next_problem_block.get('lesson_block')
+        url_to_block = reverse(
+            'jump_to',
+            kwargs={'course_id': course.id, 'location': problem_block.get('id')}
+        )
+
+        return {
+            'unit_name': course.display_name_with_default,
+            'lesson_name': lesson_block.get("display_name"),
+            'url': f'{settings.LMS_ROOT_URL}{url_to_block}'
+        }
+
+    return None
+
+
+def get_user_next_course_lesson(user, course_id):
+    next_problem_block = get_next_problem_block(user, course_id)
+    if next_problem_block:
+        problem_block = next_problem_block.get('problem_block')
+        url_to_block = reverse(
+            'jump_to',
+            kwargs={'course_id': course_id, 'location': problem_block.get('id')}
+        )
+    else:
+        course = modulestore().get_course(course_id)
+        sections = getattr(course, 'children')
+        if sections:
+            url_to_block = reverse(
+                'jump_to',
+                kwargs={'course_id': course_id, 'location': sections[0]}
+            )
+        else:
+            url_to_block = reverse(
+                'jump_to',
+                kwargs={'course_id': course_id, 'location': modulestore().make_course_usage_key(course_id)}
+            )
+
+    return f"{settings.LMS_ROOT_URL}{url_to_block}"
 
 
 def get_course_completion(course_key, user, include_block_children, block_id=None, request=None):

@@ -28,6 +28,7 @@ def register_gen_user(user, gen_user_data):
     # optional fields in genplus user registration
     year_of_entry = gen_user_data.get('year_of_entry')
     registration_group = gen_user_data.get('registration_group')
+    identity_guid = gen_user_data.get('identity_guid', '')
 
     try:
         gen_user = GenUser.objects.get(email=user.email)
@@ -40,6 +41,7 @@ def register_gen_user(user, gen_user_data):
             email=user.email,
             user=user,
             role=role,
+            identity_guid=identity_guid,
             year_of_entry=year_of_entry,
             registration_group=registration_group,
             school=school

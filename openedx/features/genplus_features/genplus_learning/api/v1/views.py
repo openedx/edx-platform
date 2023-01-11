@@ -11,7 +11,7 @@ from openedx.features.genplus_features.genplus.api.v1.permissions import IsStude
 from openedx.features.genplus_features.genplus_learning.models import (Program, ProgramEnrollment, ProgramAccessRole,
                                                                        ClassUnit, ClassLesson, UnitCompletion,
                                                                        UnitBlockCompletion)
-from openedx.features.genplus_features.genplus_learning.utils import get_absolute_url
+from openedx.features.genplus_features.genplus_learning.utils import get_absolute_url, get_user_next_program_lesson
 from .serializers import ProgramSerializer, ClassStudentSerializer, ActivitySerializer, ClassUnitSerializer
 from openedx.features.genplus_features.genplus.api.v1.serializers import ClassSummarySerializer
 
@@ -39,6 +39,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
         context = super(ProgramViewSet, self).get_serializer_context()
         context.update({
             "gen_user": self.request.user.gen_user,
+            "request": self.request
         })
         return context
 
@@ -122,8 +123,8 @@ class StudentDashboardAPIView(APIView):
         gen_class = student.active_class
         if gen_class:
             data = {
-                'progress': self.get_progress(gen_class),
-                'next_lesson': self.get_next_lesson(gen_class)
+                'progress': self.get_progress(gen_class.program),
+                'next_lesson': get_user_next_program_lesson(request.user, gen_class.program)
             }
             program_progress = data['progress']['average_progress']
             character_video_url = None
@@ -135,11 +136,14 @@ class StudentDashboardAPIView(APIView):
 
         return Response(ErrorMessages.NOT_A_PART_OF_PROGRAMME, status.HTTP_400_BAD_REQUEST)
 
-    def get_progress(self, gen_class):
+    def get_progress(self, program):
         gen_user = self.request.user.gen_user
-        units_count = gen_class.program.units.count()
+        units_count = program.units.count()
         average_progress = 0
-        program_data = ProgramSerializer(gen_class.program, context={'gen_user': gen_user}).data
+        program_data = ProgramSerializer(program, context={
+            'gen_user': gen_user,
+            'request': self.request
+        }).data
         if program_data and units_count > 0:
             average_progress += sum(item['progress'] for item in program_data['units']) // units_count
 
@@ -147,28 +151,6 @@ class StudentDashboardAPIView(APIView):
             'average_progress': average_progress,
             'units_progress': program_data
         }
-
-    def get_next_lesson(self, gen_class):
-        """
-        Fetches all the units and lessons in a single query and then traverses through
-        each lesson to get a lesson that is incomplete and unlocked.
-
-        params: class
-        Returns: Next lesson for a student of a class.
-        """
-        class_units = gen_class.class_units.prefetch_related("class_lessons").all()
-
-        for class_unit in class_units:
-            unit_lessons = class_unit.class_lessons.all()
-            for lesson in unit_lessons:
-                if not lesson.is_locked:
-                    lesson_completion = UnitBlockCompletion.objects.filter(user=self.request.user,
-                                                                           usage_key=lesson.usage_key,
-                                                                           is_complete=True).first()
-                    # if user has not attempted the lesson or lesson is incomplete
-                    if not lesson_completion:
-                        return {'url': lesson.lms_url, 'display_name': lesson.display_name}
-        return None
 
 
 class ActivityViewSet(mixins.ListModelMixin,

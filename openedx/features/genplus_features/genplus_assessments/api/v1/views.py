@@ -13,7 +13,7 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 from openedx.features.genplus_features.genplus.models import Class
 from openedx.features.genplus_features.genplus_assessments.models import UserResponse, UserRating
 from openedx.features.genplus_features.genplus_learning.models import Unit
-from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher
+from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher
 from .serializers import ClassSerializer, TextAssessmentSerializer, RatingAssessmentSerializer
 from openedx.features.genplus_features.genplus_assessments.constants import (
     TOTAL_PROBLEM_SCORE, INTRO_RATING_ASSESSMENT_RESPONSE,
@@ -100,7 +100,7 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 containing the students aggregate or individual class base result data.
     """
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
-    permission_classes = [IsAuthenticated, IsTeacher]
+    permission_classes = [IsAuthenticated, IsStudentOrTeacher]
     intro_assessments = None
     outro_assessments = None
 
@@ -118,12 +118,14 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
 
         try:
             gen_class = Class.objects.get(pk=class_id)
+            program = gen_class.program
+
             if student_id != "all" and student_id is not None:
-                text_assessment = UserResponse.objects.filter(user=student_id, gen_class=class_id, program=gen_class.program)
-                rating_assessment = UserRating.objects.filter(user=student_id, gen_class=class_id, program=gen_class.program)
+                text_assessment = UserResponse.objects.filter(user=student_id, gen_class=class_id, program=program)
+                rating_assessment = UserRating.objects.filter(user=student_id, gen_class=class_id, program=program)
             else:
-                text_assessment = UserResponse.objects.filter(gen_class=class_id, program=gen_class.program)
-                rating_assessment = UserRating.objects.filter( gen_class=class_id, program=gen_class.program)
+                text_assessment = UserResponse.objects.filter(gen_class=class_id, program=program)
+                rating_assessment = UserRating.objects.filter( gen_class=class_id, program=program)
 
             text_assessment_data = TextAssessmentSerializer(text_assessment, many=True).data
             rating_assessment_data = RatingAssessmentSerializer(rating_assessment, many=True).data

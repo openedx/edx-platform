@@ -1,8 +1,10 @@
 from django.conf import settings
 from rest_framework import serializers
 from xmodule.modulestore.django import modulestore
+from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from django.urls import reverse
 from openedx.features.genplus_features.genplus_learning.models import (
     Program,
     ProgramEnrollment,
@@ -15,36 +17,49 @@ from openedx.features.genplus_features.genplus_learning.models import (
 from openedx.features.genplus_features.genplus_learning.utils import (
     calculate_class_lesson_progress,
     get_absolute_url,
+    get_user_next_course_lesson,
 )
 from openedx.features.genplus_features.genplus.models import Student, JournalPost, Activity, Teacher
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
 from openedx.features.genplus_features.genplus.api.v1.serializers import TeacherSerializer
 from openedx.features.genplus_features.common.utils import get_generic_serializer
-from openedx.features.genplus_features.genplus_assessments.utils import get_student_skills_assessment_completion
-
+from openedx.features.genplus_features.genplus_assessments.utils import (
+    get_student_program_skills_assessment,
+    get_student_unit_skills_assessment,
+)
 
 
 class UnitSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     is_locked = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
+    completion_badge_url = serializers.SerializerMethodField()
+    lms_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Unit
         fields = ('id', 'display_name', 'short_description',
                   'banner_image_url', 'is_locked', 'lms_url',
-                  'progress')
+                  'progress', 'completion_badge_url')
 
     def get_id(self, obj):
         return str(obj.course.id)
 
     def get_is_locked(self, obj):
         units_context = self.context.get("units_context")
-        return units_context[obj.pk]['is_locked']
+        return units_context.get(obj.pk, {}).get('is_locked', False)
 
     def get_progress(self, obj):
         units_context = self.context.get("units_context")
-        return units_context[obj.pk]['progress']
+        return units_context.get(obj.pk, {}).get('progress', None)
+
+    def get_completion_badge_url(self, obj):
+        units_context = self.context.get("units_context")
+        return units_context.get(obj.pk, {}).get('completion_badge_url', None)
+
+    def get_lms_url(self, obj):
+        gen_user = self.context.get("gen_user")
+        return get_user_next_course_lesson(gen_user.user, obj.course.id)
 
 
 class AssessmentUnitSerializer(serializers.ModelSerializer):
@@ -60,30 +75,26 @@ class AssessmentUnitSerializer(serializers.ModelSerializer):
                   'is_complete')
 
     def get_is_locked(self, obj):
-        return self.context.get('is_locked')
+        return False
 
     def get_is_complete(self, obj):
-        return self.context.get('is_complete')
+        gen_user = self.context.get('gen_user')
+        if gen_user.is_student:
+            return get_student_unit_skills_assessment(gen_user.user, obj)
+        return None
 
     def get_course_image_url(self, obj):
         return f"{settings.LMS_ROOT_URL}{obj.course_image_url}"
 
     def get_lms_url(self, obj):
-        course = modulestore().get_course(obj.id)
-        course_key_str = str(obj.id)
-        sections = course.children
-        if sections:
-            usage_key_str = str(sections[0])
-        else:
-            usage_key_str = str(modulestore().make_course_usage_key(course.id))
-
-        return f"{settings.LMS_ROOT_URL}/courses/{course_key_str}/jump_to/{usage_key_str}"
+        gen_user = self.context.get("gen_user")
+        return get_user_next_course_lesson(gen_user.user, obj.id)
 
 
 class ProgramSerializer(serializers.ModelSerializer):
     units = serializers.SerializerMethodField()
-    intro_unit = serializers.SerializerMethodField()
-    outro_unit = serializers.SerializerMethodField()
+    intro_unit = AssessmentUnitSerializer(many=False, read_only=True)
+    outro_unit = AssessmentUnitSerializer(many=False, read_only=True)
     year_group_name = serializers.CharField(source='year_group.name')
     program_name = serializers.CharField(source='year_group.program_name')
 
@@ -93,60 +104,31 @@ class ProgramSerializer(serializers.ModelSerializer):
 
     def get_units(self, obj):
         gen_user = self.context.get('gen_user')
-        units = obj.units.all()
-        completions = UnitCompletion.objects.filter(
-            user=gen_user.user,
-            course_key__in=units.values_list('course', flat=True)
-        )
+        request = self.context.get('request')
+        units = obj.units.select_related('course').all()
         units_context = {}
 
-        for unit in units:
-            is_locked = False
-            progress = None
+        if gen_user.is_student:
+            course_ids = units.values_list('course', flat=True)
+            completions = UnitCompletion.objects.filter(user=gen_user.user, course_key__in=course_ids)
+            badges = BadgeAssertion.objects.filter(user=gen_user.user, badge_class__issuing_component='genplus__unit')
 
-            if gen_user.is_student:
+            for unit in units:
+                course_key = unit.course.id
                 enrollment = gen_user.student.program_enrollments.get(program=obj)
-                completion = completions.filter(user=gen_user.user, course_key=unit.course.id).first()
-                progress = completion.progress if completion else 0
-                if CourseEnrollment.is_enrolled(gen_user.user, unit.course.id):
+                completion = completions.filter(course_key=course_key).first()
+                badge = badges.filter(badge_class__course_id=course_key).first()
+                is_locked = True
+                if CourseEnrollment.is_enrolled(gen_user.user, course_key):
                     is_locked = unit.is_locked(enrollment.gen_class)
-                else:
-                    is_locked = True
 
-            units_context[unit.pk] = {
-                'is_locked': is_locked,
-                'progress': progress,
-            }
+                units_context[unit.pk] = {
+                    'is_locked': is_locked,
+                    'progress': completion.progress if completion else 0,
+                    'completion_badge_url': get_absolute_url(request, badge.badge_class.image) if badge else None,
+                }
 
-        return UnitSerializer(units, many=True, read_only=True, context={'units_context': units_context}).data
-
-    def get_intro_unit(self, obj):
-        if not obj.intro_unit:
-            return None
-
-        gen_user = self.context.get('gen_user')
-        context = {
-            'is_locked': False,
-            'is_complete': None,
-        }
-        if gen_user.is_student:
-            context['is_complete'] = get_student_skills_assessment_completion(gen_user.student, assessment_filter='intro')
-
-        return AssessmentUnitSerializer(obj.intro_unit, read_only=True, context=context).data
-
-    def get_outro_unit(self, obj):
-        if not obj.outro_unit:
-            return None
-
-        gen_user = self.context.get('gen_user')
-        context = {
-            'is_locked': False,
-            'is_complete': None,
-        }
-        if gen_user.is_student:
-            context['is_complete'] = get_student_skills_assessment_completion(gen_user.student, assessment_filter='outro')
-
-        return AssessmentUnitSerializer(obj.outro_unit, read_only=True, context=context).data
+        return UnitSerializer(units, many=True, read_only=True, context={'units_context': units_context, 'gen_user': gen_user}).data
 
 
 class ClassLessonSerializer(serializers.ModelSerializer):
@@ -190,7 +172,7 @@ class ClassStudentSerializer(serializers.ModelSerializer):
         return get_absolute_url(request, profile)
 
     def get_skills_assessment(self, obj):
-        return get_student_skills_assessment_completion(student=obj)
+        return get_student_program_skills_assessment(student=obj)
 
     def get_unit_lesson_completion(self, obj):
         results = []
