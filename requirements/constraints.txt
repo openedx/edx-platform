@@ -95,5 +95,5 @@ django-ratelimit<4.0.0
 django-classy-tags<4.0.0
 edx-event-bus-kafka<3.0.0
 python-slugify<7.0.0
+cryptography<37.0.0
 
-# aaaaa
