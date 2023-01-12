@@ -58,7 +58,7 @@ pytz==2022.2.1
     #   babel
 pyyaml==6.0
     # via code-annotations
-requests==2.28.1
+requests==2.28.2
     # via sphinx
 six==1.16.0
     # via edx-sphinx-theme
