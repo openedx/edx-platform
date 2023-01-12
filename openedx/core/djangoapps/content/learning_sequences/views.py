@@ -173,9 +173,11 @@ class CourseOutlineView(APIView):
         # data using this API." The MFE should _never_ pass this parameter. It's
         # just a way to peek at the API while it's techincally dark for rollout
         # purposes. TODO: REMOVE THIS PARAM AFTER FULL ROLLOUT OF THIS FEATURE.
-        force_on = request.GET.get("force_on")
-        if (not force_on) and (not can_call_public_api(course_key)):
-            raise PermissionDenied()
+        
+        ## .. FUNiX Custom for MFE
+        # force_on = request.GET.get("force_on")
+        # if (not force_on) and (not can_call_public_api(course_key)):
+        #     raise PermissionDenied()
 
         try:
             # Grab the user's outline and send our response...
