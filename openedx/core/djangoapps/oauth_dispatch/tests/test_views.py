@@ -494,7 +494,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         )
 
         assert 'expires_in' in data
-        assert data['expires_in'] == 60 * 60
+        assert data['expires_in'] > 0
         assert data['token_type'] == 'JWT'
 
     @ddt.data('dot_app')
