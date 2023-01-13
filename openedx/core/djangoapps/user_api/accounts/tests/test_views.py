@@ -19,7 +19,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.models import PendingEmailChange, UserProfile
-from common.djangoapps.student.models_api import do_name_change_request, get_pending_name_change
+from common.djangoapps.student.api import get_pending_name_change, do_name_change_request
 from common.djangoapps.student.tests.factories import (
     TEST_PASSWORD,
     ContentTypeFactory,

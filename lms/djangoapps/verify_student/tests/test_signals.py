@@ -8,7 +8,7 @@ from datetime import timedelta
 from django.utils.timezone import now
 from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
 
-from common.djangoapps.student.models_api import do_name_change_request
+from common.djangoapps.student.api import do_name_change_request
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.signals import _listen_for_course_publish, _listen_for_lms_retire

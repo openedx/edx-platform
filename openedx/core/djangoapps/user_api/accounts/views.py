@@ -51,7 +51,7 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     is_email_retired,
     is_username_retired
 )
-from common.djangoapps.student.models_api import confirm_name_change, do_name_change_request, get_pending_name_change
+from common.djangoapps.student.api import get_pending_name_change, do_name_change_request, confirm_name_change
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
