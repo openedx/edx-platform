@@ -98,3 +98,5 @@ python-slugify<7.0.0
 cryptography<37.0.0
 django-countries==7.4.2
 icalendar==5.0.1
+mock=4.0.3
+
