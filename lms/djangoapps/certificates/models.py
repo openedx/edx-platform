@@ -23,6 +23,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
+import common.djangoapps.student.api
 from common.djangoapps.student import models_api as student_api
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
@@ -439,7 +440,7 @@ class GeneratedCertificate(models.Model):
         Copy of `get_preferred_certificate_name` from utils.py - importing it here would introduce
         a circular dependency.
         """
-        name_to_use = student_api.get_name(user.id)
+        name_to_use = common.djangoapps.student.api.get_name(user.id)
         name_affirmation_service = get_name_affirmation_service()
 
         if name_affirmation_service and name_affirmation_service.should_use_verified_name_for_certs(user):

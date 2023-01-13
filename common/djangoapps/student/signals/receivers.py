@@ -21,7 +21,7 @@ from common.djangoapps.student.models import (
     is_email_retired,
     is_username_retired
 )
-from common.djangoapps.student.models_api import confirm_name_change
+from common.djangoapps.student.api import confirm_name_change
 from common.djangoapps.student.signals import USER_EMAIL_CHANGED
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
 

@@ -31,7 +31,7 @@ from common.djangoapps.student.models import (
     UserCelebration,
     UserProfile
 )
-from common.djangoapps.student.models_api import confirm_name_change, do_name_change_request, get_name
+from common.djangoapps.student.api import get_name, do_name_change_request, confirm_name_change
 from common.djangoapps.student.tests.factories import AccountRecoveryFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from lms.djangoapps.courseware.toggles import (
