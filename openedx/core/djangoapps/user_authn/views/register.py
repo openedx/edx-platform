@@ -88,6 +88,10 @@ from edx_django_utils.user import generate_password
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
+#.. FUNiX custom ..
+from openedx.core.lib.api.authentication import BearerAuthentication
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from openedx.core.lib.api.permissions import IsStaff
 
 # Used as the name of the user attribute for tracking affiliate registrations
 REGISTRATION_AFFILIATE_ID = 'registration_affiliate_id'
@@ -521,7 +525,9 @@ class RegistrationView(APIView):
 
     # This end-point is available to anonymous users,
     # so do not require authentication.
-    authentication_classes = []
+    # .. FUNiX Custom .. : do not available to anonymous users
+    authentication_classes = [JwtAuthentication, BearerAuthentication]
+    permission_classes = (IsStaff,)
 
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(sensitive_post_parameters("password"))

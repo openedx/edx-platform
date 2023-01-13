@@ -59,7 +59,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params  # lint-amnesty, pylint: disable=unused-import
 from openedx.features.enterprise_support.api import activate_learner_enterprise, get_enterprise_learner_data_from_api
 
-#=================== CUSTOM FOR PP1: IMPORT =====================
+# .. FUNiX Custom ..
 from django.contrib.auth.models import User
 from openedx.core.djangoapps.user_authn.views.registration_form import (
     AccountCreationForm,
@@ -74,20 +74,21 @@ from common.djangoapps.student.models import (
 import random
 import string
 import time
-#=================== END OF CUSTOM ==============================
+
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 USER_MODEL = get_user_model()
 
 
-# .. FX Custom ===================== CUSTOM FOR PP1 FUNCTION ========================
+# .. FUNiX Custom ..
 def _is_funix_email(email):
     _funix_email_tail = '@funix.edu.vn'
     if not email[-13:].__eq__(_funix_email_tail):
         return False
     return True
 
+# .. FUNiX Custom ..
 def _create_random_password(length):
     letters = string.ascii_lowercase
     result_str = ''.join(random.choice(letters) for i in range(length))
