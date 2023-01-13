@@ -774,10 +774,8 @@ html5lib==1.1
     #   ora2
 httpretty==1.1.4
     # via -r requirements/edx/testing.txt
-icalendar==5.0.1
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.txt
+icalendar==5.0.4
+    # via -r requirements/edx/testing.txt
 idna==3.4
     # via
     #   -r requirements/edx/testing.txt
@@ -952,9 +950,8 @@ mistune==0.8.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   m2r
-mock==4.0.3
+mock==5.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   xblock-poll
 mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
@@ -1508,7 +1505,9 @@ sphinxcontrib-httpdomain==1.8.1
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-openapi[markdown]==0.7.0
-    # via -r requirements/edx/development.in
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/development.in
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
