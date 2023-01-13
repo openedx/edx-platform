@@ -774,8 +774,10 @@ html5lib==1.1
     #   ora2
 httpretty==1.1.4
     # via -r requirements/edx/testing.txt
-icalendar==5.0.4
-    # via -r requirements/edx/testing.txt
+icalendar==5.0.1
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/testing.txt
 idna==3.4
     # via
     #   -r requirements/edx/testing.txt
