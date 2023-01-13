@@ -261,8 +261,9 @@ django-config-models==2.3.0
     #   lti-consumer-xblock
 django-cors-headers==3.13.0
     # via -r requirements/edx/base.in
-django-countries==7.5
+django-countries==7.4.2
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-enterprise
 django-crum==0.7.9
@@ -480,7 +481,7 @@ edx-drf-extensions==8.4.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.60.10
+edx-enterprise==3.60.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -587,7 +588,7 @@ fs-s3fs==0.1.8
     # via
     #   -r requirements/edx/base.in
     #   django-pyfs
-future==0.18.2
+future==0.18.3
     # via
     #   edx-celeryutils
     #   pyjwkest
@@ -603,8 +604,10 @@ html5lib==1.1
     # via
     #   -r requirements/edx/base.in
     #   ora2
-icalendar==5.0.4
-    # via -r requirements/edx/base.in
+icalendar==5.0.1
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.in
 idna==3.4
     # via
     #   -r requirements/edx/paver.txt
@@ -713,8 +716,9 @@ markupsafe==2.1.1
     #   xblock
 maxminddb==2.2.0
     # via geoip2
-mock==5.0.1
+mock==4.0.3
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.txt
     #   xblock-poll
 mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
@@ -968,7 +972,7 @@ redis==4.4.2
     # via -r requirements/edx/base.in
 regex==2022.10.31
     # via nltk
-requests==2.28.1
+requests==2.28.2
     # via
     #   -r requirements/edx/paver.txt
     #   analytics-python

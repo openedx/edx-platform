@@ -343,8 +343,9 @@ django-config-models==2.3.0
     #   lti-consumer-xblock
 django-cors-headers==3.13.0
     # via -r requirements/edx/base.txt
-django-countries==7.5
+django-countries==7.4.2
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
 django-crum==0.7.9
@@ -581,7 +582,7 @@ edx-drf-extensions==8.4.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.60.10
+edx-enterprise==3.60.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -687,7 +688,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==16.3.0
+faker==16.4.0
     # via factory-boy
 fastapi==0.89.1
     # via pact-python
@@ -718,7 +719,7 @@ fs-s3fs==0.1.8
     # via
     #   -r requirements/edx/base.txt
     #   django-pyfs
-future==0.18.2
+future==0.18.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-celeryutils
@@ -741,8 +742,10 @@ html5lib==1.1
     #   ora2
 httpretty==1.1.4
     # via -r requirements/edx/testing.in
-icalendar==5.0.4
-    # via -r requirements/edx/base.txt
+icalendar==5.0.1
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
 idna==3.4
     # via
     #   -r requirements/edx/base.txt
@@ -902,8 +905,9 @@ maxminddb==2.2.0
     #   geoip2
 mccabe==0.7.0
     # via pylint
-mock==5.0.1
+mock==4.0.3
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   xblock-poll
 mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
@@ -1269,7 +1273,7 @@ regex==2022.10.31
     # via
     #   -r requirements/edx/base.txt
     #   nltk
-requests==2.28.1
+requests==2.28.2
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
