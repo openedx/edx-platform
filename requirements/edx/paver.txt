@@ -20,7 +20,7 @@ libsass==0.10.0
     # via -r requirements/edx/paver.in
 markupsafe==2.1.1
     # via -r requirements/edx/paver.in
-mock==4.0.3
+mock==5.0.1
     # via -r requirements/edx/paver.in
 path==16.6.0
     # via -r requirements/edx/paver.in
