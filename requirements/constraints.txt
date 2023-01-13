@@ -98,3 +98,4 @@ python-slugify<7.0.0
 cryptography<37.0.0
 django-countries==7.4.2
 sphinxcontrib-openapi[markdown]==0.7.0
+icalendar==5.0.1
