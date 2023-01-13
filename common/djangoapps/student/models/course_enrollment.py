@@ -596,7 +596,8 @@ class CourseEnrollment(models.Model):
                                                               self.course_overview.display_name,
                                                               self.course_overview.short_description,
                                                               self.course_overview.has_ended(),
-                                                              course_pacing_type))
+                                                              course_pacing_type,
+                                                              self.mode))
                 segment_properties['email'] = self.user.email
                 # This next property is for an experiment, see method's comments for more information
                 segment_properties['external_course_updates'] = set_up_external_updates_for_enrollment(self.user,
