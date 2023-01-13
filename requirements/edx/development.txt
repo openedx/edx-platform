@@ -952,8 +952,9 @@ mistune==0.8.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   m2r
-mock==5.0.1
+mock==4.0.3
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   xblock-poll
 mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
