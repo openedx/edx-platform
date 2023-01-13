@@ -90,7 +90,9 @@ pytz==2022.2.1
 docutils<0.19
 
 
-# right now lots of package have major upgrades.
+# right now lots of packages have major upgrades and lots of tests failing.
+# so adding following constraints and will unpin one by one.
+
 django-ratelimit<4.0.0
 django-classy-tags<4.0.0
 edx-event-bus-kafka<3.0.0
