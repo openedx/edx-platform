@@ -34,3 +34,8 @@ django-simple-history==3.0.0
 # tox>4.0.0 isn't yet compatible with many tox plugins, causing CI failures in almost all repos.
 # Details can be found in this discussion: https://github.com/tox-dev/tox/discussions/1810
 tox<4.0.0
+
+# edx-sphinx-theme is not compatible with latest Sphinx==6.0.0 version 
+# Pinning Sphinx version unless the compatibility issue gets resolved
+# For details, see issue https://github.com/openedx/edx-sphinx-theme/issues/197
+sphinx<6.0.0
