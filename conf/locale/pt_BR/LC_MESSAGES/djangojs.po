@@ -1825,7 +1825,7 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid "Are you sure you want to unenroll from {courseName} ({courseNumber})?"
-msgstr ""
+msgstr "Tem certeza de que deseja cancelar a inscrição em {courseName} ({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
@@ -3000,7 +3000,7 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Explore courses"
-msgstr ""
+msgstr "Explorar cursos"
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid "More opportunities for you"
@@ -3941,7 +3941,7 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
-msgstr ""
+msgstr "Perfil"
 
 #: xmodule/assets/library_content/public/js/library_content_edit.js
 #: xmodule/js/public/js/library_content_edit.js
@@ -8330,7 +8330,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"
-msgstr ""
+msgstr "Inscreva-se agora"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Coming Soon"
@@ -8540,7 +8540,7 @@ msgstr "Um erro ocorreu. Por favor, recarregue a página."
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Need help signing in?"
-msgstr ""
+msgstr "precisa de ajuda para entrar?"
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot my password"
@@ -8642,7 +8642,7 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign In"
-msgstr ""
+msgstr "Entrar"
 
 #: lms/templates/student_account/login.underscore
 msgid ""
