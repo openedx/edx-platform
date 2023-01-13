@@ -147,7 +147,7 @@ coreschema==0.0.4
     #   drf-yasg
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.in
-cryptography==38.0.3
+cryptography==36.0.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
