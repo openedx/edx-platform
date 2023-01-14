@@ -756,8 +756,9 @@ idna==3.4
     #   yarl
 import-linter==1.6.0
     # via -r requirements/edx/testing.in
-importlib-metadata==6.0.0
+importlib-metadata==5.1.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   markdown
     #   pytest-randomly
@@ -1162,7 +1163,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-pytest==7.2.0
+pytest==7.2.1
     # via
     #   -r requirements/edx/testing.in
     #   pylint-pytest

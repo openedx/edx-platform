@@ -615,8 +615,10 @@ idna==3.4
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==6.0.0
-    # via markdown
+importlib-metadata==5.1.0
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   markdown
 importlib-resources==5.10.2
     # via jsonschema
 inflection==0.5.1
