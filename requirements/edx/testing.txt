@@ -1162,7 +1162,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-pytest==7.2.0
+pytest==7.2.1
     # via
     #   -r requirements/edx/testing.in
     #   pylint-pytest
