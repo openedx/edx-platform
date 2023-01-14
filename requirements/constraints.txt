@@ -101,3 +101,4 @@ django-countries==7.4.2
 sphinxcontrib-openapi[markdown]==0.7.0
 icalendar==5.0.1
 cryptography==38.0.4 # greater version has some issues.
+importlib-metadata==5.1.0
