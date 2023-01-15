@@ -88,3 +88,16 @@ pytz==2022.2.1
 # docutils==0.19 has removed the docutils.core.ErrorString which is required by the sphinxcontrib-openapi
 # This constraint can be removed once sphinxcontrib-openapi is updated to resolve this issue.
 docutils<0.19
+
+# right now lots of packages have major upgrades and lots of tests failing.
+# so adding following constraints and will unpin one by one.
+
+django-ratelimit<4.0.0
+django-classy-tags<4.0.0
+edx-event-bus-kafka<3.0.0
+python-slugify<7.0.0
+django-countries==7.4.2
+sphinxcontrib-openapi[markdown]==0.7.0
+icalendar==5.0.1
+cryptography==38.0.4 # greater version has some issues.
+importlib-metadata==5.1.0
