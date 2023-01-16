@@ -31,7 +31,7 @@ COUNTDOWN = 60
 
 @shared_task(bind=True, ignore_result=True)
 def send_course_enrollment_email(
-    self, user_id, course_id, course_title, short_description, course_ended, pacing_type
+    self, user_id, course_id, course_title, short_description, course_ended, pacing_type, track_mode
 ):
     """
     Send course enrollment email using Braze API.
@@ -69,6 +69,7 @@ def send_course_enrollment_email(
         "learning_base_url": configuration_helpers.get_value(
             "LEARNING_MICROFRONTEND_URL", settings.LEARNING_MICROFRONTEND_URL
         ),
+        "track_mode": track_mode
     }
 
     try:
