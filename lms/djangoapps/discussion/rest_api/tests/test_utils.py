@@ -119,15 +119,25 @@ class TestRemoveEmptySequentials(unittest.TestCase):
         data = [
             {"type": "sequential", "children": []},
             {"type": "chapter", "children": [
-                {"type": "sequential", "children": [{"type": "vertical"}]},
+                {"type": "sequential", "children": [{"type": "vertical3"}]},
                 {"type": "sequential", "children": []},
-                {"type": "sequential", "children": [{"type": "vertical"}]}
+                {"type": "sequential", "children": []},
+                {"type": "sequential", "children": [{"type": "vertical4"}]}
+            ]},
+            {"type": "chapter", "children": [
+                {"type": "sequential", "children": [{"type": "vertical1"}]},
+                {"type": "sequential", "children": []},
+                {"type": "sequential", "children": [{"type": "vertical2"}]}
             ]}
         ]
         expected_output = [
             {"type": "chapter", "children": [
-                {"type": "sequential", "children": [{"type": "vertical"}]},
-                {"type": "sequential", "children": [{"type": "vertical"}]}
+                {"type": "sequential", "children": [{"type": "vertical3"}]},
+                {"type": "sequential", "children": [{"type": "vertical4"}]}
+            ]},
+            {"type": "chapter", "children": [
+                {"type": "sequential", "children": [{"type": "vertical1"}]},
+                {"type": "sequential", "children": [{"type": "vertical2"}]}
             ]}
         ]
         result = remove_empty_sequentials(data)

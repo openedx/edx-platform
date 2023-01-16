@@ -282,12 +282,14 @@ def remove_empty_sequentials(data):
     Returns:
     list: The modified list with empty sequentials removed.
     """
+
+    new_data = []
     for obj in data:
-        if obj['type'] == 'sequential' and not obj.get('children'):
-            data.remove(obj)
-        elif obj.get('children'):
-            remove_empty_sequentials(obj['children'])
-    return data
+        if obj['type'] != 'sequential' or (obj['type'] == 'sequential' and obj.get('children')):
+            new_data.append(obj)
+            if obj.get('children'):
+                obj['children'] = remove_empty_sequentials(obj['children'])
+    return new_data
 
 
 def get_topic_ids_from_topics(topics: List[Dict[str, str]]) -> List[str]:
