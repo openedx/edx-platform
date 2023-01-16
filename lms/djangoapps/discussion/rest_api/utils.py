@@ -285,7 +285,8 @@ def remove_empty_sequentials(data):
 
     new_data = []
     for obj in data:
-        if obj['type'] != 'sequential' or (obj['type'] == 'sequential' and obj.get('children')):
+        block_type = obj.get('type')
+        if block_type != 'sequential' or (block_type == 'sequential' and obj.get('children')):
             new_data.append(obj)
             if obj.get('children'):
                 obj['children'] = remove_empty_sequentials(obj['children'])

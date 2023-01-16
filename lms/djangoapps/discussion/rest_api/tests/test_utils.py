@@ -130,7 +130,7 @@ class TestRemoveEmptySequentials(unittest.TestCase):
             {"type": "chapter", "children": [
                 {"type": "sequential", "children": [{"type": "vertical1"}]},
                 {"type": "sequential", "children": []},
-                {"type": "sequential", "children": [{"type": "vertical2"}]}
+                {"children": [{"type": "vertical2"}]}
             ]}
         ]
         expected_output = [
@@ -140,7 +140,7 @@ class TestRemoveEmptySequentials(unittest.TestCase):
             ]},
             {"type": "chapter", "children": [
                 {"type": "sequential", "children": [{"type": "vertical1"}]},
-                {"type": "sequential", "children": [{"type": "vertical2"}]}
+                {"children": [{"type": "vertical2"}]}
             ]}
         ]
         result = remove_empty_sequentials(data)
