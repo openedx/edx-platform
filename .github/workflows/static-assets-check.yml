@@ -26,6 +26,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Install system Packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install libxmlsec1-dev pkg-config
+
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
