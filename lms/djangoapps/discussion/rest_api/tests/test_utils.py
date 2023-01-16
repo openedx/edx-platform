@@ -97,6 +97,9 @@ class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
 
 
 class TestRemoveEmptySequentials(unittest.TestCase):
+    """
+    Test for the remove_empty_sequentials function
+    """
     def test_empty_data(self):
         # Test that the function can handle an empty list
         data = []
