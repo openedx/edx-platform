@@ -41,7 +41,6 @@ class TestCourseRecommendationSerializer(TestCase):
         output_data = CourseRecommendationSerializer(
             {
                 "courses": recommended_courses,
-                "is_personalized_recommendation": False,
             }
         ).data
 
@@ -49,7 +48,7 @@ class TestCourseRecommendationSerializer(TestCase):
             output_data,
             {
                 "courses": [],
-                "isPersonalizedRecommendation": False,
+                "isControl": None,
             },
         )
 
@@ -61,7 +60,7 @@ class TestCourseRecommendationSerializer(TestCase):
         output_data = CourseRecommendationSerializer(
             {
                 "courses": recommended_courses,
-                "is_personalized_recommendation": True,
+                "is_control": False,
             }
         ).data
 
@@ -82,6 +81,6 @@ class TestCourseRecommendationSerializer(TestCase):
                         "title": recommended_courses[1]["title"],
                     },
                 ],
-                "isPersonalizedRecommendation": True,
+                "isControl": False,
             },
         )

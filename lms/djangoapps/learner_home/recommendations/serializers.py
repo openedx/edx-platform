@@ -19,6 +19,7 @@ class CourseRecommendationSerializer(serializers.Serializer):
     courses = serializers.ListField(
         child=RecommendedCourseSerializer(), allow_empty=True
     )
-    isPersonalizedRecommendation = serializers.BooleanField(
-        source="is_personalized_recommendation"
+    isControl = serializers.BooleanField(
+        source="is_control",
+        default=None
     )
