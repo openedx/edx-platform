@@ -246,6 +246,8 @@ ddt==1.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   xblock-poll
+deepmerge==1.1.0
+    # via sphinxcontrib-openapi
 defusedxml==0.7.1
     # via
     #   -r requirements/edx/testing.txt
@@ -518,13 +520,12 @@ djfernet==0.8.1
     #   edxval
 docopt==0.6.2
     # via -r requirements/edx/testing.txt
-docutils==0.18.1
+docutils==0.19
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   botocore
-    #   m2r
     #   sphinx
+    #   sphinx-mdinclude
 done-xblock==2.0.5
     # via -r requirements/edx/testing.txt
 drf-jwt==1.19.2
@@ -656,7 +657,7 @@ edx-search==3.4.0
     # via -r requirements/edx/testing.txt
 edx-sga==0.20.0
     # via -r requirements/edx/testing.txt
-edx-sphinx-theme==3.0.0
+edx-sphinx-theme==3.1.0
     # via -r requirements/edx/development.in
 edx-submissions==3.5.4
     # via
@@ -709,7 +710,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==16.4.0
+faker==16.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -907,8 +908,6 @@ lxml==4.9.2
     #   pyquery
     #   xblock
     #   xmlsec
-m2r==0.3.1
-    # via sphinxcontrib-openapi
 mailsnake==1.6.4
     # via -r requirements/edx/testing.txt
 mako==1.2.4
@@ -929,7 +928,7 @@ markey==0.8
     # via
     #   -r requirements/edx/testing.txt
     #   enmerkar-underscore
-markupsafe==2.1.1
+markupsafe==2.1.2
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -945,10 +944,8 @@ mccabe==0.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
-mistune==0.8.4
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   m2r
+mistune==2.0.4
+    # via sphinx-mdinclude
 mock==5.0.1
     # via
     #   -r requirements/edx/testing.txt
@@ -1063,6 +1060,8 @@ pgpy==0.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
+picobox==2.2.0
+    # via sphinxcontrib-openapi
 piexif==1.1.3
     # via -r requirements/edx/testing.txt
 pillow==9.4.0
@@ -1144,6 +1143,7 @@ pygments==2.14.0
     #   diff-cover
     #   py2neo
     #   sphinx
+    #   sphinx-mdinclude
 pyjwkest==1.4.2
     # via
     #   -r requirements/edx/testing.txt
@@ -1492,6 +1492,8 @@ sphinx==5.3.0
     #   edx-sphinx-theme
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
+sphinx-mdinclude==0.5.3
+    # via sphinxcontrib-openapi
 sphinxcontrib-applehelp==1.0.3
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
@@ -1502,10 +1504,8 @@ sphinxcontrib-httpdomain==1.8.1
     # via sphinxcontrib-openapi
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-openapi[markdown]==0.7.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/development.in
+sphinxcontrib-openapi[markdown]==0.8.0
+    # via -r requirements/edx/development.in
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5

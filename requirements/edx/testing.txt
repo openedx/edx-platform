@@ -501,9 +501,8 @@ djfernet==0.8.1
     #   edxval
 docopt==0.6.2
     # via -r requirements/edx/base.txt
-docutils==0.18.1
+docutils==0.19
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   botocore
 done-xblock==2.0.5
@@ -685,7 +684,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==16.4.0
+faker==16.5.0
     # via factory-boy
 fastapi==0.89.1
     # via pact-python
@@ -887,7 +886,7 @@ markey==0.8
     # via
     #   -r requirements/edx/base.txt
     #   enmerkar-underscore
-markupsafe==2.1.1
+markupsafe==2.1.2
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt

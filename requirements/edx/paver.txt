@@ -18,7 +18,7 @@ lazy==1.5
     # via -r requirements/edx/paver.in
 libsass==0.10.0
     # via -r requirements/edx/paver.in
-markupsafe==2.1.1
+markupsafe==2.1.2
     # via -r requirements/edx/paver.in
 mock==5.0.1
     # via -r requirements/edx/paver.in
