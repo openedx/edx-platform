@@ -64,6 +64,7 @@ git+https://github.com/openedx/django-require.git@0c54adb167142383b26ea6b3edecc3
 # Our libraries:
 -e git+https://github.com/openedx/blockstore.git@1.2.4#egg=blockstore==1.2.4  # Note: Blockstore 1.2.2 & 1.2.3 are failing.
 -e git+https://github.com/openedx/codejail.git@3.1.3#egg=codejail==3.1.3
+-e git+https://github.com/openedx/edx-sphinx-theme.git@3763bed325fa73eefb89f0ddc00ef9962e17ce4f#egg=edx-sphinx-theme==3.1.0
 
 # Third Party XBlocks
 
