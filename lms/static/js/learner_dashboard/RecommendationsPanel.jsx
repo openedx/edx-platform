@@ -28,7 +28,12 @@ class RecommendationsPanel extends React.Component {
     } else {
       recommendedCourses = JSON.parse(recommendedCourses);
       if (!recommendedCourses.course_keys.includes(courseKey)) {
-        recommendedCourses.course_keys.push(courseKey);
+        if (recommendedCourses.course_keys.length < 5) {
+          recommendedCourses.course_keys.push(course.courseKey);
+        } else {
+          recommendedCourses.course_keys.shift();
+          recommendedCourses.course_keys.push(course.courseKey);
+        }
       }
     }
     recommendedCourses['is_personalized_recommendation'] = this.state.isPersonalizedRecommendation;
