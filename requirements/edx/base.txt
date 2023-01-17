@@ -259,9 +259,8 @@ django-config-models==2.3.0
     #   lti-consumer-xblock
 django-cors-headers==3.13.0
     # via -r requirements/edx/base.in
-django-countries==7.4.2
+django-countries==7.5
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-enterprise
 django-crum==0.7.9
@@ -910,10 +909,8 @@ python-levenshtein==0.20.9
     # via -r requirements/edx/base.in
 python-memcached==1.59
     # via -r requirements/edx/paver.txt
-python-slugify==6.1.2
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   code-annotations
+python-slugify==7.0.0
+    # via code-annotations
 python-swiftclient==4.1.0
     # via ora2
 python3-openid==3.2.0 ; python_version >= "3"
