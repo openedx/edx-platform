@@ -357,9 +357,8 @@ django-config-models==2.3.0
     #   lti-consumer-xblock
 django-cors-headers==3.13.0
     # via -r requirements/edx/testing.txt
-django-countries==7.4.2
+django-countries==7.5
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
 django-crum==0.7.9
@@ -1275,9 +1274,8 @@ python-levenshtein==0.20.9
     # via -r requirements/edx/testing.txt
 python-memcached==1.59
     # via -r requirements/edx/testing.txt
-python-slugify==6.1.2
+python-slugify==7.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   code-annotations
 python-swiftclient==4.1.0
