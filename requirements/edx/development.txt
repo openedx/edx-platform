@@ -656,7 +656,7 @@ edx-search==3.4.0
     # via -r requirements/edx/testing.txt
 edx-sga==0.20.0
     # via -r requirements/edx/testing.txt
-edx-sphinx-theme==3.0.0
+edx-sphinx-theme==3.1.0
     # via -r requirements/edx/development.in
 edx-submissions==3.5.4
     # via
