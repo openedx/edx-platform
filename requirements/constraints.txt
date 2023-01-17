@@ -93,5 +93,6 @@ docutils<0.19
 # so adding following constraints and will unpin one by one.
 
 django-ratelimit<4.0.0
+sphinxcontrib-openapi[markdown]==0.7.0
 icalendar==5.0.1
 cryptography==38.0.4 # greater version has some issues.
