@@ -14,8 +14,7 @@ from ...models import UserRetirementStatus
 
 
 logger = logging.getLogger(__name__)
-unknown_users = []
-users = []
+
 
 
 class Command(BaseCommand):
@@ -51,21 +50,17 @@ class Command(BaseCommand):
             help='Comma separated file that have username and user_email of the users that needs to be retired'
         )
 
-    def handle(self, *args, **options):
+    def check_user_exist(self, user_model, userfile, user_name, useremail):
         """
-        Execute the command.
-        """
-        try:
-            userfile = options['user_file']
-        except KeyError:
-            userfile = None
-        try:
-            user_name = options['username']
-            useremail = options['user_email']
-        except KeyError:
-            user_name = None
-            useremail = None
+        Function to check if user exists. This function works for both cases.
 
+        Args:
+            userfile: file that have username and email of users to be retired
+            user_name: username of user to be retired
+            useremail: email of user to be retired
+        """
+        unknown_users = []
+        users = []
         if userfile:
             try:
                 userinfo = open(userfile, 'r')
@@ -80,15 +75,28 @@ class Command(BaseCommand):
                 user_email = userdata[1].strip()
                 try:
                     users.append(User.objects.get(username=username, email=user_email))
-                except Exception:
+                except user_model.DoesNotExist:
                     unknown_users.append({username: user_email})
         elif user_name and useremail:
             try:
                 users.append(User.objects.get(username=username, email=user_email))
-            except Exception:
+            except user_model.DoesNotExist:
                 unknown_users.append({username: useremail})
         else:
             raise CommandError("Please provide user_file or username and user_email parameter when runing command")
+        return users, unknown_users
+
+    def handle(self, *args, **options):
+        """
+        Execute the command.
+        """
+        userfile = options['user_file']
+        user_name = options['username']
+        useremail = options['user_email']
+
+        user_model = get_user_model()
+
+        users, unknown_users = self.check_user_exist(user_model, userfile, user_name, useremail)
 
         if len(unknown_users) > 0:
             error_message = (
@@ -98,8 +106,6 @@ class Command(BaseCommand):
             )
             logger.error(error_message)
             raise CommandError(error_message + f': {unknown_users}')  # lint-amnesty, pylint: disable=raise-missing-from
-
-        user_model = get_user_model()
 
         try:
             with transaction.atomic():
@@ -132,5 +138,4 @@ class Command(BaseCommand):
             error_message = f'500 error deactivating account: {exc}'
             logger.error(error_message)
             raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
-
         logger.info("User succesfully moved to the retirment pipeline")
