@@ -26,8 +26,11 @@
 #  NOTE: This uses plain POSIX `sh` instead of `bash` for the purpose of
 #  maximum portability.
 
-USAGE="Usage: $0"
+USAGE="Usage: $0 [ (-n|--node-modules) NODE_MODULES_PATH ]"
 
+# By default, we look for node_modules in the current directory.
+# Some Open edX distributions may want node_modules to be located somewhere
+# else, so we let this be configured with -n|--node-modules.
 NODE_MODULES_PATH="./node_modules"
 
 # Vendor destination paths for assets.
@@ -41,6 +44,16 @@ set -eu
 # Parse options.
 while [ $# -gt 0 ]; do
 	case $1 in
+		-n|--node-modules)
+			shift
+			if [ $# -eq 0 ]; then
+				echo "Error: Missing value for -n/--node-modules"
+				echo "$USAGE"
+				exit 1
+			fi
+			NODE_MODULES_PATH="$1"
+			shift
+			;;
 		--help)
 			echo "$USAGE"
 			exit 0
