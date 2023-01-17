@@ -94,4 +94,5 @@ docutils<0.19
 
 django-countries==7.4.2   # Rename Turkey to Türkiye. It needs approval.
 sphinxcontrib-openapi[markdown]==0.7.0
+icalendar==5.0.1
 cryptography==38.0.4 # greater version has some issues.
