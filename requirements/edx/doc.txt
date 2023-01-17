@@ -24,7 +24,7 @@ docutils==0.18.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   sphinx
-edx-sphinx-theme==3.0.0
+edx-sphinx-theme==3.1.0
     # via -r requirements/edx/doc.in
 gitdb==4.0.10
     # via gitpython
