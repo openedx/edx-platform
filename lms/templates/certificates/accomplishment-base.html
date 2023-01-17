@@ -15,7 +15,15 @@ course_mode_class = course_mode if course_mode else ''
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    % if facebook_share_enabled:
+        ## OG (Open Graph) url, title, type, image and description added below to give social media info to display
+        ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
+        <meta property="og:url" content="${share_url}" />
+        <meta property="og:title" content="${document_title}" />
+        <meta property="og:type" content="image/png" />
+        <meta property="og:image" content="${full_course_image_url}" />
+        <meta property="og:description" content="${facebook_share_text}" />
+    %endif
     <title>${document_title}</title>
 
     <%static:css group='style-certificates'/>

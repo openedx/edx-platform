@@ -49,6 +49,7 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import (
 )
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
@@ -350,6 +351,70 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             response,
             js_escaped_string(self.linkedin_url.format(params=urlencode(params))),
         )
+
+    @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
+        "CERTIFICATE_FACEBOOK": True,
+        "CERTIFICATE_FACEBOOK_TEXT": "test FB text"
+    })
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_certificate_html_view_with_facebook_meta_tags(self):
+        """
+        Test view html certificate if share to FB is enabled.
+
+        If 'facebook_share_enabled=True', <meta> tags with property="og:..."
+        must be enabled to pass parameters to FB.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.update_course(self.course, self.user.id)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=str(self.course.id),
+            uuid=self.cert.verify_uuid
+        )
+        platform_name = settings.PLATFORM_NAME
+        share_url = f'http://testserver{test_url}'
+        full_course_image_url = f'http://testserver{course_image_url(self.course)}'
+        document_title = f'{self.course.org} {self.course.number} Certificate | {platform_name}'
+        response = self.client.get(test_url)
+
+        assert response.status_code == 200
+        self.assertContains(response, f'<meta property="og:url" content="{share_url}" />')
+        self.assertContains(response, f'<meta property="og:title" content="{document_title}" />')
+        self.assertContains(response, '<meta property="og:type" content="image/png" />')
+        self.assertContains(response, f'<meta property="og:image" content="{full_course_image_url}" />')
+        self.assertContains(response, '<meta property="og:description" content="test FB text" />')
+
+    @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
+        "CERTIFICATE_FACEBOOK": False,
+    })
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_certificate_html_view_without_facebook_meta_tags(self):
+        """
+        Test view html certificate if share to FB is disabled.
+
+        If 'facebook_share_enabled=False', html certificate view
+        should not contain <meta> tags with parameters property="og:..."
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.update_course(self.course, self.user.id)
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=str(self.course.id),
+            uuid=self.cert.verify_uuid
+        )
+        response = self.client.get(test_url)
+
+        assert response.status_code == 200
+        self.assertNotContains(response, '<meta property="og:url" ')
+        self.assertNotContains(response, '<meta property="og:title" ')
+        self.assertNotContains(response, '<meta property="og:type" content="image/png" />')
+        self.assertNotContains(response, '<meta property="og:image" ')
+        self.assertNotContains(response, '<meta property="og:description" ')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {"CERTIFICATE_FACEBOOK": True})
