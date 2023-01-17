@@ -92,8 +92,6 @@ docutils<0.19
 # right now lots of packages have major upgrades and lots of tests failing.
 # so adding following constraints and will unpin one by one.
 
-django-ratelimit<4.0.0
 django-countries==7.4.2   # Rename Turkey to Türkiye. It needs approval.
 sphinxcontrib-openapi[markdown]==0.7.0
-icalendar==5.0.1
 cryptography==38.0.4 # greater version has some issues.
