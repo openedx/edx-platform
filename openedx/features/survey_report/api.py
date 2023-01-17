@@ -91,7 +91,7 @@ def send_report_to_external_api(report_id: int) -> None:
 
     SurveyReportUpload.objects.create(
         report=report,
-        status=request.status_code,
+        status_code=request.status_code,
         request_details=request.content
     )
 
