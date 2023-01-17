@@ -1204,9 +1204,8 @@ python-levenshtein==0.20.9
     # via -r requirements/edx/base.txt
 python-memcached==1.59
     # via -r requirements/edx/base.txt
-python-slugify==6.1.2
+python-slugify==7.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   code-annotations
 python-swiftclient==4.1.0
