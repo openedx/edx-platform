@@ -6,7 +6,7 @@
 #
 -e git+https://github.com/openedx/blockstore.git@1.2.4#egg=blockstore==1.2.4
     # via -r requirements/edx/base.txt
--e git+https://github.com/openedx/codejail.git@3.1.3#egg=codejail==3.1.3
+-e git+https://github.com/openedx/codejail.git@b14bf859243e787e617d1c1e52fe8cbc50c140f4#egg=codejail
     # via -r requirements/edx/base.txt
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
     # via -r requirements/edx/base.txt
