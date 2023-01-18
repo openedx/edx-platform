@@ -80,6 +80,5 @@ pytz==2022.2.1
 # so adding following constraints and will unpin one by one.
 
 django-ratelimit<4.0.0
-django-countries==7.4.2   # Rename Turkey to Türkiye. It needs approval.
 icalendar==5.0.1
 cryptography==38.0.4 # greater version has some issues.
