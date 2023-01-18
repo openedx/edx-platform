@@ -196,8 +196,8 @@ class Command(BaseCommand):
         """
         Makes manage-command input validation. Raises CommandError if has conflicts.
         """
-        if (not len(options['course_ids']) and not options.get('course_storage_type')) or (
-            len(options['course_ids']) and options.get('course_storage_type')
+        if (not options['course_ids'] and not options.get('course_storage_type')) or (
+            options['course_ids'] and options.get('course_storage_type')
         ):
             raise CommandError(
                 'Certificate configurations migration requires one or more <course_id>s '
