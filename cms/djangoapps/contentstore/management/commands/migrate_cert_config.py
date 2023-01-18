@@ -1,5 +1,5 @@
 """
-Script to transfer course certificate configuration to Credential IDA from modulestore (old mongo (draft) and slit).
+Script to transfer course certificate configuration to Credential IDA from modulestore (old mongo (draft) and split).
 The script is a one-time action.
 The context for this decision can be read here
 lms/djangoapps/certificates/docs/decisions/007-transfer-certificate-signatures-from-mongo.rst
