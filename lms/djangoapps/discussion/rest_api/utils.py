@@ -269,7 +269,28 @@ def create_topics_v3_structure(blocks, topics):
     if archived_topics['children']:
         structured_topics.append(archived_topics)
 
-    return structured_topics
+    return remove_empty_sequentials(structured_topics)
+
+
+def remove_empty_sequentials(data):
+    """
+    Removes all objects of type "sequential" from a nested list of objects if they have no children.
+
+    Parameters:
+    data (list): A list of nested objects to check and remove empty sequentials from.
+
+    Returns:
+    list: The modified list with empty sequentials removed.
+    """
+
+    new_data = []
+    for obj in data:
+        block_type = obj.get('type')
+        if block_type != 'sequential' or (block_type == 'sequential' and obj.get('children')):
+            new_data.append(obj)
+            if obj.get('children'):
+                obj['children'] = remove_empty_sequentials(obj['children'])
+    return new_data
 
 
 def get_topic_ids_from_topics(topics: List[Dict[str, str]]) -> List[str]:
