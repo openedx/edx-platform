@@ -597,10 +597,8 @@ html5lib==1.1
     # via
     #   -r requirements/edx/base.in
     #   ora2
-icalendar==5.0.1
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+icalendar==5.0.4
+    # via -r requirements/edx/base.in
 idna==3.4
     # via
     #   -r requirements/edx/paver.txt
@@ -699,7 +697,7 @@ markdown==3.3.7
     #   xblock-poll
 markey==0.8
     # via enmerkar-underscore
-markupsafe==2.1.1
+markupsafe==2.1.2
     # via
     #   -r requirements/edx/paver.txt
     #   chem
