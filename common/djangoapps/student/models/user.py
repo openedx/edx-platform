@@ -391,7 +391,7 @@ def is_course_recommended_on_user_dashboard(course_id):
     if recommended_courses:
         recommended_courses = json.loads(unquote(recommended_courses))
         if course_id in recommended_courses['course_keys']:
-            return True, recommended_courses['is_control']
+            return True, recommended_courses.get('is_control')
 
     return False, None
 
