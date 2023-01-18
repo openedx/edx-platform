@@ -605,11 +605,11 @@ class CourseEnrollment(models.Model):
                 segment_properties['course_start'] = self.course.start
                 segment_properties['course_pacing'] = self.course.pacing
 
-                from .user import is_personalized_recommendation_for_user
+                from .user import is_course_recommended_on_user_dashboard
                 course_key = f'{self.course_id.org}+{self.course_id.course}'
-                is_personalized_recommendation = is_personalized_recommendation_for_user(course_key)
-                if is_personalized_recommendation is not None:
-                    segment_properties['is_personalized_recommendation'] = is_personalized_recommendation
+                is_recommended_course, control_group = is_course_recommended_on_user_dashboard(course_key)
+                if is_recommended_course:
+                    segment_properties['dashboard_recommendations_group'] = control_group
 
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)

@@ -11,7 +11,7 @@ class RecommendationsPanel extends React.Component {
     this.getCourseList = this.getCourseList.bind(this);
     this.state = {
       isLoading: true,
-      isPersonalizedRecommendation: false,
+      isControl: null,
       coursesList: [],
     };
   }
@@ -19,7 +19,7 @@ class RecommendationsPanel extends React.Component {
   onCourseSelect(courseKey) {
     window.analytics.track('edx.bi.user.recommended.course.click', {
       course_key: courseKey,
-      is_personalized_recommendation: this.state.isPersonalizedRecommendation,
+      is_control: this.state.isControl,
     });
 
     let recommendedCourses = Cookies.get(this.cookieName);
@@ -28,29 +28,30 @@ class RecommendationsPanel extends React.Component {
     } else {
       recommendedCourses = JSON.parse(recommendedCourses);
       if (!recommendedCourses.course_keys.includes(courseKey)) {
-        recommendedCourses.course_keys.push(courseKey);
+        if (recommendedCourses.course_keys.length < 5) {
+          recommendedCourses.course_keys.push(course.courseKey);
+        } else {
+          recommendedCourses.course_keys.shift();
+          recommendedCourses.course_keys.push(course.courseKey);
+        }
       }
     }
-    recommendedCourses['is_personalized_recommendation'] = this.state.isPersonalizedRecommendation;
+    recommendedCourses['is_personalized_recommendation'] = this.state.isControl;
+    recommendedCourses['is_control'] = this.state.isControl;
     Cookies.set(this.cookieName, JSON.stringify(recommendedCourses), this.domainInfo);
   };
 
   getCourseList = async () => {
     const coursesRecommendationData = await fetch(`${this.props.lmsRootUrl}/api/dashboard/v0/recommendation/courses/`)
-      .then(response => {
-        if (response.status === 400) {
-          return this.props.generalRecommendations;
-        } else {
-          return response.json();
-        }
-      }).catch(() => {
-        return this.props.generalRecommendations;
-      });
+      .then(response => response.json())
+      .catch(() => ({
+        courses: this.props.generalRecommendations,
+      }));
 
     this.setState({
-      isLoading: false,
       coursesList: coursesRecommendationData.courses,
-      isPersonalizedRecommendation: coursesRecommendationData.is_personalized_recommendation
+      isLoading: false,
+      isControl: coursesRecommendationData.is_control === undefined ? null : coursesRecommendationData.is_control,
     });
   };
 
