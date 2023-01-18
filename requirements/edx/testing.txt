@@ -342,9 +342,8 @@ django-config-models==2.3.0
     #   lti-consumer-xblock
 django-cors-headers==3.13.0
     # via -r requirements/edx/base.txt
-django-countries==7.4.2
+django-countries==7.5
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
 django-crum==0.7.9
@@ -499,9 +498,8 @@ djfernet==0.8.1
     #   edxval
 docopt==0.6.2
     # via -r requirements/edx/base.txt
-docutils==0.18.1
+docutils==0.19
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   botocore
 done-xblock==2.0.5

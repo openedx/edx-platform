@@ -374,9 +374,15 @@ def get_potentially_retired_user_by_username_and_hash(username, hashed_username)
     return User.objects.get(username__in=locally_hashed_usernames)
 
 
-def is_personalized_recommendation_for_user(course_id):
+def is_course_recommended_on_user_dashboard(course_id):
     """
-    Returns the personalized recommendation value from the cookie.
+    Tells whether the course was recommended on the user dashboard.
+
+    Return values:
+        Personalized recommendation: Returns whether the course was recommended on user dashboard
+        Control group: Returns the user segmentation group a user belonged in. This is useful when we
+                       show different recommendations based on the group a user belongs in i.e general
+                       vs personalized.
     """
     request = crum.get_current_request()
     recommended_courses = \
@@ -385,8 +391,9 @@ def is_personalized_recommendation_for_user(course_id):
     if recommended_courses:
         recommended_courses = json.loads(unquote(recommended_courses))
         if course_id in recommended_courses['course_keys']:
-            return recommended_courses['is_personalized_recommendation']
-    return None
+            return True, recommended_courses.get('is_control')
+
+    return False, None
 
 
 class UserStanding(models.Model):
