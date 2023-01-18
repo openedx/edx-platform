@@ -509,11 +509,6 @@ def _compile_sass(system, theme, debug, force, timing_info):
     :param timing_info: list variable to keep track of timing for sass compilation
     """
 
-    # Note: import sass only when it is needed and not at the top of the file.
-    # This allows other paver commands to operate even without libsass being
-    # installed. In particular, this allows the install_prereqs command to be
-    # used to install the dependency.
-    import sass
     if system == "common":
         sass_dirs = get_common_sass_directories()
     else:
@@ -555,11 +550,14 @@ def _compile_sass(system, theme, debug, force, timing_info):
                 sass_dir=sass_source_dir,
             ))
         else:
-            sass.compile(
-                dirname=(sass_source_dir, css_dir),
-                include_paths=COMMON_LOOKUP_PATHS + lookup_paths,
-                source_comments=source_comments,
-                output_style=output_style,
+            include_paths = COMMON_LOOKUP_PATHS + lookup_paths
+            sh(
+                "node-sass"
+                + f" --output-style {output_style}"
+                + (" --source-comments"  if source_comments else "")
+                + " ".join(f"--include-path {path}" for path in include_paths)
+                + sass_source_dir  # input dir
+                + css_dir  # output dir
             )
 
         # For Sass files without explicit RTL versions, generate

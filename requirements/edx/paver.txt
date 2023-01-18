@@ -16,8 +16,6 @@ idna==3.4
     # via requests
 lazy==1.5
     # via -r requirements/edx/paver.in
-libsass==0.10.0
-    # via -r requirements/edx/paver.in
 markupsafe==2.1.2
     # via -r requirements/edx/paver.in
 mock==5.0.1
@@ -41,7 +39,6 @@ requests==2.28.2
     # via -r requirements/edx/paver.in
 six==1.16.0
     # via
-    #   libsass
     #   paver
     #   python-memcached
 stevedore==4.1.1
