@@ -59,7 +59,7 @@ def remove_user_file():
 
 
 @skip_unless_lms
-def test_successful_retire(setup_retirement_states):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
+def test_successful_retire_with_userfile(setup_retirement_states):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
     user = UserFactory.create(username='user0', email="user0@example.com")
     username = user.username
     user_email = user.email
@@ -79,4 +79,35 @@ def test_retire_user_with_usename_email_mismatch(setup_retirement_states):  # li
     create_user_file(True)
     with pytest.raises(CommandError, match=r'Could not find users with specified username and email '):
         call_command('retire_user', user_file=user_file)
+    remove_user_file()
+
+
+@skip_unless_lms
+def test_retire_user_without_usename_email_userfile(setup_retirement_states):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
+    with pytest.raises(CommandError, match=r'Please provide user_file or username and user_email '):
+        call_command('retire_user')
+
+
+@skip_unless_lms
+def test_successful_retire_with_username_email(setup_retirement_states):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
+    user = UserFactory.create(username='user0', email="user0@example.com")
+    username = user.username
+    user_email = user.email
+    call_command('retire_user', username=username, user_email=user_email)
+    user = User.objects.get(username=username)
+    retired_user_status = UserRetirementStatus.objects.all()[0]
+    assert retired_user_status.original_username == username
+    assert retired_user_status.original_email == user_email
+    # Make sure that we have changed the email address linked to the original user
+    assert user.email != user_email
+
+
+@skip_unless_lms
+def test_retire_with_username_email_userfile(setup_retirement_states):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
+    user = UserFactory.create(username='user0', email="user0@example.com")
+    username = user.username
+    user_email = user.email
+    create_user_file(True)
+    with pytest.raises(CommandError, match=r'You cannot use userfile option with username and user_email'):
+        call_command('retire_user', user_file=user_file, username=username, user_email=user_email)
     remove_user_file()
