@@ -709,7 +709,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==16.4.0
+faker==16.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -927,7 +927,7 @@ markey==0.8
     # via
     #   -r requirements/edx/testing.txt
     #   enmerkar-underscore
-markupsafe==2.1.1
+markupsafe==2.1.2
     # via
     #   -r requirements/edx/testing.txt
     #   chem
