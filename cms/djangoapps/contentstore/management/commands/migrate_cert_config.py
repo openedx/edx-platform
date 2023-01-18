@@ -10,20 +10,20 @@ from itertools import chain
 from typing import Dict, Iterator, List, Union
 
 from django.core.management.base import BaseCommand, CommandError
-
-from common.djangoapps.course_modes.models import CourseMode
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangoapps.credentials.utils import send_course_certificate_configuration
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseBlock
+
 from cms.djangoapps.contentstore.signals.handlers import (
     create_course_certificate_config_data,
     get_certificate_signature_assets,
 )
 from cms.djangoapps.contentstore.views.certificates import CertificateManager
+from common.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.credentials.utils import send_course_certificate_configuration
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseBlock
 
 
 class FakedUser:
