@@ -168,7 +168,7 @@ class TahoeUserMetadataProcessor(object):
         # which count SQL queries; e.g., `cms.djangoapps.contentstore.views.tests.test_course_index)
         # Currently we can do this by only enabling the event processor for LMS.
         # We don't care about user metadata for Studio, at this point.
-        if not (app_variant.is_lms() or app_variant.is_lms_test()):
+        if not app_variant.is_lms() and not app_variant.is_lms_test():
             return event
         # eventtracking Processors are loaded before apps are ready
         from django.contrib.auth.models import User
