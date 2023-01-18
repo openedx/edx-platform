@@ -509,11 +509,6 @@ def _compile_sass(system, theme, debug, force, timing_info):
     :param timing_info: list variable to keep track of timing for sass compilation
     """
 
-    # Note: import sass only when it is needed and not at the top of the file.
-    # This allows other paver commands to operate even without libsass being
-    # installed. In particular, this allows the install_prereqs command to be
-    # used to install the dependency.
-    import sass
     if system == "common":
         sass_dirs = get_common_sass_directories()
     else:
@@ -523,11 +518,9 @@ def _compile_sass(system, theme, debug, force, timing_info):
 
     # determine css out put style and source comments enabling
     if debug:
-        source_comments = True
-        output_style = 'nested'
+        output_style = 'expanded'  # note: includes comments
     else:
-        source_comments = False
-        output_style = 'compressed'
+        output_style = 'compressed'  # note: comments are removed
 
     for dirs in sass_dirs:
         start = datetime.now()
@@ -555,11 +548,13 @@ def _compile_sass(system, theme, debug, force, timing_info):
                 sass_dir=sass_source_dir,
             ))
         else:
-            sass.compile(
-                dirname=(sass_source_dir, css_dir),
-                include_paths=COMMON_LOOKUP_PATHS + lookup_paths,
-                source_comments=source_comments,
-                output_style=output_style,
+            load_paths = COMMON_LOOKUP_PATHS + lookup_paths
+            sh(
+                "sass"
+                + f" --style={output_style}"
+                + "".join(f" --load-path={path}" for path in load_paths)
+                + f" {sass_source_dir}"  # input dir
+                + f" {css_dir}"  # output dir
             )
 
         # For Sass files without explicit RTL versions, generate
