@@ -14,6 +14,7 @@ from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
 )
+from common.djangoapps.student.toggles import ENABLE_FALLBACK_RECOMMENDATIONS
 from lms.djangoapps.learner_home.test_utils import (
     random_url,
 )
@@ -106,6 +107,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.data, None)
 
+    @override_waffle_flag(ENABLE_FALLBACK_RECOMMENDATIONS, active=True)
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
     @mock.patch(
@@ -123,12 +125,13 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         response_content = json.loads(response.content)
-        self.assertEqual(response_content.get("isPersonalizedRecommendation"), False)
+        self.assertEqual(response_content.get("isControl"), False)
         self.assertEqual(
             response_content.get("courses"),
             self.SERIALIZED_GENERAL_RECOMMENDATIONS,
         )
 
+    @override_waffle_flag(ENABLE_FALLBACK_RECOMMENDATIONS, active=True)
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
     @mock.patch(
@@ -144,7 +147,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         response_content = json.loads(response.content)
-        self.assertEqual(response_content.get("isPersonalizedRecommendation"), False)
+        self.assertEqual(response_content.get("isControl"), None)
         self.assertEqual(
             response_content.get("courses"),
             self.SERIALIZED_GENERAL_RECOMMENDATIONS,
@@ -173,11 +176,12 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         response_content = json.loads(response.content)
-        self.assertEqual(response_content.get("isPersonalizedRecommendation"), True)
+        self.assertEqual(response_content.get("isControl"), False)
         self.assertEqual(
             len(response_content.get("courses")), expected_recommendations_length
         )
 
+    @override_waffle_flag(ENABLE_FALLBACK_RECOMMENDATIONS, active=True)
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
     @mock.patch(
@@ -199,11 +203,36 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         response_content = json.loads(response.content)
-        self.assertEqual(response_content.get("isPersonalizedRecommendation"), False)
+        self.assertEqual(response_content.get("isControl"), True)
         self.assertEqual(
             response_content.get("courses"),
             self.SERIALIZED_GENERAL_RECOMMENDATIONS,
         )
+
+    @override_waffle_flag(ENABLE_FALLBACK_RECOMMENDATIONS, active=False)
+    @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
+    @mock.patch(
+        "lms.djangoapps.learner_home.recommendations.views.get_personalized_course_recommendations"
+    )
+    def test_fallback_recommendations_disabled(
+        self, mocked_get_personalized_course_recommendations
+    ):
+        """
+        Test that a user gets no recommendations for the control group.
+        """
+        mocked_get_personalized_course_recommendations.return_value = [
+            True,
+            True,
+            [],
+        ]
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content.get("isControl"), True)
+        self.assertEqual(response_content.get("courses"), [])
 
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch(
@@ -231,9 +260,10 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         response_content = json.loads(response.content)
-        self.assertEqual(response_content.get("isPersonalizedRecommendation"), True)
+        self.assertEqual(response_content.get("isControl"), False)
         self.assertEqual(len(response_content.get("courses")), expected_recommendations)
 
+    @override_waffle_flag(ENABLE_FALLBACK_RECOMMENDATIONS, active=True)
     @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
     @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
     @mock.patch(
@@ -262,7 +292,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         response_content = json.loads(response.content)
-        self.assertEqual(response_content.get("isPersonalizedRecommendation"), False)
+        self.assertEqual(response_content.get("isControl"), False)
         self.assertEqual(
             response_content.get("courses"),
             self.SERIALIZED_GENERAL_RECOMMENDATIONS,
