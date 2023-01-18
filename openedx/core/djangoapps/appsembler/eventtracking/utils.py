@@ -76,3 +76,21 @@ def get_site_config_for_event(event_props):
             log.exception('get_site_config_for_event: Cannot get site config for event. props=`%s`', repr(event_props))
             raise EventProcessingError(e)
     return site_configuration
+
+
+def get_user_id_from_event(event_props):
+    """
+    Get a user id from event properties.
+
+    For events emitted without a request. This would generally be an event emitted
+    by a Celery worker, e.g., `edx.bi.completion.*` or `.grade_calculated` events.
+    """
+
+    user_id = None
+    if event_props.get('user_id') is not None:
+        user_id = event_props['user_id']
+    else:
+        context = event_props.get('context')
+        if context is not None:
+            user_id = context.get('user_id')
+    return user_id
