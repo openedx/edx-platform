@@ -551,6 +551,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
             load_paths = COMMON_LOOKUP_PATHS + lookup_paths
             sh(
                 "sass"
+                + " --quiet"
                 + f" --style={output_style}"
                 + "".join(f" --load-path={path}" for path in load_paths)
                 + f" {sass_source_dir}"  # input dir
