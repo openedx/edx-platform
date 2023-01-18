@@ -55,15 +55,6 @@ py2neo<2022
 # scipy version 1.8 requires numpy>=1.17.3, we've pinned numpy to <1.17.0 in requirements/edx-sandbox/py38.in
 scipy<1.8.0
 
-# mistune is a dependency of m2r (which is a dependency of sphinxcontrib-openapi)
-# m2r fails to specify the version of mistune that it needs leading to the error message:
-# AttributeError: module 'mistune' has no attribute 'BlockGrammar'
-# See Issue: https://github.com/miyakogi/m2r/issues/66
-# m2r is no longer actively maintained: https://github.com/miyakogi/m2r/pull/43
-# This will be fixed when sphinxcontrib-openapi depends on m2r2 instead of m2r
-# See issue: https://github.com/sphinx-contrib/openapi/issues/123
-mistune<2.0.0
-
 # edx-enterprise, snowflake-connector-python require charset-normalizer==2.0.0
 # Can be removed once snowflake-connector-python>2.7.9 is released with the fix.
 charset-normalizer<2.1.0
@@ -85,14 +76,9 @@ pyopenssl==22.0.0
 # pytz>2022.2.1 causes test failures in edx-platform
 pytz==2022.2.1
 
-# docutils==0.19 has removed the docutils.core.ErrorString which is required by the sphinxcontrib-openapi
-# This constraint can be removed once sphinxcontrib-openapi is updated to resolve this issue.
-docutils<0.19
-
 # right now lots of packages have major upgrades and lots of tests failing.
 # so adding following constraints and will unpin one by one.
 
 django-ratelimit<4.0.0
-sphinxcontrib-openapi[markdown]==0.7.0
 icalendar==5.0.1
 cryptography==38.0.4 # greater version has some issues.
