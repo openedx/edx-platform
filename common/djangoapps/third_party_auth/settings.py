@@ -100,7 +100,7 @@ def apply_settings(django_settings):
     django_settings.SOCIAL_AUTH_INACTIVE_USER_URL = '/auth/inactive'
 
     # Context processors required under Django.
-    django_settings.SOCIAL_AUTH_UUID_LENGTH = 4
+    django_settings.SOCIAL_AUTH_UUID_LENGTH = 16
     django_settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
         'social_django.context_processors.backends',
         'social_django.context_processors.login_redirect',
