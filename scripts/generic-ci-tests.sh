@@ -147,10 +147,6 @@ case "$TEST_SUITE" in
         exit $EXIT
         ;;
 
-    "lms-unit"|"cms-unit"|"pavelib-unit")
-        $TOX bash scripts/unit-tests.sh
-        ;;
-
     "js-unit")
         $TOX paver test_js --coverage
         $TOX paver diff_coverage

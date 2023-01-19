@@ -16,7 +16,7 @@ class RecommendationsPanel extends React.Component {
     };
   }
 
-  onCourseSelect(courseKey) {
+  onCourseSelect(courseKey, marketingUrl) {
     window.analytics.track('edx.bi.user.recommended.course.click', {
       course_key: courseKey,
       is_control: this.state.isControl,
@@ -29,16 +29,17 @@ class RecommendationsPanel extends React.Component {
       recommendedCourses = JSON.parse(recommendedCourses);
       if (!recommendedCourses.course_keys.includes(courseKey)) {
         if (recommendedCourses.course_keys.length < 5) {
-          recommendedCourses.course_keys.push(course.courseKey);
+          recommendedCourses.course_keys.push(courseKey);
         } else {
           recommendedCourses.course_keys.shift();
-          recommendedCourses.course_keys.push(course.courseKey);
+          recommendedCourses.course_keys.push(courseKey);
         }
       }
     }
     recommendedCourses['is_personalized_recommendation'] = this.state.isControl;
     recommendedCourses['is_control'] = this.state.isControl;
     Cookies.set(this.cookieName, JSON.stringify(recommendedCourses), this.domainInfo);
+    window.location.href = marketingUrl;
   };
 
   getCourseList = async () => {
@@ -78,8 +79,11 @@ class RecommendationsPanel extends React.Component {
                 <div className="recommend-heading mb-4">{gettext('Recommendations for you')}</div>
                 <div>
                   {this.state.coursesList.map(course => (
-                    <a href={course.marketing_url} className="course-link"
-                      onClick={() => this.onCourseSelect(course.course_key)}>
+                    <span
+                      role="link"
+                      className="course-link"
+                      onClick={() => this.onCourseSelect(course.course_key, course.marketing_url)}
+                    >
                       <div className="course-card box-shadow-down-1 bg-white mb-3">
                         <div className="box-shadow-down-1 image-box">
                           <img
@@ -92,7 +96,7 @@ class RecommendationsPanel extends React.Component {
                           {course.title}
                         </div>
                       </div>
-                    </a>
+                    </span>
                   ))}
                 </div>
               </div>

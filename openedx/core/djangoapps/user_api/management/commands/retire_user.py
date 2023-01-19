@@ -60,7 +60,9 @@ class Command(BaseCommand):
         """
         unknown_users = []
         users = []
-        if userfile:
+        user = user_name
+        email = useremail
+        if userfile and (not user and not email):
             try:
                 userinfo = open(userfile, 'r')
             except Exception as exc:
@@ -76,13 +78,19 @@ class Command(BaseCommand):
                     users.append(User.objects.get(username=username, email=user_email))
                 except user_model.DoesNotExist:
                     unknown_users.append({username: user_email})
-        elif user_name and useremail:
+        elif (user and email) and not userfile:
             try:
-                users.append(User.objects.get(username=username, email=user_email))
+                users.append(User.objects.get(username=user, email=email))
             except user_model.DoesNotExist:
-                unknown_users.append({username: useremail})
+                unknown_users.append({user: email})
+        elif userfile and user and email:
+            error_message = (
+                'You cannot use userfile option with username and user_email option. '
+                'Use only userfile option or use just username and user_email option'
+            )
+            raise CommandError(error_message)
         else:
-            raise CommandError("Please provide user_file or username and user_email parameter when runing command")
+            raise CommandError("Please provide user_file or username and user_email parameter when running command")
         return users, unknown_users
 
     def handle(self, *args, **options):
