@@ -33,9 +33,6 @@ oauthlib==3.0.1
 # django-auth-toolkit==1.3.3 requires oauthlib>=3.1.0 which is pinned because of test failures
 django-oauth-toolkit<=1.3.2
 
-# Will be updated once we update python-dateutil package
-matplotlib<3.4.0
-
 # constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
 # Major upgrade will be done in separate ticket.
 pymongo<4.0.0
