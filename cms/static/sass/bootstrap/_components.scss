@@ -92,7 +92,7 @@
   .sock {
     @include clearfix();
 
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
 
     max-width: $studio-max-width;
     width: flex-grid(12);
@@ -103,7 +103,7 @@
     // support body
     header {
       .title {
-        @extend %t-title4;
+        @extend %t-title4 !optional;
       }
     }
 
@@ -115,14 +115,14 @@
     .support,
     .feedback {
       .title {
-        @extend %t-title6;
+        @extend %t-title6 !optional;
 
         color: $white;
         margin-bottom: ($baseline/2);
       }
 
       .copy {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
         margin: 0 0 $baseline 0;
       }
@@ -140,7 +140,7 @@
           }
 
           .action {
-            @extend %t-action4;
+            @extend %t-action4 !optional;
 
             display: block;
 
@@ -159,7 +159,7 @@
 
         .action-primary {
           @extend %btn-primary-blue;
-          @extend %t-action3;
+          @extend %t-action3 !optional;
         }
       }
     }

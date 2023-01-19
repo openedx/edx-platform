@@ -831,19 +831,19 @@ $btn-color-primary: $primary-dark;
 }
 
 .program-detail-nav {
-  @extend .content;
+  @extend .content !optional;
 
   display: block;
   width: 100%;
   padding: 40px;
 
   .program-detail-nav-list {
-    @extend %ui-no-list;
+    @extend %ui-no-list !optional;
 
     border-bottom: 1px solid $gray-base;
 
     .nav-item {
-      @extend %t-copy-base;
+      @extend %t-copy-base !optional;
 
       font-weight: 500;
       font-size: 1.125rem;
