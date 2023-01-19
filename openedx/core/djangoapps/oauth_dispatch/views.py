@@ -9,10 +9,10 @@ import json
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.generic import View
-from django_ratelimit import ALL
-from django_ratelimit.decorators import ratelimit
 from edx_django_utils import monitoring as monitoring_utils
 from oauth2_provider import views as dot_views
+from ratelimit import ALL
+from ratelimit.decorators import ratelimit
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.djangoapps.oauth_dispatch import adapters

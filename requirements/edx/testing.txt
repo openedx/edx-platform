@@ -423,8 +423,10 @@ django-pipeline==2.0.8
     # via -r requirements/edx/base.txt
 django-pyfs==3.2.0
     # via -r requirements/edx/base.txt
-django-ratelimit==4.0.0
-    # via -r requirements/edx/base.txt
+django-ratelimit==3.0.1
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
 django-require @ git+https://github.com/openedx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/base.txt
 django-sekizai==4.0.0

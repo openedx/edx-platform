@@ -24,7 +24,7 @@ from django.views.decorators.http import require_POST
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
-from django_ratelimit.decorators import ratelimit
+from ratelimit.decorators import ratelimit
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
@@ -280,8 +280,8 @@ def request_password_change(email, is_secure):
 
 @csrf_exempt
 @require_POST
-@ratelimit(key=POST_EMAIL_KEY, rate=settings.PASSWORD_RESET_EMAIL_RATE, block=False)
-@ratelimit(key=REAL_IP_KEY, rate=settings.PASSWORD_RESET_IP_RATE, block=False)
+@ratelimit(key=POST_EMAIL_KEY, rate=settings.PASSWORD_RESET_EMAIL_RATE)
+@ratelimit(key=REAL_IP_KEY, rate=settings.PASSWORD_RESET_IP_RATE)
 def password_reset(request):
     """
     Attempts to send a password reset e-mail.
@@ -574,8 +574,8 @@ def _get_user_from_email(email):
 
 
 @require_POST
-@ratelimit(key=POST_EMAIL_KEY, rate=settings.PASSWORD_RESET_EMAIL_RATE, block=False)
-@ratelimit(key=REAL_IP_KEY, rate=settings.PASSWORD_RESET_IP_RATE, block=False)
+@ratelimit(key=POST_EMAIL_KEY, rate=settings.PASSWORD_RESET_EMAIL_RATE)
+@ratelimit(key=REAL_IP_KEY, rate=settings.PASSWORD_RESET_IP_RATE)
 def password_change_request_handler(request):
     """Handle password change requests originating from the account page.
 

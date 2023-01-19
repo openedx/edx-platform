@@ -28,7 +28,7 @@ from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import STUDENT_REGISTRATION_COMPLETED
 from openedx_filters.learning.filters import StudentRegistrationRequested
 from pytz import UTC
-from django_ratelimit.decorators import ratelimit
+from ratelimit.decorators import ratelimit
 from requests import HTTPError
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -545,7 +545,7 @@ class RegistrationView(APIView):
                             content_type="application/json")
 
     @method_decorator(csrf_exempt)
-    @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.REGISTRATION_RATELIMIT, method='POST', block=False))
+    @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.REGISTRATION_RATELIMIT, method='POST'))
     def post(self, request):
         """Create the user's account.
 
