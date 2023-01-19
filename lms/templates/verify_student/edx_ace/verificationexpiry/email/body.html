@@ -9,7 +9,7 @@
             <h1>
                 {% trans "Expired ID Verification" as tmsg %}{{ tmsg | force_escape }}
             </h1>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}Hello {{full_name}},{% endblocktrans %}
                 {% endfilter %}
@@ -19,12 +19,12 @@
                 {% endfilter %}
                 <br />
             </p>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% trans "You must have a valid ID verification to take proctored exams and qualify for certificates." as tmsg %}{{ tmsg | force_escape }}
                 {% trans "Follow the link below to submit your photos and renew your ID verification." as tmsg %}{{ tmsg | force_escape }}
                 {% trans "You can also do this from your dashboard." as tmsg %}{{ tmsg | force_escape }}
             </p>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}Resubmit Verification : {{lms_verification_link}} {% endblocktrans %}
                 {% endfilter %}

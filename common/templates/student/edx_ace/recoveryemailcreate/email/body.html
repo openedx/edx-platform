@@ -9,7 +9,7 @@
             <h1>
                 {% trans "Create Recovery Email" as create_recovery_text %}{{ create_recovery_text | force_escape }}
             </h1>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}You've registered this recovery email address for {{ platform_name }}.{% endblocktrans %}
                 {% endfilter %}

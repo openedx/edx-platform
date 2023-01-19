@@ -9,7 +9,7 @@
             <h1>
                 {% trans "Email Change" as tmsg %}{{ tmsg | force_escape }}
             </h1>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}We received a request to change the e-mail associated with your {{ platform_name }} account from {{ old_email }} to {{ new_email }}. If this is correct, please confirm your new e-mail address by visiting:{% endblocktrans %}
                 {% endfilter %}
@@ -21,7 +21,7 @@
             {% endfilter %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=confirm_link %}
 
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}If you didn't request this, you don't need to do anything; you won't receive any more email from us. Please do not reply to this e-mail; if you require assistance, check the help section of the {{ platform_name }} web site.{% endblocktrans %}
                 {% endfilter %}

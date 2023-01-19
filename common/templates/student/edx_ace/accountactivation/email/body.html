@@ -8,7 +8,7 @@
 {% if route_enabled %}
     <tr>
         <td>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                     {% blocktrans %}This is a routed Account Activation email for {{ routed_user }} ({{ routed_user_email }}): {{ routed_profile_name }}{% endblocktrans %}
                 {% endfilter %}
@@ -22,7 +22,7 @@
             <h1>
                 {% trans "Account activation" as header_msg %}{{ header_msg | force_escape }}
             </h1>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                     {% blocktrans %}You're almost there! Use the link below to activate your account to access engaging, high-quality {{ platform_name }} courses. Note that you will not be able to log back into your account until you have activated it.{% endblocktrans %}
                 {% endfilter %}
@@ -37,7 +37,7 @@
     </tr>
     <tr>
         <td>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                     {% blocktrans %}Enjoy learning with {{ platform_name }}.{% endblocktrans %}
                 {% endfilter %}
@@ -46,7 +46,7 @@
         </td>
     </tr>
         <td>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% blocktrans trimmed asvar assist_msg %}
                 If you need help, please use our web form at {start_anchor_web}{{ support_url }}{end_anchor} or email {start_anchor_email}{{ support_email }}{end_anchor}.
                 {% endblocktrans %}
@@ -59,7 +59,7 @@
     </tr>
     <tr>
         <td>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                     {% blocktrans %}This email message was automatically sent by {{ lms_url }} because someone attempted to create an account on {{ platform_name }} using this email address.{% endblocktrans %}
                 {% endfilter %}

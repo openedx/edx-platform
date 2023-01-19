@@ -14,7 +14,7 @@
                 {% endfilter %}
             </h1>
 
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}
                     Hello {{full_name}},
@@ -22,7 +22,7 @@
                 {% endfilter %}
             </p>
 
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}
                     You are enrolled in {{ course_name }} at {{ platform_name }}. This course contains proctored exams.
@@ -30,7 +30,7 @@
                 {% endfilter %}
             </p>
 
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}
                     Proctored exams are timed exams that you take while proctoring software monitors your computer's desktop, webcam video, and audio. Your course uses {{ proctoring_provider }} software for proctoring.
@@ -38,7 +38,7 @@
                 {% endfilter %}
             </p>
 
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}
                     Carefully review the system requirements as well as the steps to take a proctored exam in order to ensure that you are prepared.
@@ -53,10 +53,10 @@
             {% endfilter %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=proctoring_requirements_url %}
 
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}
-                    Before taking a graded proctored exam, you must have approved ID verification photos. 
+                    Before taking a graded proctored exam, you must have approved ID verification photos.
                 {% endblocktrans %}
                 {% endfilter %}
                 <a href="{{ id_verification_url }}">

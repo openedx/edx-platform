@@ -9,18 +9,18 @@
       <h1>
         {% trans "ID Verification Submitted" as tmsg %}{{ tmsg | force_escape }}
       </h1>
-      <p style="color: rgba(0,0,0,.75);">
+      <p style="color: #defffd">
         {% filter force_escape %}
           {% blocktrans %}Hello {{ full_name }},{% endblocktrans %}
         {% endfilter %}
       </p>
-      <p style="color: rgba(0,0,0,.75);">
+      <p style="color: #defffd">
         {% filter force_escape %}
            {% blocktrans %}Thank you for submitting your photos for identity verification with {{ platform_name }}. {% endblocktrans %}
         {% endfilter %}
       </p>
 
-      <p style="color: rgba(0,0,0,.75);">
+      <p style="color: #defffd">
         {% trans "We have received your photos and they will be reviewed within 3-5 days." as tmsg %}{{ tmsg | force_escape }}
 
       {% filter force_escape %}

@@ -14,7 +14,7 @@
                 {% endfilter %}
             </h1>
 
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}You have been enrolled in {{ course_name }} at {{ site_name }} by a member of the course staff. This course will now appear on your {{ site_name }} dashboard.{% endblocktrans %}
                 {% endfilter %}
@@ -26,7 +26,7 @@
             {% endfilter %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_url %}
 
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}This email was automatically sent from {{ site_name }} to {{ full_name }}{% endblocktrans %}
                 {% endfilter %}

@@ -9,12 +9,12 @@
             <h1>
                 {% trans "Password reset success" as tmsg %}{{ tmsg | force_escape }}
             </h1>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                    {% blocktrans %}Hello {{ name }},{% endblocktrans %}
                 {% endfilter %}
             </p>
-            <p style="color: rgba(0,0,0,.75);">
+            <p style="color: #defffd">
                 {% filter force_escape %}
                 {% blocktrans %}This is to confirm that you have successfully changed your password associated with {{ platform_name }} account. Please sign-in to your account.{% endblocktrans %}
                 {% endfilter %}
