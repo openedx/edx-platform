@@ -31,7 +31,7 @@ $cross-icon: '\f00d'; // .fa-close
 $asterisk-icon: '\f069'; // .fa-asterisk
 
 
-@import '../../../../../static/sass/edx-pattern-library-shims/base/variables';
+@import 'edx-pattern-library-shims/base/variables';
 
 // +Extends - Capa
 // ====================
@@ -1615,7 +1615,7 @@ div.problem {
     }
 
     label.choicetextgroup_correct, section.choicetextgroup_correct {
-      @extend label.choicegroup_correct;
+      @extend label, .choicegroup_correct;
 
       input[type="text"] {
         border-color: $correct;
@@ -1623,7 +1623,7 @@ div.problem {
     }
 
     label.choicetextgroup_partially-correct, section.choicetextgroup_partially-correct {
-      @extend label.choicegroup_partially-correct;
+      @extend label, .choicegroup_partially-correct;
 
       input[type="text"] {
         border-color: $partially-correct;
@@ -1631,11 +1631,11 @@ div.problem {
     }
 
     label.choicetextgroup_incorrect, section.choicetextgroup_incorrect {
-      @extend label.choicegroup_incorrect;
+      @extend label, .choicegroup_incorrect;
     }
 
     label.choicetextgroup_submitted, section.choicetextgroup_submitted {
-      @extend label.choicegroup_submitted;
+      @extend label, .choicegroup_submitted;
     }
 
     label.choicetextgroup_show_correct, section.choicetextgroup_show_correct {
