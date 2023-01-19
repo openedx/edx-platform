@@ -14,11 +14,15 @@ click==8.1.3
     #   nltk
 codejail-includes==1.0.0
     # via -r requirements/edx-sandbox/py38.in
+contourpy==1.0.7
+    # via matplotlib
 cryptography==38.0.4
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
 cycler==0.11.0
+    # via matplotlib
+fonttools==4.38.0
     # via matplotlib
 joblib==1.2.0
     # via nltk
@@ -32,10 +36,8 @@ markupsafe==2.1.2
     # via
     #   chem
     #   openedx-calc
-matplotlib==3.3.4
-    # via
-    #   -c requirements/edx-sandbox/../constraints.txt
-    #   -r requirements/edx-sandbox/py38.in
+matplotlib==3.6.3
+    # via -r requirements/edx-sandbox/py38.in
 mpmath==1.2.1
     # via sympy
 networkx==3.0
@@ -47,11 +49,14 @@ nltk==3.8.1
 numpy==1.22.4
     # via
     #   chem
+    #   contourpy
     #   matplotlib
     #   openedx-calc
     #   scipy
 openedx-calc==3.0.1
     # via -r requirements/edx-sandbox/py38.in
+packaging==23.0
+    # via matplotlib
 pillow==9.4.0
     # via matplotlib
 pycparser==2.21
