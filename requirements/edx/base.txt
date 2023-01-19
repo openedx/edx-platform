@@ -462,7 +462,7 @@ edx-django-utils==5.2.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions==8.4.0
+edx-drf-extensions==8.4.1
     # via
     #   -r requirements/edx/base.in
     #   edx-completion
@@ -479,7 +479,7 @@ edx-enterprise==3.60.12
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   learner-pathway-progress
-edx-event-bus-kafka==3.5.1
+edx-event-bus-kafka==3.6.0
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.9.2
     # via ora2
