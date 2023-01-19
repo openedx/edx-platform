@@ -535,7 +535,7 @@ edx-bulk-grades==1.0.1
     #   staff-graded-xblock
 edx-ccx-keys==1.2.1
     # via -r requirements/edx/base.txt
-edx-celeryutils==1.2.1
+edx-celeryutils==1.2.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
@@ -715,7 +715,6 @@ fs-s3fs==0.1.8
 future==0.18.3
     # via
     #   -r requirements/edx/base.txt
-    #   edx-celeryutils
     #   pyjwkest
 geoip2==4.6.0
     # via -r requirements/edx/base.txt

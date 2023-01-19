@@ -432,7 +432,7 @@ edx-bulk-grades==1.0.1
     #   staff-graded-xblock
 edx-ccx-keys==1.2.1
     # via -r requirements/edx/base.in
-edx-celeryutils==1.2.1
+edx-celeryutils==1.2.2
     # via
     #   -r requirements/edx/base.in
     #   edx-name-affirmation
@@ -580,9 +580,7 @@ fs-s3fs==0.1.8
     #   -r requirements/edx/base.in
     #   django-pyfs
 future==0.18.3
-    # via
-    #   edx-celeryutils
-    #   pyjwkest
+    # via pyjwkest
 geoip2==4.6.0
     # via -r requirements/edx/base.in
 glob2==0.7
