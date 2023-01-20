@@ -9,7 +9,7 @@ from edx_toggles.toggles.testutils import override_waffle_switch
 
 from ..block_structure import BlockStructureBlockData
 from ..config import STORAGE_BACKING_FOR_CACHE
-from ..exceptions import BlockStructureNotFound, UsageKeyNotInBlockStructure
+from ..exceptions import UsageKeyNotInBlockStructure
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
 from .helpers import (
