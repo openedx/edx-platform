@@ -8,7 +8,7 @@ from django.test import TestCase
 from edx_toggles.toggles.testutils import override_waffle_switch
 
 from ..block_structure import BlockStructureBlockData
-from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE
+from ..config import STORAGE_BACKING_FOR_CACHE
 from ..exceptions import BlockStructureNotFound, UsageKeyNotInBlockStructure
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
@@ -176,12 +176,6 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
         assert TestTransformer1.collect_call_count == 1
-
-    def test_get_collected_error_raised(self):
-        with override_waffle_switch(RAISE_ERROR_WHEN_NOT_FOUND, active=True):
-            with mock_registered_transformers(self.registered_transformers):
-                with pytest.raises(BlockStructureNotFound):
-                    self.bs_manager.get_collected()
 
     @ddt.data(True, False)
     def test_update_collected_if_needed(self, with_storage_backing):
