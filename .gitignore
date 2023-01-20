@@ -67,8 +67,8 @@ conf/locale/messages.mo
 .noseids
 nosetests.xml
 .cache/
-.coverage
-.coverage.*
+# .coverage
+# .coverage.*
 coverage.xml
 cover/
 cover_html/
