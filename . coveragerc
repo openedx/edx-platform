@@ -1,0 +1,5 @@
+[run]
+branch = True
+data_file = .coverage
+source=edx_platform
+concurrency=multiprocessing
