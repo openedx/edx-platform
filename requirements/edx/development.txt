@@ -220,9 +220,8 @@ coverage[toml]==7.0.5
     #   pytest-cov
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/testing.txt
-cryptography==38.0.4
+cryptography==39.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-fernet-fields
     #   djfernet
