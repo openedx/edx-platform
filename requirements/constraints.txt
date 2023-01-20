@@ -74,7 +74,7 @@ pycodestyle<2.9.0
 pyopenssl==22.0.0
 
 
-# right now lots of packages have major upgrades and lots of tests failing.
-# so adding following constraints and will unpin one by one.
+# AttributeError appeared in v==39.0.0
+cryptography==38.0.4 
 
-cryptography==38.0.4 # greater version has some issues.
+
