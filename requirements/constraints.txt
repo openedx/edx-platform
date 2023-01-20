@@ -40,9 +40,6 @@ matplotlib<3.4.0
 # Major upgrade will be done in separate ticket.
 pymongo<4.0.0
 
-# python3-saml==1.10.0 version started breaking a11y tests
-python3-saml<1.10.0
-
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
 
