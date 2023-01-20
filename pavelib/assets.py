@@ -508,6 +508,15 @@ def _compile_sass(system, theme, debug, force, timing_info):
     :param force: boolean showing whether to remove existing css files before generating new files
     :param timing_info: list variable to keep track of timing for sass compilation
     """
+    shell_command = ["/bin/sh", "scripts/assets/compile-sass.sh", system]
+    if force:
+        shell_command.append("--force")
+    if force:
+        shell_command.append("--debug")
+    if system != "common":
+        shell_command.append(theme)
+    sh(" ".join(shell_command))
+    return True
 
     # Note: import sass only when it is needed and not at the top of the file.
     # This allows other paver commands to operate even without libsass being
