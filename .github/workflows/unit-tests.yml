@@ -74,6 +74,12 @@ jobs:
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests
 
+      - name: Upload coverage
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage${{ matrix.shard_name }}
+          path: .coverage
+
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
   # https://github.com/orgs/community/discussions/33579
@@ -117,3 +123,33 @@ jobs:
           name: pytest-warning-report-html
           path: |
             reports/pytest_warnings/warning_report_all.html
+
+  # Combine and upload coverage reports.
+  coverage:
+    needs: run-tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.8 ]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements/edx/coverage.txt
+
+      - name: Run coverage
+        run: |
+          coverage combine coverage*/.coverage*
+          coverage report
+          coverage xml
+      - uses: codecov/codecov-action@v1
