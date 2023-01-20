@@ -142,8 +142,6 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v2
-        with:
-          path: .coverage
 
       - name: Install Python dependencies
         run: |
@@ -151,7 +149,7 @@ jobs:
 
       - name: Run coverage
         run: |
-          coverage combine /home/runner/work/edx-platform/edx-platform/.coverage/coverage*
+          coverage combine coverage*/.coverage*
           coverage report
           coverage xml
       - uses: codecov/codecov-action@v1
