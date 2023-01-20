@@ -151,7 +151,7 @@ jobs:
 
       - name: Run coverage
         run: |
-          coverage combine .coverage/coverage*
+          coverage combine /home/runner/work/edx-platform/edx-platform/.coverage/coverage*
           coverage report
           coverage xml
       - uses: codecov/codecov-action@v1
