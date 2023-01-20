@@ -74,7 +74,3 @@ pycodestyle<2.9.0
 pyopenssl==22.0.0
 
 
-# AttributeError appeared in v==39.0.0
-cryptography==38.0.4 
-
-
