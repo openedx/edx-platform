@@ -45,7 +45,7 @@ asn1crypto==1.5.1
     #   -r requirements/edx/base.txt
     #   oscrypto
     #   snowflake-connector-python
-astroid==2.13.2
+astroid==2.13.3
     # via
     #   pylint
     #   pylint-celery
@@ -582,7 +582,7 @@ edx-enterprise==3.60.12
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   learner-pathway-progress
-edx-event-bus-kafka==3.6.0
+edx-event-bus-kafka==3.6.1
     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.9.2
     # via
@@ -901,7 +901,7 @@ mock==5.0.1
     #   xblock-poll
 mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
     # via -r requirements/edx/base.txt
-mongoengine==0.25.0
+mongoengine==0.26.0
     # via -r requirements/edx/base.txt
 monotonic==1.6
     # via
@@ -954,7 +954,7 @@ openedx-events==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
-openedx-filters==0.8.0
+openedx-filters==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
@@ -1052,10 +1052,8 @@ pyblake2==1.1.2
     # via
     #   -r requirements/edx/base.txt
     #   blockstore
-pycodestyle==2.8.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.in
+pycodestyle==2.10.0
+    # via -r requirements/edx/testing.in
 pycountry==22.3.5
     # via -r requirements/edx/base.txt
 pycparser==2.21
