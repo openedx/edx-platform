@@ -75,25 +75,29 @@ class RmUnify(BaseRmUnify):
             response = 'created' if created else 'updated'
             logger.info('{} has been {} successfully.'.format(school['DisplayName'], response))
 
-    def fetch_classes(self, class_type, queryset=School.objects.all()):
+    def fetch_classes(self, class_type, queryset=School.objects.filter(type=SchoolTypes.RM_UNIFY)):
         for school in queryset:
+            logger.info('___Fetching classes for {}___'.format(school.name))
             fetch_type = re.sub(r'(?<!^)(?=[A-Z])', '_', class_type).upper()
             # get specific url based on class_type
             url_path = getattr(self, fetch_type)
             url = self.generate_url(url_path.format(RmUnify.ORGANISATION, school.guid))
             classes = self.fetch(url)
             for gen_class in classes:
-                Class.objects.update_or_create(
+                gen_class, created = Class.objects.update_or_create(
                     type=class_type,
                     school=school,
                     group_id=gen_class['GroupId'],
                     name=gen_class['DisplayName'],
                     defaults={"name": gen_class['DisplayName']}
                 )
-            logger.info('classes for {} has been successfully fetched.'.format(school.name))
+                if created:
+                    logger.info('{} has been successfully created.'.format(gen_class.name))
+            logger.info('___classes for {} has been successfully fetched___'.format(school.name))
 
     def fetch_students(self, query=Class.visible_objects.all()):
         for gen_class in query:
+            logger.info('___Fetching students for {}___'.format(gen_class.name))
             fetch_type = re.sub(r'(?<!^)(?=[A-Z])', '_', gen_class.type).upper()
             # formatting url according to class type
             url_path = getattr(self, fetch_type).format(RmUnify.ORGANISATION,
@@ -113,9 +117,11 @@ class RmUnify(BaseRmUnify):
                 gen_user.identity_guid = identity_guid
                 gen_user.save()
                 gen_user_ids.append(gen_user.pk)
-
+                if created:
+                    logger.info('Student with email {} created.'.format(gen_user.email))
             gen_students = Student.objects.filter(gen_user__in=gen_user_ids)
             gen_class.students.add(*gen_students)
+            logger.info('_____{} students added to {}_____'.format(str(gen_students.count()), gen_class.name))
 
 
 class RmUnifyProvisioning(BaseRmUnify):
@@ -160,7 +166,8 @@ class RmUnifyProvisioning(BaseRmUnify):
                 )
             if len(updates_batch):
                 self.delete_batch(updates_batch)
-        logger.error('No Updates Found')
+        else:
+            logger.info('No Updates Found')
 
     def delete_batch(self, batch):
         headers = self.get_header()

@@ -1,6 +1,7 @@
 import csv
 import codecs
 from django.contrib import admin
+from django.core.validators import ValidationError
 from openedx.features.genplus_features.genplus.models import *
 from openedx.features.genplus_features.genplus_learning.models import Program, UnitCompletion, ProgramEnrollment
 from django import forms
@@ -16,24 +17,43 @@ from django.template.loader import get_template
 from django.shortcuts import redirect, render
 from django.conf.urls import url
 from .constants import GenUserRoles, SchoolTypes
-from django.contrib.auth.models import User
+from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
+from common.djangoapps.student.helpers import (
+    AccountValidationError,
+    do_create_account
+)
 from openedx.features.genplus_features.genplus.rmunify import RmUnify
 from openedx.features.genplus_features.genplus_learning.utils import (
     process_pending_student_program_enrollments,
     process_pending_teacher_program_access
 )
-
+from social_core.utils import slugify
 
 @admin.register(GenUser)
 class GenUserAdmin(admin.ModelAdmin):
     list_display = (
         'user',
+        'email',
         'role',
         'school',
         'year_of_entry',
-        'registration_group'
+        'registration_group',
+        'social_user_exist'
     )
-    search_fields = ('user__email', 'email')
+    search_fields = ('user__email', 'email', 'school')
+
+    def social_user_exist(self, obj):
+        try:
+            if obj.from_private_school:
+                return '-'
+            elif obj.user is None:
+                return 'User not logged in yet.'
+            else:
+                return "Yes" if obj.user.social_auth.count() > 0 else "No"
+        except AttributeError:
+            return '-'
+
+
 
 
 @admin.register(Skill)
@@ -89,32 +109,47 @@ class SchoolAdmin(admin.ModelAdmin):
                         role = GenUserRoles.STUDENT
                     elif non_empty_row['role'] == GenUserRoles.TEACHING_STAFF:
                         role = GenUserRoles.TEACHING_STAFF
-                    user, created = User.objects.get_or_create(
-                        username=email,
-                        email=email,
-                        first_name=first_name,
-                        last_name=last_name,
+                    form = AccountCreationForm(
+                        data={
+                            'username': slugify(email),
+                            'email': email,
+                            'password': password,
+                            'name': f'{first_name} {last_name}',
+                        },
+                        tos_required=False,
+                        do_third_party_auth=False,
                     )
-                    user.set_password(password)
-                    user.save()
-                    gen_user, created = GenUser.objects.get_or_create(
-                        role=role,
-                        user=user,
-                        school=school,
-                        email=user.email,
-                    )
-                    if role == GenUserRoles.STUDENT:
-                        gen_student = gen_user.student
-                        gen_user.refresh_from_db()
-                        gen_class.students.add(gen_student)
-                    if gen_user.is_student:
-                        process_pending_student_program_enrollments(gen_user)
-                    elif gen_user.is_teacher:
-                        process_pending_teacher_program_access(gen_user)
+
+                    try:
+                        # register user (edx way)
+                        user, profile, registration = do_create_account(form)
+                        gen_user, created = GenUser.objects.get_or_create(
+                            role=role,
+                            user=user,
+                            school=school,
+                            email=user.email,
+                        )
+                        if role == GenUserRoles.STUDENT:
+                            gen_student = gen_user.student
+                            gen_user.refresh_from_db()
+                            gen_class.students.add(gen_student)
+                        # process pending enrollments if any.
+                        if gen_user.is_student:
+                            process_pending_student_program_enrollments(gen_user)
+                        elif gen_user.is_teacher:
+                            process_pending_teacher_program_access(gen_user)
+                        # activate user
+                        registration.activate()
+                    except AccountValidationError as e:
+                        self.message_user(request, str(e), level=messages.ERROR)
+                    except ValidationError as e:
+                        self.message_user(request, str(e), level=messages.ERROR)
                 except KeyError as e:
                     print(e)
-                    self.message_user(request, 'An Error occurred while parsing the csv', level=messages.ERROR)
-            self.message_user(request, "Your csv file has been imported")
+                    self.message_user(request,
+                                      'An Error occurred while parsing the csv. Please make sure that the csv is in the right format.',
+                                      level=messages.ERROR)
+            self.message_user(request, "Your csv file has been uploaded.")
             return redirect("..")
         form = CsvImportForm()
         payload = {"form": form}
@@ -153,6 +188,11 @@ class SchoolAdmin(admin.ModelAdmin):
         return mark_safe('<a href="%s?gen_user__school__guid__exact=%s">%s</a>' % (url, obj.pk, student_count))
 
     def logged_in_students(self, obj):
+        """
+        check if students is logged into the system
+        in case of private schools check if last_login time is null
+        in case of the rm_unify check if the user object exists or not
+        """
         url = reverse('admin:genplus_student_changelist')
         students = Student.objects.filter(gen_user__school=obj, gen_user__user__last_login__isnull=False)
         if obj.type == SchoolTypes.RM_UNIFY:
@@ -161,8 +201,10 @@ class SchoolAdmin(admin.ModelAdmin):
             url, obj.pk, ','.join(map(str, students.values_list('id', flat=True))), students.count()))
 
     def enrolled_students(self, obj):
+        """
+        check enrolled students by checking if program enrollments against that users exist or not
+        """
         url = reverse('admin:genplus_student_changelist')
-        Student.objects.filter(program_enrollments__isnull=True)
         students = Student.objects.filter(gen_user__school=obj, gen_user__user__isnull=False,
                                           program_enrollments__isnull=False)
         return mark_safe('<a href="%s?gen_user__school__guid__exact=%s&id__in=%s">%s</a>' % (
@@ -337,6 +379,7 @@ class StudentAdmin(admin.ModelAdmin):
             unit_data = {}
             for unit in units:
                 try:
+                    obj.gen_user.student.program_enrollments.get(program=program)
                     completion = completions.filter(user=obj.gen_user.user, course_key=unit.course.id).first()
                     progress = completion.progress if completion else 0
                     unit_data[unit.display_name] = f"{int(progress)}%"

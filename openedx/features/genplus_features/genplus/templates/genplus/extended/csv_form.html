@@ -2,7 +2,10 @@
 
 {% block content %}
     <div>
-        <p>Make sure it is in correct format before uploading it.</p>
+        <ul>
+            <li><span>Make sure it is in correct format before uploading it.</span></li>
+            <li><span>For making sure please download sample file <a href="https://learn.genplus.co.uk/asset-v1:Genplus+mediaandcontent+constant+type@asset+block@sample_import.csv">here</a></span></li>
+        </ul>
         <form action="." method="POST" enctype="multipart/form-data">
             {{ form.as_p }}
             {% csrf_token %}
