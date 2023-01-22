@@ -474,7 +474,7 @@ class CoursewareIndex(View):
                 if gen_user.is_student:
                     gen_class = gen_user.student.active_class
                     lessons = ClassLesson.objects.filter(class_unit__gen_class=gen_class, course_key=self.course.id)
-                    sections = course_block_tree.get('children')
+                    sections = course_block_tree.get('children', [])
                     for i, section in enumerate(sections):
                         lesson = lessons.get(usage_key=UsageKey.from_string(section.get('id')))
                         sections[i]['is_locked'] = lesson.is_locked if lesson else False

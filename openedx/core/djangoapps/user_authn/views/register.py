@@ -204,24 +204,12 @@ def create_account_with_params(request, params):
         tos_required=tos_required,
     )
 
-    current_provider = None
-    running_pipeline = pipeline.get(request)
-    if running_pipeline:
-        current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-
     custom_form = get_registration_extension_form(data=params)
 
     # Perform operations within a transaction that are critical to account creation
     with outer_atomic(read_committed=True):
         # first, create the account
         (user, profile, registration) = do_create_account(form, custom_form)
-
-        if current_provider:
-            gen_user_data = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
-            try:
-                register_gen_user(user, gen_user_data)
-            except ValidationError as err:
-                log.error("Gen user registration failed!: %s", err)
 
         third_party_provider, running_pipeline = _link_user_to_third_party_provider(
             is_third_party_auth_enabled, third_party_auth_credentials_in_api, user, request, params,
@@ -230,6 +218,13 @@ def create_account_with_params(request, params):
         new_user = authenticate_new_user(request, user.username, form.cleaned_data['password'])
         django_login(request, new_user)
         request.session.set_expiry(0)
+
+    if third_party_provider:
+        gen_user_data = third_party_provider.get_register_form_data(running_pipeline.get('kwargs'))
+        try:
+            register_gen_user(user, gen_user_data)
+        except ValidationError as err:
+            log.error("Gen user registration failed!: %s", err)
 
     # Sites using multiple languages need to record the language used during registration.
     # If not, compose_and_send_activation_email will be sent in site's default language only.

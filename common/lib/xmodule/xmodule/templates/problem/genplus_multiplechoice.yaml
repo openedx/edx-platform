@@ -6,16 +6,16 @@ data: |
     <div class="choices-xblock theme-dark">
       <problem class="multiple_choice">
         <!-- <div class="asn-icon top-left">
-          <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@asset-logo-pink.svg" alt="Logo Left" />
-          <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@read-alt.png" width="50" alt="Icon Read" />
+          <img src="/static/images/asset-logo-pink.svg" alt="Logo Left" />
+          <img src="/static/images/asset+block@read-alt.png" width="50" alt="Icon Read" />
         </div> -->
         <!-- <div class="asn-icon top-right">
-          <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@read-alt.png" width="50" alt="Icon Read" />
-          <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@asset-logo-pink.svg" alt="Logo Left" />
+          <img src="/static/images/asset+block@read-alt.png" width="50" alt="Icon Read" />
+          <img src="/static/images/asset-logo-pink.svg" alt="Logo Left" />
         </div> -->
         <div class="choices-xblock-wapper">
           <div class="choices-info">
-            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GP741+2022_T1+type@asset+block@calendar.png" alt="Trophy" class="align-center" width="280" />
+            <img src="/static/images/@calendar.png" alt="Trophy" class="align-center" width="280" />
           </div>
           <div class="choices-form">
             <choiceresponse>

@@ -7,15 +7,15 @@ data: |
       <problem class="short_answers">
         <div class="journals-xblock-wapper">
           <!-- <div class="asn-icon top-left">
-            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@asset-logo-pink.svg" alt="Logo Left" />
-            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@read-alt.png" width="50" alt="Icon Read" />
+            <img src="/static/images/asset-logo-pink.svg" alt="Logo Left" />
+            <img src="/static/images/read-alt.png" width="50" alt="Icon Read" />
           </div> -->
           <!-- <div class="asn-icon top-right">
-            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@read-alt.png" width="50" alt="Icon Read" />
-            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@asset-logo-pink.svg" alt="Logo Left" />
+            <img src="/static/images/read-alt.png" width="50" alt="Icon Read" />
+            <img src="/static/images/asset-logo-pink.svg" alt="Logo Left" />
           </div> -->
           <div class="journals-info">
-            <img width="240" src="https://dev.genplus.co.uk/asset-v1:genplus+GP741+2022_T1+type@asset+block@a797f98edda60ebed5b29f4b4a6b82d8.png" alt="Your Turn" />
+            <img width="240" src="/static/images/a797f98edda60ebed5b29f4b4a6b82d8.png" alt="Your Turn" />
             <h2>Your Turn</h2>
             <p>Identify an event, project, opportunity or problem within the school locally or globally.</p>
             <p>Use the decision-making process to create a plan to help you acheive this goal.</p>

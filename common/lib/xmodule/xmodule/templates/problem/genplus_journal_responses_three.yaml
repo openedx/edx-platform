@@ -7,16 +7,16 @@ data: |
       <problem class="journal_responses">
         <div class="journals-xblock-wapper">
           <!-- <div class="asn-icon top-left">
-            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@asset-logo-black.svg" alt="Logo Left" />
-            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@Read.png" width="50" alt="Icon Read" />
+            <img src="/static/images/asset-logo-black.svg" alt="Logo Left" />
+            <img src="/static/images/Read.png" width="50" alt="Icon Read" />
           </div> -->
           <!-- <div class="asn-icon top-right">
-            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@Read.png" width="50" alt="Icon Read" />
-            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GAI_2022+GAI_2022_01+type@asset+block@asset-logo-black.svg" alt="Logo Left" />
+            <img src="/static/images/Read.png" width="50" alt="Icon Read" />
+            <img src="/static/images/asset-logo-black.svg" alt="Logo Left" />
           </div> -->
           <div class="journal-entries journals-form">
             <div class="col order-sm-2">
-              <img src="https://dev.genplus.co.uk/asset-v1:genplus+GP414+2022_T1+type@asset+block@journal-flipped.png" alt="journal" />
+              <img src="/static/images/journal-flipped.png" alt="journal" />
             </div>
             <div class="col order-sm-1">
               <div class="journals-info">
