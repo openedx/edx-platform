@@ -12,7 +12,8 @@
 
 edx-opaque-keys                     # Create and introspect course and xblock identities
 lazy                                # Lazily-evaluated attributes for Python objects
-libsass==0.11.0                     # Python bindings for the LibSass CSS compiler
+libsass==0.11.0                     # Provides `sassc` CLI for compiling SCSS. Not referenced in our Python code directly.
+                                    # Note for maintainers: In libsass>=0.15, the CLI has been renamed to `pysassc`.
 markupsafe                          # XML/HTML/XHTML Markup safe strings
 mock                                # Stub out code with mock objects and make assertions about how they have been used
 path                                # Easier manipulation of filesystem paths

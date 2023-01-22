@@ -555,11 +555,13 @@ def _compile_sass(system, theme, debug, force, timing_info):
                 sass_dir=sass_source_dir,
             ))
         else:
-            sass.compile(
-                dirname=(sass_source_dir, css_dir),
-                include_paths=COMMON_LOOKUP_PATHS + lookup_paths,
-                source_comments=source_comments,
-                output_style=output_style,
+            all_lookup_paths = COMMON_LOOKUP_PATHS + lookup_paths
+            sh(
+                "pysassc"
+                + "".join(f" --include-path={path}" for path in all_lookup_paths)
+                + (" --source-comments" if source_comments else "")
+                + f" --output-style={output_style}"
+                + f" {sass_source_dir} {css_dir}"
             )
 
         # For Sass files without explicit RTL versions, generate
