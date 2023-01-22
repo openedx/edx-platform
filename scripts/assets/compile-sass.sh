@@ -18,7 +18,8 @@ OPTIONS:\n\
     -n, --node_modules <NODE_MODULES_PATH>   Path to installed node_modules directory.\n\
                                              Defaults to ./node_modules.\n\
     -f, --force                              Remove existing css before generating new css\n\
-    -d, --debug                              Whether to show source comments in resulting css\n\
+    -d, --dev                                Dev mode: whether to show source comments in resulting css\n\
+	-w, --watch                              Watch sass directories and compile and recompile whenever changed\n\
     -h, --help                               Display this.\n\
 "
 
@@ -33,10 +34,11 @@ node_modules_path="./node_modules"
 system=""
 theme_dir=""
 
-# Should we delete css first? Default is false.
+# Flags.
 #  Empty string    (-z) => false
 #  Nonempty string (-n) => true
 force=""
+watch=""
 
 # Output style arguments, to be passed to underlying
 # libsass complition command.
@@ -54,6 +56,10 @@ while [ $# -gt 0 ]; do
 				exit 1
 			fi
 			node_modules_path="$1"
+			shift
+			;;
+		-w|--watch)
+			watch="True"
 			shift
 			;;
 		-f|--force)
@@ -105,13 +111,16 @@ while [ $# -gt 0 ]; do
 done
 
 # Define source directories for LMS and CMS.
-sass_lookup_paths_common="\
- common/static\
+sass_lookup_paths_common=\
+"common/static\
  common/static/sass\
  $node_modules_path\
  $node_modules_path/@edx"
-sass_lookup_paths_cms="$sass_lookup_paths_common"
-sass_lookup_paths_lms="$sass_lookup_paths_common lms/static/sass/partials"
+sass_lookup_paths_lms=\"
+"$sass_lookup_paths_common\
+ lms/static/sass/partials"
+sass_lookup_paths_cms=\
+"$sass_lookup_paths_common"
 
 # Input validation
 if [ -z "$system" ]; then
@@ -131,8 +140,21 @@ for lookup_path in $sass_lookup_paths_lms $sass_lookup_paths_cms; do
 	fi
 done
 
+# TODO: This seems too complicated.
+# TODO: just kidding, we can use sassc on the command line!
+run_sass ( ) {
+    sass_src="$1"
+	css_dest="$2"
+	lookup_dirs="$3"
+	python -c "sass.compile(dirname=(\"$1\", \"$2\", 
+}
+
 echo "-------------------------------------------------------------------------"
-echo "Compiling $system sass..."
+if [ -n "$watch" ] ; then
+	echo "Compiling $system sass..."
+else
+	echo "Watching $system sass for changes..."
+fi
 echo "  Working directory     : $(pwd)"
 echo "  sass_lookup_paths_lms :$sass_lookup_paths_lms"
 echo "  sass_lookup_paths_cms :$sass_lookup_paths_cms"
@@ -142,6 +164,7 @@ echo "-------------------------------------------------------------------------"
 
 # Echo lines back to user.
 set -x
+
 
 echo TODO: implement
 
