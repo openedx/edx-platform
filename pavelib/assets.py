@@ -557,7 +557,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
         else:
             all_lookup_paths = COMMON_LOOKUP_PATHS + lookup_paths
             sh(
-                "pysassc"
+                "sassc"
                 + "".join(f" --include-path={path}" for path in all_lookup_paths)
                 + (" --source-comments" if source_comments else "")
                 + f" --output-style={output_style}"
