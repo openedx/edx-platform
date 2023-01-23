@@ -25,6 +25,7 @@
 #    as development.in or testing.in instead.
 
 acid-xblock
+algoliasearch                       # Algolia’s API client for indexed searching
 analytics-python                    # Used for Segment analytics
 attrs                               # Reduces boilerplate code involving class attributes
 Babel                               # Internationalization utilities, used for date formatting in a few places
