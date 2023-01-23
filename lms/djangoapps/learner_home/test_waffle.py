@@ -15,7 +15,9 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 @ddt.ddt
 class TestWaffle(SharedModuleStoreTestCase):
     def setUp(self):
-        # Set up a user
+        super().setUp()
+
+        # Set up a user for testing
         self.user = UserFactory
 
     @patch("lms.djangoapps.learner_home.waffle.ENABLE_LEARNER_HOME_MFE")
