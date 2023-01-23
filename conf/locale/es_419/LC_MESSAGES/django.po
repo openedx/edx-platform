@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -31,7 +31,7 @@
 # Félix Antonio Valdez Noverola <felix@itesm.mx>, 2015
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
-# Jesica Greco, 2022
+# Jesica Greco, 2022-2023
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2022
@@ -79,7 +79,7 @@
 # Zainab Amir <zamir@edx.org>, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -119,7 +119,7 @@
 # Valeria Freire <valtodopds@hotmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -205,7 +205,7 @@
 # Zimeng Chen, 2021
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -249,7 +249,7 @@
 # Zimeng Chen, 2021
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -262,9 +262,9 @@
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2018
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Miguel Bonilla <mbonilla@edx.org>, 2019
@@ -274,7 +274,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-18 20:42+0000\n"
+"POT-Creation-Date: 2023-01-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -2390,7 +2390,7 @@ msgstr "Centro de Ayuda"
 
 #: lms/djangoapps/branding/api.py
 msgid "Security"
-msgstr ""
+msgstr "Seguridad"
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -2479,11 +2479,11 @@ msgstr "Open edX"
 
 #: lms/djangoapps/branding/api.py
 msgid "Cookie Policy"
-msgstr ""
+msgstr "Política de cookies"
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Data"
-msgstr ""
+msgid "Do Not Sell My Personal Information"
+msgstr "No vender mi información personal"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -9026,6 +9026,8 @@ msgid ""
 "An error has occurred. Try refreshing the page, or check your internet "
 "connection."
 msgstr ""
+"Se ha producido un error. Intente actualizar la página o verifique su "
+"conexión a Internet."
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -10632,6 +10634,10 @@ msgid ""
 "Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
+"Los ID de ubicación de componentes de todos los componentes de origen que se"
+" utilizan para determinar si se muestra a un alumno el contenido de este "
+"bloque condicional. Copie el ID de ubicación del componente de un componente"
+" desde su cuadro de diálogo Configuración en Studio."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Attribute"
@@ -10642,6 +10648,8 @@ msgid ""
 "The attribute of the source components that determines whether a learner is "
 "shown the content of this conditional block."
 msgstr ""
+"El atributo de los componentes de origen que determina si a un alumno se le "
+"muestra el contenido de este bloque condicional."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Value"
@@ -10652,6 +10660,9 @@ msgid ""
 "The value that the conditional attribute of the source components must match"
 " before a learner is shown the content of this conditional block."
 msgstr ""
+"El valor con el que debe coincidir el atributo condicional de los "
+"componentes de origen antes de que se muestre a un alumno el contenido de "
+"este bloque condicional."
 
 #: xmodule/conditional_block.py
 msgid "Blocked Content Message"
@@ -10665,6 +10676,11 @@ msgid ""
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
+"El mensaje que se muestra a los alumnos cuando no se cumplen todas las "
+"condiciones para mostrar el contenido de este bloque condicional. Incluya "
+"{link} en el texto de su mensaje para brindarles a los alumnos un enlace "
+"directo a las unidades requeridas. Por ejemplo, Debe completar {link} antes "
+"de poder acceder a esta unidad."
 
 #: xmodule/conditional_block.py
 #, python-brace-format
@@ -12518,6 +12534,9 @@ msgid ""
 "Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
+"Etiquete este bloque de curso como un examen de ingreso. Tenga en cuenta que"
+" debe habilitar los exámenes de ingreso para que la configuración de este "
+"curso tenga efecto."
 
 #: xmodule/seq_block.py
 msgid "Is Time Limited"
@@ -12738,6 +12757,7 @@ msgstr "Agrega discusiones para la unidad."
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
 msgstr ""
+"No se puede obtener el enlace de transcripción de Youtube para {youtube_id}."
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
@@ -14453,7 +14473,7 @@ msgstr "Marcar esta página"
 
 #: lms/templates/conditional_block.html
 msgid "You do not have access to this dependency block."
-msgstr ""
+msgstr "No tienes acceso a este bloque de dependencia."
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -18845,7 +18865,7 @@ msgstr "Instituciones"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
-msgstr ""
+msgstr "Registrate gratis"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
@@ -20064,6 +20084,8 @@ msgid ""
 "You can include keywords in your messages. For list of available keywords "
 "see the {start_link}documentation{end_link}."
 msgstr ""
+"Puede incluir palabras clave en sus mensajes. Para obtener una lista de "
+"palabras clave disponibles, consulte la {start_link}documentación{end_link}."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
