@@ -51,7 +51,7 @@ from openedx.core.djangoapps.django_comment_common.utils import seed_permissions
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, ToyCourseFactory
 
 
 class DictionaryTestCase(TestCase):
@@ -135,14 +135,14 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
-        self.discussion1 = ItemFactory.create(
+        self.discussion1 = BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="discussion1",
             discussion_category="Chapter",
             discussion_target="Discussion 1"
         )
-        self.discussion2 = ItemFactory.create(
+        self.discussion2 = BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="discussion2",
@@ -180,7 +180,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         Test that for empty subcategory inline discussion modules,
         the divider " / " is not rendered on a post or inline discussion topic label.
         """
-        discussion = ItemFactory.create(
+        discussion = BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="discussion",
@@ -228,21 +228,21 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         super().setUp()
 
         self.course = CourseFactory.create(org='TestX', number='101', display_name='Test Course')
-        self.discussion = ItemFactory.create(
+        self.discussion = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='test_discussion_id',
             discussion_category='Chapter',
             discussion_target='Discussion 1'
         )
-        self.discussion2 = ItemFactory.create(
+        self.discussion2 = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='test_discussion_id_2',
             discussion_category='Chapter 2',
             discussion_target='Discussion 2'
         )
-        self.private_discussion = ItemFactory.create(
+        self.private_discussion = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='private_discussion_id',
@@ -251,7 +251,7 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
             visible_to_staff_only=True
         )
         RequestCache.clear_all_namespaces()  # clear the cache before the last course publish
-        self.bad_discussion = ItemFactory.create(
+        self.bad_discussion = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='bad_discussion_id',
@@ -376,7 +376,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
         self.discussion_num += 1
-        return ItemFactory.create(
+        return BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id=f"discussion{self.discussion_num}",

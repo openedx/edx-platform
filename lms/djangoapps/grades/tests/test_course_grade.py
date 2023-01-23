@@ -4,7 +4,7 @@ from unittest.mock import patch
 import ddt
 from crum import set_current_request
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
@@ -74,20 +74,20 @@ class TestScoreForModule(SharedModuleStoreTestCase):
         super().setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
-            cls.a = ItemFactory.create(parent=cls.course, category="chapter", display_name="a")
-            cls.b = ItemFactory.create(parent=cls.a, category="sequential", display_name="b")
-            cls.c = ItemFactory.create(parent=cls.a, category="sequential", display_name="c")
-            cls.d = ItemFactory.create(parent=cls.b, category="vertical", display_name="d")
-            cls.e = ItemFactory.create(parent=cls.b, category="vertical", display_name="e")
-            cls.f = ItemFactory.create(parent=cls.b, category="vertical", display_name="f")
-            cls.g = ItemFactory.create(parent=cls.c, category="vertical", display_name="g")
-            cls.h = ItemFactory.create(parent=cls.d, category="problem", display_name="h")
-            cls.i = ItemFactory.create(parent=cls.d, category="problem", display_name="i")
-            cls.j = ItemFactory.create(parent=cls.e, category="problem", display_name="j")
-            cls.k = ItemFactory.create(parent=cls.e, category="html", display_name="k")
-            cls.l = ItemFactory.create(parent=cls.e, category="problem", display_name="l")
-            cls.m = ItemFactory.create(parent=cls.f, category="html", display_name="m")
-            cls.n = ItemFactory.create(parent=cls.g, category="problem", display_name="n")
+            cls.a = BlockFactory.create(parent=cls.course, category="chapter", display_name="a")
+            cls.b = BlockFactory.create(parent=cls.a, category="sequential", display_name="b")
+            cls.c = BlockFactory.create(parent=cls.a, category="sequential", display_name="c")
+            cls.d = BlockFactory.create(parent=cls.b, category="vertical", display_name="d")
+            cls.e = BlockFactory.create(parent=cls.b, category="vertical", display_name="e")
+            cls.f = BlockFactory.create(parent=cls.b, category="vertical", display_name="f")
+            cls.g = BlockFactory.create(parent=cls.c, category="vertical", display_name="g")
+            cls.h = BlockFactory.create(parent=cls.d, category="problem", display_name="h")
+            cls.i = BlockFactory.create(parent=cls.d, category="problem", display_name="i")
+            cls.j = BlockFactory.create(parent=cls.e, category="problem", display_name="j")
+            cls.k = BlockFactory.create(parent=cls.e, category="html", display_name="k")
+            cls.l = BlockFactory.create(parent=cls.e, category="problem", display_name="l")
+            cls.m = BlockFactory.create(parent=cls.f, category="html", display_name="m")
+            cls.n = BlockFactory.create(parent=cls.g, category="problem", display_name="n")
 
         cls.request = get_mock_request(UserFactory())
         CourseEnrollment.enroll(cls.request.user, cls.course.id)

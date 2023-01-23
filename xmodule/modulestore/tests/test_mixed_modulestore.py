@@ -448,7 +448,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             assert block.course_version == course_version
             # ensure that when the block is retrieved from the runtime cache,
             # the course version is still present
-            cached_block = course.runtime.load_item(block.location)
+            cached_block = course.runtime.get_block(block.location)
             assert cached_block.course_version == block.course_version
 
     @ddt.data((ModuleStoreEnum.Type.split, 2, False), (ModuleStoreEnum.Type.mongo, 3, True))

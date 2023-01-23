@@ -14,7 +14,7 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlockAside
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.modulestore.tests.test_asides import AsideTestType
 
 from openedx.core.lib.url_utils import quote_slashes
@@ -164,7 +164,7 @@ class TestXBlockAside(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        cls.block = ItemFactory.create(parent=cls.course)
+        cls.block = BlockFactory.create(parent=cls.course)
         cls.aside_v2 = AsideUsageKeyV2(cls.block.scope_ids.usage_id, "aside")
         cls.aside_v1 = AsideUsageKeyV1(cls.block.scope_ids.usage_id, "aside")
 

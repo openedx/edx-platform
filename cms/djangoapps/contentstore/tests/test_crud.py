@@ -8,7 +8,7 @@ from xmodule.html_block import HtmlBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.seq_block import SequenceBlock
 
 
@@ -61,7 +61,7 @@ class TemplateTests(ModuleStoreTestCase):
         self.assertEqual(course_from_store.id.course, 'course')
         self.assertEqual(course_from_store.id.run, '2014')
 
-        test_chapter = ItemFactory.create(
+        test_chapter = BlockFactory.create(
             parent_location=test_course.location,
             category='chapter',
             display_name='chapter 1'
@@ -117,7 +117,7 @@ class TemplateTests(ModuleStoreTestCase):
             display_name='doomed test course',
             user_id=ModuleStoreEnum.UserID.test,
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=test_course.location,
             category='chapter',
             display_name='chapter 1'

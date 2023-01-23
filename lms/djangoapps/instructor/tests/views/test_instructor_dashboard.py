@@ -16,7 +16,7 @@ from pyquery import PyQuery as pq
 from pytz import UTC
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -557,7 +557,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         self.assertNotContains(response, ora_section)
 
-        ItemFactory.create(parent_location=self.course.location, category="openassessment")
+        BlockFactory.create(parent_location=self.course.location, category="openassessment")
         response = self.client.get(self.url)
         self.assertContains(response, ora_section)
 
@@ -567,7 +567,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         orphaned openassessment block
         """
         # create non-orphaned openassessment block
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category="openassessment",
         )
@@ -627,7 +627,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
         Test that the MongoDB cache is used in API to return grades
         """
         # prepare course structure
-        course = ItemFactory.create(
+        course = BlockFactory.create(
             parent_location=self.course.location,
             category="course",
             display_name="Test course",
@@ -640,14 +640,14 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
             students.append(student)
 
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent=course,
             category='chapter',
             display_name="Chapter",
             publish_item=True,
             start=datetime.datetime(2015, 3, 1, tzinfo=UTC),
         )
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name="Lesson",
@@ -655,7 +655,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
             start=datetime.datetime(2015, 3, 1, tzinfo=UTC),
             metadata={'graded': True, 'format': 'Homework'},
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             parent=sequential,
             category='vertical',
             display_name='Subsection',
@@ -663,7 +663,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
             start=datetime.datetime(2015, 4, 1, tzinfo=UTC),
         )
         for i in range(10):
-            problem = ItemFactory.create(
+            problem = BlockFactory.create(
                 category="problem",
                 parent=vertical,
                 display_name="A Problem Block %d" % i,

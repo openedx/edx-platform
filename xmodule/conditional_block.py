@@ -287,7 +287,7 @@ class ConditionalBlock(
             html = self.runtime.service(self, 'mako').render_template('conditional_block.html', context)
             return json.dumps({'fragments': [{'content': html}], 'message': bool(self.conditional_message)})
 
-        fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_display_items()]
+        fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_children()]
 
         return json.dumps({'fragments': fragments})
 
@@ -326,7 +326,7 @@ class ConditionalBlock(
         descriptors = []
         for location in self.sources_list:
             try:
-                descriptor = self.system.load_item(location)
+                descriptor = self.runtime.get_block(location)
                 descriptors.append(descriptor)
             except ItemNotFoundError:
                 msg = "Invalid module by location."

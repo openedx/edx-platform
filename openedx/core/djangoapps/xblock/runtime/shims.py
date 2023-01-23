@@ -394,21 +394,3 @@ class XBlockShim:
         student when the module is created. This is deprecated and discouraged.
         """
         return False
-
-    def get_display_items(self):
-        """
-        Returns a list of descendent XBlock instances that will display
-        immediately inside this module.
-        """
-        warnings.warn("get_display_items() is deprecated.", DeprecationWarning, stacklevel=2)
-        items = []
-        for child in self.get_children():
-            items.extend(child.displayable_items())
-        return items
-
-    def displayable_items(self):
-        """
-        Returns list of displayable modules contained by this XBlock. If this
-        module is visible, should return [self].
-        """
-        return [self]

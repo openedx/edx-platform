@@ -824,7 +824,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             system = using_descriptor_system
             system.module_data.update(data_cache)
 
-        item = system.load_item(location, for_parent=for_parent)
+        item = system.get_block(location, for_parent=for_parent)
 
         # TODO Once TNL-5092 is implemented, we can remove the following line
         # of code. Until then, set the course_version field on the block to be

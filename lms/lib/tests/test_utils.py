@@ -5,7 +5,7 @@ Tests for the LMS/lib utils
 
 from lms.lib import utils
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class LmsUtilsTest(ModuleStoreTestCase):
@@ -20,17 +20,17 @@ class LmsUtilsTest(ModuleStoreTestCase):
         super().setUp()
 
         self.course = CourseFactory.create()
-        self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
-        self.sequential = ItemFactory.create(category="sequential", parent_location=self.chapter.location)
-        self.vertical = ItemFactory.create(category="vertical", parent_location=self.sequential.location)
-        self.html_block_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
-        self.vertical_with_container = ItemFactory.create(
+        self.chapter = BlockFactory.create(category="chapter", parent_location=self.course.location)
+        self.sequential = BlockFactory.create(category="sequential", parent_location=self.chapter.location)
+        self.vertical = BlockFactory.create(category="vertical", parent_location=self.sequential.location)
+        self.html_block_1 = BlockFactory.create(category="html", parent_location=self.vertical.location)
+        self.vertical_with_container = BlockFactory.create(
             category="vertical", parent_location=self.sequential.location
         )
-        self.child_container = ItemFactory.create(
+        self.child_container = BlockFactory.create(
             category="split_test", parent_location=self.vertical_with_container.location)
-        self.child_vertical = ItemFactory.create(category="vertical", parent_location=self.child_container.location)
-        self.child_html_block = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
+        self.child_vertical = BlockFactory.create(category="vertical", parent_location=self.child_container.location)
+        self.child_html_block = BlockFactory.create(category="html", parent_location=self.child_vertical.location)
 
         # Read again so that children lists are accurate
         self.course = self.store.get_item(self.course.location)

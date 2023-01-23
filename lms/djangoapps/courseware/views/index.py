@@ -491,7 +491,7 @@ class CoursewareIndex(View):
         exceeds the length of the displayable items, default the position
         to the first element.
         """
-        display_items = self.section.get_display_items()
+        display_items = self.section.get_children()
         if not display_items:
             return
         if self.section.position > len(display_items):
@@ -565,7 +565,7 @@ def save_child_position(seq_block, child_name):
     """
     child_name: url_name of the child
     """
-    for position, child in enumerate(seq_block.get_display_items(), start=1):
+    for position, child in enumerate(seq_block.get_children(), start=1):
         if child.location.block_id == child_name:
             # Only save if position changed
             if position != seq_block.position:

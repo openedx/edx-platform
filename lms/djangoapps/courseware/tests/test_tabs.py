@@ -42,7 +42,7 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -242,7 +242,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        cls.page = ItemFactory.create(
+        cls.page = BlockFactory.create(
             category="static_tab", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="new_tab"
         )
@@ -346,11 +346,11 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         super().setUp()
 
         self.course = CourseFactory.create()
-        self.extra_tab_2 = ItemFactory.create(
+        self.extra_tab_2 = BlockFactory.create(
             category="static_tab", parent_location=self.course.location,
             data="Extra Tab", display_name="Extra Tab 2"
         )
-        self.extra_tab_3 = ItemFactory.create(
+        self.extra_tab_3 = BlockFactory.create(
             category="static_tab", parent_location=self.course.location,
             data="Extra Tab", display_name="Extra Tab 3"
         )
@@ -364,7 +364,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         """
         Unit Test: test_get_course_tabs_list_entrance_exam_enabled
         """
-        entrance_exam = ItemFactory.create(
+        entrance_exam = BlockFactory.create(
             category="chapter",
             parent_location=self.course.location,
             display_name="Entrance Exam",

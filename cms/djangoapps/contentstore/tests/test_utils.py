@@ -25,7 +25,7 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -180,9 +180,9 @@ class ReleaseDateSourceTest(CourseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
-        self.sequential = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
-        self.vertical = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
+        self.chapter = BlockFactory.create(category='chapter', parent_location=self.course.location)
+        self.sequential = BlockFactory.create(category='sequential', parent_location=self.chapter.location)
+        self.vertical = BlockFactory.create(category='vertical', parent_location=self.sequential.location)
 
         # Read again so that children lists are accurate
         self.chapter = self.store.get_item(self.chapter.location)
@@ -234,10 +234,10 @@ class StaffLockTest(CourseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
-        self.sequential = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
-        self.vertical = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
-        self.orphan = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
+        self.chapter = BlockFactory.create(category='chapter', parent_location=self.course.location)
+        self.sequential = BlockFactory.create(category='sequential', parent_location=self.chapter.location)
+        self.vertical = BlockFactory.create(category='vertical', parent_location=self.sequential.location)
+        self.orphan = BlockFactory.create(category='vertical', parent_location=self.sequential.location)
 
         # Read again so that children lists are accurate
         self.chapter = self.store.get_item(self.chapter.location)
@@ -345,11 +345,11 @@ class GroupVisibilityTest(CourseTestCase):
 
     def setUp(self):
         super().setUp()
-        chapter = ItemFactory.create(category='chapter', parent=self.course)
-        sequential = ItemFactory.create(category='sequential', parent=chapter)
-        vertical = ItemFactory.create(category='vertical', parent=sequential)
-        html = ItemFactory.create(category='html', parent=vertical)
-        problem = ItemFactory.create(
+        chapter = BlockFactory.create(category='chapter', parent=self.course)
+        sequential = BlockFactory.create(category='sequential', parent=chapter)
+        vertical = BlockFactory.create(category='vertical', parent=sequential)
+        html = BlockFactory.create(category='html', parent=vertical)
+        problem = BlockFactory.create(
             category='problem', parent=vertical, data="<problem></problem>"
         )
         self.sequential = self.store.get_item(sequential.location)
@@ -449,7 +449,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         """Create a dummy course. """
         super().setUp()
         self.course = CourseFactory()
-        self.block = ItemFactory.create(category="problem", parent_location=self.course.location)
+        self.block = BlockFactory.create(category="problem", parent_location=self.course.location)
 
         # Set up some default partitions
         self._set_partitions([

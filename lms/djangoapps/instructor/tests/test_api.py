@@ -35,7 +35,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -360,14 +360,14 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(
+        cls.chapter = BlockFactory.create(
             parent=cls.course,
             category='chapter',
             display_name="Chapter",
             publish_item=True,
             start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
         )
-        cls.sequential = ItemFactory.create(
+        cls.sequential = BlockFactory.create(
             parent=cls.chapter,
             category='sequential',
             display_name="Lesson",
@@ -375,14 +375,14 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
             metadata={'graded': True, 'format': 'Homework'},
         )
-        cls.vertical = ItemFactory.create(
+        cls.vertical = BlockFactory.create(
             parent=cls.sequential,
             category='vertical',
             display_name='Subsection',
             publish_item=True,
             start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
         )
-        cls.problem = ItemFactory.create(
+        cls.problem = BlockFactory.create(
             category="problem",
             parent=cls.vertical,
             display_name="A Problem Block",
@@ -3105,27 +3105,27 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         cls.course_with_invalid_ee = CourseFactory.create(entrance_exam_id='invalid_exam')
 
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
-            cls.entrance_exam = ItemFactory.create(
+            cls.entrance_exam = BlockFactory.create(
                 parent=cls.course,
                 category='chapter',
                 display_name='Entrance exam'
             )
-            subsection = ItemFactory.create(
+            subsection = BlockFactory.create(
                 parent=cls.entrance_exam,
                 category='sequential',
                 display_name='Subsection 1'
             )
-            vertical = ItemFactory.create(
+            vertical = BlockFactory.create(
                 parent=subsection,
                 category='vertical',
                 display_name='Vertical 1'
             )
-            cls.ee_problem_1 = ItemFactory.create(
+            cls.ee_problem_1 = BlockFactory.create(
                 parent=vertical,
                 category="problem",
                 display_name="Exam Problem - Problem 1"
             )
-            cls.ee_problem_2 = ItemFactory.create(
+            cls.ee_problem_2 = BlockFactory.create(
                 parent=vertical,
                 category="problem",
                 display_name="Exam Problem - Problem 2"
@@ -3938,15 +3938,15 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
 
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
-            cls.week1 = ItemFactory.create(due=cls.due)
-            cls.week2 = ItemFactory.create(due=cls.due)
-            cls.week3 = ItemFactory.create()  # No due date
+            cls.week1 = BlockFactory.create(due=cls.due)
+            cls.week2 = BlockFactory.create(due=cls.due)
+            cls.week3 = BlockFactory.create()  # No due date
             cls.course.children = [
                 str(cls.week1.location),
                 str(cls.week2.location),
                 str(cls.week3.location)
             ]
-            cls.homework = ItemFactory.create(
+            cls.homework = BlockFactory.create(
                 parent_location=cls.week1.location,
                 due=cls.due
             )
@@ -4120,15 +4120,15 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
 
         with self.store.bulk_operations(self.course.id, emit_signals=False):
-            self.week1 = ItemFactory.create(due=self.due)
-            self.week2 = ItemFactory.create(due=self.due)
-            self.week3 = ItemFactory.create()  # No due date
+            self.week1 = BlockFactory.create(due=self.due)
+            self.week2 = BlockFactory.create(due=self.due)
+            self.week3 = BlockFactory.create()  # No due date
             self.course.children = [
                 self.week1.location,
                 self.week2.location,
                 self.week3.location
             ]
-            self.homework = ItemFactory.create(
+            self.homework = BlockFactory.create(
                 parent_location=self.week1.location,
                 due=self.due
             )

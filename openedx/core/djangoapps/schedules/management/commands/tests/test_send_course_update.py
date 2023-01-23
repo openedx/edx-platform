@@ -22,7 +22,7 @@ from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -65,7 +65,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
 
         course = CourseFactory(highlights_enabled_for_messaging=True, self_paced=is_self_paced)
         with self.store.bulk_operations(course.id):
-            ItemFactory.create(parent=course, category='chapter', highlights=['highlights'])
+            BlockFactory.create(parent=course, category='chapter', highlights=['highlights'])
 
         enrollment = CourseEnrollmentFactory(course_id=course.id, user=self.user, mode='audit')
         assert enrollment.schedule.get_experience_type() == ScheduleExperience.EXPERIENCES.course_updates

@@ -26,7 +26,7 @@ from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_s
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -746,7 +746,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         course_url = reverse("course_topics", kwargs={"course_id": str(course.id)})
         # add some discussion xblocks
         for i in range(modules_count):
-            ItemFactory.create(
+            BlockFactory.create(
                 parent_location=course.location,
                 category='discussion',
                 discussion_id=f'id_module_{i}',
@@ -760,7 +760,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         """
         Build a discussion xblock in self.course
         """
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id=topic_id,
@@ -882,19 +882,19 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         Tests whether the new structure is available on old topics API
         (For mobile compatibility)
         """
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=chapter.location,
             category='sequential',
             display_name="Lesson 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=sequential.location,
             category='vertical',
             display_name='vertical',
@@ -942,20 +942,20 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
                 "usage_key": None,
             }}
         )
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
         self.verticals = [
-            ItemFactory.create(
+            BlockFactory.create(
                 parent_location=self.sequential.location,
                 category='vertical',
                 display_name='vertical',
@@ -2747,7 +2747,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         divided_course_wide_discussions = ['Topic B', ]
         divided_discussions = divided_inline_discussions + divided_course_wide_discussions
 
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.course,
             category='discussion',
             discussion_id=topic_name_to_id(self.course, 'Topic A'),
@@ -2971,7 +2971,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         self._assert_current_settings(expected_response)
 
         now = datetime.now()
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='Topic_A',

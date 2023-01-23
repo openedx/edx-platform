@@ -20,7 +20,7 @@ from openedx.core.lib.tests import attr
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBootstrapper
 from xmodule.modulestore.tests.utils import (
     DRAFT_MODULESTORE_SETUP,
@@ -217,7 +217,7 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
                     parent_id = _make_block_id(parent_type, idx // 2)
                 parent_item = getattr(self, parent_id)
                 block_id = _make_block_id(block_type, idx)
-                setattr(self, block_id, ItemFactory.create(
+                setattr(self, block_id, BlockFactory.create(
                     parent_location=parent_item.location,
                     category=block_type,
                     modulestore=store,

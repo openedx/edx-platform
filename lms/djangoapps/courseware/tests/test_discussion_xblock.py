@@ -18,7 +18,7 @@ from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 from xmodule.discussion_block import DiscussionXBlock, loader
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
+from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 
 from lms.djangoapps.course_api.blocks.tests.helpers import deserialize_usage_key
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
@@ -273,7 +273,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         cls.course_key = cls.course.id
         cls.course_usage_key = cls.store.make_course_usage_key(cls.course_key)
         cls.discussion_id = "test_discussion_xblock_id"
-        cls.discussion = ItemFactory.create(
+        cls.discussion = BlockFactory.create(
             parent_location=cls.course_usage_key,
             category='discussion',
             discussion_id=cls.discussion_id,
@@ -419,7 +419,7 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
 
         for counter in range(5):
             discussion_id = f'test_discussion_{counter}'
-            discussions.append(ItemFactory.create(
+            discussions.append(BlockFactory.create(
                 parent_location=course_usage_key,
                 category='discussion',
                 discussion_id=discussion_id,

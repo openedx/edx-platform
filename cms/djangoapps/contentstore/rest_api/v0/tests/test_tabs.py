@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 
 import ddt
 from django.urls import reverse
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import BlockFactory
 from xmodule.tabs import CourseTabList
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -43,7 +43,7 @@ class TabsAPITests(CourseTestCase):
         )
 
         # add a static tab to the course, for code coverage
-        self.test_tab = ItemFactory.create(
+        self.test_tab = BlockFactory.create(
             parent_location=self.course.location,
             category="static_tab",
             display_name="Static_1",

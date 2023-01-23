@@ -16,7 +16,7 @@ import cms.djangoapps.contentstore.views.component as views
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .utils import StudioPageTestCase
 
@@ -181,7 +181,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         creates an item in the module store, without publishing it.
         """
-        return ItemFactory.create(
+        return BlockFactory.create(
             parent_location=parent_location,
             category=category,
             display_name=display_name,

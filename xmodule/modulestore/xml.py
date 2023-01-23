@@ -639,7 +639,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                         else:
                             try:
                                 # get and update data field in xblock runtime
-                                module = system.load_item(loc)
+                                module = system.get_block(loc)
                                 for key, value in data_content.items():
                                     setattr(module, key, value)
                                 module.save()
@@ -653,7 +653,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                         # html file with html data content
                         html = f.read()
                         try:
-                            module = system.load_item(loc)
+                            module = system.get_block(loc)
                             module.data = html
                             module.save()
                         except ItemNotFoundError:

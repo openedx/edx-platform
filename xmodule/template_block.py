@@ -111,7 +111,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
         # cdodge: look up the template as a module
         template_loc = self.location.replace(category='custom_tag_template', name=template_name)
 
-        template_block = system.load_item(template_loc)
+        template_block = system.get_block(template_loc)
         template_block_data = template_block.data
         template = Template(template_block_data)
         return template.safe_substitute(params)

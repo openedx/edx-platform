@@ -54,7 +54,7 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase,
     upload_file_to_course,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.services import RebindUserServiceError
 from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
@@ -411,7 +411,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         request = self.request_factory.get('')
         request.user = self.mock_user
         course = CourseFactory()
-        descriptor = ItemFactory(category=block_type, parent=course)
+        descriptor = BlockFactory(category=block_type, parent=course)
         field_data_cache = FieldDataCache([self.toy_course, descriptor], self.toy_course.id, self.mock_user)
         # This is verifying that caching doesn't cause an error during get_module_for_descriptor, which
         # is why it calls the method twice identically.
@@ -467,7 +467,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         request.user = self.mock_user
         course = CourseFactory.create()
 
-        descriptor = ItemFactory(category="html", parent=course)
+        descriptor = BlockFactory(category="html", parent=course)
         if block_category == 'test_aside':
             descriptor = create_aside(descriptor, "test_aside")
 
@@ -713,7 +713,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
     def test_score_without_student_state(self):
         course = CourseFactory.create()
-        block = ItemFactory.create(category='stateless_scorer', parent=course)
+        block = BlockFactory.create(category='stateless_scorer', parent=course)
 
         request = self.request_factory.post(
             'dummy_url',
@@ -746,7 +746,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     def test_completion_events_with_completion_disabled(self, signal, data):
         with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, False):
             course = CourseFactory.create()
-            block = ItemFactory.create(category='comp', parent=course)
+            block = BlockFactory.create(category='comp', parent=course)
             request = self.request_factory.post(
                 '/',
                 data=json.dumps(data),
@@ -768,7 +768,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     def test_completion_signal_for_completable_xblock(self):
         with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
-            block = ItemFactory.create(category='comp', parent=course)
+            block = BlockFactory.create(category='comp', parent=course)
 
             response = self.make_xblock_callback_response(
                 {'completion': 0.625}, course, block, 'complete'
@@ -786,7 +786,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         test get_aside_from_xblock called
         """
         course = CourseFactory.create()
-        block = ItemFactory.create(category='comp', parent=course)
+        block = BlockFactory.create(category='comp', parent=course)
         request = self.request_factory.post(
             '/',
             data=json.dumps({'completion': 0.625}),
@@ -848,7 +848,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     def test_progress_signal_ignored_for_completable_xblock(self):
         with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
-            block = ItemFactory.create(category='comp', parent=course)
+            block = BlockFactory.create(category='comp', parent=course)
 
             response = self.make_xblock_callback_response(
                 {}, course, block, 'progress'
@@ -861,7 +861,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     def test_progress_signal_processed_for_xblock_without_completion_api(self):
         with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
-            block = ItemFactory.create(category='no_comp', parent=course)
+            block = BlockFactory.create(category='no_comp', parent=course)
 
             response = self.make_xblock_callback_response(
                 {}, course, block, 'progress'
@@ -875,7 +875,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     def test_skip_handlers_for_masquerading_staff(self):
         with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
-            block = ItemFactory.create(category='comp', parent=course)
+            block = BlockFactory.create(category='comp', parent=course)
             request = self.request_factory.post(
                 '/',
                 data=json.dumps({'completion': 0.8}),
@@ -908,7 +908,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         }
         request = self.request_factory.get('/')
         request.user = AnonymousUser()
-        descriptor = ItemFactory.create(**descriptor_kwargs)
+        descriptor = BlockFactory.create(**descriptor_kwargs)
 
         render.handle_xblock_callback(
             request,
@@ -933,7 +933,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             'category': 'sequential',
             'parent': course,
         }
-        descriptor = ItemFactory.create(**descriptor_kwargs)
+        descriptor = BlockFactory.create(**descriptor_kwargs)
         usage_id = str(descriptor.location)
 
         # Send no special parameters, which will be invalid, but we don't care
@@ -1421,17 +1421,17 @@ class TestGatedSubsectionRendering(ModuleStoreTestCase, MilestonesTestCaseMixin)
         super().setUp()
 
         self.course = CourseFactory.create(enable_subsection_gating=True)
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent=self.course,
             category="chapter",
             display_name="Chapter"
         )
-        self.open_seq = ItemFactory.create(
+        self.open_seq = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name="Open Sequential"
         )
-        self.gated_seq = ItemFactory.create(
+        self.gated_seq = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name="Gated Sequential"
@@ -1504,7 +1504,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.rewrite_link = '<a href="/static/foo/content">Test rewrite</a>'
         self.rewrite_bad_link = '<img src="/static//file.jpg" />'
         self.course_link = '<a href="/course/bar/content">Test course rewrite</a>'
-        self.descriptor = ItemFactory.create(
+        self.descriptor = BlockFactory.create(
             category='html',
             data=self.content_string + self.rewrite_link + self.rewrite_bad_link + self.course_link
         )
@@ -1649,7 +1649,7 @@ class JsonInitDataTest(ModuleStoreTestCase):
         mock_request = MagicMock()
         mock_request.user = mock_user
         course = CourseFactory()
-        descriptor = ItemFactory(category='withjson', parent=course)
+        descriptor = BlockFactory(category='withjson', parent=course)
         field_data_cache = FieldDataCache([course, descriptor], course.id, mock_user)
         module = render.get_module_for_descriptor(
             mock_user,
@@ -1704,7 +1704,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
             options=['Correct', 'Incorrect'],
             correct_option='Correct'
         )
-        self.descriptor = ItemFactory.create(
+        self.descriptor = BlockFactory.create(
             category='problem',
             data=problem_xml,
             display_name='Option Response Problem'
@@ -1757,7 +1757,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
             </optionresponse>
         </problem>
         """
-        problem_descriptor = ItemFactory.create(
+        problem_descriptor = BlockFactory.create(
             category='problem',
             data=problem_xml
         )
@@ -1781,7 +1781,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
     def test_staff_debug_info_disabled_for_detached_blocks(self):
         """Staff markup should not be present on detached blocks."""
 
-        descriptor = ItemFactory.create(
+        descriptor = BlockFactory.create(
             category='detached-block',
             display_name='Detached Block'
         )
@@ -1813,7 +1813,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
     def test_histogram_enabled_for_unscored_xmodules(self):
         """Histograms should not display for xmodules which are not scored."""
 
-        html_descriptor = ItemFactory.create(
+        html_descriptor = BlockFactory.create(
             category='html',
             data='Here are some course details.'
         )
@@ -2020,7 +2020,7 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
         if problem_display_name:
             descriptor_kwargs['display_name'] = problem_display_name
 
-        descriptor = ItemFactory.create(**descriptor_kwargs)
+        descriptor = BlockFactory.create(**descriptor_kwargs)
         mock_tracker_for_context = MagicMock()
         with patch('lms.djangoapps.courseware.module_render.tracker', mock_tracker_for_context), patch(
             'xmodule.services.tracker', mock_tracker_for_context
@@ -2157,8 +2157,8 @@ class TestRebindModule(TestSubmittingProblems):
     def setUp(self):
         super().setUp()
         self.homework = self.add_graded_section_to_course('homework')
-        self.lti = ItemFactory.create(category='lti', parent=self.homework)
-        self.problem = ItemFactory.create(category='problem', parent=self.homework)
+        self.lti = BlockFactory.create(category='lti', parent=self.homework)
+        self.problem = BlockFactory.create(category='problem', parent=self.homework)
         self.user = UserFactory.create()
         self.anon_user = AnonymousUser()
 
@@ -2247,7 +2247,7 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
         request = self.request_factory.get('')
         request.user = self.mock_user
         course = CourseFactory()
-        descriptor = ItemFactory(category='xblock', parent=course)
+        descriptor = BlockFactory(category='xblock', parent=course)
         field_data_cache = FieldDataCache([course, descriptor], course.id, self.mock_user)
         block = render.get_module(self.mock_user, request, descriptor.location, field_data_cache)
 
@@ -2290,7 +2290,7 @@ class LMSXBlockServiceMixin(SharedModuleStoreTestCase):
         self.student_data = Mock()
         self.track_function = Mock()
         self.request_token = Mock()
-        self.descriptor = ItemFactory(category="pure", parent=self.course)
+        self.descriptor = BlockFactory(category="pure", parent=self.course)
         self._prepare_runtime()
 
 
@@ -2524,11 +2524,11 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
         """
         Instantiate an XBlock with the appropriate set of children.
         """
-        self.parent = ItemFactory(category='xblock', parent=self.course)
+        self.parent = BlockFactory(category='xblock', parent=self.course)
 
         # Create a child for each user
         self.children_for_user = {
-            user: ItemFactory(category='xblock', parent=self.parent).scope_ids.usage_id  # lint-amnesty, pylint: disable=no-member
+            user: BlockFactory(category='xblock', parent=self.parent).scope_ids.usage_id  # lint-amnesty, pylint: disable=no-member
             for user in self.users.values()
         }
 
@@ -2625,7 +2625,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         Returns the item's usage_id.
         """
         if not item_id:
-            item = ItemFactory(category=category, parent=course)
+            item = BlockFactory(category=category, parent=course)
             item_id = item.scope_ids.usage_id  # lint-amnesty, pylint: disable=no-member
 
         item = self.store.get_item(item_id)
@@ -2653,8 +2653,8 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         number = 'LmsModuleShimTest'
         run = '2021_Fall'
         cls.course = CourseFactory.create(org=org, number=number, run=run)
-        cls.descriptor = ItemFactory(category="vertical", parent=cls.course)
-        cls.problem_descriptor = ItemFactory(category="problem", parent=cls.course)
+        cls.descriptor = BlockFactory(category="vertical", parent=cls.course)
+        cls.problem_descriptor = BlockFactory(category="problem", parent=cls.course)
 
     def setUp(self):
         """
@@ -2883,7 +2883,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     @XBlock.register_temp_plugin(PureXBlock, 'pure')
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
     def test_course_id(self):
-        descriptor = ItemFactory(category="pure", parent=self.course)
+        descriptor = BlockFactory(category="pure", parent=self.course)
 
         block = render.get_module(self.user, Mock(), descriptor.location, None)
         assert str(block.runtime.course_id) == self.COURSE_ID

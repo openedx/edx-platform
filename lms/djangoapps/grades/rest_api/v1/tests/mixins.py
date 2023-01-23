@@ -7,7 +7,7 @@ from datetime import datetime
 
 from pytz import UTC
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -127,7 +127,7 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
         course = CourseFactory.create(display_name=display_name, run=run)
         _ = CourseOverviewFactory.create(id=course.id)
 
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             category='chapter',
             parent_location=course.location,
             display_name="Chapter 1",
@@ -136,7 +136,7 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
         # A section is not considered if the student answers less than "min_count" problems
         for grading_type, min_count in (("Homework", 12), ("Lab", 12), ("Midterm Exam", 1), ("Final Exam", 1)):
             for num in range(min_count):
-                section = ItemFactory.create(
+                section = BlockFactory.create(
                     category='sequential',
                     parent_location=chapter.location,
                     due=datetime(2017, 12, 18, 11, 30, 00),
@@ -144,12 +144,12 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
                     format=grading_type,
                     graded=True,
                 )
-                vertical = ItemFactory.create(
+                vertical = BlockFactory.create(
                     category='vertical',
                     parent_location=section.location,
                     display_name=f'Vertical {grading_type} {num}',
                 )
-                ItemFactory.create(
+                BlockFactory.create(
                     category='problem',
                     parent_location=vertical.location,
                     display_name=f'Problem {grading_type} {num}',
