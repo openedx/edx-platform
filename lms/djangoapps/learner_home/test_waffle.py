@@ -13,7 +13,11 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 @ddt.ddt
-class TestWaffle(SharedModuleStoreTestCase):
+class TestLearnerHomeRedirect(SharedModuleStoreTestCase):
+    """
+    Tests for should_redirect_to_learner_home, used for experimental rollout.
+    """
+
     def setUp(self):
         super().setUp()
 
