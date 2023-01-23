@@ -167,17 +167,45 @@ def confirm_name_change(user, pending_name_change):
     pending_name_change.delete()
 
 
+def retrieve_skills_builder_metadata(user):
+    """
+    If present, this function retrieves a learner's Skills Builder data. Data is retrieved from the meta field of the
+    UserProfile.
+    """
+    log.info(f"Retrieving skills builder data for user [{user.id}] ")
+
+    skills_data = None
+    try:
+        user_profile = _UserProfile.objects.get(user=user)
+    except _UserProfile.DoesNotExist:
+        log.error(
+            f"Error occurred retrieving skills builder data. Could not find User Profile for user with id [{user.id}]"
+        )
+        return skills_data
+
+    if user_profile:
+        meta = user_profile.get_meta()
+        skills_data = meta.get('skills_builder', None)
+
+    return skills_data
+
+
 def store_skills_builder_metadata(user, skills_data):
     """
-    Stores a learner's "learning goal" from the Skills Builder. Data is stored in the meta field of the UserProfile.
+    Stores a learner's data from the Skills Builder. Data is stored in the meta field of the UserProfile.
     """
-    log.info(f"Updating learning goal for user [{user.id}]")
+    log.info(f"Updating skills builder data for user [{user.id}]")
 
-    # store data in the profile metadata
-    user_profile = _UserProfile.objects.get(user=user)
+    try:
+        user_profile = _UserProfile.objects.get(user=user)
+    except _UserProfile.DoesNotExist:
+        log.error(
+            f"Error occurred saving skills builder data. Could not find User Profile for user with id [{user.id}]"
+        )
+
     if user_profile:
         meta = user_profile.get_meta()
         skills_data['date'] = datetime.datetime.now(UTC).isoformat()
         meta['skills_builder'] = skills_data
-    user_profile.set_meta(meta)
-    user_profile.save()
+        user_profile.set_meta(meta)
+        user_profile.save()

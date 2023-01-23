@@ -55,6 +55,7 @@ from common.djangoapps.student.models_api import (
     confirm_name_change,
     do_name_change_request,
     get_pending_name_change,
+    retrieve_skills_builder_metadata,
     store_skills_builder_metadata,
 )
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
@@ -523,10 +524,21 @@ class NameChangeView(ViewSet):
 
 class SkillsBuilderView(ViewSet):
     """
-    Learning Goal viewset. This facilitates the storing of learner data for the "Skills Builder".
+    Learning Goal viewset. This facilitates the retrieval and storing of learner data from the "Skills Builder".
     """
     authentication_classes = (JwtAuthentication, SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request):
+        """
+        GET /api/user/v1/accounts/skills/
+        """
+        user = request.user
+        skills_data = retrieve_skills_builder_metadata(user)
+        if skills_data:
+            return Response(skills_data, status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         """
@@ -535,7 +547,6 @@ class SkillsBuilderView(ViewSet):
         Responsible for storing learner metadata captured by the SkillsBuilder feature. This endpoint will capture the
         user's learning goal specified when using the SkillsBuilder.
         """
-        import pdb; pdb.set_trace()
         user = request.user
         skills_data = request.data.get('skills_builder', None)
 
