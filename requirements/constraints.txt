@@ -73,6 +73,8 @@ pycodestyle<2.9.0
 # and snowflake-connector-python>2.8.0 is released.
 pyopenssl==22.0.0
 
+# pytz>2022.2.1 causes test failures in edx-platform
+pytz==2022.2.1
 
 # right now lots of packages have major upgrades and lots of tests failing.
 # so adding following constraints and will unpin one by one.
