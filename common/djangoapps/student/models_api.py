@@ -165,3 +165,19 @@ def confirm_name_change(user, pending_name_change):
     user_profile.name = pending_name_change.new_name
     user_profile.save()
     pending_name_change.delete()
+
+
+def store_skills_builder_metadata(user, skills_data):
+    """
+    Stores a learner's "learning goal" from the Skills Builder. Data is stored in the meta field of the UserProfile.
+    """
+    log.info(f"Updating learning goal for user [{user.id}]")
+
+    # store data in the profile metadata
+    user_profile = _UserProfile.objects.get(user=user)
+    if user_profile:
+        meta = user_profile.get_meta()
+        skills_data['date'] = datetime.datetime.now(UTC).isoformat()
+        meta['skills_builder'] = skills_data
+    user_profile.set_meta(meta)
+    user_profile.save()

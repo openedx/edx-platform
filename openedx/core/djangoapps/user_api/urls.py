@@ -14,10 +14,12 @@ from .accounts.views import (
     AccountRetirementStatusView,
     AccountRetirementView,
     AccountViewSet,
+    CancelAccountRetirementStatusView,
     DeactivateLogoutView,
     LMSAccountRetirementView,
     NameChangeView,
-    UsernameReplacementView, CancelAccountRetirementStatusView
+    SkillsBuilderView,
+    UsernameReplacementView,
 )
 from .learner_skill_levels.views import LearnerSkillLevelsView
 from . import views as user_api_views
@@ -52,6 +54,10 @@ REQUEST_NAME_CHANGE = NameChangeView.as_view({
 
 CONFIRM_NAME_CHANGE = NameChangeView.as_view({
     'post': 'confirm'
+})
+
+SKILLS_BUILDER = SkillsBuilderView.as_view({
+    'post': 'post',
 })
 
 PARTNER_REPORT = AccountRetirementPartnerReportView.as_view({
@@ -136,6 +142,9 @@ urlpatterns = [
         fr'^v1/accounts/name_change/{settings.USERNAME_PATTERN}/confirm/$',
         CONFIRM_NAME_CHANGE,
         name='confirm_name_change'
+    ),
+    path(
+        'v1/accounts/skills/', SKILLS_BUILDER, name='skills_builder'
     ),
     re_path(
         fr'^v1/accounts/{settings.USERNAME_PATTERN}/verification_status/$',

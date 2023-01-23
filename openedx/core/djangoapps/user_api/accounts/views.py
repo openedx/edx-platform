@@ -51,7 +51,12 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     is_email_retired,
     is_username_retired
 )
-from common.djangoapps.student.models_api import confirm_name_change, do_name_change_request, get_pending_name_change
+from common.djangoapps.student.models_api import (
+    confirm_name_change,
+    do_name_change_request,
+    get_pending_name_change,
+    store_skills_builder_metadata,
+)
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
@@ -514,6 +519,31 @@ class NameChangeView(ViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class SkillsBuilderView(ViewSet):
+    """
+    Learning Goal viewset. This facilitates the storing of learner data for the "Skills Builder".
+    """
+    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        """
+        POST /api/user/v1/accounts/skills/
+
+        Responsible for storing learner metadata captured by the SkillsBuilder feature. This endpoint will capture the
+        user's learning goal specified when using the SkillsBuilder.
+        """
+        import pdb; pdb.set_trace()
+        user = request.user
+        skills_data = request.data.get('skills_builder', None)
+
+        if skills_data:
+            store_skills_builder_metadata(user, skills_data)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class AccountDeactivationView(APIView):
