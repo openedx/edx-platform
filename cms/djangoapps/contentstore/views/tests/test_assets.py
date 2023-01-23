@@ -26,6 +26,7 @@ from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: 
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 
@@ -47,6 +48,7 @@ class AssetsTestCase(CourseTestCase):
 
     def setUp(self):
         super().setUp()
+        self.course = CourseFactory(default_store='split')
         self.url = reverse_course_url('assets_handler', self.course.id)
 
     def upload_asset(self, name="asset-1", asset_type='text'):

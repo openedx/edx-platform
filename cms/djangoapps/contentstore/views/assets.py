@@ -406,6 +406,9 @@ def _upload_asset(request, course_key):
     if course_exists_error is not None:
         return course_exists_error
 
+    if course_key.deprecated:
+        return JsonResponse({'error': 'Uploading assets for the legacy course is not available.'}, status=400)
+
     # compute a 'filename' which is similar to the location formatting, we're
     # using the 'filename' nomenclature since we're using a FileSystem paradigm
     # here. We're just imposing the Location string formatting expectations to
