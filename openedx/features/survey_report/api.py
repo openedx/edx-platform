@@ -2,6 +2,7 @@
 Contains the logic to manage survey report model.
 """
 import requests
+import hashlib
 
 from django.conf import settings
 from django.forms.models import model_to_dict
@@ -54,6 +55,13 @@ def generate_report() -> None:
     return survey_report.id
 
 
+def get_id() -> str:
+    """ Generate id for the survey report."""
+    if not settings.ANONYMOUS_SURVEY_REPORT:
+        return settings.LMS_BASE
+    return hashlib.sha256(settings.LMS_BASE.encode('utf-8')).hexdigest()
+
+
 def send_report_to_external_api(report_id: int) -> None:
     """
     Send a report to Openedx endpoint and save the response in the SurveyReportUpload model.
@@ -82,6 +90,7 @@ def send_report_to_external_api(report_id: int) -> None:
     ]
 
     data = model_to_dict(report, fields=fields)
+    data["id"] = get_id()
     data["extra_data"] = report.extra_data
     data["created_at"] = report.created_at.strftime("%m-%d-%Y %H:%M:%S")
 
