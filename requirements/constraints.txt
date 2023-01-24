@@ -67,14 +67,10 @@ markdown<3.4.0
 # Constraint can be removed once the issue https://github.com/PyCQA/pycodestyle/issues/1090 is fixed.
 pycodestyle<2.9.0
 
-# pyopenssl>22.0.0 requires cryptography>=38.0 && conflicts with snowflak-connector-python requires cryptography<37
-# which causes the requirements upgrade job to fail due to constraint conflict
-# This constraint can be removed once https://github.com/snowflakedb/snowflake-connector-python/issues/1259 is resolved
-# and snowflake-connector-python>2.8.0 is released.
-pyopenssl==22.0.0
+
+# snowflake connector python 2.9.0 requires cryptography <39.0.0. This constraint has been relaxed on master but newer version hasn't been released yet on PyPI.
+# We have to put constraint on cryptography here to avoid different versions of cryptography in different requirement files.
+# This constraint can be removed once newer version of snowflake connector python is released.
+cryptography<39.0.0 
 
 
-# right now lots of packages have major upgrades and lots of tests failing.
-# so adding following constraints and will unpin one by one.
-
-cryptography==38.0.4 # greater version has some issues.
