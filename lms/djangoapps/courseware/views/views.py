@@ -44,6 +44,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
+from token_utils.api import unpack_token_for
 from web_fragments.fragment import Fragment
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
@@ -107,6 +108,7 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course,
     is_user_eligible_for_credit
 )
+from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -1484,6 +1486,33 @@ def enclosing_sequence_for_gating_checks(block):
         return block.runtime.get_block(ancestor.location)
     return None
 
+def _check_sequence_exam_access(request, location):
+    """
+    Checks the client request for an exam access token for a sequence.
+    Exam access is always granted at the sequence block. This method of gating is
+    only used by the edx-exams system and NOT edx-proctoring.
+    """
+    if not exams_ida_enabled(location.course_key):
+        return True
+
+    if request.user.is_staff or is_masquerading_as_specific_student(request.user, location.course_key):
+        return True
+
+    exam_access_token = request.COOKIES.get(settings.EXAM_ACCESS_TOKEN_COOKIE)
+    if exam_access_token:
+        try:
+            exam_access_unpacked = unpack_token_for(exam_access_token, request.user.id)
+        except:
+            log.exception("Failed to validate exam access token")
+            return False
+
+        return (
+            str(location) == exam_access_unpacked.get('content_id')
+            and request.user.id == exam_access_unpacked.get('lms_user_id')
+        )
+
+    return False
+
 
 @require_http_methods(["GET", "POST"])
 @ensure_valid_usage_key
@@ -1583,6 +1612,16 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                     )
                 )
 
+        # For courses using the edx-exams service:
+        # Access to exam content is determined by edx-exams and passed the the LMS using a
+        # signed JWT. There is no longer a need for exam gating or logic inside the
+        # sequence block or its render call. As a result decendants_are_gated will not return
+        # true for these exams
+        exam_block = ancestor_sequence_block if ancestor_sequence_block else block
+        if getattr(exam_block, 'is_time_limited', None):
+            if not _check_sequence_exam_access(request, exam_block):
+                return HttpResponseForbidden("Access to exam content is restricted")
+            
         fragment = block.render(requested_view, context=student_view_context)
         optimization_flags = get_optimization_flags_for_content(block, fragment)
 
