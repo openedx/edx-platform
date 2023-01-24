@@ -14,6 +14,8 @@ runs:
         echo "unit_test_paths=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} )" >> $GITHUB_ENV
 
     - name: run tests
+      env:
+        TEST_SUITE: ${{ matrix.shard_name }}
       shell: bash
       run: |
         python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}

@@ -77,8 +77,8 @@ jobs:
       - name: Upload coverage
         uses: actions/upload-artifact@v2
         with:
-          name: coverage${{ matrix.shard_name }}
-          path: .coverage
+          name: coverage
+          path: reports/${{matrix.shard_name}}.coverage
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
@@ -142,6 +142,9 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v2
+        with:
+          name: coverage
+          path: reports
 
       - name: Install Python dependencies
         run: |
@@ -149,7 +152,7 @@ jobs:
 
       - name: Run coverage
         run: |
-          coverage combine coverage*/.coverage*
+          coverage combine reports/
           coverage report
           coverage xml
       - uses: codecov/codecov-action@v1
