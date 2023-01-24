@@ -78,7 +78,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: coverage${{ matrix.shard_name }}
-          path: coverage
+          path: .coverage
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
@@ -149,7 +149,7 @@ jobs:
 
       - name: Run coverage
         run: |
-          coverage combine /home/runner/work/edx-platform/edx-platform/
+          coverage combine coverage*/.coverage*
           coverage report
           coverage xml
       - uses: codecov/codecov-action@v1
