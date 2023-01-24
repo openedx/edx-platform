@@ -158,7 +158,8 @@ from openedx.core.release import RELEASE_LINE
           revision: "${context_course.location.branch | n, js_escaped_string}",
           self_paced: ${ context_course.self_paced | n, dump_js_escaped_json },
           is_custom_relative_dates_active: ${CUSTOM_RELATIVE_DATES.is_enabled(context_course.id) | n, dump_js_escaped_json},
-          start: ${context_course.start | n, dump_js_escaped_json}
+          start: ${context_course.start | n, dump_js_escaped_json},
+          discussions_settings: ${context_course.discussions_settings | n, dump_js_escaped_json}
         });
       </script>
     % endif

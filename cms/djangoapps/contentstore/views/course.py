@@ -34,7 +34,6 @@ from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
 
-from cms.djangoapps.contentstore.utils import mark_verticals_discussion_enabled
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -67,7 +66,6 @@ from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
@@ -725,11 +723,6 @@ def course_index(request, course_key):
         # gather any errors in the currently stored proctoring settings.
         advanced_dict = CourseMetadata.fetch(course_block)
         proctoring_errors = CourseMetadata.validate_proctoring_settings(course_block, advanced_dict, request.user)
-
-        configuration = DiscussionsConfiguration.get(course_key)
-        provider = configuration.provider_type
-        if provider == Provider.OPEN_EDX:
-            mark_verticals_discussion_enabled(course_structure, course_key)
 
         return render_to_response('course_outline.html', {
             'language_code': request.LANGUAGE_CODE,
