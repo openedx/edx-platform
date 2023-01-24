@@ -1944,13 +1944,12 @@ def get_organizations(user):
     """
     Returns the list of organizations for which the user is allowed to create courses.
     """
-    course_creator = CourseCreator.objects.filter(user=user)
+    course_creator = CourseCreator.objects.filter(user=user).first()
     if not course_creator:
         return []
-    elif course_creator[0].all_organizations:
+    elif course_creator.all_organizations:
         organizations = Organization.objects.all().values_list('short_name', flat=True)
     else:
-        # User is defined to be unique, can assume a single entry.
-        organizations = course_creator[0].organizations.all().values_list('short_name', flat=True)
+        organizations = course_creator.organizations.all().values_list('short_name', flat=True)
 
     return organizations
