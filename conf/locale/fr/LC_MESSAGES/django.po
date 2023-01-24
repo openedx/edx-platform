@@ -1,10 +1,10 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Abdessamad Derraz <derraz.abdessamad@gmail.com>, 2021
+# Abdessamad Derraz <derraz.abdessamad@gmail.com>, 2021,2023
 # Alexandre DS <alexandre@cleverm8.com>, 2020
 # alexis swyngedauw, 2022
 # anaseha <anaselhadjamor@gmail.com>, 2014
@@ -68,6 +68,7 @@
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013-2014
 # Pierre-André Mudry <pmudry@gmail.com>, 2020
+# Pierre Mailhot <pierre.mailhot@gmail.com>, 2023
 # qcappart <quentin.c@swing.be>, 2014
 # qcappart <quentin.c@swing.be>, 2014
 # rafcha <raphael.chay@gmail.com>, 2014-2015,2018-2019
@@ -93,7 +94,7 @@
 # d6910e756eb8532754192e6021dc9f83, 2014-2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -146,12 +147,12 @@
 # d6910e756eb8532754192e6021dc9f83, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Abdenour AMGHAR <abdenour.amghar@unicoorp.com>, 2019
-# Abdessamad Derraz <derraz.abdessamad@gmail.com>, 2021
+# Abdessamad Derraz <derraz.abdessamad@gmail.com>, 2021,2023
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # Alexandre DS <alexandre@cleverm8.com>, 2020
 # alexis swyngedauw, 2022
@@ -213,6 +214,7 @@
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013-2014
+# Pierre Mailhot <pierre.mailhot@gmail.com>, 2023
 # Pierre Rudloff <prudloff@animafac.net>, 2017
 # Pyrog <pyrog@laposte.net>, 2017
 # qcappart <quentin.c@swing.be>, 2014
@@ -233,7 +235,7 @@
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -287,7 +289,7 @@
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -303,9 +305,9 @@
 # Sarina Canelake <sarina@tcril.org>, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from French (https://www.transifex.com/open-edx/teams/6205/fr/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Alexandre DS <alexandre@cleverm8.com>, 2020
@@ -314,7 +316,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-18 20:42+0000\n"
+"POT-Creation-Date: 2023-01-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Alexandre DS <alexandre@cleverm8.com>, 2020\n"
 "Language-Team: French (https://www.transifex.com/open-edx/teams/6205/fr/)\n"
@@ -2530,7 +2532,7 @@ msgid "Cookie Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Data"
+msgid "Do Not Sell My Personal Information"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -7463,7 +7465,7 @@ msgstr "Une cohorte avec le même nom existe déjà."
 
 #: openedx/core/djangoapps/course_live/models.py
 msgid "If disabled, the LTI in the associated course will be disabled."
-msgstr "S&#39;il est désactivé, le LTI du cours associé sera désactivé."
+msgstr "S'il est désactivé, le LTI du cours associé sera désactivé."
 
 #: openedx/core/djangoapps/course_live/models.py
 msgid "The LTI configuration data for this course/provider."
@@ -17325,7 +17327,7 @@ msgstr "Partager avec ses amis et sa famille !"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {account} {url}"
-msgstr "Je viens de m&#39;inscrire à {number} {title} via {account} {url}"
+msgstr "Je viens de m'inscrire à {number} {title} via {account} {url}"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
@@ -20096,7 +20098,7 @@ msgstr "Ajouter un coach CCX"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "To use the email tool, visit the"
-msgstr "Pour utiliser l&#39;outil de messagerie, visitez le"
+msgstr "Pour utiliser l'outil de messagerie, visitez le"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "new experience"

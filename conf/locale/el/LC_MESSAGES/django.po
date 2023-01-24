@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -23,7 +23,7 @@
 # kafroulitsa <zasimak@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -36,7 +36,7 @@
 # Zacharias Sdregas <azdrax@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -55,7 +55,7 @@
 # Vassia Kouremenou <Vassiacat@hotmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -68,7 +68,7 @@
 # Nick Gikopoulos, 2014-2015
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -80,9 +80,9 @@
 # SYMI PASALIDOU <simipass@hotmail.com>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (https://www.transifex.com/open-edx/teams/6205/el/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -91,7 +91,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-18 20:42+0000\n"
+"POT-Creation-Date: 2023-01-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Greek (https://www.transifex.com/open-edx/teams/6205/el/)\n"
@@ -2093,7 +2093,7 @@ msgid "Cookie Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Data"
+msgid "Do Not Sell My Personal Information"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
