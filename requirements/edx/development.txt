@@ -93,7 +93,7 @@ billiard==3.6.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   celery
-bleach[css]==6.0.0
+bleach[css]==5.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1005,7 +1005,7 @@ openedx-events==4.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
-openedx-filters==1.0.0
+openedx-filters==0.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
