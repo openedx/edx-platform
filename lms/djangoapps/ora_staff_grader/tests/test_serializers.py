@@ -106,6 +106,7 @@ class TestOpenResponseMetadataSerializer(TestCase):
             ],
             "teams_enabled": False,
             "text_response": None,
+            "text_response_editor": "text",
             "file_upload_response": None,
             **test_data.example_rubric,
         }
@@ -121,6 +122,7 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "prompts": self.ora_data["prompts"],
             "type": "individual",
             "textResponseConfig": "none",
+            "textResponseEditor": "text",
             "fileUploadResponseConfig": "none",
             "rubricConfig": {
                 "feedbackPrompt": "How did this student do?",
@@ -155,6 +157,7 @@ class TestOpenResponseMetadataSerializer(TestCase):
             "prompts": self.ora_data["prompts"],
             "type": "team",
             "textResponseConfig": "none",
+            "textResponseEditor": "text",
             "fileUploadResponseConfig": "none",
             "rubricConfig": {
                 "feedbackPrompt": "How did this student do?",
@@ -198,6 +201,16 @@ class TestOpenResponseMetadataSerializer(TestCase):
 
         assert data["textResponseConfig"] == "none"
         assert data["fileUploadResponseConfig"] == "none"
+
+    @ddt.data("text", "tinymce")
+    def test_text_response_editor_config(self, text_response_editor):
+        # Currently allowed types are "text" and "tinymce" for student text responses.
+        # Text is set as default
+        self.mock_ora_instance.text_response_editor = text_response_editor
+
+        data = OpenResponseMetadataSerializer(self.mock_ora_instance).data
+
+        assert data["textResponseEditor"] == text_response_editor
 
 
 class TestSubmissionMetadataSerializer(TestCase):

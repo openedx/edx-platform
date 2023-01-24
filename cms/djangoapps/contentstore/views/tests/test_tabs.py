@@ -1,5 +1,6 @@
 """ Tests for tab functions (just primitive). """
 
+
 import json
 import random
 
@@ -9,7 +10,7 @@ from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views import tabs
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTabList  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -26,15 +27,12 @@ class TabsPageTests(CourseTestCase):
         # Set the URL for tests
         self.url = reverse_course_url('tabs_handler', self.course.id)
 
-        # add 4 static tabs to the course, for code coverage
-        self.test_tabs = []
-        for i in range(1, 5):
-            tab = ItemFactory.create(
-                parent_location=self.course.location,
-                category="static_tab",
-                display_name=f"Static_{i}"
-            )
-        self.test_tabs.append(tab)
+        # add a static tab to the course, for code coverage
+        self.test_tab = BlockFactory.create(
+            parent_location=self.course.location,
+            category="static_tab",
+            display_name="Static_1"
+        )
         self.reload_course()
 
     def check_invalid_tab_id_response(self, resp):
@@ -95,7 +93,7 @@ class TabsPageTests(CourseTestCase):
         # Remove one tab randomly. This shouldn't delete the tab.
         tabs_data.pop()
 
-        # post the request with the reordered static tabs only
+        # post the request
         resp = self.client.ajax_post(
             self.url,
             data={
@@ -167,7 +165,7 @@ class TabsPageTests(CourseTestCase):
         """
         Verify that the static tab renders itself with the correct HTML
         """
-        preview_url = f'/xblock/{self.test_tabs[0].location}/{STUDENT_VIEW}'
+        preview_url = f'/xblock/{self.test_tab.location}/{STUDENT_VIEW}'
 
         resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
         assert resp.status_code == 200

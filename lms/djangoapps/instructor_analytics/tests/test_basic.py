@@ -51,7 +51,9 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.students_who_may_enroll = list(self.users) + [UserFactory() for _ in range(5)]
         for student in self.students_who_may_enroll:
             CourseEnrollmentAllowed.objects.create(
-                email=student.email, course_id=self.course_key
+                email=student.email,
+                course_id=self.course_key,
+                user=student if student in self.users else None,
             )
 
     @ddt.data(
@@ -180,7 +182,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             assert userreport['verification_status'] in ['N/A']
         # make sure that the user report respects whatever value
         # is returned by verification and enrollment code
-        with patch("common.djangoapps.student.models.CourseEnrollment.enrollment_mode_for_user") as enrollment_patch:
+        MODE_MTHD_NAME = "common.djangoapps.student.models.course_enrollment.CourseEnrollment.enrollment_mode_for_user"
+        with patch(MODE_MTHD_NAME) as enrollment_patch:
             with patch(
                 "lms.djangoapps.verify_student.services.IDVerificationService.verification_status_for_user"
             ) as verify_patch:

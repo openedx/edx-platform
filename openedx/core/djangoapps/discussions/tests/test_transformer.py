@@ -3,11 +3,14 @@ Tests for discussions course block transformer
 """
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import TransformerRegistryTestMixin
-from openedx.core.djangoapps.discussions.models import DEFAULT_PROVIDER_TYPE, DiscussionTopicLink
+from openedx.core.djangoapps.discussions.models import (
+    DiscussionTopicLink,
+    get_default_provider_type,
+)
 from openedx.core.djangoapps.discussions.transformers import DiscussionsTopicLinkTransformer
 
 
@@ -21,15 +24,15 @@ class DiscussionsTopicLinkTransformerTestCase(TransformerRegistryTestMixin, Modu
         super().setUp()
         self.test_topic_id = 'test-topic-id'
         self.course = CourseFactory.create()
-        section = ItemFactory.create(
+        section = BlockFactory.create(
             parent_location=self.course.location,
             category="chapter",
         )
-        subsection1 = ItemFactory.create(
+        subsection1 = BlockFactory.create(
             parent_location=section.location,
             category="sequential",
         )
-        self.discussable_unit = ItemFactory.create(
+        self.discussable_unit = BlockFactory.create(
             parent_location=subsection1.location,
             category="vertical",
             # This won't really be used, but set it anyway
@@ -39,10 +42,10 @@ class DiscussionsTopicLinkTransformerTestCase(TransformerRegistryTestMixin, Modu
             context_key=self.course.id,
             usage_key=self.discussable_unit.location,
             title=self.discussable_unit.display_name,
-            provider_id=DEFAULT_PROVIDER_TYPE,
+            provider_id=get_default_provider_type(),
             external_id=self.test_topic_id,
         )
-        self.non_discussable_unit = ItemFactory.create(
+        self.non_discussable_unit = BlockFactory.create(
             parent_location=subsection1.location,
             category="vertical",
             discussion_enabled=False,

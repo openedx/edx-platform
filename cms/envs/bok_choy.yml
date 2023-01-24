@@ -35,6 +35,7 @@ CELERY_BROKER_HOSTNAME: localhost
 CELERY_BROKER_PASSWORD: celery
 CELERY_BROKER_TRANSPORT: amqp
 CELERY_BROKER_USER: celery
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION: false
 CERT_QUEUE: certificates
 CMS_BASE: localhost:8031
 CODE_JAIL:
@@ -104,14 +105,14 @@ MODULESTORE:
         OPTIONS:
           collection: modulestore
           db: test
-          default_class: xmodule.hidden_module.HiddenDescriptor
+          default_class: xmodule.hidden_block.HiddenBlock
           fs_root: '** OVERRIDDEN **'
           host: [localhost]
           port: 27017
           render_template: common.djangoapps.edxmako.shortcuts.render_to_string
       - ENGINE: xmodule.modulestore.xml.XMLModuleStore
         NAME: xml
-        OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_module.HiddenDescriptor}
+        OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_block.HiddenBlock}
 # We need to test different scenarios, following setting effectively disbale rate limiting
 PASSWORD_RESET_IP_RATE: '1/s'
 PASSWORD_RESET_EMAIL_RATE: '1/s'

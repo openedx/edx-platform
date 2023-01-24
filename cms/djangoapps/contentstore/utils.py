@@ -20,13 +20,14 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
+from openedx.core.djangoapps.discussions.models import DiscussionTopicLink, Provider
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
-from cms.djangoapps.contentstore.toggles import use_new_text_editor
+from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_video_editor
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -203,7 +204,7 @@ def get_editor_page_base_url(course_locator) -> str:
     Gets course authoring microfrontend URL for links to the new base editors
     """
     editor_url = None
-    if use_new_text_editor():
+    if use_new_text_editor() or use_new_video_editor():
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}/editor'
         if mfe_base_url:
@@ -731,3 +732,38 @@ def translation_language(language):
             translation.activate(previous)
     else:
         yield
+
+
+def mark_verticals_discussion_enabled(course_structure, course_key):
+    """
+    Adds has_discussion attribute on verticals of course_structure
+    """
+    topics = []
+    topics_query = DiscussionTopicLink.objects.filter(
+        context_key=course_key,
+        provider_id=Provider.OPEN_EDX,
+    )
+    for topic in topics_query:
+        topics.append({
+            "usage_key": str(topic.usage_key)
+        })
+
+    sub_sections_reference = []
+    if course_structure.get('has_children'):
+        chapters = course_structure['child_info'].get('children')
+        for section in chapters:
+            if section.get('has_children'):
+                sub_sections = section.get('child_info').get('children')
+                for sub_section in sub_sections:
+                    sub_sections_reference.append(sub_section)
+
+    for sub_section in sub_sections_reference:
+        if sub_section.get('has_children'):
+            verticals = sub_section.get('child_info').get('children')
+            for vertical in verticals:
+                vertical_id = vertical.get('id')
+                vertical['has_discussion'] = False
+                for topic in topics:
+                    if topic.get('usage_key') == vertical_id:
+                        vertical['has_discussion'] = True
+    return course_structure

@@ -465,7 +465,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
             )
         }
 
-    _sort_map_entries(category_map, course.discussion_sort_alpha)
+    _sort_map_entries(category_map, False)
 
     return _filter_unstarted_categories(category_map, course) if exclude_unstarted else category_map
 

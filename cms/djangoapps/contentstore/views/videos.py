@@ -52,7 +52,7 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.view_utils import view_auth_classes
-from xmodule.video_module.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import VideoUploadConfig
 from ..utils import reverse_course_url
@@ -63,6 +63,7 @@ __all__ = [
     'videos_handler',
     'video_encodings_download',
     'video_images_handler',
+    'video_images_upload_enabled',
     'transcript_preferences_handler',
     'generate_video_upload_link_handler',
 ]
@@ -261,6 +262,17 @@ def video_images_handler(request, course_key_string, edx_video_id=None):
         )
 
     return JsonResponse({'image_url': image_url})
+
+
+@login_required
+@require_GET
+def video_images_upload_enabled(request):
+    """Function to check if images can be uploaded"""
+    # respond with a false if image upload is not enabled.
+    if not VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled():
+        return JsonResponse({'allowThumbnailUpload': False})
+
+    return JsonResponse({'allowThumbnailUpload': True})
 
 
 def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnaround,

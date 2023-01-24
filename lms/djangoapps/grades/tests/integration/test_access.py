@@ -5,7 +5,7 @@ Test grading with access changes.
 
 from crum import set_current_request
 
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -14,7 +14,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ...subsection_grade_factory import SubsectionGradeFactory
 
@@ -30,19 +30,19 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
         super().setUpClass()
         cls.store = modulestore()
         cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(
+        cls.chapter = BlockFactory.create(
             parent=cls.course,
             category="chapter",
             display_name="Test Chapter"
         )
-        cls.sequence = ItemFactory.create(
+        cls.sequence = BlockFactory.create(
             parent=cls.chapter,
             category='sequential',
             display_name="Test Sequential 1",
             graded=True,
             format="Homework"
         )
-        cls.vertical = ItemFactory.create(
+        cls.vertical = BlockFactory.create(
             parent=cls.sequence,
             category='vertical',
             display_name='Test Vertical 1'
@@ -52,7 +52,7 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
             choices=[False, False, True, False],
             choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
         )
-        cls.problem = ItemFactory.create(
+        cls.problem = BlockFactory.create(
             parent=cls.vertical,
             category="problem",
             display_name="p1",
@@ -60,7 +60,7 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
             metadata={'weight': 2}
         )
 
-        cls.problem_2 = ItemFactory.create(
+        cls.problem_2 = BlockFactory.create(
             parent=cls.vertical,
             category="problem",
             display_name="p2",

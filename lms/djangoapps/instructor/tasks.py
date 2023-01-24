@@ -57,7 +57,7 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
         return
 
     # This logic has been copied over from openedx/core/djangoapps/schedules/content_highlights.py
-    # in the _get_course_module function.
+    # in the _get_course_block function.
     # I'm not sure if this is an anti-pattern or not, so if you can avoid re-copying this, please do.
     # We are using it here because we ran into issues with the User service being undefined when we
     # encountered a split_test xblock.
@@ -69,10 +69,10 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
     # Now evil modulestore magic to inflate our descriptor with user state and
     # permissions checks.
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        root_descriptor.course_id, user, root_descriptor, read_only=True,
+        root_descriptor.scope_ids.usage_id.context_key, user, root_descriptor, read_only=True,
     )
     root_module = get_module_for_descriptor(
-        user, request, root_descriptor, field_data_cache, root_descriptor.course_id,
+        user, request, root_descriptor, field_data_cache, root_descriptor.scope_ids.usage_id.context_key,
     )
     if not root_module:
         err_msg = err_msg_prefix + 'Module unable to be created from descriptor!'
@@ -91,7 +91,7 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
             # single way to get the children assigned for a partcular user. Some blocks define the
             # child descriptors method, but others don't and with blocks like Randomized Content
             # (Library Content), the get_children method returns all children and not just assigned
-            # children. So this is our way around situations like that. See also Split Test Module
+            # children. So this is our way around situations like that. See also Split Test Block
             # for another use case where user state has to be taken into account via get_child_descriptors
             block_children = ((hasattr(block, 'get_child_descriptors') and block.get_child_descriptors())
                               or (hasattr(block, 'get_children') and block.get_children())

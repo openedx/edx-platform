@@ -18,7 +18,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
+from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -68,9 +68,9 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
             certificate_available_date=_NEXT_WEEK,
             certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE
         )
-        cls.chapter = ItemFactory(parent=cls.course, category='chapter')
-        cls.sequence = ItemFactory(parent=cls.chapter, category='sequential', display_name='sequence')
-        cls.unit = ItemFactory.create(parent=cls.sequence, category='vertical', display_name="Vertical")
+        cls.chapter = BlockFactory(parent=cls.course, category='chapter')
+        cls.sequence = BlockFactory(parent=cls.chapter, category='sequential', display_name='sequence')
+        cls.unit = BlockFactory.create(parent=cls.sequence, category='vertical', display_name="Vertical")
 
         cls.user = UserFactory(
             username='student',
@@ -301,7 +301,8 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         """ Test that metadata endpoint returns data for the streak celebration """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=True):
-            with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
+            UPDATE_MTHD_NAME = 'common.djangoapps.student.models.user.UserCelebration.perform_streak_updates'
+            with mock.patch(UPDATE_MTHD_NAME, return_value=3):
                 response = self.client.get(self.url, content_type='application/json')
                 celebrations = response.json()['celebrations']
                 assert celebrations['streak_length_to_celebrate'] == 3
@@ -311,7 +312,8 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         """ Test that metadata endpoint does not return a discount and signal is not sent if flag is not set """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=False):
-            with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
+            UPDATE_MTHD_NAME = 'common.djangoapps.student.models.user.UserCelebration.perform_streak_updates'
+            with mock.patch(UPDATE_MTHD_NAME, return_value=3):
                 response = self.client.get(self.url, content_type='application/json')
                 celebrations = response.json()['celebrations']
                 assert celebrations['streak_length_to_celebrate'] == 3
@@ -465,7 +467,7 @@ class SequenceApiTestViews(MasqueradeMixin, BaseCoursewareTests):
     def test_hidden_after_due(self, is_past_due, masquerade_config, expected_hidden, expected_banner):
         """Validate the metadata when hide-after-due is set for a sequence"""
         due = datetime.now() + timedelta(days=-1 if is_past_due else 1)
-        sequence = ItemFactory(
+        sequence = BlockFactory(
             parent_location=self.chapter.location,
             # ^ It is very important that we use parent_location=self.chapter.location (and not parent=self.chapter), as
             # chapter is a class attribute and passing it by value will update its .children=[] which will then leak

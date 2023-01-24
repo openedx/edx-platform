@@ -23,6 +23,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked
 )
 from openedx.core.lib.cache_utils import request_cached
+from functools import lru_cache
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -255,6 +256,7 @@ def theme_exists(theme_name, themes_dir=None):
     return False
 
 
+@lru_cache
 def get_themes(themes_dir=None):
     """
     get a list of all themes known to the system.

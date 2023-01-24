@@ -6,7 +6,7 @@ Tests for the django comment client integration models
 from django.test.testcases import TestCase
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -18,13 +18,13 @@ class RoleClassTestCase(ModuleStoreTestCase):
     """
     Tests for roles of the comment client service integration
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
 
         # For course ID, syntax edx/classname/classdate is important
-        # because xmodel.course_module.id_to_location looks for a string to split
+        # because xmodel.course_block.id_to_location looks for a string to split
 
         self.course_id = ToyCourseFactory.create().id
         self.student_role = models.Role.objects.get_or_create(name="Student",

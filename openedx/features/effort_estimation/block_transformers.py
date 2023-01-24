@@ -166,10 +166,10 @@ class EffortEstimationTransformer(BlockStructureTransformer):
 
     def _gather_child_values(self, block_structure, block_key, field, default=0):
         """Collects and sums all child values for field."""
-        return sum([
+        return sum(
             block_structure.get_xblock_field(child_key, field, default=default)
             for child_key in block_structure.get_children(block_key)
-        ])
+        )
 
     def _estimate_children_effort(self, _usage_info, block_structure, block_key):
         """Collects time and activity counts for children."""

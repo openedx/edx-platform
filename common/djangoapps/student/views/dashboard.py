@@ -18,6 +18,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.plugins import get_plugins_view_context
 from edx_toggles.toggles import WaffleFlag
+from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import DashboardRenderStarted
 from pytz import UTC
@@ -29,6 +30,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_st
 from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.learner_home.waffle import should_redirect_to_learner_home_mfe
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
@@ -50,6 +52,8 @@ from openedx.features.enterprise_support.api import (
     get_dashboard_consent_notification,
     get_enterprise_learner_portal_context,
 )
+from openedx.features.enterprise_support.utils import is_enterprise_learner
+from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from common.djangoapps.student.models import (
@@ -268,6 +272,7 @@ def complete_course_mode_info(course_id, enrollment, modes=None):
         if modes['verified'].expiration_datetime:
             today = datetime.datetime.now(UTC).date()
             mode_info['days_for_upsell'] = (modes['verified'].expiration_datetime.date() - today).days
+            mode_info['expiration_datetime'] = modes['verified'].expiration_datetime.date()
 
     return mode_info
 
@@ -319,7 +324,7 @@ def reverification_info(statuses):
     return reverifications
 
 
-def _credit_statuses(user, course_enrollments):
+def credit_statuses(user, course_enrollments):
     """
     Retrieve the status for credit courses.
 
@@ -348,12 +353,13 @@ def _credit_statuses(user, course_enrollments):
         * purchased (bool): Whether the user has purchased credit for this course.
         * provider_name (string): The display name of the credit provider.
         * provider_status_url (string): A URL the user can visit to check on their credit request status.
+        * provider_id (string): A unique alphanumeric (plus hyphens) string identifying the provider.
         * request_status (string): Either "pending", "approved", or "rejected"
         * error (bool): If true, an unexpected error occurred when retrieving the credit status,
             so the user should contact the support team.
 
     Example:
-    >>> _credit_statuses(user, course_enrollments)
+    >>> credit_statuses(user, course_enrollments)
     {
         CourseKey.from_string("edX/DemoX/Demo_Course"): {
             "course_key": "edX/DemoX/Demo_Course",
@@ -362,6 +368,7 @@ def _credit_statuses(user, course_enrollments):
             "purchased": True,
             "provider_name": "Hogwarts",
             "provider_status_url": "http://example.com/status",
+            "provider_id": "HSWW",
             "request_status": "pending",
             "error": False
         }
@@ -513,6 +520,9 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     user = request.user
     if not UserProfile.objects.filter(user=user).exists():
         return redirect(reverse('account_settings'))
+
+    if should_redirect_to_learner_home_mfe():
+        return redirect(settings.LEARNER_HOME_MICROFRONTEND_URL)
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 
@@ -777,6 +787,9 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         if fbe_is_on:
             enrollments_fbe_is_on.append(course_key)
 
+    ip_address = get_client_ip(request)[0]
+    country_code = country_code_from_ip(ip_address).upper()
+
     context = {
         'urls': urls,
         'programs_data': programs_data,
@@ -796,7 +809,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'show_courseware_links_for': show_courseware_links_for,
         'all_course_modes': course_mode_info,
         'cert_statuses': cert_statuses,
-        'credit_statuses': _credit_statuses(user, course_enrollments),
+        'credit_statuses': credit_statuses(user, course_enrollments),
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
         'verification_display': verification_status['should_display'],
@@ -831,6 +844,9 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)
         'disable_unenrollment': disable_unenrollment,
+        'country_code': country_code,
+        # TODO: clean when experiment(Merchandise 2U LOBs - Dashboard) would be stop. [VAN-1097]
+        'is_enterprise_user': is_enterprise_learner(user),
     }
 
     # Include enterprise learner portal metadata and messaging

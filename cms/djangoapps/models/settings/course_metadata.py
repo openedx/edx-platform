@@ -14,9 +14,11 @@ from xblock.fields import Scope
 
 from cms.djangoapps.contentstore import toggles
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
+from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -254,9 +256,21 @@ class CourseMetadata:
                 val = model['value']
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
-            except (InvalidProctoringProvider, TypeError, ValueError, ValidationError) as err:
+            except (TypeError, ValueError, ValidationError) as err:
                 did_validate = False
                 errors.append({'key': key, 'message': str(err), 'model': model})
+            except InvalidProctoringProvider as err:
+                # LTI is automatically considered a proctoring provider, so it will be included in the error message
+                # Because we cannot pass course context to the exception, we need to check if the LTI provider
+                # should actually be available to the course
+                err_message = str(err)
+                if not exams_ida_enabled(descriptor.id):
+                    available_providers = get_available_providers()
+                    available_providers.remove('lti_external')
+                    err_message = str(InvalidProctoringProvider(val, available_providers))
+
+                did_validate = False
+                errors.append({'key': key, 'message': err_message, 'model': model})
 
         team_setting_errors = cls.validate_team_settings(filtered_dict)
         if team_setting_errors:
@@ -407,6 +421,15 @@ class CourseMetadata:
                 ' Contact {support_email} for assistance'
             ).format(support_email=settings.PARTNER_SUPPORT_EMAIL or 'support')
             errors.append({'key': 'proctoring_provider', 'message': message, 'model': proctoring_provider_model})
+
+        # check that a user should actually be able to update the provider to lti, which
+        # should only be allowed if the exams IDA is enabled for a course
+        available_providers = get_available_providers()
+        updated_provider = settings_dict.get('proctoring_provider', {}).get('value')
+        if updated_provider == 'lti_external' and not exams_ida_enabled(descriptor.id):
+            available_providers.remove('lti_external')
+            error = InvalidProctoringProvider('lti_external', available_providers)
+            errors.append({'key': 'proctoring_provider', 'message': str(error), 'model': proctoring_provider_model})
 
         enable_proctoring_model = settings_dict.get('enable_proctored_exams')
         if enable_proctoring_model:

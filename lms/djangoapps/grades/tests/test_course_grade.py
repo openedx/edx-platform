@@ -3,16 +3,13 @@ from unittest.mock import patch
 
 import ddt
 from crum import set_current_request
-from django.conf import settings
-from edx_toggles.toggles.testutils import override_waffle_switch
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import get_mock_request
 
-from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from ..course_data import CourseData
 from ..course_grade import ZeroCourseGrade
 from ..course_grade_factory import CourseGradeFactory
@@ -20,7 +17,6 @@ from .base import GradeTestBase
 from .utils import answer_problem
 
 
-@patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
 @ddt.ddt
 class ZeroGradeTest(GradeTestBase):
     """
@@ -33,29 +29,27 @@ class ZeroGradeTest(GradeTestBase):
         """
         Creates a ZeroCourseGrade and ensures it's empty.
         """
-        with override_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
-            course_data = CourseData(self.request.user, structure=self.course_structure)
-            chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
-            for chapter in chapter_grades:
-                for section in chapter_grades[chapter]['sections']:
-                    for score in section.problem_scores.values():
-                        assert score.earned == 0
-                        assert score.first_attempted is None
-                    assert section.all_total.earned == 0
+        course_data = CourseData(self.request.user, structure=self.course_structure)
+        chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
+        for chapter in chapter_grades:
+            for section in chapter_grades[chapter]['sections']:
+                for score in section.problem_scores.values():
+                    assert score.earned == 0
+                    assert score.first_attempted is None
+                assert section.all_total.earned == 0
 
     @ddt.data(True, False)
     def test_zero_null_scores(self, assume_zero_enabled):
         """
         Creates a zero course grade and ensures that null scores aren't included in the section problem scores.
         """
-        with override_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
-            with patch('lms.djangoapps.grades.subsection_grade.get_score', return_value=None):
-                course_data = CourseData(self.request.user, structure=self.course_structure)
-                chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
-                for chapter in chapter_grades:
-                    assert {} != chapter_grades[chapter]['sections']
-                    for section in chapter_grades[chapter]['sections']:
-                        assert {} == section.problem_scores
+        with patch('lms.djangoapps.grades.subsection_grade.get_score', return_value=None):
+            course_data = CourseData(self.request.user, structure=self.course_structure)
+            chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
+            for chapter in chapter_grades:
+                assert {} != chapter_grades[chapter]['sections']
+                for section in chapter_grades[chapter]['sections']:
+                    assert {} == section.problem_scores
 
 
 class TestScoreForModule(SharedModuleStoreTestCase):
@@ -73,27 +67,27 @@ class TestScoreForModule(SharedModuleStoreTestCase):
                    (2/5) (3/5) (0/1)   -   (1/3)   -   (3/10)
 
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
-            cls.a = ItemFactory.create(parent=cls.course, category="chapter", display_name="a")
-            cls.b = ItemFactory.create(parent=cls.a, category="sequential", display_name="b")
-            cls.c = ItemFactory.create(parent=cls.a, category="sequential", display_name="c")
-            cls.d = ItemFactory.create(parent=cls.b, category="vertical", display_name="d")
-            cls.e = ItemFactory.create(parent=cls.b, category="vertical", display_name="e")
-            cls.f = ItemFactory.create(parent=cls.b, category="vertical", display_name="f")
-            cls.g = ItemFactory.create(parent=cls.c, category="vertical", display_name="g")
-            cls.h = ItemFactory.create(parent=cls.d, category="problem", display_name="h")
-            cls.i = ItemFactory.create(parent=cls.d, category="problem", display_name="i")
-            cls.j = ItemFactory.create(parent=cls.e, category="problem", display_name="j")
-            cls.k = ItemFactory.create(parent=cls.e, category="html", display_name="k")
-            cls.l = ItemFactory.create(parent=cls.e, category="problem", display_name="l")
-            cls.m = ItemFactory.create(parent=cls.f, category="html", display_name="m")
-            cls.n = ItemFactory.create(parent=cls.g, category="problem", display_name="n")
+            cls.a = BlockFactory.create(parent=cls.course, category="chapter", display_name="a")
+            cls.b = BlockFactory.create(parent=cls.a, category="sequential", display_name="b")
+            cls.c = BlockFactory.create(parent=cls.a, category="sequential", display_name="c")
+            cls.d = BlockFactory.create(parent=cls.b, category="vertical", display_name="d")
+            cls.e = BlockFactory.create(parent=cls.b, category="vertical", display_name="e")
+            cls.f = BlockFactory.create(parent=cls.b, category="vertical", display_name="f")
+            cls.g = BlockFactory.create(parent=cls.c, category="vertical", display_name="g")
+            cls.h = BlockFactory.create(parent=cls.d, category="problem", display_name="h")
+            cls.i = BlockFactory.create(parent=cls.d, category="problem", display_name="i")
+            cls.j = BlockFactory.create(parent=cls.e, category="problem", display_name="j")
+            cls.k = BlockFactory.create(parent=cls.e, category="html", display_name="k")
+            cls.l = BlockFactory.create(parent=cls.e, category="problem", display_name="l")
+            cls.m = BlockFactory.create(parent=cls.f, category="html", display_name="m")
+            cls.n = BlockFactory.create(parent=cls.g, category="problem", display_name="n")
 
         cls.request = get_mock_request(UserFactory())
         CourseEnrollment.enroll(cls.request.user, cls.course.id)

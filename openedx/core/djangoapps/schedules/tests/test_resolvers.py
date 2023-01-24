@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_switch
 from testfixtures import LogCapture
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -144,7 +144,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         super().setUp()
         self.course = CourseFactory.create(highlights_enabled_for_messaging=True)
         with self.store.bulk_operations(self.course.id):
-            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff'])
+            BlockFactory.create(parent=self.course, category='chapter', highlights=['good stuff'])
 
     def create_resolver(self):
         """
@@ -165,6 +165,18 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
     def test_schedule_context(self):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
+        apple_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_apple_229x78.jpg'
+        google_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_google_253x78.jpg'
+        apple_store_url = 'https://itunes.apple.com/us/app/edx/id945480667?mt=8'
+        google_store_url = 'https://play.google.com/store/apps/details?id=org.edx.mobile'
+        facebook_url = 'http://www.facebook.com/EdxOnline'
+        linkedin_url = 'http://www.linkedin.com/company/edx'
+        twitter_url = 'https://twitter.com/edXOnline'
+        reddit_url = 'http://www.reddit.com/r/edx'
+        facebook_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png'
+        linkedin_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png'
+        twitter_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_2_twitter.png'
+        reddit_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_5_reddit.png'
         expected_context = {
             'contact_email': 'info@example.com',
             'contact_mailing_address': '123 Sesame Street',
@@ -173,12 +185,22 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'course_url': f'http://learning-mfe/course/{self.course.id}/home',
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
-            'mobile_store_urls': {},
+            'mobile_store_logo_urls': {'apple': apple_logo_url,
+                                       'google': google_logo_url},
+            'mobile_store_urls': {'apple': apple_store_url,
+                                  'google': google_store_url},
             'logo_url': 'https://www.logo.png',
             'platform_name': '\xe9dX',
             'show_upsell': False,
             'site_configuration_values': {},
-            'social_media_urls': {},
+            'social_media_logo_urls': {'facebook': facebook_logo_url,
+                                       'linkedin': linkedin_logo_url,
+                                       'reddit': reddit_logo_url,
+                                       'twitter': twitter_logo_url},
+            'social_media_urls': {'facebook': facebook_url,
+                                  'linkedin': linkedin_url,
+                                  'reddit': reddit_url,
+                                  'twitter': twitter_url},
             'template_revision': 'release',
             'unsubscribe_url': None,
             'week_highlights': ['good stuff'],
@@ -222,10 +244,10 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         )
 
         with self.store.bulk_operations(self.course.id):
-            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 1'])
-            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 2'])
-            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 3'])
-            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 4'])
+            BlockFactory.create(parent=self.course, category='chapter', highlights=['good stuff 1'])
+            BlockFactory.create(parent=self.course, category='chapter', highlights=['good stuff 2'])
+            BlockFactory.create(parent=self.course, category='chapter', highlights=['good stuff 3'])
+            BlockFactory.create(parent=self.course, category='chapter', highlights=['good stuff 4'])
 
     def create_resolver(self, user_start_date_offset=8):
         """
@@ -255,7 +277,18 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         with self.assertNumQueries(38):
             sc = resolver.get_schedules()
             schedules = list(sc)
-
+        apple_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_apple_229x78.jpg'
+        google_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_google_253x78.jpg'
+        apple_store_url = 'https://itunes.apple.com/us/app/edx/id945480667?mt=8'
+        google_store_url = 'https://play.google.com/store/apps/details?id=org.edx.mobile'
+        facebook_url = 'http://www.facebook.com/EdxOnline'
+        linkedin_url = 'http://www.linkedin.com/company/edx'
+        twitter_url = 'https://twitter.com/edXOnline'
+        reddit_url = 'http://www.reddit.com/r/edx'
+        facebook_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png'
+        linkedin_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png'
+        twitter_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_2_twitter.png'
+        reddit_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_5_reddit.png'
         expected_context = {
             'contact_email': 'info@example.com',
             'contact_mailing_address': '123 Sesame Street',
@@ -264,12 +297,22 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'course_url': f'http://learning-mfe/course/{self.course.id}/home',
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
-            'mobile_store_urls': {},
+            'mobile_store_logo_urls': {'apple': apple_logo_url,
+                                       'google': google_logo_url},
+            'mobile_store_urls': {'apple': apple_store_url,
+                                  'google': google_store_url},
             'logo_url': 'https://www.logo.png',
             'platform_name': '\xe9dX',
             'show_upsell': False,
             'site_configuration_values': {},
-            'social_media_urls': {},
+            'social_media_logo_urls': {'facebook': facebook_logo_url,
+                                       'linkedin': linkedin_logo_url,
+                                       'reddit': reddit_logo_url,
+                                       'twitter': twitter_logo_url},
+            'social_media_urls': {'facebook': facebook_url,
+                                  'linkedin': linkedin_url,
+                                  'reddit': reddit_url,
+                                  'twitter': twitter_url},
             'template_revision': 'release',
             'unsubscribe_url': None,
             'week_highlights': ['good stuff 2'],

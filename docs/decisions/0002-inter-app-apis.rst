@@ -40,7 +40,7 @@ Exmaples
 As a reference example, see the Python APIs exposed by the grades app in the
 `grades/api.py module`_.
 
-.. _`grades/api.py module`: https://github.com/edx/edx-platform/blob/master/lms/djangoapps/grades/api.py
+.. _`grades/api.py module`: https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/grades/api.py
 
 
 Consequences

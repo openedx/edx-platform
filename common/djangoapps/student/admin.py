@@ -58,7 +58,7 @@ User = get_user_model()  # pylint:disable=invalid-name
 #     makes DB queries that could cause site outages for a large enough Open edX installation.
 # .. toggle_use_cases: opt_in, open_edx
 # .. toggle_creation_date: 2018-08-01
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/18638
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/18638
 COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch('student.courseenrollment_admin', __name__)
 
 
@@ -305,8 +305,8 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
 
         return qs, use_distinct
 
-    def queryset(self, request):
-        return super().queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
 
 class UserProfileInline(admin.StackedInline):

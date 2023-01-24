@@ -11,7 +11,6 @@
 -c ../constraints.txt
 
 -r github.in              # Forks and other dependencies not yet on PyPI
--r local.in               # Packages in edx-platform which have their own setup.py
 -r paver.txt              # Requirements for running paver commands
 
 # Please follow these guidelines whenever you change this file:
@@ -26,10 +25,11 @@
 #    as development.in or testing.in instead.
 
 acid-xblock
+algoliasearch                       # Algolia’s API client for indexed searching
 analytics-python                    # Used for Segment analytics
 attrs                               # Reduces boilerplate code involving class attributes
 Babel                               # Internationalization utilities, used for date formatting in a few places
-bleach                              # Allowed-list-based HTML sanitizing library that escapes or strips markup and attributes; used for capa and LTI
+bleach[css]                         # Allowed-list-based HTML sanitizing library that escapes or strips markup and attributes; used for capa and LTI
 boto==2.39.0                        # Deprecated version of the AWS SDK; we should stop using this
 boto3==1.4.8                        # Amazon Web Services SDK for Python
 botocore==1.8.17                    # via boto3, s3transfer
@@ -69,6 +69,7 @@ django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
+docopt
 done-xblock
 edx-ace
 edx-api-doc-tools
@@ -80,11 +81,15 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-edx-django-utils>=5.0.0            # Utilities for cache, monitoring, and plugins
+# Need IP address code that was moved to edx-django-utils 5.1.0
+edx-django-utils>=5.1.0             # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
+# edx-event-bus-kafka 2.0.0 adds support for configurable producer API
+edx-event-bus-kafka>=2.0.0          # Kafka implementation of event bus
 edx-milestones
 edx-name-affirmation
+edx-opaque-keys
 edx-organizations
 edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
@@ -109,8 +114,8 @@ ipaddress                           # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lxml                                # XML parser
-learner-pathway-progress            # A plugin for lms to track learners progress in pathays
-lti-consumer-xblock>=4.1.1
+learner-pathway-progress    # A plugin for lms to track learners progress in pathays
+lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
@@ -121,9 +126,13 @@ nltk                                # Natural language processing; used by the c
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 openedx-calc                        # Library supporting mathematical calculations for Open edX
-openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
+# openedx-events 3.1.0 introduces producer API
+openedx-events>=3.1.0               # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
-ora2>=4.4.0
+optimizely-sdk                      # Optimizely full stack SDK for Python
+ora2>=4.5.0
+outcome-surveys                     # edx-platform plugin to send and track segment events needed for surveys
+path
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
 py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
@@ -163,8 +172,12 @@ staff-graded-xblock                 # An XBlock that allows for off-site bulk sc
 super-csv                           # Generic CSV processor
 unicodecsv                          # Easier support for CSV files with unicode text
 user-util                           # Functionality for retiring users (GDPR compliance)
+webob
 web-fragments                       # Provides the ability to render fragments of web pages
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
+xblock-drag-and-drop-v2             # Drag and Drop XBlock
+xblock-google-drive                 # XBlock for google docs and calendar
+openedx-django-wiki

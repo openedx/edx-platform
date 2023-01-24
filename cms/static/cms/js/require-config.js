@@ -123,7 +123,7 @@
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
             'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'js/vendor/tinymce/js/tinymce/jquery.tinymce.min',
-            'xmodule': '/xmodule/xmodule',
+            'xmodule': '/xmodule',
             'xblock/cms.runtime.v1': 'cms/js/xblock/cms.runtime.v1',
             'xblock': 'common/js/xblock',
             'utility': 'js/src/utility',

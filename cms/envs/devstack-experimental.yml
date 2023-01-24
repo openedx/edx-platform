@@ -15,7 +15,7 @@
 #    a devstack.py at all.
 #
 # This is part of the effort to move our dev tools off of Ansible and
-# Paver, described here: https://github.com/edx/devstack/pull/866
+# Paver, described here: https://github.com/openedx/devstack/pull/866
 # TODO: If the effort described above is abandoned, then this file should
 # probably be deleted.
 ACTIVATION_EMAIL_SUPPORT_LINK: ''
@@ -258,6 +258,7 @@ ENTERPRISE_API_URL: http://edx.devstack.lms:18000/enterprise/api/v1
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS: {}
 ENTERPRISE_SERVICE_WORKER_USERNAME: enterprise_worker
 EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST: []
+EXAMS_API_URL: http://localhost:8740/api/v1
 EXTRA_MIDDLEWARE_CLASSES: []
 FACEBOOK_API_VERSION: v2.1
 FACEBOOK_APP_ID: FACEBOOK_APP_ID
@@ -354,7 +355,7 @@ MEDIA_ROOT: /edx/var/edxapp/media/
 MEDIA_URL: /media/
 MKTG_URLS: {}
 MKTG_URL_LINK_MAP: {}
-MOBILE_STORE_URLS: {}
+MOBILE_STORE_ACE_URLS: {}
 MODULESTORE:
     default:
         ENGINE: xmodule.modulestore.mixed.MixedModuleStore
@@ -378,7 +379,7 @@ MODULESTORE:
                 ENGINE: xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore
                 NAME: split
                 OPTIONS:
-                    default_class: xmodule.hidden_module.HiddenDescriptor
+                    default_class: xmodule.hidden_block.HiddenBlock
                     fs_root: /edx/var/edxapp/data
                     render_template: common.djangoapps.edxmako.shortcuts.render_to_string
             -   DOC_STORE_CONFIG:
@@ -398,7 +399,7 @@ MODULESTORE:
                 ENGINE: xmodule.modulestore.mongo.DraftMongoModuleStore
                 NAME: draft
                 OPTIONS:
-                    default_class: xmodule.hidden_module.HiddenDescriptor
+                    default_class: xmodule.hidden_block.HiddenBlock
                     fs_root: /edx/var/edxapp/data
                     render_template: common.djangoapps.edxmako.shortcuts.render_to_string
 ORA2_FILE_PREFIX: default_env-default_deployment/ora2
@@ -413,6 +414,7 @@ PLATFORM_FACEBOOK_ACCOUNT: http://www.facebook.com/YourPlatformFacebookAccount
 PLATFORM_NAME: Your Platform Name Here
 PLATFORM_TWITTER_ACCOUNT: '@YourPlatformTwitterAccount'
 POLICY_CHANGE_GRADES_ROUTING_KEY: edx.lms.core.default
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY: edx.lms.core.default
 PREPEND_LOCALE_PATHS: []
 PRESS_EMAIL: press@example.com
 PROCTORING_BACKENDS:

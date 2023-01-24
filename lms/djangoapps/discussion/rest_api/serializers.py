@@ -10,10 +10,12 @@ from django.core.exceptions import ValidationError
 from django.db.models import TextChoices
 from django.urls import reverse
 from django.utils.html import strip_tags
-from django.utils.text import Truncator
 from rest_framework import serializers
 
 from common.djangoapps.student.models import get_user_by_username_or_email
+from common.djangoapps.student.roles import GlobalStaff
+from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_lock_unlock_event, \
+    track_thread_edited_event, track_comment_edited_event, track_forum_response_mark_event
 from lms.djangoapps.discussion.django_comment_client.utils import (
     course_discussion_division_enabled,
     get_group_id_for_user,
@@ -27,21 +29,19 @@ from lms.djangoapps.discussion.rest_api.permissions import (
     get_editable_fields,
 )
 from lms.djangoapps.discussion.rest_api.render import render_body
+from lms.djangoapps.discussion.rest_api.utils import (
+    get_course_staff_users_list,
+    get_moderator_users_list,
+    get_course_ta_users_list,
+)
 from openedx.core.djangoapps.discussions.models import DiscussionTopicLink
 from openedx.core.djangoapps.discussions.utils import get_group_names_by_id
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
-from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_COMMUNITY_TA,
-    FORUM_ROLE_MODERATOR,
-    CourseDiscussionSettings,
-    Role,
-)
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.api.serializers import CourseKeyField
-from common.djangoapps.student.roles import (GlobalStaff)
 
 User = get_user_model()
 
@@ -63,35 +63,26 @@ def get_context(course, request, thread=None):
     Returns a context appropriate for use with ThreadSerializer or
     (if thread is provided) CommentSerializer.
     """
-    # TODO: cache staff_user_ids and ta_user_ids if we need to improve perf
-    staff_user_ids = {
-        user.id
-        for role in Role.objects.filter(
-            name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR],
-            course_id=course.id
-        )
-        for user in role.users.all()
-    }
-    ta_user_ids = {
-        user.id
-        for role in Role.objects.filter(name=FORUM_ROLE_COMMUNITY_TA, course_id=course.id)
-        for user in role.users.all()
-    }
+    course_staff_user_ids = get_course_staff_users_list(course.id)
+    moderator_user_ids = get_moderator_users_list(course.id)
+    ta_user_ids = get_course_ta_users_list(course.id)
     requester = request.user
     cc_requester = CommentClientUser.from_django_user(requester).retrieve()
     cc_requester["course_id"] = course.id
     course_discussion_settings = CourseDiscussionSettings.get(course.id)
     is_global_staff = GlobalStaff().has_user(requester)
+    has_moderation_privilege = requester.id in moderator_user_ids or requester.id in ta_user_ids or is_global_staff
     return {
         "course": course,
         "request": request,
         "thread": thread,
         "discussion_division_enabled": course_discussion_division_enabled(course_discussion_settings),
         "group_ids_to_names": get_group_names_by_id(course_discussion_settings),
-        "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids or is_global_staff,
-        "staff_user_ids": staff_user_ids,
+        "moderator_user_ids": moderator_user_ids,
+        "course_staff_user_ids": course_staff_user_ids,
         "ta_user_ids": ta_user_ids,
         "cc_requester": cc_requester,
+        "has_moderation_privilege": has_moderation_privilege,
     }
 
 
@@ -139,7 +130,7 @@ def _validate_privileged_access(context: Dict) -> bool:
         bool: Course exists and the user has privileged access.
     """
     course = context.get('course', None)
-    is_requester_privileged = context.get('is_requester_privileged')
+    is_requester_privileged = context.get('has_moderation_privilege')
     return course and is_requester_privileged
 
 
@@ -185,7 +176,7 @@ class _ContentSerializer(serializers.Serializer):
         Returns a boolean indicating whether the given user_id identifies a
         privileged user.
         """
-        return user_id in self.context["staff_user_ids"] or user_id in self.context["ta_user_ids"]
+        return user_id in self.context["moderator_user_ids"] or user_id in self.context["ta_user_ids"]
 
     def _is_anonymous(self, obj):
         """
@@ -193,7 +184,8 @@ class _ContentSerializer(serializers.Serializer):
         the requester.
         """
         user_id = self.context["request"].user.id
-        is_user_staff = user_id in self.context["staff_user_ids"]
+        is_user_staff = user_id in self.context["moderator_user_ids"] or user_id in self.context["ta_user_ids"]
+
         return (
             obj["anonymous"] or
             obj["anonymous_to_peers"] and not is_user_staff
@@ -210,9 +202,12 @@ class _ContentSerializer(serializers.Serializer):
         Returns the role label (i.e. "Staff" or "Community TA") for the user
         with the given id.
         """
+        is_staff = user_id in self.context["course_staff_user_ids"] or user_id in self.context["moderator_user_ids"]
+        is_ta = user_id in self.context["ta_user_ids"]
+
         return (
-            "Staff" if user_id in self.context["staff_user_ids"] else
-            "Community TA" if user_id in self.context["ta_user_ids"] else
+            "Staff" if is_staff else
+            "Community TA" if is_ta else
             None
         )
 
@@ -241,7 +236,7 @@ class _ContentSerializer(serializers.Serializer):
         """
         total_abuse_flaggers = len(obj.get("abuse_flaggers", []))
         return (
-            self.context["is_requester_privileged"] and total_abuse_flaggers > 0 or
+            self.context["has_moderation_privilege"] and total_abuse_flaggers > 0 or
             self.context["cc_requester"]["id"] in obj.get("abuse_flaggers", [])
         )
 
@@ -275,7 +270,8 @@ class _ContentSerializer(serializers.Serializer):
         Returns information about the last edit for this content for
         privileged users.
         """
-        if not _validate_privileged_access(self.context):
+        is_user_author = str(obj['user_id']) == str(self.context['request'].user.id)
+        if not (_validate_privileged_access(self.context) or is_user_author):
             return None
         edit_history = obj.get("edit_history")
         if not edit_history:
@@ -363,8 +359,8 @@ class ThreadSerializer(_ContentSerializer):
         the endorsed query parameter.
         """
         if (
-                (obj["thread_type"] == "question" and endorsed is None) or
-                (obj["thread_type"] == "discussion" and endorsed is not None)
+            (obj["thread_type"] == "question" and endorsed is None) or
+            (obj["thread_type"] == "discussion" and endorsed is not None)
         ):
             return None
         path = reverse("comment-list")
@@ -409,13 +405,14 @@ class ThreadSerializer(_ContentSerializer):
         Returns a cleaned and truncated version of the thread's body to display in a
         preview capacity.
         """
-        return Truncator(strip_tags(self.get_rendered_body(obj))).chars(35, ).replace('\n', ' ')
+        return strip_tags(self.get_rendered_body(obj)).replace('\n', ' ')
 
     def get_close_reason(self, obj):
         """
         Returns the reason for which the thread was closed.
         """
-        if not _validate_privileged_access(self.context):
+        is_user_author = str(obj['user_id']) == str(self.context['request'].user.id)
+        if not (_validate_privileged_access(self.context) or is_user_author):
             return None
         reason_code = obj.get("close_reason_code")
         return CLOSE_REASON_CODES.get(reason_code)
@@ -423,9 +420,10 @@ class ThreadSerializer(_ContentSerializer):
     def get_closed_by(self, obj):
         """
         Returns the username of the moderator who closed this thread,
-        only to other privileged users.
+        only to other privileged users and author.
         """
-        if _validate_privileged_access(self.context):
+        is_user_author = str(obj['user_id']) == str(self.context['request'].user.id)
+        if _validate_privileged_access(self.context) or is_user_author:
             return obj.get("closed_by")
 
     def create(self, validated_data):
@@ -439,8 +437,18 @@ class ThreadSerializer(_ContentSerializer):
             requesting_user_id = self.context["cc_requester"]["id"]
             if key == "closed" and val:
                 instance["closing_user_id"] = requesting_user_id
+                track_thread_lock_unlock_event(self.context['request'], self.context['course'],
+                                               instance, validated_data.get('close_reason_code'))
+
+            if key == "closed" and not val:
+                instance["closing_user_id"] = requesting_user_id
+                track_thread_lock_unlock_event(self.context['request'], self.context['course'],
+                                               instance, validated_data.get('close_reason_code'), locked=False)
+
             if key == "body" and val:
                 instance["editing_user_id"] = requesting_user_id
+                track_thread_edited_event(self.context['request'], self.context['course'],
+                                          instance, validated_data.get('edit_reason_code'))
         instance.save()
         return instance
 
@@ -488,8 +496,8 @@ class CommentSerializer(_ContentSerializer):
             # Avoid revealing the identity of an anonymous non-staff question
             # author who has endorsed a comment in the thread
             if not (
-                    self._is_anonymous(self.context["thread"]) and
-                    not self._is_user_privileged(endorser_id)
+                self._is_anonymous(self.context["thread"]) and
+                not self._is_user_privileged(endorser_id)
             ):
                 return User.objects.get(id=endorser_id).username
         return None
@@ -582,9 +590,12 @@ class CommentSerializer(_ContentSerializer):
             # endorsement_user_id on update
             requesting_user_id = self.context["cc_requester"]["id"]
             if key == "endorsed":
+                track_forum_response_mark_event(self.context['request'], self.context['course'], instance, val)
                 instance["endorsement_user_id"] = requesting_user_id
             if key == "body" and val:
                 instance["editing_user_id"] = requesting_user_id
+                track_comment_edited_event(self.context['request'], self.context['course'],
+                                           instance, validated_data.get('edit_reason_code'))
 
         instance.save()
         return instance

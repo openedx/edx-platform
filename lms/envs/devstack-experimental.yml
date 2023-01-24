@@ -15,7 +15,7 @@
 #    a devstack.py at all.
 #
 # This is part of the effort to move our dev tools off of Ansible and
-# Paver, described here: https://github.com/edx/devstack/pull/866
+# Paver, described here: https://github.com/openedx/devstack/pull/866
 # TODO: If the effort described above is abandoned, then this file should
 # probably be deleted.
 ACCOUNT_MICROFRONTEND_URL: null
@@ -419,7 +419,7 @@ MODULESTORE:
                 ENGINE: xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore
                 NAME: split
                 OPTIONS:
-                    default_class: xmodule.hidden_module.HiddenDescriptor
+                    default_class: xmodule.hidden_block.HiddenBlock
                     fs_root: /edx/var/edxapp/data
                     render_template: common.djangoapps.edxmako.shortcuts.render_to_string
             -   DOC_STORE_CONFIG:
@@ -439,7 +439,7 @@ MODULESTORE:
                 ENGINE: xmodule.modulestore.mongo.DraftMongoModuleStore
                 NAME: draft
                 OPTIONS:
-                    default_class: xmodule.hidden_module.HiddenDescriptor
+                    default_class: xmodule.hidden_block.HiddenBlock
                     fs_root: /edx/var/edxapp/data
                     render_template: common.djangoapps.edxmako.shortcuts.render_to_string
 OAUTH_DELETE_EXPIRED: true
@@ -482,6 +482,7 @@ PLATFORM_FACEBOOK_ACCOUNT: http://www.facebook.com/YourPlatformFacebookAccount
 PLATFORM_NAME: Your Platform Name Here
 PLATFORM_TWITTER_ACCOUNT: '@YourPlatformTwitterAccount'
 POLICY_CHANGE_GRADES_ROUTING_KEY: edx.lms.core.default
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY: edx.lms.core.default
 PREPEND_LOCALE_PATHS: []
 PRESS_EMAIL: press@example.com
 PROCTORING_BACKENDS:

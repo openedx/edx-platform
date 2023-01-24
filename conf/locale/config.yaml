@@ -35,7 +35,7 @@ locales:
     # - et_EE  # Estonian (Estonia)
     - eu_ES  # Basque (Spain)
     # - fa  # Persian
-    # - fa_IR  # Persian (Iran)
+    - fa_IR  # Persian (Iran)
     # - fi_FI  # Finnish (Finland)
     # - fil  # Filipino
     - fr  # French
@@ -129,7 +129,6 @@ ignore_dirs:
     - src/codejail
     - src/django-wiki
     - src/done-xblock
-    - src/edx-jsme
     - src/parse-rest
     - src/geoip2
     - src/pystache-custom

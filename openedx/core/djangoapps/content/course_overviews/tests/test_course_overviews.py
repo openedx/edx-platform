@@ -28,12 +28,12 @@ from xmodule.assetstore.assetmgr import AssetManager  # lint-amnesty, pylint: di
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_metadata_utils import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_module import (  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import (  # lint-amnesty, pylint: disable=wrong-import-order
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
-from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -141,6 +141,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             ('clean_id', ('#',)),
             ('has_ended', ()),
             ('has_started', ()),
+            ('is_enrollment_open', ()),
         ]
         for method_name, method_args in methods_to_test:
             course_value = getattr(course, method_name)(*method_args)
@@ -160,7 +161,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         time_field_accessor = lambda object, field_name: get_seconds_since_epoch(getattr(object, field_name))
 
         # The course about fields are accessed through the CourseDetail
-        # class for the course module, and stored as attributes on the
+        # class for the course block, and stored as attributes on the
         # CourseOverview objects.
         course_about_accessor = lambda object, field_name: CourseDetails.fetch_about_attribute(object.id, field_name)
 
@@ -378,7 +379,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         course_overview = CourseOverview._create_or_update(course)  # pylint: disable=protected-access
         assert course_overview.lowest_passing_grade is None
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 4, 4), (ModuleStoreEnum.Type.split, 2, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 5, 5), (ModuleStoreEnum.Type.split, 2, 2))
     @ddt.unpack
     def test_versioning(self, modulestore_type, min_mongo_calls, max_mongo_calls):
         """
@@ -552,6 +553,20 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         for filter_, expected_courses in test_cases:
             assert {course_overview.id for course_overview in CourseOverview.get_all_courses(filter_=filter_)} ==\
                    expected_courses, f'testing CourseOverview.get_all_courses with filter_={filter_}'
+
+    def test_get_all_active_courses(self):
+        """
+        Verify active courses or courses with null end date are returned if active_only is provided.
+        """
+        active_course = CourseFactory.create(emit_signals=True, end=self.DATES[self.NEXT_MONTH])
+        missing_end_date = CourseFactory.create(emit_signals=True, end=None)
+        inactive_course = CourseFactory.create(emit_signals=True, end=self.DATES[self.LAST_MONTH])
+
+        output_ids = {course.id for course in CourseOverview.get_all_courses(active_only=True)}
+
+        assert len(output_ids) == 2
+        assert inactive_course.id not in output_ids
+        assert {active_course.id, missing_end_date.id} == output_ids
 
     def test_get_from_ids(self):
         """

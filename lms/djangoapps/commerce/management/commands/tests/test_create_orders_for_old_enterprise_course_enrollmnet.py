@@ -37,31 +37,24 @@ class TestEnterpriseCourseEnrollmentCreateOldOrder(TestCase):
         """
             Creates `count` test enrollments plus 1 invalid and 1 Audit enrollment
         """
-        with patch(
-            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
-            return_value=None
-        ):
-            for _ in range(count):
-                user = UserFactory()
-                course_enrollment = CourseEnrollmentFactory(mode=CourseMode.VERIFIED, user=user)
-                course = course_enrollment.course
-                enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=user.id)
-                EnterpriseCourseEnrollmentFactory(
-                    enterprise_customer_user=enterprise_customer_user,
-                    course_id=course.id
-                )
-
-            # creating audit enrollment
+        for _ in range(count):
             user = UserFactory()
-            course_enrollment = CourseEnrollmentFactory(mode=CourseMode.AUDIT, user=user)
+            course_enrollment = CourseEnrollmentFactory(mode=CourseMode.VERIFIED, user=user)
             course = course_enrollment.course
             enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=user.id)
             EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user, course_id=course.id)
 
-            # creating invalid enrollment (with no CourseEnrollment)
-            user = UserFactory()
-            enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=user.id)
-            EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user, course_id=course.id)
+        # creating audit enrollment
+        user = UserFactory()
+        course_enrollment = CourseEnrollmentFactory(mode=CourseMode.AUDIT, user=user)
+        course = course_enrollment.course
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=user.id)
+        EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user, course_id=course.id)
+
+        # creating invalid enrollment (with no CourseEnrollment)
+        user = UserFactory()
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=user.id)
+        EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user, course_id=course.id)
 
     @patch('lms.djangoapps.commerce.management.commands.create_orders_for_old_enterprise_course_enrollment'
            '.Command._create_manual_enrollment_orders')

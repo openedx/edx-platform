@@ -101,7 +101,7 @@ BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        'default_class': 'xmodule.hidden_block.HiddenBlock',
         'fs_root': TEST_ROOT / "data",
     },
     doc_store_settings={
@@ -362,3 +362,9 @@ PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
 #################### Network configuration ####################
 # Tests are not behind any proxies
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
+COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
+    "KEY": "***",
+    "SECRET": "***",
+    "URL": "***",
+}

@@ -7,7 +7,7 @@ from datetime import datetime
 
 from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from cms.djangoapps.contentstore.outlines import update_outline_from_modulestore
 from common.djangoapps.course_modes.models import CourseMode
@@ -35,8 +35,8 @@ class BaseCourseHomeTests(ModuleStoreTestCase, MasqueradeMixin):
             emit_signals=True,
             modulestore=self.store,
         )
-        chapter = ItemFactory(parent=self.course, category='chapter')
-        ItemFactory(parent=chapter, category='sequential')
+        chapter = BlockFactory(parent=self.course, category='chapter')
+        BlockFactory(parent=chapter, category='sequential')
 
         CourseModeFactory(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
         CourseModeFactory(

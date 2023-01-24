@@ -1345,7 +1345,7 @@ paths:
                     percent_graded: (float) the percentage of total points the user has received a grade for in a given subsection
                     show_correctness: (str) a str representing whether to show the problem/practice scores based on due date
                                       ('always', 'never', 'past_due', values defined in
-                                       common/lib/xmodule/xmodule/modulestore/inheritance.py)
+                                       xmodule/modulestore/inheritance.py)
                     show_grades: (bool) a bool for whether to show grades based on the access the user has
                     url: (str) the absolute path url to the Subsection
             enrollment_mode: (str) a str representing the enrollment the user has ('audit', 'verified', ...)
@@ -1657,6 +1657,51 @@ paths:
         required: true
         type: string
       - name: mode_slug
+        in: path
+        required: true
+        type: string
+  /courses/v1/block_metadata/{usage_key_string}:
+    get:
+      operationId: courses_v1_block_metadata_read
+      summary: '**Use Case**'
+      description: |-
+        Returns the block metadata. Data like index_dictionary related to a
+            block should be fetched using this API, because they are too large for
+            the cache used by the course blocks/transformers API.
+
+        **Example requests**:
+
+            GET /api/courses/v1/block_metadata/<usage_id>/?
+                &include=index_dictionary
+
+        **Parameters**:
+
+            * "include": a comma-separated list of keys to include.
+              Valid keys are "index_dictionary".
+
+        **Response Values**
+
+            A dictionary containing:
+            * id (string): Block usage_key_str.
+            * type (string) Block type.
+            * index_dictionary: (dict) The index_dictionary JSON data
+              (usually this is the text content of the block, for search
+              indexing or other purposes) for this block. Returned only if
+              the "index_dictionary" is included in the "include"
+              parameter.
+      parameters:
+        - name: include
+          in: query
+          description: A comma-separated list of keys to include.
+          required: false
+          type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+        - courses
+    parameters:
+      - name: usage_key_string
         in: path
         required: true
         type: string
@@ -5517,7 +5562,7 @@ paths:
         that a user has for course-runs within a given program.
         Fields included are the title, upcoming due dates, etc.
         This API endpoint is intended for use with the
-        [Program Learner Portal MFE](https://github.com/edx/frontend-app-learner-portal-programs).
+        [Program Learner Portal MFE](https://github.com/openedx/frontend-app-learner-portal-programs).
 
         It is important to note that the set of enrollments that this endpoint returns
         is different than a user's set of *program-course-run enrollments*.

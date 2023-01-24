@@ -177,7 +177,7 @@ def add_profession_field(is_field_required=False):
 
 def add_specialty_field(is_field_required=False):
     """
-    Returns the user speciality field description
+    Returns the user specialty field description
     """
     # Translators: This label appears above a dropdown menu to select
     # the user's specialty
@@ -347,3 +347,20 @@ def add_country_field(is_field_required=False):
     empty
     """
     return {'name': 'country', 'error_message': is_field_required}
+
+
+def add_confirm_email_field(is_field_required=False):
+    """
+    Returns a email confirmation field description
+    """
+    # Translators: This label appears above a field on the registration form
+    # meant to confirm the user's email address.
+
+    email_label = _("Confirm Email")
+
+    return {
+        'name': 'confirm_email',
+        'type': SUPPORTED_FIELDS_TYPES['TEXT'],
+        'label': email_label,
+        'error_message': accounts.REQUIRED_FIELD_CONFIRM_EMAIL_TEXT_MSG if is_field_required else '',
+    }

@@ -1,12 +1,10 @@
 # pylintrc tweaks for use with edx_lint.
 [MASTER]
 ignore+ = ,.git,.tox,migrations,node_modules,.pycharm_helpers
-load-plugins = edx_lint.pylint,pylint_django_settings,pylint_django,pylint_celery,pylint_pytest
+load-plugins = edx_lint.pylint,pylint_django,pylint_celery,pylint_pytest
 
 [MESSAGES CONTROL]
 disable+ =
-    # Disable unicode-format-string until we can agree to turn it on.
-    native-string,
     # Disable new refactoring suggestions for now, we have more important things to fix first
     import-outside-toplevel,
     inconsistent-return-statements,
@@ -29,6 +27,12 @@ disable+ =
     unused-argument,
     unsubscriptable-object,
     abstract-method,
+    not-callable,
+    unsupported-binary-operation,
+    missing-timeout,
+    c-extension-no-member,
+    no-name-in-module,
+    unnecessary-lambda-assignment,
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$

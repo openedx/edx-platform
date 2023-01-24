@@ -112,7 +112,7 @@ class ProgressTabView(RetrieveAPIView):
                     possible: (float) number of possible points
                 show_correctness: (str) a str representing whether to show the problem/practice scores based on due date
                                   ('always', 'never', 'past_due', values defined in
-                                   common/lib/xmodule/xmodule/modulestore/inheritance.py)
+                                   xmodule/modulestore/inheritance.py)
                 show_grades: (bool) a bool for whether to show grades based on the access the user has
                 url: (str or None) the absolute path url to the Subsection or None if the Subsection is no longer
                      accessible to the learner due to a hide_after_due course team setting

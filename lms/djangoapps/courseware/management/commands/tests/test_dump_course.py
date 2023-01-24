@@ -14,11 +14,10 @@ from django.core.management import call_command
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -64,7 +63,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             end=TEST_COURSE_END,
         )
 
-        cls.discussion = ItemFactory.create(
+        cls.discussion = BlockFactory.create(
             category='discussion', parent_location=cls.course.location
         )
 
@@ -107,7 +106,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
     def test_dump_course_ids(self):
         output = self.call_command('dump_course_ids')
-        dumped_courses = output.strip().split('\n')
+        dumped_courses = (output.strip() or []) and output.strip().split('\n')
         course_ids = {str(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
         assert course_ids == dumped_ids
@@ -221,15 +220,6 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         assert_in('edX-simple-2012_Fall/html/toylab.html', names)
         assert_in('edX-simple-2012_Fall/sequential/A_simple_sequence.xml', names)
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
-
-
-class CommandsMongoTestCase(CommandsTestBase):
-    """
-    Test case for management commands using the mixed mongo modulestore with old mongo as the default.
-
-    """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
-    __test__ = True
 
 
 class CommandSplitMongoTestCase(CommandsTestBase):

@@ -16,9 +16,7 @@ from opaque_keys.edx.keys import CourseKey
 from organizations.api import add_organization, get_course_organizations, get_organization_by_short_name
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization
-from xmodule.course_module import CourseFields
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from xmodule.course_block import CourseFields
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -83,7 +81,7 @@ class TestCourseListing(ModuleStoreTestCase):
         Reverse the setup
         """
         self.client.logout()
-        ModuleStoreTestCase.tearDown(self)
+        ModuleStoreTestCase.tearDown(self)  # pylint: disable=non-parent-method-called
 
     def test_rerun(self):
         """
@@ -114,26 +112,23 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(len(course_orgs), 1)
         self.assertEqual(course_orgs[0]['short_name'], self.source_course_key.org)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_newly_created_course_has_web_certs_enabled(self, store):
+    def test_newly_created_course_has_web_certs_enabled(self):
         """
         Tests newly created course has web certs enabled by default.
         """
-        with modulestore().default_store(store):
-            response = self.client.ajax_post(self.course_create_rerun_url, {
-                'org': 'orgX',
-                'number': 'CS101',
-                'display_name': 'Course with web certs enabled',
-                'run': '2015_T2'
-            })
-            self.assertEqual(response.status_code, 200)
-            data = parse_json(response)
-            new_course_key = CourseKey.from_string(data['course_key'])
-            course = self.store.get_course(new_course_key)
-            self.assertTrue(course.cert_html_view_enabled)
+        response = self.client.ajax_post(self.course_create_rerun_url, {
+            'org': 'orgX',
+            'number': 'CS101',
+            'display_name': 'Course with web certs enabled',
+            'run': '2015_T2'
+        })
+        self.assertEqual(response.status_code, 200)
+        data = parse_json(response)
+        new_course_key = CourseKey.from_string(data['course_key'])
+        course = self.store.get_course(new_course_key)
+        self.assertTrue(course.cert_html_view_enabled)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_course_creation_for_unknown_organization_relaxed(self, store):
+    def test_course_creation_for_unknown_organization_relaxed(self):
         """
         Tests that when ORGANIZATIONS_AUTOCREATE is True,
         creating a course-run with an unknown org slug will create an organization
@@ -141,40 +136,37 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         with self.assertRaises(InvalidOrganizationException):
             get_organization_by_short_name("orgX")
-        with modulestore().default_store(store):
-            response = self.client.ajax_post(self.course_create_rerun_url, {
-                'org': 'orgX',
-                'number': 'CS101',
-                'display_name': 'Course with web certs enabled',
-                'run': '2015_T2'
-            })
-            self.assertEqual(response.status_code, 200)
-            self.assertIsNotNone(get_organization_by_short_name("orgX"))
-            data = parse_json(response)
-            new_course_key = CourseKey.from_string(data['course_key'])
-            course_orgs = get_course_organizations(new_course_key)
-            self.assertEqual(len(course_orgs), 1)
-            self.assertEqual(course_orgs[0]['short_name'], 'orgX')
+        response = self.client.ajax_post(self.course_create_rerun_url, {
+            'org': 'orgX',
+            'number': 'CS101',
+            'display_name': 'Course with web certs enabled',
+            'run': '2015_T2'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(get_organization_by_short_name("orgX"))
+        data = parse_json(response)
+        new_course_key = CourseKey.from_string(data['course_key'])
+        course_orgs = get_course_organizations(new_course_key)
+        self.assertEqual(len(course_orgs), 1)
+        self.assertEqual(course_orgs[0]['short_name'], 'orgX')
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     @override_settings(ORGANIZATIONS_AUTOCREATE=False)
-    def test_course_creation_for_unknown_organization_strict(self, store):
+    def test_course_creation_for_unknown_organization_strict(self):
         """
         Tests that when ORGANIZATIONS_AUTOCREATE is False,
         creating a course-run with an unknown org slug will raise a validation error.
         """
-        with modulestore().default_store(store):
-            response = self.client.ajax_post(self.course_create_rerun_url, {
-                'org': 'orgX',
-                'number': 'CS101',
-                'display_name': 'Course with web certs enabled',
-                'run': '2015_T2'
-            })
-            self.assertEqual(response.status_code, 400)
-            with self.assertRaises(InvalidOrganizationException):
-                get_organization_by_short_name("orgX")
-            data = parse_json(response)
-            self.assertIn('Organization you selected does not exist in the system', data['error'])
+        response = self.client.ajax_post(self.course_create_rerun_url, {
+            'org': 'orgX',
+            'number': 'CS101',
+            'display_name': 'Course with web certs enabled',
+            'run': '2015_T2'
+        })
+        self.assertEqual(response.status_code, 400)
+        with self.assertRaises(InvalidOrganizationException):
+            get_organization_by_short_name("orgX")
+        data = parse_json(response)
+        self.assertIn('Organization you selected does not exist in the system', data['error'])
 
     @ddt.data(True, False)
     def test_course_creation_for_known_organization(self, organizations_autocreate):
@@ -201,23 +193,20 @@ class TestCourseListing(ModuleStoreTestCase):
             self.assertEqual(course_orgs[0]['short_name'], 'orgX')
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_course_creation_when_user_not_in_org(self, store):
+    def test_course_creation_when_user_not_in_org(self):
         """
         Tests course creation when user doesn't have the required role.
         """
-        with modulestore().default_store(store):
-            response = self.client.ajax_post(self.course_create_rerun_url, {
-                'org': 'TestorgX',
-                'number': 'CS101',
-                'display_name': 'Course with web certs enabled',
-                'run': '2021_T1'
-            })
-            self.assertEqual(response.status_code, 403)
+        response = self.client.ajax_post(self.course_create_rerun_url, {
+            'org': 'TestorgX',
+            'number': 'CS101',
+            'display_name': 'Course with web certs enabled',
+            'run': '2021_T1'
+        })
+        self.assertEqual(response.status_code, 403)
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_course_creation_when_user_in_org_with_creator_role(self, store):
+    def test_course_creation_when_user_in_org_with_creator_role(self):
         """
         Tests course creation with user having the organization content creation role.
         """
@@ -227,22 +216,20 @@ class TestCourseListing(ModuleStoreTestCase):
             'description': 'Testing Organization Description',
         })
         update_org_role(self.global_admin, OrgContentCreatorRole, self.user, [self.source_course_key.org])
-        with modulestore().default_store(store):
-            response = self.client.ajax_post(self.course_create_rerun_url, {
-                'org': self.source_course_key.org,
-                'number': 'CS101',
-                'display_name': 'Course with web certs enabled',
-                'run': '2021_T1'
-            })
-            self.assertEqual(response.status_code, 200)
+        response = self.client.ajax_post(self.course_create_rerun_url, {
+            'org': self.source_course_key.org,
+            'number': 'CS101',
+            'display_name': 'Course with web certs enabled',
+            'run': '2021_T1'
+        })
+        self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     @mock.patch(
         'cms.djangoapps.course_creators.admin.render_to_string',
         mock.Mock(side_effect=mock_render_to_string, autospec=True)
     )
-    def test_course_creation_with_all_org_checked(self, store):
+    def test_course_creation_with_all_org_checked(self):
         """
         Tests course creation with user having permission to create course for all organization.
         """
@@ -254,22 +241,20 @@ class TestCourseListing(ModuleStoreTestCase):
         self.course_creator_entry.all_organizations = True
         self.course_creator_entry.state = CourseCreator.GRANTED
         self.creator_admin.save_model(self.request, self.course_creator_entry, None, True)
-        with modulestore().default_store(store):
-            response = self.client.ajax_post(self.course_create_rerun_url, {
-                'org': self.source_course_key.org,
-                'number': 'CS101',
-                'display_name': 'Course with web certs enabled',
-                'run': '2021_T1'
-            })
-            self.assertEqual(response.status_code, 200)
+        response = self.client.ajax_post(self.course_create_rerun_url, {
+            'org': self.source_course_key.org,
+            'number': 'CS101',
+            'display_name': 'Course with web certs enabled',
+            'run': '2021_T1'
+        })
+        self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     @mock.patch(
         'cms.djangoapps.course_creators.admin.render_to_string',
         mock.Mock(side_effect=mock_render_to_string, autospec=True)
     )
-    def test_course_creation_with_permission_for_specific_organization(self, store):
+    def test_course_creation_with_permission_for_specific_organization(self):
         """
         Tests course creation with user having permission to create course for specific organization.
         """
@@ -283,22 +268,20 @@ class TestCourseListing(ModuleStoreTestCase):
         self.creator_admin.save_model(self.request, self.course_creator_entry, None, True)
         dc_org_object = Organization.objects.get(name='Test Organization')
         self.course_creator_entry.organizations.add(dc_org_object)
-        with modulestore().default_store(store):
-            response = self.client.ajax_post(self.course_create_rerun_url, {
-                'org': self.source_course_key.org,
-                'number': 'CS101',
-                'display_name': 'Course with web certs enabled',
-                'run': '2021_T1'
-            })
-            self.assertEqual(response.status_code, 200)
+        response = self.client.ajax_post(self.course_create_rerun_url, {
+            'org': self.source_course_key.org,
+            'number': 'CS101',
+            'display_name': 'Course with web certs enabled',
+            'run': '2021_T1'
+        })
+        self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     @mock.patch(
         'cms.djangoapps.course_creators.admin.render_to_string',
         mock.Mock(side_effect=mock_render_to_string, autospec=True)
     )
-    def test_course_creation_without_permission_for_specific_organization(self, store):
+    def test_course_creation_without_permission_for_specific_organization(self):
         """
         Tests course creation with user not having permission to create course for specific organization.
         """
@@ -319,11 +302,10 @@ class TestCourseListing(ModuleStoreTestCase):
         # When the user tries to create course under `Test Organization` it throws a 403.
         dc_org_object = Organization.objects.get(name='DC')
         self.course_creator_entry.organizations.add(dc_org_object)
-        with modulestore().default_store(store):
-            response = self.client.ajax_post(self.course_create_rerun_url, {
-                'org': self.source_course_key.org,
-                'number': 'CS101',
-                'display_name': 'Course with web certs enabled',
-                'run': '2021_T1'
-            })
-            self.assertEqual(response.status_code, 403)
+        response = self.client.ajax_post(self.course_create_rerun_url, {
+            'org': self.source_course_key.org,
+            'number': 'CS101',
+            'display_name': 'Course with web certs enabled',
+            'run': '2021_T1'
+        })
+        self.assertEqual(response.status_code, 403)

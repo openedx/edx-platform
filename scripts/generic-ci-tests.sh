@@ -17,9 +17,9 @@ set -e
 #       - "lms-unit": Run the LMS Python unit tests
 #       - "cms-unit": Run the CMS Python unit tests
 #       - "js-unit": Run the JavaScript tests
-#       - "commonlib-unit": Run Python unit tests from the common/lib directory
-#       - "commonlib-js-unit": Run the JavaScript tests and the Python unit
-#           tests from the common/lib directory
+#       - "pavelib-unit": Run Python unit tests from the pavelib/lib directory
+#       - "pavelib-js-unit": Run the JavaScript tests and the Python unit
+#           tests from the pavelib/lib directory
 #       - "bok-choy": Run acceptance tests that use the bok-choy framework
 #
 #   `SHARD` is a number indicating which subset of the tests to build.
@@ -70,7 +70,7 @@ if [ -z ${TOX_ENV+x} ] || [[ ${TOX_ENV} == 'null' ]]; then
     echo "TOX_ENV: ${TOX_ENV}"
     TOX=""
 elif tox -l |grep -q "${TOX_ENV}"; then
-    if [[ "${TOX_ENV}" == 'quality-django32' ]]; then
+    if [[ "${TOX_ENV}" == 'quality' ]]; then
         TOX=""
     else
         TOX="tox -r -e ${TOX_ENV} --"
@@ -147,16 +147,12 @@ case "$TEST_SUITE" in
         exit $EXIT
         ;;
 
-    "lms-unit"|"cms-unit"|"commonlib-unit")
-        $TOX bash scripts/unit-tests.sh
-        ;;
-
     "js-unit")
         $TOX paver test_js --coverage
         $TOX paver diff_coverage
         ;;
 
-    "commonlib-js-unit")
+    "pavelib-js-unit")
         $TOX paver test_js --coverage --skip-clean || { EXIT=1; }
         paver test_lib --skip-clean $PAVER_ARGS || { EXIT=1; }
 

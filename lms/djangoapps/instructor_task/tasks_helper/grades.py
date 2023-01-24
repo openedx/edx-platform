@@ -2,11 +2,14 @@
 Functionality for generating grade reports.
 """
 
+import csv
 import logging
 import re
 from collections import OrderedDict, defaultdict
 from datetime import datetime
 from itertools import chain
+from tempfile import TemporaryFile
+
 from time import time
 
 from django.conf import settings
@@ -30,8 +33,8 @@ from lms.djangoapps.instructor_analytics.basic import list_problem_responses
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor_task.config.waffle import (
     course_grade_report_verified_only,
-    optimize_get_learners_switch_enabled,
-    problem_grade_report_verified_only
+    problem_grade_report_verified_only,
+    use_on_disk_grade_reporting,
 )
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -42,10 +45,10 @@ from openedx.core.lib.cache_utils import get_cache
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.split_test_module import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.split_test_block import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .runner import TaskProgress
-from .utils import upload_csv_to_report_store
+from .utils import upload_csv_to_report_store, upload_csv_file_to_report_store
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
@@ -67,147 +70,6 @@ def _user_enrollment_status(user, course_id):
 
 def _flatten(iterable):
     return list(chain.from_iterable(iterable))
-
-
-class GradeReportBase:
-    """
-    Base class for grade reports (ProblemGradeReport and CourseGradeReport).
-    """
-
-    def _get_enrolled_learner_count(self, context):
-        """
-        Returns count of number of learner enrolled in course.
-        """
-        return CourseEnrollment.objects.users_enrolled_in(
-            course_id=context.course_id,
-            include_inactive=True,
-            verified_only=context.report_for_verified_only,
-        ).count()
-
-    def log_task_info(self, context, message):
-        """
-        Updates the status on the celery task to the given message.
-        Also logs the update.
-        """
-        fmt = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
-        task_info_string = fmt.format(
-            task_id=context.task_id,
-            entry_id=context.entry_id,
-            course_id=context.course_id,
-            task_input=context.task_input
-        )
-        TASK_LOG.info('%s, Task type: %s, %s, %s', task_info_string, context.action_name,
-                      message, context.task_progress.state)
-
-    def _handle_empty_generator(self, generator, default):
-        """
-        Handle empty generator.
-        Return default if the generator is emtpy, otherwise return all
-        its iterations (including the first which was used for validation).
-        """
-        TASK_LOG.info('GradeReport: Checking generator')
-        empty_generator_sentinel = object()
-        first_iteration_output = next(generator, empty_generator_sentinel)
-        generator_is_empty = first_iteration_output == empty_generator_sentinel
-
-        if generator_is_empty:
-            TASK_LOG.info('GradeReport: Generator is empty')
-            yield default
-
-        else:
-            TASK_LOG.info('GradeReport: Generator is not empty')
-            yield first_iteration_output
-            yield from generator
-
-    def _batch_users(self, context):
-        """
-        Returns a generator of batches of users.
-        """
-        def grouper(iterable, chunk_size=100, fillvalue=None):
-            args = [iter(iterable)] * chunk_size
-            return zip_longest(*args, fillvalue=fillvalue)
-
-        def get_enrolled_learners_for_course(course_id, verified_only=False):
-            """
-            Get all the enrolled users in a course chunk by chunk.
-            This generator method fetches & loads the enrolled user objects on demand which in chunk
-            size defined. This method is a workaround to avoid out-of-memory errors.
-            """
-            self.log_additional_info_for_testing(
-                context,
-                'ProblemGradeReport: Starting batching of enrolled students'
-            )
-
-            filter_kwargs = {
-                'courseenrollment__course_id': course_id,
-            }
-            if verified_only:
-                filter_kwargs['courseenrollment__mode'] = CourseMode.VERIFIED
-
-            user_ids_list = get_user_model().objects.filter(**filter_kwargs).values_list('id', flat=True).order_by('id')
-            user_chunks = grouper(user_ids_list)
-            for user_ids in user_chunks:
-                user_ids = [user_id for user_id in user_ids if user_id is not None]
-                min_id = min(user_ids)
-                max_id = max(user_ids)
-                users = get_user_model().objects.filter(
-                    id__gte=min_id,
-                    id__lte=max_id,
-                    **filter_kwargs
-                ).select_related('profile')
-
-                self.log_additional_info_for_testing(context, 'ProblemGradeReport: user chunk yielded successfully')
-                yield users
-
-        course_id = context.course_id
-        return get_enrolled_learners_for_course(course_id=course_id, verified_only=context.report_for_verified_only)
-
-    def _compile(self, context, batched_rows):
-        """
-        Compiles and returns the complete list of (success_rows, error_rows) for
-        the given batched_rows and context.
-        """
-        # partition and chain successes and errors
-        success_rows, error_rows = zip(*batched_rows)
-        success_rows = list(chain(*success_rows))
-        error_rows = list(chain(*error_rows))
-
-        # update metrics on task status
-        context.task_progress.succeeded = len(success_rows)
-        context.task_progress.failed = len(error_rows)
-        context.task_progress.attempted = context.task_progress.succeeded + context.task_progress.failed
-        context.task_progress.total = context.task_progress.attempted
-        return success_rows, error_rows
-
-    def _upload(self, context, success_rows, error_rows):
-        """
-        Creates and uploads a CSV for the given headers and rows.
-        """
-        date = datetime.now(UTC)
-        upload_csv_to_report_store(
-            success_rows,
-            context.upload_filename,
-            context.course_id,
-            date,
-            parent_dir=context.upload_parent_dir
-        )
-
-        if len(error_rows) > 1:
-            upload_csv_to_report_store(
-                error_rows,
-                context.upload_filename + '_err',
-                context.course_id,
-                date,
-                parent_dir=context.upload_parent_dir
-            )
-
-    def log_additional_info_for_testing(self, context, message):
-        """
-        Investigation logs for test problem grade report.
-
-        TODO -- Remove as a part of PROD-1287
-        """
-        context.update_status(message)
 
 
 class _CourseGradeReportContext:
@@ -414,72 +276,53 @@ class _CourseGradeBulkContext:  # lint-amnesty, pylint: disable=missing-class-do
         BulkCourseTags.prefetch(context.course_id, users)
 
 
-class CourseGradeReport:
+class InMemoryReportMixin:
     """
-    Class to encapsulate functionality related to generating Grade Reports.
+    Mixin for a file report that will generate file in memory and then upload to report store
     """
-    # Batch size for chunking the list of enrollees in the course.
-    USER_BATCH_SIZE = 100
-
-    @classmethod
-    def generate(cls, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
-        """
-        Public method to generate a grade report.
-        """
-        with modulestore().bulk_operations(course_id):
-            context = _CourseGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
-            return CourseGradeReport()._generate(context)  # lint-amnesty, pylint: disable=protected-access
-
-    def _generate(self, context):
+    def _generate(self):
         """
         Internal method for generating a grade report for the given context.
         """
-        context.update_status('Starting grades')
-        success_headers = self._success_headers(context)
+        self.context.update_status('InMemoryReportMixin - 1: Starting grade report')
+        success_headers = self._success_headers()
         error_headers = self._error_headers()
-        batched_rows = self._batched_rows(context)
+        batched_rows = self._batched_rows()
 
-        context.update_status('Compiling grades')
-        success_rows, error_rows = self._compile(context, batched_rows)
+        self.context.update_status('InMemoryReportMixin - 2: Compiling grades')
+        success_rows, error_rows = self._compile(batched_rows)
 
-        context.update_status('Uploading grades')
-        self._upload(context, success_headers, success_rows, error_headers, error_rows)
+        self.context.update_status('InMemoryReportMixin - 3: Uploading grades')
+        self._upload(success_headers, success_rows, error_headers, error_rows)
 
-        return context.update_status('Completed grades')
+        return self.context.update_status('InMemoryReportMixin - 4: Completed grades')
 
-    def _success_headers(self, context):
+    def _upload(self, success_headers, success_rows, error_headers, error_rows):
         """
-        Returns a list of all applicable column headers for this grade report.
+        Creates and uploads a CSV for the given headers and rows.
         """
-        return (
-            ["Student ID", "Email", "Username"] +
-            self._grades_header(context) +
-            (['Cohort Name'] if context.cohorts_enabled else []) +
-            [f'Experiment Group ({partition.name})' for partition in context.course_experiments] +
-            (['Team Name'] if context.teams_enabled else []) +
-            ['Enrollment Track', 'Verification Status'] +
-            ['Certificate Eligible', 'Certificate Delivered', 'Certificate Type'] +
-            ['Enrollment Status']
+        date = datetime.now(UTC)
+        upload_csv_to_report_store(
+            [success_headers] + success_rows,
+            self.context.upload_filename,
+            self.context.course_id,
+            date,
+            parent_dir=self.context.upload_parent_dir
         )
 
-    def _error_headers(self):
-        """
-        Returns a list of error headers for this grade report.
-        """
-        return ["Student ID", "Username", "Error"]
+        if len(error_rows) > 0:
+            upload_csv_to_report_store(
+                [error_headers] + error_rows,
+                self.context.upload_filename + '_err',
+                self.context.course_id,
+                date,
+                parent_dir=self.context.upload_parent_dir
+            )
 
-    def _batched_rows(self, context):
-        """
-        A generator of batches of (success_rows, error_rows) for this report.
-        """
-        for users in self._batch_users(context):
-            users = [u for u in users if u is not None]
-            yield self._rows_for_users(context, users)
-
-    def _compile(self, context, batched_rows):
+    def _compile(self, batched_rows):
         """
         Compiles and returns the complete list of (success_rows, error_rows) for
-        the given batched_rows and context.
+        the given batched_rows.
         """
         # partition and chain successes and errors
         success_rows, error_rows = zip(*batched_rows)
@@ -487,84 +330,128 @@ class CourseGradeReport:
         error_rows = list(chain(*error_rows))
 
         # update metrics on task status
-        context.task_progress.succeeded = len(success_rows)
-        context.task_progress.failed = len(error_rows)
-        context.task_progress.attempted = context.task_progress.succeeded + context.task_progress.failed
-        context.task_progress.total = context.task_progress.attempted
+        self.context.task_progress.succeeded = len(success_rows)
+        self.context.task_progress.failed = len(error_rows)
+        self.context.task_progress.attempted = self.context.task_progress.succeeded + self.context.task_progress.failed
+        self.context.task_progress.total = self.context.task_progress.attempted
         return success_rows, error_rows
 
-    def _upload(self, context, success_headers, success_rows, error_headers, error_rows):
+
+class TemporaryFileReportMixin:
+    """
+    Mixin for a file report that will write rows iteratively to a TempFile
+    """
+    def _generate(self):
         """
-        Creates and uploads a CSV for the given headers and rows.
+        Generate a CSV containing all students' problem grades within a given `course_id`.
+        """
+        self.context.update_status('TemporaryFileReportMixin - 1: Starting grade report')
+        batched_rows = self._batched_rows()
+
+        with TemporaryFile('r+') as success_file, TemporaryFile('r+') as error_file:
+            self.context.update_status('TemporaryFileReportMixin - 2: Compiling grades into temp files')
+            has_errors = self.iter_and_write_batched_rows(batched_rows, success_file, error_file)
+
+            self.context.update_status('TemporaryFileReportMixin - 3: Uploading files')
+            self.upload_temp_files(success_file, error_file, has_errors)
+
+        return self.context.update_status('TemporaryFileReportMixin - 4: Completed grades')
+
+    def iter_and_write_batched_rows(self, batched_rows, success_file, error_file):
+        """
+        Iterate through batched rows, writing returned chunks to disk as we go.
+        This should hopefully help us avoid out of memory errors.
+        """
+        success_writer = csv.writer(success_file)
+        error_writer = csv.writer(error_file)
+
+        # Write headers
+        success_writer.writerow(self._success_headers())
+        error_writer.writerow(self._error_headers())
+
+        succeeded, failed = 0, 0
+        # Iterate through batched rows, writing to temp file
+        for success_rows, error_rows in batched_rows:
+            success_writer.writerows(success_rows)
+            if len(error_rows) > 0:
+                error_writer.writerows(error_rows)
+            succeeded += len(success_rows)
+            failed += len(error_rows)
+
+        self.context.task_progress.succeeded = succeeded
+        self.context.task_progress.failed = failed
+        self.context.task_progress.attempted = succeeded + failed
+        self.context.task_progress.total = self.context.task_progress.attempted
+
+        return self.context.task_progress.failed > 0
+
+    def upload_temp_files(self, success_file, error_file, has_errors):
+        """
+        Uploads success and error csv files to report store
         """
         date = datetime.now(UTC)
-        upload_csv_to_report_store(
-            [success_headers] + success_rows,
-            context.upload_filename,
-            context.course_id,
+
+        success_file.seek(0)
+        upload_csv_file_to_report_store(
+            success_file,
+            self.context.upload_filename,
+            self.context.course_id,
             date,
-            parent_dir=context.upload_parent_dir
+            parent_dir=self.context.upload_parent_dir
         )
-        if len(error_rows) > 0:
-            upload_csv_to_report_store(
-                [error_headers] + error_rows,
-                '{}_err'.format(context.upload_filename),
-                context.course_id,
+
+        if has_errors:
+            error_file.seek(0)
+            upload_csv_file_to_report_store(
+                error_file,
+                self.context.upload_filename + '_err',
+                self.context.course_id,
                 date,
-                parent_dir=context.upload_parent_dir
+                parent_dir=self.context.upload_parent_dir
             )
 
-    def _grades_header(self, context):
-        """
-        Returns the applicable grades-related headers for this report.
-        """
-        graded_assignments = context.graded_assignments
-        grades_header = ["Grade"]
-        for assignment_info in graded_assignments.values():
-            if assignment_info['separate_subsection_avg_headers']:
-                grades_header.extend(assignment_info['subsection_headers'].values())
-            grades_header.append(assignment_info['average_header'])
-        return grades_header
 
-    def _batch_users(self, context):
+class GradeReportBase:
+    """
+    Base class for grade reports (ProblemGradeReport and CourseGradeReport).
+    """
+    def __init__(self, context):
+        self.context = context
+
+    def _get_enrolled_learner_count(self):
+        """
+        Returns count of number of learner enrolled in course.
+        """
+        return CourseEnrollment.objects.users_enrolled_in(
+            course_id=self.context.course_id,
+            include_inactive=True,
+            verified_only=self.context.report_for_verified_only,
+        ).count()
+
+    def log_task_info(self, message):
+        """
+        Updates the status on the celery task to the given message.
+        Also logs the update.
+        """
+        fmt = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+        task_info_string = fmt.format(
+            task_id=self.context.task_id,
+            entry_id=self.context.entry_id,
+            course_id=self.context.course_id,
+            task_input=self.context.task_input
+        )
+        TASK_LOG.info('%s, Task type: %s, %s, %s', task_info_string, self.context.action_name,
+                      message, self.context.task_progress.state)
+
+    def _batch_users(self):
         """
         Returns a generator of batches of users.
         """
-
-        def grouper(iterable, chunk_size=self.USER_BATCH_SIZE, fillvalue=None):
+        def grouper(iterable, chunk_size=100, fillvalue=None):
             args = [iter(iterable)] * chunk_size
             return zip_longest(*args, fillvalue=fillvalue)
 
         def get_enrolled_learners_for_course(course_id, verified_only=False):
-            """
-            Get enrolled learners in a course.
-            Arguments:
-                course_id (CourseLocator): course_id to return enrollees for.
-                verified_only (boolean): is a boolean when True, returns only verified enrollees.
-            """
-            if optimize_get_learners_switch_enabled():
-                TASK_LOG.info('%s, Creating Course Grade with optimization', task_log_message)
-                return users_for_course_v2(course_id, verified_only=verified_only)
-
-            TASK_LOG.info('%s, Creating Course Grade without optimization', task_log_message)
-            return users_for_course(course_id, verified_only=verified_only)
-
-        def users_for_course(course_id, verified_only=False):
-            """
-            Get all the enrolled users in a course.
-            This method fetches & loads the enrolled user objects at once which may cause
-            out-of-memory errors in large courses. This method will be removed when
-            `OPTIMIZE_GET_LEARNERS_FOR_COURSE` waffle flag is removed.
-            """
-            users = CourseEnrollment.objects.users_enrolled_in(
-                course_id,
-                include_inactive=True,
-                verified_only=verified_only,
-            )
-            users = users.select_related('profile')
-            return grouper(users)
-
-        def users_for_course_v2(course_id, verified_only=False):
             """
             Get all the enrolled users in a course chunk by chunk.
             This generator method fetches & loads the enrolled user objects on demand which in chunk
@@ -587,18 +474,126 @@ class CourseGradeReport:
                     id__lte=max_id,
                     **filter_kwargs
                 ).select_related('profile')
-                yield users
-        course_id = context.course_id
-        task_log_message = f'{context.task_info_string}, Task type: {context.action_name}'
-        return get_enrolled_learners_for_course(course_id=course_id, verified_only=context.report_for_verified_only)
 
-    def _user_grades(self, course_grade, context):
+                yield users
+
+        return get_enrolled_learners_for_course(
+            course_id=self.context.course_id,
+            verified_only=self.context.report_for_verified_only
+        )
+
+    def log_additional_info_for_testing(self, message):
+        """
+        Investigation logs for test problem grade report.
+
+        TODO -- Remove as a part of PROD-1287
+        """
+        self.context.update_status(message)
+
+    def _clear_caches(self):
+        """
+        Override if a report type wants to clear caches after a batch of learners has
+        been processed
+        """
+
+    def _batched_rows(self):
+        """
+        A generator of batches of (success_rows, error_rows) for this report.
+        """
+        for users in self._batch_users():
+            yield self._rows_for_users(users)
+            self._clear_caches()
+
+
+class CourseGradeReport(GradeReportBase):
+    """
+    Class to encapsulate functionality related to generating user/row had header data for Corse Grade Reports.
+    """
+    # Batch size for chunking the list of enrollees in the course.
+    USER_BATCH_SIZE = 100
+
+    @classmethod
+    def generate(cls, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+        """
+        Public method to generate a grade report.
+        """
+        with modulestore().bulk_operations(course_id):
+            context = _CourseGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
+            if use_on_disk_grade_reporting(course_id):  # AU-926
+                return TempFileCourseGradeReport(context)._generate()  # pylint: disable=protected-access
+            else:
+                return InMemoryCourseGradeReport(context)._generate()  # pylint: disable=protected-access
+
+    def _success_headers(self):
+        """
+        Returns a list of all applicable column headers for this grade report.
+        """
+        return (
+            ["Student ID", "Email", "Username"] +
+            self._grades_header() +
+            (['Cohort Name'] if self.context.cohorts_enabled else []) +
+            [f'Experiment Group ({partition.name})' for partition in self.context.course_experiments] +
+            (['Team Name'] if self.context.teams_enabled else []) +
+            ['Enrollment Track', 'Verification Status'] +
+            ['Certificate Eligible', 'Certificate Delivered', 'Certificate Type'] +
+            ['Enrollment Status']
+        )
+
+    def _error_headers(self):
+        """
+        Returns a list of error headers for this grade report.
+        """
+        return ["Student ID", "Username", "Error"]
+
+    def _grades_header(self):
+        """
+        Returns the applicable grades-related headers for this report.
+        """
+        graded_assignments = self.context.graded_assignments
+        grades_header = ["Grade"]
+        for assignment_info in graded_assignments.values():
+            if assignment_info['separate_subsection_avg_headers']:
+                grades_header.extend(assignment_info['subsection_headers'].values())
+            grades_header.append(assignment_info['average_header'])
+        return grades_header
+
+    def _rows_for_users(self, users):
+        """
+        Returns a list of rows for the given users for this report.
+        """
+        with modulestore().bulk_operations(self.context.course_id):
+            bulk_context = _CourseGradeBulkContext(self.context, users)
+
+            success_rows, error_rows = [], []
+            for user, course_grade, error in CourseGradeFactory().iter(
+                users,
+                course=self.context.course,
+                collected_block_structure=self.context.course_structure,
+                course_key=self.context.course_id,
+            ):
+                if not course_grade:
+                    # An empty gradeset means we failed to grade a student.
+                    error_rows.append([user.id, user.username, str(error)])
+                else:
+                    success_rows.append(
+                        [user.id, user.email, user.username] +
+                        self._user_grades(course_grade) +
+                        self._user_cohort_group_names(user) +
+                        self._user_experiment_group_names(user) +
+                        self._user_team_names(user, bulk_context.teams) +
+                        self._user_verification_mode(user, bulk_context.enrollments) +
+                        self._user_certificate_info(user, course_grade, bulk_context.certs) +
+                        [_user_enrollment_status(user, self.context.course_id)]
+                    )
+            return success_rows, error_rows
+
+    def _user_grades(self, course_grade):
         """
         Returns a list of grade results for the given course_grade corresponding
         to the headers for this report.
         """
         grade_results = []
-        for _, assignment_info in context.graded_assignments.items():
+        for _, assignment_info in self.context.graded_assignments.items():
             subsection_grades, subsection_grades_results = self._user_subsection_grades(
                 course_grade,
                 assignment_info['subsection_headers'],
@@ -628,7 +623,10 @@ class CourseGradeReport:
             subsection_grades.append(subsection_grade)
         return subsection_grades, grade_results
 
-    def _user_assignment_average(self, course_grade, subsection_grades, assignment_info):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _user_assignment_average(self, course_grade, subsection_grades, assignment_info):
+        """
+        Returns grade averages for assignment types
+        """
         if assignment_info['separate_subsection_avg_headers']:
             if assignment_info['grader']:
                 if course_grade.attempted:
@@ -641,25 +639,25 @@ class CourseGradeReport:
                     assignment_average = 0.0
                 return assignment_average
 
-    def _user_cohort_group_names(self, user, context):
+    def _user_cohort_group_names(self, user):
         """
         Returns a list of names of cohort groups in which the given user
         belongs.
         """
         cohort_group_names = []
-        if context.cohorts_enabled:
-            group = get_cohort(user, context.course_id, assign=False, use_cached=True)
+        if self.context.cohorts_enabled:
+            group = get_cohort(user, self.context.course_id, assign=False, use_cached=True)
             cohort_group_names.append(group.name if group else '')
         return cohort_group_names
 
-    def _user_experiment_group_names(self, user, context):
+    def _user_experiment_group_names(self, user):
         """
         Returns a list of names of course experiments in which the given user
         belongs.
         """
         experiment_group_names = []
-        for partition in context.course_experiments:
-            group = PartitionService(context.course_id).get_group(user, partition, assign=False)
+        for partition in self.context.course_experiments:
+            group = PartitionService(self.context.course_id).get_group(user, partition, assign=False)
             experiment_group_names.append(group.name if group else '')
         return experiment_group_names
 
@@ -672,12 +670,12 @@ class CourseGradeReport:
             team_names = [bulk_teams.teams_by_user.get(user.id, '')]
         return team_names
 
-    def _user_verification_mode(self, user, context, bulk_enrollments):
+    def _user_verification_mode(self, user, bulk_enrollments):
         """
         Returns a list of enrollment-mode and verification-status for the
         given user.
         """
-        enrollment_mode = CourseEnrollment.enrollment_mode_for_user(user, context.course_id)[0]
+        enrollment_mode = CourseEnrollment.enrollment_mode_for_user(user, self.context.course_id)[0]
         verification_status = IDVerificationService.verification_status_for_user(
             user,
             enrollment_mode,
@@ -685,54 +683,32 @@ class CourseGradeReport:
         )
         return [enrollment_mode, verification_status]
 
-    def _user_certificate_info(self, user, context, course_grade, bulk_certs):
+    def _user_certificate_info(self, user, course_grade, bulk_certs):
         """
         Returns the course certification information for the given user.
         """
         is_allowlisted = user.id in bulk_certs.allowlisted_user_ids
         certificate_info = certs_api.certificate_info_for_user(
             user,
-            context.course_id,
+            self.context.course_id,
             course_grade.letter_grade,
             is_allowlisted,
             bulk_certs.certificates_by_user.get(user.id),
         )
         return certificate_info
 
-    def _rows_for_users(self, context, users):
-        """
-        Returns a list of rows for the given users for this report.
-        """
-        with modulestore().bulk_operations(context.course_id):
-            bulk_context = _CourseGradeBulkContext(context, users)
 
-            success_rows, error_rows = [], []
-            for user, course_grade, error in CourseGradeFactory().iter(
-                users,
-                course=context.course,
-                collected_block_structure=context.course_structure,
-                course_key=context.course_id,
-            ):
-                if not course_grade:
-                    # An empty gradeset means we failed to grade a student.
-                    error_rows.append([user.id, user.username, str(error)])
-                else:
-                    success_rows.append(
-                        [user.id, user.email, user.username] +
-                        self._user_grades(course_grade, context) +
-                        self._user_cohort_group_names(user, context) +
-                        self._user_experiment_group_names(user, context) +
-                        self._user_team_names(user, bulk_context.teams) +
-                        self._user_verification_mode(user, context, bulk_context.enrollments) +
-                        self._user_certificate_info(user, context, course_grade, bulk_context.certs) +
-                        [_user_enrollment_status(user, context.course_id)]
-                    )
-            return success_rows, error_rows
+class InMemoryCourseGradeReport(CourseGradeReport, InMemoryReportMixin):
+    """ Course Grade Report that compiles and then uploads all rows at once """
+
+
+class TempFileCourseGradeReport(CourseGradeReport, TemporaryFileReportMixin):
+    """ Course Grade Report that writes file iteratively to a TempFile to then be uploaded """
 
 
 class ProblemGradeReport(GradeReportBase):
     """
-    Class to encapsulate functionality related to generating Problem Grade Reports.
+    Class to encapsulate functionality related to generating user/row had header data for Problem Grade Reports.
     """
 
     @classmethod
@@ -742,31 +718,12 @@ class ProblemGradeReport(GradeReportBase):
         """
         with modulestore().bulk_operations(course_id):
             context = _ProblemGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
-            # pylint: disable=protected-access
-            return ProblemGradeReport()._generate(context)
+            if use_on_disk_grade_reporting(course_id):  # AU-926
+                return TempFileProblemGradeReport(context)._generate()  # pylint: disable=protected-access
+            else:
+                return InMemoryProblemGradeReport(context)._generate()  # pylint: disable=protected-access
 
-    def _generate(self, context):
-        """
-        Generate a CSV containing all students' problem grades within a given
-        `course_id`.
-        """
-        context.update_status('ProblemGradeReport - 1: Starting problem grades')
-        success_headers = self._success_headers(context)
-        error_headers = self._error_headers()
-        batched_rows = self._batched_rows(context)
-
-        context.update_status('ProblemGradeReport - 2: Compiling grades')
-        success_rows, error_rows = self._compile(context, batched_rows)
-        context.update_status('ProblemGradeReport - 3: Uploading grades')
-        self._upload(context, [success_headers] + success_rows, [error_headers] + error_rows)
-
-        return context.update_status('ProblemGradeReport - 4: Completed problem grades')
-
-    def _problem_grades_header(self):
-        """Problem Grade report header."""
-        return OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
-
-    def _success_headers(self, context):
+    def _success_headers(self):
         """
         Returns headers for all gradable blocks including fixed headers
         for report.
@@ -774,7 +731,7 @@ class ProblemGradeReport(GradeReportBase):
             list: combined header and scorable blocks
         """
         header_row = list(self._problem_grades_header().values()) + ['Enrollment Status', 'Grade']
-        return header_row + _flatten(list(context.graded_scorable_blocks_header.values()))
+        return header_row + _flatten(list(self.context.graded_scorable_blocks_header.values()))
 
     def _error_headers(self):
         """
@@ -784,19 +741,21 @@ class ProblemGradeReport(GradeReportBase):
         """
         return list(self._problem_grades_header().values()) + ['error_msg']
 
-    def _rows_for_users(self, context, users):
+    def _problem_grades_header(self):
+        """Problem Grade report header."""
+        return OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
+
+    def _rows_for_users(self, users):
         """
         Returns a list of rows for the given users for this report.
         """
-        self.log_additional_info_for_testing(context, 'ProblemGradeReport: Starting to process new user batch.')
         success_rows, error_rows = [], []
         for student, course_grade, error in CourseGradeFactory().iter(
             users,
-            course=context.course,
-            collected_block_structure=context.course_structure,
-            course_key=context.course_id,
+            course=self.context.course,
+            collected_block_structure=self.context.course_structure,
+            course_key=self.context.course_id,
         ):
-            context.task_progress.attempted += 1
             if not course_grade:
                 err_msg = str(error)
                 # There was an error grading this student.
@@ -806,11 +765,10 @@ class ProblemGradeReport(GradeReportBase):
                     [student.id, student.email, student.username] +
                     [err_msg]
                 )
-                context.task_progress.failed += 1
                 continue
 
             earned_possible_values = []
-            for block_location in context.graded_scorable_blocks_header:
+            for block_location in self.context.graded_scorable_blocks_header:
                 try:
                     problem_score = course_grade.problem_scores[block_location]
                 except KeyError:
@@ -821,8 +779,7 @@ class ProblemGradeReport(GradeReportBase):
                     else:
                         earned_possible_values.append(['Not Attempted', problem_score.possible])
 
-            context.task_progress.succeeded += 1
-            enrollment_status = _user_enrollment_status(student, context.course_id)
+            enrollment_status = _user_enrollment_status(student, self.context.course_id)
             success_rows.append(
                 [student.id, student.email, student.username] +
                 [enrollment_status, course_grade.percent] +
@@ -831,15 +788,17 @@ class ProblemGradeReport(GradeReportBase):
 
         return success_rows, error_rows
 
-    def _batched_rows(self, context):
-        """
-        A generator of batches of (success_rows, error_rows) for this report.
-        """
-        for users in self._batch_users(context):
-            yield self._rows_for_users(context, users)
-            # Clear the CourseEnrollment caches after each batch of users has been processed
-            get_cache('get_enrollment').clear()
-            get_cache(CourseEnrollment.MODE_CACHE_NAMESPACE).clear()
+    def _clear_caches(self):
+        get_cache('get_enrollment').clear()
+        get_cache(CourseEnrollment.MODE_CACHE_NAMESPACE).clear()
+
+
+class InMemoryProblemGradeReport(ProblemGradeReport, InMemoryReportMixin):
+    """ Program Grade Report that compiles and then uploads all rows at once """
+
+
+class TempFileProblemGradeReport(ProblemGradeReport, TemporaryFileReportMixin):
+    """ Program Grade Report that writes file iteratively to a TempFile to then be uploaded """
 
 
 class ProblemResponses:

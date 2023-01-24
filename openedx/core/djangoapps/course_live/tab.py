@@ -4,11 +4,14 @@ Configurations to render Course Live Tab
 from django.utils.translation import gettext_lazy
 from lti_consumer.models import LtiConfiguration
 
-from xmodule.course_module import CourseBlock
+
+from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
+from xmodule.course_block import CourseBlock
 from xmodule.tabs import TabFragmentViewMixin
 from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
+from openedx.core.djangoapps.course_live.providers import ProviderManager, HasGlobalCredentials
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
@@ -41,7 +44,21 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         """
         Get course live configurations
         """
-        return CourseLiveConfiguration.get(course.id).lti_configuration
+        course_live_configurations = CourseLiveConfiguration.get(course.id)
+        if course_live_configurations.free_tier:
+            providers = ProviderManager().get_enabled_providers()
+            provider = providers[course_live_configurations.provider_type]
+            if isinstance(provider, HasGlobalCredentials):
+                return LtiConfiguration(
+                    lti_1p1_launch_url=provider.url,
+                    lti_1p1_client_key=provider.key,
+                    lti_1p1_client_secret=provider.secret,
+                    version='lti_1p1',
+                    config_store=LtiConfiguration.CONFIG_ON_DB,
+                )
+            else:
+                raise ValueError("Provider does not support global credentials")
+        return course_live_configurations.lti_configuration
 
     @classmethod
     @request_cached()
@@ -49,6 +66,22 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         """
         Check if the tab is enabled.
         """
-        return (ENABLE_COURSE_LIVE.is_enabled(course.id) and
-                super().is_enabled(course, user) and
-                CourseLiveConfiguration.is_enabled(course.id))
+        return (
+            ENABLE_COURSE_LIVE.is_enabled(course.id) and
+            super().is_enabled(course, user) and
+            CourseLiveConfiguration.is_enabled(course.id)
+        )
+
+    def _get_pii_lti_parameters(self, course, request):
+        pii_config = super()._get_pii_lti_parameters(course, request)
+        provider_type = ''
+
+        course_live_configurations = CourseLiveConfiguration.get(course.id)
+        if course_live_configurations:
+            provider_type = course_live_configurations.provider_type
+
+        if provider_type == 'zoom' and (CourseStaffRole(course.id).has_user(request.user) or
+                                        CourseInstructorRole(course.id).has_user(request.user)):
+            pii_config['person_contact_email_primary'] = request.user.email
+
+        return pii_config

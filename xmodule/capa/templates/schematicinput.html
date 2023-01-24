@@ -1,0 +1,24 @@
+<%! from xmodule.capa.util import remove_markup %>
+<div>
+  <div class="script_placeholder" data-src="${setup_script}"/>
+  <input type="hidden"
+    class="schematic"
+    height="${height}"
+    width="${width}"
+    parts="${parts}"
+    analyses="${analyses}"
+    name="input_${id}"
+    id="input_${id}"
+    aria-label="${remove_markup(response_data['label'])}"
+    aria-describedby="answer_${id}"
+    value="${value|h}"
+    initial_value="${initial_value|h}"
+    submit_analyses="${submit_analyses|h}"
+    />
+
+  <span id="answer_${id}"></span>
+  <div class="indicator-container">
+    <%include file="status_span.html" args="status=status, status_id=id"/>
+
+  </div>
+</div>

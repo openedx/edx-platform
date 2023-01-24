@@ -114,7 +114,11 @@ if (is_proctored_exam) {
             >
                 <span class="icon fa fa-caret-down" aria-hidden="true"></span>
         <% } else { %>
-            <h3 class="<%- xblockType %>-header-details">
+            <% if (xblockType == "unit") { %>
+                <h3 class="unit-header-details" style="width: 50%">
+            <% } else { %>
+                <h3 class="<%- xblockType %>-header-details">
+            <% } %>
         <% } %>
                 <% if (xblockInfo.isVertical()) { %>
                     <span class="unit-title item-title">
@@ -128,8 +132,19 @@ if (is_proctored_exam) {
                     </span>
                 <% } %>
             </h3>
-        <div class="<%- xblockType %>-header-actions">
+        <% if (xblockType == "unit") {%>
+            <div class="unit-header-actions" style="width: 50%">
+        <% } else { %>
+            <div class="<%- xblockType %>-header-actions">
+        <% } %>
             <ul class="actions-list">
+                <% if (xblockInfo.isVertical()) { %>
+                    <% if (xblockInfo.get('has_discussion')) {%>
+                        <li class="action-item" style="font-size: 75%; color:grey">
+                            Discussions enabled
+                        </li>
+                    <% } %>
+                <% } %>
                 <% if (xblockInfo.isSequential() && xblockInfo.get('proctoring_exam_configuration_link')) { %>
                 <li class="action-item">
                     <a href="<%- xblockInfo.get('proctoring_exam_configuration_link') %>" data-tooltip="<%- gettext('Proctoring Settings') %>" class="proctoring-configuration-button" rel="noopener" target="_blank">

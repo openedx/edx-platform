@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 
 import ddt
 from django.urls import reverse
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import BlockFactory
 from xmodule.tabs import CourseTabList
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -43,15 +43,11 @@ class TabsAPITests(CourseTestCase):
         )
 
         # add a static tab to the course, for code coverage
-        # add 4 static tabs to the course, for code coverage
-        self.test_tabs = []
-        for i in range(1, 5):
-            tab = ItemFactory.create(
-                parent_location=self.course.location,
-                category="static_tab",
-                display_name=f"Static_{i}"
-            )
-        self.test_tabs.append(tab)
+        self.test_tab = BlockFactory.create(
+            parent_location=self.course.location,
+            category="static_tab",
+            display_name="Static_1",
+        )
         self.reload_course()
 
     def check_invalid_response(self, resp):
@@ -128,27 +124,6 @@ class TabsAPITests(CourseTestCase):
         reordered_tab_ids = [tab.tab_id for tab in course_tabs]
         new_tab_ids = [tab.tab_id for tab in self.course.tabs]
         assert new_tab_ids == reordered_tab_ids
-
-    def test_reorder_tabs_invalid_list(self):
-        """
-        Test re-ordering of tabs with invalid tab list.
-
-        Not all tabs can be rearranged. Here we are trying to swap the first
-        two tabs, which is disallowed since the first tab is the "Course" tab
-        which is immovable.
-        """
-
-        orig_tab_ids = [tab.tab_id for tab in self.course.tabs]
-        tab_ids = list(orig_tab_ids)
-
-        # reorder the first two tabs
-        tab_ids[0], tab_ids[1] = tab_ids[1], tab_ids[0]
-
-        # post the request
-        resp = self.make_reorder_tabs_request([{"tab_id": tab_id} for tab_id in tab_ids])
-        assert resp.status_code == 400
-        error = self.check_invalid_response(resp)
-        assert "error" in error
 
     def test_reorder_tabs_invalid_tab_ids(self):
         """

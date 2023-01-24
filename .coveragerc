@@ -4,12 +4,11 @@ data_file = reports/${TEST_SUITE}.coverage
 source =
     cms
     common/djangoapps
-    common/lib/capa
-    common/lib/xmodule
     lms
     openedx
     pavelib
     scripts
+    xmodule
 
 omit =
     cms/envs/*

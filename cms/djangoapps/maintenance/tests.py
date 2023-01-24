@@ -12,10 +12,9 @@ from django.urls import reverse
 from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from openedx.features.announcements.models import Announcement
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .views import COURSE_KEY_ERROR_MESSAGES, MAINTENANCE_VIEWS
 
@@ -140,9 +139,9 @@ class TestForcePublish(MaintenanceViewTestCase):
         Returns:
             course: a course object
         """
-        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        course = CourseFactory.create()
         # Add some changes to course
-        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        chapter = BlockFactory.create(category='chapter', parent_location=course.location)
         self.store.create_child(
             self.user.id,
             chapter.location,
@@ -167,34 +166,6 @@ class TestForcePublish(MaintenanceViewTestCase):
         self.verify_error_message(
             data={'course-id': course_key},
             error_message=error_message
-        )
-
-    def test_mongo_course(self):
-        """
-        Test that we get a error message on old mongo courses.
-        """
-        # validate non split error message
-        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
-        self.verify_error_message(
-            data={'course-id': str(course.id)},
-            error_message='Force publishing course is not supported with old mongo courses.'
-        )
-
-    def test_mongo_course_with_split_course_key(self):
-        """
-        Test that we get an error message `course_key_not_found` for a provided split course key
-        if we already have an old mongo course.
-        """
-        # validate non split error message
-        course = CourseFactory.create(org='e', number='d', run='X', default_store=ModuleStoreEnum.Type.mongo)
-        self.verify_error_message(
-            data={'course-id': str(course.id)},
-            error_message='Force publishing course is not supported with old mongo courses.'
-        )
-        # Now search for the course key in split version.
-        self.verify_error_message(
-            data={'course-id': 'course-v1:e+d+X'},
-            error_message=COURSE_KEY_ERROR_MESSAGES['course_key_not_found']
         )
 
     def test_already_published(self):

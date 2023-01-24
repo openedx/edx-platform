@@ -5,8 +5,10 @@ Declaration of CourseOverview model
 
 import json
 import logging
+from datetime import datetime
 from urllib.parse import urlparse, urlunparse
 
+import pytz
 from ccx_keys.locator import CCXLocator
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -28,8 +30,8 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.cache_utils import request_cached, RequestCache
 from common.djangoapps.static_replace.models import AssetBaseUrlConfig
 from xmodule import block_metadata_utils, course_metadata_utils  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_module import DEFAULT_START_DATE, CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import DEFAULT_START_DATE, CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -62,7 +64,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 17
+    VERSION = 18
 
     # Cache entry versioning.
     version = models.IntegerField()
@@ -141,6 +143,8 @@ class CourseOverview(TimeStampedModel):
     entrance_exam_enabled = models.BooleanField(default=False)
     entrance_exam_id = models.CharField(max_length=255, blank=True)
     entrance_exam_minimum_score_pct = models.FloatField(default=0.65)
+
+    external_id = models.CharField(max_length=128, null=True, blank=True)
 
     language = models.TextField(null=True)
 
@@ -532,6 +536,12 @@ class CourseOverview(TimeStampedModel):
         """
         return course_metadata_utils.has_course_ended(self.end)
 
+    def is_enrollment_open(self):
+        """
+        Returns True if course enrollment is open
+        """
+        return course_metadata_utils.is_enrollment_open(self.enrollment_start, self.enrollment_end)
+
     def has_marketing_url(self):
         """
         Returns whether the course has marketing url.
@@ -647,7 +657,7 @@ class CourseOverview(TimeStampedModel):
         log.info('Finished generating course overviews.')
 
     @classmethod
-    def get_all_courses(cls, orgs=None, filter_=None):
+    def get_all_courses(cls, orgs=None, filter_=None, active_only=False):
         """
         Return a queryset containing all CourseOverview objects in the database.
 
@@ -655,6 +665,7 @@ class CourseOverview(TimeStampedModel):
             orgs (list[string]): Optional parameter that allows case-insensitive
                 filtering by organization.
             filter_ (dict): Optional parameter that allows custom filtering.
+            active_only (bool): If provided, only the courses that have not ended will be returned.
         """
         # Note: If a newly created course is not returned in this QueryList,
         # make sure the "publish" signal was emitted when the course was
@@ -672,6 +683,10 @@ class CourseOverview(TimeStampedModel):
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
+        if active_only:
+            course_overviews = course_overviews.filter(
+                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=pytz.UTC))
+            )
 
         return course_overviews
 

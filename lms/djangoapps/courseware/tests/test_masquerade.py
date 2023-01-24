@@ -16,7 +16,7 @@ from django.urls import reverse
 from pytz import UTC
 from xblock.runtime import DictKeyValueStore
 
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory
 from lms.djangoapps.courseware.masquerade import (
     MASQUERADE_SETTINGS_KEY,
     CourseMasquerade,
@@ -36,7 +36,7 @@ from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -49,22 +49,22 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC)})
-        cls.info_page = ItemFactory.create(
+        cls.info_page = BlockFactory.create(
             category="course_info", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="updates"
         )
-        cls.chapter = ItemFactory.create(
+        cls.chapter = BlockFactory.create(
             parent_location=cls.course.location,
             category="chapter",
             display_name="Test Section",
         )
         cls.sequential_display_name = "Test Masquerade Subsection"
-        cls.sequential = ItemFactory.create(
+        cls.sequential = BlockFactory.create(
             parent_location=cls.chapter.location,
             category="sequential",
             display_name=cls.sequential_display_name,
         )
-        cls.vertical = ItemFactory.create(
+        cls.vertical = BlockFactory.create(
             parent_location=cls.sequential.location,
             category="vertical",
             display_name="Test Unit",
@@ -77,7 +77,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
             correct_option='Correct'
         )
         cls.problem_display_name = "TestMasqueradeProblem"
-        cls.problem = ItemFactory.create(
+        cls.problem = BlockFactory.create(
             parent_location=cls.vertical.location,
             category='problem',
             data=problem_xml,

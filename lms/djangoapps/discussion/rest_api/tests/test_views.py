@@ -14,21 +14,30 @@ import httpretty
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
+
+from lms.djangoapps.discussion.config.waffle import ENABLE_LEARNERS_STATS
+from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import get_retired_username_by_username
+from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
+from common.djangoapps.student.tests.factories import (
+    AdminFactory,
+    CourseEnrollmentFactory,
+    SuperuserFactory,
+    UserFactory
+)
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from common.test.utils import disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
@@ -46,6 +55,9 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     parsed_body,
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
+from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
@@ -516,7 +528,10 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "provider": "legacy",
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
-                "user_is_privileged": False,
+                "has_moderation_privileges": False,
+                'is_course_admin': False,
+                'is_course_staff': False,
+                "is_group_ta": False,
                 'is_user_admin': False,
                 "user_roles": ["Student"],
                 'learners_tab_enabled': False,
@@ -731,7 +746,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         course_url = reverse("course_topics", kwargs={"course_id": str(course.id)})
         # add some discussion xblocks
         for i in range(modules_count):
-            ItemFactory.create(
+            BlockFactory.create(
                 parent_location=course.location,
                 category='discussion',
                 discussion_id=f'id_module_{i}',
@@ -745,7 +760,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         """
         Build a discussion xblock in self.course
         """
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id=topic_id,
@@ -861,6 +876,138 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
             }
         )
 
+    @override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, True)
+    def test_new_course_structure_response(self):
+        """
+        Tests whether the new structure is available on old topics API
+        (For mobile compatibility)
+        """
+        chapter = BlockFactory.create(
+            parent_location=self.course.location,
+            category='chapter',
+            display_name="Week 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        sequential = BlockFactory.create(
+            parent_location=chapter.location,
+            category='sequential',
+            display_name="Lesson 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        BlockFactory.create(
+            parent_location=sequential.location,
+            category='vertical',
+            display_name='vertical',
+            start=datetime(2015, 4, 1, tzinfo=UTC),
+        )
+        DiscussionsConfiguration.objects.create(
+            context_key=self.course.id,
+            provider_type=Provider.OPEN_EDX
+        )
+        update_discussions_settings_from_course_task(str(self.course.id))
+        response = json.loads(self.client.get(self.url).content.decode())
+        keys = ['children', 'id', 'name', 'thread_counts', 'thread_list_url']
+        assert list(response.keys()) == ['courseware_topics', 'non_courseware_topics']
+        assert len(response['courseware_topics']) == 1
+        courseware_keys = list(response['courseware_topics'][0].keys())
+        courseware_keys.sort()
+        assert courseware_keys == keys
+        assert len(response['non_courseware_topics']) == 1
+        non_courseware_keys = list(response['non_courseware_topics'][0].keys())
+        non_courseware_keys.sort()
+        assert non_courseware_keys == keys
+
+
+@ddt.ddt
+@mock.patch('lms.djangoapps.discussion.rest_api.api._get_course', mock.Mock())
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, True)
+class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixin, ModuleStoreTestCase):
+    """
+    Tests for CourseTopicsViewV3
+    """
+    def setUp(self) -> None:
+        super().setUp()
+        self.password = "password"
+        self.user = UserFactory.create(password=self.password)
+        self.client.login(username=self.user.username, password=self.password)
+        self.staff = AdminFactory.create()
+        self.course = CourseFactory.create(
+            start=datetime(2020, 1, 1),
+            end=datetime(2028, 1, 1),
+            enrollment_start=datetime(2020, 1, 1),
+            enrollment_end=datetime(2028, 1, 1),
+            discussion_topics={"Course Wide Topic": {
+                "id": 'course-wide-topic',
+                "usage_key": None,
+            }}
+        )
+        self.chapter = BlockFactory.create(
+            parent_location=self.course.location,
+            category='chapter',
+            display_name="Week 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        self.sequential = BlockFactory.create(
+            parent_location=self.chapter.location,
+            category='sequential',
+            display_name="Lesson 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        self.verticals = [
+            BlockFactory.create(
+                parent_location=self.sequential.location,
+                category='vertical',
+                display_name='vertical',
+                start=datetime(2015, 4, 1, tzinfo=UTC),
+            )
+        ]
+        course_key = self.course.id
+        self.config = DiscussionsConfiguration.objects.create(context_key=course_key, provider_type=Provider.OPEN_EDX)
+        topic_links = []
+        update_discussions_settings_from_course_task(str(course_key))
+        topic_id_query = DiscussionTopicLink.objects.filter(context_key=course_key).values_list(
+            'external_id', flat=True,
+        )
+        topic_ids = list(topic_id_query.order_by('ordering'))
+        DiscussionTopicLink.objects.bulk_create(topic_links)
+        self.topic_stats = {
+            **{topic_id: dict(discussion=random.randint(0, 10), question=random.randint(0, 10))
+               for topic_id in set(topic_ids)},
+            topic_ids[0]: dict(discussion=0, question=0),
+        }
+        patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.api.get_course_commentable_counts',
+            mock.Mock(return_value=self.topic_stats),
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.url = reverse("course_topics_v3", kwargs={"course_id": str(self.course.id)})
+
+    def test_basic(self):
+        response = self.client.get(self.url)
+        data = json.loads(response.content.decode())
+        expected_non_courseware_keys = [
+            'id', 'usage_key', 'name', 'thread_counts', 'enabled_in_context',
+            'courseware'
+        ]
+        expected_courseware_keys = [
+            'id', 'block_id', 'lms_web_url', 'legacy_web_url', 'student_view_url',
+            'type', 'display_name', 'children', 'courseware'
+        ]
+        assert response.status_code == 200
+        assert len(data) == 2
+        non_courseware_topic_keys = list(data[0].keys())
+        assert non_courseware_topic_keys == expected_non_courseware_keys
+        courseware_topic_keys = list(data[1].keys())
+        assert courseware_topic_keys == expected_courseware_keys
+        expected_courseware_keys.remove('courseware')
+        sequential_keys = list(data[1]['children'][0].keys())
+        assert sequential_keys == expected_courseware_keys
+        expected_non_courseware_keys.remove('courseware')
+        vertical_keys = list(data[1]['children'][0]['children'][0].keys())
+        assert vertical_keys == expected_non_courseware_keys
+
 
 @ddt.ddt
 @httpretty.activate
@@ -924,7 +1071,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "unread_comment_count": 3,
             "voted": True,
             "author": self.author.username,
-            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
             "abuse_flagged_count": None,
         })]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
@@ -950,7 +1097,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "per_page": ["10"],
         })
 
-    @ddt.data("unread", "unanswered")
+    @ddt.data("unread", "unanswered", "unresponded")
     def test_view_query(self, query):
         threads = [make_minimal_cs_thread()]
         self.register_get_user_response(self.user)
@@ -1225,7 +1372,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "topic_id": "test_topic",
             "type": "discussion",
             "title": "Test Title",
-            "raw_body": "# Test \n This is a very long body that will be truncated for the preview.",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
         }
         response = self.client.post(
             self.url,
@@ -1236,16 +1383,17 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == self.expected_thread_data({
             "read": True,
-            "raw_body": "# Test \n This is a very long body that will be truncated for the preview.",
-            "preview_body": "Test This is a very long body that…",
-            "rendered_body": "<h1>Test</h1>\n<p>This is a very long body that will be truncated for the preview.</p>",
+            "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+            "preview_body": "Test This is a very long body but will not be truncated for the preview.",
+            "rendered_body": "<h1>Test</h1>\n<p>This is a very long body but will not be truncated for"
+                             " the preview.</p>",
         })
         assert parsed_body(httpretty.last_request()) == {
             'course_id': [str(self.course.id)],
             'commentable_id': ['test_topic'],
             'thread_type': ['discussion'],
             'title': ['Test Title'],
-            'body': ['# Test \n This is a very long body that will be truncated for the preview.'],
+            'body': ['# Test \n This is a very long body but will not be truncated for the preview.'],
             'user_id': [str(self.user.id)],
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
@@ -1299,7 +1447,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'rendered_body': '<p>Edited body</p>',
             'preview_body': 'Edited body',
             'editable_fields': [
-                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
                 'title', 'topic_id', 'type', 'voted'
             ],
             'created_at': 'Test Created Date',
@@ -1352,7 +1500,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'read': True,
             'closed': True,
             'abuse_flagged': value,
-            'editable_fields': ['abuse_flagged', 'read'],
+            'editable_fields': ['abuse_flagged', 'copy_link', 'read'],
             'comment_count': 1, 'unread_comment_count': 0
         })
 
@@ -1383,7 +1531,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'comment_count': 1,
             'read': True,
             'editable_fields': [
-                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body', 'read',
                 'title', 'topic_id', 'type', 'voted'
             ],
             'response_count': 2
@@ -1410,7 +1558,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'comment_count': 1,
             'can_delete': False,
             'read': True,
-            'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
+            'editable_fields': ['abuse_flagged', 'copy_link', 'following', 'read', 'voted'],
             'response_count': 2
         })
 
@@ -1445,6 +1593,311 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_thread_error_response(self.thread_id, 404)
         response = self.client.delete(self.url)
         assert response.status_code == 404
+
+
+@ddt.ddt
+@httpretty.activate
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for LearnerThreadView list"""
+
+    def setUp(self):
+        """
+        Sets up the test case
+        """
+        super().setUp()
+        self.author = self.user
+        self.remove_keys = [
+            "abuse_flaggers",
+            "body",
+            "children",
+            "commentable_id",
+            "endorsed",
+            "last_activity_at",
+            "resp_total",
+            "thread_type",
+            "user_id",
+            "username",
+            "votes",
+        ]
+        self.replace_keys = [
+            {"from": "unread_comments_count", "to": "unread_comment_count"},
+            {"from": "comments_count", "to": "comment_count"},
+        ]
+        self.add_keys = [
+            {"key": "author", "value": self.author.username},
+            {"key": "abuse_flagged", "value": False},
+            {"key": "author_label", "value": None},
+            {"key": "can_delete", "value": True},
+            {"key": "close_reason", "value": None},
+            {
+                "key": "comment_list_url",
+                "value": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread"
+            },
+            {
+                "key": "editable_fields",
+                "value": [
+                    'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body',
+                    'read', 'title', 'topic_id', 'type', 'voted'
+                ]
+            },
+            {"key": "endorsed_comment_list_url", "value": None},
+            {"key": "following", "value": False},
+            {"key": "group_name", "value": None},
+            {"key": "has_endorsed", "value": False},
+            {"key": "last_edit", "value": None},
+            {"key": "non_endorsed_comment_list_url", "value": None},
+            {"key": "preview_body", "value": "Test body"},
+            {"key": "raw_body", "value": "Test body"},
+
+            {"key": "rendered_body", "value": "<p>Test body</p>"},
+            {"key": "response_count", "value": 0},
+            {"key": "topic_id", "value": "test_topic"},
+            {"key": "type", "value": "discussion"},
+            {"key": "users", "value": {
+                self.user.username: {
+                    "profile": {
+                        "image": {
+                            "has_image": False,
+                            "image_url_full": "http://testserver/static/default_500.png",
+                            "image_url_large": "http://testserver/static/default_120.png",
+                            "image_url_medium": "http://testserver/static/default_50.png",
+                            "image_url_small": "http://testserver/static/default_30.png",
+                        }
+                    }
+                }
+            }},
+            {"key": "vote_count", "value": 4},
+            {"key": "voted", "value": False},
+
+        ]
+        self.url = reverse("discussion_learner_threads", kwargs={'course_id': str(self.course.id)})
+
+    def update_thread(self, thread):
+        """
+        This function updates the thread by adding and remove some keys.
+        Value of these keys has been defined in setUp function
+        """
+        for element in self.add_keys:
+            thread[element['key']] = element['value']
+        for pair in self.replace_keys:
+            thread[pair['to']] = thread.pop(pair['from'])
+        for key in self.remove_keys:
+            thread.pop(key)
+        thread['comment_count'] += 1
+        return thread
+
+    def test_basic(self):
+        """
+        Tests the data is fetched correctly
+
+        Note: test_basic is required as the name because DiscussionAPIViewTestMixin
+              calls this test case automatically
+        """
+        self.register_get_user_response(self.user)
+        expected_cs_comments_response = {
+            "collection": [make_minimal_cs_thread({
+                "id": "test_thread",
+                "course_id": str(self.course.id),
+                "commentable_id": "test_topic",
+                "user_id": str(self.user.id),
+                "username": self.user.username,
+                "created_at": "2015-04-28T00:00:00Z",
+                "updated_at": "2015-04-28T11:11:11Z",
+                "title": "Test Title",
+                "body": "Test body",
+                "votes": {"up_count": 4},
+                "comments_count": 5,
+                "unread_comments_count": 3,
+            })],
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        self.url += f"?username={self.user.username}"
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        expected_api_response = expected_cs_comments_response['collection']
+
+        for thread in expected_api_response:
+            self.update_thread(thread)
+
+        assert response_data['results'] == expected_api_response
+        assert response_data['pagination'] == {
+            "next": None,
+            "previous": None,
+            "count": 1,
+            "num_pages": 1,
+        }
+
+    def test_no_username_given(self):
+        """
+        Tests that 404 response is returned when no username is passed
+        """
+        response = self.client.get(self.url)
+        assert response.status_code == 404
+
+    def test_not_authenticated(self):
+        """
+        This test is called by DiscussionAPIViewTestMixin and is not required in
+        our case
+        """
+        assert True
+
+    @ddt.data("None", "discussion", "question")
+    def test_thread_type_by(self, thread_type):
+        """
+        Tests the thread_type parameter
+
+        Arguments:
+            thread_type (str): Value of thread_type can be 'None',
+                          'discussion' and 'question'
+        """
+        threads = [make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(self.user.id),
+            "username": self.user.username,
+            "created_at": "2015-04-28T00:00:00Z",
+            "updated_at": "2015-04-28T11:11:11Z",
+            "title": "Test Title",
+            "body": "Test body",
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+        })]
+        expected_cs_comments_response = {
+            "collection": threads,
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_get_user_response(self.user)
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "username": self.user.username,
+                "thread_type": thread_type,
+            }
+        )
+        assert response.status_code == 200
+        self.assert_last_query_params({
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
+            "page": ["1"],
+            "per_page": ["10"],
+            "thread_type": [thread_type],
+            "sort_key": ['activity'],
+            "count_flagged": ["False"]
+        })
+
+    @ddt.data(
+        ("last_activity_at", "activity"),
+        ("comment_count", "comments"),
+        ("vote_count", "votes")
+    )
+    @ddt.unpack
+    def test_order_by(self, http_query, cc_query):
+        """
+        Tests the order_by parameter for active threads
+
+        Arguments:
+            http_query (str): Query string sent in the http request
+            cc_query (str): Query string used for the comments client service
+        """
+        threads = [make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(self.user.id),
+            "username": self.user.username,
+            "created_at": "2015-04-28T00:00:00Z",
+            "updated_at": "2015-04-28T11:11:11Z",
+            "title": "Test Title",
+            "body": "Test body",
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+        })]
+        expected_cs_comments_response = {
+            "collection": threads,
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_get_user_response(self.user)
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "username": self.user.username,
+                "order_by": http_query,
+            }
+        )
+        assert response.status_code == 200
+        self.assert_last_query_params({
+            "user_id": [str(self.user.id)],
+            "course_id": [str(self.course.id)],
+            "page": ["1"],
+            "per_page": ["10"],
+            "sort_key": [cc_query],
+            "count_flagged": ["False"]
+        })
+
+    @ddt.data("flagged", "unanswered", "unread", "unresponded")
+    def test_status_by(self, post_status):
+        """
+        Tests the post_status parameter
+
+        Arguments:
+            post_status (str): Value of post_status can be 'flagged',
+                          'unanswered' and 'unread'
+        """
+        threads = [make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(self.user.id),
+            "username": self.user.username,
+            "created_at": "2015-04-28T00:00:00Z",
+            "updated_at": "2015-04-28T11:11:11Z",
+            "title": "Test Title",
+            "body": "Test body",
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+        })]
+        expected_cs_comments_response = {
+            "collection": threads,
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_get_user_response(self.user)
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "username": self.user.username,
+                "status": post_status,
+            }
+        )
+        if post_status == "flagged":
+            assert response.status_code == 403
+        else:
+            assert response.status_code == 200
+            self.assert_last_query_params({
+                "user_id": [str(self.user.id)],
+                "course_id": [str(self.course.id)],
+                "page": ["1"],
+                "per_page": ["10"],
+                post_status: ['True'],
+                "sort_key": ['activity'],
+                "count_flagged": ["False"]
+            })
 
 
 @ddt.ddt
@@ -2294,7 +2747,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         divided_course_wide_discussions = ['Topic B', ]
         divided_discussions = divided_inline_discussions + divided_course_wide_discussions
 
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.course,
             category='discussion',
             discussion_id=topic_name_to_id(self.course, 'Topic A'),
@@ -2518,7 +2971,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         self._assert_current_settings(expected_response)
 
         now = datetime.now()
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='Topic_A',
@@ -2740,7 +3193,9 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 
 @ddt.ddt
 @httpretty.activate
-class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase):
+@override_waffle_flag(ENABLE_LEARNERS_STATS, True)
+class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase,
+                              SharedModuleStoreTestCase):
     """
     Tests for the course stats endpoint
     """
@@ -2748,11 +3203,12 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self) -> None:
         super().setUp()
-        self.course_key = 'course-v1:test+test+test'
-        seed_permissions_roles(self.course_key)
+        self.course = CourseFactory.create()
+        self.course_key = str(self.course.id)
+        seed_permissions_roles(self.course.id)
         self.user = UserFactory(username='user')
         self.moderator = UserFactory(username='moderator')
-        moderator_role = Role.objects.get(name="Moderator", course_id=self.course_key)
+        moderator_role = Role.objects.get(name="Moderator", course_id=self.course.id)
         moderator_role.users.add(self.moderator)
         self.stats = [
             {
@@ -2765,6 +3221,16 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
             }
             for idx in range(10)
         ]
+
+        for stat in self.stats:
+            user = UserFactory.create(
+                username=stat['username'],
+                email=f"{stat['username']}@example.com",
+                password='12345'
+            )
+            CourseEnrollment.enroll(user, self.course.id, mode='audit')
+
+        CourseEnrollment.enroll(self.moderator, self.course.id, mode='audit')
         self.stats_without_flags = [{**stat, "active_flags": None, "inactive_flags": None} for stat in self.stats]
         self.register_course_stats_response(self.course_key, self.stats, 1, 3)
         self.url = reverse("discussion_course_activity_stats", kwargs={"course_key_string": self.course_key})
@@ -2792,9 +3258,11 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
     @ddt.data(
         ("moderator", "flagged", "flagged"),
         ("moderator", "activity", "activity"),
+        ("moderator", "recency", "recency"),
         ("moderator", None, "flagged"),
         ("user", None, "activity"),
         ("user", "activity", "activity"),
+        ("user", "recency", "recency"),
     )
     @ddt.unpack
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2823,3 +3291,49 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         self.client.login(username=self.user.username, password='test')
         response = self.client.get(self.url, {"order_by": order_by})
         assert "order_by" in response.json()["field_errors"]
+
+    @ddt.data(
+        ('user', 'user-0,user-1,user-2,user-3,user-4,user-5,user-6,user-7,user-8,user-9'),
+        ('moderator', 'moderator'),
+    )
+    @ddt.unpack
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param(self, username_search_string, comma_separated_usernames):
+        """
+        Test for endpoint with username param.
+        """
+        params = {'username': username_search_string}
+        self.client.login(username=self.moderator.username, password='test')
+        self.client.get(self.url, params)
+        assert urlparse(
+            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
+        ).path == f'/api/v1/users/{self.course_key}/stats'
+        assert parse_qs(
+            urlparse(httpretty.last_request().path).query  # lint-amnesty, pylint: disable=no-member
+        ).get('usernames', [None]) == [comma_separated_usernames]
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param_with_no_matches(self):
+        """
+        Test for endpoint with username param with no matches.
+        """
+        params = {'username': 'unknown'}
+        self.client.login(username=self.moderator.username, password='test')
+        response = self.client.get(self.url, params)
+        data = response.json()
+        self.assertFalse(data['results'])
+        assert data['pagination']['count'] == 0
+
+    @ddt.data(
+        'user-0',
+        'USER-1',
+        'User-2',
+        'UsEr-3'
+    )
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param_case(self, username_search_string):
+        """
+        Test user search function is case-insensitive.
+        """
+        response = get_usernames_from_search_string(self.course_key, username_search_string, 1, 1)
+        assert response == (username_search_string.lower(), 1, 1)

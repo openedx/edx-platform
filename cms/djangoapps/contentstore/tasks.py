@@ -51,10 +51,12 @@ from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.monitoring import monitor_import_failure
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
+from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
+from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_module import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import SerializationError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -119,6 +121,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         store = modulestore()
         with store.default_store('split'):
             store.clone_course(source_course_key, destination_course_key, user_id, fields=fields)
+        update_unit_discussion_state_from_discussion_blocks(destination_course_key, user_id)
 
         # set initial permissions for the user to access the course.
         initialize_permissions(destination_course_key, User.objects.get(id=user_id))
@@ -164,7 +167,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
             # cleanup any remnants of the course
             modulestore().delete_course(destination_course_key, user_id)
         except ItemNotFoundError:
-            # it's possible there was an error even before the course module was created
+            # it's possible there was an error even before the course block was created
             pass
 
         return "exception: " + str(exc)
@@ -240,13 +243,17 @@ def update_special_exams_and_publish(course_key_str):
     on_course_publish expects that the edx-proctoring subsystem has been refreshed
     before being executed, so both functions are called here synchronously.
     """
-    from cms.djangoapps.contentstore.proctoring import register_special_exams
+    from cms.djangoapps.contentstore.exams import register_exams
+    from cms.djangoapps.contentstore.proctoring import register_special_exams as register_exams_legacy
     from openedx.core.djangoapps.credit.signals import on_course_publish
 
     course_key = CourseKey.from_string(course_key_str)
     LOGGER.info('Attempting to register exams for course %s', course_key_str)
+
+    # Call the appropriate handler for either the exams IDA or the edx-proctoring plugin
+    register_exams_handler = register_exams if exams_ida_enabled(course_key) else register_exams_legacy
     try:
-        register_special_exams(course_key)
+        register_exams_handler(course_key)
         LOGGER.info('Successfully registered exams for course %s', course_key_str)
     # pylint: disable=broad-except
     except Exception as exception:
@@ -328,13 +335,13 @@ def export_olx(self, user_id, course_key_string, language):
         return
 
 
-def create_export_tarball(course_module, course_key, context, status=None):
+def create_export_tarball(course_block, course_key, context, status=None):
     """
     Generates the export tarball, or returns None if there was an error.
 
     Updates the context with any error information if applicable.
     """
-    name = course_module.url_name
+    name = course_block.url_name
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")  # lint-amnesty, pylint: disable=consider-using-with
     root_dir = path(mkdtemp())
 
@@ -342,7 +349,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
         if isinstance(course_key, LibraryLocator):
             export_library_to_xml(modulestore(), contentstore(), course_key, root_dir, name)
         else:
-            export_course_to_xml(modulestore(), contentstore(), course_module.id, root_dir, name)
+            export_course_to_xml(modulestore(), contentstore(), course_block.id, root_dir, name)
 
         if status:
             status.set_state('Compressing')

@@ -3,15 +3,15 @@
 
 import logging
 from datetime import timedelta
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import ddt
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from edx_django_utils.cache import TieredCache
 from opaque_keys.edx.keys import CourseKey
-# from slumber.exceptions import HttpClientError, HttpServerError
-from requests.exceptions import HTTPError
+from slumber.exceptions import HttpClientError, HttpServerError
+# from requests.exceptions import HTTPError
 from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -45,27 +45,12 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
     """
     Tests for the enterprise support signals.
     """
-
-    def setup_patch(self, function_name, return_value):
-        """
-        Patch a function with a given return value, and return the mock
-        """
-        mock = MagicMock(return_value=return_value)
-        new_patch = patch(function_name, new=mock)
-        new_patch.start()
-        self.addCleanup(new_patch.stop)
-        return mock
-
     def setUp(self):
         UserFactory.create(username=TEST_ECOMMERCE_WORKER)
         self.user = UserFactory.create(username='test', email=TEST_EMAIL)
         self.course_id = 'course-v1:edX+DemoX+Demo_Course'
         self.enterprise_customer = EnterpriseCustomerFactory()
         self.enterprise_customer_uuid = str(self.enterprise_customer.uuid)
-        self.mock_pathways_with_course = self.setup_patch(
-            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
-            None,
-        )
         super().setUp()
 
     @staticmethod
@@ -148,7 +133,7 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
 
         return enrollment
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_order_voucher_refundable')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_order_voucher_refundable')
     @ddt.data(
         (True, True, 2, True, False),  # test if skip_refund
         (False, True, 20, True, False),  # test refundable time passed
@@ -172,13 +157,14 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
         """
         mock_is_order_voucher_refundable.return_value = order_voucher_refundable
         enrollment = self._create_enrollment_to_refund(no_of_days_placed, enterprise_enrollment_exists)
-        with patch('openedx.features.enterprise_support.signals.get_ecommerce_api_client') as mock_ecommerce_api_client:
+        with patch('openedx.features.enterprise_support.signals.ecommerce_api_client') as mock_ecommerce_api_client:
             enrollment.update_enrollment(is_active=False, skip_refund=skip_refund)
             assert mock_ecommerce_api_client.called == api_called
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_order_voucher_refundable')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_order_voucher_refundable')
     @ddt.data(
-        (HTTPError, 'INFO'),
+        (HttpClientError, 'INFO'),
+        (HttpServerError, 'ERROR'),
         (Exception, 'ERROR'),
     )
     @ddt.unpack
@@ -188,9 +174,9 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
         """
         mock_is_order_voucher_refundable.return_value = True
         enrollment = self._create_enrollment_to_refund()
-        with patch('openedx.features.enterprise_support.signals.get_ecommerce_api_client') as mock_ecommerce_api_client:
+        with patch('openedx.features.enterprise_support.signals.ecommerce_api_client') as mock_ecommerce_api_client:
             client_instance = mock_ecommerce_api_client.return_value
-            client_instance.post.side_effect = mock_error()
+            client_instance.enterprise.coupons.create_refunded_voucher.post.side_effect = mock_error()
             with LogCapture(LOGGER_NAME) as logger:
                 enrollment.update_enrollment(is_active=False)
                 assert mock_ecommerce_api_client.called is True

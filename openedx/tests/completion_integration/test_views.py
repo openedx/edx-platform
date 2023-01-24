@@ -14,7 +14,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -28,9 +28,6 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
     UNENROLLED_USERNAME = 'unenrolled_user'
     COURSE_KEY = 'course-v1:TestX+101+Test'
     BLOCK_KEY = 'block-v1:TestX+101+Test+type@problem+block@Test_Problem'
-    # And for old mongo:
-    COURSE_KEY_DEPRECATED = 'TestX/201/Test'
-    BLOCK_KEY_DEPRECATED = 'i4x://TestX/201/problem/Test_Problem'
 
     def setUp(self):
         """
@@ -48,21 +45,10 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
             default_store=ModuleStoreEnum.Type.split,
         )
         assert str(self.course.id) == self.COURSE_KEY
-        self.problem = ItemFactory.create(
+        self.problem = BlockFactory.create(
             parent=self.course, category="problem", display_name="Test Problem", publish_item=False,
         )
         assert str(self.problem.location) == self.BLOCK_KEY
-        # And an old mongo course:
-        self.course_deprecated = CourseFactory.create(
-            org='TestX', number='201', display_name='Test',
-            default_store=ModuleStoreEnum.Type.mongo,
-        )
-        assert str(self.course_deprecated.id) == self.COURSE_KEY_DEPRECATED
-        self.problem_deprecated = ItemFactory.create(
-            parent=self.course_deprecated, category="problem", display_name="Test Problem",
-            publish_item=False,
-        )
-        assert str(self.problem_deprecated.location) == self.BLOCK_KEY_DEPRECATED
 
         # Create users
         self.staff_user = UserFactory(is_staff=True)
@@ -71,7 +57,6 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
 
         # Enrol one user in the course
         CourseEnrollmentFactory.create(user=self.enrolled_user, course_id=self.course.id)
-        CourseEnrollmentFactory.create(user=self.enrolled_user, course_id=self.course_deprecated.id)
 
         # Login the enrolled user by for all tests
         self.client = APIClient()
@@ -98,16 +83,6 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
                 'course_key': COURSE_KEY,
                 'blocks': {
                     BLOCK_KEY: 1.0,
-                }
-            }, 200, {'detail': 'ok'}
-        ),
-        # Valid submission (old mongo)
-        (
-            {
-                'username': ENROLLED_USERNAME,
-                'course_key': COURSE_KEY_DEPRECATED,
-                'blocks': {
-                    BLOCK_KEY_DEPRECATED: 1.0,
                 }
             }, 200, {'detail': 'ok'}
         ),
@@ -219,16 +194,6 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
                 'course_key': COURSE_KEY,
                 'blocks': {
                     BLOCK_KEY: 1.0,
-                }
-            }, 200, {'detail': 'ok'}
-        ),
-        # Staff can submit completion on behalf of other users (old mongo)
-        (
-            {
-                'username': ENROLLED_USERNAME,
-                'course_key': COURSE_KEY_DEPRECATED,
-                'blocks': {
-                    BLOCK_KEY_DEPRECATED: 1.0,
                 }
             }, 200, {'detail': 'ok'}
         ),

@@ -76,13 +76,16 @@ class TestComputeGrades(SharedModuleStoreTestCase):
         if not estimate_first_attempted:
             command.append('--no_estimate_first_attempted')
         call_command(*(command + courses))
-        _kwargs = lambda course_key, offset: {
-            'course_key': course_key,
-            'batch_size': 2,
-            'offset': offset,
-            'estimate_first_attempted': estimate_first_attempted,
-            'seq_id': ANY,
-        }
+
+        def _kwargs(course_key, offset):
+            return {
+                'course_key': course_key,
+                'batch_size': 2,
+                'offset': offset,
+                'estimate_first_attempted': estimate_first_attempted,
+                'seq_id': ANY
+            }
+
         actual = mock_task.apply_async.call_args_list
         # Order doesn't matter, but can't use a set because dicts aren't hashable
         expected = [

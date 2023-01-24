@@ -20,11 +20,20 @@ from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.models import PendingEmailChange, UserProfile
 from common.djangoapps.student.models_api import do_name_change_request, get_pending_name_change
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, RegistrationFactory, UserFactory
-from openedx.core.djangoapps.user_api.accounts import RETIRED_EMAIL_MSG
+from common.djangoapps.student.tests.factories import (
+    TEST_PASSWORD,
+    ContentTypeFactory,
+    PermissionFactory,
+    RegistrationFactory,
+    UserFactory
+)
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.accounts.tests.factories import (
+    RetirementStateFactory,
+    UserRetirementStatusFactory
+)
+from openedx.core.djangoapps.user_api.models import UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, FilteredQueryCountMixin, skip_unless_lms
@@ -243,6 +252,96 @@ class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAP
 
         # verify that the endpoint is inaccessible when not logged in
         self._verify_get_own_username(12, expected_status=401)
+
+
+@skip_unless_lms
+class TestCancelAccountRetirementStatusView(UserAPITestCase):
+    """
+    Unit tests for CancelAccountRetirementStatusView
+    """
+    def setUp(self):
+        super().setUp()
+        permission = PermissionFactory(
+            codename='change_userretirementstatus',
+            content_type=ContentTypeFactory(
+                app_label='user_api'
+            )
+        )
+        self.staff_user.user_permissions.add(permission)
+        self.client = self.login_client('staff_client', 'staff_user')
+
+    def test_cancel_retirement_bad_request(self):
+        """
+        Test that cancel_retirement throws 400 if no retirement_id is given.
+        """
+        client = self.login_client('staff_client', 'staff_user')
+        url = reverse("cancel_account_retirement")
+        response = client.post(url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {'message': 'retirement_id must be specified.'}
+
+    def test_cancel_retirement_does_not_exist(self):
+        """
+        Test that cancel_retirement throws 400 if no retirement status exists.
+        """
+        client = self.login_client('staff_client', 'staff_user')
+        url = reverse("cancel_account_retirement")
+        response = client.post(url, data={'retirement_id': 1})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {"message": 'Retirement does not exist!'}
+
+    def test_cancel_retirement_not_pending(self):
+        """
+        Test that cancel_retirement throws 400 if retirement state is not PENDING.
+        """
+        client = self.login_client('staff_client', 'staff_user')
+        retirement_state = RetirementStateFactory.create(state_name='NOT_PENDING', state_execution_order=1)
+        user_retirement_status = UserRetirementStatusFactory.create(
+            user=self.user,
+            current_state=retirement_state,
+            last_state=retirement_state,
+            original_email=self.user.email,
+            created=datetime.datetime.now(pytz.UTC)
+        )
+        url = reverse("cancel_account_retirement")
+        response = client.post(url, data={'retirement_id': user_retirement_status.id})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data == {
+            "message": f"Retirement requests can only be cancelled for users in the PENDING state. "
+                       f"Current request state for '{user_retirement_status.original_username}': "
+                       f"{user_retirement_status.current_state.state_name}"
+        }
+
+    def test_cancel_retirement_successful(self):
+        """
+        Test that cancel_retirement does the following things properly:
+        1. Restore user's email
+        2. Reset user's password
+        3. Delete Retirement Status entry
+        """
+        client = self.login_client('staff_client', 'staff_user')
+        retirement_state = RetirementStateFactory.create(state_name='PENDING', state_execution_order=1)
+        user_retirement_status = UserRetirementStatusFactory.create(
+            user=self.user,
+            current_state=retirement_state,
+            last_state=retirement_state,
+            original_email=self.user.email,
+            created=datetime.datetime.now(pytz.UTC)
+        )
+        user_retirement_status.user.set_unusable_password()
+        assert UserRetirementStatus.objects.count() == 1
+        assert user_retirement_status.user.has_usable_password() is False
+
+        url = reverse("cancel_account_retirement")
+        response = client.post(url, data={'retirement_id': user_retirement_status.id})
+        self.user.refresh_from_db()
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {"success": True}
+        assert user_retirement_status.user.email == user_retirement_status.original_email
+        assert self.user.has_usable_password() is True
+
+        assert UserRetirementStatus.objects.count() == 0
 
 
 @ddt.ddt
@@ -483,15 +582,32 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @mock.patch('openedx.core.djangoapps.user_api.accounts.views.is_email_retired')
-    def test_get_retired_user_from_email(self, mock_is_email_retired):
+    @ddt.data(
+        (datetime.datetime.now(pytz.UTC), True),
+        (datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=15), False)
+    )
+    @ddt.unpack
+    def test_search_emails_retired_before_cooloff_period(self, created_date, can_cancel, mock_is_email_retired):
         """
-        Tests that the retired user from email cannot be accessed and shows an error message.
+        Tests either of the two possibilities i.e. either the retirement is created before the cool off time
+        or after the cool off time.
         """
         mock_is_email_retired.return_value = True
         client = self.login_client('staff_client', 'staff_user')
+        retirement_state = RetirementStateFactory.create(state_name='PENDING', state_execution_order=1)
+        user_retirement_status = UserRetirementStatusFactory.create(
+            user=self.user,
+            current_state=retirement_state,
+            last_state=retirement_state,
+            original_email=self.user.email,
+            created=created_date
+        )
         url = reverse("accounts_detail_api")
         response = client.get(url + f'?email={quote(self.user.email)}')
-        assert response.data == {"error_msg": RETIRED_EMAIL_MSG}
+        assert response.data == {
+            "error_msg": "This email is associated to a retired account.", "can_cancel_retirement": can_cancel,
+            "retirement_id": user_retirement_status.id if can_cancel else None
+        }
 
     def test_search_emails(self):
         client = self.login_client('staff_client', 'staff_user')

@@ -5,7 +5,6 @@ Helper methods for Studio views.
 import urllib
 from uuid import uuid4
 
-from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import UsageKey
@@ -134,7 +133,7 @@ def xblock_type_display_name(xblock, default_display_name=None):
         return _('Subsection')
     elif category == 'vertical':
         return _('Unit')
-    component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
+    component_class = XBlock.load_class(category)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
         return _(component_class.display_name.default)  # lint-amnesty, pylint: disable=translation-of-non-string
     else:
@@ -255,7 +254,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
                         user
                     )
 
-        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course block, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if category == 'static_tab':

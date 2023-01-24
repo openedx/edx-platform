@@ -4,6 +4,46 @@ Setup script for the Open edX package.
 
 from setuptools import setup
 
+XBLOCKS = [
+    "about = xmodule.html_block:AboutBlock",
+    "book = xmodule.template_block:TranslateCustomTagBlock",
+    "annotatable = xmodule.annotatable_block:AnnotatableBlock",
+    "chapter = xmodule.seq_block:SectionBlock",
+    "conditional = xmodule.conditional_block:ConditionalBlock",
+    "course = xmodule.course_block:CourseBlock",
+    "course_info = xmodule.html_block:CourseInfoBlock",
+    "customtag = xmodule.template_block:CustomTagBlock",
+    "custom_tag_template = xmodule.template_block:CustomTagTemplateBlock",
+    "discuss = xmodule.template_block:TranslateCustomTagBlock",
+    "discussion = xmodule.discussion_block:DiscussionXBlock",
+    "error = xmodule.error_block:ErrorBlock",
+    "hidden = xmodule.hidden_block:HiddenBlock",
+    "html = xmodule.html_block:HtmlBlock",
+    "image = xmodule.template_block:TranslateCustomTagBlock",
+    "library = xmodule.library_root_xblock:LibraryRoot",
+    "library_content = xmodule.library_content_block:LibraryContentBlock",
+    "library_sourced = xmodule.library_sourced_block:LibrarySourcedBlock",
+    "lti = xmodule.lti_block:LTIBlock",
+    "poll_question = xmodule.poll_block:PollBlock",
+    "problem = xmodule.capa_block:ProblemBlock",
+    "randomize = xmodule.randomize_block:RandomizeBlock",
+    "sequential = xmodule.seq_block:SequenceBlock",
+    "slides = xmodule.template_block:TranslateCustomTagBlock",
+    "split_test = xmodule.split_test_block:SplitTestBlock",
+    "static_tab = xmodule.html_block:StaticTabBlock",
+    "unit = xmodule.unit_block:UnitBlock",
+    "vertical = xmodule.vertical_block:VerticalBlock",
+    "video = xmodule.video_block:VideoBlock",
+    "videoalpha = xmodule.video_block:VideoBlock",
+    "videodev = xmodule.template_block:TranslateCustomTagBlock",
+    "word_cloud = xmodule.word_cloud_block:WordCloudBlock",
+    "wrapper = xmodule.wrapper_block:WrapperBlock",
+]
+XBLOCKS_ASIDES = [
+    'tagging_aside = cms.lib.xblock.tagging:StructuredTagsAside',
+]
+
+
 setup(
     name="Open edX",
     version='0.13',
@@ -15,7 +55,11 @@ setup(
         "cms",
         "lms",
         "openedx",
+        "xmodule",
     ],
+    package_data={
+        'xmodule': ['js/module/*'],
+    },
     entry_points={
         "openedx.course_tab": [
             "ccx = lms.djangoapps.ccx.plugins:CcxCourseTab",
@@ -136,6 +180,11 @@ setup(
         'openedx.dynamic_partition_generator': [
             'enrollment_track = xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',  # lint-amnesty, pylint: disable=line-too-long
             'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition'
+        ],
+        'xblock.v1': XBLOCKS,
+        'xblock_asides.v1': XBLOCKS_ASIDES,
+        'console_scripts': [
+            'xmodule_assets = xmodule.static_content:main',
         ],
     }
 )

@@ -23,15 +23,13 @@ from rest_framework.viewsets import ViewSet
 from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.file import store_uploaded_file
+from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_group_id_for_comments_service,
-    is_user_community_ta,
-    prepare_content,
-)
+from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
 from lms.djangoapps.instructor.access import update_forum_role
+from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
@@ -54,7 +52,9 @@ from ..rest_api.api import (
     get_response_comments,
     get_thread,
     get_thread_list,
+    get_learner_active_thread_list,
     get_user_comments,
+    get_v2_course_topics_as_v1,
     update_comment,
     update_thread,
 )
@@ -77,6 +77,11 @@ from ..rest_api.serializers import (
     DiscussionTopicSerializerV2,
     TopicOrdering,
 )
+from .utils import (
+    create_blocks_params,
+    create_topics_v3_structure,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -177,12 +182,14 @@ class CourseActivityStatsView(DeveloperErrorViewMixin, APIView):
             raise ValidationError(form_query_string.errors)
         order_by = form_query_string.cleaned_data.get('order_by', None)
         order_by = UserOrdering(order_by) if order_by else None
+        username_search_string = form_query_string.cleaned_data.get('username', None)
         data = get_course_discussion_user_stats(
             request,
             course_key_string,
             form_query_string.cleaned_data['page'],
             form_query_string.cleaned_data['page_size'],
             order_by,
+            username_search_string,
         )
         return data
 
@@ -223,11 +230,22 @@ class CourseTopicsView(DeveloperErrorViewMixin, APIView):
         topic_ids = self.request.GET.get('topic_id')
         topic_ids = set(topic_ids.strip(',').split(',')) if topic_ids else None
         with modulestore().bulk_operations(course_key):
-            response = get_course_topics(
-                request,
-                course_key,
-                topic_ids,
-            )
+            configuration = DiscussionsConfiguration.get(context_key=course_key)
+            provider = configuration.provider_type
+            # This will be removed when mobile app will support new topic structure
+            new_structure_enabled = ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled(course_key)
+            if provider == Provider.OPEN_EDX and new_structure_enabled:
+                response = get_v2_course_topics_as_v1(
+                    request,
+                    course_key,
+                    topic_ids
+                )
+            else:
+                response = get_course_topics(
+                    request,
+                    course_key,
+                    topic_ids,
+                )
             # Record user activity for tracking progress towards a user's course goals (for mobile app)
             UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
         return Response(response)
@@ -292,6 +310,85 @@ class CourseTopicsViewV2(DeveloperErrorViewMixin, APIView):
             form_query_params.cleaned_data["order_by"]
         )
         return Response(response)
+
+
+@view_auth_classes()
+class CourseTopicsViewV3(DeveloperErrorViewMixin, APIView):
+    """
+    View for listing course topics v3.
+
+    ** Response Example **:
+    [
+        {
+            "id": "non-courseware-discussion-id",
+            "usage_key": None,
+            "name": "Non Courseware Topic",
+            "thread_counts": {"discussion": 0, "question": 0},
+            "enabled_in_context": true,
+            "courseware": false
+        },
+        {
+            "id": "id",
+            "block_id": "block_id",
+            "lms_web_url": "",
+            "legacy_web_url": "",
+            "student_view_url": "",
+            "type": "chapter",
+            "display_name": "First section",
+            "children": [
+                "id": "id",
+                "block_id": "block_id",
+                "lms_web_url": "",
+                "legacy_web_url": "",
+                "student_view_url": "",
+                "type": "sequential",
+                "display_name": "First Sub-Section",
+                "children": [
+                    "id": "id",
+                    "usage_key": "",
+                    "name": "First Unit?",
+                    "thread_counts": { "discussion": 0, "question": 0 },
+                    "enabled_in_context": true
+                ]
+            ],
+            "courseware": true,
+        }
+    ]
+    """
+
+    def get(self, request, course_id):
+        """
+        **Use Cases**
+
+            Retrieve the topic listing for a course.
+
+        **Example Requests**:
+
+            GET /api/discussion/v3/course_topics/course-v1:ExampleX+Subject101+2015
+        """
+        course_key = CourseKey.from_string(course_id)
+        topics = get_course_topics_v2(
+            course_key,
+            request.user,
+        )
+        course_usage_key = modulestore().make_course_usage_key(course_key)
+        blocks_params = create_blocks_params(course_usage_key, request.user)
+        blocks = get_blocks(
+            request,
+            blocks_params['usage_key'],
+            blocks_params['user'],
+            blocks_params['depth'],
+            blocks_params['nav_depth'],
+            blocks_params['requested_fields'],
+            blocks_params['block_counts'],
+            blocks_params['student_view_data'],
+            blocks_params['return_type'],
+            blocks_params['block_types_filter'],
+            hide_access_denials=False,
+        )['blocks']
+
+        topics = create_topics_v3_structure(blocks, topics)
+        return Response(topics)
 
 
 @view_auth_classes()
@@ -363,7 +460,7 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * view: "unread" for threads the requesting user has not read, or
             "unanswered" for question threads with no marked answer. Only one
-            can be selected.
+            can be selected, or unresponded for discussion type posts with no response
 
         * requested_fields: (list) Indicates which additional fields to return
           for each thread. (supports 'profile_image')
@@ -529,7 +626,8 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the GET method for thread ID
         """
         requested_fields = request.GET.get('requested_fields')
-        return Response(get_thread(request, thread_id, requested_fields))
+        course_id = request.GET.get('course_id')
+        return Response(get_thread(request, thread_id, requested_fields, course_id))
 
     def create(self, request):
         """
@@ -564,14 +662,38 @@ class LearnerThreadView(APIView):
 
     **Example Requests**:
 
-        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015/learner/?page=1&page_size=10
+        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015/learner/?username=edx&page=1&page_size=10
 
     **GET Thread List Parameters**:
+
+        * username: (Required) Username of the user whose active threads are required
 
         * page: The (1-indexed) page to retrieve (default is 1)
 
         * page_size: The number of items per page (default is 10)
+
+        * count_flagged: If True, return the count of flagged comments for each thread.
+        (can only be used by moderators or above)
+
+        * thread_type: The type of thread to filter None, "discussion" or "question".
+
+        * order_by: Sort order for threads "last_activity_at", "comment_count" or
+        "vote_count".
+
+        * status: Filter for threads "flagged", "unanswered", "unread".
+
+        * group_id: Filter threads w.r.t cohorts (Cohort ID).
     """
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthentication,
+        SessionAuthentication,
+    )
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsStaffOrCourseTeamOrEnrolled,
+    )
 
     def get(self, request, course_id=None):
         """
@@ -580,8 +702,19 @@ class LearnerThreadView(APIView):
         course_key = CourseKey.from_string(course_id)
         page_num = request.GET.get('page', 1)
         threads_per_page = request.GET.get('page_size', 10)
+        count_flagged = request.GET.get('count_flagged', False)
+        thread_type = request.GET.get('thread_type')
+        order_by = request.GET.get('order_by')
+        order_by_mapping = {
+            "last_activity_at": "activity",
+            "comment_count": "comments",
+            "vote_count": "votes"
+        }
+        order_by = order_by_mapping.get(order_by, 'activity')
+        post_status = request.GET.get('status', None)
         discussion_id = None
-        user_id = request.user.id
+        username = request.GET.get('username', None)
+        user = get_object_or_404(User, username=username)
         group_id = None
         try:
             group_id = get_group_id_for_comments_service(request, course_key, discussion_id)
@@ -592,20 +725,21 @@ class LearnerThreadView(APIView):
             "page": page_num,
             "per_page": threads_per_page,
             "course_id": str(course_key),
-            "user_id": user_id,
+            "user_id": user.id,
+            "group_id": group_id,
+            "count_flagged": count_flagged,
+            "thread_type": thread_type,
+            "sort_key": order_by,
         }
-
-        if group_id is not None:
-            query_params['group_id'] = group_id
-            profiled_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
-        else:
-            profiled_user = comment_client.User(id=user_id, course_id=course_key)
-        threads, page, num_pages = profiled_user.active_threads(query_params)
-
-        is_staff = has_permission(request.user, 'openclose_thread', course_key)
-        is_community_ta = is_user_community_ta(request.user, course_key)
-        threads = [prepare_content(thread, course_key, is_staff, is_community_ta) for thread in threads]
-        return Response(threads)
+        if post_status:
+            if post_status not in ['flagged', 'unanswered', 'unread', 'unresponded']:
+                raise ValidationError({
+                    "status": [
+                        f"Invalid value. '{post_status}' must be 'flagged', 'unanswered', 'unread' or 'unresponded"
+                    ]
+                })
+            query_params[post_status] = True
+        return get_learner_active_thread_list(request, course_key, query_params)
 
 
 @view_auth_classes()

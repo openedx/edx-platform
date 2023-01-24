@@ -144,7 +144,7 @@ urlpatterns = [
     path('api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
 
     # Video Abstraction Layer used to allow video teams to manage video assets
-    # independently of courseware. https://github.com/edx/edx-val
+    # independently of courseware. https://github.com/openedx/edx-val
     path('api/val/v0/', include('edxval.urls')),
 
     path(
@@ -191,9 +191,18 @@ urlpatterns = [
     path('api-admin/', include(('openedx.core.djangoapps.api_admin.urls', 'openedx.core.djangoapps.api_admin'),
                                namespace='api_admin')),
 
+    # Learner Dashboard
     path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
-    # Dashboard REST APIs
     path('api/dashboard/', include('lms.djangoapps.learner_dashboard.api.urls', namespace='dashboard_api')),
+
+    # Learner Home
+    path('api/learner_home/', include('lms.djangoapps.learner_home.urls', namespace='learner_home')),
+
+    # Learner Recommendations
+    path(
+        'api/learner_recommendations/',
+        include('lms.djangoapps.learner_recommendations.urls', namespace='learner_recommendations')
+    ),
 
     path(
         'api/experiments/',
@@ -212,7 +221,7 @@ urlpatterns = [
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
-        re_path(r'^api/mobile/(?P<api_version>v(1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
+        re_path(r'^api/mobile/(?P<api_version>v(2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
     ]
 
 if settings.FEATURES.get('ENABLE_OPENBADGES'):
@@ -1021,4 +1030,9 @@ urlpatterns += [
 # Scheduled Bulk Email (Instructor Task) URLs
 urlpatterns += [
     path('api/instructor_task/', include('lms.djangoapps.instructor_task.rest_api.urls')),
+]
+
+# MFE API urls
+urlpatterns += [
+    path('api/mfe_config/v1', include(('lms.djangoapps.mfe_config_api.urls', 'lms.djangoapps.mfe_config_api'), namespace='mfe_config_api'))
 ]

@@ -92,7 +92,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
     def test_login_success(self):
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.user.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', ['Login success', self.user_email])
@@ -105,7 +105,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         self.user.is_active = False
         self.user.save()
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.user.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', ['Login success', self.user_email])
@@ -318,7 +318,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.user.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', ['Login success'])
@@ -330,7 +330,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         self.user.save()
 
         response, mock_audit_log = self._login_response(
-            unicode_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
+            unicode_email, self.password, patched_audit_log='common.djangoapps.student.models.user.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', ['Login success', unicode_email])
@@ -477,7 +477,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
-        with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
+        with patch('common.djangoapps.student.models.user.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         assert response.status_code == 200
         self._assert_audit_log(mock_audit_log, 'info', ['Logout', 'test'])
@@ -537,7 +537,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
-        with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
+        with patch('common.djangoapps.student.models.user.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         assert response.status_code == 200
         self._assert_audit_log(mock_audit_log, 'info', ['Logout'])
@@ -571,6 +571,24 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
                 self._login_response(self.user_email, password)
             # check to see if this response indicates that this was ratelimited
             response, _audit_log = self._login_response(self.user_email, 'wrong_password')
+        self._assert_response(response, success=False, value='Too many failed login attempts')
+
+    @patch('openedx.core.djangoapps.util.ratelimit.real_ip')
+    def test_excessive_login_attempts_by_username(self, real_ip_mock):
+        # try logging in 6 times, the defalutlimit for the number of failed
+        # login attempts in one 5 minute period before the rate gets limited
+        # for a specific username.
+
+        # We freeze time to deal with the fact that rate limit time boundaries
+        # are not predictable and we don't want the test to be flaky.
+        with freeze_time():
+            for i in range(6):
+                password = f'test_password{i}'
+                # Provide unique IPs so we don't get ip rate limited.
+                real_ip_mock.return_value = f'192.168.1.{i}'
+                self._login_response(self.username, password)
+            # check to see if this response indicates that this was ratelimited
+            response, _audit_log = self._login_response(self.username, 'wrong_password')
         self._assert_response(response, success=False, value='Too many failed login attempts')
 
     def test_excessive_login_attempts_by_ip(self):

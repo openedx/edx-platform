@@ -8,7 +8,7 @@ on:
 
 jobs:
   collect-and-verify:
-    if: github.repository == 'openedx/edx-platform' || github.repository == 'edx/edx-platform-private'
+    if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
     runs-on: [ edx-platform-runner ]
     steps:
       - name: sync directory owner
@@ -17,8 +17,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: install requirements
         run: |
-          sudo pip install -r requirements/pip.txt
-          sudo pip install -r requirements/edx/testing.txt
+          sudo make test-requirements
 
       - name: verify unit tests count
         uses: ./.github/actions/verify-tests-count

@@ -8,7 +8,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     build-essential git language-pack-en libmysqlclient-dev libssl-dev libxml2-dev \
     libxmlsec1-dev libxslt1-dev \
-    # lynx: Required by https://github.com/edx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
+    # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
     lynx xvfb pkg-config \
     python3-dev python3-venv \
     && rm -rf /var/lib/apt/lists/*
@@ -42,15 +42,14 @@ FROM base as build
 
 # Install Python requirements
 COPY setup.py setup.py
-COPY common/lib/ common/lib/
 COPY openedx/core/lib openedx/core/lib
 COPY lms lms
 COPY cms cms
 COPY requirements/pip.txt requirements/pip.txt
+COPY requirements/edx/pip-tools.txt requirements/edx/pip-tools.txt
 COPY requirements/edx/testing.txt requirements/edx/testing.txt
-COPY requirements/edx/django.txt requirements/edx/django.txt
-RUN pip install -r requirements/pip.txt && \
-pip install -r requirements/edx/testing.txt -r requirements/edx/django.txt
+COPY Makefile Makefile
+RUN make test-requirements
 
 FROM base as runner
 

@@ -12,7 +12,7 @@ from fs.wrapfs import WrapFS
 from lxml.etree import Element
 from lxml.etree import tostring as etree_tostring
 
-from xmodule.xml_module import XmlParserMixin
+from xmodule.xml_block import XmlMixin
 
 log = logging.getLogger(__name__)
 
@@ -104,7 +104,7 @@ def override_export_fs(block):
 
     This method temporarily replaces a block's runtime's 'export_fs' system with
     an in-memory filesystem. This method also abuses the
-        XmlParserMixin.export_to_file()
+        XmlMixin.export_to_file()
     API to prevent the XModule export code from exporting each block as two
     files (one .olx pointing to one .xml file). The export_to_file was meant to
     be used only by the customtag XModule but it makes our lives here much
@@ -119,8 +119,8 @@ def override_export_fs(block):
     if hasattr(block, 'export_to_file'):
         old_export_to_file = block.export_to_file
         block.export_to_file = lambda: False
-    old_global_export_to_file = XmlParserMixin.export_to_file
-    XmlParserMixin.export_to_file = lambda _: False  # So this applies to child blocks that get loaded during export
+    old_global_export_to_file = XmlMixin.export_to_file
+    XmlMixin.export_to_file = lambda _: False  # So this applies to child blocks that get loaded during export
     try:
         yield fs
     except:  # lint-amnesty, pylint: disable=try-except-raise
@@ -129,4 +129,4 @@ def override_export_fs(block):
         block.runtime.export_fs = old_export_fs
         if hasattr(block, 'export_to_file'):
             block.export_to_file = old_export_to_file
-        XmlParserMixin.export_to_file = old_global_export_to_file
+        XmlMixin.export_to_file = old_global_export_to_file

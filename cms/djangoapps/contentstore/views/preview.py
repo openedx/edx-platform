@@ -17,7 +17,6 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.runtime import KvsFieldData
 
 from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorBlock
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
@@ -208,17 +207,12 @@ def _preview_module_system(request, descriptor, field_data):
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
 
     return PreviewModuleSystem(
-        static_url=settings.STATIC_URL,
-        # TODO (cpennington): Do we want to track how instructors are using the preview problems?
-        track_function=lambda event_type, event: None,
         get_module=partial(_load_preview_module, request),
         mixins=settings.XBLOCK_MIXINS,
-        course_id=course_id,
 
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,
         wrappers_asides=wrappers_asides,
-        error_descriptor_class=ErrorBlock,
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
@@ -246,7 +240,7 @@ class StudioPartitionService(PartitionService):
     """
     def get_user_group_id_for_partition(self, user, user_partition_id):
         """
-        Override this method to return None, as the split_test_module calls this
+        Override this method to return None, as the split_test_block calls this
         to determine which group a user should see, but is robust to getting a return
         value of None meaning that all groups should be shown.
         """

@@ -6,8 +6,8 @@ Tests for the Studio authoring XBlock mixin.
 from django.conf import settings
 from django.test.utils import override_settings
 from xblock.core import XBlock
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
     MINIMUM_STATIC_PARTITION_ID,
@@ -23,7 +23,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
     """
     Tests the studio authoring XBlock mixin.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     GROUP_NO_LONGER_EXISTS = "This group no longer exists"
     NO_CONTENT_OR_ENROLLMENT_GROUPS = "Access to this component is not restricted"
     NO_CONTENT_ENROLLMENT_TRACK_ENABLED = "You can restrict access to this component to learners in specific enrollment tracks or content groups"  # lint-amnesty, pylint: disable=line-too-long
@@ -42,29 +42,29 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         """
         super().setUp()
         self.course = CourseFactory.create()
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             category='chapter',
-            parent_location=self.course.location,
+            parent=self.course,
             display_name='Test Chapter'
         )
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             category='sequential',
-            parent_location=chapter.location,
+            parent=chapter,
             display_name='Test Sequential'
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             category='vertical',
-            parent_location=sequential.location,
+            parent=sequential,
             display_name='Test Vertical'
         )
-        video = ItemFactory.create(
+        video = BlockFactory.create(
             category='video',
-            parent_location=vertical.location,
+            parent=vertical,
             display_name='Test Vertical'
         )
-        pure = ItemFactory.create(
+        pure = BlockFactory.create(
             category='pure',
-            parent_location=vertical.location,
+            parent=vertical,
             display_name='Test Pure'
         )
         self.vertical_location = vertical.location

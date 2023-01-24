@@ -24,6 +24,7 @@ from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiVa
 class UserOrdering(TextChoices):
     BY_ACTIVITY = 'activity'
     BY_FLAGS = 'flagged'
+    BY_RECENT_ACTIVITY = 'recency'
 
 
 class _PaginationForm(Form):
@@ -58,7 +59,7 @@ class ThreadListGetForm(_PaginationForm):
     count_flagged = ExtendedNullBooleanField(required=False)
     flagged = ExtendedNullBooleanField(required=False)
     view = ChoiceField(
-        choices=[(choice, choice) for choice in ["unread", "unanswered"]],
+        choices=[(choice, choice) for choice in ["unread", "unanswered", "unresponded"]],
         required=False,
     )
     order_by = ChoiceField(
@@ -229,3 +230,4 @@ class TopicListGetForm(Form):
 class CourseActivityStatsForm(_PaginationForm):
     """Form for validating course activity stats API query parameters"""
     order_by = ChoiceField(choices=UserOrdering.choices, required=False)
+    username = CharField(required=False)

@@ -77,7 +77,7 @@ class TestActivateAccount(TestCase):
         assert self.user.is_active
         assert not mock_segment_identify.called
 
-    @patch('common.djangoapps.student.models.USER_ACCOUNT_ACTIVATED')
+    @patch('common.djangoapps.student.models.user.USER_ACCOUNT_ACTIVATED')
     def test_activation_signal(self, mock_signal):
         """
         Verify that USER_ACCOUNT_ACTIVATED is emitted upon account email activation.

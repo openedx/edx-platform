@@ -73,7 +73,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         (FORUM_ROLE_MODERATOR, True, False, True),
         (FORUM_ROLE_MODERATOR, False, True, False),
         (FORUM_ROLE_COMMUNITY_TA, True, False, True),
-        (FORUM_ROLE_COMMUNITY_TA, False, True, True),
+        (FORUM_ROLE_COMMUNITY_TA, False, True, False),
         (FORUM_ROLE_STUDENT, True, False, True),
         (FORUM_ROLE_STUDENT, False, True, True),
     )
@@ -186,7 +186,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "comment_count": 6,
             "unread_comment_count": 3,
             "pinned": True,
-            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
             "abuse_flagged_count": None,
         })
         assert self.serialize(thread) == expected

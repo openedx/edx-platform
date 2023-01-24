@@ -15,8 +15,7 @@ from django.urls import reverse
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import (
-    _get_all_retired_emails_by_email,
-    _get_all_retired_usernames_by_username,
+    get_all_retired_usernames_by_username,
     get_potentially_retired_user_by_username,
     get_potentially_retired_user_by_username_and_hash,
     get_retired_email_by_email,
@@ -112,7 +111,7 @@ def test_get_all_retired_usernames_by_username(retirement_user):  # lint-amnesty
     Check that all salts are used for this method and return expected
     formats.
     """
-    hashed_usernames = list(_get_all_retired_usernames_by_username(retirement_user.username))
+    hashed_usernames = list(get_all_retired_usernames_by_username(retirement_user.username))
     assert len(hashed_usernames) == len(settings.RETIRED_USER_SALTS)
 
     for hashed_username in hashed_usernames:
@@ -180,21 +179,6 @@ def test_get_retired_email_status_exists(retirement_user, retirement_status):  #
     hashed_email = get_retired_email_by_email(retirement_user.email)
     check_email_against_fmt(hashed_email)
     assert retirement_status.retired_email == hashed_email
-
-
-def test_get_all_retired_email_by_email(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
-    """
-    Check that all salts are used for this method and return expected
-    formats.
-    """
-    hashed_emails = list(_get_all_retired_emails_by_email(retirement_user.email))
-    assert len(hashed_emails) == len(settings.RETIRED_USER_SALTS)
-
-    for hashed_email in hashed_emails:
-        check_email_against_fmt(hashed_email)
-
-    # Make sure hashes are unique
-    assert len(hashed_emails) == len(set(hashed_emails))
 
 
 def test_get_correct_user_varying_by_case_only(two_users_same_username_different_case):  # lint-amnesty, pylint: disable=redefined-outer-name
@@ -266,8 +250,8 @@ class TestRegisterRetiredUsername(TestCase):
     """
     # The returned message here varies depending on whether a ValidationError -or-
     # an AccountValidationError occurs.
-    INVALID_ACCT_ERR_MSG = ('An account with the Public Username', 'already exists.')
-    INVALID_ERR_MSG = ('It looks like', 'belongs to an existing account. Try again with a different username.')
+    INVALID_ACCT_ERR_MSG = "An account with the Public Username '{username}' already exists."
+    INVALID_ERR_MSG = "It looks like this username is already taken"
 
     def setUp(self):
         super().setUp()
@@ -281,7 +265,7 @@ class TestRegisterRetiredUsername(TestCase):
             'honor_code': 'true',
         }
 
-    def _validate_exiting_username_response(self, orig_username, response, start_msg=INVALID_ACCT_ERR_MSG[0], end_msg=INVALID_ACCT_ERR_MSG[1]):  # lint-amnesty, pylint: disable=line-too-long
+    def _validate_exiting_username_response(self, orig_username, response, error_message):
         """
         Validates a response stating that a username already exists -or- is invalid.
         """
@@ -289,9 +273,7 @@ class TestRegisterRetiredUsername(TestCase):
         obj = json.loads(response.content.decode('utf-8'))
 
         username_msg = obj['username'][0]['user_message']
-        assert username_msg.startswith(start_msg)
-        assert username_msg.endswith(end_msg)
-        assert orig_username in username_msg
+        assert username_msg == error_message
 
     def test_retired_username(self):
         """
@@ -307,7 +289,7 @@ class TestRegisterRetiredUsername(TestCase):
         # Attempt to create another account with the same username that's been retired.
         self.url_params['username'] = orig_username
         response = self.client.post(self.url, self.url_params)
-        self._validate_exiting_username_response(orig_username, response, self.INVALID_ERR_MSG[0], self.INVALID_ERR_MSG[1])  # lint-amnesty, pylint: disable=line-too-long
+        self._validate_exiting_username_response(orig_username, response, self.INVALID_ERR_MSG)
 
     def test_username_close_to_retired_format_active(self):
         """
@@ -315,6 +297,9 @@ class TestRegisterRetiredUsername(TestCase):
         """
         # Attempt to create an account with a username similar to the format of a retired username
         # which matches the RETIRED_USERNAME_PREFIX setting.
-        self.url_params['username'] = settings.RETIRED_USERNAME_PREFIX
+        username = settings.RETIRED_USERNAME_PREFIX
+        self.url_params['username'] = username
         response = self.client.post(self.url, self.url_params)
-        self._validate_exiting_username_response(settings.RETIRED_USERNAME_PREFIX, response)
+        self._validate_exiting_username_response(
+            username, response, self.INVALID_ACCT_ERR_MSG.format(username=username)
+        )

@@ -8,9 +8,11 @@ from unittest import mock, skip
 
 from django.utils import translation
 from django.utils.translation import get_language
+from xblock.core import XBlock
 from xmodule.modulestore.django import ModuleI18nService
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+from xmodule.tests.test_export import PureXBlock
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.views.preview import _preview_module_system
@@ -57,8 +59,9 @@ class FakeTranslations(ModuleI18nService):
 
 class TestModuleI18nService(ModuleStoreTestCase):
     """ Test ModuleI18nService """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
+    @XBlock.register_temp_plugin(PureXBlock, 'pure')
     def setUp(self):
         """ Setting up tests """
         super().setUp()
@@ -66,7 +69,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
         self.request = mock.Mock()
         self.course = CourseFactory.create()
         self.field_data = mock.Mock()
-        self.descriptor = ItemFactory(category="pure", parent=self.course)
+        self.descriptor = BlockFactory(category="pure", parent=self.course)
         self.runtime = _preview_module_system(
             self.request,
             self.descriptor,

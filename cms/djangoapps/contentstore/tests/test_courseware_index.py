@@ -32,10 +32,10 @@ from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import SignalHandler, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     ModuleStoreTestCase,
-    TEST_DATA_MONGO_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 COURSE_CHILD_STRUCTURE = {
@@ -50,7 +50,7 @@ def create_children(store, parent, category, load_factor):
     """ create load_factor children within the given parent; recursively call to insert children when appropriate """
     created_count = 0
     for child_index in range(load_factor):
-        child_object = ItemFactory.create(
+        child_object = BlockFactory.create(
             parent_location=parent.location,
             category=category,
             display_name=f"{category} {child_index} {time.clock()}",  # lint-amnesty, pylint: disable=no-member
@@ -129,7 +129,6 @@ class MixedWithOptionsTestCase(ModuleStoreTestCase):
 class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     """ Tests the operation of the CoursewareSearchIndexer """
 
-    WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     ENABLED_SIGNALS = ['course_deleted']
 
     def setUp(self):
@@ -141,6 +140,8 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.vertical = None
         self.html_unit = None
 
+        self.setup_course_base(self.store)
+
     def setup_course_base(self, store):
         """
         Set up the for the course outline tests.
@@ -151,7 +152,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             display_name="Search Index Test Course"
         )
 
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
@@ -159,7 +160,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
@@ -167,7 +168,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
             display_name='Subsection 1',
@@ -176,7 +177,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             start=datetime(2015, 4, 1, tzinfo=UTC),
         )
         # unspecified start - should inherit from container
-        self.html_unit = ItemFactory.create(
+        self.html_unit = BlockFactory.create(
             parent_location=self.vertical.location,
             category="html",
             display_name="Html Content",
@@ -226,7 +227,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.assertEqual(response["total"], 4)
 
         # Now add a new unit to the existing vertical
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.vertical.location,
             category="html",
             display_name="Some other content",
@@ -315,7 +316,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.assertEqual(indexed_count, 4)
 
         # Add a new sequential
-        sequential2 = ItemFactory.create(
+        sequential2 = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name='Section 2',
@@ -325,14 +326,14 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         )
 
         # add a new vertical
-        vertical2 = ItemFactory.create(
+        vertical2 = BlockFactory.create(
             parent_location=sequential2.location,
             category='vertical',
             display_name='Subsection 2',
             modulestore=store,
             publish_item=True,
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=vertical2.location,
             category="html",
             display_name="Some other content",
@@ -425,7 +426,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
 
     def _test_course_location_null(self, store):
         """ Test that course location information is added to index """
-        sequential2 = ItemFactory.create(
+        sequential2 = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name=None,
@@ -434,14 +435,14 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
         # add a new vertical
-        vertical2 = ItemFactory.create(
+        vertical2 = BlockFactory.create(
             parent_location=sequential2.location,
             category='vertical',
             display_name='Subsection 2',
             modulestore=store,
             publish_item=True,
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=vertical2.location,
             category="html",
             display_name="Find Me",
@@ -463,66 +464,51 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         with self.assertRaises(SearchIndexingError):
             self.reindex_course(store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_indexing_course(self, store_type):
-        self._perform_test_using_store(store_type, self._test_indexing_course)
+    def test_indexing_course(self):
+        self._test_indexing_course(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_not_indexing_unpublished_content(self, store_type):
-        self._perform_test_using_store(store_type, self._test_not_indexing_unpublished_content)
+    def test_not_indexing_unpublished_content(self):
+        self._test_not_indexing_unpublished_content(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_deleting_item(self, store_type):
-        self._perform_test_using_store(store_type, self._test_deleting_item)
+    def test_deleting_item(self):
+        self._test_deleting_item(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_start_date_propagation(self, store_type):
-        self._perform_test_using_store(store_type, self._test_start_date_propagation)
+    def test_start_date_propagation(self):
+        self._test_start_date_propagation(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_search_disabled(self, store_type):
-        self._perform_test_using_store(store_type, self._test_search_disabled)
+    def test_search_disabled(self):
+        self._test_search_disabled(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_time_based_index(self, store_type):
-        self._perform_test_using_store(store_type, self._test_time_based_index)
+    def test_time_based_index(self):
+        self._test_time_based_index(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_exception(self, store_type):
-        self._perform_test_using_store(store_type, self._test_exception)
+    def test_exception(self):
+        self._test_exception(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_course_about_property_index(self, store_type):
-        self._perform_test_using_store(store_type, self._test_course_about_property_index)
+    def test_course_about_property_index(self):
+        self._test_course_about_property_index(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_course_about_store_index(self, store_type):
-        self._perform_test_using_store(store_type, self._test_course_about_store_index)
+    def test_course_about_store_index(self):
+        self._test_course_about_store_index(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_course_about_mode_index(self, store_type):
-        self._perform_test_using_store(store_type, self._test_course_about_mode_index)
+    def test_course_about_mode_index(self):
+        self._test_course_about_mode_index(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_course_location_info(self, store_type):
-        self._perform_test_using_store(store_type, self._test_course_location_info)
+    def test_course_location_info(self):
+        self._test_course_location_info(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_course_location_null(self, store_type):
-        self._perform_test_using_store(store_type, self._test_course_location_null)
+    def test_course_location_null(self):
+        self._test_course_location_null(self.store)
 
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_delete_course_from_search_index_after_course_deletion(self, store_type):
+    def test_delete_course_from_search_index_after_course_deletion(self):
         """ Test for removing course from CourseAboutSearchIndexer """
-        self._perform_test_using_store(store_type, self._test_delete_course_from_search_index_after_course_deletion)
+        self._test_delete_course_from_search_index_after_course_deletion(self.store)
 
 
 @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ForceRefreshElasticSearchEngine')
 @ddt.ddt
 class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     """ Tests to excerise deleting items from a course """
-
-    WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
     def _clean_course_id(self):
         """
@@ -540,6 +526,7 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     def setUp(self):
         super().setUp()
         self.course_id = None
+        self.setup_course_base(self.store)
 
     def tearDown(self):
         super().tearDown()
@@ -594,9 +581,8 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
 
     @skip("This test is to see how we handle very large courses, to ensure that the delete"
           "procedure works smoothly - too long to run during the normal course of things")
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_large_course_deletion(self, store_type):
-        self._perform_test_using_store(store_type, self._test_large_course_deletion)
+    def test_large_course_deletion(self):
+        self._test_large_course_deletion(self.store)
 
 
 class TestTaskExecution(SharedModuleStoreTestCase):
@@ -614,21 +600,21 @@ class TestTaskExecution(SharedModuleStoreTestCase):
         SignalHandler.library_updated.disconnect(listen_for_library_update)
         cls.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=UTC))
 
-        cls.chapter = ItemFactory.create(
+        cls.chapter = BlockFactory.create(
             parent_location=cls.course.location,
             category='chapter',
             display_name="Week 1",
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        cls.sequential = ItemFactory.create(
+        cls.sequential = BlockFactory.create(
             parent_location=cls.chapter.location,
             category='sequential',
             display_name="Lesson 1",
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        cls.vertical = ItemFactory.create(
+        cls.vertical = BlockFactory.create(
             parent_location=cls.sequential.location,
             category='vertical',
             display_name='Subsection 1',
@@ -636,7 +622,7 @@ class TestTaskExecution(SharedModuleStoreTestCase):
             start=datetime(2015, 4, 1, tzinfo=UTC),
         )
         # unspecified start - should inherit from container
-        cls.html_unit = ItemFactory.create(
+        cls.html_unit = BlockFactory.create(
             parent_location=cls.vertical.location,
             category="html",
             display_name="Html Content",
@@ -645,14 +631,14 @@ class TestTaskExecution(SharedModuleStoreTestCase):
 
         cls.library = LibraryFactory.create()
 
-        cls.library_block1 = ItemFactory.create(
+        cls.library_block1 = BlockFactory.create(
             parent_location=cls.library.location,
             category="html",
             display_name="Html Content",
             publish_item=False,
         )
 
-        cls.library_block2 = ItemFactory.create(
+        cls.library_block2 = BlockFactory.create(
             parent_location=cls.library.location,
             category="html",
             display_name="Html Content 2",
@@ -733,7 +719,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         """
         self.library = LibraryFactory.create(modulestore=store)
 
-        self.html_unit1 = ItemFactory.create(
+        self.html_unit1 = BlockFactory.create(
             parent_location=self.library.location,
             category="html",
             display_name="Html Content",
@@ -741,7 +727,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
             publish_item=False,
         )
 
-        self.html_unit2 = ItemFactory.create(
+        self.html_unit2 = BlockFactory.create(
             parent_location=self.library.location,
             category="html",
             display_name="Html Content 2",
@@ -782,7 +768,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
 
         # updating a library item causes immediate reindexing
         data = "Some data"
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.library.location,
             category="html",
             display_name="Html Content 3",
@@ -864,16 +850,17 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
 
 class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
     """
-    Tests indexing of content groups on course modules using split modulestore.
+    Tests indexing of content groups on course blocks using split modulestore.
     """
     CREATE_USER = True
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
 
         self._setup_course_with_content()
-        self._setup_split_test_module()
+        self._setup_split_test_block()
         self._setup_content_groups()
         self.reload_course()
 
@@ -881,7 +868,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         """
         Set up course with html content in it.
         """
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
@@ -890,7 +877,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
 
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
@@ -899,7 +886,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
 
-        self.sequential2 = ItemFactory.create(
+        self.sequential2 = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 2",
@@ -908,7 +895,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
 
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
             display_name='Subsection 1',
@@ -917,7 +904,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             start=datetime(2015, 4, 1, tzinfo=UTC),
         )
 
-        self.vertical2 = ItemFactory.create(
+        self.vertical2 = BlockFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
             display_name='Subsection 2',
@@ -926,7 +913,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             start=datetime(2015, 4, 1, tzinfo=UTC),
         )
 
-        self.vertical3 = ItemFactory.create(
+        self.vertical3 = BlockFactory.create(
             parent_location=self.sequential2.location,
             category='vertical',
             display_name='Subsection 3',
@@ -936,7 +923,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
 
         # unspecified start - should inherit from container
-        self.html_unit1 = ItemFactory.create(
+        self.html_unit1 = BlockFactory.create(
             parent_location=self.vertical.location,
             category="html",
             display_name="Html Content 1",
@@ -945,7 +932,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit1.parent = self.vertical
 
-        self.html_unit2 = ItemFactory.create(
+        self.html_unit2 = BlockFactory.create(
             parent_location=self.vertical2.location,
             category="html",
             display_name="Html Content 2",
@@ -954,7 +941,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit2.parent = self.vertical2
 
-        self.html_unit3 = ItemFactory.create(
+        self.html_unit3 = BlockFactory.create(
             parent_location=self.vertical2.location,
             category="html",
             display_name="Html Content 3",
@@ -963,15 +950,15 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit3.parent = self.vertical2
 
-    def _setup_split_test_module(self):
+    def _setup_split_test_block(self):
         """
-        Set up split test module.
+        Set up split test block.
         """
         c0_url = self.course.id.make_usage_key("vertical", "condition_0_vertical")
         c1_url = self.course.id.make_usage_key("vertical", "condition_1_vertical")
         c2_url = self.course.id.make_usage_key("vertical", "condition_2_vertical")
 
-        self.split_test_unit = ItemFactory.create(
+        self.split_test_unit = BlockFactory.create(
             parent_location=self.vertical3.location,
             category='split_test',
             user_partition_id=0,
@@ -979,7 +966,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             group_id_to_child={"2": c0_url, "3": c1_url, "4": c2_url}
         )
 
-        self.condition_0_vertical = ItemFactory.create(
+        self.condition_0_vertical = BlockFactory.create(
             parent_location=self.split_test_unit.location,
             category="vertical",
             display_name="Group ID 2",
@@ -987,7 +974,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.condition_0_vertical.parent = self.vertical3
 
-        self.condition_1_vertical = ItemFactory.create(
+        self.condition_1_vertical = BlockFactory.create(
             parent_location=self.split_test_unit.location,
             category="vertical",
             display_name="Group ID 3",
@@ -995,7 +982,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.condition_1_vertical.parent = self.vertical3
 
-        self.condition_2_vertical = ItemFactory.create(
+        self.condition_2_vertical = BlockFactory.create(
             parent_location=self.split_test_unit.location,
             category="vertical",
             display_name="Group ID 4",
@@ -1003,7 +990,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.condition_2_vertical.parent = self.vertical3
 
-        self.html_unit4 = ItemFactory.create(
+        self.html_unit4 = BlockFactory.create(
             parent_location=self.condition_0_vertical.location,
             category="html",
             display_name="Split A",
@@ -1011,7 +998,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit4.parent = self.condition_0_vertical
 
-        self.html_unit5 = ItemFactory.create(
+        self.html_unit5 = BlockFactory.create(
             parent_location=self.condition_1_vertical.location,
             category="html",
             display_name="Split B",
@@ -1019,7 +1006,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         )
         self.html_unit5.parent = self.condition_1_vertical
 
-        self.html_unit6 = ItemFactory.create(
+        self.html_unit6 = BlockFactory.create(
             parent_location=self.condition_2_vertical.location,
             category="html",
             display_name="Split C",
@@ -1358,10 +1345,3 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             self.assertIn(self._html_group_result(self.html_unit2, [1]), indexed_content)
             self.assertIn(self._html_group_result(self.html_unit3, [0]), indexed_content)
             mock_index.reset_mock()
-
-
-class GroupConfigurationSearchMongo(GroupConfigurationSearchSplit):  # pylint: disable=test-inherits-tests
-    """
-    Tests indexing of content groups on course modules using mongo modulestore.
-    """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE

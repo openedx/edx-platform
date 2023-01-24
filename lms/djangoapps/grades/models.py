@@ -16,6 +16,8 @@ from hashlib import sha1
 
 from django.apps import apps
 from django.db import models, IntegrityError, transaction
+from openedx_events.learning.data import CourseData, PersistentCourseGradeData
+from openedx_events.learning.signals import PERSISTENT_GRADE_SUMMARY_CHANGED
 
 from django.utils.timezone import now
 from lazy import lazy
@@ -32,9 +34,7 @@ from lms.djangoapps.grades.signals.signals import (
     COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY
 )
 
-
 log = logging.getLogger(__name__)
-
 
 BLOCK_RECORD_LIST_VERSION = 1
 
@@ -664,6 +664,7 @@ class PersistentCourseGrade(TimeStampedModel):
 
         cls._emit_grade_calculated_event(grade)
         cls._update_cache(course_id, user_id, grade)
+        cls._emit_openedx_persistent_grade_summary_changed_event(course_id, user_id, grade)
         return grade
 
     @classmethod
@@ -679,6 +680,27 @@ class PersistentCourseGrade(TimeStampedModel):
     @staticmethod
     def _emit_grade_calculated_event(grade):
         events.course_grade_calculated(grade)
+
+    @staticmethod
+    def _emit_openedx_persistent_grade_summary_changed_event(course_id, user_id, grade):
+        """
+        When called emits an event when a persistent grade is created or updated.
+        """
+        # .. event_implemented_name: PERSISTENT_GRADE_SUMMARY_CHANGED
+        PERSISTENT_GRADE_SUMMARY_CHANGED.send_event(
+            grade=PersistentCourseGradeData(
+                user_id=user_id,
+                course=CourseData(
+                    course_key=course_id,
+                ),
+                course_edited_timestamp=grade.course_edited_timestamp,
+                course_version=grade.course_version,
+                grading_policy_hash=grade.grading_policy_hash,
+                percent_grade=grade.percent_grade,
+                letter_grade=grade.letter_grade,
+                passed_timestamp=grade.passed_timestamp,
+            )
+        )
 
 
 class PersistentSubsectionGradeOverride(models.Model):

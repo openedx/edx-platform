@@ -51,21 +51,21 @@ class MFEContextView(APIView):
         request_params = request.GET
         redirect_to = get_next_url_for_login_page(request)
         third_party_auth_hint = request_params.get('tpa_hint')
-        is_register_page = request_params.get('is_registered')
+        is_register_page = request_params.get('is_register_page')
         context = {
             'context_data': get_mfe_context(request, redirect_to, third_party_auth_hint),
             'registration_fields': {},
-            'optional_fields': {},
+            'optional_fields': {
+                'extended_profile': []
+            },
         }
 
-        if settings.ENABLE_DYNAMIC_REGISTRATION_FIELDS:
-            if is_register_page:
-                registration_fields = RegistrationFieldsContext()._get_fields()  # pylint: disable=protected-access
-                context['registration_fields'].update({
-                    'fields': registration_fields,
-                    'extended_profile': configuration_helpers.get_value('extended_profile_fields', []),
-                })
-            optional_fields = RegistrationFieldsContext('optional')._get_fields()  # pylint: disable=protected-access
+        if settings.ENABLE_DYNAMIC_REGISTRATION_FIELDS and is_register_page:
+            registration_fields = RegistrationFieldsContext().get_fields()
+            context['registration_fields'].update({
+                'fields': registration_fields,
+            })
+            optional_fields = RegistrationFieldsContext('optional').get_fields()
             if optional_fields:
                 context['optional_fields'].update({
                     'fields': optional_fields,

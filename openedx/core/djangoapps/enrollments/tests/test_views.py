@@ -67,6 +67,7 @@ class EnrollmentTestMixin:
             max_mongo_calls=0,
             linked_enterprise_customer=None,
             cohort=None,
+            force_enrollment=False,
     ):
         """
         Enroll in the course and verify the response's status code. If the expected status is 200, also validates
@@ -84,6 +85,7 @@ class EnrollmentTestMixin:
                 'course_id': course_id
             },
             'user': username,
+            'force_enrollment': force_enrollment,
             'enrollment_attributes': enrollment_attributes
         }
 
@@ -227,6 +229,75 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         assert is_active
         assert course_mode == enrollment_mode
+
+    @ddt.data(
+        # Default (no course modes in the database)
+        # Expect that users are automatically enrolled as the default
+        ([CourseMode.VERIFIED], CourseMode.VERIFIED, False),
+
+        # Audit / Verified
+        # We should always go to the "choose your course" page.
+        # We should also be enrolled as the default.
+        ([CourseMode.VERIFIED], CourseMode.VERIFIED, True),
+    )
+    @ddt.unpack
+    def test_force_enrollment(self, course_modes, enrollment_mode, force_enrollment):
+        # Create the course modes (if any) required for this test case
+        start_date = datetime.datetime(2021, 12, 1, 5, 0, 0, tzinfo=pytz.UTC)
+        end_date = datetime.datetime(2022, 12, 1, 5, 0, 0, tzinfo=pytz.UTC)
+        self.course = CourseFactory.create(
+            emit_signals=True,
+            start=start_date,
+            end=end_date,
+            enrollment_start=start_date,
+            enrollment_end=end_date,
+        )
+        for mode_slug in course_modes:
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode_slug,
+                mode_display_name=mode_slug,
+            )
+
+        # If a user enroll himself in expired course
+        # whether force_enrollmet is True or False
+        self.assert_enrollment_status(
+            mode=CourseMode.VERIFIED,
+            expected_status=status.HTTP_403_FORBIDDEN,
+            force_enrollment=force_enrollment,
+        )
+
+        self.client.logout()
+        AdminFactory.create(username='global_staff', email='global_staff@example.com', password=self.PASSWORD)
+        self.client.login(username="global_staff", password=self.PASSWORD)
+
+        if force_enrollment:
+            # Create an enrollment
+            resp = self.assert_enrollment_status(
+                username=self.USERNAME,
+                mode=CourseMode.VERIFIED,
+                force_enrollment=force_enrollment,
+            )
+
+            # Verify that the response contains the correct course_name
+            data = json.loads(resp.content.decode('utf-8'))
+            assert self.course.display_name_with_default == data['course_details']['course_name']
+
+            # Verify that the enrollment was created correctly
+            assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+            course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+            assert is_active
+            assert course_mode == enrollment_mode
+        else:
+            # If a staff user enroll other user in expired course
+            # This will raise the CourseEnrollmentClosedError excecption
+            # and return status will be 400
+            self.assert_enrollment_status(
+                username=self.USERNAME,
+                mode=CourseMode.VERIFIED,
+                expected_status=status.HTTP_400_BAD_REQUEST,
+                force_enrollment=force_enrollment,
+            )
 
     def test_check_enrollment(self):
         CourseModeFactory.create(

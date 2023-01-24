@@ -8,9 +8,9 @@ import pytz
 from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
-from django.db.models import signals  # pylint: disable=unused-import
+from django.conf import settings
 from django.db.models.functions import Lower
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
@@ -20,12 +20,14 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
+    IS_MARKETABLE,
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,
     ManualEnrollmentAudit,
     PendingEmailChange,
     PendingNameChange,
+    UserAttribute,
     UserCelebration,
     UserProfile
 )
@@ -37,11 +39,12 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -550,13 +553,13 @@ class PendingEmailChangeTests(SharedModuleStoreTestCase):
         assert 1 == len(PendingEmailChange.objects.all())
 
 
-class TestCourseEnrollmentAllowed(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TestCourseEnrollmentAllowed(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
         super().setUp()
         self.email = 'learner@example.com'
         self.course_key = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
-        self.user = UserFactory.create()
+        self.user = UserFactory.create(email=self.email)
         self.allowed_enrollment = CourseEnrollmentAllowed.objects.create(
             email=self.email,
             course_id=self.course_key,
@@ -584,6 +587,51 @@ class TestCourseEnrollmentAllowed(TestCase):  # lint-amnesty, pylint: disable=mi
             email=self.email
         )
         assert user_search_results.exists()
+
+    def test_may_enroll_and_unenrolled_result_is_based_on_unmarked_user_field(self):
+        """
+        Make sure that if an allowed student has no assigned user in its user field,
+        then it must be counted by may_enroll_and_unenrolled.
+        """
+        # Unmark the user field.
+        self.allowed_enrollment.user = None
+        self.allowed_enrollment.save()
+
+        assert 1 == CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id=self.course_key).count()
+
+    def test_former_allowed_student_isnt_counted_if_email_is_updated(self):
+        """
+        Make sure that if allowed students change their emails after being registered,
+        then they are not counted.
+        """
+        # Once user registers, then it is enrolled in the course.
+        CourseEnrollment.enroll(
+            user=self.user,
+            course_key=self.course_key,
+        )
+        # Change user's email.
+        self.user.email = 'updated-learner@example.com'
+        self.user.save()
+
+        assert 0 == CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id=self.course_key).count()
+
+    def test_may_enroll_and_unenrolled_does_not_count_unenrolled_users(self):
+        """Validate that the unenrollment action has no effect on the result of may_enroll_and_unenrolled."""
+        # Simulating that the users is not yet registered in the platform.
+        self.allowed_enrollment.user = None
+        self.allowed_enrollment.save()
+        # User registers, then it is enrolled.
+        CourseEnrollment.enroll(
+            user=self.user,
+            course_key=self.course_key,
+        )
+        # Unenroll user from course.
+        CourseEnrollment.unenroll(
+            user=self.user,
+            course_id=self.course_key,
+        )
+
+        assert 0 == CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id=self.course_key).count()
 
 
 class TestManualEnrollmentAudit(SharedModuleStoreTestCase):
@@ -713,6 +761,42 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
         assert actual_student.is_active is True
         assert actual_cea.user == student
 
+    @ddt.data(False, True)
+    def test_auto_enrollment_if_course_enrollment_closed(self, feature_enabled):
+        """
+        Test the following scenarios
+
+        1. Invited students who register when enrollment is closed are not enrolled if
+        DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED is True
+
+        2. Invited students who register when enrollment is closed are enrolled if
+        DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED is False
+        """
+
+        def register_and_enroll_student():
+            student = self._set_up_invited_student(
+                course=self.course,
+                active=False,
+                enrolled=False
+            )
+            student.is_active = True
+            # trigger the post_save callback
+            student.save()
+            return CourseEnrollment.get_enrollment(student, self.course.id)
+
+        # Set enrollment end date to a past date so that enrollment is ended
+        enrollment_end = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=2)
+        course_overview = CourseOverviewFactory.create(id=self.course.id, enrollment_end=enrollment_end)
+        course_overview.save()
+
+        if feature_enabled:
+            with override_settings(
+                FEATURES={**settings.FEATURES, 'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': True}
+            ):
+                assert register_and_enroll_student() is None
+        else:
+            assert register_and_enroll_student() is not None
+
     def test_verified_student_not_downgraded_when_changing_email(self):
         """
         Make sure that verified students do not get downgrade if they are active + changing their email.
@@ -735,6 +819,40 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
 
         assert actual_course_enrollment.mode == 'verified'
         assert actual_student.is_active is True
+
+    @override_settings(MARKETING_EMAILS_OPT_IN=True)
+    def test_is_marketable_set_to_false_for_user_created_via_management_command(self):
+        """
+        For users that are created using manage_user.py management command, set the
+        is_marketable value to 'false'.
+        """
+        expected_traits = {
+            'email': 'some.user@example.com',
+            'username': 'some_user',
+            'name': 'Student Person',
+            'age': -1,
+            'yearOfBirth': datetime.datetime.today().year,
+            'education': None,
+            'address': None,
+            'gender': 'Male',
+            'country': '',
+            'is_marketable': False
+        }
+
+        user = UserFactory(
+            username='some_user',
+            first_name='Student',
+            last_name='Person',
+            email='some.user@example.com',
+        )
+        with mock.patch('common.djangoapps.student.models.user.segment') as mock_segment:
+            user._called_by_management_command = True  # pylint: disable=protected-access
+            user.save()
+
+        attribute = UserAttribute.objects.filter(user_id=user.id, name=IS_MARKETABLE)
+        assert attribute
+        assert mock_segment.identify.call_count == 1
+        assert mock_segment.identify.call_args[0] == (user.id, expected_traits)
 
     def _set_up_invited_student(self, course, active=False, enrolled=True, course_mode=''):
         """

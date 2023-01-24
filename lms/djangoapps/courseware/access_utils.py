@@ -7,25 +7,25 @@ It allows us to share code between access.py and block transformers.
 from datetime import datetime, timedelta
 from logging import getLogger
 
+from crum import get_current_request
 from django.conf import settings
+from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser
 from pytz import UTC
-from lms.djangoapps.courseware.access_response import (
-    AccessResponse,
-    StartDateError,
-    EnrollmentRequiredAccessError,
-    AuthenticationRequiredAccessError,
-)
-from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
-from openedx.core.djangoapps.util.user_messages import PageLevelMessages  # lint-amnesty, pylint: disable=unused-import
-from openedx.core.djangolib.markup import HTML  # lint-amnesty, pylint: disable=unused-import
-from openedx.features.course_experience import (
-    COURSE_PRE_START_ACCESS_FLAG,
-    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-)
+
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseBetaTesterRole
+from lms.djangoapps.courseware.access_response import (
+    AccessResponse,
+    AuthenticationRequiredAccessError,
+    DataSharingConsentRequiredAccessError,
+    EnrollmentRequiredAccessError,
+    IncorrectActiveEnterpriseAccessError,
+    StartDateError
+)
+from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, COURSE_PRE_START_ACCESS_FLAG
+from xmodule.course_block import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)
@@ -153,7 +153,7 @@ def check_public_access(course, visibilities):
     This checks if the unenrolled access waffle flag for the course is set
     and the course visibility matches any of the input visibilities.
 
-    The "visibilities" argument is one of these constants from xmodule.course_module:
+    The "visibilities" argument is one of these constants from xmodule.course_block:
     - COURSE_VISIBILITY_PRIVATE
     - COURSE_VISIBILITY_PUBLIC
     - COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -168,3 +168,67 @@ def check_public_access(course, visibilities):
         return ACCESS_GRANTED
 
     return ACCESS_DENIED
+
+
+def check_data_sharing_consent(course_id):
+    """
+        Grants access if the user is do not need DataSharing consent, otherwise returns data sharing link.
+
+        Returns:
+            AccessResponse: Either ACCESS_GRANTED or DataSharingConsentRequiredAccessError
+        """
+    from openedx.features.enterprise_support.api import get_enterprise_consent_url
+    consent_url = get_enterprise_consent_url(
+        request=get_current_request(),
+        course_id=str(course_id),
+        return_to='courseware',
+        enrollment_exists=True,
+        source='CoursewareAccess'
+    )
+    if consent_url:
+        return DataSharingConsentRequiredAccessError(consent_url=consent_url)
+    return ACCESS_GRANTED
+
+
+def check_correct_active_enterprise_customer(user, course_id):
+    """
+    Grants access if the user's active enterprise customer is same as  EnterpriseCourseEnrollment's Enterprise.
+    Also, Grant access if enrollment is not Enterprise
+
+    Returns:
+        AccessResponse: Either ACCESS_GRANTED or IncorrectActiveEnterpriseAccessError
+    """
+    enterprise_enrollments = EnterpriseCourseEnrollment.objects.filter(
+        course_id=course_id, enterprise_customer_user__user_id=user.id
+    )
+    if not enterprise_enrollments.exists():
+        return ACCESS_GRANTED
+
+    try:
+        active_enterprise_customer_user = EnterpriseCustomerUser.objects.get(user_id=user.id, active=True)
+        if enterprise_enrollments.filter(enterprise_customer_user=active_enterprise_customer_user).exists():
+            return ACCESS_GRANTED
+
+        active_enterprise_name = active_enterprise_customer_user.enterprise_customer.name
+    except (EnterpriseCustomerUser.DoesNotExist, EnterpriseCustomerUser.MultipleObjectsReturned):
+        # Ideally this should not happen. As there should be only 1 active enterprise customer in our system
+        log.error("Multiple or No Active Enterprise found for the user %s.", user.id)
+        active_enterprise_name = 'Incorrect'
+
+    enrollment_enterprise_name = enterprise_enrollments.first().enterprise_customer_user.enterprise_customer.name
+    return IncorrectActiveEnterpriseAccessError(enrollment_enterprise_name, active_enterprise_name)
+
+
+def is_priority_access_error(access_error):
+    """
+    Check if given access error is a priority Access Error or not.
+    Priority Access Error can not be bypassed by staff users.
+    """
+    priority_access_errors = [
+        DataSharingConsentRequiredAccessError,
+        IncorrectActiveEnterpriseAccessError,
+    ]
+    for priority_access_error in priority_access_errors:
+        if isinstance(access_error, priority_access_error):
+            return True
+    return False

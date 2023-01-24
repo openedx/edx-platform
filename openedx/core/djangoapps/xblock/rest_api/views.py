@@ -29,28 +29,7 @@ from ..utils import validate_secure_token_for_xblock_handler
 
 User = get_user_model()
 
-LX_BLOCK_TYPES_OVERRIDE = {
-    'problem': 'lx_question',
-    'video': 'lx_video',
-    'html': 'lx_html',
-}
-
-
 invalid_not_found_fmt = "XBlock {usage_key} does not exist, or you don't have permission to view it."
-
-
-def _block_type_overrides(request_args):
-    """
-    If the request contains the argument `lx_block_types=1`, then
-    returns a dict of LabXchange block types, which override the default block types.
-
-    Otherwise, returns None.
-
-    FYI: This is a temporary change, added to assist LabXchange with the transition to using their custom runtime.
-    """
-    if request_args.get('lx_block_types'):
-        return LX_BLOCK_TYPES_OVERRIDE
-    return None
 
 
 @api_view(['GET'])
@@ -64,15 +43,13 @@ def block_metadata(request, usage_key_str):
 
     * "include": a comma-separated list of keys to include.
       Valid keys are "index_dictionary" and "student_view_data".
-    * "lx_block_types": optional boolean; set to use the LabXchange XBlock classes to load the requested block.
-      The block ID and OLX remain unchanged; they will use the original block type.
     """
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-    block = load_block(usage_key, request.user, block_type_overrides=_block_type_overrides(request.GET))
+    block = load_block(usage_key, request.user)
     includes = request.GET.get("include", "").split(",")
     metadata_dict = get_block_metadata(block, includes=includes)
     if 'children' in metadata_dict:
@@ -88,17 +65,13 @@ def block_metadata(request, usage_key_str):
 def render_block_view(request, usage_key_str, view_name):
     """
     Get the HTML, JS, and CSS needed to render the given XBlock.
-
-    Accepts the following query parameters:
-    * "lx_block_types": optional boolean; set to use the LabXchange XBlock classes to load the requested block.
-      The block ID and OLX remain unchanged; they will use the original block type.
     """
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-    block = load_block(usage_key, request.user, block_type_overrides=_block_type_overrides(request.GET))
+    block = load_block(usage_key, request.user)
     fragment = _render_block_view(block, view_name, request.user)
     response_data = get_block_metadata(block)
     response_data.update(fragment.to_dict())
@@ -113,24 +86,20 @@ def get_handler_url(request, usage_key_str, handler_name):
     the given XBlock handler.
 
     The URL will expire but is guaranteed to be valid for a minimum of 2 days.
-
-    The following query parameters will be appended to the returned handler_url:
-    * "lx_block_types": optional boolean; set to use the LabXchange XBlock classes to load the requested block.
-      The block ID and OLX remain unchanged; they will use the original block type.
     """
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
         raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-    handler_url = _get_handler_url(usage_key, handler_name, request.user, request.GET)
+    handler_url = _get_handler_url(usage_key, handler_name, request.user)
     return Response({"handler_url": handler_url})
 
 
 # We cannot use DRF for this endpoint because its Request object is incompatible
 # with the API expected by XBlock handlers.
-# See https://github.com/edx/edx-platform/pull/19253
-# and https://github.com/edx/XBlock/pull/383 for context.
+# See https://github.com/openedx/edx-platform/pull/19253
+# and https://github.com/openedx/XBlock/pull/383 for context.
 @csrf_exempt
 @xframe_options_exempt
 def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, suffix=None):
@@ -140,11 +109,6 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
     This endpoint has a unique authentication scheme that involves a temporary
     auth token included in the URL (see below). As a result it can be exempt
     from CSRF, session auth, and JWT/OAuth.
-
-    Accepts the following query parameters (in addition to those passed to the handler):
-
-    * "lx_block_types": optional boolean; set to use the LabXchange XBlock classes to load the requested block.
-      The block ID and OLX remain unchanged; they will use the original block type.
     """
     try:
         usage_key = UsageKey.from_string(usage_key_str)
@@ -185,7 +149,7 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
         raise AuthenticationFailed("Invalid user ID format.")
 
     request_webob = DjangoWebobRequest(request)  # Convert from django request to the webob format that XBlocks expect
-    block = load_block(usage_key, user, block_type_overrides=_block_type_overrides(request.GET))
+    block = load_block(usage_key, user)
     # Run the handler, and save any resulting XBlock field value changes:
     response_webob = block.handle(handler_name, request_webob, suffix)
     response = webob_to_django_response(response_webob)

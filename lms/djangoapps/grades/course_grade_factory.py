@@ -9,12 +9,6 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_FAILED,
     COURSE_GRADE_NOW_PASSED
 )
-
-from lms.djangoapps.grades.signals.signals import (
-    COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY,
-)
-
-from .config import assume_zero_if_absent, should_persist_grades
 from .course_data import CourseData
 from .course_grade import CourseGrade, ZeroCourseGrade
 from .models import PersistentCourseGrade
@@ -37,14 +31,10 @@ class CourseGradeFactory:
             course_structure=None,
             course_key=None,
             create_if_needed=True,
-            send_course_grade_signals=True,
     ):
         """
         Returns the CourseGrade for the given user in the course.
-        Reads the value from storage.
-        If not in storage, returns a ZeroGrade if ASSUME_ZERO_GRADE_IF_ABSENT.
-        Else if create_if_needed, computes and returns a new value.
-        Else, returns None.
+        Reads the value from storage or creates an initial value of zero.
 
         At least one of course, collected_block_structure, course_structure,
         or course_key should be provided.
@@ -53,12 +43,7 @@ class CourseGradeFactory:
         try:
             return self._read(user, course_data)
         except PersistentCourseGrade.DoesNotExist:
-            if assume_zero_if_absent(course_data.course_key):
-                return self._create_zero(user, course_data)
-            elif create_if_needed:
-                return self._update(user, course_data, send_course_grade_signals=send_course_grade_signals)
-            else:
-                return None
+            return self._create_zero(user, course_data)
 
     def update(
             self,
@@ -150,9 +135,6 @@ class CourseGradeFactory:
         Returns a CourseGrade object based on stored grade information
         for the given user and course.
         """
-        if not should_persist_grades(course_data.course_key):
-            raise PersistentCourseGrade.DoesNotExist
-
         persistent_grade = PersistentCourseGrade.read(user.id, course_data.course_key)
         log.debug('Grades: Read, %s, User: %s, %s', str(course_data), user.id, persistent_grade)
 
@@ -161,24 +143,20 @@ class CourseGradeFactory:
             course_data,
             persistent_grade.percent_grade,
             persistent_grade.letter_grade,
-            persistent_grade.letter_grade != ''
+            persistent_grade.letter_grade != '',
+            last_updated=persistent_grade.modified
         )
 
     @staticmethod
-    def _update(user, course_data, force_update_subsections=False, send_course_grade_signals=True):
+    def _update(user, course_data, force_update_subsections=False):
         """
-        Computes, saves, and returns a CourseGrade object for the given user and course.
-
-        send_course_grade_signals defines if signals should be sent. Use it to avoid recursion issues in
-        cases when the signal listener trying to get grades but Persistent Grades are disabled.
-        If True - sends:
-            COURSE_GRADE_CHANGED signal to listeners and
-            COURSE_GRADE_NOW_PASSED if learner has passed course or
-            COURSE_GRADE_NOW_FAILED if learner is now failing course
-            COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY if learner has passed course
+        Computes, saves, and returns a CourseGrade object for the
+        given user and course.
+        Sends a COURSE_GRADE_CHANGED signal to listeners and
+        COURSE_GRADE_NOW_PASSED if learner has passed course or
+        COURSE_GRADE_NOW_FAILED if learner is now failing course
         """
-        should_persist = should_persist_grades(course_data.course_key)
-        if should_persist and force_update_subsections:
+        if force_update_subsections:
             prefetch_grade_overrides_and_visible_blocks(user, course_data.course_key)
 
         course_grade = CourseGrade(
@@ -188,7 +166,7 @@ class CourseGradeFactory:
         )
         course_grade = course_grade.update()
 
-        should_persist = should_persist and course_grade.attempted
+        should_persist = course_grade.attempted
         if should_persist:
             course_grade._subsection_grade_factory.bulk_create_unsaved()  # lint-amnesty, pylint: disable=protected-access
             PersistentCourseGrade.update_or_create(
@@ -202,32 +180,26 @@ class CourseGradeFactory:
                 passed=course_grade.passed,
             )
 
-        if send_course_grade_signals:
-            COURSE_GRADE_CHANGED.send_robust(
-                sender=None,
+        COURSE_GRADE_CHANGED.send_robust(
+            sender=None,
+            user=user,
+            course_grade=course_grade,
+            course_key=course_data.course_key,
+            deadline=course_data.course.end,
+        )
+        if course_grade.passed:
+            COURSE_GRADE_NOW_PASSED.send(
+                sender=CourseGradeFactory,
                 user=user,
-                course_grade=course_grade,
-                course_key=course_data.course_key,
-                deadline=course_data.course.end,
+                course_id=course_data.course_key,
             )
-            if course_grade.passed:
-                COURSE_GRADE_NOW_PASSED.send(
-                    sender=CourseGradeFactory,
-                    user=user,
-                    course_id=course_data.course_key,
-                )
-                COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send(
-                    sender=CourseGradeFactory,
-                    user_id=user.id,
-                    course_id=course_data.course_key,
-                )
-            else:
-                COURSE_GRADE_NOW_FAILED.send(
-                    sender=CourseGradeFactory,
-                    user=user,
-                    course_id=course_data.course_key,
-                    grade=course_grade,
-                )
+        else:
+            COURSE_GRADE_NOW_FAILED.send(
+                sender=CourseGradeFactory,
+                user=user,
+                course_id=course_data.course_key,
+                grade=course_grade,
+            )
 
         log.info(
             'Grades: Update, %s, User: %s, %s, persisted: %s',

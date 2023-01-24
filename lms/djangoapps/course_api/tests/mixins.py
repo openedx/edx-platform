@@ -17,13 +17,12 @@ class CourseApiFactoryMixin:
     """
 
     @staticmethod
-    def create_course(**kwargs):
+    def create_course(end=datetime(2015, 9, 19, 18, 0, 0), **kwargs):
         """
         Create a course for use in test cases
         """
-
         return ToyCourseFactory.create(
-            end=datetime(2015, 9, 19, 18, 0, 0),
+            end=end,
             enrollment_start=datetime(2015, 6, 15, 0, 0, 0),
             enrollment_end=datetime(2015, 7, 15, 0, 0, 0),
             emit_signals=True,

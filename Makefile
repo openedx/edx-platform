@@ -64,12 +64,28 @@ pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
 pre-requirements: ## install Python requirements for running pip-tools
+	pip install -qr requirements/pip.txt
 	pip install -qr requirements/edx/pip-tools.txt
 
-requirements: pre-requirements ## install development environment requirements
+local-requirements:
+# 	edx-platform installs some Python projects from within the edx-platform repo itself.
+	pip install -e .
+
+dev-requirements: pre-requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
 	@# of it if it does not.  Shell wildcarding can't do that with default options.
 	pip-sync -q requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
+	make local-requirements
+
+base-requirements: pre-requirements
+	pip-sync requirements/edx/base.txt
+	make local-requirements
+
+test-requirements: pre-requirements
+	pip-sync --pip-args="--exists-action=w" requirements/edx/testing.txt
+	make local-requirements
+
+requirements: dev-requirements ## install development environment requirements
 
 shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
 	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
@@ -102,11 +118,8 @@ $(COMMON_CONSTRAINTS_TXT):
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
 compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
-	@# This is a temporary solution to override the real common_constraints.txt
-	@# In edx-lint, until the pyjwt constraint in edx-lint has been removed.
-	@# See BOM-2721 for more details.
-	sed 's/Django<2.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
-	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+	pip install -q pip-tools
+	pip-compile --allow-unsafe --upgrade -o requirements/edx/pip.txt requirements/edx/pip.in
 
 	@ export REBUILD='--rebuild'; \
 	for f in $(REQ_FILES); do \
@@ -116,12 +129,9 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 		pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
 		export REBUILD=''; \
 	done
-	# Post process all of the files generated above to work around open pip-tools issues
-	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
-	# Let tox control the Django version for tests
-	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
-	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
-	mv requirements/edx/testing.tmp requirements/edx/testing.txt
+
+	pip install -qr requirements/edx/pip.txt
+	pip install -qr requirements/edx/pip-tools.txt
 
 upgrade: pre-requirements  ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
@@ -130,10 +140,10 @@ check-types: ## run static type-checking tests
 	mypy
 
 docker_build:
-	docker build . -f Dockerfile --target lms     -t openedx/lms
-	docker build . -f Dockerfile --target lms-dev -t openedx/lms-dev
-	docker build . -f Dockerfile --target cms     -t openedx/cms
-	docker build . -f Dockerfile --target cms-dev -t openedx/cms-dev
+	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
+	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production -t openedx/lms
+	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development -t openedx/cms-dev
+	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production -t openedx/cms
 
 docker_tag: docker_build
 	docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
@@ -153,3 +163,13 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push "openedx/cms:${GITHUB_SHA}"
 	docker push "openedx/cms-dev:latest"
 	docker push "openedx/cms-dev:${GITHUB_SHA}"
+
+lint-imports:
+	lint-imports
+
+# WARNING (EXPERIMENTAL):
+# This installs the Ubuntu requirements necessary to make `pip install` and some other basic
+# dev commands to pass. This is not necessarily everything needed to get a working edx-platform.
+# Part of https://github.com/openedx/wg-developer-experience/issues/136
+ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
+	sudo apt install libmysqlclient-dev libxmlsec1-dev

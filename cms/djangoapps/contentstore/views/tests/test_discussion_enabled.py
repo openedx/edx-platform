@@ -5,7 +5,7 @@ Test module to test the discussion enabled flag.
 
 import json
 
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_usage_url
@@ -32,25 +32,25 @@ class TestDiscussionEnabled(CourseTestCase):
             run="2020_T2",
             modulestore=self.store
         )
-        self.chapter = ItemFactory(
+        self.chapter = BlockFactory(
             parent_location=self.course.location,
             category="chapter",
             display_name="What is SHIELD?",
             modulestore=self.store
         )
-        self.sequential = ItemFactory(
+        self.sequential = BlockFactory(
             parent_location=self.chapter.location,
             category="sequential",
             display_name="HQ",
             modulestore=self.store
         )
-        self.vertical = ItemFactory(
+        self.vertical = BlockFactory(
             parent_location=self.sequential.location,
             category="vertical",
             display_name="Triskelion",
             modulestore=self.store
         )
-        self.vertical_1 = ItemFactory(
+        self.vertical_1 = BlockFactory(
             parent_location=self.sequential.location,
             category="vertical",
             display_name="Helicarrier",
@@ -91,20 +91,20 @@ class TestDiscussionEnabled(CourseTestCase):
         )
         return resp
 
-    def test_discussion_enabled_false_initially(self):
+    def test_discussion_enabled_true_initially(self):
         """
-        Tests discussion_enabled flag is False initially for vertical
+        Tests discussion_enabled flag is True initially for vertical
         """
-        self.assertFalse(self.get_discussion_enabled_status(self.vertical))
-        self.assertFalse(self.get_discussion_enabled_status(self.vertical_1))
+        self.assertTrue(self.get_discussion_enabled_status(self.vertical))
+        self.assertTrue(self.get_discussion_enabled_status(self.vertical_1))
 
     def test_discussion_enabled_toggle(self):
         """
         Tests discussion_enabled can be toggled.
         """
-        self.set_discussion_enabled_status(self.vertical, True)
-        self.assertTrue(self.get_discussion_enabled_status(self.vertical))
-        self.assertFalse(self.get_discussion_enabled_status(self.vertical_1))
+        self.set_discussion_enabled_status(self.vertical, False)
+        self.assertFalse(self.get_discussion_enabled_status(self.vertical))
+        self.assertTrue(self.get_discussion_enabled_status(self.vertical_1))
 
     def test_non_course_author_cannot_get_or_set_discussion_enabled_flag(self):
         """

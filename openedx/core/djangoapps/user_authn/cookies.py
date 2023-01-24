@@ -251,9 +251,16 @@ def _get_user_info_cookie_data(request, user):
 
     # Add 'resume course' last completed block
     try:
-        header_urls['resume_block'] = retrieve_last_sitewide_block_completed(user)
+        block_url = retrieve_last_sitewide_block_completed(user)
+        if block_url:
+            header_urls['resume_block'] = block_url
     except User.DoesNotExist:
         pass
+    except Exception as err:  # pylint: disable=broad-except
+        log.exception(
+            '[PROD-2877] Error retrieving resume block for user %s with raw error %r',
+            user.username, err,
+        )
 
     header_urls = _convert_to_absolute_uris(request, header_urls)
 
@@ -281,7 +288,7 @@ def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None):
 
     # Skip setting JWT cookies for most unit tests, since it raises errors when
     # a login oauth client cannot be found in the database in ``_get_login_oauth_client``.
-    # This solution is not ideal, but see https://github.com/edx/edx-platform/pull/19180#issue-226706355
+    # This solution is not ideal, but see https://github.com/openedx/edx-platform/pull/19180#issue-226706355
     # for a discussion of alternative solutions that did not work or were halted.
     if settings.FEATURES.get('DISABLE_SET_JWT_COOKIES_FOR_TESTS', False):
         return

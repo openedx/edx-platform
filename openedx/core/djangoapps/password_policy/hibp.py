@@ -6,6 +6,7 @@ import hashlib
 import logging
 
 import requests
+from django.conf import settings
 from requests.exceptions import ReadTimeout
 from rest_framework.status import HTTP_408_REQUEST_TIMEOUT
 
@@ -58,7 +59,8 @@ class PwnedPasswordsAPI:
 
         if ENABLE_PWNED_PASSWORD_API.is_enabled():
             try:
-                response = requests.get(range_url, timeout=5)
+                timeout = getattr(settings, 'PASSWORD_POLICY_COMPLIANCE_API_TIMEOUT', 5)
+                response = requests.get(range_url, timeout=timeout)
                 entries = dict(map(convert_password_tuple, response.text.split("\r\n")))
                 return entries
 

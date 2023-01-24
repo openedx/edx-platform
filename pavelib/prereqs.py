@@ -24,10 +24,8 @@ COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 # a corresponding change to circle.yml, which is how the python
 # prerequisites are installed for builds on circleci.com
 toxenv = os.environ.get('TOXENV')
-if toxenv and toxenv != 'quality-django32':
+if toxenv and toxenv != 'quality':
     PYTHON_REQ_FILES = ['requirements/edx/testing.txt']
-elif toxenv and toxenv == 'quality-django32':
-    PYTHON_REQ_FILES = ['requirements/edx/testing.txt', 'requirements/edx/django.txt']
 else:
     PYTHON_REQ_FILES = ['requirements/edx/development.txt']
 
@@ -139,7 +137,7 @@ def node_prereqs_installation():
     else:
         npm_log_file_path = f'{Env.GEN_LOG_DIR}/npm-install.log'
     npm_log_file = open(npm_log_file_path, 'wb')  # lint-amnesty, pylint: disable=consider-using-with
-    npm_command = 'npm install --verbose'.split()
+    npm_command = 'npm clean-install --verbose'.split()
 
     # The implementation of Paver's `sh` function returns before the forked
     # actually returns. Using a Popen object so that we can ensure that
@@ -150,12 +148,12 @@ def node_prereqs_installation():
         # Error handling around a race condition that produces "cb() never called" error. This
         # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
         # npm to 3 or higher. TODO: clean this up when we do that.
-        print("npm install error detected. Retrying...")
+        print("npm clean-install error detected. Retrying...")
         proc = subprocess.Popen(npm_command, stderr=npm_log_file)  # lint-amnesty, pylint: disable=consider-using-with
         retcode = proc.wait()
         if retcode == 1:
             raise Exception(f"npm install failed: See {npm_log_file_path}")
-    print("Successfully installed NPM packages. Log found at {}".format(
+    print("Successfully clean-installed NPM packages. Log found at {}".format(
         npm_log_file_path
     ))
 
@@ -164,6 +162,8 @@ def python_prereqs_installation():
     """
     Installs Python prerequisites
     """
+    # 	edx-platform installs some Python projects from within the edx-platform repo itself.
+    sh(f"pip install -e .")
     for req_file in PYTHON_REQ_FILES:
         pip_install_req_file(req_file)
 
@@ -171,11 +171,7 @@ def python_prereqs_installation():
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
-
-    if Env.PIP_SRC_DIR:
-        sh(f"{pip_cmd} -r {req_file} --src {Env.PIP_SRC_DIR}")
-    else:
-        sh(f"{pip_cmd} -r {req_file}")
+    sh(f"{pip_cmd} -r {req_file}")
 
 
 @task
@@ -311,8 +307,8 @@ def install_python_prereqs():
     files_to_fingerprint.append(sysconfig.get_python_lib())
 
     # In a virtualenv, "-e installs" get put in a src directory.
-    if Env.PIP_SRC_DIR:
-        src_dir = Env.PIP_SRC_DIR
+    if Env.PIP_SRC:
+        src_dir = Env.PIP_SRC
     else:
         src_dir = os.path.join(sys.prefix, "src")
     if os.path.isdir(src_dir):
@@ -356,5 +352,5 @@ def print_devstack_warning():  # lint-amnesty, pylint: disable=missing-function-
         print("* WARNING: Mac users should run this from both the lms and studio shells")
         print("* in docker devstack to avoid startup errors that kill your CPU.")
         print("* For more details, see:")
-        print("* https://github.com/edx/devstack#docker-is-using-lots-of-cpu-time-when-it-should-be-idle")
+        print("* https://github.com/openedx/devstack#docker-is-using-lots-of-cpu-time-when-it-should-be-idle")
         print("********************************************************************************")

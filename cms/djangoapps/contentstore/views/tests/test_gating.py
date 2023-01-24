@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import ddt
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import BlockFactory
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_usage_url
@@ -36,21 +36,21 @@ class TestSubsectionGating(CourseTestCase):
         self.save_course()
 
         # create a chapter
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name='untitled chapter'
         )
 
         # create 2 sequentials
-        self.seq1 = ItemFactory.create(
+        self.seq1 = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name='untitled sequential 1'
         )
         self.seq1_url = reverse_usage_url('xblock_handler', self.seq1.location)
 
-        self.seq2 = ItemFactory.create(
+        self.seq2 = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name='untitled sequential 2'
@@ -150,7 +150,7 @@ class TestSubsectionGating(CourseTestCase):
     @patch('cms.djangoapps.contentstore.signals.handlers.gating_api.set_required_content')
     @patch('cms.djangoapps.contentstore.signals.handlers.gating_api.remove_prerequisite')
     def test_delete_item_signal_handler_called(self, mock_remove_prereq, mock_set_required):
-        seq3 = ItemFactory.create(
+        seq3 = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name='untitled sequential 3'

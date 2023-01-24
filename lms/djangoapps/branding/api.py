@@ -167,7 +167,7 @@ def _footer_social_links():
             {
                 "name": social_name,
                 "title": str(display.get("title", "")),
-                "url": settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
+                "url": settings.SOCIAL_MEDIA_FOOTER_ACE_URLS.get(social_name, "#"),
                 "icon-class": display.get("icon", ""),
                 "action": str(display.get("action", "")).format(platform_name=platform_name),
             }
@@ -241,12 +241,20 @@ def _build_help_center_url(language):
     return support_url
 
 
+def _security_url():
+    """
+    Return the security policy page URL.
+    """
+    return settings.SECURITY_PAGE_URL
+
+
 def _footer_connect_links(language=settings.LANGUAGE_CODE):
     """Return the connect links to display in the footer. """
     links = [
         ("blog", (marketing_link("BLOG"), _("Blog"))),
         ("contact", (_build_support_form_url(full_path=True), _("Contact Us"))),
         ("help-center", (_build_help_center_url(language), _("Help Center"))),
+        ("security", (_security_url(), _("Security"))),
     ]
 
     if language == settings.LANGUAGE_CODE:
@@ -382,7 +390,9 @@ def _footer_more_info_links(language=settings.LANGUAGE_CODE):
     links = [
         ("terms_of_service_and_honor_code", (marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code"))),
         ("privacy_policy", (marketing_link("PRIVACY"), _("Privacy Policy"))),
+        ("cookie_policy_link", (marketing_link("COOKIE"), _("Cookie Policy"))),
         ("accessibility_policy", (marketing_link("ACCESSIBILITY"), _("Accessibility Policy"))),
+        ("ccpa_link", (marketing_link("CCPA"), _("Do Not Sell My Personal Information")))
     ]
 
     # Backwards compatibility: If a combined "terms of service and honor code"
@@ -428,7 +438,7 @@ def _footer_mobile_links(is_secure):
                 "title": _(
                     "Download the {platform_name} mobile app from the Apple App Store"
                 ).format(platform_name=platform_name),
-                "url": settings.MOBILE_STORE_URLS.get('apple', '#'),
+                "url": settings.MOBILE_STORE_ACE_URLS.get('apple', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/app_store_badge_135x40.svg'),
             },
             {
@@ -436,7 +446,7 @@ def _footer_mobile_links(is_secure):
                 "title": _(
                     "Download the {platform_name} mobile app from Google Play"
                 ).format(platform_name=platform_name),
-                "url": settings.MOBILE_STORE_URLS.get('google', '#'),
+                "url": settings.MOBILE_STORE_ACE_URLS.get('google', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/google_play_badge_45.png'),
             }
         ]

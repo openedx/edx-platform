@@ -35,6 +35,7 @@ from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.utils import OptimizelyClient
 from openedx.core.djangoapps.content.learning_sequences.api import get_user_course_outline
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_404
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -48,7 +49,7 @@ from openedx.features.course_experience.course_updates import (
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.course_experience.utils import get_course_outline_block_tree, get_start_block
 from openedx.features.discounts.utils import generate_offer_data
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class UnableToDismissWelcomeMessage(APIException):
@@ -390,6 +391,11 @@ def save_course_goal(request):  # pylint: disable=missing-function-docstring
 
     try:
         add_course_goal(request.user, course_id, subscribed_to_reminders, days_per_week)
+        # TODO: VAN-1052: This event is added to track the KPIs for A/B experiment.
+        #  Remove it after the experiment has been paused.
+        optimizely_client = OptimizelyClient.get_optimizely_client()
+        if optimizely_client and request.user:
+            optimizely_client.track('goal_set', str(request.user.id))
         return Response({
             'header': _('Your course goal has been successfully set.'),
             'message': _('Course goal updated successfully.'),

@@ -2,28 +2,30 @@
 Utility methods for the account settings.
 """
 
+import logging
 import random
 import re
 import string
 from urllib.parse import urlparse  # pylint: disable=import-error
 
 import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
-from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.conf import settings
 from django.utils.translation import gettext as _
+from edx_django_utils.user import generate_password
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.student.models import AccountRecovery, Registration, get_retired_email_by_email
-from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
+from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import UserRetirementStatus
 
 ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH = 'enable_secondary_email_feature'
+LOGGER = logging.getLogger(__name__)
 
 
 def validate_social_link(platform_name, new_social_link):
@@ -170,7 +172,11 @@ def retrieve_last_sitewide_block_completed(user):
 
     try:
         item = modulestore().get_item(candidate_block_key, depth=1)
-    except ItemNotFoundError:
+    except Exception as err:  # pylint: disable=broad-except
+        LOGGER.exception(
+            '[PROD-2877] Error retrieving resume block for user %s with raw error %r',
+            user.username, err,
+        )
         item = None
 
     if not (lms_root and item):
@@ -231,3 +237,19 @@ def username_suffix_generator(suffix_length=4):
         else:
             output += random.choice(string.digits)
     return output
+
+
+def handle_retirement_cancellation(retirement, email_address=None):
+    """
+    Do the following in order to cancel retirement for a given user:
+
+    1. Load the user record using the retired email address -and- change the email address back.
+    2. Reset users password so they can request a password reset and log in again.
+    3. No need to delete the accompanying "permanent" retirement request record - it gets done via Django signal.
+    """
+    retirement.user.email = email_address if email_address else retirement.original_email
+
+    retirement.user.set_password(generate_password(length=25))
+    retirement.user.save()
+
+    retirement.delete()

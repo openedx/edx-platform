@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from openedx.core.djangoapps.schedules.content_highlights import (
     course_has_highlights_from_store,
@@ -36,7 +36,7 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
         CourseEnrollment.enroll(self.user, self.course_key)
 
     def _create_chapter(self, **kwargs):
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.course,
             category='chapter',
             **kwargs
@@ -168,10 +168,10 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
         with self.store.bulk_operations(self.course_key):
             self._create_chapter(highlights=['Test highlight'])
 
-        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course module .* not found'):
+        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course block .* not found'):
             get_week_highlights(self.user, self.course_key, 1)
 
         yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
         today = datetime.datetime.utcnow()
-        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course module .* not found'):
+        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course block .* not found'):
             get_next_section_highlights(self.user, self.course_key, yesterday, today.date())

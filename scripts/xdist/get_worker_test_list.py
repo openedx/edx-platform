@@ -25,7 +25,7 @@ import click
 @click.option(
     '--test-suite',
     help="Test suite that the pytest worker ran.",
-    type=click.Choice(['lms-unit', 'cms-unit', 'commonlib-unit']),
+    type=click.Choice(['lms-unit', 'cms-unit']),
     required=True
 )
 def main(log_file, test_suite):
@@ -38,9 +38,6 @@ def main(log_file, test_suite):
                 if worker_num_string not in worker_test_dict:
                     worker_test_dict[worker_num_string] = []
                 test = regex_search.group(3)
-                if test_suite == "commonlib-unit":
-                    if "pavelib" not in test and not test.startswith('scripts'):
-                        test = f"common/lib/{test}"
                 worker_test_dict[worker_num_string].append(test)
 
     output_folder_name = "worker_list_files"

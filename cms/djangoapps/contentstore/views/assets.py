@@ -102,11 +102,11 @@ def _asset_index(request, course_key):
 
     Supports start (0-based index into the list of assets) and max query parameters.
     '''
-    course_module = modulestore().get_course(course_key)
+    course_block = modulestore().get_course(course_key)
 
     return render_to_response('asset_index.html', {
         'language_code': request.LANGUAGE_CODE,
-        'context_course': course_module,
+        'context_course': course_block,
         'max_file_size_in_mbs': settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
         'chunk_size_in_mbs': settings.UPLOAD_CHUNK_SIZE_IN_MB,
         'max_file_size_redirect_url': settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,
@@ -356,7 +356,8 @@ def _get_assets_in_json_format(assets, course_key):
             asset['uploadDate'],
             asset['asset_key'],
             thumbnail_asset_key,
-            asset_is_locked
+            asset_is_locked,
+            course_key,
         )
 
         assets_in_json_format.append(asset_in_json)
@@ -405,6 +406,9 @@ def _upload_asset(request, course_key):
     if course_exists_error is not None:
         return course_exists_error
 
+    if course_key.deprecated:
+        return JsonResponse({'error': 'Uploading assets for the legacy course is not available.'}, status=400)
+
     # compute a 'filename' which is similar to the location formatting, we're
     # using the 'filename' nomenclature since we're using a FileSystem paradigm
     # here. We're just imposing the Location string formatting expectations to
@@ -426,7 +430,8 @@ def _upload_asset(request, course_key):
             readback.last_modified_at,
             content.location,
             content.thumbnail_location,
-            locked
+            locked,
+            course_key,
         ),
         'msg': _('Upload completed')
     })
@@ -588,21 +593,23 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
-def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked):
+def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key):
     '''
     Helper method for formatting the asset information to send to client.
     '''
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
     external_url = urljoin(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL), asset_url)
+    portable_url = StaticContent.get_static_path_from_location(location)
     return {
         'display_name': display_name,
         'content_type': content_type,
         'date_added': get_default_time_display(date),
         'url': asset_url,
         'external_url': external_url,
-        'portable_url': StaticContent.get_static_path_from_location(location),
+        'portable_url': portable_url,
         'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,
+        'static_full_url': StaticContent.get_canonicalized_asset_path(course_key, portable_url, '', []),
         # needed for Backbone delete/update.
         'id': str(location)
     }

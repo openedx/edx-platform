@@ -16,10 +16,10 @@ from django.utils.translation import get_language
 from django.utils.translation import override as override_language
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from common.djangoapps.student.roles import CourseCcxCoachRole
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
@@ -380,22 +380,22 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         )
         cls.course_key = cls.course.location.course_key  # lint-amnesty, pylint: disable=no-member
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):  # lint-amnesty, pylint: disable=no-member
-            cls.parent = ItemFactory(
+            cls.parent = BlockFactory(
                 category="library_content",
                 parent=cls.course,
                 publish_item=True,
             )
-            cls.child = ItemFactory(
+            cls.child = BlockFactory(
                 category="html",
                 parent=cls.parent,
                 publish_item=True,
             )
-            cls.unrelated = ItemFactory(
+            cls.unrelated = BlockFactory(
                 category="html",
                 parent=cls.course,
                 publish_item=True,
             )
-            cls.team_enabled_ora = ItemFactory.create(
+            cls.team_enabled_ora = BlockFactory.create(
                 parent=cls.parent,
                 category="openassessment",
                 teams_enabled=True,
@@ -438,8 +438,10 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             module_state_key=msk,
             state=original_state
         )
-        # lambda to reload the module state from the database
-        module = lambda: StudentModule.objects.get(student=self.user, course_id=self.course_key, module_state_key=msk)
+
+        def module():
+            return StudentModule.objects.get(student=self.user, course_id=self.course_key, module_state_key=msk)
+
         assert json.loads(module().state)['attempts'] == 32
         reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user)
         assert json.loads(module().state)['attempts'] == 0
@@ -710,18 +712,18 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(
+        cls.chapter = BlockFactory.create(
             parent=cls.course,
             category="chapter",
             display_name="Test Chapter"
         )
-        cls.sequence = ItemFactory.create(
+        cls.sequence = BlockFactory.create(
             parent=cls.chapter,
             category='sequential',
             display_name="Test Sequential 1",
             graded=True
         )
-        cls.vertical = ItemFactory.create(
+        cls.vertical = BlockFactory.create(
             parent=cls.sequence,
             category='vertical',
             display_name='Test Vertical 1'
@@ -731,7 +733,7 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
             choices=[False, False, True, False],
             choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
         )
-        cls.problem = ItemFactory.create(
+        cls.problem = BlockFactory.create(
             parent=cls.vertical,
             category="problem",
             display_name="Test Problem",

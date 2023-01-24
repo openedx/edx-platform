@@ -6,9 +6,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.learning_sequences.api import get_course_keys_with_outlines
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ....outlines import update_outline_from_modulestore
 
@@ -40,47 +39,40 @@ class BackfillCourseOutlinesTest(SharedModuleStoreTestCase):
         """
         super().setUpClass()
         course_run_ids = [
-            "OpenEdX/OutlineCourse/OldMongoRun1",
+            "course-v1:OpenEdX+OutlineCourse+Run1",
             "course-v1:OpenEdX+OutlineCourse+Run2",
-            "course-v1:OpenEdX+OutlineCourse+Run3",
         ]
         cls.course_keys = [
             CourseKey.from_string(course_run_id) for course_run_id in course_run_ids
         ]
         for course_key in cls.course_keys:
-            if course_key.deprecated:
-                store_type = ModuleStoreEnum.Type.mongo
-            else:
-                store_type = ModuleStoreEnum.Type.split
-
-            with cls.store.default_store(store_type):
-                course = CourseFactory.create(
-                    org=course_key.org,
-                    number=course_key.course,
-                    run=course_key.run,
-                    display_name=f"Outline Backfill Test Course {course_key.run}"
+            course = CourseFactory.create(
+                org=course_key.org,
+                number=course_key.course,
+                run=course_key.run,
+                display_name=f"Outline Backfill Test Course {course_key.run}"
+            )
+            with cls.store.bulk_operations(course_key):
+                section = BlockFactory.create(
+                    parent=course,
+                    category="chapter",
+                    display_name="A Section"
                 )
-                with cls.store.bulk_operations(course_key):
-                    section = ItemFactory.create(
-                        parent=course,
-                        category="chapter",
-                        display_name="A Section"
-                    )
-                    sequence = ItemFactory.create(
-                        parent=section,
-                        category="sequential",
-                        display_name="A Sequence"
-                    )
-                    unit = ItemFactory.create(
-                        parent=sequence,
-                        category="vertical",
-                        display_name="A Unit"
-                    )
-                    ItemFactory.create(
-                        parent=unit,
-                        category="html",
-                        display_name="An HTML Module"
-                    )
+                sequence = BlockFactory.create(
+                    parent=section,
+                    category="sequential",
+                    display_name="A Sequence"
+                )
+                unit = BlockFactory.create(
+                    parent=sequence,
+                    category="vertical",
+                    display_name="A Unit"
+                )
+                BlockFactory.create(
+                    parent=unit,
+                    category="html",
+                    display_name="An HTML Block"
+                )
 
     def test_end_to_end(self):
         """Normal invocation, it should skip only the Old Mongo course."""
@@ -91,8 +83,8 @@ class BackfillCourseOutlinesTest(SharedModuleStoreTestCase):
         call_command("backfill_course_outlines")
         course_keys_with_outlines = set(get_course_keys_with_outlines())
         assert course_keys_with_outlines == {
+            CourseKey.from_string("course-v1:OpenEdX+OutlineCourse+Run1"),
             CourseKey.from_string("course-v1:OpenEdX+OutlineCourse+Run2"),
-            CourseKey.from_string("course-v1:OpenEdX+OutlineCourse+Run3"),
         }
 
     def test_partial(self):
@@ -102,16 +94,16 @@ class BackfillCourseOutlinesTest(SharedModuleStoreTestCase):
 
         # Manually create one
         update_outline_from_modulestore(
-            CourseKey.from_string("course-v1:OpenEdX+OutlineCourse+Run2")
+            CourseKey.from_string("course-v1:OpenEdX+OutlineCourse+Run1")
         )
         assert set(get_course_keys_with_outlines()) == {
-            CourseKey.from_string("course-v1:OpenEdX+OutlineCourse+Run2")
+            CourseKey.from_string("course-v1:OpenEdX+OutlineCourse+Run1")
         }
 
         # backfill command should fill in the other
         call_command("backfill_course_outlines")
         course_keys_with_outlines = set(get_course_keys_with_outlines())
         assert course_keys_with_outlines == {
+            CourseKey.from_string("course-v1:OpenEdX+OutlineCourse+Run1"),
             CourseKey.from_string("course-v1:OpenEdX+OutlineCourse+Run2"),
-            CourseKey.from_string("course-v1:OpenEdX+OutlineCourse+Run3"),
         }

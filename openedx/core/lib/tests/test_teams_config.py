@@ -23,11 +23,27 @@ class TeamsConfigTests(TestCase):
         {"team_sets": "not-a-list"},
         {"team_sets": ["not-a-dict"]},
         {"topics": None, "random_key": 88},
+        {
+            "max_team_size": 5,
+            "topics": [
+                {
+                    "id": "bananas",
+                    "max_team_size": 10,
+                    "type": "private_managed",
+                },
+                {
+                    "id": "apples",
+                    "max_team_size": 6,
+                    "type": "open",
+                },
+            ],
+            "enabled": False
+        }
     )
     def test_disabled_team_configs(self, data):
         """
         Test that configuration that doesn't specify any valid team-sets
-        is considered disabled.
+        or specifically defines enabled as False is considered disabled
         """
         teams_config = TeamsConfig(data)
         assert not teams_config.is_enabled

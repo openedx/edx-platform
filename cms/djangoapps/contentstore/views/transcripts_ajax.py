@@ -7,12 +7,10 @@ All user changes are saved immediately.
 """
 
 
-import copy
 import json
 import logging
 import os
 
-import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -31,7 +29,7 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_module.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     GetTranscriptsFromYouTubeException,
     Transcript,
     TranscriptsGenerationException,
@@ -42,7 +40,7 @@ from xmodule.video_module.transcripts_utils import (  # lint-amnesty, pylint: di
     get_transcript_for_video,
     get_transcript_from_val,
     get_transcripts_from_youtube,
-    youtube_video_transcript_name
+    get_transcript_link_from_youtube
 )
 
 __all__ = [
@@ -126,9 +124,9 @@ def save_video_transcript(edx_video_id, input_format, transcript_content, langua
     return result
 
 
-def validate_video_module(request, locator):
+def validate_video_block(request, locator):
     """
-    Validates video module given its locator and request. Also, checks
+    Validates video block given its locator and request. Also, checks
     if requesting user has course authoring access.
 
     Arguments:
@@ -177,7 +175,7 @@ def validate_transcript_upload_data(request):
         error = _('Video ID is required.')
 
     if not error:
-        error, video = validate_video_module(request, video_locator)
+        error, video = validate_video_block(request, video_locator)
         if not error:
             validated_data.update({
                 'video': video,
@@ -252,7 +250,7 @@ def download_transcripts(request):
 
     Raises Http404 if unsuccessful.
     """
-    error, video = validate_video_module(request, locator=request.GET.get('locator'))
+    error, video = validate_video_block(request, locator=request.GET.get('locator'))
     if error:
         raise Http404
 
@@ -340,15 +338,7 @@ def check_transcripts(request):  # lint-amnesty, pylint: disable=too-many-statem
             except NotFoundError:
                 log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
 
-            # youtube server
-            youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
-            youtube_text_api['params']['v'] = youtube_id
-            youtube_transcript_name = youtube_video_transcript_name(youtube_text_api)
-            if youtube_transcript_name:
-                youtube_text_api['params']['name'] = youtube_transcript_name
-            youtube_response = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
-
-            if youtube_response.status_code == 200 and youtube_response.text:
+            if get_transcript_link_from_youtube(youtube_id):
                 transcripts_presence['youtube_server'] = True
             #check youtube local and server transcripts for equality
             if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
@@ -501,7 +491,7 @@ def validate_transcripts_request(request, include_yt=False, include_html5=False)
     if not data:
         error = _('Incoming video data is empty.')
     else:
-        error, video = validate_video_module(request, locator=data.get('locator'))
+        error, video = validate_video_block(request, locator=data.get('locator'))
         if not error:
             validated_data.update({'video': video})
 

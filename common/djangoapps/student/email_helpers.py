@@ -51,11 +51,11 @@ def generate_proctoring_requirements_email_context(user, course_id):
         user: Currently logged-in user
         course_id: ID of the proctoring-enabled course the user is enrolled in
     """
-    course_module = modulestore().get_course(course_id)
+    course_block = modulestore().get_course(course_id)
     return {
         'user': user,
-        'course_name': course_module.display_name,
-        'proctoring_provider': capwords(course_module.proctoring_provider.replace('_', ' ')),
+        'course_name': course_block.display_name,
+        'proctoring_provider': capwords(course_block.proctoring_provider.replace('_', ' ')),
         'proctoring_requirements_url': settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('faq', ''),
         'idv_required': not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'),
         'id_verification_url': IDVerificationService.get_verify_location(),

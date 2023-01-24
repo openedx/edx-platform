@@ -27,7 +27,8 @@ from lms.djangoapps.courseware.courses import get_current_child
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
-from lms.djangoapps.mobile_api.utils import API_V1, API_V05
+from lms.djangoapps.mobile_api.models import MobileConfig
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2
 from openedx.features.course_duration_limits.access import check_course_expired
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -116,7 +117,7 @@ class UserCourseStatus(views.APIView):
         * last_visited_module_id: The ID of the last module that the user
           visited in the course.
         * last_visited_module_path: The ID of the modules in the path from the
-          last visited module to the course module.
+          last visited module to the course block.
 
         For version v1 GET request response includes the following values.
 
@@ -136,18 +137,18 @@ class UserCourseStatus(views.APIView):
     def _last_visited_module_path(self, request, course):
         """
         Returns the path from the last module visited by the current user in the given course up to
-        the course module. If there is no such visit, the first item deep enough down the course
+        the course block. If there is no such visit, the first item deep enough down the course
         tree is used.
         """
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2)
 
-        course_module = get_module_for_descriptor(
+        course_block = get_module_for_descriptor(
             request.user, request, course, field_data_cache, course.id, course=course
         )
 
-        path = [course_module] if course_module else []
-        chapter = get_current_child(course_module, min_depth=2)
+        path = [course_block] if course_block else []
+        chapter = get_current_child(course_block, min_depth=2)
         if chapter is not None:
             path.append(chapter)
             section = get_current_child(chapter, min_depth=1)
@@ -359,6 +360,19 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         else:
             # return all courses, with associated expiration
             return list(mobile_available)
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        api_version = self.kwargs.get('api_version')
+
+        if api_version == API_V2:
+            enrollment_data = {
+                'configs': MobileConfig.get_structured_configs(),
+                'enrollments': response.data
+            }
+            return Response(enrollment_data)
+
+        return response
 
 
 @api_view(["GET"])

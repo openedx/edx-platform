@@ -151,6 +151,7 @@
       .action-primary {
         @extend %btn-primary-blue;
         @extend %t-action3;
+        color: $white;
       }
 
       // specific - request button

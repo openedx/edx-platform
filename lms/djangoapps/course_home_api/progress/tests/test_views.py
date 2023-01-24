@@ -7,12 +7,11 @@ from unittest.mock import patch
 
 import dateutil
 import ddt
-from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -21,9 +20,9 @@ from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.models import DisableProgressPageStackedConfig
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND_PROGRESS_TAB
 from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.models import (
+    PersistentCourseGrade,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride
 )
@@ -49,10 +48,10 @@ class ProgressTabTestViews(BaseCourseHomeTests):
 
     def add_subsection_with_problem(self, **kwargs):
         """Makes a chapter -> problem chain, and sets up the subsection as requested, returning the problem"""
-        chapter = ItemFactory(parent=self.course, category='chapter')
-        subsection = ItemFactory(parent=chapter, category='sequential', graded=True, **kwargs)
-        vertical = ItemFactory(parent=subsection, category='vertical', graded=True)
-        problem = ItemFactory(parent=vertical, category='problem', graded=True)
+        chapter = BlockFactory(parent=self.course, category='chapter')
+        subsection = BlockFactory(parent=chapter, category='sequential', graded=True, **kwargs)
+        vertical = BlockFactory(parent=subsection, category='vertical', graded=True)
+        problem = BlockFactory(parent=vertical, category='problem', graded=True)
         return problem
 
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
@@ -122,7 +121,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
     def test_has_scheduled_content_data(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         future = now() + timedelta(days=30)
-        ItemFactory(parent=self.course, category='chapter', start=future)
+        BlockFactory(parent=self.course, category='chapter', start=future)
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.json()['has_scheduled_content']
@@ -168,15 +167,15 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.status_code == 404
 
     def test_learner_has_access(self):
-        chapter = ItemFactory(parent=self.course, category='chapter')
-        gated = ItemFactory(parent=chapter, category='sequential')
-        ItemFactory.create(parent=gated, category='problem', graded=True, has_score=True)
-        ungated = ItemFactory(parent=chapter, category='sequential')
-        ItemFactory.create(parent=ungated, category='problem', graded=True, has_score=True,
-                           group_access={
-                               CONTENT_GATING_PARTITION_ID: [CONTENT_TYPE_GATE_GROUP_IDS['full_access'],
-                                                             CONTENT_TYPE_GATE_GROUP_IDS['limited_access']],
-                           })
+        chapter = BlockFactory(parent=self.course, category='chapter')
+        gated = BlockFactory(parent=chapter, category='sequential')
+        BlockFactory.create(parent=gated, category='problem', graded=True, has_score=True)
+        ungated = BlockFactory(parent=chapter, category='sequential')
+        BlockFactory.create(parent=ungated, category='problem', graded=True, has_score=True,
+                            group_access={
+                                CONTENT_GATING_PARTITION_ID: [CONTENT_TYPE_GATE_GROUP_IDS['full_access'],
+                                                              CONTENT_TYPE_GATE_GROUP_IDS['limited_access']],
+                            })
 
         CourseEnrollment.enroll(self.user, self.course.id)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
@@ -193,48 +192,54 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert not gated_score['learner_has_access']
         assert ungated_score['learner_has_access']
 
-    @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     def test_override_is_visible(self):
-        with persistent_grades_feature_flags(global_flag=True):
-            chapter = ItemFactory(parent=self.course, category='chapter')
-            subsection = ItemFactory.create(parent=chapter, category="sequential", display_name="Subsection")
+        chapter = BlockFactory(parent=self.course, category='chapter')
+        subsection = BlockFactory.create(parent=chapter, category="sequential", display_name="Subsection")
 
-            CourseEnrollment.enroll(self.user, self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.id)
+        course_grade_params = {
+            "user_id": self.user.id,
+            "course_id": self.course.id,
+            "percent_grade": 77.7,
+            "letter_grade": "pass",
+            "passed": True,
+        }
+        PersistentCourseGrade.update_or_create(**course_grade_params)
 
-            params = {
-                "user_id": self.user.id,
-                "usage_key": subsection.location,
-                "course_version": self.course.course_version,
-                "subtree_edited_timestamp": "2016-08-01 18:53:24.354741Z",
-                "earned_all": 6.0,
-                "possible_all": 12.0,
-                "earned_graded": 6.0,
-                "possible_graded": 8.0,
-                "visible_blocks": [],
-                "first_attempted": datetime.now(),
-            }
+        params = {
+            "user_id": self.user.id,
+            "usage_key": subsection.location,
+            "course_version": self.course.course_version,
+            "subtree_edited_timestamp": "2016-08-01 18:53:24.354741Z",
+            "earned_all": 6.0,
+            "possible_all": 12.0,
+            "earned_graded": 6.0,
+            "possible_graded": 8.0,
+            "visible_blocks": [],
+            "first_attempted": datetime.now(),
+        }
 
-            created_grade = PersistentSubsectionGrade.update_or_create_grade(**params)
-            proctoring_failure_comment = "Failed Test Proctoring"
-            PersistentSubsectionGradeOverride.update_or_create_override(
-                requesting_user=self.staff_user,
-                subsection_grade_model=created_grade,
-                earned_all_override=0.0,
-                earned_graded_override=0.0,
-                system=GradeOverrideFeatureEnum.proctoring,
-                feature=GradeOverrideFeatureEnum.proctoring,
-                comment=proctoring_failure_comment
-            )
+        created_grade = PersistentSubsectionGrade.update_or_create_grade(**params)
+        proctoring_failure_comment = "Failed Test Proctoring"
+        PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=self.staff_user,
+            subsection_grade_model=created_grade,
+            earned_all_override=0.0,
+            earned_graded_override=0.0,
+            system=GradeOverrideFeatureEnum.proctoring,
+            feature=GradeOverrideFeatureEnum.proctoring,
+            comment=proctoring_failure_comment
+        )
 
-            response = self.client.get(self.url)
-            assert response.status_code == 200
+        response = self.client.get(self.url)
+        assert response.status_code == 200
 
-            sections = response.data['section_scores']
-            overridden_subsection = sections[1]['subsections'][0]
-            override_entry = overridden_subsection["override"]
+        sections = response.data['section_scores']
+        overridden_subsection = sections[1]['subsections'][0]
+        override_entry = overridden_subsection["override"]
 
-            assert override_entry['system'] == GradeOverrideFeatureEnum.proctoring
-            assert override_entry['reason'] == proctoring_failure_comment
+        assert override_entry['system'] == GradeOverrideFeatureEnum.proctoring
+        assert override_entry['reason'] == proctoring_failure_comment
 
     def test_view_other_students_progress_page(self):
         # Test the ability to view progress pages of other students by changing the url
@@ -261,9 +266,9 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.data['username'] == other_user.username
 
     def test_url_hidden_if_subsection_hide_after_due(self):
-        chapter = ItemFactory(parent=self.course, category='chapter')
+        chapter = BlockFactory(parent=self.course, category='chapter')
         yesterday = now() - timedelta(days=1)
-        ItemFactory(parent=chapter, category='sequential', hide_after_due=True, due=yesterday)
+        BlockFactory(parent=chapter, category='sequential', hide_after_due=True, due=yesterday)
 
         CourseEnrollment.enroll(self.user, self.course.id)
 

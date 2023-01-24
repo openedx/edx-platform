@@ -17,8 +17,9 @@ from .accounts.views import (
     DeactivateLogoutView,
     LMSAccountRetirementView,
     NameChangeView,
-    UsernameReplacementView
+    UsernameReplacementView, CancelAccountRetirementStatusView
 )
+from .learner_skill_levels.views import LearnerSkillLevelsView
 from . import views as user_api_views
 from .models import UserPreference
 from .preferences.views import PreferencesDetailView, PreferencesView
@@ -60,6 +61,10 @@ PARTNER_REPORT = AccountRetirementPartnerReportView.as_view({
 
 PARTNER_REPORT_CLEANUP = AccountRetirementPartnerReportView.as_view({
     'post': 'retirement_partner_cleanup'
+})
+
+CANCEL_RETIREMENT = CancelAccountRetirementStatusView.as_view({
+    'post': 'cancel_retirement'
 })
 
 RETIREMENT_QUEUE = AccountRetirementStatusView.as_view({
@@ -158,6 +163,9 @@ urlpatterns = [
     path('v1/accounts/retirement_partner_report_cleanup/', PARTNER_REPORT_CLEANUP,
          name='accounts_retirement_partner_report_cleanup'
          ),
+    path('v1/accounts/cancel_retirement/', CANCEL_RETIREMENT,
+         name='cancel_account_retirement'
+         ),
     path('v1/accounts/retirement_queue/', RETIREMENT_QUEUE,
          name='accounts_retirement_queue'
          ),
@@ -188,6 +196,11 @@ urlpatterns = [
         fr'^v1/preferences/{settings.USERNAME_PATTERN}/(?P<preference_key>[a-zA-Z0-9_]+)$',
         PreferencesDetailView.as_view(),
         name='preferences_detail_api'
+    ),
+    re_path(
+        r'^v1/skill_level/(?P<job_id>[0-9]+)/$',
+        LearnerSkillLevelsView.as_view(),
+        name="learner_skill_level"
     ),
     # Moved from user_api/legacy_urls.py
     path('v1/', include(USER_API_ROUTER.urls)),

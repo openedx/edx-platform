@@ -40,7 +40,6 @@ from openedx.core.djangoapps.discussions.config.waffle import (
 )
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.fields import Date  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -482,6 +481,66 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(course.entrance_exam_enabled)
         self.assertEqual(course.entrance_exam_minimum_score_pct, .5)
 
+    @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    def test_entrance_after_changing_other_setting(self):
+        """
+        Test entrance exam is not deactivated when prerequisites removed.
+
+        This test ensures that the entrance milestone is not deactivated after
+        course details are saves without pre-requisite courses active.
+
+        The test was implemented after a bug fixing, correcting the behaviour
+        that every time course details were saved,
+        if there wasn't any pre-requisite course in the POST
+        the view just deleted all the pre-requisite courses, including entrance exam,
+        despite the fact that the entrance_exam_enabled was True.
+        """
+        assert not milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
+            'The initial empty state should be: no entrance exam'
+
+        settings_details_url = get_url(self.course.id)
+        data = {
+            'entrance_exam_enabled': 'true',
+            'entrance_exam_minimum_score_pct': '60',
+            'syllabus': 'none',
+            'short_description': 'empty',
+            'overview': '',
+            'effort': '',
+            'intro_video': '',
+            'start_date': '2012-01-01',
+            'end_date': '2012-12-31',
+        }
+        response = self.client.post(
+            settings_details_url,
+            data=json.dumps(data),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json'
+        )
+
+        assert response.status_code == 200
+        course = modulestore().get_course(self.course.id)
+        assert course.entrance_exam_enabled
+        assert course.entrance_exam_minimum_score_pct == .60
+
+        assert milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
+            'The entrance exam should be required.'
+
+        # Call the settings handler again then ensure it didn't delete the settings of the entrance exam
+        data.update({
+            'start_date': '2018-01-01',
+            'end_date': '{year}-12-31'.format(year=datetime.datetime.now().year + 4),
+        })
+        response = self.client.post(
+            settings_details_url,
+            data=json.dumps(data),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json'
+        )
+        assert response.status_code == 200
+        assert milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
+            'The entrance exam should be required.'
+
     def test_editable_short_description_fetch(self):
         settings_details_url = get_url(self.course.id)
 
@@ -542,10 +601,9 @@ class CourseGradingTest(CourseTestCase):
     @mock.patch('common.djangoapps.track.event_transaction_utils.uuid4')
     @mock.patch('cms.djangoapps.models.settings.course_grading.tracker')
     @mock.patch('cms.djangoapps.contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_update_from_json(self, store, send_signal, tracker, uuid):
+    def test_update_from_json(self, send_signal, tracker, uuid):
         uuid.return_value = "mockUUID"
-        self.course = CourseFactory.create(default_store=store)
+        self.course = CourseFactory.create()
         test_grader = CourseGradingModel.fetch(self.course.id)
         # there should be no event raised after this call, since nothing got modified
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
@@ -600,14 +658,13 @@ class CourseGradingTest(CourseTestCase):
             )
         ])
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_must_fire_grading_event_and_signal_multiple_type(self, store):
+    def test_must_fire_grading_event_and_signal_multiple_type(self):
         """
         Verifies that 'must_fire_grading_event_and_signal' ignores (returns False) if we modify
         short_label and or name
         use test_must_fire_grading_event_and_signal_multiple_type_2_split to run this test only
         """
-        self.course = CourseFactory.create(default_store=store)
+        self.course = CourseFactory.create()
         # .raw_grader approximates what our UI sends down. It uses decimal representation of percent
         # without it, the  weights would be percentages
         raw_grader_list = modulestore().get_course(self.course.id).raw_grader
@@ -626,14 +683,13 @@ class CourseGradingTest(CourseTestCase):
         self.assertTrue(result)
 
     @override_waffle_flag(MATERIAL_RECOMPUTE_ONLY_FLAG, True)
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_must_fire_grading_event_and_signal_multiple_type_waffle_on(self, store):
+    def test_must_fire_grading_event_and_signal_multiple_type_waffle_on(self):
         """
         Verifies that 'must_fire_grading_event_and_signal' ignores (returns False) if we modify
         short_label and or name
         use test_must_fire_grading_event_and_signal_multiple_type_2_split to run this test only
         """
-        self.course = CourseFactory.create(default_store=store)
+        self.course = CourseFactory.create()
         # .raw_grader approximates what our UI sends down. It uses decimal representation of percent
         # without it, the  weights would be percentages
         raw_grader_list = modulestore().get_course(self.course.id).raw_grader
@@ -651,14 +707,13 @@ class CourseGradingTest(CourseTestCase):
         )
         self.assertFalse(result)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_must_fire_grading_event_and_signal_return_true(self, store):
+    def test_must_fire_grading_event_and_signal_return_true(self):
         """
         Verifies that 'must_fire_grading_event_and_signal' ignores (returns False) if we modify
         short_label and or name
         use _2_split suffix to run this test only
         """
-        self.course = CourseFactory.create(default_store=store)
+        self.course = CourseFactory.create()
         # .raw_grader approximates what our UI sends down. It uses decimal representation of percent
         # without it, the  weights would be percentages
         raw_grader_list = modulestore().get_course(self.course.id).raw_grader

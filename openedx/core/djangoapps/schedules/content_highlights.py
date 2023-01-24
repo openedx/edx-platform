@@ -83,8 +83,8 @@ def get_week_highlights(user, course_key, week_num):
             the requested week_num.
     """
     course_descriptor = _get_course_with_highlights(course_key)
-    course_module = _get_course_module(course_descriptor, user)
-    sections_with_highlights = _get_sections_with_highlights(course_module)
+    course_block = _get_course_block(course_descriptor, user)
+    sections_with_highlights = _get_sections_with_highlights(course_block)
     highlights = _get_highlights_for_week(
         sections_with_highlights,
         week_num,
@@ -101,8 +101,8 @@ def get_next_section_highlights(user, course_key, start_date, target_date):
         CourseUpdateDoeNotExist: if highlights do not exist for the requested date
     """
     course_descriptor = _get_course_with_highlights(course_key)
-    course_module = _get_course_module(course_descriptor, user)
-    return _get_highlights_for_next_section(course_module, start_date, target_date)
+    course_block = _get_course_block(course_descriptor, user)
+    return _get_highlights_for_next_section(course_block, start_date, target_date)
 
 
 def _get_course_with_highlights(course_key):
@@ -126,8 +126,8 @@ def _get_course_descriptor(course_key):
     return course_descriptor
 
 
-def _get_course_module(course_descriptor, user):
-    """ Gets course module that takes into account user state and permissions """
+def _get_course_block(course_descriptor, user):
+    """ Gets course block that takes into account user state and permissions """
     # Adding courseware imports here to insulate other apps (e.g. schedules) to
     # avoid import errors.
     from lms.djangoapps.courseware.model_data import FieldDataCache
@@ -142,12 +142,12 @@ def _get_course_module(course_descriptor, user):
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_descriptor.id, user, course_descriptor, depth=1, read_only=True,
     )
-    course_module = get_module_for_descriptor(
+    course_block = get_module_for_descriptor(
         user, request, course_descriptor, field_data_cache, course_descriptor.id, course=course_descriptor,
     )
-    if not course_module:
-        raise CourseUpdateDoesNotExist(f'Course module {course_descriptor.id} not found')
-    return course_module
+    if not course_block:
+        raise CourseUpdateDoesNotExist(f'Course block {course_descriptor.id} not found')
+    return course_block
 
 
 def _section_has_highlights(section):
@@ -155,9 +155,9 @@ def _section_has_highlights(section):
     return section.highlights and not section.hide_from_toc
 
 
-def _get_sections_with_highlights(course_module):
+def _get_sections_with_highlights(course_block):
     """ Returns all sections that have highlights in a course """
-    return list(filter(_section_has_highlights, course_module.get_children()))
+    return list(filter(_section_has_highlights, course_block.get_children()))
 
 
 def _get_highlights_for_week(sections, week_num, course_key):

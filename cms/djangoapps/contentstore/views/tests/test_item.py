@@ -27,13 +27,13 @@ from xblock.fields import Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 from xblock.validation import ValidationMessage
-from xmodule.capa_module import ProblemBlock
-from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.capa_block import ProblemBlock
+from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory, check_mongo_calls
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
     MINIMUM_STATIC_PARTITION_ID,
@@ -46,7 +46,7 @@ from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.views import item as item_module
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
     XBlockStudioConfiguration,
@@ -166,35 +166,6 @@ class GetItemTest(ItemTest):
         if content_contains:
             self.assertContains(resp, content_contains, status_code=expected_code)
         return resp
-
-    @ddt.data(
-        (1, 17, 15, 16, 12),
-        (2, 17, 15, 16, 12),
-        (3, 17, 15, 16, 12),
-    )
-    @ddt.unpack
-    def test_get_query_count(self, branching_factor, chapter_queries, section_queries, unit_queries, problem_queries):
-        self.populate_course(branching_factor)
-        # Retrieve it
-        with check_mongo_calls(chapter_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['chapter'][-1]))
-        with check_mongo_calls(section_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['sequential'][-1]))
-        with check_mongo_calls(unit_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['vertical'][-1]))
-        with check_mongo_calls(problem_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
-
-    @ddt.data(
-        (1, 30),
-        (2, 32),
-        (3, 34),
-    )
-    @ddt.unpack
-    def test_container_get_query_count(self, branching_factor, unit_queries,):
-        self.populate_course(branching_factor)
-        with check_mongo_calls(unit_queries):
-            self.client.get(reverse_usage_url('xblock_container_handler', self.populated_usage_keys['vertical'][-1]))
 
     def test_get_vertical(self):
         # Add a vertical
@@ -2159,9 +2130,7 @@ class TestComponentHandler(TestCase):
             CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name'
         )
         self.usage_key_string = str(self.usage_key)
-
-        self.user = UserFactory()
-
+        self.user = StaffFactory(course_key=CourseLocator('dummy_org', 'dummy_course', 'dummy_run'))
         self.request = self.request_factory.get('/dummy-url')
         self.request.user = self.user
 
@@ -2184,7 +2153,6 @@ class TestComponentHandler(TestCase):
         req_factory_method = getattr(self.request_factory, method.lower())
         request = req_factory_method('/dummy-url')
         request.user = self.user
-
         component_handler(request, self.usage_key_string, 'dummy_handler')
 
     @ddt.data(200, 404, 500)
@@ -2197,12 +2165,44 @@ class TestComponentHandler(TestCase):
         self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                          status_code)
 
+    @patch('cms.djangoapps.contentstore.views.component.log')
+    def test_submit_studio_edits_checks_author_permission(self, mock_logger):
+        """
+        Test logging a user without studio write permissions attempts to run a studio submit handler..
+
+        Arguments:
+            mock_logger (object):  A mock logger object.
+        """
+
+        def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
+            """create dummy response"""
+            return Response(status_code=200)
+
+        self.request.user = UserFactory()
+        mock_handler = 'dummy_handler'
+
+        self.descriptor.handle = create_response
+
+        with patch(
+            'cms.djangoapps.contentstore.views.component.is_xblock_aside',
+            return_value=False
+        ), patch("cms.djangoapps.contentstore.views.component.webob_to_django_response"):
+            component_handler(self.request, self.usage_key_string, mock_handler)
+
+        mock_logger.warning.assert_called_with(
+            "%s does not have have studio write permissions on course: %s. write operations not performed on %r",
+            self. request.user.id,
+            UsageKey.from_string(self.usage_key_string).course_key,
+            mock_handler
+        )
+
     @ddt.data((True, True), (False, False),)
     @ddt.unpack
     def test_aside(self, is_xblock_aside, is_get_aside_called):
         """
         test get_aside_from_xblock called
         """
+
         def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
             """create dummy response"""
             return Response(status_code=200)
@@ -2253,6 +2253,9 @@ class TestComponentTemplates(CourseTestCase):
         XBlockStudioConfiguration.objects.create(name='video', enabled=True, support_level="us")
         # ORA Block has it's own category.
         XBlockStudioConfiguration.objects.create(name='openassessment', enabled=True, support_level="us")
+        # Library Sourced Block and Library Content block has it's own category.
+        XBlockStudioConfiguration.objects.create(name='library_sourced', enabled=True, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='library_content', enabled=True, support_level="fs")
         # XBlock masquerading as a problem
         XBlockStudioConfiguration.objects.create(name='drag-and-drop-v2', enabled=True, support_level="fs")
         XBlockStudioConfiguration.objects.create(name='staffgradedxblock', enabled=True, support_level="us")
@@ -2291,10 +2294,11 @@ class TestComponentTemplates(CourseTestCase):
         """
         self._verify_basic_component("discussion", "Discussion")
         self._verify_basic_component("video", "Video")
-        self._verify_basic_component("openassessment", "Blank Open Response Assessment", True, 6)
+        self._verify_basic_component("openassessment", "Peer Assessment Only", True, 5)
         self._verify_basic_component_display_name("discussion", "Discussion")
         self._verify_basic_component_display_name("video", "Video")
         self._verify_basic_component_display_name("openassessment", "Open Response")
+        self.assertGreater(len(self.get_templates_of_type('library')), 0)
         self.assertGreater(len(self.get_templates_of_type('html')), 0)
         self.assertGreater(len(self.get_templates_of_type('problem')), 0)
         self.assertIsNone(self.get_templates_of_type('advanced'))
@@ -2539,17 +2543,17 @@ class TestXBlockInfo(ItemTest):
     def setUp(self):
         super().setUp()
         user_id = self.user.id
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id,
             highlights=['highlight'],
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Lesson 1", user_id=user_id
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location, category='vertical', display_name='Unit 1', user_id=user_id
         )
-        self.video = ItemFactory.create(
+        self.video = BlockFactory.create(
             parent_location=self.vertical.location, category='video', display_name='My Video', user_id=user_id
         )
 
@@ -2561,24 +2565,24 @@ class TestXBlockInfo(ItemTest):
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 3, 3),
-        (ModuleStoreEnum.Type.mongo, 5, 7),
+        (ModuleStoreEnum.Type.mongo, 8, 12),
     )
     @ddt.unpack
     def test_xblock_outline_handler_mongo_calls(self, store_type, chapter_queries, chapter_queries_1):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
-            chapter = ItemFactory.create(
+            chapter = BlockFactory.create(
                 parent_location=course.location, category='chapter', display_name='Week 1'
             )
             outline_url = reverse_usage_url('xblock_outline_handler', chapter.location)
             with check_mongo_calls(chapter_queries):
                 self.client.get(outline_url, HTTP_ACCEPT='application/json')
 
-            sequential = ItemFactory.create(
+            sequential = BlockFactory.create(
                 parent_location=chapter.location, category='sequential', display_name='Sequential 1'
             )
 
-            ItemFactory.create(
+            BlockFactory.create(
                 parent_location=sequential.location, category='vertical', display_name='Vertical 1'
             )
             # calls should be same after adding two new children for split only.
@@ -2586,7 +2590,7 @@ class TestXBlockInfo(ItemTest):
                 self.client.get(outline_url, HTTP_ACCEPT='application/json')
 
     def test_entrance_exam_chapter_xblock_info(self):
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Entrance Exam",
             user_id=self.user.id, is_entrance_exam=True
         )
@@ -2605,7 +2609,7 @@ class TestXBlockInfo(ItemTest):
         self.assertIsNone(xblock_info.get('is_header_visible', None))
 
     def test_none_entrance_exam_chapter_xblock_info(self):
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Test Chapter",
             user_id=self.user.id
         )
@@ -2625,12 +2629,12 @@ class TestXBlockInfo(ItemTest):
         self.assertIsNone(xblock_info.get('is_header_visible', None))
 
     def test_entrance_exam_sequential_xblock_info(self):
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Entrance Exam",
             user_id=self.user.id, is_entrance_exam=True, in_entrance_exam=True
         )
 
-        subsection = ItemFactory.create(
+        subsection = BlockFactory.create(
             parent_location=chapter.location, category='sequential', display_name="Subsection - Entrance Exam",
             user_id=self.user.id, in_entrance_exam=True
         )
@@ -2645,7 +2649,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['display_name'], 'Subsection - Entrance Exam')
 
     def test_none_entrance_exam_sequential_xblock_info(self):
-        subsection = ItemFactory.create(
+        subsection = BlockFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Subsection - Exam",
             user_id=self.user.id
         )
@@ -2706,7 +2710,7 @@ class TestXBlockInfo(ItemTest):
         """
         with self.store.default_store(store_type):
             course = CourseFactory.create()
-            chapter = ItemFactory.create(
+            chapter = BlockFactory.create(
                 parent_location=course.location, category='chapter', display_name='Week 1'
             )
 
@@ -2864,7 +2868,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
     def setUp(self):
         super().setUp()
         user_id = self.user.id
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id,
             highlights=['highlight'],
         )
@@ -2891,7 +2895,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             _mock_does_backend_support_onboarding,
             mock_get_exam_configuration_dashboard_url,
     ):
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Test Lesson 1",
@@ -2933,7 +2937,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             _mock_does_backend_support_onboarding_patch,
             _mock_get_exam_configuration_dashboard_url,
     ):
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Test Lesson 1",
@@ -2961,7 +2965,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             _mock_does_backend_support_onboarding_patch,
             _mock_get_exam_configuration_dashboard_url,
     ):
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Test Lesson 1",
@@ -2989,13 +2993,13 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
         super().setUp()
         user_id = self.user.id
         self.library = LibraryFactory.create()
-        self.top_level_html = ItemFactory.create(
+        self.top_level_html = BlockFactory.create(
             parent_location=self.library.location, category='html', user_id=user_id, publish_item=False
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.library.location, category='vertical', user_id=user_id, publish_item=False
         )
-        self.child_html = ItemFactory.create(
+        self.child_html = BlockFactory.create(
             parent_location=self.vertical.location, category='html', display_name='Test HTML Child Block',
             user_id=user_id, publish_item=False
         )
@@ -3079,7 +3083,7 @@ class TestXBlockPublishingInfo(ItemTest):
         """
         Creates a child xblock for the given parent.
         """
-        child = ItemFactory.create(
+        child = BlockFactory.create(
             parent_location=parent.location, category=category, display_name=display_name,
             user_id=self.user.id, publish_item=publish_item
         )

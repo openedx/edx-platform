@@ -1,18 +1,22 @@
 <!--
 
-🌰🌰
-🌰🌰🌰🌰         🌰 Note: the Nutmeg master branch has been created.  Please consider whether your change
-    🌰🌰🌰🌰     should also be applied to Nutmeg. If so, make another pull request against the
-🌰🌰🌰🌰         open-release/nutmeg.master branch, or ping @nedbat for help or questions.
-🌰🌰
+🎉🎉 Olive has been released! 🎉🎉
+
+🫒🫒
+🫒🫒🫒🫒         🫒 Note: Olive is in support. Fixes you make on master may still
+    🫒🫒🫒🫒     be needed on Olive. If so, make another pull request against the
+🫒🫒🫒🫒         open-release/olive.master branch, or ping @nedbat for help or questions.
+🫒🫒
 
 Please give your pull request a short but descriptive title.
 Use conventional commits to separate and summarize commits logically:
 https://open-edx-proposals.readthedocs.io/en/latest/oep-0051-bp-conventional-commits.html
 
-Use this template as a guide. Omit sections that don't apply. You may link to information rather than copy it.
-More details about the template are at https://github.com/edx/open-edx-proposals/pull/180
-(link will be updated when that document merges)
+Use this template as a guide. Omit sections that don't apply.
+You may link to information rather than copy it, but only if the link is publicly
+readable.  If you must linked information must be private (because it has secrets),
+clearly label the link as private.
+
 -->
 
 ## Description
@@ -47,3 +51,4 @@ Please provide detailed step-by-step instructions for testing this change.
 Include anything else that will help reviewers and consumers understand the change.
 - Does this change depend on other changes elsewhere?
 - Any special concerns or limitations? For example: deprecations, migrations, security, or accessibility.
+- If your [database migration](https://openedx.atlassian.net/wiki/spaces/AC/pages/23003228/Everything+About+Database+Migrations) can't be rolled back easily.

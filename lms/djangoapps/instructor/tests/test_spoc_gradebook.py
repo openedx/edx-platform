@@ -1,16 +1,14 @@
 """
 Tests of the instructor dashboard spoc gradebook
 """
-from unittest.mock import patch, MagicMock
-
 from django.urls import reverse
 
-from capa.tests.response_xml_factory import StringResponseXMLFactory
+from xmodule.capa.tests.response_xml_factory import StringResponseXMLFactory
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 USER_COUNT = 11
 
@@ -22,16 +20,6 @@ class TestGradebook(SharedModuleStoreTestCase):
     gradebook tests.
     """
     grading_policy = None
-
-    def setup_patch(self, function_name, return_value):
-        """
-        Patch a function with a given return value, and return the mock
-        """
-        mock = MagicMock(return_value=return_value)
-        new_patch = patch(function_name, new=mock)
-        new_patch.start()
-        self.addCleanup(new_patch.stop)
-        return mock
 
     @classmethod
     def setUpClass(cls):
@@ -45,17 +33,17 @@ class TestGradebook(SharedModuleStoreTestCase):
 
         # Now give it some content
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
-            chapter = ItemFactory.create(
+            chapter = BlockFactory.create(
                 parent_location=cls.course.location,
                 category="sequential",
             )
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent_location=chapter.location,
                 category="sequential",
                 metadata={'graded': True, 'format': 'Homework'}
             )
             cls.items = [
-                ItemFactory.create(
+                BlockFactory.create(
                     parent_location=section.location,
                     category="problem",
                     data=StringResponseXMLFactory().build_xml(answer='foo'),
@@ -70,10 +58,6 @@ class TestGradebook(SharedModuleStoreTestCase):
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
         self.users = [UserFactory.create() for _ in range(USER_COUNT)]
-        self.signal_mock_pathway_progress = self.setup_patch(
-            'lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send',
-            None,
-        )
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 

@@ -19,7 +19,7 @@ from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangolib.markup import HTML
 from common.djangoapps.student.models import anonymous_id_for_user
-from xmodule.course_module import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import TabFragmentViewMixin, key_checker  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -57,6 +57,7 @@ class LtiCourseLaunchMixin:
         pii_config = {}
         if lti_config.pii_share_username:
             pii_config['person_sourcedid'] = request.user.username
+
         if lti_config.pii_share_email:
             pii_config['person_contact_email_primary'] = request.user.email
         return pii_config

@@ -15,7 +15,7 @@ var filesWithRequireJSBlocks = [
     path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js'),
     /descriptors\/js/,
     /modules\/js/,
-    /common\/lib\/xmodule\/xmodule\/js\/src\//
+    /xmodule\/js\/src\//
 ];
 
 var defineHeader = /\(function ?\(((define|require|requirejs|\$)(, )?)+\) ?\{/;
@@ -72,7 +72,7 @@ module.exports = Merge.smart({
             // Studio
             Import: './cms/static/js/features/import/factories/import.js',
             CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
-            LibrarySourcedBlockPicker: './common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx',  // eslint-disable-line max-len
+            LibrarySourcedBlockPicker: './xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx',  // eslint-disable-line max-len
             'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
             'js/factories/container': './cms/static/js/factories/container.js',
             'js/factories/context_course': './cms/static/js/factories/context_course.js',
@@ -97,6 +97,8 @@ module.exports = Merge.smart({
             DemographicsCollectionModal: './lms/static/js/demographics_collection/DemographicsCollectionModal.jsx',
             AxiosJwtTokenService: './lms/static/js/jwt_auth/AxiosJwtTokenService.js',
             EnterpriseLearnerPortalModal: './lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx',
+            RecommendationsPanel: './lms/static/js/learner_dashboard/RecommendationsPanel.jsx',
+            Static2UCallouts: './lms/static/js/learner_dashboard/Static2UCallouts.jsx',
 
             // Learner Dashboard
             EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',
@@ -115,8 +117,8 @@ module.exports = Merge.smart({
 
             // Common
             ReactRenderer: './common/static/js/src/ReactRenderer.jsx',
-            XModuleShim: 'xmodule/js/src/xmodule.js',
-            VerticalStudentView: './common/lib/xmodule/xmodule/assets/vertical/public/js/vertical_student_view.js',
+            XModuleShim: './xmodule/js/src/xmodule.js',
+            VerticalStudentView: './xmodule/assets/vertical/public/js/vertical_student_view.js',
             commons: 'babel-polyfill'
         },
 
@@ -172,7 +174,7 @@ module.exports = Merge.smart({
                 // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
                 // (I've tried every other suggestion solution on that page, this
                 // was the only one that worked.)
-                /\/sinon\.js|codemirror-compressed\.js|hls\.js|tinymce\.full\.min\.js/
+                /\/sinon\.js|codemirror-compressed\.js|hls\.js|tinymce.js/
             ],
             rules: [
                 {
@@ -376,7 +378,7 @@ module.exports = Merge.smart({
                 'jquery.timepicker': 'timepicker/jquery.timepicker',
                 'backbone.associations': 'backbone-associations/backbone-associations-min',
                 squire: 'Squire',
-                tinymce: 'tinymce.full.min',
+                tinymce: 'tinymce',
 
                 // See sinon/webpack interaction weirdness:
                 // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
@@ -391,9 +393,9 @@ module.exports = Merge.smart({
                 'cms/static/cms/js',
                 'cms/templates/js',
                 'lms/static',
-                'common/lib/xmodule',
-                'common/lib/xmodule/xmodule/js/src',
-                'common/lib/xmodule/xmodule/assets/word_cloud/src/js',
+                path.resolve(__dirname),
+                'xmodule/js/src',
+                'xmodule/assets/word_cloud/src/js',
                 'common/static',
                 'common/static/coffee/src',
                 'common/static/common/js',
@@ -437,4 +439,3 @@ module.exports = Merge.smart({
 
     }
 }, {web: xmoduleJS}, workerConfig());
-

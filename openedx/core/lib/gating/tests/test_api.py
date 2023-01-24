@@ -11,8 +11,8 @@ from ddt import data, ddt, unpack
 from django.conf import settings
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.gating import api as lms_gating_api
@@ -46,26 +46,26 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.course.save()
 
         # create chapter
-        self.chapter1 = ItemFactory.create(
+        self.chapter1 = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name='untitled chapter 1'
         )
 
         # create sequentials
-        self.seq1 = ItemFactory.create(
+        self.seq1 = BlockFactory.create(
             parent_location=self.chapter1.location,
             category='sequential',
             display_name='untitled sequential 1'
         )
-        self.seq2 = ItemFactory.create(
+        self.seq2 = BlockFactory.create(
             parent_location=self.chapter1.location,
             category='sequential',
             display_name='untitled sequential 2'
         )
 
         # create vertical
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.seq1.location,
             category='vertical',
             display_name='untitled vertical 1'
@@ -248,12 +248,12 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         """
         student = UserFactory(is_staff=False)
-        problem_block = ItemFactory.create(
+        problem_block = BlockFactory.create(
             parent_location=self.vertical.location,
             category='problem',
             display_name='some problem'
         )
-        html_block = ItemFactory.create(
+        html_block = BlockFactory.create(
             parent_location=self.vertical.location,
             category='html',
             display_name='some html block'
@@ -293,7 +293,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         student = UserFactory(is_staff=False)
 
-        component = ItemFactory.create(
+        component = BlockFactory.create(
             parent_location=self.vertical.location,
             category=component_type,
             display_name=f'{component_type} block'
@@ -351,7 +351,7 @@ class TestGatingGradesIntegration(GradeTestBase):
     """
     Tests the integration between the gating API and our Persistent Grades framework.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_get_subsection_grade_percentage(self):

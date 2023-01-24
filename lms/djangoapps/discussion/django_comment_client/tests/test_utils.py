@@ -9,10 +9,9 @@ from unittest.mock import Mock, patch
 
 import ddt
 import pytest
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
-from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
@@ -27,7 +26,6 @@ from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
@@ -51,11 +49,9 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
-from xmodule.tabs import CourseTabList
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, ToyCourseFactory
 
 
 class DictionaryTestCase(TestCase):
@@ -139,14 +135,14 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
-        self.discussion1 = ItemFactory.create(
+        self.discussion1 = BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="discussion1",
             discussion_category="Chapter",
             discussion_target="Discussion 1"
         )
-        self.discussion2 = ItemFactory.create(
+        self.discussion2 = BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="discussion2",
@@ -184,7 +180,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         Test that for empty subcategory inline discussion modules,
         the divider " / " is not rendered on a post or inline discussion topic label.
         """
-        discussion = ItemFactory.create(
+        discussion = BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="discussion",
@@ -195,13 +191,11 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         utils.add_courseware_context([thread], self.course, self.user)
         assert '/' not in thread.get('courseware_title')
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 2), (ModuleStoreEnum.Type.split, 1))
-    @ddt.unpack
-    def test_get_accessible_discussion_xblocks(self, modulestore_type, expected_discussion_xblocks):
+    def test_get_accessible_discussion_xblocks(self):
         """
         Tests that the accessible discussion xblocks having no parents do not get fetched for split modulestore.
         """
-        course = CourseFactory.create(default_store=modulestore_type)
+        course = CourseFactory.create()
 
         # Create a discussion xblock.
         test_discussion = self.store.create_child(self.user.id, course.location, 'discussion', 'test_discussion')
@@ -221,7 +215,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         # Assert that the discussion xblock is an orphan.
         assert orphan in self.store.get_orphans(course.id)
 
-        assert len(get_accessible_discussion_xblocks(course, self.user)) == expected_discussion_xblocks
+        assert len(get_accessible_discussion_xblocks(course, self.user)) == 1
 
 
 class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
@@ -234,21 +228,21 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         super().setUp()
 
         self.course = CourseFactory.create(org='TestX', number='101', display_name='Test Course')
-        self.discussion = ItemFactory.create(
+        self.discussion = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='test_discussion_id',
             discussion_category='Chapter',
             discussion_target='Discussion 1'
         )
-        self.discussion2 = ItemFactory.create(
+        self.discussion2 = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='test_discussion_id_2',
             discussion_category='Chapter 2',
             discussion_target='Discussion 2'
         )
-        self.private_discussion = ItemFactory.create(
+        self.private_discussion = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='private_discussion_id',
@@ -257,7 +251,7 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
             visible_to_staff_only=True
         )
         RequestCache.clear_all_namespaces()  # clear the cache before the last course publish
-        self.bad_discussion = ItemFactory.create(
+        self.bad_discussion = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='bad_discussion_id',
@@ -382,7 +376,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
         self.discussion_num += 1
-        return ItemFactory.create(
+        return BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id=f"discussion{self.discussion_num}",
@@ -883,60 +877,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             }
         )
 
-    def test_sort_alpha(self):
-        self.course.discussion_sort_alpha = True
-        self.create_discussion("Chapter", "Discussion D")
-        self.create_discussion("Chapter", "Discussion A")
-        self.create_discussion("Chapter", "Discussion E")
-        self.create_discussion("Chapter", "Discussion C")
-        self.create_discussion("Chapter", "Discussion B")
-
-        self.assert_category_map_equals(
-            {
-                "entries": {},
-                "subcategories": {
-                    "Chapter": {
-                        "entries": {
-                            "Discussion D": {
-                                "id": "discussion1",
-                                "sort_key": "Discussion D",
-                                "is_divided": False,
-                            },
-                            "Discussion A": {
-                                "id": "discussion2",
-                                "sort_key": "Discussion A",
-                                "is_divided": False,
-                            },
-                            "Discussion E": {
-                                "id": "discussion3",
-                                "sort_key": "Discussion E",
-                                "is_divided": False,
-                            },
-                            "Discussion C": {
-                                "id": "discussion4",
-                                "sort_key": "Discussion C",
-                                "is_divided": False,
-                            },
-                            "Discussion B": {
-                                "id": "discussion5",
-                                "sort_key": "Discussion B",
-                                "is_divided": False,
-                            }
-                        },
-                        "subcategories": {},
-                        "children": [
-                            ("Discussion A", TYPE_ENTRY),
-                            ("Discussion B", TYPE_ENTRY),
-                            ("Discussion C", TYPE_ENTRY),
-                            ("Discussion D", TYPE_ENTRY),
-                            ("Discussion E", TYPE_ENTRY)
-                        ]
-                    }
-                },
-                "children": [("Chapter", TYPE_SUBCATEGORY)]
-            }
-        )
-
     def test_sort_intermediates(self):
         self.create_discussion("Chapter B", "Discussion 2")
         self.create_discussion("Chapter C", "Discussion")
@@ -1240,7 +1180,7 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
     Test the is_commentable_divided function.
     """
 
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """

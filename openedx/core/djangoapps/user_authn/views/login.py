@@ -22,13 +22,12 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
+from django_ratelimit.decorators import ratelimit
 from edx_django_utils.monitoring import set_custom_attribute
-from ratelimit.decorators import ratelimit
-from rest_framework.views import APIView
-
 from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import SESSION_LOGIN_COMPLETED
 from openedx_filters.learning.filters import StudentLoginRequested
+from rest_framework.views import APIView
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -46,6 +45,7 @@ from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError, VulnerablePasswordError
+from openedx.core.djangoapps.user_authn.tasks import check_pwned_password_and_send_track_event
 from openedx.core.djangoapps.user_authn.toggles import (
     is_require_third_party_auth_enabled,
     should_redirect_to_authn_microfrontend
@@ -53,7 +53,6 @@ from openedx.core.djangoapps.user_authn.toggles import (
 from openedx.core.djangoapps.user_authn.views.login_form import get_login_session_form
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
 from openedx.core.djangoapps.user_authn.views.utils import API_V1, ENTERPRISE_ENROLLMENT_URL_REGEX, UUID4_REGEX
-from openedx.core.djangoapps.user_authn.tasks import check_pwned_password_and_send_track_event
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params  # lint-amnesty, pylint: disable=unused-import
@@ -411,10 +410,16 @@ def _check_user_auth_flow(site, user):
         if user_domain == allowed_domain and not AllowedAuthUser.objects.filter(site=site, email=user.email).exists():
             if not should_redirect_to_authn_microfrontend():
                 msg = _create_message(site, None, allowed_domain)
-            else:
-                root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
-                msg = _create_message(site, root_url, allowed_domain)
-            raise AuthFailedError(msg)
+                raise AuthFailedError(msg)
+
+            raise AuthFailedError(
+                error_code='allowed-domain-login-error',
+                context={
+                    'allowed_domain': allowed_domain,
+                    'provider': site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER'),
+                    'tpa_hint': site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_HINT'),
+                }
+            )
 
 
 @login_required
@@ -483,14 +488,16 @@ def enterprise_selection_page(request, user, next_url):
 @ensure_csrf_cookie
 @require_http_methods(['POST'])
 @ratelimit(
-    key='openedx.core.djangoapps.util.ratelimit.request_post_email',
+    key='openedx.core.djangoapps.util.ratelimit.request_post_email_or_username',
     rate=settings.LOGISTRATION_PER_EMAIL_RATELIMIT_RATE,
     method='POST',
+    block=False,
 )  # lint-amnesty, pylint: disable=too-many-statements
 @ratelimit(
     key='openedx.core.djangoapps.util.ratelimit.real_ip',
     rate=settings.LOGISTRATION_RATELIMIT_RATE,
     method='POST',
+    block=False,
 )  # lint-amnesty, pylint: disable=too-many-statements
 def login_user(request, api_version='v1'):  # pylint: disable=too-many-statements
     """
@@ -526,7 +533,7 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
     _parse_analytics_param_for_course_id(request)
 
     third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
-    first_party_auth_requested = bool(request.POST.get('email')) or bool(request.POST.get('password'))
+    first_party_auth_requested = any(bool(request.POST.get(p)) for p in ['email', 'email_or_username', 'password'])
     is_user_third_party_authenticated = False
 
     set_custom_attribute('login_user_course_id', request.POST.get('course_id'))

@@ -227,6 +227,33 @@ class EnrollmentRequiredAccessError(AccessError):
         super().__init__(error_code, developer_message, user_message)
 
 
+class IncorrectActiveEnterpriseAccessError(AccessError):
+    """
+    Access denied because the user must login with correct enterprise.
+    """
+    def __init__(self, enrollment_enterprise_name, active_enterprise_name):
+        error_code = "incorrect_active_enterprise"
+        developer_message = "User active enterprise should be same as EnterpriseCourseEnrollment enterprise."
+        user_message = _("You are enrolled in this course with '{enrollment_enterprise_name}'. However, you are "
+                         "currently logged in as a '{active_enterprise_name}' user. Please log in with "
+                         "'{enrollment_enterprise_name}' to access this course.")
+        user_message = user_message.format(
+            enrollment_enterprise_name=enrollment_enterprise_name, active_enterprise_name=active_enterprise_name
+        )
+        super().__init__(error_code, developer_message, user_message)
+
+
+class DataSharingConsentRequiredAccessError(AccessError):
+    """
+    Access denied because the user must give Data sharing consent before access it.
+    """
+    def __init__(self, consent_url):
+        error_code = "data_sharing_access_required"
+        developer_message = consent_url
+        user_message = _("You must give Data Sharing Consent for the course")
+        super().__init__(error_code, developer_message, user_message)
+
+
 class AuthenticationRequiredAccessError(AccessError):
     """
     Access denied because the user must be authenticated to see it

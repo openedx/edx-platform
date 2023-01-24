@@ -23,8 +23,8 @@ new ``CourseModes`` with similar but not identical permissions requires
 numerous distributed code changes.
 
 .. _OEP-9: https://open-edx-proposals.readthedocs.io/en/latest/oep-0009-bp-permissions.html
-.. _CourseMode: https://github.com/edx/edx-platform/blob/master/common/djangoapps/course_modes/models.py#L37
-.. _edx-platform: https://github.com/edx/edx-platform
+.. _CourseMode: https://github.com/openedx/edx-platform/blob/master/common/djangoapps/course_modes/models.py#L37
+.. _edx-platform: https://github.com/openedx/edx-platform
 
 ~~~~~~~~
 Decision
@@ -87,7 +87,7 @@ Finally, we need to make sure that ``__invert__`` doesn't lose error
 messages (https://github.com/dfunckt/django-rules/blob/master/rules/predicates.py#L173)
 
 .. _django-rules: https://github.com/dfunckt/django-rules
-.. _AccessResponse: https://github.com/edx/edx-platform/blob/master/lms/djangoapps/courseware/access_response.py#L10
+.. _AccessResponse: https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/courseware/access_response.py#L10
 .. _Predicate: https://github.com/dfunckt/django-rules/blob/master/rules/predicates.py#L47
 
 Convert built-in predicates to non-boolean predicates in edx-platform
@@ -122,7 +122,7 @@ and can be parallelized. However, at present, there are ~150 calls to
 `has_access`_ in edx-platform, so this is not an insignificant amount of
 work.
 
-.. _has_access: https://github.com/edx/edx-platform/blob/master/lms/djangoapps/courseware/access.py#L103
+.. _has_access: https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/courseware/access.py#L103
 .. _user.has_perm: https://docs.djangoproject.com/en/2.1/ref/contrib/auth/#django.contrib.auth.models.User.has_perm
 
 Refactor contents of ``has_access``
@@ -169,7 +169,7 @@ It will also allow those conditions (predicates) to be written in
 a location that is central to the app they are responsible for, rather
 than requiring that they be added to `access.py`_.
 
-.. _access.py: https://github.com/edx/edx-platform/blob/master/lms/djangoapps/courseware/access.py
+.. _access.py: https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/courseware/access.py
 
 When the conversion of `CourseMode`_ membership checks has been completed,
 it will be easier to add new `CourseMode`_ types with similar permissions
