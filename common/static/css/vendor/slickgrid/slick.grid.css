@@ -5,22 +5,32 @@ No built-in (selected, editable, highlight, flashing, invalid, loading, :focus) 
 classes should alter those!
 */
 
-.slick-header.ui-state-default, .slick-headerrow.ui-state-default {
+.slick-header.ui-state-default, .slick-headerrow.ui-state-default, .slick-footerrow.ui-state-default, .slick-top-panel-scroller.ui-state-default, .slick-group-header.ui-state-default {
   width: 100%;
-  overflow: hidden;
-  border-left: 0px;
+  overflow: auto;
+  position: relative;
+  border-left: 0px !important;
 }
 
-.slick-header-columns, .slick-headerrow-columns {
+.slick-header.ui-state-default {
+  overflow: inherit;
+  border-top: 1px solid #d3d3d3;
+}
+.slick-header::-webkit-scrollbar,  .slick-headerrow::-webkit-scrollbar, .slick-footerrow::-webkit-scrollbar {
+  display: none
+}
+
+.slick-header-columns, .slick-headerrow-columns, .slick-footerrow-columns, .slick-group-header-columns {
   position: relative;
   white-space: nowrap;
   cursor: default;
   overflow: hidden;
 }
 
-.slick-header-column.ui-state-default {
+.slick-header-column.ui-state-default, .slick-group-header-column.ui-state-default {
   position: relative;
   display: inline-block;
+  box-sizing: content-box !important; /* this here only for Firefox! */ 
   overflow: hidden;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
@@ -29,13 +39,28 @@ classes should alter those!
   margin: 0;
   padding: 4px;
   border-right: 1px solid silver;
+  border-left: 0px !important;
+  border-top: 0px !important;
+  border-bottom: 0px !important;
+  float: left;
+  z-index: 1;
+}
+
+.slick-footerrow-column.ui-state-default {
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  margin: 0;
+  padding: 4px;
+  border-right: 1px solid silver;
   border-left: 0px;
   border-top: 0px;
   border-bottom: 0px;
   float: left;
+  line-height: 20px;
+  vertical-align: middle;
 }
 
-.slick-headerrow-column.ui-state-default {
+.slick-headerrow-column.ui-state-default, .slick-footerrow-column.ui-state-default {
   padding: 4px;
 }
 
@@ -52,6 +77,20 @@ classes should alter those!
   float: left;
 }
 
+.slick-sort-indicator-numbered {
+  display: inline-block;
+  width: 8px;
+  height: 5px;
+  margin-left: 4px;
+  margin-top: 0;
+  line-height: 20px;
+  float: left;
+  font-family: Arial;
+  font-style: normal;
+  font-weight: bold;
+  color: #6190CD;
+}
+
 .slick-sort-indicator-desc {
   background: url(images/sort-desc.gif);
 }
@@ -65,10 +104,11 @@ classes should alter those!
   font-size: 0.1px;
   display: block;
   cursor: col-resize;
-  width: 4px;
-  right: 0px;
+  width: 9px;
+  right: -5px;
   top: 0;
   height: 100%;
+  z-index: 2;
 }
 
 .slick-sortable-placeholder {
@@ -86,7 +126,7 @@ classes should alter those!
   width: 100%;
 }
 
-.slick-cell, .slick-headerrow-column {
+.slick-cell, .slick-headerrow-column , .slick-footerrow-column{
   position: absolute;
   border: 1px solid transparent;
   border-right: 1px dotted silver;
@@ -100,6 +140,12 @@ classes should alter those!
   margin: 0;
   white-space: nowrap;
   cursor: default;
+}
+.slick-cell, .slick-headerrow-column{
+  border-bottom-color: silver;
+}
+.slick-footerrow-column {
+  border-top-color: silver;
 }
 
 .slick-group {
@@ -150,8 +196,50 @@ classes should alter those!
   filter: alpha(opacity = 70);
 }
 
+.slick-reorder-shadow-row {
+  position: absolute;
+  z-index: 999999;
+  box-shadow: rgba(0, 0, 0, 0.2) 8px 2px 8px 4px, rgba(0, 0, 0, 0.19) 2px 2px 0px 0px;
+}
+
 .slick-selection {
   z-index: 10;
   position: absolute;
   border: 2px dashed black;
+}
+
+.slick-pane {
+  position: absolute;
+  outline: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.slick-pane-header {
+  display: block;
+}
+
+.slick-header {
+  overflow: hidden;
+  position: relative;
+}
+
+.slick-headerrow {
+  overflow: hidden;
+  position: relative;
+}
+
+.slick-top-panel-scroller {
+  overflow: hidden;
+  position: relative;
+}
+
+.slick-top-panel {
+  width: 10000px
+}
+
+.slick-viewport {
+  position: relative;
+  outline: 0;
+  width: 100%;
 }
