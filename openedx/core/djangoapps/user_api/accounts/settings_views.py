@@ -8,7 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -76,9 +76,13 @@ def account_settings(request):
     context = account_settings_context(request)
 
     try:
+        # .. filter_implemented_name: AccountSettingsRenderStarted
+        # .. filter_type: org.openedx.learning.student.settings.render.started.v1
         context = AccountSettingsRenderStarted().run_filter(context=context)
-    except AccountSettingsRenderStarted.ErrorFilteringContext as exc:
-        raise ImproperlyConfigured(f'Pipeline configuration error: {exc}') from exc
+    except AccountSettingsRenderStarted.RedirectToPage as exc:
+        return HttpResponseRedirect(exc.redirect_to)
+    except AccountSettingsRenderStarted.RenderCustomResponse as exc:
+        return exc.response
 
     return render_to_response('student_account/account_settings.html', context)
 
