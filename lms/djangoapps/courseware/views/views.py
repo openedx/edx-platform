@@ -1619,7 +1619,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         # true for these exams
         exam_block = ancestor_sequence_block if ancestor_sequence_block else block
         if getattr(exam_block, 'is_time_limited', None):
-            if not _check_sequence_exam_access(request, exam_block):
+            if not _check_sequence_exam_access(request, exam_block.location):
                 return HttpResponseForbidden("Access to exam content is restricted")
             
         fragment = block.render(requested_view, context=student_view_context)
