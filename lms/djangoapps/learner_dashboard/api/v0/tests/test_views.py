@@ -290,7 +290,7 @@ class TestCourseRecommendationApiView(TestCase):
         filtered_course = []
         for course_key in self.recommended_courses[:5]:
             filtered_course.append({
-                "course_key": course_key,
+                "key": course_key,
                 "title": f"Title for {course_key}",
                 "logo_image_url": "https://www.logo_image_url.com",
                 "marketing_url": "https://www.marketing_url.com",
@@ -398,7 +398,8 @@ class TestCourseRecommendationApiView(TestCase):
             {
                 "is_control": False,
                 "amplitude_recommendations": True,
-                "course_key_array": self.recommended_courses[:5],
+                "course_key_array": [course.get("key") for course in
+                                     self._get_filtered_courses()[:expected_recommendations]],
             },
         )
 

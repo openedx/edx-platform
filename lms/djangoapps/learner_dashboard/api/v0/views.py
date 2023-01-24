@@ -401,6 +401,16 @@ class CourseRecommendationApiView(APIView):
             status=200,
         )
 
+    def _course_data(self, course):
+        """Helper method for personalized recommendation response"""
+        return {
+            "course_key": course.get("key"),
+            "title": course.get("title"),
+            "logo_image_url": course.get("owners")[0]["logo_image_url"] if course.get(
+                "owners") else "",
+            "marketing_url": course.get("marketing_url"),
+        }
+
     def get(self, request):
         """Retrieves course recommendations details of a user in a specified course."""
         user_id = request.user.id
@@ -427,12 +437,13 @@ class CourseRecommendationApiView(APIView):
                 user_id, is_control, fallback_recommendations
             )
 
-        recommended_courses = filter_recommended_courses(request.user, course_keys)
-        if not recommended_courses:
+        filtered_courses = filter_recommended_courses(request.user, course_keys, recommendation_count=5)
+        if not filtered_courses:
             return self._general_recommendations_response(
                 user_id, is_control, fallback_recommendations
             )
 
+        recommended_courses = list(map(self._course_data, filtered_courses))
         self._emit_recommendations_viewed_event(
             user_id, is_control, recommended_courses
         )

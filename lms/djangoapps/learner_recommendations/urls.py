@@ -13,4 +13,7 @@ urlpatterns = [
     re_path(fr'^algolia/courses/{settings.COURSE_ID_PATTERN}/$',
             views.AlgoliaCoursesSearchView.as_view(),
             name='algolia_courses'),
+    re_path(fr'^amplitude/{settings.COURSE_ID_PATTERN}/$',
+            views.AmplitudeRecommendationsView.as_view(),
+            name='amplitude_recommendations'),
 ]
