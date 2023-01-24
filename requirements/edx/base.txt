@@ -665,7 +665,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==7.2.1
+lti-consumer-xblock==7.2.2
     # via -r requirements/edx/base.in
 lxml==4.9.2
     # via
