@@ -65,7 +65,7 @@ sphinx==5.3.0
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/doc.in
     #   edx-sphinx-theme
-sphinxcontrib-applehelp==1.0.3
+sphinxcontrib-applehelp==1.0.4
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
