@@ -15,13 +15,20 @@ USAGE:\n\
     $0 [OPTIONS] cms [<THEME_DIR>]\n\
 \n\
 OPTIONS:\n\
-    -n, --node_modules <NODE_MODULES_PATH>   Path to installed node_modules directory.\n\
+    -n, --node-modules <NODE_MODULES_PATH>   Path to installed node_modules directory.\n\
                                              Defaults to ./node_modules.\n\
+    -w, --watch                              Watch sass directories and compile and recompile whenever changed\n\
     -f, --force                              Remove existing css before generating new css\n\
     -d, --dev                                Dev mode: whether to show source comments in resulting css\n\
-	-w, --watch                              Watch sass directories and compile and recompile whenever changed\n\
+        --dry                                Dry run: don't do anything; just print what _would_ be done.\n\
     -h, --help                               Display this.\n\
 "
+
+# Commands we use.
+# In --dry mode, these are overriden to 'echo <command>'
+rm='rm'
+sassc='sassc'
+rtlcss='rtlcss'
 
 # By default, we look for node_modules in the current directory.
 # Some Open edX distributions may want node_modules to be located somewhere
@@ -42,8 +49,7 @@ watch=""
 
 # Output style arguments, to be passed to underlying
 # libsass complition command.
-source_comments="False"
-output_style="compressed"
+output_options="--style=compressed"
 
 # Parse arguments and options.
 while [ $# -gt 0 ]; do
@@ -59,17 +65,21 @@ while [ $# -gt 0 ]; do
 			shift
 			;;
 		-w|--watch)
-			watch="True"
+			watch="T"
 			shift
 			;;
 		-f|--force)
-			source_comments="True"
-			output_style="nested"
+			force="T"
 			shift
 			;;
 		-d|--debug)
-			source_comments="True"
-			output_style="nested"
+			output_options="--style=nested --source-comments"
+			shift
+			;;
+		--dry)
+			rm="echo rm"
+			sassc="echo sassc"
+			rtlcss="echo rtlcss"
 			shift
 			;;
 		-h|--help)
@@ -110,17 +120,13 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-# Define source directories for LMS and CMS.
-sass_lookup_paths_common=\
-"common/static\
- common/static/sass\
- $node_modules_path\
- $node_modules_path/@edx"
-sass_lookup_paths_lms=\"
-"$sass_lookup_paths_common\
- lms/static/sass/partials"
-sass_lookup_paths_cms=\
-"$sass_lookup_paths_common"
+# Sass import roots common to all Sass compliations.
+common_include_paths=\
+"--include-path='common/static'\
+ --include-path='common/static/sass'\
+ --include-path='$node_modules_path'\
+ --include-path='$node_modules_path/@edx'\
+"
 
 # Input validation
 if [ -z "$system" ]; then
@@ -133,43 +139,105 @@ if [ -n "$theme_dir" ] && ! [ -d "$theme_dir" ]; then
 	echo "$USAGE"
 	exit 1
 fi 
-for lookup_path in $sass_lookup_paths_lms $sass_lookup_paths_cms; do
-	if ! [ -d "$lookup_path" ]; then
-		echo "Error: not a directory: $lookup_path"
-		exit 1
-	fi
-done
 
-# TODO: This seems too complicated.
-# TODO: just kidding, we can use sassc on the command line!
-run_sass ( ) {
-    sass_src="$1"
+compile_dir ( ) {
+	scss_src="$1"
 	css_dest="$2"
-	lookup_dirs="$3"
-	python -c "sass.compile(dirname=(\"$1\", \"$2\", 
-}
+	include_path_options="$3"
 
+	# Echo lines back to user.
+	#set -x
+
+	if [ -n "$force" ] ; then
+		$rm -f "$css_dest/*.css"
+	fi
+
+	# cd into sass_src and recursively print out relative paths
+	# to all files ending in '.scss' and NOT starting with '_'.
+	# For each file path, run sass.
+	# Use \0 (NUL) as a delimiter and {} as the path placeholder.
+	# Note that sassc's $..._options arguments are not quoted,
+	# because they may contain multiple arguments, which we want to
+	# split apart rather than passed as one big argument.
+	# Shellcheck is not a fan of this, so:
+	#     shellcheck disable=2086
+	(cd "$scss_src" && find . \( -name \*.scss -and \! -name _\* \) -print0) | \
+		xargs -0 -I{} \
+		$sassc $output_options $include_path_options "$scss_src"/{} "$css_dest"/{}
+
+	# Stop echoing.
+	#set +x
+}
 echo "-------------------------------------------------------------------------"
 if [ -n "$watch" ] ; then
 	echo "Compiling $system sass..."
+	echo "ERROR: watching is not yet implemented"
+	exit 1
 else
 	echo "Watching $system sass for changes..."
 fi
 echo "  Working directory     : $(pwd)"
-echo "  sass_lookup_paths_lms :$sass_lookup_paths_lms"
-echo "  sass_lookup_paths_cms :$sass_lookup_paths_cms"
-echo "  node_modules_path     : $node_modules_path"
+echo "  common_include_paths  : $common_include_paths"
 echo "  theme_dir             : $theme_dir"
 echo "-------------------------------------------------------------------------"
 
-# Echo lines back to user.
-set -x
+system_include_paths=\
+"$common_include_paths\
+ --include-path='$system/static/sass'\
+ --include-path='$system/static/sass/partials'\
+"
+theme_system_include_paths=\
+"$system_include_paths\
+ --include-path='$theme_dir/$system/static/sass/partials'\
+"
+theme_certificate_include_paths=\
+"$common_include_paths\
+ --include-path='$theme_dir/lms/static/sass'\
+ --include-path='$theme_dir/lms/static/sass/partials'\
+"
 
+if [ "$system" = "common" ] ; then
+	# Compile SCSS that is common to LMS+CMS and all themes.
+	compile_dir \
+		"common/static/sass" \
+		"common/static/css" \
+		"$common_include_paths"
+elif [ -n "$theme_dir" ] ; then
+	# Compile built-in SCSS into theme's CSS dir.
+	compile_dir \
+		"$system/static/sass" \
+		"$theme_dir/$system/static/css" \
+		"$theme_system_include_paths"
+	# Now override some or all of the built-in CSS by compiling the 
+	# theme's SCSS into its CSS dir.
+	compile_dir \
+		"$theme_dir/$system/static/sass" \
+		"$theme_dir/$system/static/css" \
+		"$theme_system_include_paths"
+	if [ "$system" = "lms" ] ; then
+		# Finally, for LMS only, compile the theme's certificates
+		# SCSS into its certificates CSS dir.
+		compile_dir \
+			"$theme_dir/lms/static/certificates/sass" \
+			"$theme_dir/lms/static/certificates/css" \
+			"$theme_certificate_include_paths"
+	fi
+else
+	# Compile built-in SCSS into CSS dir.
+	compile_dir \
+		"$system/static/sass" \
+		"$system/static/css" \
+		"$system_include_paths"
+	if [ "$system" = "lms" ] ; then
+		# For LMS only, compile built-in certificate SCSS.
+		compile_dir \
+			"lms/static/certificates/sass" \
+			"lms/static/certificates/css" \
+			"$system_include_paths"
+	fi
+fi
 
-echo TODO: implement
-
-# Stop echoing.
-set +x
+echo TODO!!! rtlcss stuff. echo "$rtlcss"
 
 echo "-------------------------------------------------------------------------"
 echo "Done compiling $system sass."
