@@ -130,9 +130,6 @@ compile_dir ( ) {
 	css_dest="$2"
 	include_path_options="$3"
 
-	# Echo lines back to user.
-	set -x
-
 	if [ -n "$force" ] ; then
 		$rm -f "$css_dest/*.css"
 	fi
@@ -146,12 +143,24 @@ compile_dir ( ) {
 	# split apart rather than passed as one big argument.
 	# Shellcheck is not a fan of this, so:
 	#     shellcheck disable=2086
-	(cd "$scss_src" && find . \( -name \*.scss -and \! -name _\* \) -print0) | \
-		xargs -0 -I{} \
-		$sassc $output_options $include_path_options "$scss_src"/{} "$css_dest"/{}
+	for relpath in $(cd "$scss_src" && find . \( -name \*.scss -and \! -name _\* \)) ; do
 
-	# Stop echoing.
-	set +x
+		# Compile one SCSS file into a CSS file.
+		$sassc $output_options $include_path_options "$scss_src/$relpath" "$css_dest/$relpath"
+
+		# Generate converted RTL css too, if relevant.
+		reldir="$(dirname relpath)"
+		filename_no_ext="$(basename relpath | sed -n 's/.scss$//p')"
+		case "$filename_no_ext" in
+			*-rtl)
+				# SCSS is already RTL; no need to generate extra RTL file.
+				;;
+			*)
+		 		# shellcheck disable=2086
+				$rtlcss "$css_dest/$reldir/${filename_no_ext}.css" "$css_dest/$reldir/{$filename_no_ext}-rtl.css"
+				;;
+		esac
+	done
 }
 echo "-------------------------------------------------------------------------"
 if [ -n "$watch" ] ; then
@@ -220,7 +229,6 @@ else
 	fi
 fi
 
-echo TODO!!! rtlcss stuff. echo "$rtlcss"
 
 echo "-------------------------------------------------------------------------"
 echo "Done compiling $system sass."
