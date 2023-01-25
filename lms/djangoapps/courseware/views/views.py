@@ -1486,6 +1486,7 @@ def enclosing_sequence_for_gating_checks(block):
         return block.runtime.get_block(ancestor.location)
     return None
 
+
 def _check_sequence_exam_access(request, location):
     """
     Checks the client request for an exam access token for a sequence.
@@ -1502,7 +1503,7 @@ def _check_sequence_exam_access(request, location):
     if exam_access_token:
         try:
             exam_access_unpacked = unpack_token_for(exam_access_token, request.user.id)
-        except:
+        except:  # pylint: disable=bare-except
             log.exception("Failed to validate exam access token")
             return False
 
@@ -1622,7 +1623,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         if getattr(exam_block, 'is_time_limited', None):
             if not _check_sequence_exam_access(request, exam_block.location):
                 return HttpResponseForbidden("Access to exam content is restricted")
-            
+
         fragment = block.render(requested_view, context=student_view_context)
         optimization_flags = get_optimization_flags_for_content(block, fragment)
 
