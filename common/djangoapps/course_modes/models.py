@@ -128,7 +128,7 @@ class CourseMode(models.Model):
         )
     )
 
-    # Optional SKU for integration with mobile and the ecommerce service
+    # Optional IOS SKU for integration with mobile and the ecommerce service
     ios_sku = models.CharField(
         max_length=255,
         null=True,

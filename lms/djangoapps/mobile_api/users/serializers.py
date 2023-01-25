@@ -168,11 +168,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ModeSerializer(serializers.Serializer):  # pylint: disable=abstract-method
-    """Serializes a course's 'Mode' tuples
+    """
+    Serializes a course's 'Mode' tuples
 
     Returns a serialized representation of the modes available for course enrollment. The course
     modes models are designed to return a tuple instead of the model object itself. This serializer
-    does not handle the model object itself, but the tuple.
+    handles the given tuple.
 
     """
     slug = serializers.CharField(max_length=100)
