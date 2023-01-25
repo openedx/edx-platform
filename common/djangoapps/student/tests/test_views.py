@@ -235,13 +235,14 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertRedirects(response, reverse('account_settings'))
 
-    def test_redirect_to_learner_home(self):
+    @patch('common.djangoapps.student.views.dashboard.should_redirect_to_learner_home_mfe')
+    def test_redirect_to_learner_home(self, mock_should_redirect_to_learner_home_mfe):
         """
         if learner home mfe is enabled, redirect to learner home mfe
         """
-        with patch('lms.djangoapps.learner_home.waffle.ENABLE_LEARNER_HOME_MFE.is_enabled', return_value=True):
-            response = self.client.get(self.path)
-            self.assertRedirects(response, settings.LEARNER_HOME_MICROFRONTEND_URL, fetch_redirect_response=False)
+        mock_should_redirect_to_learner_home_mfe.return_value = True
+        response = self.client.get(self.path)
+        self.assertRedirects(response, settings.LEARNER_HOME_MICROFRONTEND_URL, fetch_redirect_response=False)
 
     def test_course_cert_available_message_after_course_end(self):
         course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
