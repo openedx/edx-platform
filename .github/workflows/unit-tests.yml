@@ -76,6 +76,7 @@ jobs:
 
       - name: Renaming coverage data file
         run: |
+          ls
           mv reports/.coverage reports/${{ matrix.shard_name }}.coverage
 
       - name: Upload coverage
