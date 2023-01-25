@@ -93,7 +93,7 @@ billiard==3.6.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   celery
-bleach[css]==5.0.1
+bleach[css]==6.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -216,7 +216,7 @@ coreschema==0.0.4
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==7.0.5
+coverage[toml]==7.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-cov
@@ -262,7 +262,7 @@ deprecated==1.2.13
     # via
     #   -r requirements/edx/testing.txt
     #   jwcrypto
-diff-cover==7.3.2
+diff-cover==7.4.0
     # via -r requirements/edx/testing.txt
 dill==0.3.6
     # via
@@ -440,7 +440,7 @@ django-object-actions==4.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-django-pipeline==2.0.8
+django-pipeline==2.0.9
     # via -r requirements/edx/testing.txt
 django-pyfs==3.2.0
     # via -r requirements/edx/testing.txt
@@ -709,7 +709,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==16.6.0
+faker==16.6.1
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -891,7 +891,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==7.2.2
+lti-consumer-xblock==7.2.3
     # via -r requirements/edx/testing.txt
 lxml==4.9.2
     # via
@@ -1005,7 +1005,7 @@ openedx-events==4.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
-openedx-filters==0.8.0
+openedx-filters==1.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
@@ -1199,9 +1199,8 @@ pynacl==1.5.0
     #   edx-django-utils
 pynliner==0.8.0
     # via -r requirements/edx/testing.txt
-pyopenssl==22.0.0
+pyopenssl==22.1.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   optimizely-sdk
     #   snowflake-connector-python
@@ -1500,7 +1499,7 @@ sphinxcontrib-httpdomain==1.8.1
     # via sphinxcontrib-openapi
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-openapi[markdown]==0.8.0
+sphinxcontrib-openapi[markdown]==0.8.1
     # via -r requirements/edx/development.in
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
