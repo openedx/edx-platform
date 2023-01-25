@@ -139,7 +139,7 @@ if (is_proctored_exam) {
         <% } %>
             <ul class="actions-list">
                 <% var discussion_settings = course.get('discussions_settings') %>
-                <% if (xblockInfo.isVertical() && discussion_settings) { %>
+                <% if ((xblockInfo.isVertical()) && discussion_settings && (!parentInfo.get('is_time_limited'))) { %>
                     <% if (xblockInfo.get('discussion_enabled') && (discussion_settings.provider_type == "openedx")) { %>
                         <% if (discussion_settings.enable_graded_units || (!discussion_settings.enable_graded_units && !parentInfo.get('graded'))) {%>
                             <li class="action-item" style="font-size: 75%; color:grey">
