@@ -27,7 +27,8 @@ from openedx.features.genplus_features.genplus_learning.utils import (
     process_pending_student_program_enrollments,
     process_pending_teacher_program_access
 )
-from social_core.utils import slugify
+from common.djangoapps.third_party_auth.models import clean_username
+
 
 @admin.register(GenUser)
 class GenUserAdmin(admin.ModelAdmin):
@@ -40,7 +41,7 @@ class GenUserAdmin(admin.ModelAdmin):
         'registration_group',
         'social_user_exist'
     )
-    search_fields = ('user__email', 'email', 'school')
+    search_fields = ('user__email', 'email')
 
     def social_user_exist(self, obj):
         try:
@@ -52,8 +53,6 @@ class GenUserAdmin(admin.ModelAdmin):
                 return "Yes" if obj.user.social_auth.count() > 0 else "No"
         except AttributeError:
             return '-'
-
-
 
 
 @admin.register(Skill)
@@ -111,7 +110,7 @@ class SchoolAdmin(admin.ModelAdmin):
                         role = GenUserRoles.TEACHING_STAFF
                     form = AccountCreationForm(
                         data={
-                            'username': slugify(email),
+                            'username': clean_username(email),
                             'email': email,
                             'password': password,
                             'name': f'{first_name} {last_name}',
@@ -123,6 +122,10 @@ class SchoolAdmin(admin.ModelAdmin):
                     try:
                         # register user (edx way)
                         user, profile, registration = do_create_account(form)
+                        # update the user first/last names
+                        user.first_name = first_name
+                        user.last_name = last_name
+                        user.save()
                         gen_user, created = GenUser.objects.get_or_create(
                             role=role,
                             user=user,
