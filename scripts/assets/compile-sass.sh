@@ -10,7 +10,6 @@ set -eu
 
 USAGE="\
 USAGE:\n\
-    $0 [OPTIONS] common\n\
     $0 [OPTIONS] lms [<THEME_DIR>]\n\
     $0 [OPTIONS] cms [<THEME_DIR>]\n\
 \n\
@@ -35,9 +34,8 @@ rtlcss='rtlcss'
 # else, so we let this be configured with -n|--node-modules.
 node_modules_path="./node_modules"
 
-# system can be: lms, cms, or common.
-# theme_dir can be a path, or empty.
-# If sytem="common", then theme_dir should be empty.
+# system can be: lms or cms
+# theme_dir can be: a path, or empty
 system=""
 theme_dir=""
 
@@ -94,20 +92,15 @@ while [ $# -gt 0 ]; do
 		*)  # Positional arguments. Can be supplied before, after, or between options.
 			# First argument: system
 			if [ -z "$system" ] ; then
-				if [ "$1" = "lms" ] || [ "$1" = "cms" ] || [ "$1" = "common" ]; then
+				if [ "$1" = "lms" ] || [ "$1" = "cms" ] ; then
 					system="$1"
 				else
-					echo "Error: expected lms, cms, or common: $1"
+					echo "Error: expected 'lms' or 'cms' $1"
 					echo "$USAGE"
 					exit 1
 				fi
 			# Second argument: theme_dir
 			elif [ -z "$theme_dir" ] ; then
-				if [ "$system" = "common" ]; then
-					echo "Error: cannot provide a theme when compiling common scss"
-					echo "$USAGE"
-					exit 1
-				fi
 				theme_dir="$1"
 			# Three or more arguments is an error.
 			else
@@ -120,17 +113,9 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-# Sass import roots common to all Sass compliations.
-common_include_paths=\
-"--include-path='common/static'\
- --include-path='common/static/sass'\
- --include-path='$node_modules_path'\
- --include-path='$node_modules_path/@edx'\
-"
-
 # Input validation
 if [ -z "$system" ]; then
-	echo "Error: must specify lms, cms, or common."
+	echo "Error: must specify 'lms' or 'cms'"
 	echo "$USAGE"
 	exit 1
 fi
@@ -146,7 +131,7 @@ compile_dir ( ) {
 	include_path_options="$3"
 
 	# Echo lines back to user.
-	#set -x
+	set -x
 
 	if [ -n "$force" ] ; then
 		$rm -f "$css_dest/*.css"
@@ -166,21 +151,25 @@ compile_dir ( ) {
 		$sassc $output_options $include_path_options "$scss_src"/{} "$css_dest"/{}
 
 	# Stop echoing.
-	#set +x
+	set +x
 }
 echo "-------------------------------------------------------------------------"
 if [ -n "$watch" ] ; then
-	echo "Compiling $system sass..."
+	echo "Watching $system sass for changes..."
 	echo "ERROR: watching is not yet implemented"
 	exit 1
 else
-	echo "Watching $system sass for changes..."
+	echo "Compiling $system sass..."
 fi
 echo "  Working directory     : $(pwd)"
-echo "  common_include_paths  : $common_include_paths"
-echo "  theme_dir             : $theme_dir"
 echo "-------------------------------------------------------------------------"
 
+common_include_paths=\
+"--include-path='common/static'\
+ --include-path='common/static/sass'\
+ --include-path='$node_modules_path'\
+ --include-path='$node_modules_path/@edx'\
+"
 system_include_paths=\
 "$common_include_paths\
  --include-path='$system/static/sass'\
@@ -196,13 +185,7 @@ theme_certificate_include_paths=\
  --include-path='$theme_dir/lms/static/sass/partials'\
 "
 
-if [ "$system" = "common" ] ; then
-	# Compile SCSS that is common to LMS+CMS and all themes.
-	compile_dir \
-		"common/static/sass" \
-		"common/static/css" \
-		"$common_include_paths"
-elif [ -n "$theme_dir" ] ; then
+if [ -n "$theme_dir" ] ; then
 	# Compile built-in SCSS into theme's CSS dir.
 	compile_dir \
 		"$system/static/sass" \
