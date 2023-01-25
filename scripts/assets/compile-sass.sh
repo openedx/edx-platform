@@ -47,7 +47,7 @@ watch=""
 
 # Output style arguments, to be passed to underlying
 # libsass complition command.
-output_options="--style=compressed"
+output_options="--output-style=compressed"
 
 # Parse arguments and options.
 while [ $# -gt 0 ]; do
@@ -71,7 +71,11 @@ while [ $# -gt 0 ]; do
 			shift
 			;;
 		-d|--debug)
-			output_options="--style=nested --source-comments"
+			output_options="--output-style=nested"
+			# TODO: When moving from `sass.compile(...)` to `sassc`, we had to drop
+			#       the " --source-comments" option here because it is not available
+			#       in libsass==0.10. After upgrading to libsass>=0.11, we should
+			#       add back " --source-comments" here.
 			shift
 			;;
 		--dry)
@@ -134,19 +138,18 @@ compile_dir ( ) {
 		$rm -f "$css_dest/*.css"
 	fi
 
-	# cd into sass_src and recursively print out relative paths
-	# to all files ending in '.scss' and NOT starting with '_'.
-	# For each file path, run sass.
-	# Use \0 (NUL) as a delimiter and {} as the path placeholder.
-	# Note that sassc's $..._options arguments are not quoted,
-	# because they may contain multiple arguments, which we want to
-	# split apart rather than passed as one big argument.
-	# Shellcheck is not a fan of this, so:
-	#     shellcheck disable=2086
+	# Navigate into sass_src and recursively print out relative paths for all SCSS
+	# files, excluding underscore-prefixed ones.
 	for relpath in $(cd "$scss_src" && find . \( -name \*.scss -and \! -name _\* \)) ; do
 
 		# Compile one SCSS file into a CSS file.
+		# Note that sassc's $..._options arguments are not quoted, because they
+		# may contain multiple arguments, which we want to split apart rather than
+		# pass as one big argument. Shellcheck is not a fan of this, so:
+		#     shellcheck disable=2086
+		set -x
 		$sassc $output_options $include_path_options "$scss_src/$relpath" "$css_dest/$relpath"
+		set +x
 
 		# Generate converted RTL css too, if relevant.
 		reldir="$(dirname relpath)"
@@ -157,7 +160,7 @@ compile_dir ( ) {
 				;;
 			*)
 		 		# shellcheck disable=2086
-				$rtlcss "$css_dest/$reldir/${filename_no_ext}.css" "$css_dest/$reldir/{$filename_no_ext}-rtl.css"
+				echo TODO $rtlcss "$css_dest/$reldir/${filename_no_ext}.css" "$css_dest/$reldir/{$filename_no_ext}-rtl.css"
 				;;
 		esac
 	done
@@ -183,6 +186,7 @@ system_include_paths=\
 "$common_include_paths\
  --include-path=$system/static/sass\
  --include-path=$system/static/sass/partials\
+ --include-path=lms/static/sass/partials\
 "
 theme_system_include_paths=\
 "$system_include_paths\
