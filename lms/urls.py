@@ -665,6 +665,12 @@ urlpatterns += [
         'u/',
         include('openedx.features.learner_profile.urls'),
     ),
+
+    # Survey Report
+    re_path(
+        fr'^survey_report/',
+        include('openedx.features.survey_report.urls'),
+    ),
 ]
 
 if settings.FEATURES.get('ENABLE_TEAMS'):
