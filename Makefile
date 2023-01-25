@@ -118,9 +118,6 @@ $(COMMON_CONSTRAINTS_TXT):
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
 compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
-#	Remove setuptools constraint from common constraints to bump version in edx-platform requirements.
-#	This will be removed after completing the testing of the setuptools updated version on pipelines.
-	sed -i 's/setuptools<60//g' requirements/common_constraints.txt
 	pip install -q pip-tools
 	pip-compile --allow-unsafe --upgrade -o requirements/edx/pip.txt requirements/edx/pip.in
 
