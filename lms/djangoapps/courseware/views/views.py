@@ -1616,7 +1616,8 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         # Access to exam content is determined by edx-exams and passed the the LMS using a
         # signed JWT. There is no longer a need for exam gating or logic inside the
         # sequence block or its render call. As a result decendants_are_gated will not return
-        # true for these exams
+        # true for these exams. Instead these sequences are gated by default and we look for
+        # an access token on the request to allow rendering to continue.
         exam_block = ancestor_sequence_block if ancestor_sequence_block else block
         if getattr(exam_block, 'is_time_limited', None):
             if not _check_sequence_exam_access(request, exam_block.location):
