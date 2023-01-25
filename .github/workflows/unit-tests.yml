@@ -74,6 +74,10 @@ jobs:
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests
 
+      - name: Renaming coverage data file
+        run: |
+          mv reports/.coverage reports/${{ matrix.shard_name }}.coverage
+
       - name: Upload coverage
         uses: actions/upload-artifact@v2
         with:
