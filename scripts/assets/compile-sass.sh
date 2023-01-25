@@ -165,24 +165,24 @@ echo "  Working directory     : $(pwd)"
 echo "-------------------------------------------------------------------------"
 
 common_include_paths=\
-"--include-path='common/static'\
- --include-path='common/static/sass'\
- --include-path='$node_modules_path'\
- --include-path='$node_modules_path/@edx'\
+"--include-path=common/static\
+ --include-path=common/static/sass\
+ --include-path=$node_modules_path\
+ --include-path=$node_modules_path/@edx\
 "
 system_include_paths=\
 "$common_include_paths\
- --include-path='$system/static/sass'\
- --include-path='$system/static/sass/partials'\
+ --include-path=$system/static/sass\
+ --include-path=$system/static/sass/partials\
 "
 theme_system_include_paths=\
 "$system_include_paths\
- --include-path='$theme_dir/$system/static/sass/partials'\
+ --include-path=$theme_dir/$system/static/sass/partials\
 "
 theme_certificate_include_paths=\
 "$common_include_paths\
- --include-path='$theme_dir/lms/static/sass'\
- --include-path='$theme_dir/lms/static/sass/partials'\
+ --include-path=$theme_dir/lms/static/sass\
+ --include-path=$theme_dir/lms/static/sass/partials\
 "
 
 if [ -n "$theme_dir" ] ; then
