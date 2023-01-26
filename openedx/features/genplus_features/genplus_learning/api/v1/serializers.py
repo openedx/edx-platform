@@ -154,17 +154,24 @@ class ClassUnitSerializer(serializers.ModelSerializer):
 class ClassStudentSerializer(serializers.ModelSerializer):
     user_id = serializers.CharField(source='gen_user.user.id', default=None)
     username = serializers.SerializerMethodField()
+    has_first_logon = serializers.SerializerMethodField()
     profile_pic = serializers.SerializerMethodField()
     skills_assessment = serializers.SerializerMethodField()
     unit_lesson_completion = serializers.SerializerMethodField()
 
     class Meta:
         model = Student
-        fields = ('id', 'user_id', 'username', 'profile_pic', 'skills_assessment', 'unit_lesson_completion')
+        fields = ('id', 'user_id', 'username', 'has_first_logon', 'profile_pic', 'skills_assessment', 'unit_lesson_completion')
 
     def get_username(self, obj):
         edx_user = obj.gen_user.user
         return edx_user.get_full_name() if edx_user else obj.gen_user.email
+
+    def get_has_first_logon(self, obj):
+        if obj.gen_user.from_private_school:
+            return obj.gen_user.user.last_login is None
+        return obj.gen_user.user is not None
+
 
     def get_profile_pic(self, obj):
         profile = obj.character.profile_pic if obj.character else None
