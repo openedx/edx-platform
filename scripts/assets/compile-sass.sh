@@ -137,27 +137,33 @@ compile_dir ( ) {
 		$rm -f "$css_dest/*.css"
 	fi
 
-	# Navigate into scss_src and recursively print out relative paths for all SCSS
-	# files, excluding underscore-prefixed ones.
-	for relpath in $(cd "$scss_src" && find . \( -name \*.scss -and \! -name _\* \)) ; do
+	# Navigate into `scss_src` and recursively print out relative paths for all SCSS
+	# files, excluding underscore-prefixed ones, using `sed` to chop off the file extension.
+	# For each filepath, run `sassc` and, if appropriate, `rtlcss`.
+	# TODO: Unlike its Python API, libsass-python's CLI does not support compiling entire
+	#       directories, so we must implement that logic ourselves. After we upgrade
+	#       to node-sass or dart-sass, though, this logic might be able to be simplified.
+	for rel_path in $(cd "$scss_src" && find . \( -name \*.scss -and \! -name _\* \) | sed -n 's/.scss$//p') ; do
 
+		# Make sure the destination directory exists.
+		mkdir -p "$(dirname "$css_dest/$rel_path")"
+	
 		# Compile one SCSS file into a CSS file.
 		# Note that scssc's $..._options arguments are not quoted, because they
 		# may contain multiple arguments, which we want to split apart rather than
 		# pass as one big argument. Hence the shellcheck disable directive.
 		# shellcheck disable=2086
-		$sassc $output_options $include_path_options "$scss_src/$relpath" "$css_dest/$relpath"
+		$sassc $output_options $include_path_options "$scss_src/$rel_path.scss" "$css_dest/$rel_path.css"
 
 		# Generate converted RTL css too, if relevant.
-		reldir="$(dirname relpath)"
-		filename_no_ext="$(basename "$relpath" | sed -n 's/.scss$//p')"
-		case "$filename_no_ext" in
+		case "$rel_path" in
 			*-rtl)
 				# SCSS is already RTL; no need to generate extra RTL file.
 				;;
 			*)
+				# Generate RTL CSS from LTR CSS, appending -rtl to file name.
 		 		# shellcheck disable=2086
-				$rtlcss "$css_dest/$reldir/$filename_no_ext.css" "$css_dest/$reldir/$filename_no_ext-rtl.css"
+				$rtlcss "$css_dest/$rel_path.css" "$css_dest/$rel_path-rtl.css"
 				;;
 		esac
 	done
