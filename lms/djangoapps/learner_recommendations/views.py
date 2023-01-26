@@ -122,7 +122,7 @@ class AmplitudeRecommendationsView(APIView):
         return Response(
             RecommendationsSerializer(
                 {
-                    # "program_upsell": program_upsell, // pass program_upsell here for VAN-1260
+                    "program_upsell": None,
                     "courses": recommended_courses,
                     "is_control": is_control,
                 }
