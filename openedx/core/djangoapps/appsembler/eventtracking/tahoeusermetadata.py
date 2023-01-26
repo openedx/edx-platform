@@ -169,8 +169,11 @@ class TahoeUserMetadataProcessor(object):
         # We should not let this run in any CMS tests and any LMS tests other than from
         # within openedx/core/djangoapps/eventtracking/  Ugh.
         # We don't care about user metadata for Studio, at this point.
-        if not app_variant.is_lms() and not app_variant.is_self_test():
-            return event
+        if not app_variant.is_lms():  # this returns False if a test in LMS
+            if app_variant.is_test():
+                if not app_variant.is_self_test():
+                    return event
+
         # eventtracking Processors are loaded before apps are ready
         from django.contrib.auth.models import User
 

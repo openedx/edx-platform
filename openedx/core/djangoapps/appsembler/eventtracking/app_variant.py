@@ -13,8 +13,12 @@ import sys
 
 
 def is_lms():
-    """Utility function: return True if running in the LMS."""
+    """Utility function: return True if running in the LMS. And not a test."""
     return os.getenv("SERVICE_VARIANT") == 'lms'
+
+
+def is_test():
+    return 'pytest ' not in ' '.join(sys.argv)
 
 
 def is_self_test():
