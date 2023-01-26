@@ -78,6 +78,8 @@ jobs:
         run: |
           pwd
           ls
+          cd coverage
+          ls
           mv reports/.coverage reports/${{ matrix.shard_name }}.coverage
 
       - name: Upload coverage
