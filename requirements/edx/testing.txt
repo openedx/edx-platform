@@ -89,7 +89,7 @@ billiard==3.6.4.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
-bleach[css]==5.0.1
+bleach[css]==6.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -205,7 +205,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==7.0.5
+coverage[toml]==7.1.0
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -250,7 +250,7 @@ deprecated==1.2.13
     # via
     #   -r requirements/edx/base.txt
     #   jwcrypto
-diff-cover==7.3.2
+diff-cover==7.4.0
     # via -r requirements/edx/coverage.txt
 dill==0.3.6
     # via pylint
@@ -421,7 +421,7 @@ django-object-actions==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-pipeline==2.0.8
+django-pipeline==2.0.9
     # via -r requirements/edx/base.txt
 django-pyfs==3.2.0
     # via -r requirements/edx/base.txt
@@ -683,7 +683,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==16.6.0
+faker==16.6.1
     # via factory-boy
 fastapi==0.89.1
     # via pact-python
@@ -952,11 +952,11 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
 openedx-django-wiki==1.1.4
     # via -r requirements/edx/base.txt
-openedx-events==4.1.1
+openedx-events==4.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
-openedx-filters==0.8.0
+openedx-filters==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
