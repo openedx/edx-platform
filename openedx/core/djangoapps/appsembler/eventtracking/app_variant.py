@@ -18,7 +18,7 @@ def is_lms():
 
 
 def is_test():
-    return 'pytest ' not in ' '.join(sys.argv)
+    return 'pytest ' in ' '.join(sys.argv)
 
 
 def is_self_test():
