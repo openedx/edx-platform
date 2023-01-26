@@ -436,8 +436,6 @@ def compile_sass(options):
         '/edx/app/edxapp/edx-platform/themes' and '/edx/app/edxapp/edx-platform/common/test/'.
 
     """
-    debug = options.get('debug')
-    force = options.get('force')
     systems = get_parsed_option(options, 'system', ALL_SYSTEMS)
     themes = get_parsed_option(options, 'themes', [])
     theme_dirs = get_parsed_option(options, 'theme_dirs', [])
@@ -449,53 +447,20 @@ def compile_sass(options):
     if themes and theme_dirs:
         themes = get_theme_paths(themes=themes, theme_dirs=theme_dirs)
 
-    # Compile sass for OpenEdx theme after comprehensive themes
-    if None not in themes:
-        themes.append(None)
-
-    timing_info = []
-    dry_run = tasks.environment.dry_run
-    compilation_results = {'success': [], 'failure': []}
-
-    print("\t\tStarted compiling Sass:")
-
-    # compile common sass files
-    is_successful = _compile_sass('common', None, debug, force, timing_info)
-    if is_successful:
-        print("Finished compiling 'common' sass.")
-    compilation_results['success' if is_successful else 'failure'].append('"common" sass files.')
-
-    for system in systems:
-        for theme in themes:
-            print("Started compiling '{system}' Sass for '{theme}'.".format(system=system, theme=theme or 'system'))
-
-            # Compile sass files
-            is_successful = _compile_sass(
-                system=system,
-                theme=path(theme) if theme else None,
-                debug=debug,
-                force=force,
-                timing_info=timing_info
-            )
-
-            if is_successful:
-                print("Finished compiling '{system}' Sass for '{theme}'.".format(
-                    system=system, theme=theme or 'system'
-                ))
-
-            compilation_results['success' if is_successful else 'failure'].append('{system} sass for {theme}.'.format(
-                system=system, theme=theme or 'system',
-            ))
-
-    print("\t\tFinished compiling Sass:")
-    if not dry_run:
-        for sass_dir, css_dir, duration in timing_info:
-            print(f">> {sass_dir} -> {css_dir} in {duration}s")
-
-    if compilation_results['success']:
-        print("\033[92m\nSuccessful compilations:\n--- " + "\n--- ".join(compilation_results['success']) + "\n\033[00m")
-    if compilation_results['failure']:
-        print("\033[91m\nFailed compilations:\n--- " + "\n--- ".join(compilation_results['failure']) + "\n\033[00m")
+    command = ["scripts/assets/compile-scss.sh"]
+    for theme in themes:
+        command += ["--theme", path(theme)]
+    if "lms" not in systems:
+        command += ["--skip-lms"]
+    if "cms" not in systems:
+        command += ["--skip-cms"]
+    if options.get("debug"):
+        command += ["--dev"]
+    if options.get("force"):
+        command += ["--force"]
+    if tasks.environment.dry_run:
+        command += ["--dry"]
+    sh(" ".join(command))
 
 
 def _compile_sass(system, theme, debug, force, timing_info):
@@ -506,106 +471,24 @@ def _compile_sass(system, theme, debug, force, timing_info):
     :param theme: absolute path of the theme to compile sass for.
     :param debug: boolean showing whether to display source comments in resulted css
     :param force: boolean showing whether to remove existing css files before generating new files
-    :param timing_info: list variable to keep track of timing for sass compilation
+    :param timing_info: no longer supported; no effect.
     """
-    shell_command = ["/bin/sh", "scripts/assets/compile-sass.sh", system]
-    if force:
-        shell_command.append("--force")
-    if force:
-        shell_command.append("--debug")
-    if system != "common":
-        shell_command.append(theme)
-    sh(" ".join(shell_command))
-    return True
-
-    # Note: import sass only when it is needed and not at the top of the file.
-    # This allows other paver commands to operate even without libsass being
-    # installed. In particular, this allows the install_prereqs command to be
-    # used to install the dependency.
-    import sass
-    if system == "common":
-        sass_dirs = get_common_sass_directories()
+    command = ["scripts/assets/compile-scss.sh"]
+    if system == "lms":
+        command += ["--skip-cms"]
+    elif system == "lms":
+        command += ["--skip-cms"]
+    elif system = "common":
+        pass  # There is no longer any 'common' scss
     else:
-        sass_dirs = get_sass_directories(system, theme)
-
-    dry_run = tasks.environment.dry_run
-
-    # determine css out put style and source comments enabling
+        raise  # TODO
+    if theme:
+        command += ["--theme", theme]
     if debug:
-        source_comments = True
-        output_style = 'nested'
-    else:
-        source_comments = False
-        output_style = 'compressed'
-
-    for dirs in sass_dirs:
-        start = datetime.now()
-        css_dir = dirs['css_destination_dir']
-        sass_source_dir = dirs['sass_source_dir']
-        lookup_paths = dirs['lookup_paths']
-
-        if not sass_source_dir.isdir():
-            print("\033[91m Sass dir '{dir}' does not exists, skipping sass compilation for '{theme}' \033[00m".format(
-                dir=sass_source_dir, theme=theme or system,
-            ))
-            # theme doesn't override sass directory, so skip it
-            continue
-
-        if force:
-            if dry_run:
-                tasks.environment.info("rm -rf {css_dir}/*.css".format(
-                    css_dir=css_dir,
-                ))
-            else:
-                sh(f"rm -rf {css_dir}/*.css")
-
-        if dry_run:
-            tasks.environment.info("libsass {sass_dir}".format(
-                sass_dir=sass_source_dir,
-            ))
-        else:
-            sass.compile(
-                dirname=(sass_source_dir, css_dir),
-                include_paths=COMMON_LOOKUP_PATHS + lookup_paths,
-                source_comments=source_comments,
-                output_style=output_style,
-            )
-
-        # For Sass files without explicit RTL versions, generate
-        # an RTL version of the CSS using the rtlcss library.
-        for sass_file in glob.glob(sass_source_dir + '/**/*.scss'):
-            if should_generate_rtl_css_file(sass_file):
-                source_css_file = sass_file.replace(sass_source_dir, css_dir).replace('.scss', '.css')
-                target_css_file = source_css_file.replace('.css', '-rtl.css')
-                sh("rtlcss {source_file} {target_file}".format(
-                    source_file=source_css_file,
-                    target_file=target_css_file,
-                ))
-
-        # Capture the time taken
-        if not dry_run:
-            duration = datetime.now() - start
-            timing_info.append((sass_source_dir, css_dir, duration))
-    return True
-
-
-def should_generate_rtl_css_file(sass_file):
-    """
-    Returns true if a Sass file should have an RTL version generated.
-    """
-    # Don't generate RTL CSS for partials
-    if path(sass_file).name.startswith('_'):
-        return False
-
-    # Don't generate RTL CSS if the file is itself an RTL version
-    if sass_file.endswith('-rtl.scss'):
-        return False
-
-    # Don't generate RTL CSS if there is an explicit Sass version for RTL
-    rtl_sass_file = path(sass_file.replace('.scss', '-rtl.scss'))
-    if rtl_sass_file.exists():
-        return False
-
+        command += ["--dev"]
+    if force:
+        command += ["--force"]
+    sh(" ".join(command))
     return True
 
 
