@@ -22,6 +22,7 @@ OPTIONS:\n\
     -f, --force                              Remove existing css before generating new css\n\
     -d, --dev                                Dev mode: whether to show source comments in resulting css\n\
     -r, --dry                                Dry run: don't do anything; just print what _would_ be done.\n\
+	-v, --verbose                            Print commands as they are executed.\n\
     -h, --help                               Display this.\n\
 "
 
@@ -47,7 +48,7 @@ skip_cms=""
 skip_default_theme=""
 force=""
 watch=""
-echo_script_lines="T"
+verbose=""
 
 # Output style arguments, to be passed to underlying
 # libsass complition command.
@@ -110,7 +111,10 @@ while [ $# -gt 0 ]; do
 			rm="echo rm"
 			sassc="echo sassc"
 			rtlcss="echo rtlcss"
-			echo_script_lines=""
+			shift
+			;;
+		-v|--verbose)
+			verbose="T"
 			shift
 			;;
 		-h|--help)
@@ -133,7 +137,14 @@ compile_dir ( ) {
 	css_dest="$2"
 	include_path_options="$3"
 
+	echo "Compiling: $scss_src -> $css_dest ..."
+	if [ ! -d "$scss_src" ] ; then
+		echo "Directory $scss_src does not exist; skipping."
+		return
+	fi
+
 	if [ -n "$force" ] ; then
+		echo " Removing old contents of $css_dest."
 		$rm -f "$css_dest/*.css"
 	fi
 
@@ -167,6 +178,8 @@ compile_dir ( ) {
 				;;
 		esac
 	done
+
+	echo " Compiled: $scss_src -> $css_dest."
 }
 echo "-------------------------------------------------------------------------"
 if [ -n "$watch" ] ; then
@@ -197,7 +210,7 @@ cms_include_paths=\
  --include-path=lms/static/sass/partials\
 "
 
-if [ -n "$echo_script_lines" ] ; then
+if [ -n "$verbose" ] ; then
 	set -x
 fi
 
