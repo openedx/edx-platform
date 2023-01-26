@@ -149,12 +149,10 @@ compile_or_watch_dir ( ) {
 			#       Python-free.
 			xargs \
 				watchmedo shell-command \
-					--patterns="*.scss" \
+					--patterns=*.scss \
 					--recursive \
-					--command="/bin/sh scripts/assets/compile-scss-dir.sh $scss_src $css_dest $include_paths"
-					# TODO: The --command="..." above will split any paths with spaces in them into multiple
-					#       arguments. This is difficult to resolve in POSIX shell.
-		echo "Watchers set up."
+					"--command=$compile_scss_dir_command" &
+		echo " Watchers set up."
 
 	else
 
@@ -166,16 +164,21 @@ compile_or_watch_dir ( ) {
 		# shellcheck disable=2086
 		[ -z "$dry" ] && \
 			$compile_scss_dir_command
-		echo " Compiled directory: $scss_src -> $css_dest."
+		echo " Done compiling: $scss_src -> $css_dest."
 
 	fi
 }
-echo "-------------------------------------------------------------------------"
+
+action="Compiling SCSS"
+action_lower="compiling SCSS"
 if [ -n "$watch" ] ; then
-	echo "Watching SCSS for changes..."
-else
-	echo "Compiling SCSS..."
+	action="Starting watchers for SCSS"
+	action_lower="starting watchers for SCSS"
 fi
+
+echo "-------------------------------------------------------------------------"
+echo "  $action..."
+echo
 echo "  Working directory     : $(pwd)"
 echo "-------------------------------------------------------------------------"
 
@@ -202,7 +205,7 @@ if [ -n "$verbose" ] ; then
 fi
 
 if [ -z "$skip_default_theme" ] ; then
-	echo "Compiling SCSS for default theme..."
+	echo "$action for default theme..."
 	if [ -z "$skip_lms" ] ; then
 		compile_or_watch_dir \
 			"lms/static/sass" \
@@ -219,7 +222,7 @@ if [ -z "$skip_default_theme" ] ; then
 			"cms/static/css" \
 			"$cms_include_paths"
 	fi
-	echo "Default theme SCSS compiled."
+	echo "Done $action_lower for default theme."
 fi
 
 echo "$theme_paths" | while read -r theme_path ; do
@@ -228,7 +231,7 @@ echo "$theme_paths" | while read -r theme_path ; do
 		continue
 	fi
 
-	echo "Compiling SCSS for custom theme at $theme_path..."
+	echo "$action for custom theme at $theme_path..."
 
 	theme_lms_include_paths=\
 "$lms_include_paths\
@@ -272,11 +275,20 @@ echo "$theme_paths" | while read -r theme_path ; do
 			"$theme_cms_include_paths"
 	fi
 
-	echo "Done compiling SCSS for custom theme at $theme_path."
+	echo "Done $action_lower for custom theme at $theme_path."
 done
 
-
-
 echo "-------------------------------------------------------------------------"
-echo "Done compiling SCSS."
+echo "  Done $action_lower."
 echo "-------------------------------------------------------------------------"
+
+if [ -n "$watch" ] ; then
+	# Kill all child processes (the SCSS watchers) upon exit.
+	#trap 'trap - TERM && kill -- -$$' INT TERM EXIT
+	trap "exit" INT TERM
+	trap "kill 0" EXIT
+
+	echo "Use Ctrl+c to stop watchers."
+	sleep infinity
+fi
+
