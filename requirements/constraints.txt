@@ -74,7 +74,7 @@ pycodestyle<2.9.0
 pyopenssl==22.0.0
 
 
-# right now lots of packages have major upgrades and lots of tests failing.
-# so adding following constraints and will unpin one by one.
+cryptography==38.0.4 # greater version has some issues with openssl.
 
-cryptography==38.0.4 # greater version has some issues.
+bleach[css]==5.0.1 # greater version has some breaking changes.
+
