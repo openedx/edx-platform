@@ -73,9 +73,10 @@ class Article(TimeStampedModel):
         return teacher.favorite_articles.filter(article=self.pk).count() > 0
 
     def save(self, **kwargs):
-        read_time = self.get_read_time(self.title, self.content)
-        watch_time = self.get_video_time(self.content)
-        self.time = self.time + read_time + watch_time
+        if self._state.adding:
+            read_time = self.get_read_time(self.title, self.content)
+            watch_time = self.get_video_time(self.content)
+            self.time = self.time + read_time + watch_time
         if self.is_featured:
             # marking the other article as non-featured
             Article.objects.filter(is_featured=True).update(is_featured=False)

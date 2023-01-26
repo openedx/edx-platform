@@ -12,7 +12,7 @@ from django.contrib.admin.utils import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from django.contrib.auth.forms import UserChangeForm as BaseUserChangeForm
+from django.contrib.auth.forms import UserChangeForm as BaseUserChangeForm, UserCreationForm as BaseUserCreationForm
 from django.db import models, router, transaction
 from django.http import HttpResponseRedirect
 from django.http.request import QueryDict
@@ -343,10 +343,32 @@ class UserChangeForm(BaseUserChangeForm):
             )
 
 
+class EmailRequiredMixin(object):
+    def __init__(self, *args, **kwargs):
+        super(EmailRequiredMixin, self).__init__(*args, **kwargs)
+        # make user email field required
+        self.fields['email'].required = True
+
+
+class UserCreationForm(EmailRequiredMixin, BaseUserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super(UserCreationForm, self).__init__(*args, **kwargs)
+        # make user email field required
+        self.fields['email'].required = True
+        self.fields['is_superuser'].initial = True
+        self.fields['is_staff'].initial = True
+
+
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
-    inlines = (UserProfileInline, AccountRecoveryInline)
     form = UserChangeForm
+    add_form = UserCreationForm
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2', "is_staff", "is_superuser")}
+         ),
+    )
 
     def get_readonly_fields(self, request, obj=None):
         """
