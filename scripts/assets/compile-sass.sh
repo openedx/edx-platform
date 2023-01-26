@@ -22,7 +22,7 @@ OPTIONS:\n\
     -f, --force                              Remove existing css before generating new css\n\
     -d, --dev                                Dev mode: whether to show source comments in resulting css\n\
     -r, --dry                                Dry run: don't do anything; just print what _would_ be done.\n\
-	-v, --verbose                            Print commands as they are executed.\n\
+    -v, --verbose                            Print commands as they are executed.\n\
     -h, --help                               Display this.\n\
 "
 
@@ -30,7 +30,7 @@ OPTIONS:\n\
 # In --dry mode, these are overriden to 'echo <command>'
 rm='rm'
 sassc='sassc'
-rtlcss='echo rtlcss'  # TODO change
+rtlcss='rtlcss'
 
 # By default, we look for node_modules in the current directory.
 # Some Open edX distributions may want node_modules to be located somewhere
@@ -137,9 +137,9 @@ compile_dir ( ) {
 	css_dest="$2"
 	include_path_options="$3"
 
-	echo "Compiling: $scss_src -> $css_dest ..."
+	echo "Compiling directory: $scss_src -> $css_dest ..."
 	if [ ! -d "$scss_src" ] ; then
-		echo "Directory $scss_src does not exist; skipping."
+		echo " Directory $scss_src does not exist; skipping."
 		return
 	fi
 
@@ -179,7 +179,7 @@ compile_dir ( ) {
 		esac
 	done
 
-	echo " Compiled: $scss_src -> $css_dest."
+	echo " Compiled directory: $scss_src -> $css_dest."
 }
 echo "-------------------------------------------------------------------------"
 if [ -n "$watch" ] ; then
