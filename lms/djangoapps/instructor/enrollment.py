@@ -466,7 +466,7 @@ def send_mail_to_student(student, param_dict, language=None, context_vars=None):
         context_vars = get_base_template_context(param_dict['site_name'])
 
     param_dict.update(context_vars)
-
+    from_email = param_dict.pop('default_from_email', None)
     # see if there is an activation email template definition available as configuration,
     # if so, then render that
     message_type = param_dict['message_type']
@@ -487,6 +487,8 @@ def send_mail_to_student(student, param_dict, language=None, context_vars=None):
         language=language,
         user_context=param_dict,
     )
+    if from_email:
+        message.options.update({'from_address': from_email})
 
     ace.send(message)
 
