@@ -22,7 +22,7 @@ aiosignal==1.3.1
     #   aiohttp
 alabaster==0.7.13
     # via sphinx
-algoliasearch==2.6.2
+algoliasearch==2.6.3
     # via -r requirements/edx/testing.txt
 amqp==5.1.1
     # via
@@ -51,7 +51,7 @@ asn1crypto==1.5.1
     #   -r requirements/edx/testing.txt
     #   oscrypto
     #   snowflake-connector-python
-astroid==2.13.2
+astroid==2.13.3
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -605,7 +605,7 @@ edx-enterprise==3.60.15
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   learner-pathway-progress
-edx-event-bus-kafka==3.6.0
+edx-event-bus-kafka==3.6.1
     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.9.2
     # via
@@ -891,7 +891,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==7.2.1
+lti-consumer-xblock==7.2.3
     # via -r requirements/edx/testing.txt
 lxml==4.9.2
     # via
@@ -948,7 +948,7 @@ mock==5.0.1
     #   xblock-poll
 mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
     # via -r requirements/edx/testing.txt
-mongoengine==0.25.0
+mongoengine==0.26.0
     # via -r requirements/edx/testing.txt
 monotonic==1.6
     # via
@@ -1001,7 +1001,7 @@ openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
 openedx-django-wiki==1.1.4
     # via -r requirements/edx/testing.txt
-openedx-events==4.1.0
+openedx-events==4.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
@@ -1490,7 +1490,7 @@ sphinx==5.3.0
     #   sphinxcontrib-openapi
 sphinx-mdinclude==0.5.3
     # via sphinxcontrib-openapi
-sphinxcontrib-applehelp==1.0.3
+sphinxcontrib-applehelp==1.0.4
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx

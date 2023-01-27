@@ -22,9 +22,9 @@ from openedx.core.djangoapps.programs.utils import (
     get_program_and_course_data,
     get_program_urls,
 )
-from openedx.core.djangoapps.catalog.utils import get_course_data
-from lms.djangoapps.learner_dashboard.api.utils import (
-    get_personalized_course_recommendations,
+from lms.djangoapps.learner_recommendations.utils import (
+    filter_recommended_courses,
+    get_amplitude_course_recommendations,
 )
 
 
@@ -403,7 +403,6 @@ class CourseRecommendationApiView(APIView):
 
     def get(self, request):
         """Retrieves course recommendations details of a user in a specified course."""
-        recommended_courses = []
         user_id = request.user.id
         fallback_recommendations = (
             settings.GENERAL_RECOMMENDATIONS if show_fallback_recommendations() else []
@@ -414,7 +413,7 @@ class CourseRecommendationApiView(APIView):
                 is_control,
                 has_is_control,
                 course_keys,
-            ) = get_personalized_course_recommendations(user_id)
+            ) = get_amplitude_course_recommendations(user_id, settings.DASHBOARD_AMPLITUDE_RECOMMENDATION_ID)
         except Exception as ex:  # pylint: disable=broad-except
             logger.warning(f"Cannot get recommendations from Amplitude: {ex}")
             return self._general_recommendations_response(
@@ -428,32 +427,7 @@ class CourseRecommendationApiView(APIView):
                 user_id, is_control, fallback_recommendations
             )
 
-        user_enrolled_course_keys = set()
-        fields = ["title", "owners", "marketing_url"]
-
-        course_enrollments = CourseEnrollment.enrollments_for_user(request.user)
-        for course_enrollment in course_enrollments:
-            course_key = f"{course_enrollment.course_id.org}+{course_enrollment.course_id.course}"
-            user_enrolled_course_keys.add(course_key)
-
-        # Pick 5 course keys, excluding the user's already enrolled course(s).
-        enrollable_course_keys = [
-            course_key
-            for course_key in course_keys
-            if course_key not in user_enrolled_course_keys
-        ][:5]
-        for course_id in enrollable_course_keys:
-            course_data = get_course_data(course_id, fields)
-            if course_data:
-                recommended_courses.append(
-                    {
-                        "course_key": course_id,
-                        "title": course_data["title"],
-                        "logo_image_url": course_data["owners"][0]["logo_image_url"],
-                        "marketing_url": course_data.get("marketing_url"),
-                    }
-                )
-
+        recommended_courses = filter_recommended_courses(request.user, course_keys)
         if not recommended_courses:
             return self._general_recommendations_response(
                 user_id, is_control, fallback_recommendations

@@ -4768,7 +4768,7 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 ### SETTINGS FOR AMPLITUDE ####
 AMPLITUDE_URL = ''
 AMPLITUDE_API_KEY = ''
-REC_ID = ''
+DASHBOARD_AMPLITUDE_RECOMMENDATION_ID = ''
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
 
@@ -4975,6 +4975,8 @@ HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
+
+LEARNER_HOME_MFE_REDIRECT_PERCENTAGE = 0
 
 ############### Settings for the ace_common plugin #################
 # Note that all settings are actually defined by the plugin
