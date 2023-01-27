@@ -13,14 +13,8 @@ source =
 omit =
     cms/envs/*
     cms/manage.py
-    cms/djangoapps/contentstore/views/dev.py
-    cms/lib/*/migrations/*
     lms/debug/*
     lms/envs/*
-    common/djangoapps/terrain/*
-    openedx/core/djangoapps/*/migrations/*
-    openedx/core/djangoapps/debug/*
-    openedx/features/*/migrations/*
 
 concurrency=multiprocessing
 parallel = true
