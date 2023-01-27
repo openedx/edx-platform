@@ -1,14 +1,7 @@
 # .coveragerc for edx-platform
 [run]
 data_file = reports/${TEST_SUITE}.coverage
-source =
-    cms
-    common/djangoapps
-    lms
-    openedx
-    pavelib
-    scripts
-    xmodule
+source = .
 
 concurrency=multiprocessing
 parallel = true
