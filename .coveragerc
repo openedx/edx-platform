@@ -10,12 +10,6 @@ source =
     scripts
     xmodule
 
-omit =
-    cms/envs/*
-    cms/manage.py
-    lms/debug/*
-    lms/envs/*
-
 concurrency=multiprocessing
 parallel = true
 relative_files = true
