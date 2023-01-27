@@ -1,7 +1,31 @@
 # .coveragerc for edx-platform
 [run]
 data_file = reports/${TEST_SUITE}.coverage
-source = .
+source =
+    cms
+    common/djangoapps
+    lms
+    openedx
+    pavelib
+    scripts
+    xmodule
+
+omit =
+    cms/envs/*
+    cms/manage.py
+    cms/djangoapps/contentstore/views/dev.py
+    cms/djangoapps/*/migrations/*
+    cms/djangoapps/*/features/*
+    cms/lib/*/migrations/*
+    lms/debug/*
+    lms/envs/*
+    lms/djangoapps/*/migrations/*
+    lms/djangoapps/*/features/*
+    common/djangoapps/terrain/*
+    common/djangoapps/*/migrations/*
+    openedx/core/djangoapps/*/migrations/*
+    openedx/core/djangoapps/debug/*
+    openedx/features/*/migrations/*
 
 concurrency=multiprocessing
 parallel = true
