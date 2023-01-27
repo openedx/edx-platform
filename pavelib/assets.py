@@ -447,49 +447,35 @@ def compile_sass(options):
     if themes and theme_dirs:
         themes = get_theme_paths(themes=themes, theme_dirs=theme_dirs)
 
-    command = ["scripts/assets/compile-scss.sh"]
-    for theme in themes:
-        command += ["--theme", path(theme)]
-    if "lms" not in systems:
-        command += ["--skip-lms"]
-    if "cms" not in systems:
-        command += ["--skip-cms"]
-    if options.get("debug"):
-        command += ["--dev"]
-    if options.get("force"):
-        command += ["--force"]
-    if tasks.environment.dry_run:
-        command += ["--dry"]
-    sh(" ".join(command))
+    sh(
+        "scripts/assets/compile-scss.sh"
+        + ("".join(f" --theme {path(theme_dir)}" for theme in themes))
+        + (" --skip-lms" if "lms" not in systems else "")
+        + (" --skip-cms" if "cms" not in systems else "")
+        + (" --dev" if options.get("debug") else "")
+        + (" --force" if options.get("force") else "")
+        + (" --dry" if tasks.environment.dry_run else "")
+    )
 
 
 def _compile_sass(system, theme, debug, force, timing_info):
     """
     Compile sass files for the given system and theme.
 
-    :param system: system to compile sass for e.g. 'lms', 'cms', 'common'
+    :param system: system to compile sass for: 'lms' or 'cms'; any other value is a no-op.
     :param theme: absolute path of the theme to compile sass for.
     :param debug: boolean showing whether to display source comments in resulted css
     :param force: boolean showing whether to remove existing css files before generating new files
     :param timing_info: no longer supported; no effect.
     """
-    command = ["scripts/assets/compile-scss.sh"]
-    if system == "lms":
-        command += ["--skip-cms"]
-    elif system == "lms":
-        command += ["--skip-cms"]
-    elif system = "common":
-        pass  # There is no longer any 'common' scss
-    else:
-        raise  # TODO
-    if theme:
-        command += ["--theme", theme]
-    if debug:
-        command += ["--dev"]
-    if force:
-        command += ["--force"]
-    sh(" ".join(command))
-    return True
+    sh(
+        "scripts/assets/compile-scss.sh"
+        + (f" --theme {theme} --skip-default-theme" if theme else "")
+        + (" --skip-lms" if system != "lms")
+        + (" --skip-cms" if system != "cms")
+        + (" --dev" if debug else "")
+        + (" --force" if force else "")
+    )
 
 
 def process_npm_assets():
