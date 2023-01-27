@@ -101,16 +101,6 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
                 draft_node.module.add_xml_to_node(node)
 
 
-def add_course_logs(course_key_string, course_like):
-    """
-    Add logs for course export
-    TODO: To be removed after export issue is resolved (INF-667)
-    """
-    logging.info(f'{course_key_string} {course_like.url_name}  {course_like.display_name}')
-    for child in course_like.get_children():
-        add_course_logs(course_key_string, child)
-
-
 class ExportManager:
     """
     Manages XML exporting for courselike objects.
@@ -171,9 +161,6 @@ class ExportManager:
             # export only the published content
             with self.modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, self.courselike_key):
                 courselike = self.get_courselike()
-                # TODO: Remove function call after export issue is resolved (INF-667)
-                add_course_logs(str(self.courselike_key), courselike)
-
                 export_fs = courselike.runtime.export_fs = fsm.makedir(self.target_dir, recreate=True)
 
                 # change all of the references inside the course to use the xml expected key type w/o version & branch
