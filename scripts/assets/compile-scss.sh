@@ -1,5 +1,5 @@
 #!/bin/sh
-HELP="Compile SCSS files for LMS and CMS, including SCSS for zero or more themes."
+HELP="Compile SCSS files for LMS and CMS, for default and/or custom themes."
 #
 # Run this from the root of edx-platform, after ... TOOD
 # but before ... TODO
@@ -12,17 +12,17 @@ USAGE:\n\
     $0 [OPTIONS]\n\
 \n\
 OPTIONS:\n\
-	-t, --theme <THEME_PATH>                 Path to a custom theme. Can be provided multiple times.\n\
-                                             Defaults to ./node_modules.\n\
-    -L, --skip-lms                           Don't compile LMS-specific SCSS.\n\
-    -C, --skip-cms                           Don't compile CMS-specific SCSS.\n\
-    -D, --skip-default-theme                 Don't compile SCSS for the default theme.\n\
-    -n, --node-modules <NODE_MODULES_PATH>   Path to installed node_modules directory.\n\
+    -t, --theme <THEME_PATH>                 Path to a custom theme; can be provided multiple times\n\
+    -L, --skip-lms                           Don't compile LMS-specific SCSS\n\
+    -C, --skip-cms                           Don't compile CMS-specific SCSS\n\
+    -D, --skip-default-theme                 Don't compile SCSS for the default theme\n\
+    -n, --node-modules <NODE_MODULES_PATH>   Path to installed node_modules directory\n\
+                                             Defaults to ./node_modules\n\
     -f, --force                              Remove existing css before generating new css\n\
     -d, --dev                                Dev mode: Don't compress output CSS\n\
-    -r, --dry                                Dry run: don't do anything; just print what _would_ be done.\n\
-    -v, --verbose                            Print commands as they are executed.\n\
-    -h, --help                               Display this.\n\
+    -r, --dry                                Dry run: don't actually execute any changes\n\
+    -v, --verbose                            Print commands as they are executed\n\
+    -h, --help                               Display this\n\
 "
 
 # List of paths to custom themes, newline-separated.
@@ -41,8 +41,8 @@ skip_cms=""
 skip_default_theme=""
 force=""
 dev=""
-verbose=""
 dry=""
+verbose=""
 
 # Parse arguments and options.
 while [ $# -gt 0 ]; do
@@ -89,12 +89,12 @@ while [ $# -gt 0 ]; do
 			dev="T"
 			shift
 			;;
-		-v|--verbose)
-			verbose="T"
+		-r|--dry)
+			dry="T"
 			shift
 			;;
-		-r|-dry)
-			dry="T"
+		-v|--verbose)
+			verbose="T"
 			shift
 			;;
 		-h|--help)
@@ -112,37 +112,22 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
+compile_dir_opts=""
+if [ -n "$dev" ] ; then
+	compile_dir_opts="$compile_dir_opts --dev"
+fi
+if [ -n "$dry" ] ; then
+	compile_dir_opts="$compile_dir_opts --dry"
+fi
+if [ -n "$verbose" ] ; then
+	compile_dir_opts="$compile_dir_opts --verbose"
+fi
 compile_dir ( ) {
-
-	scss_src="$1"      # Dir containing SCSS input files.
-	css_dest="$2"      # Target dir for CSS output, to mirror input dir structure.
-	include_paths="$3" # List of SCSS import root paths, colon-separated.
-
-	if [ ! -d "$scss_src" ] ; then
-		echo "Directory $scss_src does not exist; skipping."
-		return
-	fi
-
-	# TODO: This will fail if any of the paths have spaces in them, because such a path
-	#       would be parsed as multiple arguments rather than one argument with a space
-	#       inside it.
-	compile_scss_dir_command="/bin/sh scripts/assets/compile-scss-dir.sh $scss_src $css_dest $include_paths"
-	if [ -n "$dev" ] ; then
-		compile_scss_dir_command="$compile_scss_dir_command --dev"
-	fi
-	if [ -n "$verbose" ] ; then
-		compile_scss_dir_command="$compile_scss_dir_command --verbose"
-	fi
-
-	echo "Compiling directory: $scss_src -> $css_dest ..."
-	if [ -n "$force" ] ; then
-		echo " Removing old contents of $css_dest."
-		[ -z "$dry" ] && rm -f "$css_dest/*.css"
-	fi
+	# Shellcheck will complain that $compile_dir_opts is unquoted.
+	# It's intentional: we want $compile_dir_opts to be split on spaces and
+	# passed as multiple arguments. Quoting it would pass it as a single argument.
 	# shellcheck disable=2086
-	[ -z "$dry" ] && \
-		$compile_scss_dir_command
-	echo " Done compiling: $scss_src -> $css_dest."
+	scripts/assets/compile-scss-dir.sh $compile_dir_opts "$1" "$2" "$3"
 }
 
 echo "-------------------------------------------------------------------------"
@@ -151,23 +136,21 @@ echo
 echo "  Working directory     : $(pwd)"
 echo "-------------------------------------------------------------------------"
 
-common_include_paths=\
-"common/static\
-:common/static/sass\
-:$node_modules_path\
-:$node_modules_path/@edx\
-"
-lms_include_paths=\
-"$common_include_paths\
-:lms/static/sass\
-:lms/static/sass/partials\
-"
-cms_include_paths=\
-"$common_include_paths\
-:cms/static/sass\
-:cms/static/sass/partials\
-:lms/static/sass/partials\
-"
+
+lms_scss="lms/static/sass"
+lms_partials="lms/static/sass/partials"
+cms_scss="cms/static/sass"
+cms_partials="cms/static/sass/partials"
+certs_scss="lms/static/certificates/sass"
+
+lms_css="lms/static/css"
+cms_css="cms/static/css"
+certs_css="lms/static/certificates/css"
+
+common_includes="common/static:common/static/sass:$node_modules_path:$node_modules_path/@edx"
+lms_includes="$common_includes:$lms_scss:$lms_partials"
+cms_includes="$common_includes:$cms_scss:$cms_partials:$lms_partials"
+certs_includes="$lms_includes"
 
 if [ -n "$verbose" ] ; then
 	set -x
@@ -175,21 +158,19 @@ fi
 
 if [ -z "$skip_default_theme" ] ; then
 	echo "Compiling SCSS for default theme..."
+	if [ -n "$force" ] ; then
+		echo "  Removing existing generated CSS first."
+		[ -n "$dry" ] || rm -rf "$lms_css" "$cms_css" "$certs_css"
+	fi
 	if [ -z "$skip_lms" ] ; then
-		compile_dir \
-			"lms/static/sass" \
-			"lms/static/css" \
-			"$lms_include_paths"
-		compile_dir \
-			"lms/static/certificates/sass" \
-			"lms/static/certificates/css" \
-			"$lms_include_paths"
+		echo "  Compiling default LMS SCSS."
+		compile_dir "$lms_scss" "$lms_css" "$lms_includes"
+		echo "  Compiling default certificates SCSS."
+		compile_dir "$certs_scss" "$certs_css" "$certs_includes"
 	fi
 	if [ -z "$skip_cms" ] ; then 
-		compile_dir \
-			"cms/static/sass" \
-			"cms/static/css" \
-			"$cms_include_paths"
+		echo "  Compiling default CMS SCSS."
+		compile_dir "$cms_scss" "$cms_css" "$cms_includes"
 	fi
 	echo "Done compiling SCSS for default theme."
 fi
@@ -200,48 +181,51 @@ echo "$theme_paths" | while read -r theme_path ; do
 		continue
 	fi
 
-	echo "Compiling SCSS for custom theme at $theme_path..."
+	theme_lms_scss="$theme_path/lms/static/sass"
+	theme_lms_partials="$theme_path/lms/static/sass/partials"
+	theme_cms_scss="$theme_path/cms/static/sass"
+	theme_cms_partials="$theme_path/cms/static/sass/partials"
+	theme_certs_scss="$theme_path/lms/static/certificates/sass"
 
-	theme_lms_include_paths=\
-"$lms_include_paths\
-:$theme_path/lms/static/sass/partials\
-"
-	theme_certificate_include_paths=\
-"$common_include_paths\
-:$theme_path/lms/static/sass\
-:$theme_path/lms/static/sass/partials\
-"
-	theme_cms_include_paths=\
-"$cms_include_paths\
-:$theme_path/cms/static/sass/partials\
-"
+	theme_lms_css="$theme_path/lms/static/css"
+	theme_cms_css="$theme_path/cms/static/css"
+	theme_certs_css="$theme_path/lms/static/certificates/css"
+
+	theme_lms_includes="$lms_includes:$theme_lms_partials"
+	theme_cms_includes="$cms_includes:$theme_cms_partials"
+	theme_certs_includes="$common_includes:$theme_lms_scss:$theme_lms_partials"
+
+	echo "Compiling SCSS for custom theme at $theme_path..."
+	if [ -n "$force" ] ; then
+		echo "  Removing theme's existing generated CSS first."
+		[ -n "$dry" ] || rm -rf "$theme_lms_css" "$theme_cms_css" "$theme_certs_css"
+	fi
+
 	if [ -z "$skip_lms" ] ; then
-		# First, compile default LMS SCSS into theme's LMS CSS dir.
-		compile_dir \
-			"lms/static/sass"  \
-			"$theme_path/lms/static/css" \
-			"$theme_lms_include_paths"
-		# Then, override some/all default LMS CSS by compiling theme's LMS SCSS.
-		compile_dir \
-			"$theme_path/lms/static/sass" \
-			"$theme_path/lms/static/css" \
-			"$theme_lms_include_paths"
-		# Finally, compile the themed certificate SCSS into certificate CSS dir.
-		compile_dir \
-			"$theme_path/lms/static/certificates/sass" \
-			"$theme_path/lms/static/certificates/css" \
-			"$theme_certificate_include_paths"
+		echo "  Compiling default LMS SCSS into theme's CSS directory."
+		compile_dir "$lms_scss" "$theme_lms_css" "$theme_lms_includes"
+		if [ -d "$theme_lms_scss" ] ; then
+			echo "  Compiling theme's LMS SCSS into theme's CSS directory."
+			compile_dir "$theme_lms_scss" "$theme_lms_css" "$theme_lms_includes"
+		else
+			echo "  Theme has no LMS SCSS; skipping."
+		fi
+		if [ -d "$theme_certs_scss" ] ; then
+			echo "  Compiling theme's certificate SCSS into theme's CSS directory."
+			compile_dir "$theme_certs_scss" "$theme_certs_css" "$theme_certs_includes"
+		else
+			echo "  Theme has no certificate SCSS; skipping."
+		fi
 	fi
 	if [ -z "$skip_cms" ] ; then 
-		# Process for CMS is same as LMS, except no certificates.
-		compile_dir \
-			"cms/static/sass"  \
-			"$theme_path/cms/static/css" \
-			"$theme_cms_include_paths"
-		compile_dir \
-			"$theme_path/cms/static/sass" \
-			"$theme_path/cms/static/css" \
-			"$theme_cms_include_paths"
+		echo "  Compiling default CMS SCSS into theme's CSS directory."
+		compile_dir "$cms_scss" "$theme_cms_css" "$theme_cms_includes"
+		if [ -d "$theme_cms_scss" ] ; then
+			echo "  Compiling theme's CMS SCSS into theme's CSS directory."
+			compile_dir "$theme_cms_scss" "$theme_cms_css" "$theme_cms_includes"
+		else
+			echo "  Theme has no CMS SCSS; skipping."
+		fi
 	fi
 
 	echo "Done compiling SCSS for custom theme at $theme_path."

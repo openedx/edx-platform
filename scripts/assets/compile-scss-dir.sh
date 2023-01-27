@@ -15,8 +15,9 @@ ARGUMENTS:\n\
 \n\
 OPTIONS:\n\
     -d, --dev                          Dev mode: don't compress output CSS\n\
-    -h, --help                         Display this.\n\
+    -r, --dry                          Dry run: don't execute commands (pairs well with -v)\n\
     -v, --verbose                      Print commands as they are executed.\n\
+    -h, --help                         Display this.\n\
 "
 
 scss_src=""
@@ -28,6 +29,7 @@ output_options="--output-style=compressed"
 #  Empty string    (-z) => false
 #  Nonempty string (-n) => true
 verbose=""
+dry=""
 
 # Parse arguments and options.
 while [ $# -gt 0 ]; do
@@ -42,6 +44,10 @@ while [ $# -gt 0 ]; do
 			;;
 		-v|--verbose)
 			verbose="T"
+			shift
+			;;
+		-r|--dry)
+			dry="T"
 			shift
 			;;
 		-h|--help)
@@ -107,7 +113,12 @@ for rel_path in $(cd "$scss_src" && find . \( -name \*.scss -and \! -name _\* \)
 	# may contain multiple arguments, which we want to split apart rather than
 	# pass as one big argument. Hence the shellcheck disable directive.
 	# shellcheck disable=2086
-	sassc $output_options $include_path_options "$scss_src/$rel_path.scss" "$css_dest/$rel_path.css"
+	[ -n "$dry" ] || \
+		sassc \
+			$output_options \
+			$include_path_options \
+			"$scss_src/$rel_path.scss" \
+			"$css_dest/$rel_path.css"
 
 	# Generate converted RTL css too, if relevant.
 	case "$rel_path" in
@@ -116,7 +127,7 @@ for rel_path in $(cd "$scss_src" && find . \( -name \*.scss -and \! -name _\* \)
 			;;
 		*)
 			# Generate RTL CSS from LTR CSS, appending -rtl to file name.
-			rtlcss "$css_dest/$rel_path.css" "$css_dest/$rel_path-rtl.css"
+			[ -n "$dry" ] || rtlcss "$css_dest/$rel_path.css" "$css_dest/$rel_path-rtl.css"
 			;;
 	esac
 done
