@@ -16,7 +16,7 @@ runs:
     - name: run tests
       shell: bash
       run: |
-        python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
+        python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} --cov --cov-config=setup.cfg ${{ env.unit_test_paths }}
 
     - name: rename warnings json file
       if: success()
