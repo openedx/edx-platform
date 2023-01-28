@@ -23,7 +23,7 @@ def get_settings_for_shard(shard_name):
 def get_output(shard_name, output_argument):
     if output_argument == "settings":
         return get_settings_for_shard(shard_name)
-    return ",".join(get_test_paths_for_shard(shard_name))
+    return " ".join(get_test_paths_for_shard(shard_name))
 
 
 if __name__ == "__main__":
