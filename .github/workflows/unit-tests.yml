@@ -30,6 +30,7 @@ jobs:
           - "openedx-3"
           - "openedx-4"
           - "cms-1"
+          - "cms-2"
           - "common-1"
           - "common-2"
           - "xmodule-1"
