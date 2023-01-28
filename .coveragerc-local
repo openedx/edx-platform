@@ -1,7 +1,14 @@
 # .coveragerc for edx-platform
 [run]
 data_file = reports/.coverage
-source = edx-platform
+source =
+    cms
+    common/djangoapps
+    lms
+    openedx
+    pavelib
+    scripts
+    xmodule
 
 omit =
     cms/envs/*
