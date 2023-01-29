@@ -19,6 +19,7 @@ jobs:
           - "pinned"
           #- "4.0"
         shard_name:
+          - "lms-1"
           - "cms-1"
     # We expect Django 4.0 to fail, so don't stop when it fails.
     continue-on-error: ${{ matrix.django-version == '4.0' }}
@@ -134,7 +135,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: coverage
-          path: reports/
+          path: reports
 
       - name: Install Python dependencies
         run: |
@@ -142,10 +143,7 @@ jobs:
 
       - name: Run coverage
         run: |
-          ls -a
-          cd reports
-          ls -a
-          coverage combine reports/
-          coverage report
-          coverage xml
+          coverage combine reports/*
+          coverage report -m --source=reports/ -i --file .coverage
+          coverage xml -d reports/
       - uses: codecov/codecov-action@v1
