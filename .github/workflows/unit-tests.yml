@@ -19,7 +19,6 @@ jobs:
           - "pinned"
           #- "4.0"
         shard_name:
-          - "lms-1"
           - "cms-1"
     # We expect Django 4.0 to fail, so don't stop when it fails.
     continue-on-error: ${{ matrix.django-version == '4.0' }}
@@ -144,6 +143,6 @@ jobs:
       - name: Run coverage
         run: |
           coverage combine reports/*
-          coverage report -m --source=reports/ -i --file .coverage
-          coverage xml -d reports/
+          coverage report
+          coverage xml
       - uses: codecov/codecov-action@v1
