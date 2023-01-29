@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-23 17:28+0000\n"
-"PO-Revision-Date: 2023-01-23 17:28:43.067962\n"
+"POT-Creation-Date: 2023-01-29 20:35+0000\n"
+"PO-Revision-Date: 2023-01-29 20:35:52.665617\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -24431,6 +24431,22 @@ msgstr ""
 "α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
 " αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
 "ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ι#"
+
+#: cms/templates/course_outline.html
+msgid ""
+"This course run is using an upgraded version of edx discussion forum. "
+"Discussion xblocks will no longer work."
+msgstr ""
+"Thïs çöürsé rün ïs üsïng än üpgrädéd vérsïön öf édx dïsçüssïön förüm. "
+"Dïsçüssïön xßlöçks wïll nö löngér wörk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/course_outline.html
+msgid " Learn more"
+msgstr " Léärn möré Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: cms/templates/course_outline.html
+msgid "Share feedback"
+msgstr "Shäré féédßäçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html

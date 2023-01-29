@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-23 17:28+0000\n"
-"PO-Revision-Date: 2023-01-23 17:28:43.067962\n"
+"POT-Creation-Date: 2023-01-29 20:35+0000\n"
+"PO-Revision-Date: 2023-01-29 20:35:52.665617\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -21238,6 +21238,22 @@ msgstr ""
 "snɹǝ ʇø ɹǝʌᴉǝʍ ɐnd ɹǝsǝʇ ɐll dɐʇǝs, ᴉnɔlndᴉnƃ ʇɥǝ Ȼønɹsǝ Sʇɐɹʇ Đɐʇǝ; sǝʇ nd "
 "ʇɥǝ ɔønɹsǝ ʇǝɐɯ; ɹǝʌᴉǝʍ ɔønɹsǝ nddɐʇǝs ɐnd øʇɥǝɹ ɐssǝʇs ɟøɹ dɐʇǝd ɯɐʇǝɹᴉɐl; "
 "ɐnd sǝǝd ʇɥǝ dᴉsɔnssᴉøns ɐnd ʍᴉʞᴉ."
+
+#: cms/templates/course_outline.html
+msgid ""
+"This course run is using an upgraded version of edx discussion forum. "
+"Discussion xblocks will no longer work."
+msgstr ""
+"Ŧɥᴉs ɔønɹsǝ ɹnn ᴉs nsᴉnƃ ɐn ndƃɹɐdǝd ʌǝɹsᴉøn øɟ ǝdx dᴉsɔnssᴉøn ɟøɹnɯ. "
+"Đᴉsɔnssᴉøn xbløɔʞs ʍᴉll nø lønƃǝɹ ʍøɹʞ."
+
+#: cms/templates/course_outline.html
+msgid " Learn more"
+msgstr " Łǝɐɹn ɯøɹǝ"
+
+#: cms/templates/course_outline.html
+msgid "Share feedback"
+msgstr "Sɥɐɹǝ ɟǝǝdbɐɔʞ"
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html
