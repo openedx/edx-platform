@@ -1502,15 +1502,14 @@ def _check_sequence_exam_access(request, location):
     exam_access_token = request.COOKIES.get(settings.EXAM_ACCESS_TOKEN_COOKIE)
     if exam_access_token:
         try:
+            # unpack will validate both expiration and the requesting user matches the
+            # token user
             exam_access_unpacked = unpack_token_for(exam_access_token, request.user.id)
         except:  # pylint: disable=bare-except
             log.exception("Failed to validate exam access token")
             return False
 
-        return (
-            str(location) == exam_access_unpacked.get('content_id')
-            and request.user.id == exam_access_unpacked.get('lms_user_id')
-        )
+        return str(location) == exam_access_unpacked.get('content_id')
 
     return False
 
@@ -1614,10 +1613,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                 )
 
         # For courses using the edx-exams service:
-        # Access to exam content is determined by edx-exams and passed the the LMS using a
-        # signed JWT. There is no longer a need for exam gating or logic inside the
-        # sequence block or its render call. As a result decendants_are_gated will not return
-        # true for these exams. Instead these sequences are gated by default and we look for
+        # Access to exam content is determined by edx-exams and passed to the LMS using a
+        # JWT cookie. There is no longer a need for exam gating or logic inside the
+        # sequence block or its render call. decendants_are_gated shoule not return true
+        # for these timed exams. Instead, sequences are assumed gated by default and we look for
         # an access token on the request to allow rendering to continue.
         exam_block = ancestor_sequence_block if ancestor_sequence_block else block
         if getattr(exam_block, 'is_time_limited', None):
