@@ -5,7 +5,7 @@ Unit tests for getting the list of courses and the course outline.
 
 import datetime
 import json
-from unittest import SkipTest, mock, skip
+from unittest import mock, skip
 from unittest.mock import patch
 
 import ddt
@@ -35,6 +35,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..course import _deprecated_blocks_info, course_outline_initial_state, reindex_course_and_check_access
@@ -45,6 +46,8 @@ class TestCourseIndex(CourseTestCase):
     """
     Unit tests for getting the list of courses and the course outline.
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """
@@ -333,6 +336,9 @@ class TestCourseIndexArchived(CourseTestCase):
     """
     Unit tests for testing the course index list when there are archived courses.
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     NOW = datetime.datetime.now(pytz.utc)
     DAY = datetime.timedelta(days=1)
     YESTERDAY = NOW - DAY
@@ -415,16 +421,15 @@ class TestCourseIndexArchived(CourseTestCase):
         archived_course_tab = parsed_html.find_class('archived-courses')
         self.assertEqual(len(archived_course_tab), 1 if separate_archived_courses else 0)
 
-    @skip('Skip test for old mongo course')
     @ddt.data(
         # Staff user has course staff access
         (True, 'staff', None, 0, 20),
         (False, 'staff', None, 0, 20),
         # Base user has global staff access
-        (True, 'user', ORG, 1, 20),
-        (False, 'user', ORG, 1, 20),
-        (True, 'user', None, 1, 20),
-        (False, 'user', None, 1, 20),
+        (True, 'user', ORG, 2, 20),
+        (False, 'user', ORG, 2, 20),
+        (True, 'user', None, 2, 20),
+        (False, 'user', None, 2, 20),
     )
     @ddt.unpack
     def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
@@ -452,6 +457,9 @@ class TestCourseOutline(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -550,7 +558,7 @@ class TestCourseOutline(CourseTestCase):
         if create_blocks:
             for block_type in block_types:
                 BlockFactory.create(
-                    parent_location=self.vertical.location,
+                    parent=self.vertical,
                     category=block_type,
                     display_name=f'{block_type} Problem'
                 )
@@ -558,6 +566,8 @@ class TestCourseOutline(CourseTestCase):
             if not publish:
                 self.store.unpublish(self.vertical.location, self.user.id)
 
+        # get updated vertical
+        self.vertical = modulestore().get_item(self.vertical.location)
         course_block.advanced_modules.extend(block_types)
 
     def _verify_deprecated_info(self, course_id, advanced_modules, info, deprecated_block_types):
@@ -584,6 +594,7 @@ class TestCourseOutline(CourseTestCase):
             reverse_course_url('advanced_settings_handler', course_id)
         )
 
+    @skip('OldMongo Deprecation. HiddenDescriptorWithMixins is not created for split.')
     @ddt.data(
         [{'publish': True}, ['notes']],
         [{'publish': False}, ['notes']],
@@ -596,6 +607,9 @@ class TestCourseOutline(CourseTestCase):
         """
         course_block = modulestore().get_item(self.course.location)
         self._create_test_data(course_block, create_blocks=True, block_types=block_types, publish=publish)
+        # get updated course_block
+        course_block = modulestore().get_item(self.course.location)
+
         info = _deprecated_blocks_info(course_block, block_types)
         self._verify_deprecated_info(
             course_block.id,
@@ -604,6 +618,7 @@ class TestCourseOutline(CourseTestCase):
             block_types
         )
 
+    @skip('OldMongo Deprecation. HiddenDescriptorWithMixins is not created for split.')
     @ddt.data(
         (["a", "b", "c"], ["a", "b", "c"]),
         (["a", "b", "c"], ["a", "b", "d"]),
@@ -618,6 +633,8 @@ class TestCourseOutline(CourseTestCase):
         expected_block_types = list(set(enabled_block_types) & set(deprecated_block_types))
         course_block = modulestore().get_item(self.course.location)
         self._create_test_data(course_block, create_blocks=True, block_types=enabled_block_types)
+        # get updated course_module
+        course_block = modulestore().get_item(self.course.location)
         info = _deprecated_blocks_info(course_block, deprecated_block_types)
         self._verify_deprecated_info(
             course_block.id,
@@ -632,8 +649,6 @@ class TestCourseOutline(CourseTestCase):
         """
         Test to check proctored exam settings mfe url is rendering properly
         """
-        if self.course.id.deprecated:
-            raise SkipTest("Skip test for old mongo course")
         mock_validate_proctoring_settings.return_value = [
             {
                 'key': 'proctoring_provider',
@@ -655,6 +670,9 @@ class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
 
     ENABLED_SIGNALS = ['course_published']
@@ -835,7 +853,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             reindex_course_and_check_access(self.course.id, self.user)
 
-    @mock.patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_course')
+    @mock.patch('xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course')
     def test_reindex_no_item(self, mock_get_course):
         """
         Test system logs an error if no item found.
@@ -945,7 +963,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
-    @mock.patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_course')
+    @mock.patch('xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course')
     def test_indexing_no_item(self, mock_get_course):
         """
         Test system logs an error if no item found.
