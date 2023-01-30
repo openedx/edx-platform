@@ -42,7 +42,7 @@ jobs:
         run: sudo chown runner:runner -R .*
 
       - name: checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # This gives Mongo several chances to start. We started getting flakiness
       # around 2022-02-15 wherein the start command would sometimes exit with:
@@ -79,7 +79,7 @@ jobs:
           mv reports/.coverage reports/${{ matrix.shard_name }}.coverage
 
       - name: Upload coverage
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage
           path: reports/${{matrix.shard_name}}.coverage
@@ -106,7 +106,7 @@ jobs:
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: collect pytest warnings files
         uses: actions/download-artifact@v2
         with:
@@ -122,7 +122,7 @@ jobs:
 
       - name: save warning report
         if: success()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: pytest-warning-report-html
           path: |
@@ -137,15 +137,15 @@ jobs:
         python-version: [ 3.8 ]
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: coverage
           path: reports
@@ -159,4 +159,4 @@ jobs:
           coverage combine reports/*
           coverage report
           coverage xml
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v3
