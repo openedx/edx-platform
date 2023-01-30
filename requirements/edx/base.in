@@ -57,7 +57,6 @@ django-mptt
 django-mysql
 django-oauth-toolkit                # Provides oAuth2 capabilities for Django
 django-pipeline
-django-pyfs
 django-ratelimit
 django-sekizai
 django-ses
@@ -174,7 +173,7 @@ unicodecsv                          # Easier support for CSV files with unicode 
 user-util                           # Functionality for retiring users (GDPR compliance)
 webob
 web-fragments                       # Provides the ability to render fragments of web pages
-XBlock                              # Courseware component architecture
+XBlock[django]                      # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
