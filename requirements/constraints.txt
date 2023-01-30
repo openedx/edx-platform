@@ -77,7 +77,3 @@ pyopenssl==22.0.0
 cryptography==38.0.4 # greater version has some issues with openssl.
 
 bleach[css]==5.0.1 # greater version has some breaking changes.
-
-# This constraint can be removed in https://github.com/openedx/edx-platform/pull/31475, which changes the imports used
-# by this XBlock.
-lti-consumer-xblock<=7.2.3
