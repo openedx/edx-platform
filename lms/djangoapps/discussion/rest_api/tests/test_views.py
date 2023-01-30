@@ -2030,6 +2030,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "mark_as_read": ["False"],
                 "recursive": ["False"],
                 "with_responses": ["True"],
+                "reverse_order": ["False"],
             }
         )
 
@@ -2064,6 +2065,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "mark_as_read": ["False"],
                 "recursive": ["False"],
                 "with_responses": ["True"],
+                "reverse_order": ["False"],
             }
         )
 
@@ -2278,6 +2280,35 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             response_users = response_comment['users']
             assert expected_author_profile_data == response_users[response_comment['author']]
             assert response_comment['endorsed_by'] not in response_users
+
+    def test_reverse_order_sort(self):
+        """
+        Tests if reverse_order param is passed to cs comments service
+        """
+        self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+        source_comments = [
+            self.create_source_comment({"user_id": str(self.author.id), "username": self.author.username})
+        ]
+        self.register_get_thread_response({
+            "id": self.thread_id,
+            "course_id": str(self.course.id),
+            "thread_type": "discussion",
+            "children": source_comments,
+            "resp_total": 100,
+        })
+        self.client.get(self.url, {"thread_id": self.thread_id, "reverse_order": True})
+        self.assert_query_params_equal(
+            httpretty.httpretty.latest_requests[-2],
+            {
+                "resp_skip": ["0"],
+                "resp_limit": ["10"],
+                "user_id": [str(self.user.id)],
+                "mark_as_read": ["False"],
+                "recursive": ["False"],
+                "with_responses": ["True"],
+                "reverse_order": ["True"],
+            }
+        )
 
 
 @httpretty.activate

@@ -1405,6 +1405,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "resp_skip": ["70"],
                 "resp_limit": ["14"],
                 "with_responses": ["True"],
+                "reverse_order": ["False"],
             }
         )
 
