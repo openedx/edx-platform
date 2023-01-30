@@ -19,6 +19,7 @@ BASE_EVENT_WITH_CONTEXT = {
     "name": "event_name",
     "time": "2022-08-29T15:42:50.636766+00:00",
     "context": {},
+    "event": {},
     "data": {}
 }
 
@@ -88,13 +89,28 @@ def test_no_context_added_if_no_metadata_of_interest(users, base_event, processo
 
 @pytest.mark.django_db
 def test_get_user_from_db_when_not_avail_from_request(users, base_event, processor):
+    """
+    Test addition for events from Celery workers and otherwise without a request.
+
+    In some cases a user_id may be in context,  in others in event.context
+    """
+    # set up event we want to match
     event_with_metadata = deepcopy(base_event)
     event_with_metadata.update(context=TAHOE_USER_METADATA_CONTEXT)
 
     with patch(EVENTTRACKING_MODULE + '.tahoeusermetadata.get_current_user', MagicMock()) as mocked:
         mocked.return_value = None
-        event_with_user_id = deepcopy(base_event)
-        event_with_user_id.update({'user_id': users[1].id})
-        event_with_metadata.update({'user_id': users[1].id})
-        event = processor(event_with_user_id)
-        assert event == event_with_metadata
+        event_with_user_id_in_context = deepcopy(base_event)
+        event_with_user_id_in_context.update({'context': {'user_id': users[1].id}})
+
+        event_with_user_id_in_event_context = deepcopy(base_event)
+        event_with_user_id_in_event_context['event'].update({'context': {'user_id': users[1].id}})
+
+        # this test can just exercise the context addition
+        event_context_processed = processor(event_with_user_id_in_context)
+        assert event_context_processed["context"]["tahoe_user_metadata"] == \
+            event_with_metadata["context"]["tahoe_user_metadata"]
+
+        event_event_context_processed = processor(event_with_user_id_in_event_context)
+        assert event_event_context_processed["context"]["tahoe_user_metadata"] == \
+            event_with_metadata["context"]["tahoe_user_metadata"]
