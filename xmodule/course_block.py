@@ -314,7 +314,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     enrollment_start = Date(help=_("Date that enrollment for this class is opened"), scope=Scope.settings)
     enrollment_end = Date(help=_("Date that enrollment for this class is closed"), scope=Scope.settings)
     start = Date(
-        help=_("Start time when this module is visible"),
+        help=_("Start time when this block is visible"),
         default=DEFAULT_START_DATE,
         scope=Scope.settings
     )
@@ -795,7 +795,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
 
     entrance_exam_id = String(
         display_name=_("Entrance Exam ID"),
-        help=_("Content module identifier (location) of entrance exam."),
+        help=_("Content block identifier (location) of entrance exam."),
         default=None,
         scope=Scope.settings,
     )
@@ -1056,10 +1056,10 @@ class CourseBlock(
 
         # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
         #   disable the syllabus content for courses that do not provide a syllabus
-        if self.system.resources_fs is None:
+        if self.runtime.resources_fs is None:
             self.syllabus_present = False
         else:
-            self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
+            self.syllabus_present = self.runtime.resources_fs.exists(path('syllabus'))
 
         self._grading_policy = {}
         self.set_grading_policy(self.grading_policy)

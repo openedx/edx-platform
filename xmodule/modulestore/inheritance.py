@@ -32,12 +32,12 @@ class InheritanceMixin(XBlockMixin):
     """Field definitions for inheritable fields."""
 
     graded = Boolean(
-        help="Whether this module contributes to the final course grade",
+        help="Whether this block contributes to the final course grade",
         scope=Scope.settings,
         default=False,
     )
     start = Date(
-        help="Start time when this module is visible",
+        help="Start time when this block is visible",
         default=DEFAULT_START_DATE,
         scope=Scope.settings
     )
@@ -220,8 +220,8 @@ class InheritanceMixin(XBlockMixin):
     )
 
     in_entrance_exam = Boolean(
-        display_name=_("Tag this module as part of an Entrance Exam section"),
-        help=_("Enter true or false. If true, answer submissions for problem modules will be "
+        display_name=_("Tag this block as part of an Entrance Exam section"),
+        help=_("Enter true or false. If true, answer submissions for problem blocks will be "
                "considered in the Entrance Exam scoring/gating algorithm."),
         scope=Scope.settings,
         default=False
@@ -294,7 +294,7 @@ def compute_inherited_metadata(descriptor):
 
 def inherit_metadata(descriptor, inherited_data):
     """
-    Updates this module with metadata inherited from a containing module.
+    Updates this block with metadata inherited from a containing block.
     Only metadata specified in self.inheritable_metadata will
     be inherited
 
@@ -307,12 +307,12 @@ def inherit_metadata(descriptor, inherited_data):
         pass
 
 
-def own_metadata(module):
+def own_metadata(block):
     """
     Return a JSON-friendly dictionary that contains only non-inherited field
     keys, mapped to their serialized values
     """
-    return module.get_explicitly_set_fields_by_scope(Scope.settings)
+    return block.get_explicitly_set_fields_by_scope(Scope.settings)
 
 
 class InheritingFieldData(KvsFieldData):

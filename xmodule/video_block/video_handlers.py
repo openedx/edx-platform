@@ -480,7 +480,7 @@ class VideoStudioViewHandlers:
         We raise all exceptions right in Studio:
             NotFoundError:
                 Video or asset was deleted from module/contentstore, but request came later.
-                Seems impossible to be raised. module_render.py catches NotFoundErrors from here.
+                Seems impossible to be raised. block_render.py catches NotFoundErrors from here.
 
             /translation POST:
                 TypeError:

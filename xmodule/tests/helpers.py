@@ -42,7 +42,7 @@ def mock_render_template(*args, **kwargs):
 
 class StubMakoService:
     """
-    Stub MakoService for testing modules that use mako templates.
+    Stub MakoService for testing blocks that use mako templates.
     """
 
     def __init__(self, render_template=None):
@@ -57,7 +57,7 @@ class StubMakoService:
 
 class StubUserService(UserService):
     """
-    Stub UserService for testing the sequence module.
+    Stub UserService for testing the sequence block.
     """
 
     def __init__(self,
@@ -101,7 +101,7 @@ class StubUserService(UserService):
 
 class StubReplaceURLService:
     """
-    Stub ReplaceURLService for testing modules.
+    Stub ReplaceURLService for testing blocks.
     """
 
     def replace_urls(self, text, static_replace_only=False):

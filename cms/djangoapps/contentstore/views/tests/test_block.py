@@ -1,4 +1,4 @@
-"""Tests for items views."""
+"""Tests for block views."""
 
 
 import json
@@ -45,7 +45,7 @@ from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
-from cms.djangoapps.contentstore.views import item as item_module
+from cms.djangoapps.contentstore.views import block as item_module
 from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
@@ -57,10 +57,10 @@ from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 
 from ..component import component_handler, get_component_templates
-from ..item import (
+from ..block import (
     ALWAYS,
     VisibilityState,
-    _get_module_info,
+    _get_block_info,
     _get_source_index,
     _xblock_type_and_display_name,
     add_container_page_publishing_info,
@@ -238,7 +238,7 @@ class GetItemTest(ItemTest):
 
     def test_split_test(self):
         """
-        Test that a split_test module renders all of its children in Studio.
+        Test that a split_test block renders all of its children in Studio.
         """
         root_usage_key = self._create_vertical()
         resp = self.create_xblock(category='split_test', parent_usage_key=root_usage_key)
@@ -305,7 +305,7 @@ class GetItemTest(ItemTest):
         """
         Tests that valid paging is passed along to underlying block
         """
-        with patch('cms.djangoapps.contentstore.views.item.get_preview_fragment') as patched_get_preview_fragment:
+        with patch('cms.djangoapps.contentstore.views.block.get_preview_fragment') as patched_get_preview_fragment:
             retval = Mock()
             type(retval).content = PropertyMock(return_value="Some content")
             type(retval).resources = PropertyMock(return_value=[])
@@ -447,7 +447,7 @@ class GetItemTest(ItemTest):
                     xblock = parent_xblock
             else:
                 self.assertNotIn('ancestors', response)
-                self.assertEqual(_get_module_info(xblock), response)
+                self.assertEqual(_get_block_info(xblock), response)
 
 
 @ddt.ddt
@@ -510,7 +510,7 @@ class TestCreateItem(ItemTest):
         self.assertEqual(problem.display_name, template['metadata']['display_name'])
         self.assertEqual(problem.markdown, template['metadata']['markdown'])
 
-    def test_create_item_negative(self):
+    def test_create_block_negative(self):
         """
         Negative tests for create_item
         """
@@ -1208,7 +1208,7 @@ class TestMoveItem(ItemTest):
         validation = html.validate()
         self.assertEqual(len(validation.messages), 0)
 
-    @patch('cms.djangoapps.contentstore.views.item.log')
+    @patch('cms.djangoapps.contentstore.views.block.log')
     def test_move_logging(self, mock_logger):
         """
         Test logging when an item is successfully moved.
@@ -1886,7 +1886,7 @@ class TestEditItemSplitMongo(TestEditItemSetup):
 
 class TestEditSplitModule(ItemTest):
     """
-    Tests around editing instances of the split_test module.
+    Tests around editing instances of the split_test block.
     """
 
     def setUp(self):
@@ -1935,7 +1935,7 @@ class TestEditSplitModule(ItemTest):
         self.client.ajax_post(
             self.split_test_update_url,
             # Even though user_partition_id is Scope.content, it will get saved by the Studio editor as
-            # metadata. The code in item.py will update the field correctly, even though it is not the
+            # metadata. The code in block.py will update the field correctly, even though it is not the
             # expected scope.
             data={'metadata': {'user_partition_id': str(partition_id)}}
         )
@@ -1956,7 +1956,7 @@ class TestEditSplitModule(ItemTest):
     def test_create_groups(self):
         """
         Test that verticals are created for the configuration groups when
-        a spit test module is edited.
+        a spit test block is edited.
         """
         split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
         # Initially, no user_partition_id is set, and the split_test has no children.
@@ -3052,7 +3052,7 @@ class TestLibraryXBlockCreation(ItemTest):
 
     def test_no_add_discussion(self):
         """
-        Verify we cannot add a discussion module to a Library.
+        Verify we cannot add a discussion block to a Library.
         """
         lib = LibraryFactory.create()
         response = self.create_xblock(parent_usage_key=lib.location, display_name='Test', category='discussion')

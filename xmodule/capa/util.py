@@ -236,7 +236,7 @@ def get_course_id_from_capa_block(capa_block):
         capa_block (ProblemBlock|None)
 
     Returns: str|None
-        The stringified course run key of the module.
+        The stringified course run key of the block.
         If not available, fall back to None.
     """
     if not capa_block:

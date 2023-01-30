@@ -10,7 +10,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
@@ -314,7 +314,7 @@ class SplitTestPosition(SharedModuleStoreTestCase):
     def test_changing_position_works(self):
         # Make a mock FieldDataCache for this course, so we can get the course block
         mock_field_data_cache = FieldDataCache([self.course], self.course.id, self.student)
-        course = get_module_for_descriptor(
+        course = get_block_for_descriptor(
             self.student,
             MagicMock(name='request'),
             self.course,

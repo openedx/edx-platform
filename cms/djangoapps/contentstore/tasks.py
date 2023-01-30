@@ -317,13 +317,13 @@ def export_olx(self, user_id, course_key_string, language):
         return
 
     if isinstance(courselike_key, LibraryLocator):
-        courselike_module = modulestore().get_library(courselike_key)
+        courselike_block = modulestore().get_library(courselike_key)
     else:
-        courselike_module = modulestore().get_course(courselike_key)
+        courselike_block = modulestore().get_course(courselike_key)
 
     try:
         self.status.set_state('Exporting')
-        tarball = create_export_tarball(courselike_module, courselike_key, {}, self.status)
+        tarball = create_export_tarball(courselike_block, courselike_key, {}, self.status)
         artifact = UserTaskArtifact(status=self.status, name='Output')
         artifact.file.save(name=os.path.basename(tarball.name), content=File(tarball))
         artifact.save()
@@ -541,11 +541,11 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     is_course = not is_library
     if is_library:
         root_name = LIBRARY_ROOT
-        courselike_module = modulestore().get_library(courselike_key)
+        courselike_block = modulestore().get_library(courselike_key)
         import_func = import_library_from_xml
     else:
         root_name = COURSE_ROOT
-        courselike_module = modulestore().get_course(courselike_key)
+        courselike_block = modulestore().get_course(courselike_key)
         import_func = import_course_from_xml
 
     # Locate the uploaded OLX archive (and download it from S3 if necessary)
@@ -581,7 +581,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         # If the course has an entrance exam then remove it and its corresponding milestone.
         # current course state before import.
         if is_course:
-            if courselike_module.entrance_exam_enabled:
+            if courselike_block.entrance_exam_enabled:
                 fake_request = RequestFactory().get('/')
                 fake_request.user = user
                 from .views.entrance_exam import remove_entrance_exam_milestone_reference
@@ -635,7 +635,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         courselike_items = import_func(
             modulestore(), user.id,
             settings.GITHUB_REPO_ROOT, [dirpath],
-            load_error_modules=False,
+            load_error_blocks=False,
             static_content_store=contentstore(),
             target_id=courselike_key,
             verbose=True,

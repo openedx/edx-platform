@@ -108,7 +108,7 @@ from ..utils import (
 from .component import ADVANCED_COMPONENT_TYPES
 from .helpers import is_content_creator
 from .entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
-from .item import create_xblock_info
+from .block import create_xblock_info
 from .library import (
     LIBRARIES_ENABLED,
     LIBRARY_AUTHORING_MICROFRONTEND_URL,
@@ -254,7 +254,7 @@ def course_handler(request, course_key_string=None):
     """
     The restful handler for course specific requests.
     It provides the course tree with the necessary information for identifying and labeling the parts. The root
-    will typically be a 'course' object but may not be especially as we support modules.
+    will typically be a 'course' object but may not be especially as we support blocks.
 
     GET
         html: return course listing page if not given a course id

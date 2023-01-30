@@ -19,8 +19,8 @@ from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, 
 
 class ContentGroupTestCase(ModuleStoreTestCase):
     """
-    Sets up discussion modules visible to content groups 'Alpha' and
-    'Beta', as well as a module visible to all students.  Creates a
+    Sets up discussion blocks visible to content groups 'Alpha' and
+    'Beta', as well as a block visible to all students.  Creates a
     staff user, users with access to Alpha/Beta (by way of cohorts),
     and a non-cohorted user with no special access.
     """
@@ -99,21 +99,21 @@ class ContentGroupTestCase(ModuleStoreTestCase):
             partition_id=self.course.user_partitions[0].id,
             group_id=self.course.user_partitions[0].groups[1].id
         )
-        self.alpha_module = BlockFactory.create(
+        self.alpha_block = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='alpha_group_discussion',
             discussion_target='Visible to Alpha',
             group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[0].id]}
         )
-        self.beta_module = BlockFactory.create(
+        self.beta_block = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='beta_group_discussion',
             discussion_target='Visible to Beta',
             group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[1].id]}
         )
-        self.global_module = BlockFactory.create(
+        self.global_block = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='global_group_discussion',

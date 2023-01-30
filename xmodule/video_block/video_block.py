@@ -510,7 +510,7 @@ class VideoBlock(
         Used to update video values during `self`:save method from CMS.
         old_metadata: dict, values of fields of `self` with scope=settings which were explicitly set by user.
         old_content, same as `old_metadata` but for scope=content.
-        Due to nature of code flow in item.py::_save_item, before current function is called,
+        Due to nature of code flow in block.py::_save_item, before current function is called,
         fields of `self` instance have been already updated, but not yet saved.
         To obtain values, which were changed by user input,
         one should compare own_metadata(self) and old_medatada.
@@ -561,7 +561,7 @@ class VideoBlock(
 
     def save_with_metadata(self, user):
         """
-        Save module with updated metadata to database."
+        Save block with updated metadata to database."
         """
         self.save()
         self.runtime.modulestore.update_item(self, user.id)
@@ -674,7 +674,7 @@ class VideoBlock(
 
     def definition_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=too-many-statements
         """
-        Returns an xml string representing this module.
+        Returns an xml string representing this block.
         """
         xml = etree.Element('video')
         youtube_string = create_youtube_string(self)

@@ -70,7 +70,7 @@ from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
-from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback
+from lms.djangoapps.courseware.block_render import get_block, handle_xblock_callback
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expiration_banner_text, set_preview_mode
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
@@ -194,46 +194,46 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url == expected_redirect_url
 
     @set_preview_mode(True)
-    def test_jump_to_legacy_from_module(self):
+    def test_jump_to_legacy_from_block(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = BlockFactory.create(category='chapter', parent_location=course.location)
             sequence = BlockFactory.create(category='sequential', parent_location=chapter.location)
             vertical1 = BlockFactory.create(category='vertical', parent_location=sequence.location)
             vertical2 = BlockFactory.create(category='vertical', parent_location=sequence.location)
-            module1 = BlockFactory.create(category='html', parent_location=vertical1.location)
-            module2 = BlockFactory.create(category='html', parent_location=vertical2.location)
+            block1 = BlockFactory.create(category='html', parent_location=vertical1.location)
+            block2 = BlockFactory.create(category='html', parent_location=vertical2.location)
 
-        activate_block_id = urlencode({'activate_block_id': str(module1.location)})
+        activate_block_id = urlencode({'activate_block_id': str(block1.location)})
         expected_redirect_url = (
             f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{module1.location}'
+        jumpto_url = f'/courses/{course.id}/jump_to/{block1.location}'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
-        activate_block_id = urlencode({'activate_block_id': str(module2.location)})
+        activate_block_id = urlencode({'activate_block_id': str(block2.location)})
         expected_redirect_url = (
             f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/2?{activate_block_id}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
+        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
     @set_preview_mode(False)
-    def test_jump_to_mfe_from_module(self):
+    def test_jump_to_mfe_from_block(self):
         course = CourseFactory.create()
         chapter = BlockFactory.create(category='chapter', parent_location=course.location)
         sequence = BlockFactory.create(category='sequential', parent_location=chapter.location)
         vertical1 = BlockFactory.create(category='vertical', parent_location=sequence.location)
         vertical2 = BlockFactory.create(category='vertical', parent_location=sequence.location)
-        module1 = BlockFactory.create(category='html', parent_location=vertical1.location)
-        module2 = BlockFactory.create(category='html', parent_location=vertical2.location)
+        block1 = BlockFactory.create(category='html', parent_location=vertical1.location)
+        block2 = BlockFactory.create(category='html', parent_location=vertical2.location)
 
         expected_redirect_url = (
             f'http://learning-mfe/course/{course.id}/{sequence.location}/{vertical1.location}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{module1.location}'
+        jumpto_url = f'/courses/{course.id}/jump_to/{block1.location}'
         response = self.client.get(jumpto_url)
         assert response.status_code == 302
         assert response.url == expected_redirect_url
@@ -241,7 +241,7 @@ class TestJumpTo(ModuleStoreTestCase):
         expected_redirect_url = (
             f'http://learning-mfe/course/{course.id}/{sequence.location}/{vertical2.location}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
+        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}'
         response = self.client.get(jumpto_url)
         assert response.status_code == 302
         assert response.url == expected_redirect_url
@@ -249,7 +249,7 @@ class TestJumpTo(ModuleStoreTestCase):
     # The new courseware experience does not support this sort of course structure;
     # it assumes a simple course->chapter->sequence->unit->component tree.
     @set_preview_mode(True)
-    def test_jump_to_legacy_from_nested_module(self):
+    def test_jump_to_legacy_from_nested_block(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = BlockFactory.create(category='chapter', parent_location=course.location)
@@ -257,17 +257,17 @@ class TestJumpTo(ModuleStoreTestCase):
             vertical = BlockFactory.create(category='vertical', parent_location=sequence.location)
             nested_sequence = BlockFactory.create(category='sequential', parent_location=vertical.location)
             nested_vertical1 = BlockFactory.create(category='vertical', parent_location=nested_sequence.location)
-            # put a module into nested_vertical1 for completeness
+            # put a block into nested_vertical1 for completeness
             BlockFactory.create(category='html', parent_location=nested_vertical1.location)
             nested_vertical2 = BlockFactory.create(category='vertical', parent_location=nested_sequence.location)
-            module2 = BlockFactory.create(category='html', parent_location=nested_vertical2.location)
+            block2 = BlockFactory.create(category='html', parent_location=nested_vertical2.location)
 
-        # internal position of module2 will be 1_2 (2nd item withing 1st item)
-        activate_block_id = urlencode({'activate_block_id': str(module2.location)})
+        # internal position of block2 will be 1_2 (2nd item withing 1st item)
+        activate_block_id = urlencode({'activate_block_id': str(block2.location)})
         expected_redirect_url = (
             f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
+        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
@@ -1927,7 +1927,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         """
         Submit the given score to the problem on behalf of the user
         """
-        # Get the module for the problem, as viewed by the user
+        # Get the block for the problem, as viewed by the user
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id,
             self.user,
@@ -1935,16 +1935,16 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
             depth=2
         )
         self.addCleanup(set_current_request, None)
-        module = get_module(
+        block = get_block(
             self.user,
             get_mock_request(self.user),
             self.problem.scope_ids.usage_id,
-            field_data_cache,
+            field_data_cache
         )
 
         # Submit the given score/max_score to the problem xmodule
         grade_dict = {'value': value, 'max_value': max_value, 'user_id': self.user.id}
-        module.system.publish(self.problem, 'grade', grade_dict)
+        block.runtime.publish(self.problem, 'grade', grade_dict)
 
     def assert_progress_page_show_grades(self, response, show_correctness, due_date, graded,
                                          show_grades, score, max_score, avg):  # lint-amnesty, pylint: disable=unused-argument

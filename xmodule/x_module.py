@@ -519,9 +519,13 @@ class XModuleMixin(XModuleFields, XBlock):
         child.runtime.export_fs = self.runtime.export_fs
         return child
 
-    def get_required_module_descriptors(self):
-        """Returns a list of XModuleDescriptor instances upon which this module depends, but are
-        not children of this module"""
+    def get_required_block_descriptors(self):
+        """
+        Return a list of XBlock instances upon which this block depends but are
+        not children of this block.
+
+        TODO: Move this method directly to the ConditionalBlock.
+        """
         return []
 
     def get_child_by(self, selector):
@@ -1176,7 +1180,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         """
         # getting the service from parent module. making sure of block service declarations.
         service = super().service(block=block, service_name=service_name)
-        # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
+        # Passing the block to service if it is callable e.g. XBlockI18nService. It is the responsibility of calling
         # service to handle the passing argument.
         if callable(service):
             return service(block)
@@ -1656,15 +1660,15 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
         self,
-        get_module,
+        get_block,
         descriptor_runtime,
         **kwargs,
     ):
         """
         Create a closure around the system environment.
 
-        get_module - function that takes a descriptor and returns a corresponding
-                         module instance object.  If the current user does not have
+        get_block - function that takes a descriptor and returns a corresponding
+                         block instance object.  If the current user does not have
                          access to that location, returns None.
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
@@ -1674,7 +1678,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
         super().__init__(**kwargs)
 
-        self.get_module = get_module
+        self.get_block_for_descriptor = get_block
 
         self.xmodule_instance = None
 
@@ -1705,7 +1709,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
 
     def get_block(self, block_id, for_parent=None):  # lint-amnesty, pylint: disable=arguments-differ
-        return self.get_module(self.descriptor_runtime.get_block(block_id, for_parent=for_parent))
+        return self.get_block_for_descriptor(self.descriptor_runtime.get_block(block_id, for_parent=for_parent))
 
     def resource_url(self, resource):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
@@ -1734,7 +1738,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         """
         # getting the service from parent module. making sure of block service declarations.
         service = super().service(block=block, service_name=service_name)
-        # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
+        # Passing the block to service if it is callable e.g. XBlockI18nService. It is the responsibility of calling
         # service to handle the passing argument.
         if callable(service):
             return service(block)
