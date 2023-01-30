@@ -56,8 +56,9 @@ beautifulsoup4==4.11.2
     # via pynliner
 billiard==3.6.4.0
     # via celery
-bleach[css]==6.0.0
+bleach[css]==5.0.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   lti-consumer-xblock
