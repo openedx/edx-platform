@@ -93,7 +93,7 @@ class ClassSummaryViewSet(viewsets.ModelViewSet):
         gen_class = self.get_object()
         class_units = ClassUnit.objects.select_related('gen_class', 'unit').prefetch_related('class_lessons')
         class_units = class_units.filter(gen_class=gen_class)
-        class_units_data = ClassUnitSerializer(class_units, many=True).data
+        class_units_data = ClassUnitSerializer(class_units, many=True, context={'user': self.request.user}).data
         gen_class_data = self.get_serializer(gen_class).data
         gen_class_data['results'] = class_units_data
         return Response(gen_class_data, status=status.HTTP_200_OK)

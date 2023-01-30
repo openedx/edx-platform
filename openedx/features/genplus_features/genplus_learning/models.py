@@ -187,6 +187,7 @@ class ClassLesson(models.Model):
     def display_name(self):
         return modulestore().get_item(self.usage_key).display_name
 
+    # TODO: Remove this after ClassFilterApiView has been removed
     @property
     def lms_url(self):
         return f"{settings.LMS_ROOT_URL}/courses/{str(self.course_key)}/jump_to/{str(self.usage_key)}"

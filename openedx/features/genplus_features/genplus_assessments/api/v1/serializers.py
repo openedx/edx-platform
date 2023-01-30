@@ -14,6 +14,7 @@ from openedx.features.genplus_features.genplus_learning.models import (
 )
 
 
+# TODO: remove this serializer
 class ClassLessonSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -21,6 +22,7 @@ class ClassLessonSerializer(serializers.ModelSerializer):
         fields = ('id', 'display_name', 'lms_url', 'usage_key')
 
 
+# TODO: remove this serializer
 class ClassUnitSerializer(serializers.ModelSerializer):
     class_lessons = ClassLessonSerializer(many=True, read_only=True)
     display_name = serializers.CharField(source="unit.display_name")
@@ -53,6 +55,7 @@ class ClassStudentSerializer(serializers.ModelSerializer):
             return None
 
 
+# TODO: remove this serializer
 class ClassSerializer(serializers.ModelSerializer):
     students = serializers.SerializerMethodField()
     class_units = ClassUnitSerializer(many=True, read_only=True)
@@ -85,7 +88,7 @@ class RatingAssessmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRating
-        fields = ('user', 'course_id', 'usage_id', 'problem_id', 
+        fields = ('user', 'course_id', 'usage_id', 'problem_id',
                   'assessment_time', 'skill', 'full_name', 'rating')
 
     def get_full_name(self, obj):

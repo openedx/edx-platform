@@ -27,6 +27,7 @@ from openedx.features.genplus_features.genplus_assessments.utils import (
 logger = logging.getLogger(__name__)
 
 
+# TODO: remove this endpoint
 class ClassFilterApiView(views.APIView):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsTeacher]
@@ -101,8 +102,8 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
     """
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsStudentOrTeacher]
-    intro_assessments = None
-    outro_assessments = None
+    intro_assessments = []
+    outro_assessments = []
 
     def aggregate_assessments_response(self, request, **kwargs):
         """

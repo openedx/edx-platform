@@ -7,6 +7,8 @@ from .views import (
     StudentAnswersViewSet, ClassFilterApiView, SkillAssessmentViewSet
 )
 
+# TODO: remove this ClassFilterApiView endpoint
+
 app_name = 'genplus_assessments_api_v1'
 
 urlpatterns = [

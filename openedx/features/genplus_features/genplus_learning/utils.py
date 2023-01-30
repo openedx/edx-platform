@@ -9,6 +9,7 @@ from django.test import RequestFactory
 
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience.utils import get_course_outline_block_tree
@@ -22,6 +23,7 @@ from openedx.features.genplus_features.genplus_learning.access import allow_acce
 from openedx.features.genplus_features.genplus_learning.roles import ProgramStaffRole, ProgramInstructorRole
 from openedx.features.genplus_features.genplus_assessments.utils import (
     get_student_unit_skills_assessment,
+    build_problem_list
 )
 
 
@@ -63,6 +65,26 @@ def calculate_class_unit_progress(course_key, gen_class):
     return round(statistics.fmean(students_unit_progress))
 
 
+def get_lesson_lms_url(user, course_key, usage_key):
+    course_blocks = get_course_blocks(user, usage_key)
+    url_to_block = ''
+    for _, _, block_key in build_problem_list(course_blocks, usage_key):
+        if block_key.block_type == 'problem':
+            url_to_block = reverse(
+                'jump_to',
+                kwargs={'course_id': course_key, 'location': block_key}
+            )
+            break
+
+    if not url_to_block:
+        url_to_block = reverse(
+            'jump_to',
+            kwargs={'course_id': course_key, 'location': usage_key}
+        )
+
+    return f"{settings.LMS_ROOT_URL}{url_to_block}"
+
+
 def get_next_problem_block(user, course_key, request=None):
     if request is None:
         request = RequestFactory().get(u'/')
@@ -77,11 +99,11 @@ def get_next_problem_block(user, course_key, request=None):
     if unit and student:
         enrollment = ProgramEnrollment.objects.filter(student=student, program=unit.program).first()
         if enrollment:
-            lessons = ClassLesson.objects.filter(class_unit__gen_class=enrollment.gen_class, course_key=course_key)
-            sections = course_outline_blocks.get('children')
+            lessons = ClassLesson.objects.filter(class_unit__gen_class=enrollment.gen_class, course_key=course_key).values_list('usage_key', 'is_locked')
+            lessons = dict(lessons)
+            sections = course_outline_blocks.get('children', [])
             for i, section in enumerate(sections):
-                lesson = lessons.get(usage_key=UsageKey.from_string(section.get('id')))
-                sections[i]['is_locked'] = lesson.is_locked if lesson else True
+                sections[i]['is_locked'] = lessons.get(UsageKey.from_string(section.get('id')), True)
             course_outline_blocks['children'] = sections
 
     if not course_outline_blocks:
@@ -103,6 +125,10 @@ def get_next_problem_block_helper(course_block, exclude_block_types):
         for block in course_block_children:
             if block.get('type') == 'chapter' and block.get('is_locked'):
                 continue
+
+            if block.get('is_completion_tracked') == False:
+                continue
+
             next_block = next_block or get_next_problem_block_helper(block, exclude_block_types)
 
             if next_block and course_block.get('type') == 'chapter':
@@ -156,15 +182,12 @@ def get_user_next_course_lesson(user, course_id):
         course = modulestore().get_course(course_id)
         sections = getattr(course, 'children')
         if sections:
-            url_to_block = reverse(
-                'jump_to',
-                kwargs={'course_id': course_id, 'location': sections[0]}
-            )
-        else:
-            url_to_block = reverse(
-                'jump_to',
-                kwargs={'course_id': course_id, 'location': modulestore().make_course_usage_key(course_id)}
-            )
+            return get_lesson_lms_url(user, course_id, sections[0])
+
+        url_to_block = reverse(
+            'jump_to',
+            kwargs={'course_id': course_id, 'location': modulestore().make_course_usage_key(course_id)}
+        )
 
     return f"{settings.LMS_ROOT_URL}{url_to_block}"
 
