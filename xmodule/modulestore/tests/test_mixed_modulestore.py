@@ -17,6 +17,7 @@ from unittest.mock import Mock, call, patch
 import ddt
 from openedx_events.content_authoring.data import XBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DELETED, XBLOCK_PUBLISHED
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 import pymongo
 import pytest
 # Mixed modulestore depends on django, so we'll manually configure some django settings
@@ -65,7 +66,7 @@ if not settings.configured:
 log = logging.getLogger(__name__)
 
 
-class CommonMixedModuleStoreSetup(CourseComparisonTest):
+class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
     """
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and
     Location-based dbs)
@@ -115,6 +116,16 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         "org.openedx.content_authoring.xblock.deleted.v1",
         "org.openedx.content_authoring.xblock.published.v1",
     ]
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         """

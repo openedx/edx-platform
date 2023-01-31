@@ -14,6 +14,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
@@ -645,7 +646,7 @@ class DuplicateHelper:
         return self.response_usage_key(resp)
 
 
-class TestDuplicateItem(ItemTest, DuplicateHelper):
+class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
     """
     Test the duplicate method.
     """
@@ -653,6 +654,16 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
     ENABLED_OPENEDX_EVENTS = [
         "org.openedx.content_authoring.xblock.duplicated.v1",
     ]
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         """ Creates the test course structure and a few components to 'duplicate'. """
