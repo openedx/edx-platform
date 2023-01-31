@@ -964,8 +964,8 @@ def _duplicate_block(parent_usage_key, duplicate_source_usage_key, user, display
         # .. event_implemented_name: XBLOCK_DUPLICATED
         XBLOCK_DUPLICATED.send_event(
             xblock_info=DuplicatedXBlockData(
-                usage_key=dest_module.location,
-                block_type=dest_module.location.block_type,
+                usage_key=dest_block.location,
+                block_type=dest_block.location.block_type,
                 source_usage_key=duplicate_source_usage_key,
             )
         )
