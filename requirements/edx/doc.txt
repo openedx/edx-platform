@@ -68,6 +68,7 @@ snowballstemmer==2.2.0
     # via sphinx
 sphinx==5.0.2
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.in
     #   edx-sphinx-theme
