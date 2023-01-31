@@ -156,7 +156,7 @@ jobs:
 
       - name: Run coverage
         run: |
-          coverage combine
+          coverage combine reports/*
           coverage report
           coverage xml
       - uses: codecov/codecov-action@v3
