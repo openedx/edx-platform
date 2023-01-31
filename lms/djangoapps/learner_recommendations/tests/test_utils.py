@@ -8,6 +8,7 @@ from common.djangoapps.student.tests.factories import (
     UserFactory,
 )
 from lms.djangoapps.learner_recommendations.utils import (
+    _has_country_restrictions,
     filter_recommended_courses,
     get_amplitude_course_recommendations,
 )
@@ -55,6 +56,27 @@ class TestRecommendationsHelper(TestCase):
         )
         self.assertEqual(len(course_keys), expected_recommendations_count)
 
+    @ddt.data(
+        ({}, False),
+        ({"restriction_type": "blocklist", "countries": []}, False),
+        ({"restriction_type": "blocklist", "countries": ["SA"]}, False),
+        ({"restriction_type": "blocklist", "countries": ["US"]}, True),
+        ({"restriction_type": "allowlist", "countries": []}, False),
+        ({"restriction_type": "allowlist", "countries": ["SA"]}, True),
+        ({"restriction_type": "allowlist", "countries": ["US"]}, False),
+    )
+    @ddt.unpack
+    def test_has_country_restrictions_method(
+        self,
+        location_restriction,
+        expected_response,
+    ):
+        """
+        Helper method to test the _has_country_restrictions method.
+        """
+        product = {"location_restriction": location_restriction}
+        assert _has_country_restrictions(product, "US") == expected_response
+
 
 class TestFilterRecommendedCourses(ModuleStoreTestCase):
     """Test for filter_recommended_courses helper method."""
@@ -62,12 +84,10 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
-        self.course_data = {
-            "course_key": "Mocked course key",
-            "title": "Mocked course title",
-            "owners": [{"logo_image_url": "https://www.logo_image_url.com"}],
-            "marketing_url": "https://www.marketing_url.com",
-        }
+        self.unrestricted_course_keys = [
+            "MITx+6.00.1x",
+            "IBM+PY0101EN",
+        ]
         self.recommended_course_keys = [
             "MITx+6.00.1x",
             "IBM+PY0101EN",
@@ -93,6 +113,29 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
             "course-v1:MichinX+101x+Run_0",
         ]
 
+    def _mock_get_course_data(self, course_id, fields=None):  # pylint: disable=unused-argument
+        """
+        Mocked response for the get_course_data call
+        """
+        course_data = {
+            "course_key": course_id,
+            "title": "Mocked course title",
+            "owners": [{"logo_image_url": "https://www.logo_image_url.com"}],
+            "marketing_url": "https://www.marketing_url.com",
+        }
+
+        if course_id not in self.unrestricted_course_keys:
+            course_data.update(
+                {
+                    "location_restriction": {
+                        "restriction_type": "blocklist",
+                        "countries": ["US"],
+                    }
+                }
+            )
+
+        return course_data
+
     @patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
     def test_enrolled_courses_are_removed_from_recommendations(
         self, mocked_get_course_data
@@ -103,11 +146,49 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
         """
         total_enrolled_courses = 6
         total_recommendations = len(self.recommended_course_keys)
-        mocked_get_course_data.return_value = self.course_data
+        mocked_get_course_data.side_effect = self._mock_get_course_data
         for course_run_key in self.course_run_keys[:total_enrolled_courses]:
             CourseEnrollmentFactory(course_id=course_run_key, user=self.user)
 
         filtered_courses = filter_recommended_courses(
             self.user, self.recommended_course_keys, total_recommendations
         )
-        self.assertEqual(len(filtered_courses), total_recommendations - total_enrolled_courses)
+        assert len(filtered_courses) == (total_recommendations - total_enrolled_courses)
+
+    @patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    def test_request_course_is_removed_from_the_recommendations(
+        self,
+        mocked_get_course_data,
+    ):
+        """
+        Test that if the "request course" is one of the recommended courses,
+        we filter that from the final recommendation list.
+        """
+        request_course = self.recommended_course_keys[0]
+        mocked_get_course_data.side_effect = self._mock_get_course_data
+        filtered_courses = filter_recommended_courses(
+            self.user,
+            self.recommended_course_keys,
+            request_course=request_course,
+        )
+
+        assert all(course["course_key"] != request_course for course in filtered_courses) is True
+
+    @patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    def test_country_restrictions_for_the_recommended_course(
+        self,
+        mocked_get_course_data,
+    ):
+        """
+        Test that if a recommended course is restricted in the country the user
+        is logged from, the course is filtered out.
+        """
+        mocked_get_course_data.side_effect = self._mock_get_course_data
+        filtered_courses = filter_recommended_courses(
+            self.user, self.recommended_course_keys, user_country_code="US"
+        )
+        expected_recommendations = []
+        for course_key in self.unrestricted_course_keys:
+            expected_recommendations.append(self._mock_get_course_data(course_key))
+
+        assert filtered_courses == expected_recommendations
