@@ -108,7 +108,6 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course,
     is_user_eligible_for_credit
 )
-from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -1612,7 +1611,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         # For courses using an LTI provider managed by edx-exams:
         # Access to exam content is determined by edx-exams and passed to the LMS using a
         # JWT cookie. There is no longer a need for exam gating or logic inside the
-        # sequence block or its render call. decendants_are_gated shoule not return true
+        # sequence block or its render call. descendants_are_gated shoule not return true
         # for these timed exams. Instead, sequences are assumed gated by default and we look for
         # an access token on the request to allow rendering to continue.
         if course.proctoring_provider == 'lti_external':
