@@ -1493,13 +1493,10 @@ def _check_sequence_exam_access(request, location):
     Exam access is always granted at the sequence block. This method of gating is
     only used by the edx-exams system and NOT edx-proctoring.
     """
-    if not exams_ida_enabled(location.course_key):
-        return True
-
     if request.user.is_staff or is_masquerading_as_specific_student(request.user, location.course_key):
         return True
 
-    exam_access_token = request.COOKIES.get(settings.EXAM_ACCESS_TOKEN_COOKIE)
+    exam_access_token = request.GET.get('exam_access')
     if exam_access_token:
         try:
             # unpack will validate both expiration and the requesting user matches the
@@ -1612,16 +1609,17 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                     )
                 )
 
-        # For courses using the edx-exams service:
+        # For courses using an LTI provider managed by edx-exams:
         # Access to exam content is determined by edx-exams and passed to the LMS using a
         # JWT cookie. There is no longer a need for exam gating or logic inside the
         # sequence block or its render call. decendants_are_gated shoule not return true
         # for these timed exams. Instead, sequences are assumed gated by default and we look for
         # an access token on the request to allow rendering to continue.
-        exam_block = ancestor_sequence_block if ancestor_sequence_block else block
-        if getattr(exam_block, 'is_time_limited', None):
-            if not _check_sequence_exam_access(request, exam_block.location):
-                return HttpResponseForbidden("Access to exam content is restricted")
+        if course.proctoring_provider == 'lti_external':
+            seq_block = ancestor_sequence_block if ancestor_sequence_block else block
+            if getattr(seq_block, 'is_time_limited', None):
+                if not _check_sequence_exam_access(request, seq_block.location):
+                    return HttpResponseForbidden("Access to exam content is restricted")
 
         fragment = block.render(requested_view, context=student_view_context)
         optimization_flags = get_optimization_flags_for_content(block, fragment)
