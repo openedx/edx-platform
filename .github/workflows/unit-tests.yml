@@ -158,5 +158,13 @@ jobs:
         run: |
           coverage combine reports/*
           coverage report
+          coverage html
           coverage xml
+
+      - name: "Upload HTML report"
+        uses: actions/upload-artifact@v3
+        with:
+          name: html_report
+          path: reports/cover
+
       - uses: codecov/codecov-action@v3

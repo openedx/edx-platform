@@ -1,5 +1,6 @@
 # .coveragerc for edx-platform
 [run]
+branch = true
 data_file = reports/${TEST_SUITE}.coverage
 source =
     cms
