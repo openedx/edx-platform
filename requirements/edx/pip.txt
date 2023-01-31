@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-pip==22.3.1
+pip==23.0
     # via -r requirements/edx/pip.in
 setuptools==67.0.0
     # via -r requirements/edx/pip.in

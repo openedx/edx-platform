@@ -180,3 +180,4 @@ enmerkar-underscore                 # Implements a underscore extractor for djan
 xblock-drag-and-drop-v2             # Drag and Drop XBlock
 xblock-google-drive                 # XBlock for google docs and calendar
 openedx-django-wiki
+openedx-blockstore
