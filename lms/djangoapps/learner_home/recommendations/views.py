@@ -67,13 +67,14 @@ class CourseRecommendationApiView(APIView):
         if is_control or is_control is None or not course_keys:
             return self._general_recommendations_response(user_id, is_control, fallback_recommendations)
 
-        recommended_courses = filter_recommended_courses(request.user, course_keys)
+        filtered_courses = filter_recommended_courses(request.user, course_keys, recommendation_count=5)
         # If no courses are left after filtering already enrolled courses from
         # the list of amplitude recommendations, show general recommendations
         # to the user.
-        if not recommended_courses:
+        if not filtered_courses:
             return self._general_recommendations_response(user_id, is_control, fallback_recommendations)
 
+        recommended_courses = list(map(self._course_data, filtered_courses))
         self._emit_recommendations_viewed_event(user_id, is_control, recommended_courses)
         return Response(
             CourseRecommendationSerializer(
@@ -113,3 +114,13 @@ class CourseRecommendationApiView(APIView):
             ).data,
             status=200,
         )
+
+    def _course_data(self, course):
+        """Helper method for personalized recommendation response"""
+        return {
+            "course_key": course.get("key"),
+            "title": course.get("title"),
+            "logo_image_url": course.get("owners")[0]["logo_image_url"] if course.get(
+                "owners") else "",
+            "marketing_url": course.get("marketing_url"),
+        }
