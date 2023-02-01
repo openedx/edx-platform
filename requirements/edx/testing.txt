@@ -848,7 +848,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==7.3.0
+lti-consumer-xblock==8.0.0
     # via -r requirements/edx/base.txt
 lxml==4.9.2
     # via
@@ -965,7 +965,7 @@ openedx-filters==1.0.0
     #   lti-consumer-xblock
 optimizely-sdk==4.1.0
     # via -r requirements/edx/base.txt
-ora2==4.5.1
+ora2==5.0.0
     # via -r requirements/edx/base.txt
 oscrypto==1.3.0
     # via
