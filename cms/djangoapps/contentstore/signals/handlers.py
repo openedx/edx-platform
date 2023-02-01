@@ -66,7 +66,7 @@ def locked(expiry_seconds, key):  # lint-amnesty, pylint: disable=missing-functi
 SEND_CATALOG_INFO_SIGNAL = SettingToggle('SEND_CATALOG_INFO_SIGNAL', default=False, module_name=__name__)
 
 
-def create_catalog_data_for_signal(course_key: CourseKey) -> Optional[CourseCatalogData]:
+def create_catalog_data_for_signal(course_key: CourseKey) -> (Optional[datetime], Optional[CourseCatalogData]):
     """
     Creates data for catalog-info-changed signal when course is published.
 
@@ -74,16 +74,19 @@ def create_catalog_data_for_signal(course_key: CourseKey) -> Optional[CourseCata
         course_key: Key of the course to announce catalog info changes for
 
     Returns:
-        Data for signal, or None if not appropriate to send on this signal.
+        (datetime, CourseCatalogData): Tuple including the timestamp of the
+            event, and data for signal, or (None, None) if not appropriate
+            to send on this signal.
     """
     # Only operate on real courses, not libraries.
     if not course_key.is_course:
-        return None
+        return None, None
 
     store = modulestore()
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         course = store.get_course(course_key)
-        return CourseCatalogData(
+        timestamp = course.subtree_edited_on.replace(tzinfo=timezone.utc)
+        return timestamp, CourseCatalogData(
             course_key=course_key.for_branch(None),  # Shouldn't be necessary, but just in case...
             name=course.display_name,
             schedule_data=CourseScheduleData(
@@ -103,9 +106,9 @@ def emit_catalog_info_changed_signal(course_key: CourseKey):
     Given the key of a recently published course, send course data to catalog-info-changed signal.
     """
     if SEND_CATALOG_INFO_SIGNAL.is_enabled():
-        catalog_info = create_catalog_data_for_signal(course_key)
+        timestamp, catalog_info = create_catalog_data_for_signal(course_key)
         if catalog_info is not None:
-            COURSE_CATALOG_INFO_CHANGED.send_event(catalog_info=catalog_info)
+            COURSE_CATALOG_INFO_CHANGED.send_event(time=timestamp, catalog_info=catalog_info)
 
 
 @receiver(SignalHandler.course_published)
