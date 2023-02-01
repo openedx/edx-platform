@@ -480,6 +480,7 @@ def parse_query_params(strategy, response, *args, **kwargs):
     """Reads whitelisted query params, transforms them into pipeline args."""
     # If auth_entry is not in the session, we got here by a non-standard workflow.
     # We simply assume 'login' in that case.
+    logger.info("==========SOCIAL AUTH PIPELINE: parse_query_params============")
     auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY, AUTH_ENTRY_LOGIN)
     if auth_entry not in _AUTH_ENTRY_CHOICES:
         raise AuthEntryError(strategy.request.backend, 'auth_entry invalid')
@@ -510,6 +511,7 @@ def set_pipeline_timeout(strategy, user, *args, **kwargs):
       successfully signed into (Google), but your (Google) account isn't linked with an edX
       account. To link your accounts, login now using your edX password.".
     """
+    logger.info("==========SOCIAL AUTH PIPELINE: set_pipeline_timeout============")
     if strategy.request and not user:  # If user is set, we're currently logged in (and/or linked) so it doesn't matter.
         strategy.request.session.set_expiry(strategy.setting('PIPELINE_TIMEOUT', 600))
         # We don't need to reset this timeout later. Because the user is not logged in and this
@@ -570,6 +572,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
     # It is important that we always execute the entire pipeline. Even if
     # behavior appears correct without executing a step, it means important
     # invariants have been violated and future misbehavior is likely.
+    logger.info("==========SOCIAL AUTH PIPELINE: ensure_user_information============")
     def dispatch_to_login():
         """Redirects to the login page."""
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
@@ -682,6 +685,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
     to the next pipeline step.
 
     """
+    logger.info("==========SOCIAL AUTH PIPELINE: set_logged_in_cookies============")
     if not is_api(auth_entry) and user is not None and user.is_authenticated:
         request = strategy.request if strategy else None
         if not user.has_usable_password():
@@ -711,6 +715,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
     """ Sends login info to Segment """
 
+    logger.info("==========SOCIAL AUTH PIPELINE: login_analytics============")
     event_name = None
     if auth_entry == AUTH_ENTRY_LOGIN:
         event_name = 'edx.bi.user.account.authenticated'
@@ -734,6 +739,7 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, current_
 
     This association is done ONLY if the user entered the pipeline through a LOGIN API.
     """
+    logger.info("==========SOCIAL AUTH PIPELINE: associate_by_email_if_login_api============")
     if auth_entry == AUTH_ENTRY_LOGIN_API:
         # Temporary custom attribute to help ensure there is no usage.
         set_custom_attribute('deprecated_auth_entry_login_api', True)
@@ -755,7 +761,7 @@ def associate_by_email_if_oauth(auth_entry, backend, details, user, strategy, *a
     This association is done ONLY if the user entered the pipeline belongs to Oauth provider and
     `ENABLE_REQUIRE_THIRD_PARTY_AUTH` is enabled.
     """
-
+    logger.info("==========SOCIAL AUTH PIPELINE: associate_by_email_if_oauth============")
     if is_require_third_party_auth_enabled() and is_oauth_provider(backend.name, **kwargs):
         association_response, user_is_active = get_associated_user_by_email_response(
             backend, details, user, *args, **kwargs)
@@ -773,6 +779,7 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
 
     This association is done ONLY if the user entered the pipeline belongs to SAML provider.
     """
+    logger.info("==========SOCIAL AUTH PIPELINE: associate_by_email_if_saml============")
 
     def get_user():
         """
@@ -855,6 +862,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
 
     This step is controlled by the `sync_learner_profile_data` flag on the provider's configuration.
     """
+    logger.info("==========SOCIAL AUTH PIPELINE: user_details_force_sync============")
     current_provider = provider.Registry.get_from_pipeline({'backend': strategy.request.backend.name, 'kwargs': kwargs})
     if user and current_provider.sync_learner_profile_data:
         # Keep track of which incoming values get applied.
@@ -963,6 +971,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
     2. case insensitive username checks
     3. enforce same maximum and minimum length restrictions we have in `user_api/accounts`
     """
+    logger.info("==========SOCIAL AUTH PIPELINE: get_username============")
     if 'username' not in backend.setting('USER_FIELDS', USER_FIELDS):
         return
     storage = strategy.storage
@@ -1015,6 +1024,10 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
             final_username = slug_func(clean_func(username[:max_length]))
             logger.info('[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
                 username=final_username))
+
+        logger.info("username: %s", username)
+        logger.info("final_username: %s", final_username)
+        logger.info("short_username: %s", short_username)
     else:
         final_username = storage.user.get_username(user)
     return {'username': final_username}

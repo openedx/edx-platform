@@ -3176,6 +3176,7 @@ TINYMCE_DEFAULT_CONFIG = {
     'convert_urls': False,
 
 }
+USERNAME_MAX_LENGTH = 60
 
 ######################### CSRF #########################################
 
