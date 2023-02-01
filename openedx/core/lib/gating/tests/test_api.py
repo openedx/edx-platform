@@ -2,19 +2,18 @@
 Tests for the gating API
 """
 
-import unittest
 from unittest.mock import Mock, patch
 
 import pytest
 from completion.models import BlockCompletion
 from ddt import data, ddt, unpack
-from django.conf import settings
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from lms.djangoapps.gating import api as lms_gating_api
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
@@ -237,7 +236,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         (0, 1, 0),
     )
     @unpack
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_get_subsection_completion_percentage(self, user_problem_completion, user_html_completion,
                                                   expected_completion_percentage):
         """
@@ -276,7 +275,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         ('openassessment', 0, 0),
     )
     @unpack
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_get_subsection_completion_percentage_single_component(
         self,
         component_type,
@@ -306,7 +305,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
             completion_percentage = gating_api.get_subsection_completion_percentage(self.seq1.location, student)
             assert completion_percentage == expected_completion_percentage
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_compute_is_prereq_met(self):
         """
         Test if prereq has been met and force recompute
@@ -353,7 +352,7 @@ class TestGatingGradesIntegration(GradeTestBase):
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_get_subsection_grade_percentage(self):
         user = self.request.user
         subsection_key = self.sequence.location
@@ -368,7 +367,7 @@ class TestGatingGradesIntegration(GradeTestBase):
             grade_percentage = gating_api.get_subsection_grade_percentage(subsection_key, user)
             assert 100.0 == grade_percentage
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_get_subsection_grade_percentage_with_override(self):
         user = self.request.user
         subsection_key = self.sequence.location
