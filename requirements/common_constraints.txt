@@ -3,6 +3,11 @@
 # See BOM-2721 for more details.
 # Below is the copied and edited version of common_constraints
 
+# This is a temporary solution to override the real common_constraints.txt
+# In edx-lint, until the pyjwt constraint in edx-lint has been removed.
+# See BOM-2721 for more details.
+# Below is the copied and edited version of common_constraints
+
 # A central location for most common version constraints
 # (across edx repos) for pip-installation.
 #
