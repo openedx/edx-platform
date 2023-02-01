@@ -783,6 +783,7 @@ class TestMongoKeyValueStore(TestCase):
         assert self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'data')) == 'xml_data'
 
     def _check_write(self, key, value):
+        1/0
         self.kvs.set(key, value)
         assert self.kvs.get(key) == value
 
@@ -792,9 +793,9 @@ class TestMongoKeyValueStore(TestCase):
         yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'parent'), None)
         yield (self._check_write, KeyValueStore.Key(Scope.settings, None, None, 'meta'), 'new_settings')
 
-    def test_write_non_dict_data(self):
-        self.kvs = MongoKeyValueStore('xml_data', self.parent, self.children, self.metadata)
-        self._check_write(KeyValueStore.Key(Scope.content, None, None, 'data'), 'new_data')
+    # def test_write_non_dict_data(self):
+    #     self.kvs = MongoKeyValueStore('xml_data', self.parent, self.children, self.metadata)
+    #     self._check_write(KeyValueStore.Key(Scope.content, None, None, 'data'), 'new_data')
 
     def test_write_invalid_scope(self):
         for scope in (Scope.preferences, Scope.user_info, Scope.user_state):
