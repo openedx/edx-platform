@@ -3,7 +3,7 @@ Add new Django application for notifications
 
 Status
 ------
-Pending
+Accepted
 
 Context
 -------
