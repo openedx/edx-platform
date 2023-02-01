@@ -1502,7 +1502,7 @@ def _check_sequence_exam_access(request, location):
             # token user
             exam_access_unpacked = unpack_token_for(exam_access_token, request.user.id)
         except:  # pylint: disable=bare-except
-            log.exception("Failed to validate exam access token")
+            log.exception(f"Failed to validate exam access token. user_id={request.user.id} location={location}")
             return False
 
         return str(location) == exam_access_unpacked.get('content_id')
