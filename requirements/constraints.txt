@@ -75,7 +75,3 @@ pyopenssl==22.0.0
 
 
 cryptography==38.0.4 # greater version has some issues with openssl.
-
-# These two constraints will be removed in this PR: https://github.com/openedx/edx-platform/pull/31678
-bleach[css]==5.0.1 # greater version has some breaking changes.
-openedx-django-wiki<2.0.0 # greater version needs bleech >6.0.0
