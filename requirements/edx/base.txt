@@ -27,7 +27,9 @@ aniso8601==9.0.1
 appdirs==1.4.4
     # via fs
 asgiref==3.6.0
-    # via django
+    # via
+    #   django
+    #   django-countries
 asn1crypto==1.5.1
     # via
     #   oscrypto
@@ -54,7 +56,7 @@ backoff==1.10.0
     # via analytics-python
 backports-zoneinfo==0.2.1
     # via icalendar
-beautifulsoup4==4.11.1
+beautifulsoup4==4.11.2
     # via pynliner
 billiard==3.6.4.0
     # via celery
@@ -262,7 +264,7 @@ django-config-models==2.3.0
     #   lti-consumer-xblock
 django-cors-headers==3.13.0
     # via -r requirements/edx/base.in
-django-countries==7.5
+django-countries==7.5.1
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -480,7 +482,7 @@ edx-enterprise==3.60.18
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   learner-pathway-progress
-edx-event-bus-kafka==3.6.3
+edx-event-bus-kafka==3.7.1
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.9.2
     # via ora2
@@ -756,7 +758,9 @@ openedx-calc==3.0.1
 openedx-django-pyfs==3.2.1
     # via xblock
 openedx-django-wiki==1.1.4
-    # via -r requirements/edx/base.in
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.in
 openedx-events==4.2.0
     # via
     #   -r requirements/edx/base.in
@@ -771,7 +775,7 @@ ora2==4.5.1
     # via -r requirements/edx/base.in
 oscrypto==1.3.0
     # via snowflake-connector-python
-outcome-surveys==1.1.1
+outcome-surveys==2.0.0
     # via -r requirements/edx/base.in
 packaging==23.0
     # via
@@ -974,6 +978,7 @@ requests==2.28.2
     #   learner-pathway-progress
     #   mailsnake
     #   optimizely-sdk
+    #   outcome-surveys
     #   pyjwkest
     #   pylti1p3
     #   python-swiftclient
@@ -1051,7 +1056,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==2.9.0
+snowflake-connector-python==3.0.0
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
