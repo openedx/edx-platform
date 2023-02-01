@@ -55,7 +55,7 @@ class Command(BaseCommand):
         pipe_results = False
 
         if filename is None:
-            filename = tempfile.NamedTemporaryFile().name
+            filename = NamedTemporaryFile().name
             pipe_results = True
 
         export_course_to_tarfile(course_key, filename)
