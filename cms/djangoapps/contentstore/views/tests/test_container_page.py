@@ -5,6 +5,7 @@ Unit tests for the container page.
 
 import datetime
 import re
+from unittest import skip
 from unittest.mock import Mock, patch
 
 from django.http import Http404
@@ -190,11 +191,12 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
             **kwargs
         )
 
+    @skip("OldMongo Deprecation")
     def test_public_child_container_preview_html(self):
         """
         Verify that a public container rendered as a child of the container page returns the expected HTML.
         """
-        empty_child_container = self._create_block(self.vertical.location, 'split_test', 'Split Test')
+        empty_child_container = self._create_block(self.vertical.location, 'split_test', 'Split Test 1')
         published_empty_child_container = self.store.publish(empty_child_container.location, self.user.id)
         self.validate_preview_html(published_empty_child_container, self.reorderable_child_view, can_add=False)
 
@@ -202,7 +204,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         Verify that a draft container rendered as a child of the container page returns the expected HTML.
         """
-        empty_child_container = self._create_block(self.vertical.location, 'split_test', 'Split Test')
+        empty_child_container = self._create_block(self.vertical.location, 'split_test', 'Split Test 1')
         self.validate_preview_html(empty_child_container, self.reorderable_child_view, can_add=False)
 
     @patch(

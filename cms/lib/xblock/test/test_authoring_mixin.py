@@ -3,6 +3,7 @@ Tests for the Studio authoring XBlock mixin.
 """
 
 
+from unittest import skip
 from django.conf import settings
 from django.test.utils import override_settings
 from xblock.core import XBlock
@@ -158,6 +159,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
             [self.STAFF_LOCKED, self.CONTENT_GROUPS_TITLE, self.ENROLLMENT_GROUPS_TITLE]
         )
 
+    @skip("OldMongo Deprecation")
     def test_html_populated_partition_staff_locked(self):
         self.create_content_groups(self.pet_groups)
         self.set_staff_only(self.vertical_location)
@@ -178,6 +180,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
             [self.STAFF_LOCKED]
         )
 
+    @skip("OldMongo Deprecation")
     def test_html_false_content_group_staff_locked(self):
         self.create_content_groups(self.pet_groups)
         self.set_staff_only(self.vertical_location)

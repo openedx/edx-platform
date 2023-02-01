@@ -5,6 +5,7 @@ Test for export all courses.
 
 import shutil
 from tempfile import mkdtemp
+from unittest import skip
 
 from cms.djangoapps.contentstore.management.commands.export_all_courses import export_courses_to_output_path
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -13,6 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-a
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
+@skip("OldMongo Deprecation")
 class ExportAllCourses(ModuleStoreTestCase):
     """
     Tests exporting all courses.
