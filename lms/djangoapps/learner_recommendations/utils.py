@@ -209,7 +209,9 @@ def filter_recommended_courses(
         filtered_recommended_courses (list): A list of filtered course objects.
     """
     filtered_recommended_courses = []
-    fields = ["key", "uuid", "title", "owners", "image", "url_slug", "course_runs", "location_restriction"]
+    fields = [
+        "key", "uuid", "title", "owners", "image", "url_slug", "course_runs", "location_restriction", "marketing_url",
+    ]
 
     # Remove the course keys a user is already enrolled in
     enrollable_course_keys = _remove_user_enrolled_course_keys(user, unfiltered_course_keys)
