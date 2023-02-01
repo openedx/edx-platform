@@ -1,3 +1,7 @@
+"""
+Utilities for edly app.
+"""
+from datetime import datetime
 import logging
 from urllib.parse import urljoin
 
@@ -5,14 +9,24 @@ import jwt
 import waffle
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from edx_ace import ace
+from edx_ace.recipient import Recipient
+from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.branding.api import get_privacy_url, get_tos_and_honor_code_url
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.helpers import get_current_site_configuration
+from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.edly.constants import ESSENTIALS
 from openedx.features.edly.models import EdlyUserProfile, EdlySubOrganization
+from student.message_types import CertificateGeneration
+from student.models import CourseAccessRole
 from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
@@ -494,3 +508,57 @@ def is_course_org_same_as_site_org(site, course_id):
 
     LOGGER.info('Course organization does not match site organization')
     return False
+
+
+def send_certificate_generation_email(msg, user, site):
+    """
+    Use edx_ace send() to deliver course certificate email based on user and site.
+    """
+    try:
+        with emulate_http_request(site=site, user=user):
+            ace.send(msg)
+    except Exception:  # pylint: disable=broad-except
+        LOGGER.exception(
+            'Unable to send activation email to user from "{}" to "{}"'.format(
+                msg.options['from_address'],
+                user.email,
+            )
+        )
+
+
+def compose_certificate_email(student, course, message_context):
+    """
+    Return message_context dict for course cerficate email.
+    """
+    message_context.update({
+        'student_email': student.email,
+        'student_name': student.profile.name,
+        'course_name': course.display_name,
+        'course_date': datetime.now().strftime('%m/%d/%Y'),
+    })
+
+    return message_context
+
+
+def send_cert_email_to_course_staff(student_email, course_key, site_id, context_vars):
+    """
+    This celery task prepares context for course certificate email.
+    """
+    student = get_user_model().objects.get(email=student_email)
+    course = modulestore().get_course(course_key, depth=0)
+    site = Site.objects.get(id=site_id)
+    from_address = context_vars.pop('from_address')
+
+    instructors = CourseAccessRole.objects.filter(org=course.org, course_id=course.id).select_related('user')
+    msg_context = compose_certificate_email(student, course, context_vars)
+
+    for instructor in instructors:
+        instructor_user = instructor.user
+        msg = CertificateGeneration().personalize(
+            recipient=Recipient(instructor_user.username, instructor_user.email),
+            language=preferences_api.get_user_preference(student, LANGUAGE_KEY),
+            user_context=msg_context,
+        )
+
+        msg.options['from_address'] = from_address
+        send_certificate_generation_email(msg, instructor_user, site)

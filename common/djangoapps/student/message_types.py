@@ -39,3 +39,10 @@ class AccountActivation(BaseMessageType):
         super(AccountActivation, self).__init__(*args, **kwargs)
 
         self.options['transactional'] = True
+
+
+class CertificateGeneration(BaseMessageType):
+    def __init__(self, *args, **kwargs):
+        super(CertificateGeneration, self).__init__(*args, **kwargs)
+
+        self.options['transactional'] = True

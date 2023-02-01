@@ -1,0 +1,10 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %} {{ platform_name }} {% endblocktrans %}
+
+
+{% blocktrans %}Hi {{ platform_name }} team,{% endblocktrans %}
+
+{% blocktrans %}Congratulations, {{ student_name }} has completed the course - {{ course_name }} on {{ course_date }}.{% endblocktrans %}
+
+{% blocktrans %}{{ student_name }} has earned a certificate. Lets, encourage {{ student_name }} to share this achievement with others by writing a personalised email {{ student_email }}.{% endblocktrans %}
+{% endautoescape %}

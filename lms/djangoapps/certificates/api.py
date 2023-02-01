@@ -9,6 +9,7 @@ rather than importing Django models directly.
 import logging
 
 import six
+from celery.task import task
 from django.conf import settings
 from django.db.models import Q
 from django.urls import reverse
@@ -30,7 +31,9 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.instructor.access import list_with_level
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.edly.utils import send_cert_email_to_course_staff
 from util.organizations_helpers import get_course_organization_id
 from xmodule.modulestore.django import modulestore
 
@@ -45,6 +48,33 @@ def is_passing_status(cert_status):
     defined in models.py
     """
     return CertificateStatuses.is_passing_status(cert_status)
+
+
+@task()
+def _email_course_certificate_notification(course_key, student_email):
+    """
+    Given the course_key and student_email, send a an email to course team
+    regarding certificate completion.
+    """
+    from figures.sites import get_site_for_course
+
+    site = get_site_for_course(course_key)
+    from_address = settings.DEFAULT_FROM_EMAIL
+    send_email = False
+    site_config = getattr(site, 'configuration', None)
+
+    if site_config:
+        from_address = site_config.site_values.get('DJANGO_SETTINGS_OVERRIDES', {}).get(
+            'DEFAULT_FROM_EMAIL', settings.DEFAULT_FROM_EMAIL
+        )
+        send_email = site_config.site_values.get('ENABLE_COURSE_CERTIFICATE_EMAIL')
+
+    if not send_email:
+        return
+
+    context_vars = get_base_template_context(site)
+    context_vars.update({'from_address': from_address})
+    send_cert_email_to_course_staff(student_email, course_key, site.id, context_vars)
 
 
 def format_certificate_for_user(username, cert):
@@ -230,6 +260,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         return
 
     if CertificateStatuses.is_passing_status(cert.status):
+        _email_course_certificate_notification(course_key, student.email)
         emit_certificate_event('created', student, course_key, course, {
             'user_id': student.id,
             'course_id': six.text_type(course_key),

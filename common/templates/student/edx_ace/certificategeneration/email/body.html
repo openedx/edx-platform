@@ -1,0 +1,48 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load django_markup %}
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% trans "Course Certificate Generated" as header_msg %}{{ header_msg | force_escape }}
+            </h1>
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                    {% blocktrans %}Hi {{ platform_name }} team,{% endblocktrans %}
+                {% endfilter %}
+                <br />
+                {% filter force_escape %}
+                    {% blocktrans %}Congratulations, {{ student_name }} has completed the course - "{{ course_name }}" on {{ course_date }}.{% endblocktrans %}
+                {% endfilter %}  
+                <br />
+                {% filter force_escape %}
+                    {% blocktrans %}{{ student_name }} has earned a certificate. Lets, encourage {{ student_name }} to share this achievement with others by writing a personalised email to {{ student_email }}.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                    {% blocktrans %}{{ platform_name }}{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+        </td>
+    </tr>
+        <td>
+            <p style="color: rgba(0,0,0,.75);">
+                {% blocktrans trimmed asvar assist_msg %}
+                If you need help, please use our email {start_anchor_email}{formatted_support_email}{end_anchor}.
+                {% endblocktrans %}
+                <br />
+            </p>
+        </td>
+</table>
+{% endblock %}
