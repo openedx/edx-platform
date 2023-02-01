@@ -11,6 +11,7 @@ from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from completion.models import BlockCompletion
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.genplus_features.genplus.models import Class
@@ -20,7 +21,8 @@ from openedx.features.genplus_features.genplus_learning.models import (
 )
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
 from openedx.features.genplus_features.genplus_learning.utils import (
-    get_course_completion, get_progress_and_completion_status
+    get_course_completion,
+    get_progress_and_completion_status
 )
 from openedx.features.genplus_features.genplus_learning.access import allow_access, revoke_access
 from openedx.features.genplus_features.genplus_learning.roles import ProgramStaffRole
@@ -163,6 +165,9 @@ def revoke_program_access_for_class_teachers(self, class_id, program_id, class_t
 )
 @set_code_owner_attribute
 def update_unit_and_lesson_completions(self, user_id, course_key_str, usage_key_str):
+    if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
+        return
+
     usage_key = UsageKey.from_string(usage_key_str)
     block_type = usage_key.block_type
     aggregator_types = ['course', 'chapter', 'sequential', 'vertical']
@@ -206,9 +211,15 @@ def update_unit_and_lesson_completions(self, user_id, course_key_str, usage_key_
                 }
                 if is_complete:
                     defaults['completion_date'] = datetime.now().replace(tzinfo=pytz.UTC)
+                    BlockCompletion.objects.submit_completion(
+                        user=user,
+                        block_key=block_usage_key,
+                        completion=1.0,
+                    )
 
                 UnitBlockCompletion.objects.update_or_create(
                     user=user, course_key=course_key, usage_key=block_usage_key,
                     defaults=defaults
                 )
+
                 return

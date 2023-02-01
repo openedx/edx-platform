@@ -46,7 +46,7 @@ from openedx.features.course_experience.views.course_sock import CourseSockFragm
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from openedx.features.genplus_features.genplus_learning.models import ClassLesson, ProgramEnrollment
+from openedx.features.genplus_features.genplus_learning.models import ClassLesson
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -479,8 +479,8 @@ class CoursewareIndex(View):
                         lesson = lessons.get(usage_key=UsageKey.from_string(section.get('id')))
                         sections[i]['is_locked'] = lesson.is_locked if lesson else False
                     course_block_tree['children'] = sections
-            except:
-                log.error('An error occurred')
+            except Exception as err:
+                log.error('An error occurred: %s', err)
 
         courseware_context['accordion'] = render_accordion(
             self.request,
