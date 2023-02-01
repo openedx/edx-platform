@@ -2,8 +2,6 @@
 Tests the ``edx_clear_expired_tokens`` management command.
 """
 
-
-import unittest
 from datetime import timedelta
 from unittest.mock import patch
 
@@ -19,6 +17,7 @@ from oauth2_provider.models import AccessToken, RefreshToken
 from testfixtures import LogCapture
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = 'openedx.core.djangoapps.oauth_dispatch.management.commands.edx_clear_expired_tokens'
@@ -37,7 +36,7 @@ def counter(fn):
     return _counted
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     # patching REFRESH_TOKEN_EXPIRE_SECONDS because override_settings not working.
