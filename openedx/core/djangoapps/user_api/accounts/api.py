@@ -5,6 +5,7 @@ Programmatic integration point for User API Accounts sub-application
 
 
 import datetime
+import logging
 import re
 
 from django.conf import settings
@@ -48,6 +49,7 @@ if name_affirmation_installed:
 
 # Public access point for this function.
 visible_fields = _visible_fields
+log = logging.getLogger(__name__)
 
 
 @helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
@@ -337,13 +339,21 @@ def _notify_language_proficiencies_update_if_needed(data, user, user_profile, ol
 
 def _update_extended_profile_if_needed(data, user_profile):
     if 'extended_profile' in data:
+        log.info(f"[Extended Profile] Extended profile data update requested for user {user_profile.user.id}")
         meta = user_profile.get_meta()
         new_extended_profile = data['extended_profile']
         for field in new_extended_profile:
             field_name = field['field_name']
             new_value = field['field_value']
+            log.info(f"[Extended Profile] Extended profile data field: [{field_name}]")
+            log.info(f"[Extended Profile] Extended profile data value: [{new_value}]")
             meta[field_name] = new_value
+
         user_profile.set_meta(meta)
+        log.info(
+            "[Extended Profile] Saving user profile after extended profile data update for user "
+            f"{user_profile.user.id}"
+        )
         user_profile.save()
 
 
