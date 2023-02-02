@@ -676,16 +676,6 @@ def _deprecated_blocks_info(course_block, deprecated_block_types):
     return data
 
 
-def add_course_logs(course_key_string, course_like):
-    """
-    Add logs for course export
-    TODO: To be removed after export issue is resolved (INF-667)
-    """
-    logging.info(f'{course_key_string} {course_like.url_name}  {course_like.display_name}')
-    for child in course_like.get_children():
-        add_course_logs(course_key_string, child)
-
-
 @login_required
 @ensure_csrf_cookie
 def course_index(request, course_key):
@@ -700,11 +690,6 @@ def course_index(request, course_key):
         course_block = get_course_and_check_access(course_key, request.user, depth=None)
         if not course_block:
             raise Http404
-        # TODO: Remove function call after export issue is resolved (INF-667)
-        try:
-            add_course_logs(str(course_key), course_block)
-        except:     # pylint: disable=bare-except
-            logging.info(f'{str(course_key)} Error traversing course')
         lms_link = get_lms_link_for_item(course_block.location)
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
