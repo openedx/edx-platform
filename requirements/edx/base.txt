@@ -58,9 +58,8 @@ beautifulsoup4==4.11.2
     # via pynliner
 billiard==3.6.4.0
     # via celery
-bleach[css]==5.0.1
+bleach[css]==6.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   lti-consumer-xblock
@@ -477,7 +476,7 @@ edx-drf-extensions==8.4.1
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.60.18
+edx-enterprise==3.60.20
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -667,7 +666,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==7.3.0
+lti-consumer-xblock==8.0.0
     # via -r requirements/edx/base.in
 lxml==4.9.2
     # via
@@ -757,10 +756,8 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.in
 openedx-django-pyfs==3.2.1
     # via xblock
-openedx-django-wiki==1.1.4
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+openedx-django-wiki==2.0.0
+    # via -r requirements/edx/base.in
 openedx-events==4.2.0
     # via
     #   -r requirements/edx/base.in
@@ -771,7 +768,7 @@ openedx-filters==1.0.0
     #   lti-consumer-xblock
 optimizely-sdk==4.1.0
     # via -r requirements/edx/base.in
-ora2==4.5.1
+ora2==5.0.0
     # via -r requirements/edx/base.in
 oscrypto==1.3.0
     # via snowflake-connector-python
@@ -1177,7 +1174,7 @@ xblock[django]==1.6.2
     #   xblock-google-drive
     #   xblock-poll
     #   xblock-utils
-xblock-drag-and-drop-v2==3.0.0
+xblock-drag-and-drop-v2==3.1.0
     # via -r requirements/edx/base.in
 xblock-google-drive==0.3.0
     # via -r requirements/edx/base.in

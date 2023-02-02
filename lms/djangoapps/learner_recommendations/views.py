@@ -10,13 +10,14 @@ from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
 from django.core.exceptions import PermissionDenied
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from openedx.core.djangoapps.catalog.utils import (
     get_course_data,
-    get_course_run_details
+    get_course_run_details,
 )
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 from openedx.features.enterprise_support.utils import is_enterprise_learner
@@ -71,39 +72,47 @@ class AmplitudeRecommendationsView(APIView):
     authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated,)
 
+    recommendations_count = 4
+
     def get(self, request, course_id):
         """
-        Recommend courses based on amplitude recommendations.
-        Recommend program if user is enrolled-in any other course of program.
+        Returns
+            - Amplitude course recommendations
+            - Upsell program if the requesting course has a related program
         """
         if not enable_course_about_page_recommendations():
-            return Response("Recommendations not found", status=404)
+            return Response(status=404)
 
         if is_enterprise_learner(request.user):
             raise PermissionDenied()
 
-        recommendation_count = 4
-        course_key = course_id
-        split_course_key = course_key.split(":")[-1]
-        split_course_id = split_course_key.split("+")[:2]
-        course_id = f"{split_course_id[0]}+{split_course_id[1]}"
+        user = request.user
+        course_locator = CourseKey.from_string(course_id)
+        course_key = f'{course_locator.org}+{course_locator.course}'
 
         try:
             is_control, has_is_control, course_keys = get_amplitude_course_recommendations(
-                request.user.id, settings.COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID
+                user.id, settings.COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID
             )
         except Exception as err:  # pylint: disable=broad-except
-            log.info(f"Amplitude API failed due to: {err}")
-            return Response("Recommendations not found", status=404)
+            log.warning(f"Amplitude API failed for {user.id} due to: {err}")
+            return Response(status=404)
 
         is_control = is_control if has_is_control else None
 
         ip_address = get_client_ip(request)[0]
         user_country_code = country_code_from_ip(ip_address).upper()
         filtered_courses = filter_recommended_courses(
-            request.user, course_keys, user_country_code=user_country_code, request_course=course_id,
+            request.user, course_keys, user_country_code=user_country_code, request_course=course_key,
         )
-        recommended_courses = map(course_data_for_discovery_card, filtered_courses)
-        recommended_courses = recommended_courses[:recommendation_count]
+
+        recommended_courses = []
+        for course in filtered_courses:
+            course_data = course_data_for_discovery_card(course)
+            if course_data:
+                recommended_courses.append(course_data)
+
+            if len(recommended_courses) == self.recommendations_count:
+                break
 
         return Response({"is_control": is_control, "courses": recommended_courses}, status=200)
