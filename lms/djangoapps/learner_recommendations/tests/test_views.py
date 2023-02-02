@@ -173,7 +173,9 @@ class TestAmplitudeRecommendationsView(APITestCase):
                 "key": course_key,
                 "uuid": "4f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
                 "title": f"Title for {course_key}",
-                "image": "https://www.logo_image_url.com",
+                "image": {
+                    "src": "https://www.logo_image_url.com",
+                },
                 "url_slug": "https://www.marketing_url.com",
                 "owners": [
                     {
@@ -255,7 +257,7 @@ class TestAmplitudeRecommendationsView(APITestCase):
         response_content = json.loads(response.content)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_content.get("is_control"), False)
+        self.assertEqual(response_content.get("isControl"), False)
         self.assertEqual(
             len(response_content.get("courses")), expected_recommendations_length
         )

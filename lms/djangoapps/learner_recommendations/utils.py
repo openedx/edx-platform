@@ -85,42 +85,14 @@ def _has_country_restrictions(product, user_country):
     return user_country in block_list or (bool(allow_list) and user_country not in allow_list)
 
 
-def _parse_course_owner_data(owner):
-    """
-    Helper to parse course owner data.
-    """
-    return {
-        "key": owner.get("key"),
-        "name": owner.get("name"),
-        "logo_image_url": owner.get("logo_image_url"),
-    }
-
-
-def course_data_for_discovery_card(course_data):
-    """Helper method to prepare data for prospectus course card"""
-    recommended_course_data = {}
+def get_active_course_run(course_data):
+    """Helper method to get course active run"""
     active_course_runs = [
         course_run
         for course_run in course_data.get("course_runs", [])
         if course_run.get("availability") == "Current"
     ]
-
-    if active_course_runs:
-        owners = list(map(_parse_course_owner_data, course_data.get("owners")))
-        recommended_course_data.update({
-            "uuid": course_data.get("uuid"),
-            "title": course_data.get("title"),
-            "image": course_data.get("image"),
-            "owners": owners,
-            "prospectus_path": f"courses/{course_data.get('url_slug')}",
-            "active_course_run": {
-                "key": active_course_runs[0].get("key"),
-                "type": "Active",
-                "marketing_url": active_course_runs[0].get("marketing_url"),
-            }
-        })
-
-    return recommended_course_data
+    return active_course_runs[0] if active_course_runs else []
 
 
 def get_algolia_courses_recommendation(course_data):
