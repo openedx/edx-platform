@@ -12,7 +12,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import format_social_link, validate_social_link
 
@@ -84,10 +84,10 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
         """
         course = CourseFactory.create()
         with self.store.bulk_operations(course.id):
-            self.chapter = ItemFactory.create(category='chapter', parent=course)
-            self.sequential = ItemFactory.create(category='sequential', parent=self.chapter)
-            self.vertical1 = ItemFactory.create(category='vertical', parent=self.sequential)
-            self.vertical2 = ItemFactory.create(category='vertical', parent=self.sequential)
+            self.chapter = BlockFactory.create(category='chapter', parent=course)
+            self.sequential = BlockFactory.create(category='sequential', parent=self.chapter)
+            self.vertical1 = BlockFactory.create(category='vertical', parent=self.sequential)
+            self.vertical2 = BlockFactory.create(category='vertical', parent=self.sequential)
 
         if hasattr(self, 'user_one'):
             CourseEnrollment.enroll(self.engaged_user, course.id)

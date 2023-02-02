@@ -22,7 +22,7 @@ from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.model_data import StudentModule
@@ -138,13 +138,13 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         Add a chapter and a sequential to the current course.
         """
         # Add a chapter to the course
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             display_name=TEST_CHAPTER_NAME,
         )
 
         # add a sequence to the course to which the problems can be added
-        self.problem_section = ItemFactory.create(
+        self.problem_section = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             metadata={'graded': True, 'format': 'Homework'},
@@ -235,12 +235,12 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         factory = OptionResponseXMLFactory()
         factory_args = self._option_problem_factory_args()
         problem_xml = factory.build_xml(**factory_args)
-        return ItemFactory.create(parent_location=parent.location,
-                                  parent=parent,
-                                  category="problem",
-                                  display_name=problem_url_name,
-                                  data=problem_xml,
-                                  **kwargs)
+        return BlockFactory.create(parent_location=parent.location,
+                                   parent=parent,
+                                   category="problem",
+                                   display_name=problem_url_name,
+                                   data=problem_xml,
+                                   **kwargs)
 
     def redefine_option_problem(self, problem_url_name, correct_answer=OPTION_1, num_inputs=1, num_responses=2):
         """Change the problem definition so the answer is Option 2"""

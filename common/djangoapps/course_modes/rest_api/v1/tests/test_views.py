@@ -2,12 +2,9 @@
 Tests for the course modes API.
 """
 
-
 import json
-import unittest
 
 import ddt
-from django.conf import settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
@@ -18,6 +15,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.user_authn.tests.utils import JWT_AUTH_TYPES, AuthAndScopesTestMixin, AuthType
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -94,7 +92,7 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
         assert status.HTTP_200_OK == resp.status_code
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, APITestCase):
     """
     Tests for the course modes list/create API endpoints.
@@ -238,7 +236,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
         assert 0 == CourseMode.objects.filter(course_id=self.course_key, mode_slug='phd').count()
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
     """
     Tests for the course modes retrieve/update/delete API endpoints.

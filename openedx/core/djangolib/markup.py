@@ -53,7 +53,7 @@ def strip_all_tags_but_br(string_to_strip):
         string_to_strip = ""
 
     string_to_strip = decode.utf8(string_to_strip)
-    string_to_strip = bleach.clean(string_to_strip, tags=['br'], strip=True)
+    string_to_strip = bleach.clean(string_to_strip, tags={'br'}, strip=True)
 
     return HTML(string_to_strip)
 

@@ -13,19 +13,18 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.toggles import show_fallback_recommendations
 from common.djangoapps.track import segment
 from lms.djangoapps.learner_home.recommendations.serializers import (
     CourseRecommendationSerializer,
 )
-from lms.djangoapps.learner_home.recommendations.utils import (
-    get_personalized_course_recommendations,
-)
 from lms.djangoapps.learner_home.recommendations.waffle import (
     should_show_learner_home_amplitude_recommendations,
 )
-from openedx.core.djangoapps.catalog.utils import get_course_data
+from lms.djangoapps.learner_recommendations.utils import (
+    filter_recommended_courses,
+    get_amplitude_course_recommendations,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -54,11 +53,12 @@ class CourseRecommendationApiView(APIView):
             return Response(status=404)
 
         user_id = request.user.id
-        recommended_courses = []
         fallback_recommendations = settings.GENERAL_RECOMMENDATIONS if show_fallback_recommendations() else []
 
         try:
-            is_control, has_is_control, course_keys = get_personalized_course_recommendations(user_id)
+            is_control, has_is_control, course_keys = get_amplitude_course_recommendations(
+                user_id, settings.DASHBOARD_AMPLITUDE_RECOMMENDATION_ID
+            )
         except Exception as ex:  # pylint: disable=broad-except
             logger.warning(f"Cannot get recommendations from Amplitude: {ex}")
             return self._general_recommendations_response(user_id, None, fallback_recommendations)
@@ -67,36 +67,14 @@ class CourseRecommendationApiView(APIView):
         if is_control or is_control is None or not course_keys:
             return self._general_recommendations_response(user_id, is_control, fallback_recommendations)
 
-        user_enrolled_course_keys = set()
-        fields = ["title", "owners", "marketing_url"]
-
-        course_enrollments = CourseEnrollment.enrollments_for_user(request.user)
-        for course_enrollment in course_enrollments:
-            course_key = f"{course_enrollment.course_id.org}+{course_enrollment.course_id.course}"
-            user_enrolled_course_keys.add(course_key)
-
-        # Pick 5 course keys, excluding the user's already enrolled course(s).
-        enrollable_course_keys = [
-            course_key for course_key in course_keys if course_key not in user_enrolled_course_keys
-        ][:5]
-        for course_id in enrollable_course_keys:
-            course_data = get_course_data(course_id, fields)
-            if course_data:
-                recommended_courses.append(
-                    {
-                        "course_key": course_id,
-                        "title": course_data["title"],
-                        "logo_image_url": course_data["owners"][0]["logo_image_url"],
-                        "marketing_url": course_data.get("marketing_url"),
-                    }
-                )
-
+        filtered_courses = filter_recommended_courses(request.user, course_keys, recommendation_count=5)
         # If no courses are left after filtering already enrolled courses from
         # the list of amplitude recommendations, show general recommendations
         # to the user.
-        if not recommended_courses:
+        if not filtered_courses:
             return self._general_recommendations_response(user_id, is_control, fallback_recommendations)
 
+        recommended_courses = list(map(self._course_data, filtered_courses))
         self._emit_recommendations_viewed_event(user_id, is_control, recommended_courses)
         return Response(
             CourseRecommendationSerializer(
@@ -136,3 +114,13 @@ class CourseRecommendationApiView(APIView):
             ).data,
             status=200,
         )
+
+    def _course_data(self, course):
+        """Helper method for personalized recommendation response"""
+        return {
+            "course_key": course.get("key"),
+            "title": course.get("title"),
+            "logo_image_url": course.get("owners")[0]["logo_image_url"] if course.get(
+                "owners") else "",
+            "marketing_url": course.get("marketing_url"),
+        }

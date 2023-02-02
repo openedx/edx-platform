@@ -2,12 +2,9 @@
 Tests the transfer student management command
 """
 
-
-import unittest
 from unittest.mock import call, patch
 
 import ddt
-from django.conf import settings
 from django.core.management import call_command
 from opaque_keys.edx import locator
 
@@ -20,11 +17,12 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.student.signals import UNENROLL_DONE
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @ddt.ddt
 class TestTransferStudents(ModuleStoreTestCase):
     """

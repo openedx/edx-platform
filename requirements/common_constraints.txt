@@ -29,10 +29,6 @@ Django<4.0
 # elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
 elasticsearch<7.14.0
 
-# setuptools==60.0 had breaking changes and busted several service's pipeline.
-# Details can be found here: https://github.com/pypa/setuptools/issues/2940
-setuptools<60
-
 # django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
 django-simple-history==3.0.0
 

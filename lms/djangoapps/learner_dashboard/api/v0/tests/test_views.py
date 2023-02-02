@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import ddt
 from django.core.cache import cache
+from django.test import TestCase
 from django.urls import reverse_lazy
 from edx_toggles.toggles.testutils import override_waffle_flag
 from enterprise.models import EnterpriseCourseEnrollment
@@ -245,10 +246,9 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
 
 
 @ddt.ddt
-class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
+class TestCourseRecommendationApiView(TestCase):
     """Unit tests for the course recommendations on dashboard page."""
 
-    password = "test"
     url = reverse_lazy("learner_dashboard:v0:courses")
     GENERAL_RECOMMENDATIONS = [
         {
@@ -268,7 +268,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password="test")
         self.recommended_courses = [
             "MITx+6.00.1x",
             "IBM+PY0101EN",
@@ -282,16 +282,20 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
             "MichinX+101x",
         ]
         self.general_recommendation_courses = ["HogwartsX+6.00.1x", "MonstersX+SC101EN"]
-        self.course_data = {
-            "course_key": "MITx+6.00.1x",
-            "title": "Introduction to Computer Science and Programming Using Python",
-            "owners": [
-                {
-                    "logo_image_url": "https://discovery/organization/logos/2a73d2ce-c34a-4e08.png"
-                }
-            ],
-            "marketing_url": "https://marketing-site.com/course/introduction-to-computer-science-and-programming",
-        }
+
+    def _get_filtered_courses(self):
+        """
+        Returns the filtered course data
+        """
+        filtered_course = []
+        for course_key in self.recommended_courses[:5]:
+            filtered_course.append({
+                "key": course_key,
+                "title": f"Title for {course_key}",
+                "logo_image_url": "https://www.logo_image_url.com",
+                "marketing_url": "https://www.marketing_url.com",
+            })
+        return filtered_course
 
     @ddt.data(
         (True, GENERAL_RECOMMENDATIONS),
@@ -299,14 +303,14 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
     )
     @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations"
+        "lms.djangoapps.learner_dashboard.api.v0.views.get_amplitude_course_recommendations"
     )
     @ddt.unpack
     def test_amplitude_user_profile_call_failed(
         self,
         show_fallback_recommendations,
         expected_course_list,
-        mocked_get_personalized_course_recommendations,
+        get_amplitude_course_recommendations_mock,
     ):
         """
         Test that if the call to Amplitude user profile API fails, we return the
@@ -314,7 +318,7 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
 
         If the fallback recommendations are not configured, an empty course list is returned.
         """
-        mocked_get_personalized_course_recommendations.side_effect = Exception
+        get_amplitude_course_recommendations_mock.side_effect = Exception
         with override_waffle_flag(
             ENABLE_FALLBACK_RECOMMENDATIONS, active=show_fallback_recommendations
         ):
@@ -328,17 +332,17 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
     @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", GENERAL_RECOMMENDATIONS)
     @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.segment.track")
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations"
+        "lms.djangoapps.learner_dashboard.api.v0.views.get_amplitude_course_recommendations"
     )
     def test_amplitude_recommended_no_courses(
         self,
-        mocked_get_personalized_course_recommendations,
+        get_amplitude_course_recommendations_mock,
         segment_mock,
     ):
         """
         Verify API returns fallback recommendations if no courses are recommended by Amplitude.
         """
-        mocked_get_personalized_course_recommendations.return_value = [False, True, []]
+        get_amplitude_course_recommendations_mock.return_value = [False, True, []]
 
         with override_waffle_flag(ENABLE_FALLBACK_RECOMMENDATIONS, active=True):
             response = self.client.get(self.url)
@@ -362,24 +366,24 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
 
     @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.segment.track")
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations"
+        "lms.djangoapps.learner_dashboard.api.v0.views.get_amplitude_course_recommendations"
     )
-    @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.filter_recommended_courses")
     def test_get_course_recommendations(
         self,
-        mocked_get_course_data,
-        mocked_get_personalized_course_recommendations,
+        filter_recommended_courses_mock,
+        get_amplitude_course_recommendations_mock,
         segment_mock,
     ):
         """
         Verify API returns course recommendations for users that fall in non-control group.
         """
-        mocked_get_personalized_course_recommendations.return_value = [
+        filter_recommended_courses_mock.return_value = self._get_filtered_courses()
+        get_amplitude_course_recommendations_mock.return_value = [
             False,
             True,
             self.recommended_courses,
         ]
-        mocked_get_course_data.return_value = self.course_data
         expected_recommendations = 5
 
         response = self.client.get(self.url)
@@ -394,63 +398,8 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
             {
                 "is_control": False,
                 "amplitude_recommendations": True,
-                "course_key_array": self.recommended_courses[:5],
-            },
-        )
-
-    @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.segment.track")
-    @mock.patch(
-        "lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations"
-    )
-    @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.get_course_data")
-    def test_get_enrollable_course_recommendations(
-        self,
-        mocked_get_course_data,
-        mocked_get_personalized_course_recommendations,
-        segment_mock,
-    ):
-        """
-        Verify API returns course recommendations for courses in which user is not enrolled.
-        """
-        mocked_get_personalized_course_recommendations.return_value = [
-            False,
-            True,
-            self.recommended_courses,
-        ]
-        mocked_get_course_data.return_value = self.course_data
-
-        recommended_courses = [
-            "HarvardX+CS50x",
-            "BabsonX+EPS03x",
-            "NYUx+FCS.NET.1",
-            "MichinX+101x",
-        ]
-        course_keys = [
-            "course-v1:IBM+PY0101EN+Run_0",
-            "course-v1:UQx+IELTSx+Run_0",
-            "course-v1:MITx+6.00.1x+Run_0",
-            "course-v1:HarvardX+CS50P+Run_0",
-            "course-v1:Harvard+CS50z+Run_0",
-            "course-v1:TUMx+QPLS2x+Run_0",
-        ]
-
-        # enrolling in 6 courses
-        for course_key in course_keys:
-            CourseEnrollmentFactory(course_id=course_key, user=self.user)
-
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.get("is_control"), False)
-        self.assertEqual(len(response.data.get("courses")), len(recommended_courses))
-
-        # Verify that the segment event was fired
-        assert segment_mock.call_args[0][1] == "edx.bi.user.recommendations.viewed"
-        self.assertEqual(
-            segment_mock.call_args[0][2],
-            {
-                "is_control": False,
-                "amplitude_recommendations": True,
-                "course_key_array": recommended_courses,
+                "course_key_array": [course.get("key") for course in
+                                     self._get_filtered_courses()[:expected_recommendations]],
             },
         )
 
@@ -461,9 +410,9 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         (True, True, True),
     )
     @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.segment.track")
-    @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.filter_recommended_courses")
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.api.v0.views.get_personalized_course_recommendations"
+        "lms.djangoapps.learner_dashboard.api.v0.views.get_amplitude_course_recommendations"
     )
     @ddt.unpack
     def test_recommendations_viewed_segment_event(
@@ -471,16 +420,16 @@ class TestCourseRecommendationApiView(SharedModuleStoreTestCase):
         is_control,
         has_is_control,
         expected_is_control,
-        mocked_get_personalized_course_recommendations,
-        mocked_get_course_data,
+        get_amplitude_course_recommendations_mock,
+        filter_recommended_courses_mock,
         segment_mock,
     ):
-        mocked_get_personalized_course_recommendations.return_value = [
+        filter_recommended_courses_mock.return_value = self._get_filtered_courses()
+        get_amplitude_course_recommendations_mock.return_value = [
             is_control,
             has_is_control,
             self.recommended_courses,
         ]
-        mocked_get_course_data.return_value = self.course_data
         self.client.get(self.url)
 
         assert segment_mock.call_count == 1

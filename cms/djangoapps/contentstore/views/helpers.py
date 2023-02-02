@@ -200,7 +200,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         if display_name is not None:
             metadata['display_name'] = display_name
 
-        # We should use the 'fields' kwarg for newer module settings/values (vs. metadata or data)
+        # We should use the 'fields' kwarg for newer block settings/values (vs. metadata or data)
         fields = {}
 
         # Entrance Exams: Chapter module positioning

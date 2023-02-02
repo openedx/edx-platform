@@ -80,14 +80,14 @@ class _CourseGradeReportContext:
     boundaries.
     """
 
-    def __init__(self, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    def __init__(self, _xblock_instance_args, _entry_id, course_id, _task_input, action_name):
         self.task_info_string = (
             'Task: {task_id}, '
             'InstructorTask ID: {entry_id}, '
             'Course: {course_id}, '
             'Input: {task_input}'
         ).format(
-            task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+            task_id=_xblock_instance_args.get('task_id') if _xblock_instance_args is not None else None,
             entry_id=_entry_id,
             course_id=course_id,
             task_input=_task_input,
@@ -171,8 +171,8 @@ class _ProblemGradeReportContext:
     boundaries.
     """
 
-    def __init__(self, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
-        task_id = _xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None
+    def __init__(self, _xblock_instance_args, _entry_id, course_id, _task_input, action_name):
+        task_id = _xblock_instance_args.get('task_id') if _xblock_instance_args is not None else None
         self.task_info_string = (
             'Task: {task_id}, '
             'InstructorTask ID: {entry_id}, '
@@ -513,12 +513,12 @@ class CourseGradeReport(GradeReportBase):
     USER_BATCH_SIZE = 100
 
     @classmethod
-    def generate(cls, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    def generate(cls, _xblock_instance_args, _entry_id, course_id, _task_input, action_name):
         """
         Public method to generate a grade report.
         """
         with modulestore().bulk_operations(course_id):
-            context = _CourseGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
+            context = _CourseGradeReportContext(_xblock_instance_args, _entry_id, course_id, _task_input, action_name)
             if use_on_disk_grade_reporting(course_id):  # AU-926
                 return TempFileCourseGradeReport(context)._generate()  # pylint: disable=protected-access
             else:
@@ -712,12 +712,12 @@ class ProblemGradeReport(GradeReportBase):
     """
 
     @classmethod
-    def generate(cls, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    def generate(cls, _xblock_instance_args, _entry_id, course_id, _task_input, action_name):
         """
         Public method to generate a grade report.
         """
         with modulestore().bulk_operations(course_id):
-            context = _ProblemGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
+            context = _ProblemGradeReportContext(_xblock_instance_args, _entry_id, course_id, _task_input, action_name)
             if use_on_disk_grade_reporting(course_id):  # AU-926
                 return TempFileProblemGradeReport(context)._generate()  # pylint: disable=protected-access
             else:
@@ -960,7 +960,7 @@ class ProblemResponses:
         return student_data, student_data_keys_list
 
     @classmethod
-    def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
+    def generate(cls, _xblock_instance_args, _entry_id, course_id, task_input, action_name):
         """
         For a given `course_id`, generate a CSV file containing
         all student answers to a given problem, and store using a `ReportStore`.

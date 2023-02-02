@@ -1,5 +1,5 @@
 """
-Tests for the Split Testing Module
+Tests for the Split Testing Block
 """
 import json
 from unittest.mock import Mock, patch
@@ -35,7 +35,7 @@ class SplitTestBlockFactory(xml.XmlImportFactory):
 
 class SplitTestUtilitiesTest(PartitionTestCase):
     """
-    Tests for utility methods related to split_test module.
+    Tests for utility methods related to split_test block.
     """
 
     def test_split_user_partitions(self):
@@ -124,7 +124,7 @@ class SplitTestBlockTest(XModuleXmlImportTest, PartitionTestCase):
         # view, since mock services exist and the rendering code will not short-circuit.
         mocked_modulestore = Mock()
         mocked_modulestore.get_course.return_value = self.course
-        self.split_test_block.system.modulestore = mocked_modulestore
+        self.split_test_block.runtime.modulestore = mocked_modulestore
 
 
 @ddt.ddt
@@ -239,7 +239,7 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
         mocked_course = Mock(advanced_modules=['split_test'])
         mocked_modulestore = Mock()
         mocked_modulestore.get_course.return_value = mocked_course
-        self.split_test_block.system.modulestore = mocked_modulestore
+        self.split_test_block.runtime.modulestore = mocked_modulestore
 
         self.split_test_block.user_partitions = [
             UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')])
@@ -585,7 +585,7 @@ class SplitTestBlockExportImportTest(MixedSplitTestCase):
         # And compare.
         assert exported_olx == expected_olx
 
-        runtime = TestImportSystem(load_error_modules=True, course_id=split_test_block.location.course_key)
+        runtime = TestImportSystem(load_error_blocks=True, course_id=split_test_block.location.course_key)
         runtime.resources_fs = export_fs
 
         # Now import it.

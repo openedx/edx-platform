@@ -852,7 +852,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     @strip_key
     def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):
         """
-        Create the new xmodule but don't save it. Returns the new module.
+        Create the new xblock but don't save it. Returns the new block.
 
         Args:
             runtime: :py:class `xblock.runtime` from another xblock in the same course. Providing this

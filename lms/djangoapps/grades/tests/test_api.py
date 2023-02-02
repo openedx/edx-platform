@@ -9,7 +9,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.grades import api
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -41,7 +41,7 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
-        self.subsection = ItemFactory.create(parent=self.course, category="sequential", display_name="Subsection")
+        self.subsection = BlockFactory.create(parent=self.course, category="sequential", display_name="Subsection")
         self.grade = PersistentSubsectionGrade.update_or_create_grade(
             user_id=self.user.id,
             course_id=self.course.id,

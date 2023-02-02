@@ -1521,6 +1521,11 @@ BRANCH_IO_KEY = ''
 OPTIMIZELY_PROJECT_ID = None
 OPTIMIZELY_FULLSTACK_SDK_KEY = None
 
+######################## ALGOLIA SEARCH ###########################
+ALGOLIA_APP_ID = None
+ALGOLIA_SEARCH_API_KEY = None
+ALGOLIA_COURSES_RECOMMENDATION_INDEX_NAME = ''
+
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 
@@ -4763,7 +4768,8 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 ### SETTINGS FOR AMPLITUDE ####
 AMPLITUDE_URL = ''
 AMPLITUDE_API_KEY = ''
-REC_ID = ''
+DASHBOARD_AMPLITUDE_RECOMMENDATION_ID = ''
+COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID = ''
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
 
@@ -4909,13 +4915,6 @@ DISCUSSIONS_MICROFRONTEND_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the discussions micro-frontend google form based feedback.
 DISCUSSIONS_MFE_FEEDBACK_URL = None
-# .. setting_name: LEARNER_RECORD_MFE_URL
-# .. setting_default: None
-# .. setting_description: Base URL of the micro-frontend responsible for displaying Learner Record and Program record
-#     pages. This MFE replaces the legacy frontend originally offered in the Credentials IDA.
-# .. setting_warning: In order to route requests to the MFE correctly you must also create and enable the credentials
-#     app's `USE_LEARNER_RECORD_MFE` waffle flag. See openedx/core/djangoapps/credentials/config.py.
-LEARNER_RECORD_MICROFRONTEND_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -4970,6 +4969,8 @@ HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
+
+LEARNER_HOME_MFE_REDIRECT_PERCENTAGE = 0
 
 ############### Settings for the ace_common plugin #################
 # Note that all settings are actually defined by the plugin

@@ -12,7 +12,7 @@ from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.access import has_access
@@ -69,28 +69,28 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
             course.save()
 
             # create chapter
-            cls.chapter1 = ItemFactory.create(
+            cls.chapter1 = BlockFactory.create(
                 parent=course,
                 category='chapter',
                 display_name='chapter 1'
             )
 
             # create sequentials
-            cls.seq1 = ItemFactory.create(
+            cls.seq1 = BlockFactory.create(
                 parent=cls.chapter1,
                 category='sequential',
                 display_name='gating sequential 1',
                 graded=True,
                 format='Homework',
             )
-            cls.seq2 = ItemFactory.create(
+            cls.seq2 = BlockFactory.create(
                 parent=cls.chapter1,
                 category='sequential',
                 display_name='gated sequential 2',
                 graded=True,
                 format='Homework',
             )
-            cls.seq3 = ItemFactory.create(
+            cls.seq3 = BlockFactory.create(
                 parent=cls.chapter1,
                 category='sequential',
                 display_name='sequential 3',
@@ -99,7 +99,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
             )
 
             # create problem
-            cls.gating_prob1 = ItemFactory.create(
+            cls.gating_prob1 = BlockFactory.create(
                 parent=cls.seq1,
                 category='problem',
                 display_name='gating problem 1',
@@ -107,7 +107,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
             # add a discussion block to the prerequisite subsection
             # this should give us ability to test gating with blocks
             # which needs to be excluded from completion tracking
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=cls.seq1,
                 category="discussion",
                 discussion_id="discussion 1",
@@ -115,12 +115,12 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
                 discussion_target="discussion target",
             )
 
-            cls.gated_prob2 = ItemFactory.create(
+            cls.gated_prob2 = BlockFactory.create(
                 parent=cls.seq2,
                 category='problem',
                 display_name='gated problem 2',
             )
-            cls.prob3 = ItemFactory.create(
+            cls.prob3 = BlockFactory.create(
                 parent=cls.seq3,
                 category='problem',
                 display_name='problem 3',

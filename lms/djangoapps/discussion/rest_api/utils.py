@@ -274,22 +274,27 @@ def create_topics_v3_structure(blocks, topics):
 
 def remove_empty_sequentials(data):
     """
-    Removes all objects of type "sequential" from a nested list of objects if they have no children.
-
+    Removes all objects of type "sequential" from a nested list of objects if they
+    have no children.
+    After removing the empty sequentials, if the parent of the sequential is now empty,
+    it will also be removed.
     Parameters:
     data (list): A list of nested objects to check and remove empty sequentials from.
 
     Returns:
     list: The modified list with empty sequentials removed.
     """
-
     new_data = []
     for obj in data:
         block_type = obj.get('type')
         if block_type != 'sequential' or (block_type == 'sequential' and obj.get('children')):
-            new_data.append(obj)
             if obj.get('children'):
                 obj['children'] = remove_empty_sequentials(obj['children'])
+                if obj['children'] or block_type != 'chapter':
+                    new_data.append(obj)
+            else:
+                if block_type != 'chapter':
+                    new_data.append(obj)
     return new_data
 
 

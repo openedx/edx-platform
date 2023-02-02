@@ -11,7 +11,7 @@ from cms.djangoapps.contentstore.management.commands.force_publish import Comman
 from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestForcePublish(SharedModuleStoreTestCase):
@@ -85,7 +85,7 @@ class TestForcePublishModifications(ModuleStoreTestCase):
         Test 'force_publish' command
         """
         # Add some changes to course
-        chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
+        chapter = BlockFactory.create(category='chapter', parent_location=self.course.location)
         self.store.create_child(
             self.test_user_id,
             chapter.location,

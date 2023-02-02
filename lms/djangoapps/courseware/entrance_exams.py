@@ -58,15 +58,15 @@ def user_has_passed_entrance_exam(user, course):
 
 def get_entrance_exam_content(user, course):
     """
-    Get the entrance exam content information (ie, chapter module)
+    Get the entrance exam content information (ie, chapter block)
     """
     required_content = get_required_content(course.id, user)
 
-    exam_module = None
+    exam_block = None
     for content in required_content:
         usage_key = UsageKey.from_string(content).map_into_course(course.id)
-        module_item = modulestore().get_item(usage_key)
-        if not module_item.hide_from_toc and module_item.is_entrance_exam:
-            exam_module = module_item
+        block = modulestore().get_item(usage_key)
+        if not block.hide_from_toc and block.is_entrance_exam:
+            exam_block = block
             break
-    return exam_module
+    return exam_block

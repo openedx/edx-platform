@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-04 19:13+0000\n"
-"PO-Revision-Date: 2023-01-04 19:13:57.533935\n"
+"POT-Creation-Date: 2023-01-29 20:35+0000\n"
+"PO-Revision-Date: 2023-01-29 20:35:52.665617\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -51,7 +51,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/item.py xmodule/html_block.py
+#: cms/djangoapps/contentstore/views/block.py xmodule/html_block.py
 msgid "Text"
 msgstr "Ŧǝxʇ"
 
@@ -2168,8 +2168,8 @@ msgid "Cookie Policy"
 msgstr "Ȼøøʞᴉǝ Ᵽølᴉɔʎ"
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Data"
-msgstr "Đø Nøʇ Sǝll Mʎ Ᵽǝɹsønɐl Đɐʇɐ"
+msgid "Do Not Sell My Personal Information"
+msgstr "Đø Nøʇ Sǝll Mʎ Ᵽǝɹsønɐl Ɨnɟøɹɯɐʇᴉøn"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -13030,64 +13030,64 @@ msgstr "Søɯǝ ɔɥnnʞs ɯᴉssǝd dnɹᴉnƃ ɟᴉlǝ ndløɐd. Ᵽlǝɐsǝ �
 msgid "File upload failed. Please try again"
 msgstr "Fᴉlǝ ndløɐd ɟɐᴉlǝd. Ᵽlǝɐsǝ ʇɹʎ ɐƃɐᴉn"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr "Łᴉbɹɐɹᴉǝs ɔɐnnøʇ ɥɐʌǝ ɯøɹǝ ʇɥɐn {limit} ɔøɯdønǝnʇs"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Invalid data"
 msgstr "Ɨnʌɐlᴉd dɐʇɐ"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Invalid data ({details})"
 msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_type} ᴉnʇø {target_parent_type}."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Item is already present in target location."
 msgstr "Ɨʇǝɯ ᴉs ɐlɹǝɐdʎ dɹǝsǝnʇ ᴉn ʇɐɹƃǝʇ løɔɐʇᴉøn."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into itself."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇsǝlɟ."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into it's child."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇ's ɔɥᴉld."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item directly into content experiment."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ dᴉɹǝɔʇlʎ ᴉnʇø ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{source_usage_key} not found in {parent_usage_key}."
 msgstr "{source_usage_key} nøʇ ɟønnd ᴉn {parent_usage_key}."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "You can not move {source_usage_key} at an invalid index ({target_index})."
 msgstr ""
 "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_usage_key} ɐʇ ɐn ᴉnʌɐlᴉd ᴉndǝx ({target_index})."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "Ɏøn ɯnsʇ dɹøʌᴉdǝ ʇɐɹƃǝʇ_ᴉndǝx ({target_index}) ɐs ɐn ᴉnʇǝƃǝɹ."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
@@ -13095,7 +13095,7 @@ msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
@@ -13104,11 +13104,11 @@ msgstr ""
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "%"
 msgstr "%"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""
@@ -21238,6 +21238,22 @@ msgstr ""
 "snɹǝ ʇø ɹǝʌᴉǝʍ ɐnd ɹǝsǝʇ ɐll dɐʇǝs, ᴉnɔlndᴉnƃ ʇɥǝ Ȼønɹsǝ Sʇɐɹʇ Đɐʇǝ; sǝʇ nd "
 "ʇɥǝ ɔønɹsǝ ʇǝɐɯ; ɹǝʌᴉǝʍ ɔønɹsǝ nddɐʇǝs ɐnd øʇɥǝɹ ɐssǝʇs ɟøɹ dɐʇǝd ɯɐʇǝɹᴉɐl; "
 "ɐnd sǝǝd ʇɥǝ dᴉsɔnssᴉøns ɐnd ʍᴉʞᴉ."
+
+#: cms/templates/course_outline.html
+msgid ""
+"This course run is using an upgraded version of edx discussion forum. "
+"Discussion xblocks will no longer work."
+msgstr ""
+"Ŧɥᴉs ɔønɹsǝ ɹnn ᴉs nsᴉnƃ ɐn ndƃɹɐdǝd ʌǝɹsᴉøn øɟ ǝdx dᴉsɔnssᴉøn ɟøɹnɯ. "
+"Đᴉsɔnssᴉøn xbløɔʞs ʍᴉll nø lønƃǝɹ ʍøɹʞ."
+
+#: cms/templates/course_outline.html
+msgid " Learn more"
+msgstr " Łǝɐɹn ɯøɹǝ"
+
+#: cms/templates/course_outline.html
+msgid "Share feedback"
+msgstr "Sɥɐɹǝ ɟǝǝdbɐɔʞ"
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html

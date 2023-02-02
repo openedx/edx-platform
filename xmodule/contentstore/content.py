@@ -143,9 +143,9 @@ class StaticContent:  # lint-amnesty, pylint: disable=missing-class-docstring
             return AssetKey.from_string(path)
         except InvalidKeyError:
             # TODO - re-address this once LMS-11198 is tackled.
-            if path.startswith('/'):
+            if path.startswith('/') or path.endswith('/'):
                 # try stripping off the leading slash and try again
-                return AssetKey.from_string(path[1:])
+                return AssetKey.from_string(path.strip('/'))
 
     @staticmethod
     def is_versioned_asset_path(path):
