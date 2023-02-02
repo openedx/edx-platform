@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -33,7 +33,7 @@
 # Валентина Пицик <lushalusha007@gmail.com>, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -48,7 +48,7 @@
 # Валентина Пицик <lushalusha007@gmail.com>, 2019
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -80,7 +80,7 @@
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -99,7 +99,7 @@
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -112,9 +112,9 @@
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -124,7 +124,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2023-01-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Danylo Shcherbak <danylo.shcherbak@raccoongang.com>, 2020\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -137,7 +137,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/item.py xmodule/html_module.py
+#: cms/djangoapps/contentstore/views/block.py xmodule/html_block.py
 msgid "Text"
 msgstr "Текст"
 
@@ -163,7 +163,7 @@ msgid "Video"
 msgstr "Відео"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Advanced"
 msgstr "Додатково"
 
@@ -178,19 +178,19 @@ msgid "Unit"
 msgstr "Блок"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "Порожній"
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 #, python-brace-format
 msgid "The following parameters are required: {missing}."
 msgstr "Наступні параметри э обов'язковими: {missing}."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 msgid ""
 "There is a problem with this transcript file. Try to upload a different "
 "file."
@@ -199,14 +199,14 @@ msgstr ""
 "інший файл."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 #, python-brace-format
 msgid "A transcript with the \"{language_code}\" language code already exists."
 msgstr "Транскрипти з кодом мови \"{language_code}\" вже існують."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Необхідний файл транскрипту. "
 
@@ -217,7 +217,7 @@ msgid "Name"
 msgstr "Ім'я"
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video ID"
 msgstr "Ідентифікатор відео"
 
@@ -251,7 +251,7 @@ msgid "Log out"
 msgstr "Вихід"
 
 #: common/djangoapps/course_modes/admin.py
-#: common/djangoapps/course_modes/models.py xmodule/library_content_module.py
+#: common/djangoapps/course_modes/models.py xmodule/library_content_block.py
 msgid "Mode"
 msgstr "Режим"
 
@@ -303,12 +303,12 @@ msgstr "Ви записані як студент з вищою освітою"
 msgid "Professional Ed"
 msgstr "Професійна освіта"
 
-#: common/djangoapps/course_modes/models.py xmodule/annotatable_module.py
-#: xmodule/capa_module.py xmodule/conditional_module.py
-#: xmodule/discussion_block.py xmodule/html_module.py
-#: xmodule/library_content_module.py xmodule/library_sourced_block.py
-#: xmodule/lti_module.py xmodule/split_test_module.py xmodule/unit_block.py
-#: xmodule/word_cloud_module.py xmodule/x_module.py
+#: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
+#: xmodule/capa_block.py xmodule/conditional_block.py
+#: xmodule/discussion_block.py xmodule/html_block.py
+#: xmodule/library_content_block.py xmodule/library_sourced_block.py
+#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/word_cloud_block.py xmodule/x_module.py
 msgid "Display Name"
 msgstr "Назва, що відображається"
 
@@ -481,101 +481,19 @@ msgstr ""
 msgid "Disabled Account"
 msgstr "Заблокований обліковий запис"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "Чоловіча"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "Жіноча"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "Інше / Не бажаю вказувати"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "Кандидатський чи докторський ступінь"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "Магістр або спеціаліст"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "Диплом бакалавра"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "Диплом про освіту"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "Середня освіта"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "Професійно-технічна освіта"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "Початкова освіта"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "Немає формальної освіти"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "Інша освіта"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "{platform_name} сертифікат кодексу честі для курсу {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "Перевірений сертифікат {platform_name} для курсу {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr " Професійний сертифікат {platform_name} для курсу {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr " Сертифікат {platform_name} для курсу {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "Код ISO 639-1 для цієї мови."
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "Простір імен атрибута реєстрації на курс "
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "Назва атрибута реєстрації на курс"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "Значення атрибута  реєстрації на курс"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
@@ -583,15 +501,7 @@ msgstr ""
 "Проміжок часу після реєстрації на курс у мікросекундах, протягом якого "
 "користувачам можуть бути повернуті гроші. Типовим проміжком є 14 днів."
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "Ім'я UTM cookie"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "Ім'я affiliate сookie"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -599,31 +509,121 @@ msgid ""
 "is_verified, verification_date"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     course_id, username, mode"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "Чоловіча"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "Жіноча"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "Інше / Не бажаю вказувати"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "Кандидатський чи докторський ступінь"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "Магістр або спеціаліст"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "Диплом бакалавра"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "Диплом про освіту"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "Середня освіта"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "Професійно-технічна освіта"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "Початкова освіта"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "Немає формальної освіти"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "Інша освіта"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{platform_name} сертифікат кодексу честі для курсу {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "Перевірений сертифікат {platform_name} для курсу {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr " Професійний сертифікат {platform_name} для курсу {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr " Сертифікат {platform_name} для курсу {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "Код ISO 639-1 для цієї мови."
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "Ім'я UTM cookie"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "Ім'я affiliate сookie"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "Назва атрибута цього користувача."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "Значення атрибута цього користувача."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr "Вторинна адреса електронної пошти"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr ""
 "Вторинна адреса електронної пошти для відновлення пов'язаного аккаунту."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -631,14 +631,14 @@ msgid ""
 "that employee can login via third party authentication backend only."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     username, current_email, desired_email"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr ""
 
@@ -2113,6 +2113,10 @@ msgid "Help Center"
 msgstr "Центр допомоги"
 
 #: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
 msgid "Media Kit"
 msgstr "Пакет Медіафайлів"
 
@@ -2182,6 +2186,14 @@ msgstr "Філії"
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "Open edX"
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Information"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -4782,7 +4794,7 @@ msgstr ""
 "Зверніть увагу, що це поле ігнорується, якщо блок має властивість "
 "visible_to_staff_only."
 
-#: lms/djangoapps/lms_xblock/mixin.py xmodule/split_test_module.py
+#: lms/djangoapps/lms_xblock/mixin.py xmodule/split_test_block.py
 msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
@@ -5092,7 +5104,7 @@ msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr "Ви дійсно бажаєте скасувати вилучення для користувача \"%(username)s\"?"
 
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
-#: xmodule/capa_module.py cms/templates/index.html
+#: xmodule/capa_block.py cms/templates/index.html
 #: cms/templates/videos_index_pagination.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
@@ -8281,6 +8293,12 @@ msgstr ""
 msgid "No email address provided."
 msgstr "Не надано електронну адресу."
 
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
 msgid "Registration using {provider} has timed out."
@@ -8882,21 +8900,21 @@ msgstr "Увійти"
 msgid "Our mailing address is"
 msgstr "Наша поштова адреса - "
 
-#: xmodule/annotatable_module.py
+#: xmodule/annotatable_block.py
 msgid "XML data for the annotation"
 msgstr "XML-дані для анотації"
 
-#: xmodule/annotatable_module.py xmodule/capa_module.py
-#: xmodule/conditional_module.py xmodule/discussion_block.py
-#: xmodule/html_module.py xmodule/library_content_module.py
+#: xmodule/annotatable_block.py xmodule/capa_block.py
+#: xmodule/conditional_block.py xmodule/discussion_block.py
+#: xmodule/html_block.py xmodule/library_content_block.py
 #: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_module.py xmodule/unit_block.py
-#: xmodule/video_module/video_xfields.py xmodule/word_cloud_module.py
+#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
 msgstr "Відображена назва для цього компоненту. "
 
-#: xmodule/annotatable_module.py
+#: xmodule/annotatable_block.py
 msgid "Annotation"
 msgstr "Анотація"
 
@@ -8908,11 +8926,11 @@ msgstr "Неможливо переоцінити задачі з можливи
 msgid "Question {}"
 msgstr ""
 
-#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+#: xmodule/capa/capa_problem.py xmodule/capa_block.py
 msgid "Incorrect"
 msgstr "Неправильно"
 
-#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+#: xmodule/capa/capa_problem.py xmodule/capa_block.py
 msgid "Correct"
 msgstr "Правильно"
 
@@ -9077,7 +9095,7 @@ msgstr "Вірно:"
 msgid "Incorrect:"
 msgstr "Невірно:"
 
-#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+#: xmodule/capa/responsetypes.py xmodule/capa_block.py
 msgid "Answer"
 msgstr "Відповідь"
 
@@ -9347,19 +9365,19 @@ msgstr ""
 msgid "Invalid JSON response received from codejail api service."
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Blank Advanced Problem"
 msgstr "Звичайне завдання"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Кількість спроб, використаних студентом при виконанні завдання"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr "Максимальна кількість спроб"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines the number of times a student can try to answer this problem. If the"
 " value is not set, infinite attempts are allowed."
@@ -9367,21 +9385,21 @@ msgstr ""
 "Визначає, скільки разів студент може давати відповідь на завдання. Якщо "
 "значення не встановлено, надається необмежена кількість спроб."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Date that this problem is due by"
 msgstr "Термін здачі даного завдання"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr ""
 "Час, протягом якого будуть прийматися відповіді після закінчення терміну "
 "здачі завдання"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Show Results"
 msgstr "Показати результати"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to show whether a learner's answer to the problem is correct. "
 "Configured on the subsection."
@@ -9389,23 +9407,23 @@ msgstr ""
 "Визначає коли показувати чи правильно відповів студент на це завдання. "
 "Налаштовано у підрозділі."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Always"
 msgstr "Завжди"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Never"
 msgstr "Ніколи"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Past Due"
 msgstr "Пройшов термін здачі"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Show Answer"
 msgstr "Показати відповідь"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
@@ -9413,47 +9431,47 @@ msgstr ""
 "Визначає, коли відображати відповідь на завдання. У розширених налаштуваннях"
 " можна встановити значення за замовчуванням."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answered"
 msgstr "Надано відповідь"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Attempted or Past Due"
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Closed"
 msgstr "Зачинено"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Finished"
 msgstr "Закінчено"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Correct or Past Due"
 msgstr "Правильно або минув термін"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After Some Number of Attempts"
 msgstr "Після декількох спроб"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After All Attempts"
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After All Attempts or Correct"
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Attempted"
 msgstr "Зроблено спробу"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Show Answer: Number of Attempts"
 msgstr "Показати відповідь: Кількість спроб"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Number of times the student must attempt to answer the question before the "
 "Show Answer button appears."
@@ -9461,15 +9479,15 @@ msgstr ""
 "Кількість разів, коли студент повинен спробувати відповісти на запитання, "
 "перш ніж з'явиться кнопка \"Показати відповідь\"."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether to force the save button to appear on the page"
 msgstr "Умови відображення кнопки \"Зберегти\" на сторінці"
 
-#: xmodule/capa_module.py xmodule/library_content_module.py
+#: xmodule/capa_block.py xmodule/library_content_block.py
 msgid "Show Reset Button"
 msgstr "Показати кнопку скидання"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Determines whether a 'Reset' button is shown so the user may reset their "
 "answer. A default value can be set in Advanced Settings."
@@ -9478,11 +9496,11 @@ msgstr ""
 "можливість вiдрегулювати свою відповідь. Значення за замовчуванням можна "
 "встановити в Додаткові параметри"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr "Рандомізація"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to randomize the variables specified in the associated Python "
 "script. For problems that do not randomize values, specify \"Never\". "
@@ -9491,56 +9509,56 @@ msgstr ""
 "відповідному скрипті Python. Для завдань, які не використовують випадкові "
 "значення, вкажіть \"Ніколи\"."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "On Reset"
 msgstr "При Скиданні"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Per Student"
 msgstr "Зі студента"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "XML data for the problem"
 msgstr "Дані, пов'язані із завданням, у форматі XML"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the correctness of current student answers"
 msgstr "Словник, що визначає правильність поточних відповідей студентів"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary for maintaining the state of inputtypes"
 msgstr "Словник для збереження станів введених даних"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the current student responses"
 msgstr "Словник, що містить поточні відповіді студентів"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the current student score"
 msgstr "Довідник з поточним балом студента "
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether or not the answers have been saved since last submit"
 msgstr ""
 "Чи була збережена відповідь з момента останньої відправки на перевірку."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether the student has answered the problem"
 msgstr "Чи дав студент відповідь на завдання"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Random seed for this student"
 msgstr "Ініціалізація випадкового значення для даного студента"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Last submission time"
 msgstr "Час останньої здачі завдання"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Timer Between Attempts"
 msgstr "Час між спробами"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Seconds a student must wait between submissions for a problem with multiple "
 "attempts."
@@ -9548,11 +9566,11 @@ msgstr ""
 "Кількість секунд, яка повинно пройти між спробами, для завдань, в яких "
 "передбачено кілька спроб."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem Weight"
 msgstr "Вага завдання"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines the number of points each problem is worth. If the value is not set,"
 " each response field in the problem is worth one point."
@@ -9560,25 +9578,25 @@ msgstr ""
 "Визначає кількість балів за кожне завдання. Якщо значення не вказано, кожне "
 "поле для відповіді в завданні буде оцінюватися в один бал."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Markdown source of this module"
 msgstr "Мarkdown код цього модуля"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Source code for LaTeX and Word problems. This feature is not well-supported."
 msgstr ""
 "Код завдань у форматі LaTeX і Word. Дана функція підтримується не повністю."
 
-#: xmodule/capa_module.py xmodule/html_module.py
+#: xmodule/capa_block.py xmodule/html_block.py
 msgid "Enable LaTeX templates?"
 msgstr "Дозволити використання шаблонів LaTeX?"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
 msgstr "Ключ Matlab API"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
 "Service. This key is granted for exclusive use by this course for the "
@@ -9594,7 +9612,7 @@ msgstr ""
 "піддається ризику. Щоб отримати ключ для вашого курсу або повідомити про "
 "проблему, будь ласка, зв'яжіться з moocsupport@mathworks.com"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "We're sorry, there was an error with processing your request. Please try "
 "reloading your page and trying again."
@@ -9602,7 +9620,7 @@ msgstr ""
 "Приносимо вибачення, сталась помилка під час обробки вашого запиту. Будь "
 "ласка, спробуйте перезавантажити вашу сторінку та спробувати знову."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "The state of this problem has changed since you loaded this page. Please "
 "refresh your page."
@@ -9610,29 +9628,29 @@ msgstr ""
 "Стан цієї задачі було змінено з часу вашого останнього перегляду цієї "
 "сторінки. Будь ласка, оновіть сторінку."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answer ID"
 msgstr "ID відповіді"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Question"
 msgstr "Питання"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Correct Answer"
 msgstr "Правильна відповідь"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Submitting"
 msgstr "Відправлення на перевірку"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Warning: The problem has been reset to its initial state!"
 msgstr "Попередження: Задача була перевантажена у початковий стан!"
 
 #. Translators: Following this message, there will be a bulleted list of
 #. items.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "The problem's state was corrupted by an invalid submission. The submission "
 "consisted of:"
@@ -9640,7 +9658,7 @@ msgstr ""
 "Стан задачі був пошкоджений через некоректне завантаження. Завантаження "
 "складається з:"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "If this error persists, please contact the course staff."
 msgstr ""
 "Якщо ця помилка повторюватиметься, будь ласка, зв'яжіться із персоналом "
@@ -9651,7 +9669,7 @@ msgstr ""
 #. is a header for this hint, and {hint_text} is the text of the hint itself.
 #. This string is being passed to translation only for possible reordering of
 #. the placeholders.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
@@ -9659,12 +9677,12 @@ msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
 #. This text is shown in bold before the accompanying hint text.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "Підказка ({hint_num} з {hints_count}):"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "Your answers were previously saved. Click '{button_name}' to grade them."
@@ -9672,7 +9690,7 @@ msgstr ""
 "Ваші відповіді були збережені раніше. Натисніть '{button_name}', щоб оцінити"
 " їх."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
@@ -9681,7 +9699,7 @@ msgstr[1] "Невірно ({progress} балів)"
 msgstr[2] "Невірно ({progress} балів)"
 msgstr[3] "Невірно ({progress} балів)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
@@ -9690,7 +9708,7 @@ msgstr[1] "Вірно ({progress} балів)"
 msgstr[2] "Вірно ({progress} балів)"
 msgstr[3] "Вірно ({progress} балів)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
@@ -9699,31 +9717,31 @@ msgstr[1] "Частково вірно ({progress} балів)"
 msgstr[2] "Частково вірно ({progress} балів)"
 msgstr[3] "Частково вірно ({progress} балів)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Partially Correct"
 msgstr "Частково правильно"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answer submitted."
 msgstr "Відповідь відправлено."
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem is closed."
 msgstr "Задача закрита."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem must be reset before it can be submitted again."
 msgstr ""
 "Задача повинна бути скинута, перш ніж можна буде знову дати відповідь."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr "Ви повинні зачекати принаймні {wait} секунд між завантаженнями."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "You must wait at least {wait_secs} between submissions. {remaining_secs} "
@@ -9731,7 +9749,7 @@ msgid ""
 msgstr ""
 "Зачекайте принаймні {wait_secs} між спробами. Залишилося {remaining_secs}."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
@@ -9740,7 +9758,7 @@ msgstr[1] "{num_hour} години"
 msgstr[2] "{num_hour} годин"
 msgstr[3] "{num_hour} годин"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
@@ -9749,7 +9767,7 @@ msgstr[1] "{num_minute} хвилини"
 msgstr[2] "{num_minute} хвилин"
 msgstr[3] "{num_minute} хвилин"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
@@ -9758,15 +9776,15 @@ msgstr[1] "{num_second} секунди"
 msgstr[2] "{num_second} секунд"
 msgstr[3] "{num_second} секунд"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem needs to be reset prior to save."
 msgstr "Задача повинна бути перевантажена аби її зберегти."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Your answers have been saved."
 msgstr "Ваші відповіді були збережені."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "Your answers have been saved but not graded. Click '{button_name}' to grade "
@@ -9777,109 +9795,97 @@ msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "You cannot select Reset for a problem that is closed."
 msgstr "Не можливо скинути відповідь, тому що задача закрита."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "You must submit an answer before you can select Reset."
 msgstr "Ви повинні надіслати відповідь, перш ніж ви зможете зробити скидання."
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem's definition does not support rescoring."
 msgstr "Визначення задачі не передбачає переоцінювання."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem must be answered before it can be graded again."
 msgstr ""
 "Необхідно відповісти на задачу перед тим як вона може бути знову оціненою."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional"
 msgstr "Умовний"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "List of urls of children that are references to external modules"
 msgstr "Список URL-адрес нащадків, які є посиланнями на зовнішні модулі"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Source Components"
 msgstr "Джерельні компоненти"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional block. "
+"Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
-"Ідентифікатори місцезнаходження компонентів усіх вхідних компонентів, які "
-"використовуються для визначення того, чи буде відображатись користувачу "
-"вміст цього умовного модуля. Скопіюйте ідентифікатор місцезнаходження "
-"компонента в діалоговому вікні \"Налаштування\" в студіі."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional Attribute"
 msgstr "Умовний Атрібут"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
+"shown the content of this conditional block."
 msgstr ""
-"Атрибут вхідних компонентів, який визначає, чи буде відображатись учням "
-"зміст цього умовного модуля."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional Value"
 msgstr "Умовне значення"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
+" before a learner is shown the content of this conditional block."
 msgstr ""
-"Значення,  з яким повинен співпадати умовний атрибут компонентів джерела, "
-"щоб учнень побачив зміст цього умовного модуля."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Blocked Content Message"
 msgstr "Заблоковане змістовне повідомлення"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
+"show the content of this conditional block. Include {link} in the text of "
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
-"Повідомлення, яке показується учням, коли не всі умови виконуються для "
-"показу змісту цього умовного модуля. Додайте {link} до тексту повідомлення, "
-"щоб дати учням пряме посилання на потрібні підрозділи. Наприклад, \"Ви "
-"повинні виконати {link}, перш ніж отримати доступ до цього розділу\"."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 #, python-brace-format
 msgid "You must complete {link} before you can access this unit."
 msgstr ""
 "Ви повинні виконати {link}, перш ніж отримати доступ до цього розділу."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "This component has no source components configured yet."
 msgstr "Цей компонент ще не має налаштуваннь джерельних компонентів."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Configure list of sources"
 msgstr "Налаштувати перелік джерел"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "LTI Passports"
 msgstr "Реєстраційні дані LTI"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
 "\"id:client_key:client_secret\"."
@@ -9887,42 +9893,42 @@ msgstr ""
 "Введіть паспорти для LTI інструментів курсу у такому форматі: \"id: "
 "client_key: client_secret\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "List of Textbook objects with (title, url) for textbooks used in this course"
 msgstr ""
 "Список об'єктів Підручник (назва, посилання) для підручників, що "
 "використовуються в цьому курсі"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Slug that points to the wiki for this course"
 msgstr "Коротка назва, що вказує на Вікі даного курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that enrollment for this class is opened"
 msgstr "Дата початку зарахування для цього класу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that enrollment for this class is closed"
 msgstr "Дата завершення зарахування для цього класу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Start time when this module is visible"
 msgstr "Час, в який цей модуль стане вiдображатися"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that this class ends"
 msgstr "Дата закінчення цього класу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that certificates become available to learners"
 msgstr "Дата, коли сертифікати стають доступними учням"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Cosmetic Course Display Price"
 msgstr "Відображення вартості курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "The cost displayed to students for enrolling in the course. If a paid course"
 " registration price is set by an administrator in the database, that price "
@@ -9932,11 +9938,11 @@ msgstr ""
 "запис на курс встановлена адміністратором у базі даних, то вказана ціна буде"
 " відображатися замість цієї."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Advertised Start"
 msgstr "Оголошений початок курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the text that you want to use as the advertised starting time frame "
 "for the course, such as \"Winter 2018\". If you enter null for this value, "
@@ -9946,23 +9952,23 @@ msgstr ""
 " для курсу, наприклад \"Зима 2018\". Якщо нічого не вводити, буде "
 "використувана дата початку цього курсу."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Requisite Courses"
 msgstr "Попереднi Курси"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Requisite Course key if this course has a pre-requisite course"
 msgstr "Попередній ключовий курс, якщо цей курс має передумову"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Grading policy definition for this class"
 msgstr "Визначення політики оцінювання для даного класу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Show Calculator"
 msgstr "Показати калькулятор"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. When true, students can see the calculator in the "
 "course."
@@ -9970,27 +9976,27 @@ msgstr ""
 "Введіть \"true\" або \"false\". Якщо введено значення \"true\", студентам "
 "буде доступний калькулятор на сторінці курсу."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the name of the course as it should appear in the course list."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Display Name"
 msgstr "Відображувана назва курсу"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Course Editor"
 msgstr "Редактор курсу"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
 msgstr "Введіть спосіб редагування курсу (\"XML\" або \"Studio\")."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Survey URL"
 msgstr "Посилання на огляд курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the URL for the end-of-course survey. If your course does not have a "
 "survey, enter null."
@@ -9998,11 +10004,11 @@ msgstr ""
 "Введіть посилання на анкету для заповнення після проходження курсу. Якщо у "
 "вашому курсі не передбачена анкета, введіть \"null\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Blackout Dates"
 msgstr "Дати завершення обговорень"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter pairs of dates between which students cannot post to discussion "
 "forums. Inside the provided brackets, enter an additional set of square "
@@ -10023,11 +10029,11 @@ msgstr ""
 "відключення, виглядає таким чином, включаючи зовнішню пару квадратних дужок:"
 " [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", \" 2015-10-08 \"]]"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Topic Mapping"
 msgstr "Схема тем обговорення"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
@@ -10050,27 +10056,27 @@ msgstr ""
 "\"Lydian Mode\": {\"id\": \"i4x-UniversityX-MUS101-course-2015_T1\", "
 "\"default\": true}."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussions Plugin Settings"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Settings for discussions plugins."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Announcement Date"
 msgstr "Дата оголошення курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the date to announce your course."
 msgstr "Введіть дату, коли ваш курс буде оголошений."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Cohort Configuration"
 msgstr "Конфігурація когорту"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter policy keys and values to enable the cohort feature, define automated "
 "student assignment to groups, or identify any course-wide discussion topics "
@@ -10080,21 +10086,21 @@ msgstr ""
 "задати автоматичний розподіл слухачів на групи, або виділити які-небудь "
 "загальні теми обговорень курсу як приватні для членів групи."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Is New"
 msgstr "Новий курс"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, the course appears in the list of new courses,"
 " and a New! badge temporarily appears next to the course image."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Mobile Course Available"
 msgstr "Доступність мобільних курсів"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, the course will be available to mobile "
 "devices."
@@ -10102,48 +10108,48 @@ msgstr ""
 "Введіть \"true\" або \"false\". Якщо введено значення \"true\", курс буде "
 "доступний на мобільних пристроях."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Video Upload Credentials"
 msgstr "Дані відео завантаження"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Enter the unique identifier for your course's video files provided by "
 "{platform_name}."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Not Graded"
 msgstr "Курс не оцінюється"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter true or false. If true, the course will not be graded."
 msgstr "Введіть \"true\" або \"false\". Якщо \"true\", то курс не буде оцінюватися."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Disable Progress Graph"
 msgstr "Прибрати діаграму прогресу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter true or false. If true, students cannot view the progress graph."
 msgstr ""
 "Введіть \"true\" або \"false\". Якщо \"true\", студентам буде недоступна "
 "діаграма прогресу."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "PDF Textbooks"
 msgstr "Підручники в форматі PDF"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "List of dictionaries containing pdf_textbook configuration"
 msgstr "Список словників, що містять конфігурацію pdf_textbook"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "HTML Textbooks"
 msgstr "Підручники у форматі HTML"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "For HTML textbooks that appear as separate tabs in the course, enter the "
 "name of the tab (usually the title of the book) as well as the URLs and "
@@ -10153,11 +10159,11 @@ msgstr ""
 "програмі, введіть назву вкладки (як правило, назву книги), а також URL-"
 "адреси та назви всіх розділів книги."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Remote Gradebook"
 msgstr "Дистанційний журнал оцінок"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the remote gradebook mapping. Only use this setting when "
 "REMOTE_GRADEBOOK_URL has been specified."
@@ -10170,7 +10176,7 @@ msgstr ""
 #. a role created by a course Instructor to enable a person (the "Coach") to
 #. manage the custom course for
 #. his students.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable CCX"
 msgstr "Включить CCX"
 
@@ -10179,7 +10185,7 @@ msgstr "Включить CCX"
 #. a role created by a course Instructor to enable a person (the "Coach") to
 #. manage the custom course for
 #. his students.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
@@ -10189,11 +10195,11 @@ msgstr ""
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
 #. course content.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "CCX Connector URL"
 msgstr "URL для CCX Connector"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "URL for CCX Connector application for managing creation of CCXs. (optional)."
 " Ignored unless 'Enable CCX' is set to 'true'."
@@ -10201,11 +10207,11 @@ msgstr ""
 "URL-адреса програми CCX Connector (необов'язково). Щоб дозволити "
 "використання CCX встановіть значення «Дозволити CCX» в true."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Anonymous Discussion Posts"
 msgstr "Дозволити анонімні повідомлення в обговореннях"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to all users."
@@ -10213,11 +10219,11 @@ msgstr ""
 "Введіть true або false. Якщо true, студенти можуть створювати повідомлення "
 "для обговорення, анонімні для всіх користувачів."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Anonymous Discussion Posts to Peers"
 msgstr "Дозволити анонімні повідомлення в обговореннях для однокурсників"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to other students. This setting does not make posts anonymous to "
@@ -10227,16 +10233,16 @@ msgstr ""
 "які відображаються для інших студентів, як анонімні. Це налаштування не "
 "дозволяє робити пости анонімними для персоналу курсу."
 
-#: xmodule/course_module.py xmodule/library_root_xblock.py
+#: xmodule/course_block.py xmodule/library_root_xblock.py
 msgid "Advanced Module List"
 msgstr "Список додаткових модулів"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the names of the advanced modules to use in your course."
 msgstr ""
 "Введіть назви додаткових модулів, які використовуватимуться у вашому курсі."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
@@ -10245,11 +10251,11 @@ msgstr ""
 "курсів. При наявності due_date_display_format цей параметр не "
 "використовується."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Due Date Display Format"
 msgstr "Формат відображення терміну кінцевої дати"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the format for due dates. The default is Mon DD, YYYY. Enter "
 "\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
@@ -10259,21 +10265,21 @@ msgstr ""
 "\"%m-1 %d-%Y\" для MM-DD-YYYY, \"1 %d-%m-%Y\" для DD-MM-YYYY, \"%Y-%m-1 "
 "%d\"\" для РРРР-ММ- DD, або \"%Y- 1 %d-%m\" \" для РРРР-ДД-ММ."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "External Login Domain"
 msgstr "Зовнішній метод входу на курс"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the external login method students can use for the course."
 msgstr ""
 "Введіть зовнішній метод входу, який студенти можуть використовувати для "
 "курсу."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificates Downloadable Before End"
 msgstr "Можливість скачування сертифікатів до закінчення курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can download certificates before the "
 "course ends, if they've met certificate requirements."
@@ -10281,21 +10287,21 @@ msgstr ""
 "Введіть true або false. Якщо встановлено значення true, то слухачі зможуть "
 "отримати сертифікати до закінчення курсу за умови виконання вимог."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificates Display Behavior"
 msgstr "Умови відображення сертифікатів"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "This field, together with certificate_available_date will determine when a "
 "user can see their certificate for the course"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course About Page Image"
 msgstr "Зображення для сторінки \"Про курс\""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the course image file. You must upload this file on the "
 "Files & Uploads page. You can also set the course image on the Settings & "
@@ -10305,11 +10311,11 @@ msgstr ""
 "цей файл на сторінці \"Файли та завантаження\". Ви також можете обрати "
 "емблему курсу на сторінці \"Налаштування і деталі курсу\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Banner Image"
 msgstr "Титульне зображення курсу "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the banner image file. You can set the banner image on the "
 "Settings & Details page."
@@ -10317,11 +10323,11 @@ msgstr ""
 "Редагувати ім'я файла зображення заголовка. Ви можете завантажити зображення"
 " заголовка за допомогою сторінки Налаштування і Деталі."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Video Thumbnail Image"
 msgstr "Мiнiaтюрне зображення відео курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the video thumbnail image file. You can set the video "
 "thumbnail image on the Settings & Details page."
@@ -10329,11 +10335,11 @@ msgstr ""
 "Редагувати назву мініатюрного зображення відеофайлу. Ви можете встановити "
 "мініатюрне зображення відео за допомогою сторінки Налаштування і Деталі."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Issue Open Badges"
 msgstr "Видача відкритих відзнак"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Issue Open Badges badges for this course. Badges are generated when "
 "certificates are created."
@@ -10341,7 +10347,7 @@ msgstr ""
 "Видайте відкриті відзнаки для цього курсу. Значки генеруються при створенні "
 "сертифікатів."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -10351,11 +10357,11 @@ msgstr ""
 "лапках введіть коротку назву типу сертифікату, який отримають студенти, коли"
 " закінчать курс. Наприклад: \"Сертифікат\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Name (Short)"
 msgstr "Назва сертифікату (Коротка)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the long name of the type of certificate that students receive "
@@ -10365,27 +10371,27 @@ msgstr ""
 "лапках введіть довгу назву типу сертифікату, який отримають студенти, коли "
 "закінчать курс. Наприклад: \"Сертифікат про успішне завершення\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Name (Long)"
 msgstr "Назва сертифікату (Повна)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Web/HTML View Enabled"
 msgstr "Перегляд сертифікату Web / HTML дозволено"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "If true, certificate Web/HTML views are enabled for the course."
 msgstr "Якщо true, переглядати сертифікати Web / HTML для курсу довзволено."
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Web/HTML View Overrides"
 msgstr "Перегляд сертифікату Web / HTML відхилено"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter course-specific overrides for the Web/HTML template parameters here "
 "(JSON format)"
@@ -10395,21 +10401,21 @@ msgstr ""
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Configuration"
 msgstr "Налаштування сертифікату"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter course-specific configuration information here (JSON format)"
 msgstr "Введіть інформацію про налаштування даного курсу (в форматі json)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "CSS Class for Course Reruns"
 msgstr "Клас CSS для перезапуску курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Allows courses to share the same css class across runs even if they have "
 "different numbers."
@@ -10417,29 +10423,29 @@ msgstr ""
 "Дозволити курсам використовувати один і той же CSS-клас навіть, якщо вони "
 "мають різні номери"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Forum External Link"
 msgstr "Зовнішнє посилання на форум обговорення"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allows specification of an external link to replace discussion forums."
 msgstr ""
 "Дозволяє вказати зовнішнє посилання замість того, щоб використовувати "
 "вбудований форум для обговорень."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Hide Progress Tab"
 msgstr "Закрити вкладку прогресу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allows hiding of the progress tab."
 msgstr "Дозволяє приховати сторінку «Прогрес»."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Organization Display String"
 msgstr "Відображення назви організації курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the course organization that you want to appear in the course. This "
 "setting overrides the organization that you entered when you created the "
@@ -10450,11 +10456,11 @@ msgstr ""
 "параметр скасовує організацію, введену вами при створенні курсу. Для "
 "використання назви організації, заданої при створенні курсу, введіть null."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Number Display String"
 msgstr "Відображення номеру курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the course number that you want to appear in the course. This setting "
 "overrides the course number that you entered when you created the course. To"
@@ -10465,11 +10471,11 @@ msgstr ""
 "заміняє номер курсу, який ви ввели при створенні курсу. Щоб використовувати "
 "номер курсу, який ви ввели при створенні курсу, введіть null."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Maximum Student Enrollment"
 msgstr "Максимальна кількість студентів курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the maximum number of students that can enroll in the course. To allow"
 " an unlimited number of students, enter null."
@@ -10477,39 +10483,39 @@ msgstr ""
 "Введіть максимальну кількість студентів, які можуть зареєструватися на курс."
 " Щоб дозволити необмежену кількість студентів, введіть null."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Public Wiki Access"
 msgstr "Дозволити загальний доступ до Вікі"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can view the course wiki even if "
 "they're not enrolled in the course."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Invitation Only"
 msgstr "Тільки за запрошеннями"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Whether to restrict enrollment to invitation by the course staff."
 msgstr "Обмежувати запрошення на реєстрацію персоналом курсу."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Course Survey Name"
 msgstr "Назва вступного опитування"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Name of SurveyForm to display as a pre-course survey to the user."
 msgstr ""
 "Назва форми-опитування, яку повинні пройти користувачі до одержання доступу "
 "до змісту курсу."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Course Survey Required"
 msgstr "Вимагається вступне опитування курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify whether students must complete a survey before they can view your "
 "course content. If you set this value to true, you must add a name for the "
@@ -10519,13 +10525,13 @@ msgstr ""
 " змісту курсу. Якщо встановлено значення true, то необхідно додати назвe в "
 "налаштуванні «Назва вступного опитування»."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Visibility In Catalog"
 msgstr "Видимість курсу у каталозі"
 
 #. Translators: the quoted words 'both', 'about', and 'none' must be
 #. left untranslated.  Leave them as English words.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Defines the access permissions for showing the course in the course catalog."
 " This can be set to one of three values: 'both' (show in catalog and allow "
@@ -10538,11 +10544,11 @@ msgstr ""
 "сторінки про курс), \"none\" (не показувати в каталозі та не дозволяти "
 "доступ до сторінки про курс)."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam Enabled"
 msgstr "Вступний іспит активовано"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
 " your course content. Note, you must enable Entrance Exams for this course "
@@ -10552,11 +10558,11 @@ msgstr ""
 "переглянути зміст курсу. Зауважте, що ви повинні активувати вступні "
 "випробування на цьому курсі для того, щоб цe налаштування працювало."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam Minimum Score (%)"
 msgstr "Прохідний бал для вступного іспиту (%)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
 "view your course content. Note, you must enable Entrance Exams for this "
@@ -10566,19 +10572,19 @@ msgstr ""
 "Зверніть увагу, що ви повинні активувати вступні випробування на цьому курсі"
 " для того, щоб це налаштування працювало."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam ID"
 msgstr "Ідентифікатор вступного іспиту"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Content module identifier (location) of entrance exam."
 msgstr "Ідентифікатор (місцезнаходження) модуля, що містить вступний іспит."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Social Media Sharing URL"
 msgstr "Посилання на соцмережі"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "If dashboard social sharing and custom course URLs are enabled, you can "
 "provide a URL (such as the URL to a course About page) that social media "
@@ -10592,19 +10598,19 @@ msgstr ""
 "абсолютною, наприклад:\\nhttp://www.edx.org/course/Introduction-to-MOOCs-"
 "ITM001"
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Course Language"
 msgstr "Мова курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Specify the language of your course."
 msgstr "Вкажіть мову навчання на вашому курсі."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Teams Configuration"
 msgstr "Налаштування команд"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Configure team sets, limit team sizes, and set visibility settings using "
 "JSON. See <a target=\"&#95;blank\" "
@@ -10613,11 +10619,11 @@ msgid ""
 "teams\">teams configuration documentation</a> for help and examples."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Proctored Exams"
 msgstr "Дозволити проведення контрольованих іспитів"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, proctored exams are enabled in "
 "your course. Note that enabling proctored exams will also enable timed "
@@ -10627,11 +10633,11 @@ msgstr ""
 "іспити. Зверніть увагу, що включення контрольованих іспитів також дозволить "
 "проводити тимчасові іспити. "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Proctoring Provider"
 msgstr " Прорегулюючий Провайдер "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Enter the proctoring provider you want to use for this course run. Choose "
@@ -10640,22 +10646,22 @@ msgstr ""
 "Введіть постачальника, якого ви бажаєте використовувати для виконання цього "
 "курсу. Виберіть з наступних опцій: {available_providers}."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Proctortrack Exam Escalation Contact"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Required if 'proctortrack' is selected as your proctoring provider. Enter an"
 " email address to be contacted by the support team whenever there are "
 "escalations (e.g. appeals, delayed reviews, etc.)."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Opting Out of Proctored Exams"
 msgstr "Дозволити виключення з прокторизованих іспитів"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, learners can choose to take "
 "proctored exams without proctoring. If this value is false, all learners "
@@ -10667,13 +10673,13 @@ msgstr ""
 " скласти іспит з використанням прокторінгу. Цей параметр застосовується лише"
 " у тому випадку, якщо для курсу включені контрольовані іспити."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
 msgstr ""
 "Створити бiлети для системи Zendesk на підозрілі спостережувані спроби "
 "іспитів"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, a Zendesk ticket will be created"
 " for suspicious attempts."
@@ -10681,11 +10687,11 @@ msgstr ""
 "Введіть значення true або false. Якщо це значення true, квиток Zendesk буде "
 "створено для підозрілої спроби."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Timed Exams"
 msgstr "Увімкнути тимчасові іспити"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
 "course. Regardless of this setting, timed exams are enabled if Enable "
@@ -10695,11 +10701,11 @@ msgstr ""
 " Незалежно від цього налаштування, тимчасові іспити ввімкнено, якщо для "
 "параметра \"Увімкнути контрольовані іспити\" встановлено значення true."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Minimum Grade for Credit"
 msgstr "Мінімальна залікова оцінка"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "The minimum grade that a learner must earn to receive credit in the course, "
 "as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
@@ -10707,11 +10713,11 @@ msgstr ""
 "Мінімальна оцінка, яка необхідна для отримання заліку на курсі, у вигляді "
 "десяткового дробу від 0,0 до 1,0. Наприклад, 60% вводяться у вигляді 0,6."
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr "Самостiйне складання"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
@@ -10722,11 +10728,11 @@ msgstr ""
 "завдань не встановлюються, а слухачі можуть проходити курс з будь-якою "
 "швидкістю до дати його закінчення."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Subsection Prerequisites"
 msgstr "Дозволити підрозділ пререквизитів"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
@@ -10734,21 +10740,21 @@ msgstr ""
 "Введіть true або false. Якщо це значення true, ви можете приховати підрозділ"
 " поки слухач не набрав необхідну кількість балів в попередньому підрозділі."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Learning Information"
 msgstr "Інформація про курс навчання"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Specify what student can learn from the course."
 msgstr "Вкажіть, що студент може дізнатися з курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Visibility For Unenrolled Learners"
 msgstr "Видимість Курсу Для Незареєстрованих Учнів"
 
 #. Translators: the quoted words 'private', 'public_outline', and 'public'
 #. must be left untranslated.  Leave them as English words.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Defines the access permissions for unenrolled learners. This can be set to "
 "one of three values: 'private' (default visibility, only allowed for "
@@ -10761,19 +10767,19 @@ msgstr ""
 "структури курсу) і \"загальнодоступний\" (дозволяти доступ як до структури, "
 "так і до контенту курсу)."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Викладач курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the details for Course Instructor"
 msgstr "Введіть деталі для викладачів курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Add Unsupported Problems and Tools"
 msgstr "Додати завдання та інструменти що не підтримуються"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, you can add unsupported problems and tools to "
 "your course in Studio. Unsupported problems and tools are not recommended "
@@ -10787,11 +10793,11 @@ msgstr ""
 "основними вимогами, таким як тестування, доступність, інтернаціоналізація та"
 " документація."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Highlights Enabled for Messaging"
 msgstr "Основні моменти увімкнено для обміну повідомленнями"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, any highlights associated with content in the "
 "course will be messaged to learners at their scheduled time."
@@ -10799,33 +10805,33 @@ msgstr ""
 "Введіть true чи false. Якщо true, будь-які тези, пов'язані зі змістом у "
 "курсі, будуть передані учням у призначений для них час."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course-wide Custom JS"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter Javascript resource URLs you want to be loaded globally throughout the"
 " course pages."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course-wide Custom CSS"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter CSS resource URLs you want to be loaded globally throughout the course"
 " pages."
 msgstr ""
 
-#: xmodule/course_module.py cms/templates/certificates.html
+#: xmodule/course_block.py cms/templates/certificates.html
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 msgid "Other Course Settings"
 msgstr "Інші налаштування курсу"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Any additional information about the course that the platform needs or that "
 "allows integration with external systems such as CRM software. Enter a "
@@ -10837,7 +10843,7 @@ msgstr ""
 "забезпечення. Введіть словник значень у форматі JSON, наприклад { "
 "\"my_custom_setting\": \"value\", \"other_setting\": \"value\" }"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "General"
 msgstr "Загальне"
 
@@ -10911,22 +10917,22 @@ msgstr "{section_type} Середній = {percent:.0%}"
 msgid "{short_label} Avg"
 msgstr "{short_label} Середній"
 
-#: xmodule/hidden_module.py
+#: xmodule/hidden_block.py
 #, python-brace-format
 msgid ""
 "ERROR: \"{block_type}\" is an unknown component type. This component will be"
 " hidden in LMS."
 msgstr ""
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Html contents to display for this module"
 msgstr "HTML зміст, показаний в цьому модулі"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
 msgstr "Код для документів LaTeX. Ця функція підтримується не повністю."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid ""
 "Select Visual to enter content and have the editor automatically create the "
 "HTML. Select Raw to edit HTML directly. If you change this setting, you must"
@@ -10937,23 +10943,23 @@ msgstr ""
 "безпосереднього редагування тексту у форматі HTML. Змінивши це налаштування,"
 " ви повинні зберегти компонент, а потім знову відкрити його для редагування."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Editor"
 msgstr "Редактор"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Visual"
 msgstr "Візуальний"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Raw"
 msgstr "Без обробки"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Hide Page From Learners"
 msgstr "Сховати сторінку від студентів"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid ""
 "If you select this option, only course team members with the Staff or Admin "
 "role see this page."
@@ -10961,51 +10967,51 @@ msgstr ""
 "Якщо вибрати цей параметр, лише участники курсу, що мають статус "
 "\"Співробітники\" або \"Адміністратор\", побачуть цю сторінку."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "HTML for the additional pages"
 msgstr "HTML код для додаткових сторінок"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "List of course update items"
 msgstr "Список оновлень курсу"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Any Type"
 msgstr "Будь-який"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Library"
 msgstr "Бібліотека"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select the library from which you want to draw content."
 msgstr "Введіть бібліотеку, з якої ви хочете отримати дані"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Library Version"
 msgstr "Версія бібліотеки"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Determines how content is drawn from the library"
 msgstr "Визначає спосіб отримання даних з бібліотеки"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Choose n at random"
 msgstr "Вибрати випадкове значення n"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Count"
 msgstr "Кількість"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Enter the number of components to display to each student."
 msgstr "Введіть кількість компонент, що відображаються слухачам."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Problem Type"
 msgstr "Вид завдання"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "Choose a problem type to fetch from the library. If \"Any Type\" is selected"
 " no filtering is applied."
@@ -11013,32 +11019,32 @@ msgstr ""
 "Виберіть вид завдання, який має повертати бібліотека. Якщо вибрано «Будь-"
 "який», фільтри не застосовуються."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "Determines whether a 'Reset Problems' button is shown, so users may reset "
 "their answers and reshuffle selected items."
 msgstr ""
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "Цей компонент застарів. Оновлено вміст бібліотеки."
 
 #. Translators: {refresh_icon} placeholder is substituted to "↻" (without
 #. double quotes)
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "{refresh_icon} Update now."
 msgstr "{refresh_icon} Оновити зараз."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Library is invalid, corrupt, or has been deleted."
 msgstr "Бібліотека несправна, пошкоджена або видалена"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Edit Library List."
 msgstr "Редагувати список бібліотек."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "This course does not support content libraries. Contact your system "
 "administrator for more information."
@@ -11046,23 +11052,23 @@ msgstr ""
 "Цей курс не підтримує контентні бібліотеки. Зв'яжіться з системним "
 "адміністратором для отримання додаткової інформації."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "A library has not yet been selected."
 msgstr "Бібліотеку ще не вибрано."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select a Library."
 msgstr "Вибрати бібліотеку."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "There are no matching problem types in the specified libraries."
 msgstr "У заданих бібліотеках немає відповідного виду завдань."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select another problem type."
 msgstr "Вибрати інший вид завдання."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "The specified library is configured to fetch {count} problem, "
 msgid_plural "The specified library is configured to fetch {count} problems, "
@@ -11071,7 +11077,7 @@ msgstr[1] "Зазначена бібліотека повинна поверта
 msgstr[2] "Зазначена бібліотека повинна повертати {count} завдань"
 msgstr[3] "Зазначена бібліотека повинна повертати {count} завдань"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "but there is only {actual} matching problem."
 msgid_plural "but there are only {actual} matching problems."
@@ -11080,15 +11086,15 @@ msgstr[1] "але в наявності всього {actual} відповідн
 msgstr[2] "але в наявності всього {actual} відповідних завдань."
 msgstr[3] "але в наявності всього {actual} відповідних завдань."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Edit the library configuration."
 msgstr "Редагувати налаштування бібліотеки."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Invalid Library"
 msgstr "Недопустима бібліотека"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "No Library Selected"
 msgstr "Бібліотека не обрана"
 
@@ -11128,7 +11134,7 @@ msgstr ""
 msgid "Importing Library Block failed - are the IDs valid and readable?"
 msgstr ""
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
 "display name to identify this component."
@@ -11136,11 +11142,11 @@ msgstr ""
 "Відображуване ім'я для цього компонента. Звіти аналітики можуть "
 "використовувати відображуване ім'я для ідентифікації цього компонента."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI ID"
 msgstr "LTI ID "
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
@@ -11149,11 +11155,11 @@ msgid ""
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI URL"
 msgstr "LTI URL"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
@@ -11162,11 +11168,11 @@ msgid ""
 "on this setting."
 msgstr ""
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Custom Parameters"
 msgstr "Персональні параметри"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
@@ -11175,11 +11181,11 @@ msgid ""
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Open in New Page"
 msgstr "Відкрити на новій сторінці"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if you want students to click a link that opens the LTI tool in "
 "a new window. Select False if you want the LTI content to open in an IFrame "
@@ -11192,11 +11198,11 @@ msgstr ""
 "разі, якщо встановлено значення \"False\" для \"Приховати Зовнішні "
 "Інструменти\"."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Scored"
 msgstr "Оцінено"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if this component will receive a numerical score from the "
 "external LTI system."
@@ -11204,11 +11210,11 @@ msgstr ""
 "Оберіть \"True\", якщо цей компонент отримає чисельну оцінку з зовнішньої "
 "LTI-системи"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Weight"
 msgstr "Вага"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter the number of points possible for this component.  The default value "
 "is 1.0.  This setting is only used when Scored is set to True."
@@ -11217,7 +11223,7 @@ msgstr ""
 "замовчуванням - 1.0. Це налаштування використовується тільки коли елементу "
 "\"Оцінка\" присвоєно значення \"True\"."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "The score kept in the xblock KVS -- duplicate of the published score in "
 "django DB"
@@ -11225,15 +11231,15 @@ msgstr ""
 "Результат збережений в xblock KVS - опублікований результат продубльований в"
 " django DB."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Comment as returned from grader, LTI2.0 spec"
 msgstr "Коментар оцінювача, специфікація LTI 2.0"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Hide External Tool"
 msgstr "Приховати зовнішній додаток"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if you want to use this component as a placeholder for syncing "
 "with an external grading  system rather than launch an external tool.  This "
@@ -11244,31 +11250,31 @@ msgstr ""
 "використання зовнішніх інструментів. Цей параметр приховує кнопку запуску і "
 "будь-які фрейми для цього компонента."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Request user's username"
 msgstr "Запитати юзернейм користувача"
 
 #. Translators: This is used to request the user's username for a third party
 #. service.
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Select True to request the user's username."
 msgstr "Виберіть «true», щоб запитати ім'я користувача."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Request user's email"
 msgstr "Запитати поштову скриньку користувача"
 
 #. Translators: This is used to request the user's email for a third party
 #. service.
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Select True to request the user's email address."
 msgstr "Виберіть True, щоб запросити електронну адресу користувача."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI Application Information"
 msgstr "LTI  Інформація щодо застосування"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter a description of the third party application. If requesting username "
 "and/or email, use this text box to inform users why their username and/or "
@@ -11279,29 +11285,29 @@ msgstr ""
 "користувачам, чому їх ім'я користувача та/або електронна пошта будуть "
 "спрямовані стороннім додаткам."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Button Text"
 msgstr "Текст кнопки"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter the text on the button used to launch the third party application."
 msgstr ""
 "Введіть текст для кнопки, що використовується для запуску програм сторонніх "
 "виробників."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Accept grades past deadline"
 msgstr "Приймати оцінки після терміну здачі"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True to allow third party systems to post grades past the deadline."
 msgstr ""
 "Виберіть «true», щоб дозволити стороннім системам публікувати оцінки після "
 "терміну здачі."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
@@ -11310,7 +11316,7 @@ msgstr ""
 "Не вдалося розпізнати спеціальний параметр: {custom_parameter}. "
 "Рекомендується використовувати строку вигляду \"x=y\"."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
@@ -11319,7 +11325,7 @@ msgstr ""
 "Не вдалося розпізнати ключ LTI: {lti_passport}. Рекомендується "
 "використовувати рядок вигляду \"id:key:secret\"."
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 #: lms/templates/ccx/schedule.html
 msgid "Due Date"
 msgstr "Кінцева дата"
@@ -11328,11 +11334,11 @@ msgstr "Кінцева дата"
 msgid "Enter the default date by which problems are due."
 msgstr "Введіть кінцеву дату виконання завдань."
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 msgid "Number of Relative Weeks Due By"
 msgstr ""
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 msgid ""
 "Enter the number of weeks the problems are due by relative to the learner's "
 "enrollment date"
@@ -11584,35 +11590,35 @@ msgstr "Групи відстеження реєстрації"
 msgid "Partition for segmenting users by enrollment track"
 msgstr "Розділ для сегментації користувачів за послідовністю реєстрації"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Whether this student has voted on the poll"
 msgstr "Чи проголосував цей студент у опитуванні"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Student answer"
 msgstr "Відповідь студента"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll answers from all students"
 msgstr "Відповіді на опитування від усіх студентів"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll answers from xml"
 msgstr "Відповіді на опитування з xml"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll question"
 msgstr "Запитання опитування"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Enter the date by which problems are due."
 msgstr "Введіть дату, до якої необхідно скласти завдання."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Hide sequence content After Due Date"
 msgstr "Приховати контент після дати завершення курсу"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "If set, the sequence content is hidden for non-staff users after the due "
 "date has passed."
@@ -11620,23 +11626,21 @@ msgstr ""
 "Якщо встановлено, послідовність контенту буде приховано для користувачів, "
 "які не є працівниками, після того, як закінчився термін."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Entrance Exam"
 msgstr "Це вступний іспит"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
-"Позначити цей модуль курсу в якості вступного іспиту. Зауважте, що ви "
-"повинні активувати вступний іспит на цьому курсі, щоб це налаштування діяло."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Time Limited"
 msgstr "Обмежити по часу"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates whether students have a limited time to view or "
 "interact with this courseware component."
@@ -11644,11 +11648,11 @@ msgstr ""
 "Цей параметр визначає, чи обмежується час, відведений слухачам на перегляд і"
 " взаємодію з даним компонентом курсу."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Time Limit in Minutes"
 msgstr "Обмеження по часу в хвилинах"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "The number of minutes available to students for viewing or interacting with "
 "this courseware component."
@@ -11656,19 +11660,19 @@ msgstr ""
 "Кількість хвилин, відведених слухачам на перегляд і взаємодію з даним "
 "компонентом курсу."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Proctoring Enabled"
 msgstr "Дозволено очне проведення"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This setting indicates whether this exam is a proctored exam."
 msgstr "Цей параметр визначає, чи є даний іспит контрольваним іспитом."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Software Secure Review Rules"
 msgstr "Заходи інформаційної безпеки"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates what rules the proctoring team should follow when "
 "viewing the videos."
@@ -11676,11 +11680,11 @@ msgstr ""
 "Цей параметр вказує те, які правила будуть використані командою перевіряючих"
 " при перегляді відеозаписів."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Practice Exam"
 msgstr "Пробний iспит"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates whether this exam is for testing purposes only. "
 "Practice exams are not verified."
@@ -11689,15 +11693,15 @@ msgstr ""
 " користувачі випробували можливості платформи. Пробні випробування не "
 "вимагають підтвердження особи."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Onboarding Exam"
 msgstr ""
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This setting indicates whether this exam is an onboarding exam."
 msgstr ""
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This subsection is unlocked for learners when they meet the prerequisite "
 "requirements."
@@ -11705,21 +11709,21 @@ msgstr ""
 "Цей підрозділ розблоковано для учнів, якщо вони відповідають вимогам "
 "попередніх умов."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This exam is hidden from the learner."
 msgstr "Екзамен прихований від слухача"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "Because the course has ended, this assignment is hidden from the learner."
 msgstr "Екзамен прихований від слухача через завершення курсу"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "Because the due date has passed, this assignment is hidden from the learner."
 msgstr "Екзамен прихований від слухача - кінцевий термін подання сплинув."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This section is a prerequisite. You must complete this section in order to "
 "unlock additional content."
@@ -11727,30 +11731,30 @@ msgstr ""
 "Цей розділ є обов'язковою умовою. Щоб розблокувати додатковий вміст, "
 "необхідно закінчити цей розділ."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "A list summarizing what students should look forward to in this section."
 msgstr ""
 "Короткий список контента, на який студенти можуть очікувати в цьому розділі."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 #, python-brace-format
 msgid "Group ID {group_id}"
 msgstr "Номер групи {group_id}"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Not Selected"
 msgstr "Не обрано"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "The display name for this component. (Not shown to learners)"
 msgstr "Відобразити назву компонента. (не показувати слухачам)"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Content Experiment"
 msgstr "Експериментальний матеріал"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The configuration defines how users are grouped for this content experiment."
 " Caution: Changing the group configuration of a student-visible experiment "
@@ -11761,28 +11765,28 @@ msgstr ""
 "експериментальні матеріали видимі для студентів, вплине на дані "
 "експерименту."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Group Configuration"
 msgstr "Конфігурація групи"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Which child module students in a particular group_id should see"
 msgstr "Який модуль в тій або іншій group_id повинні побачити слухачі"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 #, python-brace-format
 msgid "{group_name} (inactive)"
 msgstr "{group_name} (не активна)"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "The experiment is not associated with a group configuration."
 msgstr "Експеримент не пов'язаний з конфігурацією груп."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Select a Group Configuration"
 msgstr "Вибрати конфігурацію групи"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment uses a deleted group configuration. Select a valid group "
 "configuration or delete this experiment."
@@ -11790,7 +11794,7 @@ msgstr ""
 "В експерименті використана видалена конфігурація групи. Виберіть коректну "
 "конфігурацію групи або видаліть цей експеримент."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment uses a group configuration that is not supported for "
 "experiments. Select a valid group configuration or delete this experiment."
@@ -11799,16 +11803,16 @@ msgstr ""
 "передбачена в експериментах. Виберіть відповідну конфігурацію груп або "
 "видаліть цей експеримент."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment does not contain all of the groups in the configuration."
 msgstr "В експерименті беруть участь не всі групи конфігурації."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Add Missing Groups"
 msgstr "Додати відсутні групи"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment has an inactive group. Move content into active groups, then "
 "delete the inactive group."
@@ -11816,7 +11820,7 @@ msgstr ""
 "В експерименті бере участь одна неактивна група. Перенесіть вміст в активні "
 "групи, а потім видаліть неактивну."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "This content experiment has issues that affect content visibility."
 msgstr ""
 "З цим експериментальним матеріалом виникли проблеми, що впливають на його "
@@ -11838,7 +11842,12 @@ msgstr ""
 msgid "Add discussion for the Unit."
 msgstr ""
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
+#, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
+msgstr ""
+
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
@@ -11847,11 +11856,11 @@ msgstr ""
 "Неможливо отримати субтитри з сервісу Youtube для {youtube_id}. Код статусу:"
 " {status_code}."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
 msgstr "Ми підтримуємо тільки формат субтитрів SubRip (*.srt)."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
@@ -11860,26 +11869,22 @@ msgstr ""
 "Щось сталось не так із файлом субтитрів SubRip під час обробки. Системне "
 "повідомлення {error_message}"
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr "Щось не так із файлом субтитрів SubRip під час обробки."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 "{exception_message}: Не вдалось знайти завантажені транскрипти: "
 "{user_filename}"
 
-#: xmodule/video_module/video_handlers.py
-msgid "Language is required."
-msgstr "Мова обов'язкова."
-
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr "Основне"
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 #, python-brace-format
 msgid "There is no transcript file associated with the {lang} language."
 msgid_plural ""
@@ -11889,7 +11894,7 @@ msgstr[1] "Немає файлів транскриптів, пов'язаних
 msgstr[2] "Немає файлів транскриптів, пов'язаних з мовами {lang}."
 msgstr[3] "Немає файлів транскриптів, пов'язаних з мовами {lang}."
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
@@ -11898,61 +11903,65 @@ msgstr ""
 "форматів. Mp4,. Ogg або. Webm, розташовані на будь-якому хостингу в "
 "Інтернеті."
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Default Video URL"
 msgstr "URL відео за замовчуванням"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_handlers.py
+msgid "Language is required."
+msgstr "Мова обов'язкова."
+
+#: xmodule/video_block/video_xfields.py
 msgid "Component Display Name"
 msgstr "Назва компоненту, що відображається"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Current position in the video."
 msgstr "Поточна позиція в відео."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Optional, for older browsers: the YouTube ID for the normal speed video."
 msgstr ""
 "Необов'язкове значення для застарілих браузерів: ідентифікатор відео на "
 "YouTube на нормальній швидкості."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID"
 msgstr "YouTube ID"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Optional, for older browsers: the YouTube ID for the .75x speed video."
 msgstr ""
 "Необов'язкове значення для застарілих браузерів: ідентифікатор відео на "
 "YouTube на швидкості 0.75x."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for .75x speed"
 msgstr "YouTube ID для швидкості 0.75x"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Optional, for older browsers: the YouTube ID for the 1.25x speed video."
 msgstr ""
 "Необов'язкове значення для застарілих браузерів: ідентифікатор відео на "
 "YouTube на швидкості 1.25x."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for 1.25x speed"
 msgstr "YouTube ID для швидкості 1.25x"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Optional, for older browsers: the YouTube ID for the 1.5x speed video."
 msgstr ""
 "Необов'язкове значення для застарілих браузерів: ідентифікатор відео на "
 "YouTube на швидкості 1.5x."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for 1.5x speed"
 msgstr "YouTube ID для швидкості 1.5x"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Time you want the video to start if you don't want the entire video to play."
 " Not supported in the native mobile app: the full video file will play. "
@@ -11962,11 +11971,11 @@ msgstr ""
 "відео. У мобільному додатку не підтримується: відео відтворюються повністю. "
 "Формат ЧЧ:ММ:СС, максимальне значення 23:59:59."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Start Time"
 msgstr "Час початку Відео"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Time you want the video to stop if you don't want the entire video to play. "
 "Not supported in the native mobile app: the full video file will play. "
@@ -11976,11 +11985,11 @@ msgstr ""
 " відео. У мобільному додатку не підтримується: відео відтворюються повністю."
 " Формат ЧЧ:ММ:СС, максимальне значення 23:59:59."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Stop Time"
 msgstr "Час закінчення відео"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Allow students to download versions of this video in different formats if "
 "they cannot use the edX video player or do not have access to YouTube. You "
@@ -11991,11 +12000,11 @@ msgstr ""
 "до YouTube. Ви повинні додати принаймні одне посилання окрім посилання на "
 "YouTube в полі \"Посилання URL на відео файли\"."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Download Allowed"
 msgstr "Дозволити скачування відео"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
@@ -12012,11 +12021,11 @@ msgstr ""
 "дозволити студентам скачувати ці відео-файли, вкажіть \"True\" в "
 "налаштуваннях \"Дозволити Скачування Відео\"."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video File URLs"
 msgstr "Посилання URL на відео файли"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "By default, students can download an .srt or .txt transcript when you set "
 "Download Transcript Allowed to True. If you want to provide a downloadable "
@@ -12035,11 +12044,11 @@ msgstr ""
 "чого додати URL розшифровки тут. Студентам посилання для скачування "
 "розшифровки буде доступне під відео."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Downloadable Transcript URL"
 msgstr "URL завантажуваного транскрипту"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Allow students to download the timed transcript. A link to download the file"
 " appears below the video. By default, the transcript is an .srt or .txt "
@@ -12052,11 +12061,11 @@ msgstr ""
 "скачування субтитрів в іншому форматі, завантажте файл, користуючись полем "
 "\"Завантажити роздаткові матеріали\"."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Download Transcript Allowed"
 msgstr "Дозволити скачування транскриптiв"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "The default transcript for the video, from the Default Timed Transcript "
 "field on the Basic tab. This transcript should be in English. You don't have"
@@ -12066,20 +12075,20 @@ msgstr ""
 "замовчуванням\" у вкладці \"Основне\". Розшифровка повинна бути англійською "
 "мовою. Ви не можете змінити це налаштування."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Default Timed Transcript"
 msgstr "Синхронні транскрипти за замовчуванням"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether the transcripts appear with the video by default."
 msgstr ""
 "Вкажіть, чи з'являються субтитри за замовчуванням при відтворенні відео."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Show Transcript"
 msgstr "Відображати субтитри"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Add transcripts in different languages. Click below to specify a language "
 "and upload an .srt transcript file for that language."
@@ -12087,42 +12096,42 @@ msgstr ""
 "Додати субтитри на різних мовах. Натисніть кнопку нижче, щоб вказати мову і "
 "завантажити субтитри потрібною мовою у форматі .srt."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Transcript Languages"
 msgstr "Мови розшифровки"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Preferred language for transcript."
 msgstr "Головна мова субтитрів"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Preferred language for transcript"
 msgstr "Головна мова для транскриптiв"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Transcript file format to download by user."
 msgstr "Формат файлу субтитрів, який скачують користувачі."
 
 #. Translators: This is a type of file used for captioning in the video
 #. player.
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "SubRip (.srt) file"
 msgstr "Файл SubRip (.srt)"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Text (.txt) file"
 msgstr "Текстовий файл (.txt)"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "The last speed that the user specified for the video."
 msgstr ""
 "Остання швидкість відтворення даного відео, встановлена ​​користувачем."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "The default speed for the video."
 msgstr "Швидкість відтворення відео за замовчуванням."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Specify whether to advance automatically to the next unit when the video "
 "ends."
@@ -12130,11 +12139,11 @@ msgstr ""
 "Вкажіть, чи слід автоматично переходити до наступного юніту, коли відео "
 "закінчується."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether YouTube is available for the user."
 msgstr "Вкажіть, чи доступний ресурс YouTube для даного користувача."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Upload a handout to accompany this video. Students can download the handout "
 "by clicking Download Handout under the video."
@@ -12142,11 +12151,11 @@ msgstr ""
 "Завантажте супровідні матеріали для цього відео. Студенти зможуть скачати їх"
 " за посиланням \"Завантажити додаткові матеріали\" під відео."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Upload Handout"
 msgstr "Завантажити роздаткові матеріали"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Specify whether access to this video is limited to browsers only, or if it "
 "can be accessed from other applications including mobile apps."
@@ -12155,11 +12164,11 @@ msgstr ""
 "браузері, або воно може бути доступно з інших додатків, включаючи мобільні "
 "додатки."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Available on Web Only"
 msgstr "Відео доступне тільки для онлайн перегляду"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "If you were assigned a Video ID by edX for the video to play in this "
 "component, enter the ID here. In this case, do not enter values in the "
@@ -12173,35 +12182,35 @@ msgstr ""
 " не призначили ідентифікатор для відео, введіть ці значення в інших полях і "
 "проігноруйте це поле."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Date of the last view of the bumper"
 msgstr "Дата останнього перегляду заставки"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Do not show bumper again"
 msgstr "Більше не показувати заставку"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether the video can be accessed publicly by learners."
 msgstr ""
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Public Access"
 msgstr ""
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Add a specific thumbnail for learners to see before playing the video."
 msgstr ""
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Thumbnail"
 msgstr ""
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Instructions"
 msgstr "Інструкція"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid ""
 "Add instructions to help learners understand how to use the word cloud. "
 "Clear instructions are important, especially for learners who have "
@@ -12211,45 +12220,45 @@ msgstr ""
 "слів. Важливі чіткі інструкції, особливо для учнів, які мають вимоги до "
 "доступності даних."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Inputs"
 msgstr "Вхідні дані"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid ""
 "The number of text boxes available for learners to add words and sentences."
 msgstr ""
 "Кількість текстових полів, доступних слухачам для введення слів / фраз."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Maximum Words"
 msgstr "Максимальна кількість слів"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "The maximum number of words displayed in the generated word cloud."
 msgstr "Максимальна кількість слів, що відображається у створеній хмарі слів."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Show Percents"
 msgstr "Показати у відсотках"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Statistics are shown for entered words near that word."
 msgstr "Статистичні дані для кожного слова відображаються поруч з цим словом."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Whether this learner has posted words to the cloud."
 msgstr "Чи додав студент слова до хмари."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Student answer."
 msgstr "Відповідь студента."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "All possible words from all learners."
 msgstr "Всі можливі слова від слухачів."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Top num_top_words words for word cloud."
 msgstr "Слова num_top_words, що найбільш часто зустрічаються в хмарі."
 
@@ -12736,7 +12745,7 @@ msgid "Vertical"
 msgstr "Вертикальний"
 
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Section"
 msgstr "Розділ"
 
@@ -12753,47 +12762,47 @@ msgstr ""
 msgid "File upload failed. Please try again"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Invalid data"
 msgstr "Некоректні дані"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Invalid data ({details})"
 msgstr "Некоректні дані ({details})"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "Ви не можете перенести {source_type} у {target_parent_type}."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Item is already present in target location."
 msgstr "Елемент вже присутній у вказаному місці."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into itself."
 msgstr "Неможливо перемістити у самого себе."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into it's child."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item directly into content experiment."
 msgstr "Не можна перемістити елемент безпосередньо до експерименту з вмістом."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{source_usage_key} not found in {parent_usage_key}."
 msgstr "{source_usage_key} не знайдено у {parent_usage_key}."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "You can not move {source_usage_key} at an invalid index ({target_index})."
@@ -12801,17 +12810,17 @@ msgstr ""
 "Ви не можете перенести {source_usage_key} у неправильний розділ   "
 "({target_index})."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "Ви повинні давати target_index ({target_index}) як ціле число."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Копія {0}"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Копіювання '{0}'"
@@ -12819,7 +12828,7 @@ msgstr "Копіювання '{0}'"
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
@@ -12829,11 +12838,11 @@ msgstr ""
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "%"
 msgstr "%"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} «{display_name}»"
@@ -13462,7 +13471,7 @@ msgid ""
 "up shortly!"
 msgstr ""
 
-#: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
 msgstr ""
 
@@ -13488,7 +13497,7 @@ msgstr ""
 msgid "Hide Annotations"
 msgstr ""
 
-#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
 msgstr ""
 
@@ -13496,8 +13505,8 @@ msgstr ""
 msgid "Bookmark this page"
 msgstr ""
 
-#: lms/templates/conditional_module.html
-msgid "You do not have access to this dependency module."
+#: lms/templates/conditional_block.html
+msgid "You do not have access to this dependency block."
 msgstr ""
 
 #: lms/templates/course.html
@@ -14020,27 +14029,27 @@ msgid ""
 "{link_start}dashboard{link_end} for courses."
 msgstr ""
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Important!"
 msgstr ""
 
 #. Translators: A button for showing the Previous Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
 msgstr ""
 
 #. Translators: A button for showing the Next Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
 msgstr ""
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Sequence"
 msgstr ""
 
-#: lms/templates/seq_module.html lms/templates/vert_module.html
+#: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr ""
 
@@ -18301,6 +18310,12 @@ msgstr ""
 "тиждень. Перед відправленням повідомлення уважно перегляньте текст і спершу "
 "надішліть його собі для попереднього перегляду та переконайтеся, що додані "
 "посилання та зображення відображаються коректно. "
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

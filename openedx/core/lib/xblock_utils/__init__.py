@@ -28,7 +28,7 @@ from xblock.scorable import ScorableXBlockMixin
 
 from common.djangoapps import static_replace
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from xmodule.seq_module import SequenceBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.seq_block import SequenceBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.util.xmodule_django import add_webpack_to_fragment  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.vertical_block import VerticalBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import (  # lint-amnesty, pylint: disable=wrong-import-order
@@ -225,11 +225,11 @@ def wrap_xblock_aside(
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
 
-def grade_histogram(module_id):
+def grade_histogram(block_id):
     '''
     Print out a histogram of grades on a given problem in staff member debug info.
 
-    Warning: If a student has just looked at an xmodule and not attempted
+    Warning: If a student has just looked at an xblock and not attempted
     it, their grade is None. Since there will always be at least one such student
     this function almost always returns [].
     '''
@@ -242,8 +242,8 @@ def grade_histogram(module_id):
         FROM courseware_studentmodule
         WHERE courseware_studentmodule.module_id=%s
         GROUP BY courseware_studentmodule.grade"""
-    # Passing module_id this way prevents sql-injection.
-    cursor.execute(query, [str(module_id)])
+    # Passing block_id this way prevents sql-injection.
+    cursor.execute(query, [str(block_id)])
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
@@ -262,13 +262,13 @@ def sanitize_html_id(html_id):
 
 def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
     """
-    Updates the supplied module with a new get_html function that wraps
+    Updates the supplied block with a new get_html function that wraps
     the output of the old get_html function with additional information
     for admin users only, including a histogram of student answers, the
-    definition of the xmodule, and a link to view the module in Studio
+    definition of the xblock, and a link to view the block in Studio
     if it is a Studio edited, mongo stored course.
 
-    Does nothing if module is a SequenceBlock.
+    Does nothing if block is a SequenceBlock.
     """
     if context and context.get('hide_staff_markup', False):
         # If hide_staff_markup is passed, don't add the markup

@@ -26,7 +26,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -46,33 +46,33 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         self.aside_tag_lo = 'learning_outcome'
 
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
-        self.course = ItemFactory.create(
+        self.course = BlockFactory.create(
             parent_location=course.location,
             category="course",
             display_name="Test course",
         )
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
             display_name='Subsection 1',
             publish_item=True,
             start=datetime(2015, 4, 1, tzinfo=UTC),
         )
-        self.problem = ItemFactory.create(
+        self.problem = BlockFactory.create(
             category="problem",
             parent_location=self.vertical.location,
             display_name="A Problem Block",
@@ -80,7 +80,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
             user_id=self.user.id,
             publish_item=False,
         )
-        self.video = ItemFactory.create(
+        self.video = BlockFactory.create(
             parent_location=self.vertical.location,
             category='video',
             display_name='My Video',

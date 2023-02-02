@@ -1,11 +1,11 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2022
+# Ali Işıngör <ali@artistanbul.io>, 2017-2023
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
 # baris <brscvs@gmail.com>, 2013
@@ -28,11 +28,11 @@
 # ca47f5bf05c27c3888896d9870e257ad_00aad6f <5addf4166015f6e11583e89fe2c53975_164880>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Ali Işıngör <ali@artistanbul.io>, 2017-2021
+# Ali Işıngör <ali@artistanbul.io>, 2017-2022
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
@@ -49,12 +49,12 @@
 # Mustafa Tat, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2022
+# Ali Işıngör <ali@artistanbul.io>, 2017-2023
 # Ali Özcan <aliozcan@yandex.com>, 2014
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
@@ -84,7 +84,7 @@
 # ca47f5bf05c27c3888896d9870e257ad_00aad6f <5addf4166015f6e11583e89fe2c53975_164880>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -110,7 +110,7 @@
 # Yasar Celep <yasar.celep@hotmail.com>, 2017
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -121,9 +121,9 @@
 # a56fc07028489bb2b53400de33ba6a83, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Ali Işıngör <ali@artistanbul.io>, 2021
@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2023-01-22 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -145,7 +145,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/item.py xmodule/html_module.py
+#: cms/djangoapps/contentstore/views/block.py xmodule/html_block.py
 msgid "Text"
 msgstr "Metin"
 
@@ -173,7 +173,7 @@ msgid "Video"
 msgstr "Video"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Advanced"
 msgstr "Gelişmiş"
 
@@ -184,24 +184,24 @@ msgstr "Giriş Sınavı"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
 msgid "Unit"
 msgstr "Ünite"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "Boş"
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 #, python-brace-format
 msgid "The following parameters are required: {missing}."
 msgstr "Bu parametreler gerekiyor: {missing}."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 msgid ""
 "There is a problem with this transcript file. Try to upload a different "
 "file."
@@ -209,14 +209,14 @@ msgstr ""
 "Bu altyazı dosyasında sorun var. Farklı bir dosyayı yüklemeyi deneyin."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 #, python-brace-format
 msgid "A transcript with the \"{language_code}\" language code already exists."
 msgstr "\"{language_code}\" dil kodlu bir altyazı zaten mevcut."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Bir altyazı dosyası gerekiyor."
 
@@ -227,7 +227,7 @@ msgid "Name"
 msgstr "İsim"
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video ID"
 msgstr "Video No"
 
@@ -262,7 +262,7 @@ msgid "Log out"
 msgstr "Çıkış yap"
 
 #: common/djangoapps/course_modes/admin.py
-#: common/djangoapps/course_modes/models.py xmodule/library_content_module.py
+#: common/djangoapps/course_modes/models.py xmodule/library_content_block.py
 msgid "Mode"
 msgstr "Mod"
 
@@ -314,12 +314,12 @@ msgstr "Profesyonel eğitim öğrencisi olarak kaydoldunuz"
 msgid "Professional Ed"
 msgstr "Profesyonel Eğitim"
 
-#: common/djangoapps/course_modes/models.py xmodule/annotatable_module.py
-#: xmodule/capa_module.py xmodule/conditional_module.py
-#: xmodule/discussion_block.py xmodule/html_module.py
-#: xmodule/library_content_module.py xmodule/library_sourced_block.py
-#: xmodule/lti_module.py xmodule/split_test_module.py xmodule/unit_block.py
-#: xmodule/word_cloud_module.py xmodule/x_module.py
+#: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
+#: xmodule/capa_block.py xmodule/conditional_block.py
+#: xmodule/discussion_block.py xmodule/html_block.py
+#: xmodule/library_content_block.py xmodule/library_sourced_block.py
+#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "Görünen Ad"
@@ -502,104 +502,19 @@ msgstr ""
 msgid "Disabled Account"
 msgstr "Etkin Olmayan Hesap"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "Erkek"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "Kadın"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "Diğer/Söylememeyi Tercih Eder"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "Doktora derecesi"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "Yüksek lisans veya profesyonel derece"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "Lisans derecesi"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "Ön Lisans derecesi"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "Orta Okul/Lise"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "Üçüncü sınıf ortaokul/üçüncü sınıf lise/orta okul"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "Temel/İlkokul"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "Örgün olmayan eğitim"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "Diğer eğitim"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "{course_name} eğitimi için {platform_name} Onur Öğrencisi Sertifikası"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "{course_name} dersi için {platform_name} Onaylı Sertifika"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr "{course_name} için {platform_name} Profesyonel Sertifika"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-"Kuruluş kimliğiniz (kuruluşunuzun LinkedIn'de mevcut bir sayfası varsa) ör. "
-"1337. Sağlanmazsa, bunun yerine öntanımlı olarak Platform Adı (ör. edX) "
-"gönderilecektir."
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "{platform_name} {course_name} için Sertifika"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "Bu dil için ISO 639-1 dil kodu."
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "Kayıtlanma özelliğinin ad alanı"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "Kayıtlanma özelliğinin adı"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "Kayıtlanma özelliğinin değeri"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
@@ -607,15 +522,7 @@ msgstr ""
 "Kullanıcıların kayıt yaptıktan sonra geri ödeme alabileceği zaman aralığı, "
 "mikrosaniyeler ile belirtilir. Öntanımlı süre 14 gündür."
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "UTM çerezinin adı"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "Satış ortağı çerezinin adı"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -626,7 +533,7 @@ msgstr ""
 "sağlanması beklenir ve sütunlar şu şekilde olacaktır:            user_id, "
 "username, email, course_id, is_verified, verification_date"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -636,23 +543,116 @@ msgstr ""
 "sağlanması beklenir ve sütunlar şu şekilde olacaktır:                      "
 "course_id, username, mode"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "Erkek"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "Kadın"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "Diğer/Söylememeyi Tercih Eder"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "Doktora derecesi"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "Yüksek lisans veya profesyonel derece"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "Lisans derecesi"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "Ön Lisans derecesi"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "Orta Okul/Lise"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "Üçüncü sınıf ortaokul/üçüncü sınıf lise/orta okul"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "Temel/İlkokul"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "Örgün olmayan eğitim"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "Diğer eğitim"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{course_name} eğitimi için {platform_name} Onur Öğrencisi Sertifikası"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "{course_name} dersi için {platform_name} Onaylı Sertifika"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "{course_name} için {platform_name} Profesyonel Sertifika"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+"Kuruluş kimliğiniz (kuruluşunuzun LinkedIn'de mevcut bir sayfası varsa) ör. "
+"1337. Sağlanmazsa, bunun yerine öntanımlı olarak Platform Adı (ör. edX) "
+"gönderilecektir."
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{platform_name} {course_name} için Sertifika"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "Bu dil için ISO 639-1 dil kodu."
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "UTM çerezinin adı"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "Satış ortağı çerezinin adı"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "Bu kullanıcı özelliğinin adı"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "Bu kullanıcı özelliğinin değeri"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr "İkincil e-posta adresi"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr "Bağlı hesabı kurtarmak için ikincil e-posta adresi."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -665,7 +665,7 @@ msgstr ""
 "yoksa, o çalışan yalnızca üçüncü taraf kimlik doğrulama arka ucu "
 "aracılığıyla oturum açabilir."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -675,7 +675,7 @@ msgstr ""
 "beklenir ve sütunlar şu şekilde olacaktır:                      username, "
 "current_email, desired_email"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr "Bir gerekçe ekleyin"
 
@@ -818,6 +818,10 @@ msgid ""
 "{activated_or_confirmed}{html_end}Something went wrong, please <a "
 "href=\"{support_url}\">contact support</a> to resolve this issue."
 msgstr ""
+"{html_start}{account_or_email} Hesabınızda şu işlem yapılamadı "
+"{activated_or_confirmed}{html_end} Bir şeyler yanlış gitti, lütfen <a "
+"href=\"{support_url}\">destek ekibiyle</a> iletişime geçerek sorunu "
+"bildirin."
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -825,6 +829,8 @@ msgid ""
 "{html_start}This {account_or_email} has already been "
 "{activated_or_confirmed}.{html_end}"
 msgstr ""
+"{html_start}Bu {account_or_email} hesabı daha önceden  "
+"{activated_or_confirmed}.{html_end}"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -987,6 +993,8 @@ msgid ""
 "IDPs with this set to True will be excluded from the dropdown IDP selection "
 "in the EnterpriseCustomer Django Admin form."
 msgstr ""
+"Bu değeri True olarak ayarlanan kimlik sağlayıcılar, EnterpriseCustomer "
+"Django Admin formunda açılan kimlik sağlayıcı seçiminden hariç tutulacaktır."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
@@ -2111,6 +2119,11 @@ msgid ""
 "learner needs to complete to be awarded the badge. For example: "
 "slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
 msgstr ""
+"Her satır virgülle ayrılmış bir listedir. Her satırdaki ilk öğe, "
+"'openedx__course' veren bir bileşeni olan, oluşturduğunuz bir rozet "
+"sınıfının yoludur. Her satırdaki diğer öğelerse, öğrencinin rozeti kazanması"
+" için tamamlaması gereken ders anahtarlarıdır. Örneğin: "
+"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
 
 #: lms/djangoapps/badges/models.py
 msgid "Please check the syntax of your entry."
@@ -2156,6 +2169,10 @@ msgstr "Bizimle İletişime Geçin"
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
 msgstr " Yardım Merkezi"
+
+#: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr "Güvenlik"
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -2241,6 +2258,14 @@ msgstr "Satış ortakları"
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "Open edX"
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr "Çerez Politikası"
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Information"
+msgstr "Kişisel Bilgilerimi Satmayın"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -2478,6 +2503,9 @@ msgid ""
 "the honor code established by {platform_name} and has completed all of the "
 "required tasks for this course under its guidelines. "
 msgstr ""
+"{cert_type} sertifikası bir öğrencinin {platform_name} tarafından belirlenen"
+" etik kurallarına uymayı kabul ettiğini ve dersin tüm yönergelerine uyarak "
+"gerekli görevlerin hepsini tamamladığını belirtir."
 
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
@@ -2485,6 +2513,8 @@ msgid ""
 "A {cert_type} certificate also indicates that the identity of the learner "
 "has been checked and is valid."
 msgstr ""
+"Bir {cert_type} sertifikası, öğrencinin kimliğinin kontrol edildiğini ve "
+"geçerli olduğunu gösterir."
 
 #. Translators:  This text describes the 'XSeries' course certificate type.
 #. An XSeries is a collection of
@@ -2775,7 +2805,7 @@ msgstr ""
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
 msgid "Practice Exam"
-msgstr ""
+msgstr "Alıştırma Sınavı"
 
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
@@ -2790,7 +2820,7 @@ msgstr "Zamanlanmış Sınav"
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
 msgid "Exam"
-msgstr ""
+msgstr "Sınav"
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -2812,7 +2842,11 @@ msgid_plural ""
 "                            You set a goal of learning {start_bold}%(days_per_week)s times a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\n"
 "                        "
 msgstr[0] ""
+"\n"
+"                           {start_bold}%(course_name)s dersi için haftada%(days_per_week)s kez{end_bold} öğrenme hedefi belirlediniz. Tam olarak orada değilsiniz, ancak bu hedefe ulaşmak için hala zamanınız var!\""
 msgstr[1] ""
+"\n"
+"                           {start_bold}%(course_name)s dersi için haftada %(days_per_week)s kez{end_bold} öğrenme hedefi belirlediniz. Tam olarak orada değilsiniz, ancak bu hedefe ulaşmak için hala zamanınız var!\""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -3137,7 +3171,7 @@ msgstr "Bu derse ilerlemeniz dahil, tüm erişiminizi kaybedeceksiniz."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Audit Access Expires"
-msgstr "Denetçi Erişimi Sonu"
+msgstr "Gözlemci Erişimi Sonu"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Certificate Available"
@@ -3260,17 +3294,19 @@ msgstr "Dahili Hizmet Tabanı URL'si"
 
 #: lms/djangoapps/courseware/models.py
 msgid "Financial Assistance Backend API Base URL."
-msgstr ""
+msgstr "Mali Yardım Backend API Tabanı URL'si"
 
 #: lms/djangoapps/courseware/models.py
 msgid ""
 "Username created for Financial Assistance Backend, e.g. "
 "financial_assistance_service_user."
 msgstr ""
+"Mali Yardım Backend'i için oluşturulan kullanıcı adı, örn. "
+"financial_assistance_service_user."
 
 #: lms/djangoapps/courseware/models.py
 msgid "Percentage of courses allowed to use edx-financial-assistance"
-msgstr ""
+msgstr "edx-mali-yardım kullanmaya izin verilen derslerin yüzdesel oranı"
 
 #: lms/djangoapps/courseware/plugins.py lms/djangoapps/courseware/tabs.py
 #: lms/templates/peer_grading/peer_grading.html
@@ -3363,15 +3399,15 @@ msgstr "kaydol"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Audit track"
-msgstr "Kayıtlanmanız: Dinleyici"
+msgstr "Kayıtlanmanız: Gözlemci"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "You are enrolled in the audit track for this course. The audit track does "
 "not include a certificate."
 msgstr ""
-"Bu derse dinleyici kayıtlanma yoluyla kaydoldunuz. Dinleyici kayıtlanma yolu"
-" sertifika içermez."
+"Bu derse gözlemci kayıtlanma yoluyla kaydoldunuz. Gözlemci kayıtlanma yolu "
+"sertifika içermez."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Honor track"
@@ -3606,6 +3642,9 @@ msgid ""
 "                        %(course_name)s: Reported content awaits review\n"
 "                    "
 msgstr ""
+"\n"
+"                        %(course_name)s: Bildirilen içerik incelenmeyi bekliyor\n"
+"                    "
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
@@ -3615,12 +3654,12 @@ msgstr "Tartışmalara Git"
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 #, python-format
 msgid "%(course_name)s: Reported content awaits review"
-msgstr ""
+msgstr "%(course_name)s: Bildirilen içerik incelenmeyi bekliyor"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/subject.txt
 #, python-format
 msgid " %(course_name)s %(course_id)s moderator content for review "
-msgstr ""
+msgstr " %(course_name)s %(course_id)s Moderatörde inceleme bekleyen içerik "
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #, python-format, python-brace-format
@@ -3738,6 +3777,9 @@ msgid ""
 "username, full name, country, cohort, and course mode. The last two columns "
 "are optional."
 msgstr ""
+"#{row_num} satırındaki verilerde dört ila altı sütun bulunmalıdır: e-posta, "
+"kullanıcı adı, tam ad, ülke, kohort ve ders modu. Son iki sütun isteğe "
+"bağlıdır."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -3753,12 +3795,16 @@ msgid ""
 "Course is not cohorted but cohort provided. Ignoring cohort assignment for "
 "all users."
 msgstr ""
+"Ders kohortlu değildir, ancak kohort sağlanır. Tüm kullanıcılar için kohort "
+"ataması yok sayılıyor."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
 "Cohort name not found: {cohort}. Ignoring cohort assignment for all users."
 msgstr ""
+"Kohort adı bulunamadı: {cohort}. Tüm kullanıcılar için kohort ataması yok "
+"sayılıyor."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -3766,6 +3812,8 @@ msgid ""
 "Invalid course mode: {mode}. Falling back to the default mode, or keeping "
 "the current mode in case the user is already enrolled."
 msgstr ""
+"Geçersiz ders modu: {mode}. Varsayılan moda geri dönmek veya kullanıcının "
+"zaten kayıtlı olması durumunda mevcut modu korumak."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -3773,6 +3821,8 @@ msgid ""
 "Invalid course mode: {mode}.  Failling back to {default_mode}, or resetting "
 "to {default_mode} in case the user is already enrolled."
 msgstr ""
+"Geçersiz ders modu: {mode}. {default_mode} moda geri dönmek veya "
+"kullanıcının zaten kayıtlı olması durumunda {default_mode} moda sıfırlamak."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -3804,6 +3854,9 @@ msgid ""
 "Without the email student would not be able to login. Please contact support"
 " for further information."
 msgstr ""
+"Yeni kullanıcıya e-posta gönderirken '{error}' hatası (kullanıcı "
+"e-postası={email}). E-posta olmadan öğrenci oturum açamaz. Daha fazla bilgi "
+"için lütfen desteğe başvurun."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -3822,16 +3875,20 @@ msgid ""
 "A list of problem/block types to generate the report for. This field can be "
 "omitted if the report should include details of allblock types. "
 msgstr ""
+"Raporun oluşturulacağı problem/block türlerinin listesi. Raporun tüm block "
+"türlerinin ayrıntılarını içermesi gerekiyorsa bu alan atlanabilir."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User-friendly text describing current status of report generation."
-msgstr ""
+msgstr "Rapor oluşturmanın mevcut durumunu açıklayan kullanıcı dostu metin."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A unique id for the report generation task. It can be used to query the "
 "latest report generation status."
 msgstr ""
+"Rapor oluşturma görevi için benzersiz bir kimlik. En son rapor oluşturma "
+"durumunu sorgulamak için kullanılabilir."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -3962,7 +4019,7 @@ msgstr "Harici Kullanıcı Anahtarı"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
-msgstr "Topluluk"
+msgstr "Kohort"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -3996,8 +4053,7 @@ msgstr "kayıtlanma"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
-msgstr ""
-"Dosyada topluluk isimlerinin bulunduğu 'topluluk' sütunu bulunmalıdır."
+msgstr "Dosyada kohort isimlerinin bulunduğu 'kohort' sütunu bulunmalıdır."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'username' column, an 'email' column, or both."
@@ -4088,7 +4144,7 @@ msgstr "Görevin mevcut durumu."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Identifies the kind of task being performed, e.g. rescoring."
-msgstr ""
+msgstr "Gerçekleştirilen görevin türünü tanımlar, örn. yeniden puanlama."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The celery ID for the task."
@@ -4139,7 +4195,7 @@ msgstr "Rapor adı."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "HTML anchor tag that contains the name and link."
-msgstr ""
+msgstr "Adı ve bağlantıyı içeren HTML çapası etiketi."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "List of report downloads"
@@ -4147,13 +4203,15 @@ msgstr "Rapor indirmeleri listesi"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "ID for the course whose reports need to be listed."
-msgstr ""
+msgstr "Raporlarının listelenmesi gereken dersin kimliği."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Filter results to only return details of for the report with the specified "
 "name."
 msgstr ""
+"Belirtilen ada sahip raporun yalnızca ayrıntılarını döndürmek için sonuçları"
+" filtreleyin."
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -4297,7 +4355,7 @@ msgstr "Geçersiz veri, generate_for değeri \"new\" veya \"all\" olmalı."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Certificate generation started for students on the allowlist."
-msgstr ""
+msgstr "İzinliler listesindeki öğrenciler için sertifika oluşturma başladı."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -4419,7 +4477,7 @@ msgstr "Üyelik"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Cohorts"
-msgstr "Topluluklar"
+msgstr "Kohortlar"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
@@ -4629,7 +4687,7 @@ msgstr "oluşturulan sertifikalar"
 #. {attempted} so far"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
-msgstr "topluluğa alındı"
+msgstr "kohorta alındı"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -4929,7 +4987,7 @@ msgstr ""
 "kimlikleri boşsa blok herkese görülür olarak değerlendirilir. Blok "
 "visible_to_staff_only ise bu alanın yok sayılacağını göz önünde bulundurun."
 
-#: lms/djangoapps/lms_xblock/mixin.py xmodule/split_test_module.py
+#: lms/djangoapps/lms_xblock/mixin.py xmodule/split_test_block.py
 msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
@@ -5042,6 +5100,8 @@ msgstr "Takımlar"
 #: lms/djangoapps/teams/plugins.py
 msgid "Leverage teams to allow learners to connect by topic of interest."
 msgstr ""
+"Öğrencilerin ilgi alanlarına göre bağlantı kurmasını sağlamak için "
+"takımlardan yararlanın."
 
 #: lms/djangoapps/teams/views.py
 msgid "course_id must be provided"
@@ -5054,7 +5114,7 @@ msgstr "Belirtilen ders kimliği {course_id} geçersiz."
 
 #: lms/djangoapps/teams/views.py
 msgid "text_search and order_by cannot be provided together"
-msgstr ""
+msgstr "text_search ve order_by birlikte sağlanamaz"
 
 #: lms/djangoapps/teams/views.py
 #, python-brace-format
@@ -5089,7 +5149,7 @@ msgstr "Eğitmen tarafından yönetilen konuda bir takım oluşturamazsınız."
 
 #: lms/djangoapps/teams/views.py
 msgid "You are already in a team in this teamset."
-msgstr ""
+msgstr "Bu takım yapılandırmasında zaten bir takıma ait görünüyorsunuz."
 
 #: lms/djangoapps/teams/views.py
 msgid "teamset_id and team_id are mutually exclusive options."
@@ -5127,6 +5187,7 @@ msgstr "Eğitmen tarafından yönetilen bir takıma katılamazsınız."
 #, python-brace-format
 msgid "The user {username} is already a member of a team in this teamset."
 msgstr ""
+"Bu takım yapılandırmasında {username} kullanıcısı zaten bir takımın üyesi."
 
 #: lms/djangoapps/teams/views.py
 #, python-brace-format
@@ -5140,15 +5201,15 @@ msgstr "Eğitmen tarafından yönetilen bir takımı terkedemezsiniz."
 
 #: lms/djangoapps/user_tours/models.py
 msgid "Show existing user tour"
-msgstr ""
+msgstr "Mevcut kullanıcı turunu göster"
 
 #: lms/djangoapps/user_tours/models.py
 msgid "Show new user tour"
-msgstr ""
+msgstr "Yeni kullanıcı turunu göster"
 
 #: lms/djangoapps/user_tours/models.py
 msgid "Do not show user tour"
-msgstr ""
+msgstr "Kullanıcı turunu gösterme"
 
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
@@ -5245,7 +5306,7 @@ msgstr ""
 " emin misiniz? "
 
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
-#: xmodule/capa_module.py cms/templates/index.html
+#: xmodule/capa_block.py cms/templates/index.html
 #: cms/templates/videos_index_pagination.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
@@ -5266,6 +5327,9 @@ msgid ""
 "            This email was automatically sent from %(platform_name)s.\n"
 "          "
 msgstr ""
+"\n"
+"            Bu e-posta %(platform_name)s platformu tarafından otomatik olarak gönderilmiştir.\n"
+"          "
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 #, python-format
@@ -5274,6 +5338,9 @@ msgid ""
 "            You are receiving this email at address %(email)s because you are enrolled in\n"
 "          "
 msgstr ""
+"\n"
+"            Kayıtlandığınız için %(email)s adresine e-posta gönderileri almaktasınız\n"
+"          "
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid ""
@@ -5281,6 +5348,9 @@ msgid ""
 "            To stop receiving email like this, update your course email settings\n"
 "          "
 msgstr ""
+"\n"
+"           Bunun gibi e-posta iletilerini almayı durdurmak için ders e-posta ayarlarınızı güncelleyin\n"
+"          "
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid "here"
@@ -5303,6 +5373,8 @@ msgid ""
 "You are receiving this email at address %(email)s because you are enrolled "
 "in %(course_title)s."
 msgstr ""
+"%(course_title)s dersine kaydolduğunuz için %(email)s adresine e-posta "
+"iletileri almaktasınız."
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.txt
 #, python-format
@@ -5310,11 +5382,13 @@ msgid ""
 "To stop receiving email like this, update your course email settings here "
 "%(email_settings_url)s"
 msgstr ""
+"Bunun gibi e-posta iletilerini almayı durdurmak için, ders e-posta "
+"ayarlarınızı buradan güncelleyin %(email_settings_url)s"
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.txt
 #, python-format
 msgid "To unsubscribe click here %(unsubscribe_link)s"
-msgstr ""
+msgstr "Abonelikten çıkmak için buraya tıklayın %(unsubscribe_link)s"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
@@ -6717,6 +6791,8 @@ msgid ""
 "Maximum number of records in paginated response of a single request to "
 "catalog service."
 msgstr ""
+"Katalog hizmetine yönelik tek bir isteğin sayfalandırılmış yanıtındaki "
+"maksimum kayıt sayısı."
 
 #: openedx/core/djangoapps/config_model_utils/admin.py
 #, python-brace-format
@@ -6921,7 +6997,7 @@ msgstr "durum"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "The state of the block import task."
-msgstr ""
+msgstr "Block içe aktarma görevinin durumu."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "progress"
@@ -6929,7 +7005,7 @@ msgstr "ilerleme"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "A float from 0.0 to 1.0 representing the task progress."
-msgstr ""
+msgstr "Görev ilerlemesini temsil eden 0,0'dan 1,0'a kayan nokta."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "course ID"
@@ -6950,7 +7026,7 @@ msgstr "lti platform tanımlayıcısı"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "The LTI platform identifier to which this profile belongs to."
-msgstr ""
+msgstr "Bu profilin ait olduğu LTI platform tanımlayıcısı."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "client identifier"
@@ -6958,21 +7034,22 @@ msgstr "müşteri tanımlayıcısı"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "The LTI client identifier generated by the LTI platform."
-msgstr ""
+msgstr "LTI platformu tarafından oluşturulan LTI istemci tanımlayıcısı."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "subject identifier"
-msgstr ""
+msgstr "konu tanımlayıcısı"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid ""
 "Identifies the entity that initiated the launch request, commonly a user."
 msgstr ""
+"Başlatma isteğini başlatan varlığı, genellikle bir kullanıcıyı tanımlar."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid ""
 "The authorized LTI profile that launched the resource (identifies the user)."
-msgstr ""
+msgstr "Kaynağı başlatan yetkili LTI profili (kullanıcıyı tanımlar)."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid ""
@@ -6985,6 +7062,8 @@ msgid ""
 "The LTI platform unique identifier of this resource, also known as the "
 "\"resource link id\"."
 msgstr ""
+"\"Kaynak bağlantı kimliği\" olarak da bilinen bu kaynağın LTI platformu "
+"benzersiz tanımlayıcısı."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "The LTI platform descriptive title for this resource."
@@ -7016,16 +7095,16 @@ msgstr "Öntanımlı Grup"
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
-msgstr "Aynı isimle iki topluluk oluşturamazsınız"
+msgstr "Aynı isimle iki kohort oluşturamazsınız"
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid ""
 "There must be one cohort to which students can automatically be assigned."
-msgstr "Öğrencileri otomatik olarak atayabilen  bir tane topluluk olmalıdır."
+msgstr "Öğrencilerin otomatik olarak atanabildiği bir tane kohort olmalıdır."
 
 #: openedx/core/djangoapps/course_groups/views.py
 msgid "A cohort with the same name already exists."
-msgstr "Aynı isimli bir topluluk önceden oluşturulmuş."
+msgstr "Aynı isimli bir kohort önceden oluşturulmuş."
 
 #: openedx/core/djangoapps/course_live/models.py
 msgid "If disabled, the LTI in the associated course will be disabled."
@@ -7057,6 +7136,7 @@ msgstr "Canlı"
 #: openedx/core/djangoapps/course_live/plugins.py
 msgid "Enable in-platform video conferencing by configuring live"
 msgstr ""
+"Canlı olarak yapılandırarak platform içi video konferansı etkinleştirin"
 
 #: openedx/core/djangoapps/credentials/apps.py
 msgid "Credentials"
@@ -7255,6 +7335,10 @@ msgid ""
 " this provider uses email address and username to personalize the "
 "experience. Please contact {support_contact} to enable this feature."
 msgstr ""
+"{provider} dersinizde bu sağlayıcı kullanıcı deneyiminizi özelleştirebilmek "
+"için e-posta adresiniz ile kullanıcı adınızı kullanıyor, bu nedenle LTI "
+"gelişmiş paylaşım özelliğinin etkinleştirilmiş olması gerekiyor. Bu özelliği"
+" etkinleştirmek için lütfen {support_contact} ile iletişime geçin."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "technical support"
@@ -7304,16 +7388,23 @@ msgid ""
 "If enabled, discussion topics will be created for each non-graded unit in "
 "the course. A UI for discussions will show up with each unit."
 msgstr ""
+"Etkinleştirilirse, derste not verilmeyen her ünite için tartışma konuları "
+"oluşturulur. Her ünitede tartışmalar için bir kullanıcı arayüzü "
+"görünecektir."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
 "If enabled, discussion topics will be created for graded units as well."
 msgstr ""
+"Etkinleştirilirse, not verilen üniteler için de tartışma başlıkları "
+"oluşturulur."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
 "If enabled, discussions will need to be manually enabled for each unit."
 msgstr ""
+"Etkinleştirilirse, tartışmaların her ünite için elle etkinleştirilmesi "
+"gerekir."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The plugin configuration data for this context/provider."
@@ -7329,7 +7420,7 @@ msgstr "Forum aracı/sağlayıcısı kimliği"
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Context key for context in which this discussion topic exists."
-msgstr ""
+msgstr "Bu tartışma başlığının bulunduğu bağlam için bağlam anahtarı."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
@@ -7343,7 +7434,7 @@ msgstr "Tartışma konuları için başlık."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Group for divided discussions."
-msgstr ""
+msgstr "Bölünmüş tartışmalar için grup."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Provider id for discussion provider."
@@ -7361,11 +7452,11 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Ordering of this topic in its learning context"
-msgstr ""
+msgstr "Bu başlığın öğrenme bağlamında sıralaması"
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Additional context for this topic, such as its section, and subsection"
-msgstr ""
+msgstr "Bu başlık için bölümü ve alt bölümü gibi ek bağlamlar"
 
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
@@ -7456,7 +7547,7 @@ msgstr "{course} dersi için {country} kara listede"
 
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
-msgstr ""
+msgstr "Öğrenci Patikaları"
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -7568,7 +7659,7 @@ msgstr "Program UUID"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "If disabled, the LTI in the associated program will be disabled."
-msgstr ""
+msgstr "Devre dışı bırakılırsa, ilgili programdaki LTI devre dışı bırakılır. "
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "The LTI configuration data for this program/provider."
@@ -7971,16 +8062,20 @@ msgid ""
 "This email is already associated with an existing or previous "
 "{settings.PLATFORM_NAME} account"
 msgstr ""
+"Bu e-posta zaten mevcut veya önceki bir {settings.PLATFORM_NAME} hesabıyla "
+"ilişkilendirilmiş"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "This email is associated to a retired account."
-msgstr ""
+msgstr "Bu e-posta emekliye ayrılan bir hesapla ilişkili."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
 "The password you entered is on a list of known compromised passwords. Please"
 " choose a different one."
 msgstr ""
+"Girdiğiniz parola, güvenliği ihlal edilmiş olduğu bilinen parolalar "
+"listesinde. Lütfen farklı bir tane seçin."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -8080,12 +8175,16 @@ msgid ""
 "Our system detected that your password is vulnerable. Change your password "
 "so that your account stays secure."
 msgstr ""
+"Sistemimiz parolanızın savunmasız olduğunu tespit etti. Hesabınızın güvende "
+"kalması için parolanızı değiştirin."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
 "Our system detected that your password is vulnerable. We recommend you "
 "change it so that your account stays secure."
 msgstr ""
+"Sistemimiz parolanızın savunmasız olduğunu tespit etti. Hesabınızın güvende "
+"kalması için değiştirmenizi tavsiye ediyoruz."
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #, python-brace-format
@@ -8571,10 +8670,20 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Some error occurred during password change. Please try again"
 msgstr ""
+"Parola değişimi sırasında birtakım hatalar gerçekleşti. Lütfen tekrar "
+"deneyin"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "No email address provided."
 msgstr "Hiçbir e-posta adresi verilmedi."
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
+"Bir hata meydana geldi. Sayfayı yenilemeyi deneyin veya internet "
+"bağlantınızı kontrol edin."
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -8702,6 +8811,8 @@ msgstr ""
 #, python-brace-format
 msgid "I agree that {platform_name} may send me marketing messages."
 msgstr ""
+"{platform_name} platformunun bana pazarlama iletileri göndermesini kabul "
+"ediyorum."
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
@@ -8933,6 +9044,8 @@ msgid ""
 "Allow Feature Based Enrollment visibility to be overriden on a per-component"
 " basis in Studio."
 msgstr ""
+"Bedava Tur Kayıtlanması görünürlüğünün Studio'da bileşen bazında geçersiz "
+"kılınmasına izin verin."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -8942,6 +9055,8 @@ msgstr ""
 #: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
+"Geçitli içerik türlerine erişime göre kullanıcıları bölümlere ayırmak için "
+"bölümleme"
 
 #: openedx/features/content_type_gating/partitions.py
 #: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
@@ -9001,6 +9116,9 @@ msgid ""
 "{expiration_date}{strong_close}{line_break}You lose all access to this "
 "course, including your progress, on {expiration_date}."
 msgstr ""
+"{strong_open}Gözlemci Erişimi Sonu "
+"{expiration_date}{strong_close}{line_break}Bu derse erişiminiz, tüm "
+"ilerlemenizle beraber {expiration_date} tarihinde sonlanır."
 
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
@@ -9181,6 +9299,10 @@ msgid ""
 "due assignments into the future. Don’t worry—you won’t lose any of the "
 "progress you’ve made when you shift your due dates."
 msgstr ""
+"Kendinizi doğru yolda tutmak için, burayı ziyaret ederek bu programı "
+"güncelleyebilir ve gecikmiş ödevlerinizi ileri tarihlere kaydırabilirsiniz. "
+"Endişelenmeyin, son tarihlerinizi değiştirdiğinizde kaydettiğiniz "
+"ilerlemelerin hiçbirini kaybetmeyeceksiniz. "
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
 #, python-brace-format
@@ -9215,21 +9337,21 @@ msgstr "Giriş"
 msgid "Our mailing address is"
 msgstr "E-posta adresimiz şöyle: "
 
-#: xmodule/annotatable_module.py
+#: xmodule/annotatable_block.py
 msgid "XML data for the annotation"
 msgstr "Bilgi notu için XML verisi"
 
-#: xmodule/annotatable_module.py xmodule/capa_module.py
-#: xmodule/conditional_module.py xmodule/discussion_block.py
-#: xmodule/html_module.py xmodule/library_content_module.py
+#: xmodule/annotatable_block.py xmodule/capa_block.py
+#: xmodule/conditional_block.py xmodule/discussion_block.py
+#: xmodule/html_block.py xmodule/library_content_block.py
 #: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_module.py xmodule/unit_block.py
-#: xmodule/video_module/video_xfields.py xmodule/word_cloud_module.py
+#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
 msgstr "Bu bileşen için gösterilecek ad."
 
-#: xmodule/annotatable_module.py
+#: xmodule/annotatable_block.py
 msgid "Annotation"
 msgstr "İpucu"
 
@@ -9241,11 +9363,11 @@ msgstr "Olası dosya yüklemeleri olan problemler yeniden notlandırılamaz"
 msgid "Question {}"
 msgstr "Soru {}"
 
-#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+#: xmodule/capa/capa_problem.py xmodule/capa_block.py
 msgid "Incorrect"
 msgstr "Yanlış"
 
-#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+#: xmodule/capa/capa_problem.py xmodule/capa_block.py
 msgid "Correct"
 msgstr "Doğru"
 
@@ -9413,7 +9535,7 @@ msgstr "Doğru:"
 msgid "Incorrect:"
 msgstr "Yanlış:"
 
-#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+#: xmodule/capa/responsetypes.py xmodule/capa_block.py
 msgid "Answer"
 msgstr "Cevap"
 
@@ -9679,19 +9801,19 @@ msgstr "Codejail API Servisi geçersiz cevap."
 msgid "Invalid JSON response received from codejail api service."
 msgstr "Codejail api servisinden geçersiz JSON cevabı alındı."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Blank Advanced Problem"
 msgstr "Boş Gelişmiş Problem"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Öğrenciler tarafından bu problemin denenme sayısı"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr "Maksimum Deneme"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines the number of times a student can try to answer this problem. If the"
 " value is not set, infinite attempts are allowed."
@@ -9700,19 +9822,19 @@ msgstr ""
 "olduklarını açıklar. Eğer değer belirlenmemişse, sınırsız denemeye izin "
 "verilir. "
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Date that this problem is due by"
 msgstr "Bu problemin bitmesi gereken tarih"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr "Gönderim tarihinden sonra geçen süre kabul edilecektir."
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Show Results"
 msgstr "Sonuçları Göster"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to show whether a learner's answer to the problem is correct. "
 "Configured on the subsection."
@@ -9720,23 +9842,23 @@ msgstr ""
 "Probleme yönelik öğrenci cevabının doğruluğunun ne zaman gösterileceği "
 "tanımlanır. Alt bölümde ayarlanabilir."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Always"
 msgstr "Her Zaman"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Never"
 msgstr "Asla"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Past Due"
 msgstr "Zaman Aşımına Uğramış"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Show Answer"
 msgstr "Yanıtı Göster"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
@@ -9744,47 +9866,47 @@ msgstr ""
 "Probleme yönelik cevabın ne zaman gösterileceği tanımlanır. 'Gelişmiş "
 "Ayarlar' bölümünde bir varsayılan değer atanabilir."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answered"
 msgstr "Yanıtlandı"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Attempted or Past Due"
 msgstr "Denendi veya Süresi Geçmiş"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Closed"
 msgstr "Kapatıldı"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Finished"
 msgstr "Bitirildi"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Correct or Past Due"
 msgstr "Doğru veya Süresi Geçmiş "
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After Some Number of Attempts"
 msgstr "Belirli Bir Sayıda Denemeden Sonra"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After All Attempts"
 msgstr "Tüm Denemelerden Sonra"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After All Attempts or Correct"
 msgstr "Tüm Denemelerden ya da Doğru Cevaptan Sonra"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Attempted"
 msgstr "Denendi"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Show Answer: Number of Attempts"
 msgstr "Cevabı Göster: Deneme Sayısı"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Number of times the student must attempt to answer the question before the "
 "Show Answer button appears."
@@ -9792,15 +9914,15 @@ msgstr ""
 "Öğrenciye Cevabı Göster düğmesinin görünmesi için gereken cevap denemesi "
 "sayısı."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether to force the save button to appear on the page"
 msgstr "Kaydet düğmesinin sayfada görünmesini zorlayıp zorlamadığı "
 
-#: xmodule/capa_module.py xmodule/library_content_module.py
+#: xmodule/capa_block.py xmodule/library_content_block.py
 msgid "Show Reset Button"
 msgstr "Sıfırla Düğmesini Göster"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Determines whether a 'Reset' button is shown so the user may reset their "
 "answer. A default value can be set in Advanced Settings."
@@ -9809,11 +9931,11 @@ msgstr ""
 "gösterilmeyeceğini belirler. Gelişmiş Ayarlar bölümünde varsayılan bir değer"
 " atanabilir."
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr "Rasgele sıralama"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to randomize the variables specified in the associated Python "
 "script. For problems that do not randomize values, specify \"Never\". "
@@ -9822,55 +9944,55 @@ msgstr ""
 "sıralanacağını tanımlar. Değerlerin rasgele sıralanmadığı sorular için "
 "\"Never\" şeklinde belirtin."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "On Reset"
 msgstr "Sıfırla"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Per Student"
 msgstr "Her Bir Öğrenci"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "XML data for the problem"
 msgstr "Problem için XML verisi"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the correctness of current student answers"
 msgstr "Güncel öğrenci cevaplarının doğruluğu ile sözlük"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary for maintaining the state of inputtypes"
 msgstr "Giriş tipleri durumunu korumak için sözlük"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the current student responses"
 msgstr "Mevcut öğrenci yanıtları ile sözlük"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the current student score"
 msgstr "Mevcut öğrenci notları ile sözlük"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether or not the answers have been saved since last submit"
 msgstr "Son gönderimden bu yana soruların kaydedilip kaydedilmediği"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether the student has answered the problem"
 msgstr "Öğrencinin problemi cevaplayıp cevaplamadığı"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Random seed for this student"
 msgstr "Bu öğrenci için rasgele kaynak"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Last submission time"
 msgstr "Son gönderim zamanı"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Timer Between Attempts"
 msgstr "Denemeler Arası Zamanlayıcı"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Seconds a student must wait between submissions for a problem with multiple "
 "attempts."
@@ -9878,11 +10000,11 @@ msgstr ""
 "Öğrencinin bir sorunun cevabı için birden fazla kez deneme yaptığında her "
 "gönderim için beklemesi gereken saniye."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem Weight"
 msgstr "Problem Ağırlığı"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines the number of points each problem is worth. If the value is not set,"
 " each response field in the problem is worth one point."
@@ -9890,25 +10012,25 @@ msgstr ""
 "Her bir problemin kaç puan ettiğini tanımlar. Eğer bir değer verilmediyse, "
 "her problem bir puan olarak değerlendirilecektir."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Markdown source of this module"
 msgstr "Bu modülün Markdown kaynağı"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Source code for LaTeX and Word problems. This feature is not well-supported."
 msgstr ""
 "LaTeX ve Word problemleri için kaynak kodu. Bu özellik tam desteklenmiyor."
 
-#: xmodule/capa_module.py xmodule/html_module.py
+#: xmodule/capa_block.py xmodule/html_block.py
 msgid "Enable LaTeX templates?"
 msgstr "LaTeX şablonlarını etkinleştir?"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
 msgstr "Matlab API anahtarı"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
 "Service. This key is granted for exclusive use by this course for the "
@@ -9925,7 +10047,7 @@ msgstr ""
 "anahtar almak veya bir sorunu bildirmek için lütfen "
 "moocsupport@mathworks.com adresi ile iletişim kurun"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "We're sorry, there was an error with processing your request. Please try "
 "reloading your page and trying again."
@@ -9933,7 +10055,7 @@ msgstr ""
 "Özür dileriz, talebinizi işlerken bir hata oldu. Sayfayı yeniden yükleyin ve"
 " tekrar deneyin."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "The state of this problem has changed since you loaded this page. Please "
 "refresh your page."
@@ -9941,29 +10063,29 @@ msgstr ""
 "Bu problemin durumu siz sayfayı yükledikten sonra değişti. Lütfen sayfayı "
 "yeniden yükleyin."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answer ID"
 msgstr "Cevap No"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Question"
 msgstr "Soru"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Correct Answer"
 msgstr "Doğru Cevap"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Submitting"
 msgstr "Gönderiliyor"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Warning: The problem has been reset to its initial state!"
 msgstr "Uyarı: Bu problem ilk durumuna sıfırlandı!"
 
 #. Translators: Following this message, there will be a bulleted list of
 #. items.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "The problem's state was corrupted by an invalid submission. The submission "
 "consisted of:"
@@ -9971,7 +10093,7 @@ msgstr ""
 "Problemin durumu geçersiz bir yükleme nedeniyle bozuldu. Bu yükleme "
 "şunlardan oluşuyor:"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "If this error persists, please contact the course staff."
 msgstr "Eğer hata devam ederse, lütfen dersin personeliyle temasa geçiniz."
 
@@ -9980,7 +10102,7 @@ msgstr "Eğer hata devam ederse, lütfen dersin personeliyle temasa geçiniz."
 #. is a header for this hint, and {hint_text} is the text of the hint itself.
 #. This string is being passed to translation only for possible reordering of
 #. the placeholders.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
@@ -9988,12 +10110,12 @@ msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
 #. This text is shown in bold before the accompanying hint text.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "({hints_count} ipucunun {hint_num}): "
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "Your answers were previously saved. Click '{button_name}' to grade them."
@@ -10001,51 +10123,51 @@ msgstr ""
 "Cevaplarınız kaydedilmiş durumda. Notlandırmak için '{button_name}' "
 "düğmesine tıklayın."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
 msgstr[0] "Yanlış ({progress} puan)"
 msgstr[1] "Yanlış ({progress} puan)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
 msgstr[0] "Doğru ({progress} puan)"
 msgstr[1] "Doğru ({progress} puan)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
 msgstr[0] "Kısmen doğru ({progress} puan)"
 msgstr[1] "Kısmen doğru ({progress} puan)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Partially Correct"
 msgstr "Kısmen Doğru"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answer submitted."
 msgstr "Cevap gönderildi."
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem is closed."
 msgstr "Problem yanıtlara kapandı."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem must be reset before it can be submitted again."
 msgstr "Tekrar gönderilmeden önce problem sıfırlanmalı."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr "Yüklemeler arasında en az {wait} saniye beklemelisiniz."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "You must wait at least {wait_secs} between submissions. {remaining_secs} "
@@ -10054,36 +10176,36 @@ msgstr ""
 "Yüklemeler arasında en az {wait_secs} saniye beklemelisiniz. Kalan süre "
 "{remaining_secs}."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
 msgstr[0] "{num_hour} saat"
 msgstr[1] "{num_hour} saat"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
 msgstr[0] "{num_minute} dakika"
 msgstr[1] "{num_minute} dakika"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
 msgstr[0] "{num_second} saniye"
 msgstr[1] "{num_second} saniye"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem needs to be reset prior to save."
 msgstr "Kaydetmeden önce problemin sıfırlanması gerekir."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Your answers have been saved."
 msgstr "Yanıtlarınız kaydedildi."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "Your answers have been saved but not graded. Click '{button_name}' to grade "
@@ -10094,110 +10216,110 @@ msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "You cannot select Reset for a problem that is closed."
 msgstr "Kapatılmış bir problem için Sıfırlama seçilemez."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "You must submit an answer before you can select Reset."
 msgstr "Sıfırlamayı seçmeden önce bir cevap göndermiş olmalısınız."
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem's definition does not support rescoring."
 msgstr "Problemin tanımı yeniden değerlendirmeyi desteklemiyor."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem must be answered before it can be graded again."
 msgstr "Probleme yeniden not verilmeden önce cevaplanması gereklidir."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional"
 msgstr "Koşullu"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "List of urls of children that are references to external modules"
 msgstr "Harici modüllere referans olan alt URL'lerin listesi"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Source Components"
 msgstr "Kaynak Bileşenler"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional block. "
+"Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
-"Bir öğrenciye bu koşullu modülün içeriğinin gösterilip gösterilmediğini "
+"Bir öğrenciye bu koşullu block'un içeriğinin gösterilip gösterilmediğini "
 "belirlemek için kullanılan tüm kaynak bileşenlerin bileşen konum kimlikleri."
 " Studio'daki Ayarlar penceresinden bir bileşenin bileşen konumu kimliğini "
 "kopyalayın."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional Attribute"
 msgstr "Koşul Etiketleri"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
+"shown the content of this conditional block."
 msgstr ""
-"Bir öğrenciye bu koşullu modülün içeriğinin gösterilip gösterilmeyeceğini "
+"Bir öğrenciye bu koşullu block'un içeriğinin gösterilip gösterilmeyeceğini "
 "belirleyen kaynak bileşenlerin özelliği."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional Value"
 msgstr "Koşullu Değer"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
+" before a learner is shown the content of this conditional block."
 msgstr ""
-"Bir öğrenciye bu koşullu modülün içeriği gösterilmeden önce kaynak "
+"Bir öğrenciye bu koşullu block'un içeriği gösterilmeden önce kaynak "
 "bileşenlerin koşullu özniteliğinin eşleşmesi gereken değer. "
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Blocked Content Message"
 msgstr "Engellenmiş İçerik İletisi"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
+"show the content of this conditional block. Include {link} in the text of "
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
-"Bu koşullu modülün içeriğini göstermek için tüm koşullar karşılanmadığında "
+"Bu koşullu block'un içeriğini göstermek için tüm koşullar karşılanmadığında "
 "öğrencilere gösterilen ileti. Öğrencilere gerekli ünitelere doğrudan bir "
 "bağlantı vermek için iletinizin metnine {link} bağlantısını ekleyin. "
 "Örneğin, 'Bu üniteye erişebilmeniz için önce {link}' bağlantısını "
 "tamamlamalısınız'. "
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 #, python-brace-format
 msgid "You must complete {link} before you can access this unit."
 msgstr ""
 "Bu üniteye erişim hakkını edinmeden önce {link} bağlantısını "
 "tamamlamalısınız."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "This component has no source components configured yet."
 msgstr "Bu bileşenin kaynak bileşenleri henüz yapılandırılmamış."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Configure list of sources"
 msgstr "Kaynaklar listesini yapılandır"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "LTI Passports"
 msgstr "LTI Pasaportları"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
 "\"id:client_key:client_secret\"."
@@ -10205,41 +10327,41 @@ msgstr ""
 "Ders LTI araçları için aşağıdaki formatta pasaportları girin: "
 "\"id:client_key:client_secret\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "List of Textbook objects with (title, url) for textbooks used in this course"
 msgstr ""
 "Bu eğitimde kullanılan ders kitapları için (başlık, url) bilgileri listesi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Slug that points to the wiki for this course"
 msgstr "Bu dersin wikisi için kısaismi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that enrollment for this class is opened"
 msgstr "Bu ders için kayıtlanmanın açılacağı tarih"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that enrollment for this class is closed"
 msgstr "Bu ders için kayıtlanmanın kapanacağı tarih"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Start time when this module is visible"
 msgstr "Bu modül görünür olduğunda süreyi başlat"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that this class ends"
 msgstr "Dersin biteceği tarih"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that certificates become available to learners"
 msgstr "Sertifikaların öğrencilere açılacağı tarih"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Cosmetic Course Display Price"
 msgstr "Kozmetik Ders Ekran Ücreti"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "The cost displayed to students for enrolling in the course. If a paid course"
 " registration price is set by an administrator in the database, that price "
@@ -10249,11 +10371,11 @@ msgstr ""
 "olan bir dersin fiyatı veritabanındaki yönetici tarafından belirlendiyse bu "
 "belirlenen ücret gösterilecektir."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Advertised Start"
 msgstr "Dersin Duyurulan Başlama Tarihi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the text that you want to use as the advertised starting time frame "
 "for the course, such as \"Winter 2018\". If you enter null for this value, "
@@ -10263,23 +10385,23 @@ msgstr ""
 "\"Kış 2018\" gibi. Bu değeri null olarak girerseniz, bu ders için "
 "belirlediğiniz başlangıç tarihi gösterilecektir."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Requisite Courses"
 msgstr "Ön-Koşul Dersler"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Requisite Course key if this course has a pre-requisite course"
 msgstr "Eğer bu ders ön-gerekli ders ise Ön-Gerekli Ders anahtarı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Grading policy definition for this class"
 msgstr "Bu sınıf için notlandırma kuralı tanımı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Show Calculator"
 msgstr "Hesap Makinesi Göster"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. When true, students can see the calculator in the "
 "course."
@@ -10287,27 +10409,27 @@ msgstr ""
 "True ya da False değerleriyle işaretleyin. True değeri girildiğinde, öğrenci"
 " derste hesap makinesi görebilecek."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the name of the course as it should appear in the course list."
 msgstr "Ders listesinde gözükmesini istediğiniz şekilde dersin adını girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Display Name"
 msgstr "Dersin Görünecek İsmi"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Course Editor"
 msgstr "Ders Editörü"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
 msgstr "Bu dersin düzenleme yöntemini girin (\"XML\" veya \"Studio\")."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Survey URL"
 msgstr "Ders Anketi Bağlantısı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the URL for the end-of-course survey. If your course does not have a "
 "survey, enter null."
@@ -10315,11 +10437,11 @@ msgstr ""
 "Ders sonu anketi için URL girin. Eğer dersinizin anketi yoksa null/boş "
 "girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Blackout Dates"
 msgstr "Tartışmayı Karartma Tarihleri"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter pairs of dates between which students cannot post to discussion "
 "forums. Inside the provided brackets, enter an additional set of square "
@@ -10341,11 +10463,11 @@ msgstr ""
 "parantez dahil olmak üzere şu şekilde görünür: [[\"2015-09-15\", "
 "\"2015-09-21\"], [\"2015-10-01\", \"2015-10-08\"]]"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Topic Mapping"
 msgstr "Tartışma Konusu Eşleştirme"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
@@ -10368,41 +10490,41 @@ msgstr ""
 "Notaları\" için, {\"id\": \"i4x-UniversityX-MUS101-course-2015_T1\", "
 "\"default\": true}."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussions Plugin Settings"
 msgstr "Tartışmalar Eklenti Ayarları "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Settings for discussions plugins."
 msgstr "Tartışmalar eklentileri için ayarlar."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Announcement Date"
 msgstr "Dersin İlan Tarihi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the date to announce your course."
 msgstr "Dersinizi duyurma tarihini giriniz."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Cohort Configuration"
-msgstr "Topluluk Ayarları"
+msgstr "Kohort Yapılandırması"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter policy keys and values to enable the cohort feature, define automated "
 "student assignment to groups, or identify any course-wide discussion topics "
 "as private to cohort members."
 msgstr ""
-"Topluluk özelliğini etkinleştirmek için koşul anahtarı ve değerlerini girin,"
-" otomatikleştirilmiş gruplara öğrenci atamayı tanımla, ya da özel olarak "
-"ders çapında tartışma başlıklarını topluluk üyelerine tanımla."
+"Kohort özelliğini etkinleştirmek için koşul anahtarı ve değerlerini girin, "
+"gruplara otomatik öğrenci atamayı tanımlayın, ya da ders genelindeki "
+"tartışma başlıklarını kohort üyelerine özel yapın."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Is New"
 msgstr "Bu Ders Yeni"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, the course appears in the list of new courses,"
 " and a New! badge temporarily appears next to the course image."
@@ -10411,11 +10533,11 @@ msgstr ""
 "dersler listesinde ve ders görselinin yanında Yeni! rozeti geçici olarak "
 "görünür."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Mobile Course Available"
 msgstr "Mobil Ders Mevcut"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, the course will be available to mobile "
 "devices."
@@ -10423,11 +10545,11 @@ msgstr ""
 "True ya da False değerleriyle işaretleyin. True değeri girildiğinde, ders "
 "mobil cihazlara açık olacak."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Video Upload Credentials"
 msgstr "Video Yükleme Kimlik Bilgileri"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Enter the unique identifier for your course's video files provided by "
@@ -10436,39 +10558,39 @@ msgstr ""
 "Dersinizin video dosyaları için {platform_name} tarafından sağlanan özgün "
 "tanımlayıcıyı girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Not Graded"
 msgstr "Ders Puanlanmadı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter true or false. If true, the course will not be graded."
 msgstr ""
 "True ya da False değerleriyle işaretleyin. Değer True ise, ders "
 "notlandırılmayacak."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Disable Progress Graph"
 msgstr "İlerleme Grafiğini Devre Dışı Bırak"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter true or false. If true, students cannot view the progress graph."
 msgstr ""
 "True ya da False değerleriyle işaretleyin. True değeri girildiğinde, "
 "öğrenciler ilerleme grafiğini göremez."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "PDF Textbooks"
 msgstr "PDF Ders Kitapları"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "List of dictionaries containing pdf_textbook configuration"
 msgstr "pdf_textbook yapılandırmasını içeren sözlüklerin listesi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "HTML Textbooks"
 msgstr "HTML Ders Kitapları"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "For HTML textbooks that appear as separate tabs in the course, enter the "
 "name of the tab (usually the title of the book) as well as the URLs and "
@@ -10478,11 +10600,11 @@ msgstr ""
 "sekmenin (genellikle kitabın başlığı) ve kitabın her bölümünün URL ve "
 "başlıklarını girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Remote Gradebook"
 msgstr "Uzak Not Defteri"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the remote gradebook mapping. Only use this setting when "
 "REMOTE_GRADEBOOK_URL has been specified."
@@ -10495,7 +10617,7 @@ msgstr ""
 #. a role created by a course Instructor to enable a person (the "Coach") to
 #. manage the custom course for
 #. his students.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable CCX"
 msgstr "CCX Eğitimlerini Etkinleştir"
 
@@ -10504,7 +10626,7 @@ msgstr "CCX Eğitimlerini Etkinleştir"
 #. a role created by a course Instructor to enable a person (the "Coach") to
 #. manage the custom course for
 #. his students.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
@@ -10518,11 +10640,11 @@ msgstr ""
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
 #. course content.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "CCX Connector URL"
 msgstr "CCX Eğitim Bağlayıcı URL"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "URL for CCX Connector application for managing creation of CCXs. (optional)."
 " Ignored unless 'Enable CCX' is set to 'true'."
@@ -10531,11 +10653,11 @@ msgstr ""
 "bağlantısı (isteğe bağlı). 'CCX Eğitimlerini Etkinleştir' ayarı 'true' "
 "olarak işaretleninceye dek göz ardı edilir."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Anonymous Discussion Posts"
 msgstr "Anonim Tartışma Ortamı Gönderilerini Kabul et"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to all users."
@@ -10543,11 +10665,11 @@ msgstr ""
 "True ya da False değerleriyle işaretleyin. True değeri girildiğinde, "
 "öğrenciler tüm kullanıcılara anonim forum gönderileri oluşturabilir."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Anonymous Discussion Posts to Peers"
 msgstr "Kişiye Anonim Tartışma Gönderilerine İzin Ver"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to other students. This setting does not make posts anonymous to "
@@ -10557,15 +10679,15 @@ msgstr ""
 "öğrenciler diğer öğrencilere anonim olan forum gönderileri oluşturabilir. Bu"
 " ayar gönderileri ders personeline anonim yapmaz."
 
-#: xmodule/course_module.py xmodule/library_root_xblock.py
+#: xmodule/course_block.py xmodule/library_root_xblock.py
 msgid "Advanced Module List"
 msgstr "Gelişmiş Modül Listesi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the names of the advanced modules to use in your course."
 msgstr "Dersinizde kullanacağınız gelişmiş bileşenlerin adlarını girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
@@ -10573,11 +10695,11 @@ msgstr ""
 "Ders içinde saat dilimleri gösterilmeliyse, değer olarak True. "
 "bitiş_tarihi_gösterim_formatı lehine onaylanmamıştır."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Due Date Display Format"
 msgstr "Bitiş Tarihi Gösterim Formatı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the format for due dates. The default is Mon DD, YYYY. Enter "
 "\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
@@ -10587,19 +10709,19 @@ msgstr ""
 " \"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
 "YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "External Login Domain"
 msgstr "Harici Oturum Açma Alanı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the external login method students can use for the course."
 msgstr "Öğrencilerin ders için kullanabileceği harici giriş metodunu girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificates Downloadable Before End"
 msgstr "Bitişten Önce Sertifikalar İndirilebilir"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can download certificates before the "
 "course ends, if they've met certificate requirements."
@@ -10608,21 +10730,21 @@ msgstr ""
 "öğrenciler sertifika için gereklilikleri sağlıyorlarsa ders bitiminden önce "
 "sertifikalarını indirebilirler. "
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Certificates Display Behavior"
 msgstr "Sertifikalar Gösterim Davranışı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "This field, together with certificate_available_date will determine when a "
 "user can see their certificate for the course"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course About Page Image"
 msgstr "Dersin Hakkında Sayfası için Görsel"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the course image file. You must upload this file on the "
 "Files & Uploads page. You can also set the course image on the Settings & "
@@ -10632,11 +10754,11 @@ msgstr ""
 "sayfasına yüklemelisiniz. Ayarlar & Ayrıntılar sayfasından dersin resmini "
 "ayarlayabilirsiniz."
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Course Banner Image"
 msgstr "Ders Banner Görseli"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the banner image file. You can set the banner image on the "
 "Settings & Details page."
@@ -10644,11 +10766,11 @@ msgstr ""
 "Banner görüntü dosyasının adını düzenle. Banner görselini Ayarlar & "
 "Ayrıntılar sayfasından belirleyebilirsiniz."
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Course Video Thumbnail Image"
 msgstr "Ders Videosu Küçük Resmi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the video thumbnail image file. You can set the video "
 "thumbnail image on the Settings & Details page."
@@ -10656,11 +10778,11 @@ msgstr ""
 "Video küçük resmi dosyasının ismini düzenle. Video küçük resmini     Ayarlar"
 " & Ayrıntılar sayfasından belirleyebilirsiniz."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Issue Open Badges"
 msgstr "Open Badge Çıkar"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Issue Open Badges badges for this course. Badges are generated when "
 "certificates are created."
@@ -10668,7 +10790,7 @@ msgstr ""
 "Bu ders için Open Badges rozeti oluşturun. Rozetler sertifikalar "
 "düzenlendiğinde oluşturulur. "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -10678,11 +10800,11 @@ msgstr ""
 " işaretlerinin arasına, öğrencilerin dersi tamamladıktan sonra alacakları "
 "sertifika türünün kısa ismini yazın. Örneğin, \"Sertifika\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Name (Short)"
 msgstr "Sertifika İsmi (Kısa)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the long name of the type of certificate that students receive "
@@ -10692,15 +10814,15 @@ msgstr ""
 " işaretlerinin arasına, öğrencilerin dersi tamamladıktan sonra alacakları "
 "sertifika türünün uzun ismini yazın. Örneğin, \"Üstün Başarı Belgesi\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Name (Long)"
 msgstr "Sertifika İsmi (Uzun)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Web/HTML View Enabled"
 msgstr "Sertifika Web/HTML Görünümü Etkinleştirildi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "If true, certificate Web/HTML views are enabled for the course."
 msgstr ""
 "Eğer değer true/doğru ise, sertifika Web/HTML görünümleri bu ders için "
@@ -10708,13 +10830,13 @@ msgstr ""
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Web/HTML View Overrides"
 msgstr "Sertifika Web/HTML Görünümü geçersiz kılındı"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter course-specific overrides for the Web/HTML template parameters here "
 "(JSON format)"
@@ -10724,21 +10846,21 @@ msgstr ""
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Configuration"
 msgstr "Sertifika Yapılandırması"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter course-specific configuration information here (JSON format)"
 msgstr "Ders-belirli yapılandırma bilgisini buraya girin (JSON formatı)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "CSS Class for Course Reruns"
 msgstr "Dersleri Yeniden Çalıştırmak için CSS Sınıfları "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Allows courses to share the same css class across runs even if they have "
 "different numbers."
@@ -10746,29 +10868,29 @@ msgstr ""
 "Farklı numaralı olsa bile aynı css sınıfını paylaşmak için derslere izin "
 "verir."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Forum External Link"
 msgstr "Harici Forum Bağlantısı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allows specification of an external link to replace discussion forums."
 msgstr ""
 "Tartışma forumlarını değiştirmek için harici bağlantının belirtimine izin "
 "ver. "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Hide Progress Tab"
 msgstr "İlerleme Sekmesini Gizle"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allows hiding of the progress tab."
 msgstr "İlerleme sekmesini gizlemeye izin verir."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Organization Display String"
 msgstr "Ders Organizasyonu Görüntüleme Dizesi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the course organization that you want to appear in the course. This "
 "setting overrides the organization that you entered when you created the "
@@ -10780,11 +10902,11 @@ msgstr ""
 "oluşturduğunuzda girdiğiniz organizasyonu kullanmak için, değeri null olarak"
 " girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Number Display String"
 msgstr "Ders Sayısı Görüntüleme Dizesi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the course number that you want to appear in the course. This setting "
 "overrides the course number that you entered when you created the course. To"
@@ -10796,11 +10918,11 @@ msgstr ""
 "oluşturduğunuzda girmiş olduğunuz numarayı kullanmak için, null değerini "
 "girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Maximum Student Enrollment"
 msgstr "Derse Kayıtlanacak En Fazla Öğrenci"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the maximum number of students that can enroll in the course. To allow"
 " an unlimited number of students, enter null."
@@ -10808,11 +10930,11 @@ msgstr ""
 "Derse en fazla kaç öğrencinin kaydolabileceğini girin. Öğrenci sayısı sınırı"
 " olmasını istemiyorsanız null değerini girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Public Wiki Access"
 msgstr "Genel Wiki Erişimine İzin Ver"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can view the course wiki even if "
 "they're not enrolled in the course."
@@ -10821,28 +10943,28 @@ msgstr ""
 "girilmişse, derse kayıt olmamış olsalar bile öğrenciler ders wikisini "
 "görüntüleyebilir."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Invitation Only"
 msgstr "Sadece Davet ile"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Whether to restrict enrollment to invitation by the course staff."
 msgstr "Ders personeli tarafından davet için kaydın kısıtlanması."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Course Survey Name"
 msgstr "Ders-öncesi Anket Adı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Name of SurveyForm to display as a pre-course survey to the user."
 msgstr ""
 "Kullanıcılara ders önceki anketi olarak gösterilecek Anket Formunun Adı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Course Survey Required"
 msgstr "Ders-öncesi Anketi Gerekli"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify whether students must complete a survey before they can view your "
 "course content. If you set this value to true, you must add a name for the "
@@ -10852,13 +10974,13 @@ msgstr ""
 "gerekmediğini belirtin. Bu değeri True olarak ayarlarsanız, yukarıda bulunan"
 " Ders Anket Adı ayarı kısmından anketinize isim eklemelisiniz."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Visibility In Catalog"
 msgstr "Katalogda Dersin Görünürlüğü"
 
 #. Translators: the quoted words 'both', 'about', and 'none' must be
 #. left untranslated.  Leave them as English words.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Defines the access permissions for showing the course in the course catalog."
 " This can be set to one of three values: 'both' (show in catalog and allow "
@@ -10871,11 +10993,11 @@ msgstr ""
 "izin ver), 'none' (katalogda gösterme ve hakkında sayfasına erişime izin "
 "verme)."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam Enabled"
 msgstr "Giriş Sınavı Etkin"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
 " your course content. Note, you must enable Entrance Exams for this course "
@@ -10885,11 +11007,11 @@ msgstr ""
 "tamamlamaması gerektiğini belirtin. Bu ders ayarının gerçekleşmesi için "
 "Giriş Sınavları'nı etkinleştirmeniz gerektiğine dikkat edin. "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam Minimum Score (%)"
 msgstr "Giriş Sınavı Minimum Puan (%)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
 "view your course content. Note, you must enable Entrance Exams for this "
@@ -10899,19 +11021,19 @@ msgstr ""
 "minimum puanı yüzdelik olarak tanımlayın. Etkin olması için Giriş "
 "Sınavlarını ders ayarlarından etkinleştirmelisiniz."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam ID"
 msgstr "Giriş Sınavı ID'si"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Content module identifier (location) of entrance exam."
 msgstr "Giriş sınavının içerik modül belirleyicisi (yer)."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Social Media Sharing URL"
 msgstr "Sosyal Medya Paylaşım Bağlantısı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "If dashboard social sharing and custom course URLs are enabled, you can "
 "provide a URL (such as the URL to a course About page) that social media "
@@ -10923,19 +11045,19 @@ msgstr ""
 "ekleyebilirsiniz. URL'ler tüm nitelikleri taşımalıdır. Örneğin: "
 "http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Course Language"
 msgstr "Dersin Dili"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Specify the language of your course."
 msgstr "Dersinizin dilini tanımlayın."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Teams Configuration"
 msgstr "Takımlar Yapılandırması"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Configure team sets, limit team sizes, and set visibility settings using "
 "JSON. See <a target=\"&#95;blank\" "
@@ -10944,11 +11066,11 @@ msgid ""
 "teams\">teams configuration documentation</a> for help and examples."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Proctored Exams"
 msgstr "Gözetimli Sınavları Etkinleştir"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, proctored exams are enabled in "
 "your course. Note that enabling proctored exams will also enable timed "
@@ -10958,11 +11080,11 @@ msgstr ""
 "ayarlanmışsa, dersinizde gözetimli sınavlar etkindir. Gözetimli sınavları "
 "etkinleştirmenin süreli sınavları da etkin hale getireceğini unutmayın."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Proctoring Provider"
 msgstr "Gözetim Hizmet Sağlayıcısı"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Enter the proctoring provider you want to use for this course run. Choose "
@@ -10971,11 +11093,11 @@ msgstr ""
 "Bu ders yayınında kullanmayı istediğiniz gözetim sağlayıcısını girin. "
 "Aşağıdakilerden birini seçebilirsiniz: {available_providers}."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Proctortrack Exam Escalation Contact"
 msgstr "Proctortrack Sınav Sorun İletme Kişisi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Required if 'proctortrack' is selected as your proctoring provider. Enter an"
 " email address to be contacted by the support team whenever there are "
@@ -10985,11 +11107,11 @@ msgstr ""
 "(itiraz, gecikmiş değerlendirme vs.) iletiminin gerektiği durumlarda "
 "kullanılacak destek ekibi iletişim e-posta adresini girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Opting Out of Proctored Exams"
 msgstr "Gözetimli Sınavlara Katılmamaya İzin Ver"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, learners can choose to take "
 "proctored exams without proctoring. If this value is false, all learners "
@@ -11001,11 +11123,11 @@ msgstr ""
 "olarak girilmişse, tüm öğrenciler sınavı gözetimli olarak almak zorundadır. "
 "Bu ayar ders için gözetimli sınavlar etkinleştirilmişse uygulanacaktır."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
 msgstr "Şüpheli Gözetimli Sınav Girişimleri için Zendesk Bildirimleri Oluştur"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, a Zendesk ticket will be created"
 " for suspicious attempts."
@@ -11013,11 +11135,11 @@ msgstr ""
 "True ya da False değerleriyle işaretleyin. Eğer bu değer True olarak "
 "girilmişse, şüpheli girişimler için Zendesk bildirimleri oluşturulacaktır."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Timed Exams"
 msgstr "Zamanlanmış Sınavları Etkinleştir"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
 "course. Regardless of this setting, timed exams are enabled if Enable "
@@ -11028,11 +11150,11 @@ msgstr ""
 "etkinleştirmek için Gözetimli Sınavları Etkinleştir seçeneği değeri de True "
 "olmalı."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Minimum Grade for Credit"
 msgstr "Kredi için Minimum Not"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "The minimum grade that a learner must earn to receive credit in the course, "
 "as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
@@ -11040,11 +11162,11 @@ msgstr ""
 "Öğrencinin dersten kredi kazanması için alması gereken en az not, ondalıklı "
 "sayı olarak 0.0 ve 1.0 arasındadır. Örneğin %75 için 0.75 şeklinde girin. "
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr "Kendi Kendine"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
@@ -11055,11 +11177,11 @@ msgstr ""
 " öğrenciler ders bitiş tarihine kadar istedikleri zaman derste "
 "ilerleyebilir."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Subsection Prerequisites"
 msgstr "Altbölüm Önkoşullarını Etkinleştir"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
@@ -11068,21 +11190,21 @@ msgstr ""
 "girilmişse, öğrenciler önkoşul altbölümünde geçer not alıncaya dek bir "
 "altbölümü gizleyebilirsiniz."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Learning Information"
 msgstr "Ders Kazanım Bilgisi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Specify what student can learn from the course."
 msgstr "Bu dersten öğrencilerin neleri öğreneceğini belirtin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Visibility For Unenrolled Learners"
 msgstr "Kayıtlanmamış Öğrenciler İçin Ders Görünürlüğü"
 
 #. Translators: the quoted words 'private', 'public_outline', and 'public'
 #. must be left untranslated.  Leave them as English words.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Defines the access permissions for unenrolled learners. This can be set to "
 "one of three values: 'private' (default visibility, only allowed for "
@@ -11095,19 +11217,19 @@ msgstr ""
 "izin verir) ve 'public' (hem anahatlara hem de ders içeriğine erişime izin "
 "verilir). "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Ders Eğitmeni"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the details for Course Instructor"
 msgstr "Ders Eğitmeni hakkındaki ayrıntıları girin"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Add Unsupported Problems and Tools"
 msgstr "Desteklenmeyen Problem ve Araçları Ekle"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, you can add unsupported problems and tools to "
 "your course in Studio. Unsupported problems and tools are not recommended "
@@ -11121,11 +11243,11 @@ msgstr ""
 "belgelendirme gibi bir ya da daha fazla sayıda temel gerekliliği "
 "karşılamadıkları için tavsiye edilmez. "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Highlights Enabled for Messaging"
 msgstr "Mesajlaşmada Renkle Vurgusunu Etkinleştir"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, any highlights associated with content in the "
 "course will be messaged to learners at their scheduled time."
@@ -11134,11 +11256,11 @@ msgstr ""
 "tüm renkli vurgulamalar öğrencilere planlanan zaman diliminde ileti olarak "
 "gönderilecek."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course-wide Custom JS"
 msgstr "Ders boyunca Özel JS"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter Javascript resource URLs you want to be loaded globally throughout the"
 " course pages."
@@ -11146,11 +11268,11 @@ msgstr ""
 "Ders sayfalarının tamamında yüklenmesini istediğiniz JavaScript kaynak "
 "URL'lerini girin."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course-wide Custom CSS"
 msgstr "Ders boyunca Özel CSS"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter CSS resource URLs you want to be loaded globally throughout the course"
 " pages."
@@ -11158,13 +11280,13 @@ msgstr ""
 "Ders sayfalarının tamamında yüklenmesini istediğiniz CSS kaynak URL'lerini "
 "girin."
 
-#: xmodule/course_module.py cms/templates/certificates.html
+#: xmodule/course_block.py cms/templates/certificates.html
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 msgid "Other Course Settings"
 msgstr "Diğer Ders Ayarları"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Any additional information about the course that the platform needs or that "
 "allows integration with external systems such as CRM software. Enter a "
@@ -11176,7 +11298,7 @@ msgstr ""
 " \"value\", \"other_setting\": \"value\" } gibi JSON biçiminde bir değerler "
 "sözlüğü girin"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "General"
 msgstr "Genel"
 
@@ -11250,7 +11372,7 @@ msgstr "{section_type} Ortalama = {percent:.0%}"
 msgid "{short_label} Avg"
 msgstr "{short_label} Ort."
 
-#: xmodule/hidden_module.py
+#: xmodule/hidden_block.py
 #, python-brace-format
 msgid ""
 "ERROR: \"{block_type}\" is an unknown component type. This component will be"
@@ -11259,16 +11381,16 @@ msgstr ""
 "HATA: \"{block_type}\" bilinmeyen bir bileşen türü. Bu bileşen LMS'de "
 "gizlenecek."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Html contents to display for this module"
 msgstr "Bu modülde gösterilecek Html içerikleri"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
 msgstr ""
 "LaTeX belgeleri için kaynak kodu. Bu özellik tam olarak desteklenmemektedir."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid ""
 "Select Visual to enter content and have the editor automatically create the "
 "HTML. Select Raw to edit HTML directly. If you change this setting, you must"
@@ -11278,23 +11400,23 @@ msgstr ""
 "için Görsel'i seçin. HTML'yi doğrudan düzenlemek için Ham'ı seçin. Bu ayarı "
 "değiştirirseniz bileşeni kaydetmeli ve düzenlemek için yeniden açmalısınız. "
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Editor"
 msgstr "Editör"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Visual"
 msgstr "Görsel"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Raw"
 msgstr "Ham"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Hide Page From Learners"
 msgstr "Sayfayı Öğrencilerden Gizle"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid ""
 "If you select this option, only course team members with the Staff or Admin "
 "role see this page."
@@ -11302,51 +11424,51 @@ msgstr ""
 "Bu ayarı seçtiğinizde, sadece Personel ve Yönetici yetki grubundaki "
 "kullanıcılar bu sayfayı görebilecek."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "HTML for the additional pages"
 msgstr "Ek sayfalar için HTML"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "List of course update items"
 msgstr "Ders güncelleme öğelerinin listesi"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Any Type"
 msgstr "Herhangi Tip"
 
-#: xmodule/library_content_module.py cms/templates/widgets/header.html
+#: xmodule/library_content_block.py cms/templates/widgets/header.html
 msgid "Library"
 msgstr "Kütüphane"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select the library from which you want to draw content."
 msgstr "İçeriği çekmek istediğiniz kütüphaneyi seçin."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Library Version"
 msgstr "Kütüphane Sürümü"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Determines how content is drawn from the library"
 msgstr "İçeriğin kütüphaneden nasıl çekileceğini belirler"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Choose n at random"
 msgstr "n sayısını rasgele üret"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Count"
 msgstr "Say"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Enter the number of components to display to each student."
 msgstr "Her bir öğrenciye gösterilecek bileşen sayısını giriniz."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Problem Type"
 msgstr "Problem Türü"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "Choose a problem type to fetch from the library. If \"Any Type\" is selected"
 " no filtering is applied."
@@ -11354,32 +11476,32 @@ msgstr ""
 "Kütüphaneden getirmek için problem türünü seçin. Eğer \"Herhangi Bir Tür\" "
 "seçiliyse filtreleme uygulanmaz."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "Determines whether a 'Reset Problems' button is shown, so users may reset "
 "their answers and reshuffle selected items."
 msgstr ""
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "Bu bileşen güncel değil. Kütüphane yeni içeriğe sahip."
 
 #. Translators: {refresh_icon} placeholder is substituted to "↻" (without
 #. double quotes)
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "{refresh_icon} Update now."
 msgstr "{refresh_icon} Şimdi güncelle."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Library is invalid, corrupt, or has been deleted."
 msgstr "Kütüphane geçersiz, bozulmuş veya silinmiş."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Edit Library List."
 msgstr "Kütüphane Listesini Düzenle."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "This course does not support content libraries. Contact your system "
 "administrator for more information."
@@ -11387,23 +11509,23 @@ msgstr ""
 "Bu ders, içerik kütüphanelerini desteklemiyor. Daha fazla bilgi için sistem "
 "yöneticisi ile iletişime geçiniz."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "A library has not yet been selected."
 msgstr "Henüz bir kütüphane seçilmedi."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select a Library."
 msgstr "Bir Kütüphane Seçin."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "There are no matching problem types in the specified libraries."
 msgstr "Belirtilen kütüphanelerde, eşleşen problem türleri yoktur."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select another problem type."
 msgstr "Farklı problem türü seçiniz."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "The specified library is configured to fetch {count} problem, "
 msgid_plural "The specified library is configured to fetch {count} problems, "
@@ -11412,22 +11534,22 @@ msgstr[0] ""
 msgstr[1] ""
 "Belirtilen kütüphane, {count} problemi getirmek için ayarlanmıştır, "
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "but there is only {actual} matching problem."
 msgid_plural "but there are only {actual} matching problems."
 msgstr[0] "fakat sadece {actual} eşleşen problem bulunmaktadır."
 msgstr[1] "fakat sadece {actual} eşleşen problem bulunmaktadır."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Edit the library configuration."
 msgstr "Kütüphane ayarlarını düzenleyin."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Invalid Library"
 msgstr "Geçersiz Kütüphane"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "No Library Selected"
 msgstr "Hiçbir Kütüphane Seçilmedi"
 
@@ -11469,7 +11591,7 @@ msgid "Importing Library Block failed - are the IDs valid and readable?"
 msgstr ""
 "Kütüphane Block içe aktarımı başarısız - ID'ler geçerli ve okunabilir mi?"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
 "display name to identify this component."
@@ -11477,11 +11599,11 @@ msgstr ""
 "Bu bileşen için gösterim adı. Analitik raporları bu bileşeni tanımlamak için"
 " gösterim adını kullanabilir."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI ID"
 msgstr "LTI No"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
@@ -11494,11 +11616,11 @@ msgstr ""
 " olmalıdır.{break_tag}Bu ayar hakkında ayrıntılı bilgi için "
 "{docs_anchor_open}edX LTI belgelendirmesine{anchor_close} bakın."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI URL"
 msgstr "LTI URL"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
@@ -11511,11 +11633,11 @@ msgstr ""
 "için {break_tag}{docs_anchor_open}edX LTI belgelendirmesine{anchor_close} "
 "bakın."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Custom Parameters"
 msgstr "Özel yapılmış parametreler"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
@@ -11528,11 +11650,11 @@ msgstr ""
 "hakkında daha detaylı bilgi için {docs_anchor_open}edX LTI "
 "belgelendirmesine{anchor_close} bakınız."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Open in New Page"
 msgstr "Yeni Sayfada Aç"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if you want students to click a link that opens the LTI tool in "
 "a new window. Select False if you want the LTI content to open in an IFrame "
@@ -11545,11 +11667,11 @@ msgstr ""
 "işaretleyin. Bu ayar yalnızca Harici Aracı Gizle değeri False olarak "
 "ayarlandığında kullanılır."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Scored"
 msgstr "Puanlandı"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if this component will receive a numerical score from the "
 "external LTI system."
@@ -11557,11 +11679,11 @@ msgstr ""
 "Bu bileşen dış LTI sisteminden rakamsal bir skor alacaksa True olarak "
 "işaretleyin. "
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Weight"
 msgstr "Ağırlık"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter the number of points possible for this component.  The default value "
 "is 1.0.  This setting is only used when Scored is set to True."
@@ -11569,22 +11691,22 @@ msgstr ""
 "Bu bileşen için muhtemel puan sayısını girin. Varsayılan değer 1.0. Bu ayar "
 "sadece Puanlandı değeri True olarak ayarlandıysa kullanılır."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "The score kept in the xblock KVS -- duplicate of the published score in "
 "django DB"
 msgstr ""
 "Puan xblock KVS'de tutuldu -- django DB'deki yayınlanan puanın kopyası"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Comment as returned from grader, LTI2.0 spec"
 msgstr "Derecelendirenden döndüğü gibi yorum, LTI2.0 spec"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Hide External Tool"
 msgstr "Harici Aracı Gizle"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if you want to use this component as a placeholder for syncing "
 "with an external grading  system rather than launch an external tool.  This "
@@ -11595,31 +11717,31 @@ msgstr ""
 " olarak işaretleyin. Bu ayar Başlat düğmesini ve bu bileşen için olan "
 "IFrames'i gizler."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Request user's username"
 msgstr "Kullanıcının kullanıcı adını iste"
 
 #. Translators: This is used to request the user's username for a third party
 #. service.
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Select True to request the user's username."
 msgstr "Kullanıcının kullanıcı adını istemek için True'yu seçin."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Request user's email"
 msgstr "Kullanıcının e-posta adresini iste"
 
 #. Translators: This is used to request the user's email for a third party
 #. service.
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Select True to request the user's email address."
 msgstr "Kullanıcının e-posta adresini istemek için True'yu seçin."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI Application Information"
 msgstr "LTI Uygulama Bilgisi"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter a description of the third party application. If requesting username "
 "and/or email, use this text box to inform users why their username and/or "
@@ -11630,36 +11752,36 @@ msgstr ""
 "üçüncü parti uygulamaya kullanıcı adlarının ve/veya e-postalarının "
 "gönderileceğine ilişkin açıklama yazın."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Button Text"
 msgstr "Düğme Metni"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter the text on the button used to launch the third party application."
 msgstr ""
 "Üçüncü kişi uygulamasını başlatmak için kullanılan düğmenin üzerindeki metni"
 " girin."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Accept grades past deadline"
 msgstr "Tarihi geçmiş notları kabul et"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True to allow third party systems to post grades past the deadline."
 msgstr ""
 "Bitiş tarihi geçmiş notlarını göndermek için üçüncü parti sistemlere izin "
 "vermek için True'yu seçin."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
 "string."
 msgstr "Özel parametre okunamadı: {custom_parameter}.  \"x=y\" dizgesi olmalıdır."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
@@ -11668,7 +11790,7 @@ msgstr ""
 "LTI pasaportu okunamadı: {lti_passport}. \"id:key:secret\" dizgesi "
 "olmalıdır."
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 #: lms/templates/ccx/schedule.html
 msgid "Due Date"
 msgstr "Teslim Tarihi"
@@ -11677,11 +11799,11 @@ msgstr "Teslim Tarihi"
 msgid "Enter the default date by which problems are due."
 msgstr "Süresi dolan problemler vasıtasıyla varsayılan tarihi girin."
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 msgid "Number of Relative Weeks Due By"
 msgstr "Göreli Hafta Sayısı"
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 msgid ""
 "Enter the number of weeks the problems are due by relative to the learner's "
 "enrollment date"
@@ -11942,35 +12064,35 @@ msgstr "Kayıtlanma Yolu Grupları"
 msgid "Partition for segmenting users by enrollment track"
 msgstr "Kullanıcıları kayıtlanma yollarına göre ayrıştırma için bölümleme"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Whether this student has voted on the poll"
 msgstr "Bu öğrencinin anketi oylama durumu"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Student answer"
 msgstr "Öğrenci cevabı"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll answers from all students"
 msgstr "Tüm öğrencilerden gelen oylama cevapları"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll answers from xml"
 msgstr "XML kaynağından gelen oylama cevapları"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll question"
 msgstr "Oylama sorusu"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Enter the date by which problems are due."
 msgstr "Süresi dolan problemler vasıtasıyla tarihi girin."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Hide sequence content After Due Date"
 msgstr "Bitiş Tarihinden Sonra sıradaki içeriği gizle"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "If set, the sequence content is hidden for non-staff users after the due "
 "date has passed."
@@ -11978,23 +12100,21 @@ msgstr ""
 "Ayarlandığında, sıradaki içerik, bitiş tarihi geçtikten sonra akademik "
 "olmayan kullanıcılar için gizlenir."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Entrance Exam"
 msgstr "Giriş Sınavı Mı"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
-"Bu ders modülünü Giriş Sınavı olarak etiketleyin. Bu ders ayarının geçerli "
-"olması için Giriş Sınavları'nı etkinleştirmeniz gerektiğine dikkat edin. "
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Time Limited"
 msgstr "Zaman Sınırlı Mı"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates whether students have a limited time to view or "
 "interact with this courseware component."
@@ -12002,11 +12122,11 @@ msgstr ""
 "Bu ayar öğrencilerin ders yazılımını görmelerinin ve kullanmalarının belirli"
 " bir zamanla sınırlı olup olmadığını belirtir."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Time Limit in Minutes"
 msgstr "Dakika Cinsinden Süre Sınırı"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "The number of minutes available to students for viewing or interacting with "
 "this courseware component."
@@ -12014,19 +12134,19 @@ msgstr ""
 "Öğrencilerin bu ders yazılımı bileşenini görme ve kullanmaları için sahip "
 "oldukları dakika."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Proctoring Enabled"
 msgstr "Gözetim Etkinleştirilmiş Mi"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This setting indicates whether this exam is a proctored exam."
 msgstr "Bu ayar bu sınavın gözetimli sınav olup olmadığını gösterir."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Software Secure Review Rules"
 msgstr "Yazılım Güvenlikli İnceleme Kuralları"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates what rules the proctoring team should follow when "
 "viewing the videos."
@@ -12034,11 +12154,11 @@ msgstr ""
 "Bu ayar gözetim ekibi videoları izlerken hangi kuralları izleyeceğine işaret"
 " eder."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Practice Exam"
 msgstr "Uygulama Sınavı Mı"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates whether this exam is for testing purposes only. "
 "Practice exams are not verified."
@@ -12046,17 +12166,17 @@ msgstr ""
 "Bu ayar bu sınavın deneme amaçlı olup olmadığını gösterir. Deneme sınavları "
 "onaylanmaz."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Onboarding Exam"
 msgstr "Bu Bir Test Sürüşü Sınavı Mı"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This setting indicates whether this exam is an onboarding exam."
 msgstr ""
 "Bu ayar bu sınavın bilgisayar donanımlarının yeterliliğini ölçecek bir test "
 "sürüşü sınavı olup olmadığını belirler."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This subsection is unlocked for learners when they meet the prerequisite "
 "requirements."
@@ -12064,21 +12184,21 @@ msgstr ""
 "Bu altbölümün kilidi, öğrenciler gerekli önkoşulları karşıladığında "
 "kapatılacaktır. "
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This exam is hidden from the learner."
 msgstr "Bu sınav öğrenciye gösterilmiyor."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "Because the course has ended, this assignment is hidden from the learner."
 msgstr "Ders sona erdiğinden, bu görev öğrenciye gösterilmiyor."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "Because the due date has passed, this assignment is hidden from the learner."
 msgstr "Son teslim tarihi geçtiğinden, bu görev öğrenciye gösterilmiyor."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This section is a prerequisite. You must complete this section in order to "
 "unlock additional content."
@@ -12086,29 +12206,29 @@ msgstr ""
 "Bu bölüm bir önkoşuldur. Ek içeriklerin kilidini açmak için bu bölümü "
 "tamamlamanız gerekiyor."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "A list summarizing what students should look forward to in this section."
 msgstr "Bu bölümde öğrencilerin neler göreceğine dair özet liste."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 #, python-brace-format
 msgid "Group ID {group_id}"
 msgstr "Grup No {group_id}"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Not Selected"
 msgstr "Seçilmedi"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "The display name for this component. (Not shown to learners)"
 msgstr "Bu bileşen için gösterilecek isim. (Öğrencilere gösterilmeyecek)"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Content Experiment"
 msgstr "İçerik Denemesi"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The configuration defines how users are grouped for this content experiment."
 " Caution: Changing the group configuration of a student-visible experiment "
@@ -12118,29 +12238,29 @@ msgstr ""
 " tanımlar. Dikkat: Öğrencilerin görebildiği bir deneyin grup "
 "yapılandırmasını değiştirmek deney verisini etkileyecektir."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Group Configuration"
 msgstr "Grup Yapılandırma"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Which child module students in a particular group_id should see"
 msgstr ""
 "Belirli bir grup_no'da olan çocuk modülü öğrencilerinin görmesi gereken "
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 #, python-brace-format
 msgid "{group_name} (inactive)"
 msgstr "{group_name} (aktif değil)"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "The experiment is not associated with a group configuration."
 msgstr "Deney bir grup yapılandırması ile ilişkili değildir."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Select a Group Configuration"
 msgstr "Bir Grup Yapılandırması Seçiniz"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment uses a deleted group configuration. Select a valid group "
 "configuration or delete this experiment."
@@ -12148,7 +12268,7 @@ msgstr ""
 "Deney silinmiş grup yapılandırması içerir. Geçerli bir grup yapılandırması "
 "seçin ya da bu deneyi silin."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment uses a group configuration that is not supported for "
 "experiments. Select a valid group configuration or delete this experiment."
@@ -12156,16 +12276,16 @@ msgstr ""
 "Deney, deneyler için desteklenmeyen bir grup yapılandırması kullanır. "
 "Geçerli bir grup yapılandırması seçin ya da bu deneyi silin."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment does not contain all of the groups in the configuration."
 msgstr "Deney, yapılandırmadaki tüm grupları içermez."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Add Missing Groups"
 msgstr "Eksik Grupları Ekle"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment has an inactive group. Move content into active groups, then "
 "delete the inactive group."
@@ -12173,7 +12293,7 @@ msgstr ""
 "Deneyde aktif olmayan bir grup bulunuyor. İçeriği aktif gruplara taşıyın ve "
 "ardından aktif olmayan grubu silin."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "This content experiment has issues that affect content visibility."
 msgstr "Bu içerik deneyinin içerik görünürlüğünü etkileyen sorunları var."
 
@@ -12193,7 +12313,12 @@ msgstr "Ünite için bağlam içi tartışmaları etkinleştirin"
 msgid "Add discussion for the Unit."
 msgstr "Üniteye tartışma ekle."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
+#, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
+msgstr ""
+
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
@@ -12202,11 +12327,11 @@ msgstr ""
 "Youtube'dan {youtube_id} için transkript alınamadı. Durum kodu: "
 "{status_code}."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
 msgstr "Sadece SubRip (*.srt) türünde altyazı biçimini destekliyoruz."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
@@ -12215,24 +12340,20 @@ msgstr ""
 "SubRip altyazı dosyası okunurken bir şeyler yanlış gitti. İç mesaj "
 "{error_message}"
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr "SubRip altyazı dosyası okunurken bir şeyler yanlış gitti."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr "{exception_message}: Yüklenmiş altyazılar bulunamadı: {user_filename}"
 
-#: xmodule/video_module/video_handlers.py
-msgid "Language is required."
-msgstr "Dil gerekmektedir."
-
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr "Temel"
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 #, python-brace-format
 msgid "There is no transcript file associated with the {lang} language."
 msgid_plural ""
@@ -12240,7 +12361,7 @@ msgid_plural ""
 msgstr[0] "{lang} dilleriyle ilgili altyazı dosyaları bulunmuyor."
 msgstr[1] "{lang} dilleriyle ilgili altyazı dosyaları bulunmuyor."
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
@@ -12248,61 +12369,65 @@ msgstr ""
 "Videonuz için URL. Bu YouTube URL'i ya da .mp4 veya .ogg bağlantısı ya da "
 "internette herhangi bir yerde barındırılan .webm video dosyası olabilir."
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Default Video URL"
 msgstr "Varsayılan Video Bağlantısı"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_handlers.py
+msgid "Language is required."
+msgstr "Dil gerekmektedir."
+
+#: xmodule/video_block/video_xfields.py
 msgid "Component Display Name"
 msgstr "Bileşen Görünen Adı"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Current position in the video."
 msgstr "Videoda şu anki yer."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Optional, for older browsers: the YouTube ID for the normal speed video."
 msgstr ""
 "İsteğe bağlı, eski tarayıcılar için: normal hızdaki videolar için YouTube "
 "Kimliği "
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID"
 msgstr "YouTube Kimliği"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Optional, for older browsers: the YouTube ID for the .75x speed video."
 msgstr ""
 "İsteğe bağlı, eski tarayıcılar için: .75x hızındaki videolar için YouTube "
 "Kimliği "
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for .75x speed"
 msgstr ".75x hız için YouTube Kimliği"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Optional, for older browsers: the YouTube ID for the 1.25x speed video."
 msgstr ""
 "İsteğe bağlı, eski tarayıcılar için: 1.25x hızındaki videolar için YouTube "
 "Kimliği."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for 1.25x speed"
 msgstr "1.25x hız için YouTube Kimliği"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Optional, for older browsers: the YouTube ID for the 1.5x speed video."
 msgstr ""
 "İsteğe bağlı, eski tarayıcılar için: 1.5x hızındaki videolar için YouTube "
 "Kimliği."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for 1.5x speed"
 msgstr "1.5x hız için YouTube Kimliği"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Time you want the video to start if you don't want the entire video to play."
 " Not supported in the native mobile app: the full video file will play. "
@@ -12312,11 +12437,11 @@ msgstr ""
 "başlatılacağı zaman. Yerel mobil uygulamada desteklenmez, videonun tamamı "
 "gösterilir. HH:MM:SS olarak formatlanmıştır. Maksimum değer 23:59:59'dur. "
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Start Time"
 msgstr "Video Başlama Zamanı"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Time you want the video to stop if you don't want the entire video to play. "
 "Not supported in the native mobile app: the full video file will play. "
@@ -12326,11 +12451,11 @@ msgstr ""
 "durdurulacağı zaman. Native mobil uygulamada desteklenmez, videonun tamamı "
 "gösterilir. HH:MM:SS olarak formatlanmıştır. Maksimum değer 23:59:59'dur. "
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Stop Time"
 msgstr "Video Durma Zamanı"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Allow students to download versions of this video in different formats if "
 "they cannot use the edX video player or do not have access to YouTube. You "
@@ -12341,11 +12466,11 @@ msgstr ""
 "izin verin. Video Dosyası URL'lerinin bulunduğu yere YouTube URL'si olmayan "
 "en az bir URL ekleyin."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Download Allowed"
 msgstr "Video İndirilebilir"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
@@ -12361,11 +12486,11 @@ msgstr ""
 "bilgisayarlarına uyumlu olanı görebilecekler. Öğrencilerin bu videoları "
 "yüklemelerine izin vermek için Video Yükleme İzni'ni True olarak ayarlayın. "
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video File URLs"
 msgstr "Video Dosyası Bağlantıları"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "By default, students can download an .srt or .txt transcript when you set "
 "Download Transcript Allowed to True. If you want to provide a downloadable "
@@ -12384,11 +12509,11 @@ msgstr ""
 "ekleyebilirsiniz. Öğrenciler videonun altında altyazıyı yüklemek için bir "
 "bağlantı görecek."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Downloadable Transcript URL"
 msgstr "İndirilebilir Altyazı URL'si"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Allow students to download the timed transcript. A link to download the file"
 " appears below the video. By default, the transcript is an .srt or .txt "
@@ -12400,11 +12525,11 @@ msgstr ""
 ".srt ya da .txt formatındadır. Altyazının farklı bir formatta olmasını "
 "isterseniz Ders Notu Yükle bölümünden bir dosya yükleyebilirsiniz."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Download Transcript Allowed"
 msgstr "Altyazı İndirilebilir"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "The default transcript for the video, from the Default Timed Transcript "
 "field on the Basic tab. This transcript should be in English. You don't have"
@@ -12414,20 +12539,20 @@ msgstr ""
 "varsayılan konuşma metni. Bu konuşma metni İngilizce olmalıdır. Bu ayarı "
 "değiştirmeniz gerekli değildir."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Default Timed Transcript"
 msgstr "Zamanları İşaretlenmiş Öntanımlı Altyazı"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether the transcripts appear with the video by default."
 msgstr ""
 "Varsayılan olarak altyazıların video ile görünür olup olmadığını belirltin."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Show Transcript"
 msgstr "Altyazıyı Göster"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Add transcripts in different languages. Click below to specify a language "
 "and upload an .srt transcript file for that language."
@@ -12435,41 +12560,41 @@ msgstr ""
 "Farklı dillerde altyazılar ekleyin. Bir dil belirlemek için ve o dil için "
 ".srt altyazı dosyasını yüklemek için aşağıya tıklayın."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Transcript Languages"
 msgstr "Altyazı Dilleri"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Preferred language for transcript."
 msgstr "Altyazı için tercih edilen dil."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Preferred language for transcript"
 msgstr "Altyazı için tercih edilen dil"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Transcript file format to download by user."
 msgstr "Kullanıcı tarafından indirilecek altyazı dosyasının türü."
 
 #. Translators: This is a type of file used for captioning in the video
 #. player.
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "SubRip (.srt) file"
 msgstr "SubRip (.srt) dosyası"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Text (.txt) file"
 msgstr "Metin (.txt) dosyası"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "The last speed that the user specified for the video."
 msgstr "Kullanıcının video için kullandığı son hız."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "The default speed for the video."
 msgstr "Video için varsayılan hız."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Specify whether to advance automatically to the next unit when the video "
 "ends."
@@ -12477,11 +12602,11 @@ msgstr ""
 "Video bittiğinde otomatik olarak bir sonraki üniteye geçilip geçilmeyeceğini"
 " belirle."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether YouTube is available for the user."
 msgstr "YouTube'un kullanıcı için kullanılabilir olup olmadığını belirtin."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Upload a handout to accompany this video. Students can download the handout "
 "by clicking Download Handout under the video."
@@ -12489,11 +12614,11 @@ msgstr ""
 "Video ile ilgili dinleyici notunu yükle. Öğrenciler, video altındaki "
 "Dinleyici Notu İndir'e tıklayıp dinleyici notunu indirebilir."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Upload Handout"
 msgstr "Dinleyici Notu Yükle"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Specify whether access to this video is limited to browsers only, or if it "
 "can be accessed from other applications including mobile apps."
@@ -12502,11 +12627,11 @@ msgstr ""
 " uygulamalardan mobil uygulamalar da dahil olmak üzere erişim olup "
 "olmadığını belirtin."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Available on Web Only"
 msgstr "Video Sadece Web'te Bulunabilir"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "If you were assigned a Video ID by edX for the video to play in this "
 "component, enter the ID here. In this case, do not enter values in the "
@@ -12519,36 +12644,36 @@ msgstr ""
 "YouTube ID alanlarına değer girmeyin. Video No verilmediyse belirtilen diğer"
 " alanlara değerleri girin ve bu alanı yok sayın."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Date of the last view of the bumper"
 msgstr "Kısa tanıtımın son görünümünün günü"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Do not show bumper again"
 msgstr "Kısa tanıtımı tekrar gösterme"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether the video can be accessed publicly by learners."
 msgstr "Videoya öğrenciler tarafından erişilip erişilemeyeceğini belirtin."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Public Access"
 msgstr "Genel Erişim"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Add a specific thumbnail for learners to see before playing the video."
 msgstr ""
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Thumbnail"
 msgstr "Küçük Resim"
 
-#: xmodule/word_cloud_module.py lms/templates/annotatable.html
+#: xmodule/word_cloud_block.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
 msgstr "Yönergeler"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid ""
 "Add instructions to help learners understand how to use the word cloud. "
 "Clear instructions are important, especially for learners who have "
@@ -12558,46 +12683,46 @@ msgstr ""
 "Anlaşılır yönergeler, özellikle erişilebilirlik sorunu olan engelli "
 "öğrenciler için son derece önemlidir."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Inputs"
 msgstr "Girdiler"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid ""
 "The number of text boxes available for learners to add words and sentences."
 msgstr ""
 "Öğrencilerin kelime ve cümle eklemeleri için mevcut olan metin kutularının "
 "sayısı."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Maximum Words"
 msgstr "Maksimum Kelime"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "The maximum number of words displayed in the generated word cloud."
 msgstr "Oluşturulan kelime bulutunda gösterilecek maksimum kelime sayısı. "
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Show Percents"
 msgstr "Yüzdelikleri Göster"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Statistics are shown for entered words near that word."
 msgstr "Girilen kelimeye yakın olan kelime için gösterilen istatistikler."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Whether this learner has posted words to the cloud."
 msgstr "Bu öğrencinin buluta kelime gönderip göndermediği."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Student answer."
 msgstr "Öğrenci cevabı."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "All possible words from all learners."
 msgstr "Tüm öğrencilerden gelen tüm mümkün kelimeler."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Top num_top_words words for word cloud."
 msgstr "Kelime bulutu için en iyi num_top_words kelimeleri."
 
@@ -12756,6 +12881,8 @@ msgid ""
 "Non writable git url provided. Expecting something like: "
 "git@github.com:openedx/openedx-demo-course.git"
 msgstr ""
+"Yazılamaz git url'si verildi. Bunun gibi bir şey bekliyoruz: "
+"git@github.com:openedx/openedx-demo-course.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -12815,15 +12942,15 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
 msgid "Marks a field as deprecated."
-msgstr ""
+msgstr "Bir alanı kullanımdan kaldırıldı olarak işaretler."
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
 msgid "User-friendly display name for the field"
-msgstr ""
+msgstr "Alan için kullanıcı-dostu görüntüleme adı"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/advanced_settings.py
 msgid "Help text that describes the setting."
-msgstr ""
+msgstr "Ayarı açıklayan yardım metni."
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Tab type"
@@ -12831,15 +12958,15 @@ msgstr "Sekme türü"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Default name for the tab displayed to users"
-msgstr ""
+msgstr "Kullanıcılara gösterilen sekme için varsayılan ad"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True if it's possible to hide the tab for a course"
-msgstr ""
+msgstr "Bir ders için sekmeyi gizlemek mümkünse True olmalı"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True the tab is hidden for the course"
-msgstr ""
+msgstr "Sekme ders için gizliyse True"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True if it's possible to reorder the tab in the list of tabs"
@@ -12851,27 +12978,27 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Name of the tab displayed to users. Overrides title."
-msgstr ""
+msgstr "Kullanıcılara gösterilen sekmenin adı. Başlığı geçersiz kılar."
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Additional settings specific to the tab"
-msgstr ""
+msgstr "Sekmeye özel ek ayarlar"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "ID of tab to update"
-msgstr ""
+msgstr "Güncellenecek sekmenin kimliği"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Location (Usage Key) of tab to update"
-msgstr ""
+msgstr "Güncellenecek sekmenin konumu (Kullanım Anahtarı)"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Need to supply either a valid tab_id or a tab_location."
-msgstr ""
+msgstr "Geçerli bir tab_id veya tab_location sağlamanız gerekir."
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True to hide the tab, and False to show it."
-msgstr ""
+msgstr "Sekmeyi gizlemek için True, göstermek için False."
 
 #: cms/djangoapps/contentstore/rest_api/v0/views/tabs.py
 msgid "Change the visibility of tabs in a course."
@@ -13085,7 +13212,7 @@ msgstr "Dikey"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Section"
 msgstr "Bölüm"
 
@@ -13102,47 +13229,47 @@ msgstr "Dosya yükleme sırasında bazı parçalar kayboldu. Lütfen tekrar dene
 msgid "File upload failed. Please try again"
 msgstr "Dosya yükleme başarısız. Lütfen tekrar deneyin"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr "Kütüphaneler {limit} bileşenden daha fazlasına sahip olamaz"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Invalid data"
 msgstr "Geçersiz veri"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Invalid data ({details})"
 msgstr "Geçersiz veri ({details})"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "{source_type} verisini {target_parent_type} üzerine taşıyamazsınız."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Item is already present in target location."
 msgstr "Nesne hedef konumda zaten mevcut."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into itself."
 msgstr "Bir nesneyi zaten bulunduğu konuma taşıyamazsınız."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into it's child."
 msgstr "Bir nesneyi kendi altına taşıyamazsınız."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item directly into content experiment."
 msgstr "Bir nesneyi doğrudan içerik denemesine taşıyamazsınız."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{source_usage_key} not found in {parent_usage_key}."
 msgstr "{source_usage_key} anahtarı {parent_usage_key} içinde bulunamadı."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "You can not move {source_usage_key} at an invalid index ({target_index})."
@@ -13150,17 +13277,17 @@ msgstr ""
 "{source_usage_key} anahtarını geçersiz bir ({target_index}) indeksine "
 "taşıyamazsınız."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "({target_index}) target_index bir tamsayı olarak girilmeli."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "{0}'ın kopyası"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "'{0}'ın tekrarı"
@@ -13168,7 +13295,7 @@ msgstr "'{0}'ın tekrarı"
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
@@ -13178,11 +13305,11 @@ msgstr ""
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "%"
 msgstr "%"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""
@@ -13474,7 +13601,7 @@ msgstr ""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Grant the user the permission to create courses in ALL organizations"
-msgstr ""
+msgstr "Kullanıcıya TÜM kuruluşlarda ders oluşturma izni verin"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Dump courses to CourseGraph (respect cache)"
@@ -13490,7 +13617,7 @@ msgstr ""
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Skipped all {} course(s), as they were unchanged."
-msgstr ""
+msgstr "Tüm {} ders(ler) değişmediği için atlandı."
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Dump courses to CourseGraph (override cache)"
@@ -13821,7 +13948,7 @@ msgid ""
 "up shortly!"
 msgstr "Forumda bakım yapılıyor. En kısa zamanda çalışır hale getireceğiz!"
 
-#: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
 msgstr "İçerik Kilitlendi"
 
@@ -13849,7 +13976,7 @@ msgstr "Rehberli Tartışma"
 msgid "Hide Annotations"
 msgstr "İpuçlarını Gizle"
 
-#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
 msgstr "Yer imi kondu"
 
@@ -13857,9 +13984,9 @@ msgstr "Yer imi kondu"
 msgid "Bookmark this page"
 msgstr "Bu sayfaya yer imi koy"
 
-#: lms/templates/conditional_module.html
-msgid "You do not have access to this dependency module."
-msgstr "Bu bağımlılık modülüne erişim hakkınız yok."
+#: lms/templates/conditional_block.html
+msgid "You do not have access to this dependency block."
+msgstr "Bu bağımlılık block'una erişim hakkınız yok."
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -13932,6 +14059,9 @@ msgid ""
 "activate your account. Can’t find it? Check your spam folder or "
 "{link_start}resend the email{link_end}."
 msgstr ""
+"Hesabınızı etkinleştirme bağlantısını {strong_start}{email}{strong_end} "
+"e-posta adresine gönderdik. Bulamadınız mı? Spam klasörünüzü kontrol edin ya"
+" da {link_start}tekrar e-posta gönder{link_end}."
 
 #: lms/templates/dashboard.html
 msgid "Continue to {platform_name}"
@@ -14408,27 +14538,27 @@ msgstr ""
 "İkincil e-posta adresiniz etkinleştirildi. Lütfen dersler için "
 "{link_start}ana paneli{link_end} ziyaret edin."
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Important!"
 msgstr "Önemli!"
 
 #. Translators: A button for showing the Previous Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
 msgstr "Önceki"
 
 #. Translators: A button for showing the Next Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
 msgstr "Sonraki"
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Sequence"
 msgstr "Sıralı"
 
-#: lms/templates/seq_module.html lms/templates/vert_module.html
+#: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Tamamlandı"
 
@@ -15436,6 +15566,14 @@ msgid ""
 "{platform_name} Participants will have any liability to you for such an "
 "action."
 msgstr ""
+"{platform_name_capitalized} ve {platform_name} Katılımcıları, kendi "
+"takdirlerine bağlı olarak, {platform_name} aracılığıyla sunulan herhangi bir"
+" API'yi veya API İçeriği'ni herhangi bir zamanda iptal etme, geciktirme, "
+"yeniden planlama veya biçimini değiştirme veya herhangi bir kısmını veya "
+"tamamını sağlamayı durdurma hakkını saklı tutar. API'ler veya API İçeriği "
+"veya ilgili hizmetlere dair, ne {platform_name} platformunun ne de "
+"{platform_name} Katılımcılarından herhangi birinin bu tür bir eylem için "
+"size karşı herhangi bir yükümlülüğü olmayacağını baştan kabul edersiniz."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -16235,11 +16373,11 @@ msgstr ""
 
 #: lms/templates/course_modes/error.html
 msgid "Unable to enroll in {course_name}"
-msgstr ""
+msgstr "{course_name} dersine kayıtlanılamadı"
 
 #: lms/templates/course_modes/error.html
 msgid "Sorry, we were unable to enroll you in"
-msgstr ""
+msgstr "Üzgünüz, sizi şuraya kaydedemedik "
 
 #: lms/templates/course_modes/error.html
 msgid "Explore all courses on edX"
@@ -16254,6 +16392,8 @@ msgid ""
 "Showcase a {link_start}verified certificate{link_end} of completion on your "
 "resumé to advance your career"
 msgstr ""
+"Kariyerinizi ilerletmek için özgeçmişinizde {link_start}doğrulanmış bir "
+"bitirme sertifikası{link_end} sergileyin"
 
 #: lms/templates/course_modes/fbe.html
 msgid ""
@@ -16270,6 +16410,8 @@ msgid ""
 "{start_bold}Full access{end_bold} to course content and materials, even "
 "after the course ends"
 msgstr ""
+"Ders içeriğine ve materyallerine, ders bittikten sonra bile {start_bold}tam "
+"erişim{end_bold}"
 
 #: lms/templates/course_modes/fbe.html
 msgid "{link_start}Learn more{link_end} about course access"
@@ -16280,12 +16422,16 @@ msgid ""
 "Support our {start_bold}mission{end_bold} to increase access to high-quality"
 " education for everyone, everywhere"
 msgstr ""
+"Herkes için, her yerde yüksek kaliteli eğitime erişimi artırma "
+"{start_bold}misyonumuzu{end_bold} destekleyin"
 
 #: lms/templates/course_modes/fbe.html
 msgid ""
 "Get temporary access to  {start_bold}non-graded{end_bold} activities, "
 "including discussion forums and non-graded assignments"
 msgstr ""
+"Tartışma forumları ve not verilmeyen ödevler dahil {start_bold}not "
+"verilmeyen{end_bold} etkinliklere geçici erişim elde edin"
 
 #: lms/templates/course_modes/fbe.html
 msgid ""
@@ -16295,11 +16441,11 @@ msgstr ""
 
 #: lms/templates/course_modes/fbe.html
 msgid "Access expires and all progress will be lost on"
-msgstr ""
+msgstr "Erişimin süresi dolacak ve tüm ilerleme kaybolacak"
 
 #: lms/templates/course_modes/fbe.html
 msgid "Access expires and all progress will be lost"
-msgstr ""
+msgstr "Erişimin süresi dolacak ve tüm ilerleme kaybolacak"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Enroll In {course_name} | Upgrade Now"
@@ -16307,7 +16453,7 @@ msgstr "{course_name} Dersine Kaydol | Hemen Yükselt"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Choose a path for your course in"
-msgstr ""
+msgstr "Dersiniz için bir patika seçin"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Earn a certificate"
@@ -16325,7 +16471,7 @@ msgstr "Bu derse erişin"
 
 #: lms/templates/course_modes/unfbe.html
 msgid "Get access to the course material, including videos and readings"
-msgstr ""
+msgstr "Videolar ve okumalar dahil olmak üzere ders materyallerine erişin"
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
@@ -16413,7 +16559,7 @@ msgstr "Bunu ailen ve arkadaşlarınla paylaş!"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {account} {url}"
-msgstr ""
+msgstr "Ben {account} {url} hesabı ile {number}{title} dersine kaydoldum"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
@@ -17094,12 +17240,19 @@ msgid ""
 "assignments, and earn a {link_start}verified certificate{link_end} to "
 "showcase on your resumé."
 msgstr ""
+"{start_bold}Dersinizden en iyi şekilde yararlanın!{end_bold} Ders "
+"materyallerine tam erişim elde etmek için erişiminizi yükseltin, hem not "
+"verilen hem de not verilmeyen ödevlerin kilidini açın ve özgeçmişinizde "
+"gösterebileceğiniz bir {link_start}onaylanmış sertifika{link_end} kazanın."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "{start_bold}Get the most out of your course!{end_bold} Upgrade to earn a "
 "{link_start}verified certificate{link_end} to showcase on your resumé."
 msgstr ""
+"{start_bold}Dersinizden en iyi şekilde yararlanın!{end_bold} Özgeçmişinizde "
+"gösterebileceğiniz {link_start}Onaylanmış bir sertifikaya{link_end} hak "
+"kazanmak için erişiminizi yükseltin."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
@@ -17988,7 +18141,7 @@ msgstr "Okullar"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
-msgstr ""
+msgstr "Ücretsiz kayıt olun"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
@@ -18203,7 +18356,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
-msgstr "Denetçi"
+msgstr "Gözlemci"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
@@ -19071,8 +19224,8 @@ msgid ""
 "TA'. Only enrolled learners can be added as Community TAs."
 msgstr ""
 "Topluluk Asistanları, ders ekiplerinin tartışmaları yönetmesine yardımcı "
-"olan topluluk üyeleridir. Atandıkları grup veya kayıtlanma yolundaki "
-"öğrencilerin gönderileri görebilir ve düzenleyebilir veya silebilir, "
+"olan topluluk üyeleridir. Atandıkları kohort veya kayıtlanma yolundaki "
+"öğrencilerin gönderilerini görebilir ve düzenleyebilir veya silebilir, "
 "bayrakları temizleyebilir, konuları kapatabilir veya yeniden açabilir ve "
 "yanıtları onaylayabilirler. Gönderileri 'Topluluk Asistanı' olarak "
 "işaretlenir. Yalnızca kayıtlı öğrenciler Topluluk Asistanları olarak "
@@ -19130,7 +19283,7 @@ msgstr "Kohort: "
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "(Learners not explicitly assigned to a cohort)"
-msgstr "(Açıkça bir topluluğa üye olmamış tüm öğrenciler)"
+msgstr "(Açıkça bir kohorta üye olmamış tüm öğrenciler)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Learners in the {track_name} Track"
@@ -19159,6 +19312,12 @@ msgstr ""
 "E-postanızı göndermeden önce metni dikkatlice gözden geçirin ve önce "
 "kendinize gönderin, böylelikle biçimlendirmenizi görebilir ve gömülü görsel "
 "ve bağlantıların doğru çalışıp çalışmadığını kontrol edebilirsiniz."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
@@ -20317,6 +20476,9 @@ msgid ""
 "I have and that I have                             achieved something while "
 "I was unemployed."
 msgstr ""
+"Özgeçmişime ve profilime onaylı bir sertifikayı dahil etmek istedim ve bu "
+"hedefe doğru çalıştığımı ve işsizken bir şeyleri başardığımı göstermeyi "
+"istedim."
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Upgrade ({course_price})"
@@ -21416,7 +21578,7 @@ msgstr "Bir örnek görün"
 
 #: cms/templates/edit-tabs.html
 msgid "What are custom pages?"
-msgstr ""
+msgstr "Özel yapım sayfalar neye yarar?"
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -21424,16 +21586,21 @@ msgid ""
 "course content. For example, you can create pages for the grading policy, "
 "course syllabus, and a course calendar. "
 msgstr ""
+"Öğrencilere ek ders içeriği sunmak için özel yapım sayfalar oluşturabilir ve"
+" var olanları değiştirebilirsiniz. Örneğin, notlandırma yöntemi, ders "
+"izlencesi ve ders takvimi gibi sayfaları bu şekilde oluşturabilirsiniz."
 
 #: cms/templates/edit-tabs.html
 msgid "How do custom pages look to students in my course?"
-msgstr ""
+msgstr "Özel yapım sayfalar öğrencilerime dersimde nasıl gözükecek?"
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "Custom pages are listed horizontally at the top of your course after default"
 " pages."
 msgstr ""
+"Özel yapım sayfalar dersinizin en üst kısmında öntanımlı sayfalardan sonra "
+"yatay bir düzende listelenir."
 
 #: cms/templates/edit-tabs.html
 msgid "Pages in Your Course"
@@ -23220,7 +23387,7 @@ msgstr "Ders Bitiş Günü"
 
 #: cms/templates/settings.html
 msgid "Immediately upon passing"
-msgstr ""
+msgstr "Geçer not alır almaz"
 
 #: cms/templates/settings.html
 msgid "End date of course"
@@ -23228,11 +23395,11 @@ msgstr "Ders sonu tarihi"
 
 #: cms/templates/settings.html
 msgid "A date after the course end date"
-msgstr ""
+msgstr "Ders bitiş tarihinden sonra"
 
 #: cms/templates/settings.html
 msgid "Certificates are awarded at the end of a course run"
-msgstr ""
+msgstr "Sertifikalar bir ders çalışmasının sonunda verilir"
 
 #: cms/templates/settings.html
 msgid "Read more about this setting"
@@ -23295,6 +23462,8 @@ msgstr "Öğrenci kaydı için son gün."
 #: cms/templates/settings.html
 msgid "Contact your {platform_name} partner manager to update these settings."
 msgstr ""
+"Bu ayarları güncellemek için {platform_name} İş Ortağı Yöneticisi'ne "
+"başvurun."
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"

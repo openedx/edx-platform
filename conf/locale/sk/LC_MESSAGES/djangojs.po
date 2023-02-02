@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Slovak (http://www.transifex.com/open-edx/edx-platform/language/sk/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -11,7 +11,7 @@
 # Vladimír Záhradník <vladimir@zahradnik.io>, 2013,2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Slovak (http://www.transifex.com/open-edx/edx-platform/language/sk/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -22,23 +22,23 @@
 # Vladimír Záhradník <vladimir@zahradnik.io>, 2013,2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Slovak (https://www.transifex.com/open-edx/teams/6205/sk/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Marcel Miklosik <marcel.miklosik@gmail.com>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Slovak (http://www.transifex.com/open-edx/edx-platform/language/sk/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Vladimír Záhradník <vladimir@zahradnik.io>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Slovak (http://www.transifex.com/open-edx/edx-platform/language/sk/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -46,7 +46,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2023-01-08 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: Slovak (http://www.transifex.com/open-edx/edx-platform/language/sk/)\n"

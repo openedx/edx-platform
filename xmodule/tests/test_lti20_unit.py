@@ -10,14 +10,14 @@ from pytz import UTC
 from xblock.field_data import DictFieldData
 
 from xmodule.lti_2_util import LTIError
-from xmodule.lti_module import LTIBlock
+from xmodule.lti_block import LTIBlock
 from xmodule.tests.helpers import StubUserService
 
 from . import get_test_system
 
 
 class LTI20RESTResultServiceTest(unittest.TestCase):
-    """Logic tests for LTI module. LTI2.0 REST ResultService"""
+    """Logic tests for LTI block. LTI2.0 REST ResultService"""
 
     USER_STANDIN = Mock()
     USER_STANDIN.id = 999
@@ -29,10 +29,10 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         self.runtime.publish = Mock()
         self.runtime._services['rebind_user'] = Mock()  # pylint: disable=protected-access
 
-        self.xmodule = LTIBlock(self.runtime, DictFieldData({}), Mock())
-        self.lti_id = self.xmodule.lti_id
-        self.xmodule.due = None
-        self.xmodule.graceperiod = None
+        self.xblock = LTIBlock(self.runtime, DictFieldData({}), Mock())
+        self.lti_id = self.xblock.lti_id
+        self.xblock.due = None
+        self.xblock.graceperiod = None
 
     def test_sanitize_get_context(self):
         """Tests that the get_context function does basic sanitization"""
@@ -40,8 +40,8 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         mocked_course = Mock(name='mocked_course', lti_passports=['lti_id:test_client:test_secret'])
         modulestore = Mock(name='modulestore')
         modulestore.get_course.return_value = mocked_course
-        self.xmodule.runtime.modulestore = modulestore
-        self.xmodule.lti_id = "lti_id"
+        self.xblock.runtime.modulestore = modulestore
+        self.xblock.lti_id = "lti_id"
 
         test_cases = (  # (before sanitize, after sanitize)
             ("plaintext", "plaintext"),
@@ -49,8 +49,8 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
             ("<b>bold 包</b>", "<b>bold 包</b>"),  # unicode, and <b> tags pass through
         )
         for case in test_cases:
-            self.xmodule.score_comment = case[0]
-            assert case[1] == self.xmodule.get_context()['comment']
+            self.xblock.score_comment = case[0]
+            assert case[1] == self.xblock.get_context()['comment']
 
     def test_lti20_rest_bad_contenttype(self):
         """
@@ -58,28 +58,28 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         """
         with self.assertRaisesRegex(LTIError, "Content-Type must be"):
             request = Mock(headers={'Content-Type': 'Non-existent'})
-            self.xmodule.verify_lti_2_0_result_rest_headers(request)
+            self.xblock.verify_lti_2_0_result_rest_headers(request)
 
     def test_lti20_rest_failed_oauth_body_verify(self):
         """
         Input with bad oauth body hash verification
         """
         err_msg = "OAuth body verification failed"
-        self.xmodule.verify_oauth_body_sign = Mock(side_effect=LTIError(err_msg))
+        self.xblock.verify_oauth_body_sign = Mock(side_effect=LTIError(err_msg))
         with self.assertRaisesRegex(LTIError, err_msg):
             request = Mock(headers={'Content-Type': 'application/vnd.ims.lis.v2.result+json'})
-            self.xmodule.verify_lti_2_0_result_rest_headers(request)
+            self.xblock.verify_lti_2_0_result_rest_headers(request)
 
     def test_lti20_rest_good_headers(self):
         """
         Input with good oauth body hash verification
         """
-        self.xmodule.verify_oauth_body_sign = Mock(return_value=True)
+        self.xblock.verify_oauth_body_sign = Mock(return_value=True)
 
         request = Mock(headers={'Content-Type': 'application/vnd.ims.lis.v2.result+json'})
-        self.xmodule.verify_lti_2_0_result_rest_headers(request)
+        self.xblock.verify_lti_2_0_result_rest_headers(request)
         #  We just want the above call to complete without exceptions, and to have called verify_oauth_body_sign
-        assert self.xmodule.verify_oauth_body_sign.called
+        assert self.xblock.verify_oauth_body_sign.called
 
     BAD_DISPATCH_INPUTS = [
         None,
@@ -100,7 +100,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         """
         for einput in self.BAD_DISPATCH_INPUTS:
             with self.assertRaisesRegex(LTIError, "No valid user id found in endpoint URL"):
-                self.xmodule.parse_lti_2_0_handler_suffix(einput)
+                self.xblock.parse_lti_2_0_handler_suffix(einput)
 
     GOOD_DISPATCH_INPUTS = [
         ("user/abcd3", "abcd3"),
@@ -113,7 +113,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         fit the form user/<anon_id>
         """
         for ginput, expected in self.GOOD_DISPATCH_INPUTS:
-            assert self.xmodule.parse_lti_2_0_handler_suffix(ginput) == expected
+            assert self.xblock.parse_lti_2_0_handler_suffix(ginput) == expected
 
     BAD_JSON_INPUTS = [
         # (bad inputs, error message expected)
@@ -161,7 +161,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         for error_inputs, error_message in self.BAD_JSON_INPUTS:
             for einput in error_inputs:
                 with self.assertRaisesRegex(LTIError, error_message):
-                    self.xmodule.parse_lti_2_0_result_json(einput)
+                    self.xblock.parse_lti_2_0_result_json(einput)
 
     GOOD_JSON_INPUTS = [
         ('''
@@ -185,7 +185,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         Test the parsing of good comments
         """
         for json_str, expected_comment in self.GOOD_JSON_INPUTS:
-            score, comment = self.xmodule.parse_lti_2_0_result_json(json_str)
+            score, comment = self.xblock.parse_lti_2_0_result_json(json_str)
             assert score == 0.1
             assert comment == expected_comment
 
@@ -226,30 +226,30 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         mock_request.body = body
         return mock_request
 
-    def setup_system_xmodule_mocks_for_lti20_request_test(self):
+    def setup_system_xblock_mocks_for_lti20_request_test(self):
         """
         Helper fn to set up mocking for lti 2.0 request test
         """
-        self.xmodule.max_score = Mock(return_value=1.0)
-        self.xmodule.get_client_key_secret = Mock(return_value=('test_client_key', 'test_client_secret'))
-        self.xmodule.verify_oauth_body_sign = Mock()
+        self.xblock.max_score = Mock(return_value=1.0)
+        self.xblock.get_client_key_secret = Mock(return_value=('test_client_key', 'test_client_secret'))
+        self.xblock.verify_oauth_body_sign = Mock()
 
     def test_lti20_put_like_delete_success(self):
         """
         The happy path for LTI 2.0 PUT that acts like a delete
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
+        self.setup_system_xblock_mocks_for_lti20_request_test()
         SCORE = 0.55  # pylint: disable=invalid-name
         COMMENT = "ಠ益ಠ"  # pylint: disable=invalid-name
-        self.xmodule.module_score = SCORE
-        self.xmodule.score_comment = COMMENT
+        self.xblock.module_score = SCORE
+        self.xblock.score_comment = COMMENT
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT_LIKE_DELETE)
         # Now call the handler
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         # Now assert there's no score
         assert response.status_code == 200
-        assert self.xmodule.module_score is None
-        assert self.xmodule.score_comment == ''
+        assert self.xblock.module_score is None
+        assert self.xblock.score_comment == ''
         (_, evt_type, called_grade_obj), _ = self.runtime.publish.call_args  # pylint: disable=unpacking-non-sequence
         assert called_grade_obj ==\
                {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None, 'score_deleted': True}
@@ -259,18 +259,18 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         """
         The happy path for LTI 2.0 DELETE
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
+        self.setup_system_xblock_mocks_for_lti20_request_test()
         SCORE = 0.55  # pylint: disable=invalid-name
         COMMENT = "ಠ益ಠ"  # pylint: disable=invalid-name
-        self.xmodule.module_score = SCORE
-        self.xmodule.score_comment = COMMENT
+        self.xblock.module_score = SCORE
+        self.xblock.score_comment = COMMENT
         mock_request = self.get_signed_lti20_mock_request(b"", method='DELETE')
         # Now call the handler
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         # Now assert there's no score
         assert response.status_code == 200
-        assert self.xmodule.module_score is None
-        assert self.xmodule.score_comment == ''
+        assert self.xblock.module_score is None
+        assert self.xblock.score_comment == ''
         (_, evt_type, called_grade_obj), _ = self.runtime.publish.call_args  # pylint: disable=unpacking-non-sequence
         assert called_grade_obj ==\
                {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None, 'score_deleted': True}
@@ -280,14 +280,14 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         """
         The happy path for LTI 2.0 PUT that sets a score
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
+        self.setup_system_xblock_mocks_for_lti20_request_test()
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         # Now call the handler
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         # Now assert
         assert response.status_code == 200
-        assert self.xmodule.module_score == 0.1
-        assert self.xmodule.score_comment == 'ಠ益ಠ'
+        assert self.xblock.module_score == 0.1
+        assert self.xblock.score_comment == 'ಠ益ಠ'
         (_, evt_type, called_grade_obj), _ = self.runtime.publish.call_args  # pylint: disable=unpacking-non-sequence
         assert evt_type == 'grade'
         assert called_grade_obj ==\
@@ -297,10 +297,10 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         """
         The happy path for LTI 2.0 GET when there's no score
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
+        self.setup_system_xblock_mocks_for_lti20_request_test()
         mock_request = self.get_signed_lti20_mock_request(b"", method='GET')
         # Now call the handler
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         # Now assert
         assert response.status_code == 200
         assert response.json == {'@context': 'http://purl.imsglobal.org/ctx/lis/v2/Result', '@type': 'Result'}
@@ -309,14 +309,14 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         """
         The happy path for LTI 2.0 GET when there is a score
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
+        self.setup_system_xblock_mocks_for_lti20_request_test()
         SCORE = 0.55  # pylint: disable=invalid-name
         COMMENT = "ಠ益ಠ"  # pylint: disable=invalid-name
-        self.xmodule.module_score = SCORE
-        self.xmodule.score_comment = COMMENT
+        self.xblock.module_score = SCORE
+        self.xblock.score_comment = COMMENT
         mock_request = self.get_signed_lti20_mock_request(b"", method='GET')
         # Now call the handler
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         # Now assert
         assert response.status_code == 200
         assert response.json ==\
@@ -329,59 +329,59 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         """
         Test we get a 404 when we don't GET or PUT
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
+        self.setup_system_xblock_mocks_for_lti20_request_test()
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         for bad_method in self.UNSUPPORTED_HTTP_METHODS:
             mock_request.method = bad_method
-            response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+            response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
             assert response.status_code == 404
 
     def test_lti20_request_handler_bad_headers(self):
         """
         Test that we get a 401 when header verification fails
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
-        self.xmodule.verify_lti_2_0_result_rest_headers = Mock(side_effect=LTIError())
+        self.setup_system_xblock_mocks_for_lti20_request_test()
+        self.xblock.verify_lti_2_0_result_rest_headers = Mock(side_effect=LTIError())
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         assert response.status_code == 401
 
     def test_lti20_request_handler_bad_dispatch_user(self):
         """
         Test that we get a 404 when there's no (or badly formatted) user specified in the url
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
+        self.setup_system_xblock_mocks_for_lti20_request_test()
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, None)
+        response = self.xblock.lti_2_0_result_rest_handler(mock_request, None)
         assert response.status_code == 404
 
     def test_lti20_request_handler_bad_json(self):
         """
         Test that we get a 404 when json verification fails
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
-        self.xmodule.parse_lti_2_0_result_json = Mock(side_effect=LTIError())
+        self.setup_system_xblock_mocks_for_lti20_request_test()
+        self.xblock.parse_lti_2_0_result_json = Mock(side_effect=LTIError())
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         assert response.status_code == 404
 
     def test_lti20_request_handler_bad_user(self):
         """
         Test that we get a 404 when the supplied user does not exist
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
+        self.setup_system_xblock_mocks_for_lti20_request_test()
         self.runtime._services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         assert response.status_code == 404
 
     def test_lti20_request_handler_grade_past_due(self):
         """
         Test that we get a 404 when accept_grades_past_due is False and it is past due
         """
-        self.setup_system_xmodule_mocks_for_lti20_request_test()
-        self.xmodule.due = datetime.datetime.now(UTC)
-        self.xmodule.accept_grades_past_due = False
+        self.setup_system_xblock_mocks_for_lti20_request_test()
+        self.xblock.due = datetime.datetime.now(UTC)
+        self.xblock.accept_grades_past_due = False
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
-        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        response = self.xblock.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         assert response.status_code == 404

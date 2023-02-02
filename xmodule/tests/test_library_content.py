@@ -14,7 +14,7 @@ from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 from rest_framework import status
 
-from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
+from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
@@ -22,9 +22,9 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
-from xmodule.capa_module import ProblemBlock
+from xmodule.capa_block import ProblemBlock
 
-from .test_course_module import DummySystem as TestImportSystem
+from .test_course_block import DummySystem as TestImportSystem
 
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
@@ -54,24 +54,24 @@ class LibraryContentTest(MixedSplitTestCase):
             source_library_id=str(self.library.location.library_key)
         )
 
-    def _bind_course_module(self, module):
+    def _bind_course_block(self, block):
         """
-        Bind a module (part of self.course) so we can access student-specific data.
+        Bind a block (part of self.course) so we can access student-specific data.
         """
-        module_system = get_test_system(course_id=module.location.course_key)
-        module_system.descriptor_runtime = module.runtime._descriptor_system  # pylint: disable=protected-access
+        module_system = get_test_system(course_id=block.location.course_key)
+        module_system.descriptor_runtime = block.runtime._descriptor_system  # pylint: disable=protected-access
         module_system._services['library_tools'] = self.tools  # pylint: disable=protected-access
 
-        def get_module(descriptor):
-            """Mocks module_system get_module function"""
-            sub_module_system = get_test_system(course_id=module.location.course_key)
-            sub_module_system.get_module = get_module
+        def get_block(descriptor):
+            """Mocks module_system get_block function"""
+            sub_module_system = get_test_system(course_id=block.location.course_key)
+            sub_module_system.get_block_for_descriptor = get_block
             sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.bind_for_student(sub_module_system, self.user_id)
             return descriptor
 
-        module_system.get_module = get_module
-        module.xmodule_runtime = module_system
+        module_system.get_block_for_descriptor = get_block
+        block.xmodule_runtime = module_system
 
 
 class TestLibraryContentExportImport(LibraryContentTest):
@@ -102,7 +102,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
         self.lc_block.runtime._descriptor_system.export_fs = self.export_fs  # pylint: disable=protected-access
 
         # Prepare runtime for the import.
-        self.runtime = TestImportSystem(load_error_modules=True, course_id=self.lc_block.location.course_key)
+        self.runtime = TestImportSystem(load_error_blocks=True, course_id=self.lc_block.location.course_key)
         self.runtime.resources_fs = self.export_fs
         self.id_generator = Mock()
 
@@ -207,7 +207,7 @@ class LibraryContentBlockTestMixin:
         # Normally the children get added when the "source_libraries" setting
         # is updated, but the way we do it through a factory doesn't do that.
         assert len(self.lc_block.children) == 0
-        # Update the LibraryContent module:
+        # Update the LibraryContent block:
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         # Check that all blocks from the library are now children of the block:
@@ -219,7 +219,7 @@ class LibraryContentBlockTestMixin:
         """
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
         # Make sure the runtime knows that the block's children vary per-user:
         assert self.lc_block.has_dynamic_children()
 
@@ -360,7 +360,7 @@ class LibraryContentBlockTestMixin:
 
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
 
         # Eventually, we should see every child block selected
         while len(blocks_seen) != len(self.lib_blocks):
@@ -463,7 +463,7 @@ class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, Libra
 @patch(
     'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
 )
-@patch('xmodule.html_module.HtmlBlock.author_view', dummy_render, create=True)
+@patch('xmodule.html_block.HtmlBlock.author_view', dummy_render, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
 class TestLibraryContentRender(LibraryContentTest):
     """
@@ -475,7 +475,7 @@ class TestLibraryContentRender(LibraryContentTest):
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == len(self.lib_blocks)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
         rendered = self.lc_block.render(AUTHOR_VIEW, {'root_xblock': self.lc_block})
         assert 'Hello world from block 1' in rendered.content
 
@@ -484,7 +484,7 @@ class TestLibraryContentRender(LibraryContentTest):
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         assert len(self.lc_block.children) == len(self.lib_blocks)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
         rendered = self.lc_block.render(AUTHOR_VIEW, {})
         assert '' == rendered.content
         # content should be empty
@@ -502,7 +502,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.publisher = Mock()
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
         self.lc_block.xmodule_runtime.publish = self.publisher
 
     def _assert_event_was_published(self, event_type):
@@ -556,7 +556,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.store.publish(self.course.location, self.user_id)
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
             self.lc_block = self.store.get_item(self.lc_block.location)
-            self._bind_course_module(self.lc_block)
+            self._bind_course_block(self.lc_block)
             self.lc_block.xmodule_runtime.publish = self.publisher
             self.test_assigned_event()
 
@@ -575,7 +575,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
 
         # Reload lc_block and set it up for a student:
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self._bind_course_module(self.lc_block)
+        self._bind_course_block(self.lc_block)
         self.lc_block.xmodule_runtime.publish = self.publisher
 
         # Get the keys of each of our blocks, as they appear in the course:

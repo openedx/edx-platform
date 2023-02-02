@@ -122,6 +122,8 @@ class Command(BaseCommand):
             self._handle_all_goals()
         except BaseException:  # pylint: disable=broad-except
             log.exception("Error while sending course goals emails: ")
+            for h in log.handlers:
+                h.flush()
             raise
 
     def _handle_all_goals(self):
@@ -153,16 +155,25 @@ class Command(BaseCommand):
         courses_to_exclude = CourseOverview.objects.filter(
             id__in=all_goal_course_keys, end__date__lte=sunday_date
         ).values_list('id', flat=True)
+        log.info(f"Processing course goals across {len(all_goal_course_keys)} courses "
+                 + f"excluding {len(courses_to_exclude)} ended courses")
 
-        count = 0
+        sent_count = 0
+        filtered_count = 0
         course_goals = course_goals.exclude(course_key__in=courses_to_exclude).select_related('user').order_by('user')
+        total_goals = len(course_goals)
+        log.info(f'Processing course goals, total goal count {total_goals}')
         for goal in course_goals:
             # emulate a request for waffle's benefit
             with emulate_http_request(site=Site.objects.get_current(), user=goal.user):
                 if self.handle_goal(goal, today, sunday_date, monday_date):
-                    count += 1
+                    sent_count += 1
+                else:
+                    filtered_count += 1
+            if (sent_count + filtered_count) % 10000 == 0:
+                log.info(f'Processing course goals: sent {sent_count} filtered {filtered_count} out of {total_goals}')
 
-        log.info(f'Sent {count} emails')
+        log.info(f'Processing course goals complete: sent {sent_count} emails, filtered out {filtered_count} emails')
 
     @staticmethod
     def handle_goal(goal, today, sunday_date, monday_date):
@@ -196,10 +207,10 @@ class Command(BaseCommand):
         # Essentially, if today is Sunday, days_left_in_week should be 1 since they have Sunday to hit their goal.
         days_left_in_week = SUNDAY_WEEKDAY - today.weekday() + 1
 
-        # We want to email users in the morning of their timezone
+        # We want to email users during the day of their timezone
         user_timezone = get_user_timezone_or_last_seen_timezone_or_utc(goal.user)
         now_in_users_timezone = datetime.now(user_timezone)
-        if not 9 <= now_in_users_timezone.hour < 12:
+        if not 8 <= now_in_users_timezone.hour < 18:
             return False
 
         if required_days_left == days_left_in_week:

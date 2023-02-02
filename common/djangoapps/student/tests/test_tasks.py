@@ -39,6 +39,7 @@ class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
             "short_description": "Short description of course",
             "course_ended": False,
             "pacing_type": "self-paced",
+            "track_mode": "audit",
         }
 
     @staticmethod
@@ -129,6 +130,7 @@ class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
             "course_title": self.send_course_enrollment_email_kwargs["course_title"],
             "short_description": self.send_course_enrollment_email_kwargs["short_description"],
             "pacing_type": self.send_course_enrollment_email_kwargs["pacing_type"],
+            "track_mode": self.send_course_enrollment_email_kwargs["track_mode"],
         }
 
         if add_course_dates:

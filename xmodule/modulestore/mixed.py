@@ -392,7 +392,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     @strip_key
     def get_course(self, course_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
-        returns the course module associated with the course_id. If no such course exists,
+        returns the course block associated with the course_id. If no such course exists,
         it returns None
 
         :param course_key: must be a CourseKey
@@ -852,7 +852,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     @strip_key
     def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):
         """
-        Create the new xmodule but don't save it. Returns the new module.
+        Create the new xblock but don't save it. Returns the new block.
 
         Args:
             runtime: :py:class `xblock.runtime` from another xblock in the same course. Providing this

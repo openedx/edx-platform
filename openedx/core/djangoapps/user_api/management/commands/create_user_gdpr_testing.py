@@ -137,7 +137,6 @@ class Command(BaseCommand):
         )
         SapSuccessFactorsLearnerDataTransmissionAudit.objects.get_or_create(
             enterprise_course_enrollment_id=audit.id,
-            completed_timestamp=10
         )
 
         # PendingEnterpriseCustomerUser

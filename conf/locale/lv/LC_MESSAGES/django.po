@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -9,14 +9,14 @@
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -25,22 +25,22 @@
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2019
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Latvian (https://www.transifex.com/open-edx/teams/6205/lv/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -49,7 +49,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2023-01-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Latvian (https://www.transifex.com/open-edx/teams/6205/lv/)\n"
@@ -62,7 +62,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/item.py xmodule/html_module.py
+#: cms/djangoapps/contentstore/views/block.py xmodule/html_block.py
 msgid "Text"
 msgstr "Teksts"
 
@@ -88,7 +88,7 @@ msgid "Video"
 msgstr "Video"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Advanced"
 msgstr "Padziļināts"
 
@@ -99,24 +99,24 @@ msgstr "Sākuma eksāmens"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
 msgid "Unit"
 msgstr "Aktivitāte"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "Tukšs"
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 #, python-brace-format
 msgid "The following parameters are required: {missing}."
 msgstr "Nepieciešami šādi parametri: {missing}."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 msgid ""
 "There is a problem with this transcript file. Try to upload a different "
 "file."
@@ -124,14 +124,14 @@ msgstr ""
 "Ar šo transkripta failu ir problēmas. Mēģiniet augšupielādēt citu failu."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 #, python-brace-format
 msgid "A transcript with the \"{language_code}\" language code already exists."
 msgstr "Transkripts ar {language_code} valodas kodu jau eksistē."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_module/video_handlers.py
+#: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Nepieciešams transkripta fails."
 
@@ -142,7 +142,7 @@ msgid "Name"
 msgstr "Vārds"
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video ID"
 msgstr "Video ID"
 
@@ -177,7 +177,7 @@ msgid "Log out"
 msgstr "Izrakstīties"
 
 #: common/djangoapps/course_modes/admin.py
-#: common/djangoapps/course_modes/models.py xmodule/library_content_module.py
+#: common/djangoapps/course_modes/models.py xmodule/library_content_block.py
 msgid "Mode"
 msgstr "Režīms"
 
@@ -229,12 +229,12 @@ msgstr "Jūs esat reģistrēts kā students ar profesionālo izglītību. "
 msgid "Professional Ed"
 msgstr "Profesionālā izglītība"
 
-#: common/djangoapps/course_modes/models.py xmodule/annotatable_module.py
-#: xmodule/capa_module.py xmodule/conditional_module.py
-#: xmodule/discussion_block.py xmodule/html_module.py
-#: xmodule/library_content_module.py xmodule/library_sourced_block.py
-#: xmodule/lti_module.py xmodule/split_test_module.py xmodule/unit_block.py
-#: xmodule/word_cloud_module.py xmodule/x_module.py
+#: common/djangoapps/course_modes/models.py xmodule/annotatable_block.py
+#: xmodule/capa_block.py xmodule/conditional_block.py
+#: xmodule/discussion_block.py xmodule/html_block.py
+#: xmodule/library_content_block.py xmodule/library_sourced_block.py
+#: xmodule/lti_block.py xmodule/split_test_block.py xmodule/unit_block.py
+#: xmodule/word_cloud_block.py xmodule/x_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "Redzamais vārds"
@@ -407,101 +407,19 @@ msgstr ""
 msgid "Disabled Account"
 msgstr "Atspējots profils"
 
-#: common/djangoapps/student/models.py
-msgid "Male"
-msgstr "Vīrietis"
-
-#: common/djangoapps/student/models.py
-msgid "Female"
-msgstr "Sieviete"
-
-#. Translators: 'Other' refers to the student's gender
-#: common/djangoapps/student/models.py
-msgid "Other/Prefer Not to Say"
-msgstr "Cits/Nevēlos teikt"
-
-#: common/djangoapps/student/models.py
-msgid "Doctorate"
-msgstr "Doktora"
-
-#: common/djangoapps/student/models.py
-msgid "Master's or professional degree"
-msgstr "Maģistra vai profesionālais grāds"
-
-#: common/djangoapps/student/models.py
-msgid "Bachelor's degree"
-msgstr "Bakalaura grāds"
-
-#: common/djangoapps/student/models.py
-msgid "Associate degree"
-msgstr "Asociētais grāds"
-
-#: common/djangoapps/student/models.py
-msgid "Secondary/high school"
-msgstr "Vidusskola"
-
-#: common/djangoapps/student/models.py
-msgid "Junior secondary/junior high/middle school"
-msgstr "Vidusskola (5. - 9. klase)"
-
-#: common/djangoapps/student/models.py
-msgid "Elementary/primary school"
-msgstr "Pamatskola"
-
-#. Translators: 'None' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "No formal education"
-msgstr "Bez formālas izglītības"
-
-#. Translators: 'Other' refers to the student's level of education
-#: common/djangoapps/student/models.py
-msgid "Other education"
-msgstr "Cita izglītība"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr "{platform_name} Goda kodeksa sertifikāts par  kursu {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "{platform_name} Verificēts sertifikāts par kursu {course_name}"
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr "{platform_name} Profesionāls sertifikāts par kursu {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
-msgstr ""
-
-#: common/djangoapps/student/models.py
-#, python-brace-format
-msgid "{platform_name} Certificate for {course_name}"
-msgstr "{platform_name} Sertifikāts par kursu {course_name}"
-
-#: common/djangoapps/student/models.py
-msgid "The ISO 639-1 language code for this language."
-msgstr "Šīs valodas ISO 639-1 valodas kods."
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Namespace of enrollment attribute"
 msgstr "Reģistrēšanas atribūta nosaukumvieta"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Name of the enrollment attribute"
 msgstr "Reģistrēšanas atribūta nosaukums"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid "Value of the enrollment attribute"
 msgstr "Reģistrēšanas atribūta vērtība"
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
@@ -509,15 +427,7 @@ msgstr ""
 "Laika periods pēc reģistrēšanās, kura laikā lietotājiem var tikt piešķirta "
 "atmaksa, atspoguļots mikrosekundēs. Noklusējuma vērtība - 14 dienas."
 
-#: common/djangoapps/student/models.py
-msgid "Name of the UTM cookie"
-msgstr "UTM sīkdatnes nosaukums"
-
-#: common/djangoapps/student/models.py
-msgid "Name of the affiliate cookie"
-msgstr "Sadarbības partnera sīkdatnes nosaukums"
-
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
@@ -525,30 +435,120 @@ msgid ""
 "is_verified, verification_date"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/course_enrollment.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     course_id, username, mode"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
+msgid "Male"
+msgstr "Vīrietis"
+
+#: common/djangoapps/student/models/user.py
+msgid "Female"
+msgstr "Sieviete"
+
+#. Translators: 'Other' refers to the student's gender
+#: common/djangoapps/student/models/user.py
+msgid "Other/Prefer Not to Say"
+msgstr "Cits/Nevēlos teikt"
+
+#: common/djangoapps/student/models/user.py
+msgid "Doctorate"
+msgstr "Doktora"
+
+#: common/djangoapps/student/models/user.py
+msgid "Master's or professional degree"
+msgstr "Maģistra vai profesionālais grāds"
+
+#: common/djangoapps/student/models/user.py
+msgid "Bachelor's degree"
+msgstr "Bakalaura grāds"
+
+#: common/djangoapps/student/models/user.py
+msgid "Associate degree"
+msgstr "Asociētais grāds"
+
+#: common/djangoapps/student/models/user.py
+msgid "Secondary/high school"
+msgstr "Vidusskola"
+
+#: common/djangoapps/student/models/user.py
+msgid "Junior secondary/junior high/middle school"
+msgstr "Vidusskola (5. - 9. klase)"
+
+#: common/djangoapps/student/models/user.py
+msgid "Elementary/primary school"
+msgstr "Pamatskola"
+
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "No formal education"
+msgstr "Bez formālas izglītības"
+
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models/user.py
+msgid "Other education"
+msgstr "Cita izglītība"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{platform_name} Goda kodeksa sertifikāts par  kursu {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "{platform_name} Verificēts sertifikāts par kursu {course_name}"
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "{platform_name} Profesionāls sertifikāts par kursu {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid ""
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
+
+#: common/djangoapps/student/models/user.py
+#, python-brace-format
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{platform_name} Sertifikāts par kursu {course_name}"
+
+#: common/djangoapps/student/models/user.py
+msgid "The ISO 639-1 language code for this language."
+msgstr "Šīs valodas ISO 639-1 valodas kods."
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the UTM cookie"
+msgstr "UTM sīkdatnes nosaukums"
+
+#: common/djangoapps/student/models/user.py
+msgid "Name of the affiliate cookie"
+msgstr "Sadarbības partnera sīkdatnes nosaukums"
+
+#: common/djangoapps/student/models/user.py
 msgid "Name of this user attribute."
 msgstr "Šī lietotāja atribūta nosaukums."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Value of this user attribute."
 msgstr "Šī lietotāja atribūta vērtība."
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Secondary email address to recover linked account."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "An employee (a user whose email has current site's domain name) whose email "
 "exists in this model, can be able to login from login screen through email "
@@ -556,14 +556,14 @@ msgid ""
 "that employee can login via third party authentication backend only."
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     username, current_email, desired_email"
 msgstr ""
 
-#: common/djangoapps/student/models.py
+#: common/djangoapps/student/models/user.py
 msgid "Add a reason"
 msgstr ""
 
@@ -1986,6 +1986,10 @@ msgid "Help Center"
 msgstr "Palīdzības centrs"
 
 #: lms/djangoapps/branding/api.py
+msgid "Security"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "Komplekts presei"
@@ -2069,6 +2073,14 @@ msgstr "Sadarbības partneri"
 #: lms/djangoapps/branding/api.py
 msgid "Open edX"
 msgstr "Open edX"
+
+#: lms/djangoapps/branding/api.py
+msgid "Cookie Policy"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Do Not Sell My Personal Information"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -4686,7 +4698,7 @@ msgstr ""
 " tiek uzskatīts par redzamu visiem. Ņemiet vērā, ka šis lauks tiek ignorēts,"
 " ja bloks ir visible_to_staff_only."
 
-#: lms/djangoapps/lms_xblock/mixin.py xmodule/split_test_module.py
+#: lms/djangoapps/lms_xblock/mixin.py xmodule/split_test_block.py
 msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
@@ -5001,7 +5013,7 @@ msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr ""
 
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
-#: xmodule/capa_module.py cms/templates/index.html
+#: xmodule/capa_block.py cms/templates/index.html
 #: cms/templates/videos_index_pagination.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
@@ -8151,6 +8163,12 @@ msgstr ""
 msgid "No email address provided."
 msgstr "Nav sniegta e-pasta adrese."
 
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"An error has occurred. Try refreshing the page, or check your internet "
+"connection."
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
 msgid "Registration using {provider} has timed out."
@@ -8739,21 +8757,21 @@ msgstr "Pierakstīties"
 msgid "Our mailing address is"
 msgstr "Mūsu pasta adrese ir"
 
-#: xmodule/annotatable_module.py
+#: xmodule/annotatable_block.py
 msgid "XML data for the annotation"
 msgstr "XML dati anotācijai"
 
-#: xmodule/annotatable_module.py xmodule/capa_module.py
-#: xmodule/conditional_module.py xmodule/discussion_block.py
-#: xmodule/html_module.py xmodule/library_content_module.py
+#: xmodule/annotatable_block.py xmodule/capa_block.py
+#: xmodule/conditional_block.py xmodule/discussion_block.py
+#: xmodule/html_block.py xmodule/library_content_block.py
 #: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
-#: xmodule/poll_module.py xmodule/unit_block.py
-#: xmodule/video_module/video_xfields.py xmodule/word_cloud_module.py
+#: xmodule/poll_block.py xmodule/unit_block.py
+#: xmodule/video_block/video_xfields.py xmodule/word_cloud_block.py
 #: xmodule/x_module.py
 msgid "The display name for this component."
 msgstr "Šī komponenta parādāmais vārds."
 
-#: xmodule/annotatable_module.py
+#: xmodule/annotatable_block.py
 msgid "Annotation"
 msgstr "Anotācija"
 
@@ -8765,11 +8783,11 @@ msgstr "Nevar atkārtoti novērtēt problēmas ar iespējamo datņu iesniegšanu
 msgid "Question {}"
 msgstr ""
 
-#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+#: xmodule/capa/capa_problem.py xmodule/capa_block.py
 msgid "Incorrect"
 msgstr "Nepareizi"
 
-#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+#: xmodule/capa/capa_problem.py xmodule/capa_block.py
 msgid "Correct"
 msgstr "Pareizi"
 
@@ -8938,7 +8956,7 @@ msgstr "Pareizi:"
 msgid "Incorrect:"
 msgstr "Nepareizi:"
 
-#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+#: xmodule/capa/responsetypes.py xmodule/capa_block.py
 msgid "Answer"
 msgstr "Atbilde"
 
@@ -9203,19 +9221,19 @@ msgstr ""
 msgid "Invalid JSON response received from codejail api service."
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Blank Advanced Problem"
 msgstr "Tukša padziļinātā problēma"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Studenta veikto mēģinājumu skaits pie šīs problēmas"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr "Maksimālais mēģinājumu skaits"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines the number of times a student can try to answer this problem. If the"
 " value is not set, infinite attempts are allowed."
@@ -9223,19 +9241,19 @@ msgstr ""
 "Definē mēģinājumu skaitu, ko students var veikt pie šīs problēmas. Ja "
 "vērtība nav iestatīta, ir atļauts neierobežots mēģinājumu skaits."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Date that this problem is due by"
 msgstr "Datums, līdz kuram šī problēma ir jāatrisina"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr "Termiņš pēc izpildes datuma, kura laikā tiks pieņemti iesniegumi."
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Show Results"
 msgstr "Parādīt rezultātus"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to show whether a learner's answer to the problem is correct. "
 "Configured on the subsection."
@@ -9243,23 +9261,23 @@ msgstr ""
 "Definē, kad parādīt to, ka audzēkņa atbilde uz problēmu ir bijusi pareiza. "
 "Konfigurējams apakšiedaļā."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Always"
 msgstr "Vienmēr"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Never"
 msgstr "Nekad"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Past Due"
 msgstr "Pēc termiņa"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Show Answer"
 msgstr "Parādīt atbildi"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
@@ -9267,61 +9285,61 @@ msgstr ""
 "Definē, kad parādīt atbildi uz problēmu. Noklusējuma vērtību var iestatīt "
 "papildu iestatījumos."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answered"
 msgstr "Atbildēts"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Attempted or Past Due"
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Closed"
 msgstr "Aizvērts"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Finished"
 msgstr "Pabeigts"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Correct or Past Due"
 msgstr "Pareizs vai pēc termiņa"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After Some Number of Attempts"
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After All Attempts"
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "After All Attempts or Correct"
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Attempted"
 msgstr "Mēģināts"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Show Answer: Number of Attempts"
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Number of times the student must attempt to answer the question before the "
 "Show Answer button appears."
 msgstr ""
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether to force the save button to appear on the page"
 msgstr "Vai saglabāšanas taustiņu parādīt lapā piespiedu kārtā"
 
-#: xmodule/capa_module.py xmodule/library_content_module.py
+#: xmodule/capa_block.py xmodule/library_content_block.py
 msgid "Show Reset Button"
 msgstr "Parādīt atiestates taustiņu"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Determines whether a 'Reset' button is shown so the user may reset their "
 "answer. A default value can be set in Advanced Settings."
@@ -9330,11 +9348,11 @@ msgstr ""
 "varētu atiestatīt savu atbildi. Noklusējuma vērtību var iestatīt papildu "
 "iestatījumos."
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr "Randomizācija"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines when to randomize the variables specified in the associated Python "
 "script. For problems that do not randomize values, specify \"Never\". "
@@ -9342,55 +9360,55 @@ msgstr ""
 "Definē, kad randomizēt mainīgos, kas norādīti saistītajā Python skriptā. "
 "Problēmām, kurām netiek randomizētas vērtības, norādiet \"Never\". "
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "On Reset"
 msgstr "Pie atiestates"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Per Student"
 msgstr "Uz studentu"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "XML data for the problem"
 msgstr "XML dati problēmai"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the correctness of current student answers"
 msgstr "Vārdnīca ar studentu pašreizējo atbilžu pareizību"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary for maintaining the state of inputtypes"
 msgstr "Vārdnīca ievades veidu stāvokļa uzturēšanai"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the current student responses"
 msgstr "Vārdnīca ar studentu pašreizējām atbildēm"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Dictionary with the current student score"
 msgstr "Vārdnīca ar studentu pašreizējiem vērtējumiem"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether or not the answers have been saved since last submit"
 msgstr "Vai atbildes ir vai nav tikušas saglabātas kopš pēdējās iesniegšanas"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Whether the student has answered the problem"
 msgstr "Vai students ir atbildējis uz problēmu"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Random seed for this student"
 msgstr "Nejauša sākotnējā vērtība šim studentam"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Last submission time"
 msgstr "Pēdējās iesniegšanas laiks"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Timer Between Attempts"
 msgstr "Laiks starp mēģinājumiem"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Seconds a student must wait between submissions for a problem with multiple "
 "attempts."
@@ -9398,11 +9416,11 @@ msgstr ""
 "Studenta gaidīšanas laiks sekundēs starp iesniegšanas reizēm problēmā ar "
 "vairākiem mēģinājumiem."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem Weight"
 msgstr "Problēmas svarīgums"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Defines the number of points each problem is worth. If the value is not set,"
 " each response field in the problem is worth one point."
@@ -9410,24 +9428,24 @@ msgstr ""
 "Definē katras problēmas vērtības punktu skaitu. Ja vērtība nav iestatīta, "
 "katra problēmas atbildes lauka vērtība ir viens punkts."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Markdown source of this module"
 msgstr "Šī moduļa Markdown avots"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Source code for LaTeX and Word problems. This feature is not well-supported."
 msgstr "LaTeX un Word problēmu pirmkods. Šis līdzeklis nav labi atbalstīts."
 
-#: xmodule/capa_module.py xmodule/html_module.py
+#: xmodule/capa_block.py xmodule/html_block.py
 msgid "Enable LaTeX templates?"
 msgstr "Iespējot LaTeX veidnes?"
 
-#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+#: xmodule/capa_block.py xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
 msgstr "Matlab API atslēga"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
 "Service. This key is granted for exclusive use by this course for the "
@@ -9443,7 +9461,7 @@ msgstr ""
 "kompromitēta vai sniegta (atklāta). Lai iegūtu atslēgu Jūsu kursam, vai "
 "ziņotu par problēmu, lūdzu, sazinieties ar moocsupport@mathworks.com."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "We're sorry, there was an error with processing your request. Please try "
 "reloading your page and trying again."
@@ -9451,7 +9469,7 @@ msgstr ""
 "Atvainojiet, Jūsu pieprasījuma apstrādes laikā notika kļūda. Lūdzu, mēģiniet"
 " pārlādēt Jūsu lapu un mēģiniet vēlreiz."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "The state of this problem has changed since you loaded this page. Please "
 "refresh your page."
@@ -9459,29 +9477,29 @@ msgstr ""
 "Šīs problēmas statuss ir izmainījies kopš Jūs ielādējāt  šo lapu. Lūdzu, "
 "atsvaidziniet Jūsu lapu."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answer ID"
 msgstr "Atbildes ID"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Question"
 msgstr "Jautājums"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Correct Answer"
 msgstr "Pareizā atbilde"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Submitting"
 msgstr "Iesniedz"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Warning: The problem has been reset to its initial state!"
 msgstr "Brīdinājums: Problēma tika atiestatīta tās sākotnējā stāvoklī!"
 
 #. Translators: Following this message, there will be a bulleted list of
 #. items.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid ""
 "The problem's state was corrupted by an invalid submission. The submission "
 "consisted of:"
@@ -9489,7 +9507,7 @@ msgstr ""
 "Problēmas stāvoklis tika sabojāts nederīga iesnieguma dēļ. Iesniegums "
 "sastāvēja no:"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "If this error persists, please contact the course staff."
 msgstr "Ja šī kļūda atkārtojas, lūdzu, sazinieties ar kursa personālu."
 
@@ -9498,7 +9516,7 @@ msgstr "Ja šī kļūda atkārtojas, lūdzu, sazinieties ar kursa personālu."
 #. is a header for this hint, and {hint_text} is the text of the hint itself.
 #. This string is being passed to translation only for possible reordering of
 #. the placeholders.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
@@ -9506,12 +9524,12 @@ msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
 #. This text is shown in bold before the accompanying hint text.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "Ieteikums nr. ({hint_num} no {hints_count}): "
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "Your answers were previously saved. Click '{button_name}' to grade them."
@@ -9519,7 +9537,7 @@ msgstr ""
 "Jūsu atbildes iepriekš tika saglabātas. Klikšķiniet uz '{button_name}', lai "
 "tās novērtētu."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
@@ -9527,7 +9545,7 @@ msgstr[0] "Nepareizi ({progress} punkts)"
 msgstr[1] "Nepareizi ({progress} punkti)"
 msgstr[2] "Nepareizi ({progress} punkti)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
@@ -9535,7 +9553,7 @@ msgstr[0] "Pareizi ({progress} punkts)"
 msgstr[1] "Pareizi ({progress} punkti)"
 msgstr[2] "Pareizi ({progress} punkti)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
@@ -9543,30 +9561,30 @@ msgstr[0] "Daļēji pareizi ({progress} punkts)"
 msgstr[1] "Daļēji pareizi ({progress} punkti)"
 msgstr[2] "Daļēji pareizi ({progress} punkti)"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Partially Correct"
 msgstr "Daļēji pareizi"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Answer submitted."
 msgstr "Atbilde iesniegta."
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem is closed."
 msgstr "Problēma ir slēgta."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem must be reset before it can be submitted again."
 msgstr "Problēmu nepieciešams atiestatīt pirms to var atkārtoti iesniegt."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr "Jums ir jāuzgaida vismaz {wait} sekundes starp iesniegšanas reizēm."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "You must wait at least {wait_secs} between submissions. {remaining_secs} "
@@ -9575,7 +9593,7 @@ msgstr ""
 "Jums ir jāuzgaida vismaz {wait_secs} starp iesniegšanas reizēm. Ir atlicis "
 "{remaining_secs}."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
@@ -9583,7 +9601,7 @@ msgstr[0] "{num_hour} stunda"
 msgstr[1] "{num_hour} stundas"
 msgstr[2] "{num_hour} stundas"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
@@ -9591,7 +9609,7 @@ msgstr[0] "{num_minute} minūte"
 msgstr[1] "{num_minute} minūtes"
 msgstr[2] "{num_minute} minūtes"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
@@ -9599,15 +9617,15 @@ msgstr[0] "{num_second} sekunde"
 msgstr[1] "{num_second} sekundes"
 msgstr[2] "{num_second} sekundes"
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem needs to be reset prior to save."
 msgstr "Problēmu ir nepieciešams atiestatīt pirms saglabāšanas."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Your answers have been saved."
 msgstr "Jūsu atbildes tika saglabātas."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "Your answers have been saved but not graded. Click '{button_name}' to grade "
@@ -9618,150 +9636,138 @@ msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "You cannot select Reset for a problem that is closed."
 msgstr "Jūs nevarat izvēlēties atiestati problēmai, kura ir slēgta."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "You must submit an answer before you can select Reset."
 msgstr "Jums ir jāiesniedz atbilde pirms Jūs varat izvēlēties atiestati."
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem's definition does not support rescoring."
 msgstr "Problēmas definīcijā nav atbalstīta atkārtota novērtēšana."
 
-#: xmodule/capa_module.py
+#: xmodule/capa_block.py
 msgid "Problem must be answered before it can be graded again."
 msgstr "Uz problēmu nepieciešams atbildēt pirms to var atkal novērtēt."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional"
 msgstr "Nosacījuma"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "List of urls of children that are references to external modules"
 msgstr "Bērnelementu URL saraksts, kuri ir atsauces uz ārējiem moduļiem"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Source Components"
 msgstr "Avota komponenti"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
+"determine whether a learner is shown the content of this conditional block. "
+"Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
-"Komponentu atrašanās vietas ID visiem avota komponentiem, kuri tiek lietoti,"
-" lai noteiktu, vai audzēknis ir parādīts šī nosacījuma moduļa saturā. "
-"Nokopējiet komponenta vietas ID no Studio komponentu iestatījumu dialoga."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional Attribute"
 msgstr "Nosacījuma atribūts"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
+"shown the content of this conditional block."
 msgstr ""
-"Avota komponentu atribūts, kas nosaka, vai audzēknim tiek parādīts šī "
-"nosacījuma moduļa saturs."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Conditional Value"
 msgstr "Nosacījuma vērtība"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
+" before a learner is shown the content of this conditional block."
 msgstr ""
-"Vērtība, ar kuru ir jāsakrīt avota komponentu nosacījuma atribūtam, pirms "
-"audzēknim tiek parādīts šī nosacījuma moduļa saturs."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Blocked Content Message"
 msgstr "Ziņojums par bloķētu saturu"
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
+"show the content of this conditional block. Include {link} in the text of "
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
-"Ziņojums, kas tiek parādīts audzēkņiem, kad netiek izpildīti visi "
-"nosacījumi, lai parādītu nosacījuma moduļa saturu. Iekļaujiet {link} Jūsu "
-"ziņojuma tekstā, lai dotu audzēkņiem tiešu saiti uz nepieciešamajiem "
-"elementiem. Piemēram, ‘Jums ir nepieciešams pabeigt {link}, pirms Jūs varat "
-"piekļūt šim elementam’."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 #, python-brace-format
 msgid "You must complete {link} before you can access this unit."
 msgstr ""
 "Jums ir nepieciešams pabeigt {link}, pirms Jūs varat piekļūt šim elementam."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "This component has no source components configured yet."
 msgstr "Šim komponentam vēl nav konfigurētu avota komponentu."
 
-#: xmodule/conditional_module.py
+#: xmodule/conditional_block.py
 msgid "Configure list of sources"
 msgstr "Konfigurēt avotu sarakstu"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "LTI Passports"
 msgstr "LTI pases"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
 "\"id:client_key:client_secret\"."
 msgstr ""
 "Ievadiet kursa LTI rīku pases šādā formātā: \"id:client_key:client_secret\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "List of Textbook objects with (title, url) for textbooks used in this course"
 msgstr ""
 "Mācību grāmatu objektu saraksts ar (nosaukums, URL) mācību grāmatām, kas "
 "lietotas šajā kursā"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Slug that points to the wiki for this course"
 msgstr "Īsā rinda (slug), kas norāda uz šī kursa vikivietni"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that enrollment for this class is opened"
 msgstr "Datums, kurā tiek atvērta reģistrēšanās uz šo mācību priekšmetu"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that enrollment for this class is closed"
 msgstr "Datums, kurā tiek slēgta reģistrēšanās uz šo mācību priekšmetu"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Start time when this module is visible"
 msgstr "Sākuma laiks, kad šis modulis ir redzams"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that this class ends"
 msgstr "Datums, kad šis mācību priekšmets beidzas"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Date that certificates become available to learners"
 msgstr "Datums, kad sertifikāti kļūst pieejami audzēkņiem"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Cosmetic Course Display Price"
 msgstr "Kosmētikas kursa attēlotā cena"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "The cost displayed to students for enrolling in the course. If a paid course"
 " registration price is set by an administrator in the database, that price "
@@ -9771,11 +9777,11 @@ msgstr ""
 "administrators ir iestatījis maksas kursa cenu datubāzē, tad datubāzes cena "
 "tiks parādīta šīs cenas vietā."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Advertised Start"
 msgstr "Kursa reklamētais sākums"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the text that you want to use as the advertised starting time frame "
 "for the course, such as \"Winter 2018\". If you enter null for this value, "
@@ -9785,25 +9791,25 @@ msgstr ""
 "periodu, piemēram, \"Winter 2018\". Ja Jūs ievadīsiet nulli kā šo vērtību, "
 "tiks izmantots sākuma datums, ko iestatījāt šim kursam."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Requisite Courses"
 msgstr "Iepriekš nepieciešamie kursi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Requisite Course key if this course has a pre-requisite course"
 msgstr ""
 "Iepriekš nepieciešamo kursu atslēga, ja šim kursam ir iepriekš nepieciešamie"
 " kursi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Grading policy definition for this class"
 msgstr "Vērtēšanas politikas definīcija šim mācību priekšmetam"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Show Calculator"
 msgstr "Parādīt kalkulatoru"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. When true, students can see the calculator in the "
 "course."
@@ -9811,27 +9817,27 @@ msgstr ""
 "Ievadīt kā patiesu vai nepatiesu. Ja patiess, studenti var kursā redzēt "
 "kalkulatoru."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the name of the course as it should appear in the course list."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Display Name"
 msgstr "Parādāmais kursa vārds"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Course Editor"
 msgstr "Kursa redaktors"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
 msgstr "Ievadiet metodi, ar kādu šis kurss tiek rediģēts (\"XML\" vai \"Studio\")."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Survey URL"
 msgstr "Kursa aptaujas URL"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the URL for the end-of-course survey. If your course does not have a "
 "survey, enter null."
@@ -9839,11 +9845,11 @@ msgstr ""
 "Ievietojiet kursa beigu aptaujas URL. Ja Jūsu kursam nav aptaujas, ievadiet "
 "nulli."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Blackout Dates"
 msgstr "Diskusijas atteikuma laika datumi"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter pairs of dates between which students cannot post to discussion "
 "forums. Inside the provided brackets, enter an additional set of square "
@@ -9865,11 +9871,11 @@ msgstr ""
 "periodi, izskatīsies šādi, ieskaitot ārējo kvadrātiekavu pāri: "
 "[[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", \"2015-10-08\"]] "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Topic Mapping"
 msgstr "Diskusijas tematu kartēšana"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
@@ -9891,27 +9897,27 @@ msgstr ""
 "patiesu. Piemēram, \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
 "MUS101-course-2015_T1\", \"default\": true}."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussions Plugin Settings"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Settings for discussions plugins."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Announcement Date"
 msgstr "Kursa paziņošanas datums"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the date to announce your course."
 msgstr "Ievadiet datumu, kurā paziņot Jūsu kursu."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Cohort Configuration"
 msgstr "Kohortas konfigurācija"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter policy keys and values to enable the cohort feature, define automated "
 "student assignment to groups, or identify any course-wide discussion topics "
@@ -9921,21 +9927,21 @@ msgstr ""
 "definētu studentu automātisku piešķiršanu grupām, vai identificētu jebkurus "
 "visa kursa diskusiju tematus kā privātus kohortas dalībniekiem."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Is New"
 msgstr "Kurss ir jauns"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, the course appears in the list of new courses,"
 " and a New! badge temporarily appears next to the course image."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Mobile Course Available"
 msgstr "Pieejams mobilais kurss"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, the course will be available to mobile "
 "devices."
@@ -9943,49 +9949,49 @@ msgstr ""
 "Ievadiet kā patiesu vai nepatiesu. Ja patiess, tad kurss būs pieejams "
 "mobilajām ierīcēm."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Video Upload Credentials"
 msgstr "Video augšupielādes akreditācijas dati"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Enter the unique identifier for your course's video files provided by "
 "{platform_name}."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Not Graded"
 msgstr "Kurss nav novērtēts"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter true or false. If true, the course will not be graded."
 msgstr ""
 "Ievadiet kā patiesu vai nepatiesu. Ja patiess, tad kurss netiks vērtēts."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Disable Progress Graph"
 msgstr "Atspējot progresa diagrammu"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter true or false. If true, students cannot view the progress graph."
 msgstr ""
 "Ievadiet kā patiesu vai nepatiesu. Ja patiess, tad studenti nevarēs apskatīt"
 " progresa diagrammu."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "PDF Textbooks"
 msgstr "PDF mācību grāmatas"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "List of dictionaries containing pdf_textbook configuration"
 msgstr "Vārdnīcu saraksts, kas satur pdf_textbook konfigurāciju"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "HTML Textbooks"
 msgstr "HTML mācību grāmatas"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "For HTML textbooks that appear as separate tabs in the course, enter the "
 "name of the tab (usually the title of the book) as well as the URLs and "
@@ -9995,11 +10001,11 @@ msgstr ""
 "cilnes nosaukumu (parasti grāmatas nosaukumu), kā arī URL un katras grāmatas"
 " nodaļas nosaukumu."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Remote Gradebook"
 msgstr "Attālinātais sekmju žurnāls"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the remote gradebook mapping. Only use this setting when "
 "REMOTE_GRADEBOOK_URL has been specified."
@@ -10012,7 +10018,7 @@ msgstr ""
 #. a role created by a course Instructor to enable a person (the "Coach") to
 #. manage the custom course for
 #. his students.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable CCX"
 msgstr "Iespējot CCX"
 
@@ -10021,7 +10027,7 @@ msgstr "Iespējot CCX"
 #. a role created by a course Instructor to enable a person (the "Coach") to
 #. manage the custom course for
 #. his students.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
@@ -10031,11 +10037,11 @@ msgstr ""
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
 #. course content.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "CCX Connector URL"
 msgstr "CCX savienotāja URL"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "URL for CCX Connector application for managing creation of CCXs. (optional)."
 " Ignored unless 'Enable CCX' is set to 'true'."
@@ -10043,11 +10049,11 @@ msgstr ""
 "URL CCX savienotājprogrammai, lai pārvaldītu CCX izveidošanu (neobligāts). "
 "Tiek ignorēts, ja vien ‘Iespējot CCX’ ir iestatīts kā ‘patiess’."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Anonymous Discussion Posts"
 msgstr "Atļaut anonīmas diskusiju ziņas"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to all users."
@@ -10055,11 +10061,11 @@ msgstr ""
 "Ievadiet kā patiesu vai nepatiesu. Ja patiess, studenti varēs izveidot "
 "diskusiju ziņas, kas ir anonīmas visiem lietotājiem."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Anonymous Discussion Posts to Peers"
 msgstr "Atļaut anonīmas diskusiju ziņas līdzbiedriem"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to other students. This setting does not make posts anonymous to "
@@ -10069,15 +10075,15 @@ msgstr ""
 "diskusiju ziņas, kas ir anonīmas citiem studentiem. Šis iestatījums nepadara"
 " ziņas anonīmas kursa personālam."
 
-#: xmodule/course_module.py xmodule/library_root_xblock.py
+#: xmodule/course_block.py xmodule/library_root_xblock.py
 msgid "Advanced Module List"
 msgstr "Uzlaboto moduļu saraksts"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the names of the advanced modules to use in your course."
 msgstr "Ievadiet to uzlaboto moduļu nosaukumus, kurus izmantot Jūsu kursā."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
@@ -10085,11 +10091,11 @@ msgstr ""
 "Patiess, ja laika zonas tiks parādītas uz datumiem kursā. Novecojis, "
 "priekšroka tiek dota due_date_display_format."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Due Date Display Format"
 msgstr "Izpildes datuma attēlošanas formāts"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the format for due dates. The default is Mon DD, YYYY. Enter "
 "\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
@@ -10100,20 +10106,20 @@ msgstr ""
 "YYYY, \"%Y-%m-%d\" , lai izmantotu YYYY-MM-DD, vai arī \"%Y-%d-%m\" , lai "
 "izmantotu YYYY-DD-MM."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "External Login Domain"
 msgstr "Ārējās pieteikšanās domēns"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the external login method students can use for the course."
 msgstr ""
 "Ievadiet ārējās pieteikšanās metodi, kuru studenti var izmantot kursā."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificates Downloadable Before End"
 msgstr "Sertifikāti lejupielādējami pirms beigām"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can download certificates before the "
 "course ends, if they've met certificate requirements."
@@ -10122,21 +10128,21 @@ msgstr ""
 "sertifikātus pirms beidzas kurss, ja viņi ir izpildījuši sertifikātu "
 "piešķiršanas prasības."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificates Display Behavior"
 msgstr "Sertifikātu atspoguļošanas režīms"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "This field, together with certificate_available_date will determine when a "
 "user can see their certificate for the course"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course About Page Image"
 msgstr "Attēls lapai par kursu"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the course image file. You must upload this file on the "
 "Files & Uploads page. You can also set the course image on the Settings & "
@@ -10146,11 +10152,11 @@ msgstr ""
 "datņu un augšupielāžu lapā (Files & Uploads). Jūs varat iestatīt kursa "
 "attēlu arī iestatījumu un detaļu lapā."
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Course Banner Image"
 msgstr "Kursa reklāmkaroga attēls"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the banner image file. You can set the banner image on the "
 "Settings & Details page."
@@ -10158,11 +10164,11 @@ msgstr ""
 "Rediģējiet reklāmkaroga attēla datnes nosaukumu. Jūs varat iestatīt "
 "reklāmkaroga attēlu iestatījumu un detaļu lapā."
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Course Video Thumbnail Image"
 msgstr "Kursa video sīktēls"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Edit the name of the video thumbnail image file. You can set the video "
 "thumbnail image on the Settings & Details page."
@@ -10170,11 +10176,11 @@ msgstr ""
 "Rediģējiet video sīktēla datnes nosaukumu. Jūs varat iestatīt video sīktēlu "
 "lapā ‘Iestatījumi un detaļas’."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Issue Open Badges"
 msgstr "Izsniegt atvērtos žetonus"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Issue Open Badges badges for this course. Badges are generated when "
 "certificates are created."
@@ -10182,7 +10188,7 @@ msgstr ""
 "Izsniegt atvērtos žetonus šim kursam. Žetoni tiek ģenerēti, kad tiek "
 "izveidoti sertifikāti."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -10192,11 +10198,11 @@ msgstr ""
 "Pēdiņās ievadiet saīsināto vārdu sertifikāta veidam, kuru saņems studenti, "
 "pabeidzot kursu. Piemēram, \"Sertifikāts\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Name (Short)"
 msgstr "Sertifikāta nosaukums (saīsinātais)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the long name of the type of certificate that students receive "
@@ -10206,28 +10212,28 @@ msgstr ""
 "Pēdiņās ievadiet garo nosaukumu sertifikāta veidam, kuru saņems studenti, "
 "pabeidzot kursu. Piemēram, \"Sasnieguma sertifikāts\"."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Name (Long)"
 msgstr "Sertifikāta nosaukums (garais)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Web/HTML View Enabled"
 msgstr "Sertifikāta tīmekļa/HTML skats iespējots"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "If true, certificate Web/HTML views are enabled for the course."
 msgstr ""
 "Ja patiess, tad sertifikāta tīmekļa/HTML skati ir iespējoti šim kursam."
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Web/HTML View Overrides"
 msgstr "Sertifikāta tīmekļa/HTML skata ignorēšana"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter course-specific overrides for the Web/HTML template parameters here "
 "(JSON format)"
@@ -10237,22 +10243,22 @@ msgstr ""
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Certificate Configuration"
 msgstr "Sertifikātu konfigurācija"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter course-specific configuration information here (JSON format)"
 msgstr ""
 "Ievadiet šeit kursam specifisku konfigurācijas informāciju (JSON formātā)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "CSS Class for Course Reruns"
 msgstr "CSS klase atkārtotai kursa demonstrācijai"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Allows courses to share the same css class across runs even if they have "
 "different numbers."
@@ -10260,27 +10266,27 @@ msgstr ""
 "Ļauj kopīgot to pašu CSS klasi daudzu demonstrāciju starpā arī tad, ja tām "
 "ir atšķirīgi numuri."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Discussion Forum External Link"
 msgstr "Diskusiju foruma ārējā saite "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allows specification of an external link to replace discussion forums."
 msgstr "Ļauj noteikt ārējo saiti, lai nomainītu diskusiju forumus."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Hide Progress Tab"
 msgstr "Paslēpt progresa cilni"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allows hiding of the progress tab."
 msgstr "Ļauj paslēpt progresa cilni."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Organization Display String"
 msgstr "Kursa organizācijas attēlošanas virkne"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the course organization that you want to appear in the course. This "
 "setting overrides the organization that you entered when you created the "
@@ -10292,11 +10298,11 @@ msgstr ""
 "izmantotu organizāciju, kuru ievadījāt, kad izveidojāt kursu, ievadiet "
 "nulli."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Number Display String"
 msgstr "Kursa numura attēlošanas virkne"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the course number that you want to appear in the course. This setting "
 "overrides the course number that you entered when you created the course. To"
@@ -10308,11 +10314,11 @@ msgstr ""
 "izmantotu kursa numuru, kuru ievadījāt, kad izveidojāt kursu, ievadiet "
 "nulli."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Maximum Student Enrollment"
 msgstr "Kursā reģistrēto studentu maksimālais skaits"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter the maximum number of students that can enroll in the course. To allow"
 " an unlimited number of students, enter null."
@@ -10320,39 +10326,39 @@ msgstr ""
 "Ievadiet maksimālo studentu skaitu, kuri var reģistrēties kursā. Lai atļautu"
 " neierobežotu studentu skaitu, ievadiet nulli."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Public Wiki Access"
 msgstr "Atļaut publisku piekļuvi vikivietnei"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can view the course wiki even if "
 "they're not enrolled in the course."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Invitation Only"
 msgstr "Tikai ar ielūgumiem"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Whether to restrict enrollment to invitation by the course staff."
 msgstr ""
 "Vai ierobežot reģistrēšanos, atļaujot reģistrēties tikai ar ielūgumiem no "
 "kursa mācībspēkiem."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Course Survey Name"
 msgstr "Pirmskursa aptaujas nosaukums"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Name of SurveyForm to display as a pre-course survey to the user."
 msgstr "SurveyForm nosaukums, kuru lietotājam attēlot kā pirmskursa aptauju. "
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Pre-Course Survey Required"
 msgstr "Nepieciešama pirmskursa aptauja"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify whether students must complete a survey before they can view your "
 "course content. If you set this value to true, you must add a name for the "
@@ -10362,13 +10368,13 @@ msgstr ""
 "kursa saturu. Ja Jūs iestatīsiet šo vērtību kā patiesu, Jums būs jāpievieno "
 "nosaukums aptaujai pie kursa aptaujas nosaukuma iestatījumiem iepriekš."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Visibility In Catalog"
 msgstr "Kursa redzamība katalogā"
 
 #. Translators: the quoted words 'both', 'about', and 'none' must be
 #. left untranslated.  Leave them as English words.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Defines the access permissions for showing the course in the course catalog."
 " This can be set to one of three values: 'both' (show in catalog and allow "
@@ -10380,11 +10386,11 @@ msgstr ""
 "‘par’ par kursu), ‘par’ (piekļuve tikai lapai ‘par’ par kursu) un ‘neviens’ "
 "(nerādīt katalogu un neļaut piekļuvi lapai ‘par’ par kursu)."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam Enabled"
 msgstr "Iestājpārbaudījums iespējots"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
 " your course content. Note, you must enable Entrance Exams for this course "
@@ -10394,11 +10400,11 @@ msgstr ""
 "viņi varēs apskatīt Jūsu kursa saturu. Ņemiet vērā, ka Jums ir nepieciešams "
 "iespējot iestājpārbaudījumus šim kursam, lai iestatījums stātos spēkā."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam Minimum Score (%)"
 msgstr "Iestājpārbaudījumu minimālais rezultāts (%)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
 "view your course content. Note, you must enable Entrance Exams for this "
@@ -10408,19 +10414,19 @@ msgstr ""
 "varēs apskatīt Jūsu kursa saturu. Ņemiet vērā, ka Jums ir nepieciešams "
 "iespējot iestājpārbaudījumus šim kursam, lai iestatījums stātos spēkā."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Entrance Exam ID"
 msgstr "Iestājpārbaudījuma ID"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Content module identifier (location) of entrance exam."
 msgstr "Iestājpārbaudījuma satura moduļa identifikators (atrašanās vieta)"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Social Media Sharing URL"
 msgstr "Sociālo plašsaziņas līdzekļu koplietošanas URL"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "If dashboard social sharing and custom course URLs are enabled, you can "
 "provide a URL (such as the URL to a course About page) that social media "
@@ -10432,19 +10438,19 @@ msgstr ""
 "var saistīt ar sociālo plašsaziņas līdzekļu vietnēm. Piemēram, "
 "http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
 
-#: xmodule/course_module.py cms/templates/settings.html
+#: xmodule/course_block.py cms/templates/settings.html
 msgid "Course Language"
 msgstr "Kursa valoda"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Specify the language of your course."
 msgstr "Norādiet Jūsu kursa valodu."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Teams Configuration"
 msgstr "Komandu konfigurācija"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Configure team sets, limit team sizes, and set visibility settings using "
 "JSON. See <a target=\"&#95;blank\" "
@@ -10453,11 +10459,11 @@ msgid ""
 "teams\">teams configuration documentation</a> for help and examples."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Proctored Exams"
 msgstr "Iespējot uzraudzītus eksāmenus"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, proctored exams are enabled in "
 "your course. Note that enabling proctored exams will also enable timed "
@@ -10467,33 +10473,33 @@ msgstr ""
 "eksāmeni tiek iespējoti šim kursam. Ņemiet vērā, ka, ja tiks iespējoti "
 "uzraudzīti eksāmeni, tiks iespējoti arī eksāmeni ar laika ierobežojumu."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Proctoring Provider"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Enter the proctoring provider you want to use for this course run. Choose "
 "from the following options: {available_providers}."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Proctortrack Exam Escalation Contact"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Required if 'proctortrack' is selected as your proctoring provider. Enter an"
 " email address to be contacted by the support team whenever there are "
 "escalations (e.g. appeals, delayed reviews, etc.)."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Allow Opting Out of Proctored Exams"
 msgstr "Iespējot atteikšanos no uzraudzītiem eksāmeniem"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, learners can choose to take "
 "proctored exams without proctoring. If this value is false, all learners "
@@ -10506,12 +10512,12 @@ msgstr ""
 "iestatījums ir piemērojams tikai tad, ja uzraudzīti eksāmeni ir iespējoti "
 "kursam."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
 msgstr ""
 "Izveidot Zendesk biļetes par aizdomīgiem uzraudzītu eksāmenu mēģinājumiem"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, a Zendesk ticket will be created"
 " for suspicious attempts."
@@ -10519,11 +10525,11 @@ msgstr ""
 "Ievadiet kā patiesu vai nepatiesu. Ja šī vērtība ir patiesa, Zendesk biļete "
 "tiks izveidota par aizdomīgiem mēģinājumiem."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Timed Exams"
 msgstr "Iespējot eksāmenus ar laika ierobežojumu"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
 "course. Regardless of this setting, timed exams are enabled if Enable "
@@ -10534,11 +10540,11 @@ msgstr ""
 "laikā ierobežoti eksāmeni ir iespējoti, ja ‘Iespējot uzraudzītus eksāmenus’ "
 "ir iestatīts kā patiess."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Minimum Grade for Credit"
 msgstr "Minimālais vērtējums kredītpunktu saņemšanai"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "The minimum grade that a learner must earn to receive credit in the course, "
 "as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
@@ -10547,11 +10553,11 @@ msgstr ""
 " kursā, izteikts kā decimāldaļskaitlis starp 0.0 un 1.0. Piemēram, lai "
 "noteiktu 75% ievadiet 0.75."
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr "Savā tempā"
 
-#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+#: xmodule/course_block.py xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
@@ -10561,11 +10567,11 @@ msgstr ""
 "kursiem nav uzdevumu izpildes datumu, un studenti var progresēt kursā "
 "jebkurā tempā pirms beidzas kurss."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enable Subsection Prerequisites"
 msgstr "Iespējot apakšiedaļu priekšnosacījumus"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
@@ -10574,21 +10580,21 @@ msgstr ""
 "noslēpt apakšiedaļu, līdz audzēkņi iegūst minimālo punktu skaitu citā "
 "priekšnosacījuma apakšiedaļā."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Learning Information"
 msgstr "Informācija par kursā mācīto"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Specify what student can learn from the course."
 msgstr "Norādiet, ko audzēkņi varēs iemācīties kursā."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Visibility For Unenrolled Learners"
 msgstr ""
 
 #. Translators: the quoted words 'private', 'public_outline', and 'public'
 #. must be left untranslated.  Leave them as English words.
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Defines the access permissions for unenrolled learners. This can be set to "
 "one of three values: 'private' (default visibility, only allowed for "
@@ -10596,19 +10602,19 @@ msgid ""
 "'public' (allow access to both outline and course content)."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Kursa instruktors"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Enter the details for Course Instructor"
 msgstr "Ievadiet detaļas par kursa instruktoru."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Add Unsupported Problems and Tools"
 msgstr "Pievienot neatbalstītas problēmas un rīkus"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, you can add unsupported problems and tools to "
 "your course in Studio. Unsupported problems and tools are not recommended "
@@ -10622,11 +10628,11 @@ msgstr ""
 " vai vairākām pamatprasībām, piemērām, testēšanu, pieejamību, "
 "internacionalizāciju un dokumentāciju."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Highlights Enabled for Messaging"
 msgstr "Aktualitātes iespējotas ziņojumapmaiņai"
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, any highlights associated with content in the "
 "course will be messaged to learners at their scheduled time."
@@ -10635,33 +10641,33 @@ msgstr ""
 "aktualitātes, kas saistītas ar saturu kursā, tiks ziņotas audzēkņiem to "
 "noteiktajā laikā."
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course-wide Custom JS"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter Javascript resource URLs you want to be loaded globally throughout the"
 " course pages."
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "Course-wide Custom CSS"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Enter CSS resource URLs you want to be loaded globally throughout the course"
 " pages."
 msgstr ""
 
-#: xmodule/course_module.py cms/templates/certificates.html
+#: xmodule/course_block.py cms/templates/certificates.html
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 msgid "Other Course Settings"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid ""
 "Any additional information about the course that the platform needs or that "
 "allows integration with external systems such as CRM software. Enter a "
@@ -10669,7 +10675,7 @@ msgid ""
 "\"value\", \"other_setting\": \"value\" }"
 msgstr ""
 
-#: xmodule/course_module.py
+#: xmodule/course_block.py
 msgid "General"
 msgstr "Vispārīgi"
 
@@ -10743,22 +10749,22 @@ msgstr "{section_type} Vidēji = {percent:.0%}"
 msgid "{short_label} Avg"
 msgstr "{short_label} Vid."
 
-#: xmodule/hidden_module.py
+#: xmodule/hidden_block.py
 #, python-brace-format
 msgid ""
 "ERROR: \"{block_type}\" is an unknown component type. This component will be"
 " hidden in LMS."
 msgstr ""
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Html contents to display for this module"
 msgstr "Html saturs, ko parādīt šim modulim"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
 msgstr "LaTeX dokumentu pirmkods. Šis līdzeklis nav labi atbalstīts."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid ""
 "Select Visual to enter content and have the editor automatically create the "
 "HTML. Select Raw to edit HTML directly. If you change this setting, you must"
@@ -10769,23 +10775,23 @@ msgstr ""
 "Jūs izmaināt šo iestatījumu, Jums ir jāsaglabā komponents un pēc tam tas "
 "atkārtoti jāatver, lai rediģētu."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Editor"
 msgstr "Redaktors"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Visual"
 msgstr "Vadīkla"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Raw"
 msgstr "Neapstrādāts"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "Hide Page From Learners"
 msgstr "Noslēpt lapu no audzēkņiem"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid ""
 "If you select this option, only course team members with the Staff or Admin "
 "role see this page."
@@ -10793,51 +10799,51 @@ msgstr ""
 "Ja Jūs izvēlēsieties šo opciju, tikai kursa komandas biedri ar mācībspēku "
 "vai administratora lomām varēs redzēt šo lapu."
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "HTML for the additional pages"
 msgstr "HTML papildus lapām"
 
-#: xmodule/html_module.py
+#: xmodule/html_block.py
 msgid "List of course update items"
 msgstr "Kursa atjauninājumu vienumu saraksts"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Any Type"
 msgstr "Jebkura veida"
 
-#: xmodule/library_content_module.py cms/templates/widgets/header.html
+#: xmodule/library_content_block.py cms/templates/widgets/header.html
 msgid "Library"
 msgstr "Bibliotēka"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select the library from which you want to draw content."
 msgstr "Izvēlieties bibliotēku, no kuras vēlaties izrakstīt saturu."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Library Version"
 msgstr "Bibliotēkas versija"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Determines how content is drawn from the library"
 msgstr "Nosaka, kā saturs tiek izrakstīts no bibliotēkas"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Choose n at random"
 msgstr "Izvēlēties n nejauši"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Count"
 msgstr "Skaits"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Enter the number of components to display to each student."
 msgstr "Ievadiet komponentu skaitu, kurus rādīt katram audzēknim."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Problem Type"
 msgstr "Problēmas veids"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "Choose a problem type to fetch from the library. If \"Any Type\" is selected"
 " no filtering is applied."
@@ -10845,32 +10851,32 @@ msgstr ""
 "Izvēlieties problēmas veidu, kuru ienest no bibliotēkas. Ja \\”Jebkura "
 "veida\" ir izvēlēts, netiks piemērota filtrēšana."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "Determines whether a 'Reset Problems' button is shown, so users may reset "
 "their answers and reshuffle selected items."
 msgstr ""
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "Šis komponents ir novecojis. Bibliotēkā ir jauns saturs."
 
 #. Translators: {refresh_icon} placeholder is substituted to "↻" (without
 #. double quotes)
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "{refresh_icon} Update now."
 msgstr "{refresh_icon} Atjaunināt tagad."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Library is invalid, corrupt, or has been deleted."
 msgstr "Bibliotēka ir nederīga, bojāta vai arī dzēsta."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Edit Library List."
 msgstr "Rediģēt bibliotēkas sarakstu."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid ""
 "This course does not support content libraries. Contact your system "
 "administrator for more information."
@@ -10878,23 +10884,23 @@ msgstr ""
 "Šajā kursā netiek atbalstīts bibliotēku saturs. Sazinieties ar Jūsu sistēmas"
 " administratoru, lai iegūtu plašāku informāciju."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "A library has not yet been selected."
 msgstr "Bibliotēka vēl nav tikusi izvēlēta."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select a Library."
 msgstr "Izvēlieties bibliotēku."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "There are no matching problem types in the specified libraries."
 msgstr "Norādītajās bibliotēkās nav atbilstošu problēmu veidu."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Select another problem type."
 msgstr "Izvēlieties citu problēmas veidu."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "The specified library is configured to fetch {count} problem, "
 msgid_plural "The specified library is configured to fetch {count} problems, "
@@ -10902,7 +10908,7 @@ msgstr[0] "Norādītā bibliotēka ir konfigurēta, lai ienestu {count} problēm
 msgstr[1] "Norādītā bibliotēka ir konfigurēta, lai ienestu {count} problēmas,"
 msgstr[2] "Norādītā bibliotēka ir konfigurēta, lai ienestu {count} problēmas,"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 #, python-brace-format
 msgid "but there is only {actual} matching problem."
 msgid_plural "but there are only {actual} matching problems."
@@ -10910,15 +10916,15 @@ msgstr[0] "taču patiesībā ir tikai {actual} saskanīga problēma."
 msgstr[1] "taču patiesībā ir tikai {actual} saskanīgas problēmas."
 msgstr[2] "taču patiesībā ir tikai {actual} saskanīgas problēmas."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Edit the library configuration."
 msgstr "Rediģēt bibliotēkas konfigurāciju."
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "Invalid Library"
 msgstr "Nederīga bibliotēka"
 
-#: xmodule/library_content_module.py
+#: xmodule/library_content_block.py
 msgid "No Library Selected"
 msgstr "Nav izvēlēta bibliotēka"
 
@@ -10958,7 +10964,7 @@ msgstr ""
 msgid "Importing Library Block failed - are the IDs valid and readable?"
 msgstr ""
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
 "display name to identify this component."
@@ -10966,11 +10972,11 @@ msgstr ""
 "Šī komponenta parādāmais vārds. Analītikas ziņojumos var tikt izmantots arī "
 "parādāmais vārds, lai identificētu šo komponentu."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI ID"
 msgstr "LTI ID"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
@@ -10979,11 +10985,11 @@ msgid ""
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI URL"
 msgstr "LTI URL"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
@@ -10992,11 +10998,11 @@ msgid ""
 "on this setting."
 msgstr ""
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Custom Parameters"
 msgstr "Pielāgoti parametri"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
@@ -11005,11 +11011,11 @@ msgid ""
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Open in New Page"
 msgstr "Atvērt jaunā lapā"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if you want students to click a link that opens the LTI tool in "
 "a new window. Select False if you want the LTI content to open in an IFrame "
@@ -11021,11 +11027,11 @@ msgstr ""
 "saturs tiek atvērts iFrame pašreizējā lapā. Šis iestatījums tiek izmantots "
 "tikai tad, kad ‘Paslēpt ārējo rīku’ ir iestatīts kā nepatiess."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Scored"
 msgstr "Vērtēts"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if this component will receive a numerical score from the "
 "external LTI system."
@@ -11033,11 +11039,11 @@ msgstr ""
 "Izvēlieties kā patiesu, ja šis komponents saņems skaitlisku vērtējumu no "
 "ārējās LTI sistēmas."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Weight"
 msgstr "Svars"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter the number of points possible for this component.  The default value "
 "is 1.0.  This setting is only used when Scored is set to True."
@@ -11046,7 +11052,7 @@ msgstr ""
 "1.0. Šis iestatījums tiek izmantots tikai tad, kad ‘Vērtēts’ ir iestatīs kā "
 "patiess."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "The score kept in the xblock KVS -- duplicate of the published score in "
 "django DB"
@@ -11054,15 +11060,15 @@ msgstr ""
 "Vērtējums, kas uzglabāts xblock KVS -- dublikāts vērtējumam, kas publicēts "
 "django DB"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Comment as returned from grader, LTI2.0 spec"
 msgstr "Komentārs kā atgriezts no vērtētāja, LTI2.0 spec"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Hide External Tool"
 msgstr "Paslēpt ārējo rīku"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True if you want to use this component as a placeholder for syncing "
 "with an external grading  system rather than launch an external tool.  This "
@@ -11073,31 +11079,31 @@ msgstr ""
 "rīku. Ar šo iestatījumu tiek paslēpts ‘Palaist’ taustiņš un jebkuri šī "
 "komponenta IFrames."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Request user's username"
 msgstr "Pieprasīt lietotāja lietotājvārdu"
 
 #. Translators: This is used to request the user's username for a third party
 #. service.
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Select True to request the user's username."
 msgstr "Izvēlieties kā patiesu, lai pieprasītu lietotāja lietotājvārdu."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Request user's email"
 msgstr "Pieprasīt lietotāja e-pastu"
 
 #. Translators: This is used to request the user's email for a third party
 #. service.
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Select True to request the user's email address."
 msgstr "Izvēlieties kā patiesu, lai pieprasītu lietotāja e-pasta adresi."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "LTI Application Information"
 msgstr "LTI lietotnes informācija"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter a description of the third party application. If requesting username "
 "and/or email, use this text box to inform users why their username and/or "
@@ -11107,29 +11113,29 @@ msgstr ""
 "un/vai e-pasts, izmantojiet šo tekstlodziņu, lai informētu lietotājus, kādēļ"
 " viņu lietotājvārds un/vai e-pasts tiks pārsūtīts uz trešās puses lietotni."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Button Text"
 msgstr "Pogas teksts"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Enter the text on the button used to launch the third party application."
 msgstr ""
 "Ievadiet tekstu uz pogas, kas tiek izmantota trešās puses lietotnes "
 "palaišanai."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid "Accept grades past deadline"
 msgstr "Pieņemt vērtējumus pēc izpildes termiņa"
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 msgid ""
 "Select True to allow third party systems to post grades past the deadline."
 msgstr ""
 "Izvēlieties kā patiesu, lai ļautu trešo pušu sistēmām izlikt novērtējumus "
 "pēc izpildes termiņa."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
@@ -11138,7 +11144,7 @@ msgstr ""
 "Nebija iespējams parsēt pielāgoto parametru: {custom_parameter}. Vajadzētu "
 "būt \"x=y\" virknei."
 
-#: xmodule/lti_module.py
+#: xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
@@ -11147,7 +11153,7 @@ msgstr ""
 "Nebija iespējams parsēt LTI pasi: {lti_passport}. Vajadzētu būt "
 "\"id:key:secret\" virknei."
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 #: lms/templates/ccx/schedule.html
 msgid "Due Date"
 msgstr "Izpildes datums"
@@ -11156,11 +11162,11 @@ msgstr "Izpildes datums"
 msgid "Enter the default date by which problems are due."
 msgstr "Ievadiet noklusēto datumu, kurā ir jābūt izpildītām problēmām."
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 msgid "Number of Relative Weeks Due By"
 msgstr ""
 
-#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: xmodule/modulestore/inheritance.py xmodule/seq_block.py
 msgid ""
 "Enter the number of weeks the problems are due by relative to the learner's "
 "enrollment date"
@@ -11412,35 +11418,35 @@ msgstr "Reģistrēšanās režīma grupas"
 msgid "Partition for segmenting users by enrollment track"
 msgstr "Nodalījums lietotāju segmentēšanai pēc reģistrēšanās režīma"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Whether this student has voted on the poll"
 msgstr "Vai šis students ir balsojis aptaujā"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Student answer"
 msgstr "Studenta atbilde"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll answers from all students"
 msgstr "Skaitīt atbildes no visiem studentiem"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll answers from xml"
 msgstr "Skaitīt atbildes no xml"
 
-#: xmodule/poll_module.py
+#: xmodule/poll_block.py
 msgid "Poll question"
 msgstr "Aptaujas jautājums"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Enter the date by which problems are due."
 msgstr "Ievadiet datumu, kurā ir jābūt izpildītām problēmām."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Hide sequence content After Due Date"
 msgstr "Paslēpt secības saturu pēc izpildes datuma"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "If set, the sequence content is hidden for non-staff users after the due "
 "date has passed."
@@ -11448,23 +11454,21 @@ msgstr ""
 "Ja iestatīts, secības saturs tiks paslēpts no lietotājiem, kas nav "
 "mācībspēki, pēc izpildes datuma."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Entrance Exam"
 msgstr "Ir iestājpārbaudījums"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
-"Atzīmējiet šo kursa moduli kā iestājpārbaudījumu. Ņemiet vērā, ka Jums ir "
-"jāiespējo iestāšanās pārbaudījumi šim kursam, lai iestatījums stātos spēkā."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Time Limited"
 msgstr "Ir ierobežots laikā"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates whether students have a limited time to view or "
 "interact with this courseware component."
@@ -11472,11 +11476,11 @@ msgstr ""
 "Šis iestatījums norāda, vai studentiem ir ierobežots laiks, lai apskatītu "
 "vai mijiedarbotos ar šo kursprogrammatūras komponentu."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Time Limit in Minutes"
 msgstr "Laika ierobežojums minūtēs"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "The number of minutes available to students for viewing or interacting with "
 "this courseware component."
@@ -11484,19 +11488,19 @@ msgstr ""
 "Studentiem pieejamo minūšu skaits, lai apskatītu vai mijiedarbotos ar šo "
 "kursprogrammatūras komponentu."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Proctoring Enabled"
 msgstr "Uzraudzība ir iespējota"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This setting indicates whether this exam is a proctored exam."
 msgstr "Šis iestatījums norāda, vai eksāmens ir uzraudzīts eksāmens."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Software Secure Review Rules"
 msgstr "Software Secure izskatīšanas noteikumi"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates what rules the proctoring team should follow when "
 "viewing the videos."
@@ -11504,11 +11508,11 @@ msgstr ""
 "Šis iestatījums norāda, kādiem noteikumiem uzraudzības komandai ir jāseko "
 "skatoties video."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Practice Exam"
 msgstr "Ir treniņeksāmens"
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This setting indicates whether this exam is for testing purposes only. "
 "Practice exams are not verified."
@@ -11516,15 +11520,15 @@ msgstr ""
 "Šis iestatījums norāda, vai šis eksāmens ir tikai testēšanas mērķiem. "
 "Treniņeksāmeni netiek verificēti."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "Is Onboarding Exam"
 msgstr ""
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This setting indicates whether this exam is an onboarding exam."
 msgstr ""
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This subsection is unlocked for learners when they meet the prerequisite "
 "requirements."
@@ -11532,22 +11536,22 @@ msgstr ""
 "Šī apakšsadaļa tiks atbloķēta audzēkņiem, kad viņi būs izpildījuši "
 "priekšnosacījumu prasības."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid "This exam is hidden from the learner."
 msgstr "Šis eksāmens ir paslēpts no audzēkņa."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "Because the course has ended, this assignment is hidden from the learner."
 msgstr "Tā kā kurss ir beidzies, šis uzdevums ir paslēpts no audzēkņa."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "Because the due date has passed, this assignment is hidden from the learner."
 msgstr ""
 "Tā kā izpildes datums ir pagājis, šis uzdevums ir paslēpts no audzēkņa."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "This section is a prerequisite. You must complete this section in order to "
 "unlock additional content."
@@ -11555,31 +11559,31 @@ msgstr ""
 "Šī sadaļa ir priekšnosacījums. Jums ir jāizpilda šī sadaļa, lai atbloķētu "
 "papildus saturu."
 
-#: xmodule/seq_module.py
+#: xmodule/seq_block.py
 msgid ""
 "A list summarizing what students should look forward to in this section."
 msgstr ""
 "Saraksts, kurā tiek dots apkopojums par to, ko audzēkņi var sagaidīt šajā "
 "sadaļā."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 #, python-brace-format
 msgid "Group ID {group_id}"
 msgstr "Grupas ID {group_id}"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Not Selected"
 msgstr "Nav izvēlēts"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "The display name for this component. (Not shown to learners)"
 msgstr "Šī komponenta parādāmais vārds. (Netiek parādīts audzēkņiem)"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Content Experiment"
 msgstr "Satura eksperiments"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The configuration defines how users are grouped for this content experiment."
 " Caution: Changing the group configuration of a student-visible experiment "
@@ -11589,28 +11593,28 @@ msgstr ""
 "eksperimentam. Brīdinājums: grupas konfigurācijas mainīšana studentiem "
 "redzamam eksperimentam ietekmēs eksperimenta datus."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Group Configuration"
 msgstr "Grupas konfigurācija"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Which child module students in a particular group_id should see"
 msgstr "Kurus atvasinātos moduļus studentiem noteiktā group_id būtu jāredz"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 #, python-brace-format
 msgid "{group_name} (inactive)"
 msgstr "{group_name} (neaktīvs)"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "The experiment is not associated with a group configuration."
 msgstr "Eksperiments nav saistīts ar grupas konfigurāciju."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Select a Group Configuration"
 msgstr "Izvēlieties grupas konfigurāciju"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment uses a deleted group configuration. Select a valid group "
 "configuration or delete this experiment."
@@ -11618,7 +11622,7 @@ msgstr ""
 "Eksperimentā tiek izmantota dzēstas grupas konfigurācija. Izvēlieties derīgu"
 " grupas konfigurāciju vai arī dzēsiet šo eksperimentu."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment uses a group configuration that is not supported for "
 "experiments. Select a valid group configuration or delete this experiment."
@@ -11627,16 +11631,16 @@ msgstr ""
 "eksperimentiem. Izvēlieties derīgu grupas konfigurāciju vai arī dzēsiet šo "
 "eksperimentu."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment does not contain all of the groups in the configuration."
 msgstr "Eksperiments nesatur visas konfigurācijā esošās grupas."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "Add Missing Groups"
 msgstr "Pievienot trūkstošās grupas"
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid ""
 "The experiment has an inactive group. Move content into active groups, then "
 "delete the inactive group."
@@ -11644,7 +11648,7 @@ msgstr ""
 "Eksperimentā ir neaktīva grupa. Pārvietojiet saturu aktīvajās grupās, pēc "
 "tam dzēsiet neaktīvo grupu."
 
-#: xmodule/split_test_module.py
+#: xmodule/split_test_block.py
 msgid "This content experiment has issues that affect content visibility."
 msgstr "Šim satura eksperimentam ir problēmas, kas ietekmē satura redzamību."
 
@@ -11664,7 +11668,12 @@ msgstr ""
 msgid "Add discussion for the Unit."
 msgstr ""
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
+#, python-brace-format
+msgid "Can't get transcript link from Youtube for {youtube_id}."
+msgstr ""
+
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
@@ -11673,11 +11682,11 @@ msgstr ""
 "Nav iespējams saņemt norakstus no Youtube par {youtube_id}. Statusa kods: "
 "{status_code}."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
 msgstr "Mēs atbalstām tikai SubRip (*.srt) formāta norakstus."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
@@ -11686,26 +11695,22 @@ msgstr ""
 "Kaut kas ir nepareizi ar SubRip noraksta datni parsēšanas laikā. Iekšējais "
 "ziņojums ir {error_message}"
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr "Kaut kas ir nepareizi ar SubRip noraksta datni parsēšanas laikā."
 
-#: xmodule/video_module/transcripts_utils.py
+#: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 "{exception_message}: Nav iespējams atrast augšupielādētos norakstus: "
 "{user_filename}"
 
-#: xmodule/video_module/video_handlers.py
-msgid "Language is required."
-msgstr "Jānorāda valoda"
-
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr "Pamata"
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 #, python-brace-format
 msgid "There is no transcript file associated with the {lang} language."
 msgid_plural ""
@@ -11714,7 +11719,7 @@ msgstr[0] "Nav noraksta datnes, kas saistīta ar {lang} valodu."
 msgstr[1] "Nav noraksta datņu, kas saistītas ar {lang} valodu."
 msgstr[2] "Nav noraksta datņu, kas saistītas ar {lang} valodu."
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
@@ -11722,53 +11727,57 @@ msgstr ""
 "Jūsu video URL. Tas var būt YouTube URL vai saite uz .mp4, .ogg, vai .webm "
 "video datni, kas viesota citur internetā."
 
-#: xmodule/video_module/video_module.py
+#: xmodule/video_block/video_block.py
 msgid "Default Video URL"
 msgstr "Noklusētais video URL"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_handlers.py
+msgid "Language is required."
+msgstr "Jānorāda valoda"
+
+#: xmodule/video_block/video_xfields.py
 msgid "Component Display Name"
 msgstr "Parādāmais komponenta vārds"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Current position in the video."
 msgstr "Pašreizējā pozīcija video."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Optional, for older browsers: the YouTube ID for the normal speed video."
 msgstr "Neobligāti, vecākiem pārlūkiem: YouTube ID normāla ātruma video."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID"
 msgstr "YouTube ID"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Optional, for older browsers: the YouTube ID for the .75x speed video."
 msgstr "Neobligāti, vecākiem pārlūkiem: YouTube ID 0.75x ātruma video."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for .75x speed"
 msgstr "YouTube ID 0.75x ātrumam"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Optional, for older browsers: the YouTube ID for the 1.25x speed video."
 msgstr "Neobligāti, vecākiem pārlūkiem: YouTube ID 1.25x ātruma video"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for 1.25x speed"
 msgstr "YouTube ID 1.25x ātrumam"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Optional, for older browsers: the YouTube ID for the 1.5x speed video."
 msgstr "Neobligāti, vecākiem pārlūkiem: YouTube ID 1.5x ātruma video"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "YouTube ID for 1.5x speed"
 msgstr "YouTube ID 1.5x ātrumam"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Time you want the video to start if you don't want the entire video to play."
 " Not supported in the native mobile app: the full video file will play. "
@@ -11778,11 +11787,11 @@ msgstr ""
 "video. Nav atbalstīts vietējā mobilajā lietotnē: tiks atskaņots viss video. "
 "Formatēts kā HH:MM:SS. Maksimālā vērtība ir 23:59:59."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Start Time"
 msgstr "Video sākuma laiks"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Time you want the video to stop if you don't want the entire video to play. "
 "Not supported in the native mobile app: the full video file will play. "
@@ -11792,11 +11801,11 @@ msgstr ""
 "visu video. Nav atbalstīts vietējā mobilajā lietotnē: tiks atskaņots viss "
 "video. Formatēts kā HH:MM:SS. Maksimālā vērtība ir 23:59:59."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Stop Time"
 msgstr "Video apturēšanas laiks"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Allow students to download versions of this video in different formats if "
 "they cannot use the edX video player or do not have access to YouTube. You "
@@ -11807,11 +11816,11 @@ msgstr ""
 "Jums ir jāpievieno vismaz viens URL video datnes URL laukā, kas nav YouTube "
 "URL."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Download Allowed"
 msgstr "Video lejupielāde atļauta"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
@@ -11827,11 +11836,11 @@ msgstr ""
 "Lai ļautu studentiem lejupielādēt šos video, iestatiet ‘Video lejupielāde "
 "atļauta’ kā patiesu."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video File URLs"
 msgstr "Video datnes URL"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "By default, students can download an .srt or .txt transcript when you set "
 "Download Transcript Allowed to True. If you want to provide a downloadable "
@@ -11849,11 +11858,11 @@ msgstr ""
 "augšupielādes’ lapā vai internetā un pēc tam šeit pievienot noraksta URL. "
 "Studenti redzēs saiti šī noraksta lejupielādei zem video."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Downloadable Transcript URL"
 msgstr "Lejupielādējama noraksta URL"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Allow students to download the timed transcript. A link to download the file"
 " appears below the video. By default, the transcript is an .srt or .txt "
@@ -11865,11 +11874,11 @@ msgstr ""
 ".txt datne. Ja Jūs vēlaties sniegt norakstu lejupielādei citā formātā, "
 "augšupielādējiet datni, izmantojot ‘Augšupielādēt izdales materiālu’ lauku."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Download Transcript Allowed"
 msgstr "Noraksta lejupielāde atļauta"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "The default transcript for the video, from the Default Timed Transcript "
 "field on the Basic tab. This transcript should be in English. You don't have"
@@ -11879,19 +11888,19 @@ msgstr ""
 "cilnē. Šim norakstam būtu jābūt angļu valodā. Jums nav obligāti jāizmaina "
 "šis iestatījums."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Default Timed Transcript"
 msgstr "Noklusētais laika kodu noraksts"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether the transcripts appear with the video by default."
 msgstr "Norādiet, vai noraksti parādās kopā ar video pēc noklusējuma."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Show Transcript"
 msgstr "Parādīt norakstu"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Add transcripts in different languages. Click below to specify a language "
 "and upload an .srt transcript file for that language."
@@ -11899,51 +11908,51 @@ msgstr ""
 "Pievienot norakstus dažādās valodās. Klikšķiniet tālāk, lai norādītu valodu "
 "un augšupielādētu .srt noraksta datni attiecīgajai valodai."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Transcript Languages"
 msgstr "Noraksta valodas"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Preferred language for transcript."
 msgstr "Vēlamā noraksta valoda."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Preferred language for transcript"
 msgstr "Vēlamā noraksta valoda"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Transcript file format to download by user."
 msgstr "Noraksta datnes formāts, kuru lejupielādēt lietotājam."
 
 #. Translators: This is a type of file used for captioning in the video
 #. player.
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "SubRip (.srt) file"
 msgstr "SubRip (.srt) datne"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Text (.txt) file"
 msgstr "Teksta (.txt) datne"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "The last speed that the user specified for the video."
 msgstr "Pēdējais ātrums, kuru lietotājs norādīja video."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "The default speed for the video."
 msgstr "Noklusētais video ātrums."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Specify whether to advance automatically to the next unit when the video "
 "ends."
 msgstr "Norādiet, vai automātiski pāriet uz nākamo nodaļu, kad beidzas video."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether YouTube is available for the user."
 msgstr "Norādiet, vai YouTube ir pieejams lietotājam."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Upload a handout to accompany this video. Students can download the handout "
 "by clicking Download Handout under the video."
@@ -11952,11 +11961,11 @@ msgstr ""
 " izdales materiālu, klikšķinot uz ‘Lejupielādēt izdales materiālu’ zem "
 "video."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Upload Handout"
 msgstr "Augšupielādēt izdales materiālu"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "Specify whether access to this video is limited to browsers only, or if it "
 "can be accessed from other applications including mobile apps."
@@ -11964,11 +11973,11 @@ msgstr ""
 "Nosakiet, vai pieeja šim video tiek ierobežota tikai pārlūkiem, vai arī tam "
 "var piekļūt no citām lietotnēm, ieskaitot mobilās lietotnes."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Video Available on Web Only"
 msgstr "Video pieejams tikai tīmeklī"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid ""
 "If you were assigned a Video ID by edX for the video to play in this "
 "component, enter the ID here. In this case, do not enter values in the "
@@ -11981,36 +11990,36 @@ msgstr ""
 "video URL’, ‘Video datnes URL’ un ‘YouTube ID’. Ja Jums netika piešķirts "
 "video ID, ievadiet vērtības šajos citos laukos un ignorējiet šo lauku."
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Date of the last view of the bumper"
 msgstr "Video fragmenta pēdējās apskates datums"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Do not show bumper again"
 msgstr "Nerādīt fragmentu atkārtoti"
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Specify whether the video can be accessed publicly by learners."
 msgstr ""
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Public Access"
 msgstr ""
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Add a specific thumbnail for learners to see before playing the video."
 msgstr ""
 
-#: xmodule/video_module/video_xfields.py
+#: xmodule/video_block/video_xfields.py
 msgid "Thumbnail"
 msgstr ""
 
-#: xmodule/word_cloud_module.py lms/templates/annotatable.html
+#: xmodule/word_cloud_block.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
 msgstr "Instrukcijas"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid ""
 "Add instructions to help learners understand how to use the word cloud. "
 "Clear instructions are important, especially for learners who have "
@@ -12020,46 +12029,46 @@ msgstr ""
 "vārdu mākoni. Skaidras instrukcijas ir svarīgas, it sevišķi audzēkņiem, "
 "kuriem ir pieejamības prasības."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Inputs"
 msgstr "Ievades"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid ""
 "The number of text boxes available for learners to add words and sentences."
 msgstr ""
 "Tekstlodziņu skaits, kas pieejami audzēkņiem vārdu un teikumu ievadīšanai."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Maximum Words"
 msgstr "Maksimālais vārdu skaits"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "The maximum number of words displayed in the generated word cloud."
 msgstr "Maksimālais parādīto vārdu skaits ģenerētajā vārdu mākonī."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Show Percents"
 msgstr "Parādīt procentus"
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Statistics are shown for entered words near that word."
 msgstr ""
 "Statistika ir parādīta par ievadītajiem vārdiem, kas ir tuvu šim vārdam."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Whether this learner has posted words to the cloud."
 msgstr "Vai šis audzēknis ir publicējis vārdus mākonī."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Student answer."
 msgstr "Studenta atbilde."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "All possible words from all learners."
 msgstr "Visi iespējamie vārdi no visiem audzēkņiem."
 
-#: xmodule/word_cloud_module.py
+#: xmodule/word_cloud_block.py
 msgid "Top num_top_words words for word cloud."
 msgstr "Populārākie num_top_words vārdi vārdu mākonim."
 
@@ -12507,7 +12516,7 @@ msgid "Vertical"
 msgstr "Vertikāls"
 
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Section"
 msgstr "Segments"
 
@@ -12523,63 +12532,63 @@ msgstr ""
 msgid "File upload failed. Please try again"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Invalid data"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Invalid data ({details})"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Item is already present in target location."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into itself."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into it's child."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item directly into content experiment."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{source_usage_key} not found in {parent_usage_key}."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "You can not move {source_usage_key} at an invalid index ({target_index})."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr ""
@@ -12587,7 +12596,7 @@ msgstr ""
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
@@ -12595,11 +12604,11 @@ msgstr ""
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "%"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr ""
@@ -13221,7 +13230,7 @@ msgid ""
 "up shortly!"
 msgstr "Diskusijās pašreiz notiek apkope. Mēs tās drīz atkal aktivizēsim!"
 
-#: lms/templates/_gated_content.html lms/templates/seq_module.html
+#: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
 msgstr "Slēgts saturs"
 
@@ -13249,7 +13258,7 @@ msgstr "Diskusijas ar padomdevējiem"
 msgid "Hide Annotations"
 msgstr "Paslēpt anotācijas"
 
-#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+#: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
 msgstr "Grāmatzīme pievienota"
 
@@ -13257,9 +13266,9 @@ msgstr "Grāmatzīme pievienota"
 msgid "Bookmark this page"
 msgstr "Pievienot grāmatzīmi"
 
-#: lms/templates/conditional_module.html
-msgid "You do not have access to this dependency module."
-msgstr "Jums nav pieejas šim atkarības modulim."
+#: lms/templates/conditional_block.html
+msgid "You do not have access to this dependency block."
+msgstr ""
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -13812,27 +13821,27 @@ msgid ""
 "{link_start}dashboard{link_end} for courses."
 msgstr ""
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Important!"
 msgstr "Svarīgi!"
 
 #. Translators: A button for showing the Previous Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
 msgstr "Iepriekšējais"
 
 #. Translators: A button for showing the Next Unit
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
 msgstr "Nākamais"
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_block.html
 msgid "Sequence"
 msgstr "Secība"
 
-#: lms/templates/seq_module.html lms/templates/vert_module.html
+#: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr ""
 
@@ -18471,6 +18480,12 @@ msgstr ""
 "Pirms Jūs nosūtat e-pastu, uzmanīgi pārskatiet tekstu un nosūtiet to "
 "vispirms sev, lai Jūs varētu priekšskatīt formatēšanu un varētu "
 "pārliecināties, ka iegultie attēli un saites strādā pareizi."
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid ""
+"You can include keywords in your messages. For list of available keywords "
+"see the {start_link}documentation{end_link}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"

@@ -2,27 +2,24 @@
 Tests for the Third Party Auth permissions
 """
 
-
-import unittest
-
 import ddt
-from django.conf import settings
 from django.test import RequestFactory, TestCase
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from common.djangoapps.student.tests.factories import UserFactory
 
+from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.api.permissions import TPA_PERMISSIONS
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 IDP_SLUG_TESTSHIB = 'testshib'
 PROVIDER_ID_TESTSHIB = 'saml-' + IDP_SLUG_TESTSHIB
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ThirdPartyAuthPermissionTest(TestCase):
     """ Tests for third party auth TPA_PERMISSIONS """
 

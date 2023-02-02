@@ -1,0 +1,26 @@
+<%page expression_filter="h"/>
+<%!
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+from six import text_type
+%>
+
+<%
+def _message(reqm, message):
+    return Text(message).format(link=HTML("<a href={url}>{url_name}</a>").format(
+        url = reverse('jump_to', kwargs=dict(course_id=text_type(reqm.course_id),
+                        location=text_type(reqm.location))),
+        url_name = reqm.display_name_with_default))
+%>
+% if message:
+    % for reqm in module.get_required_blocks:
+        % if reqm:
+            <p class="conditional-message">${_message(reqm, message)}</p>
+        % else:
+            <p class="conditional-message">
+                ${_("You do not have access to this dependency block.")}
+            </p>
+        % endif
+    % endfor
+% endif

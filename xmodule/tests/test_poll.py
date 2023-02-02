@@ -2,14 +2,14 @@
 
 import json
 import unittest
-
 from unittest.mock import Mock
 
 from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from xmodule.poll_module import PollBlock
 
+from openedx.core.lib.safe_lxml import etree
+from xmodule.poll_block import PollBlock
 from . import get_test_system
 from .test_import import DummySystem
 
@@ -29,14 +29,14 @@ class PollBlockTest(unittest.TestCase):
         self.system = get_test_system(course_key)
         usage_key = course_key.make_usage_key(PollBlock.category, 'test_loc')
         # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
-        scope_ids = ScopeIds(1, PollBlock.category, usage_key, usage_key)
-        self.xmodule = PollBlock(
-            self.system, DictFieldData(self.raw_field_data), scope_ids
+        self.scope_ids = ScopeIds(1, PollBlock.category, usage_key, usage_key)
+        self.xblock = PollBlock(
+            self.system, DictFieldData(self.raw_field_data), self.scope_ids
         )
 
     def ajax_request(self, dispatch, data):
         """Call Xmodule.handle_ajax."""
-        return json.loads(self.xmodule.handle_ajax(dispatch, data))
+        return json.loads(self.xblock.handle_ajax(dispatch, data))
 
     def test_bad_ajax_request(self):
         # Make sure that answer for incorrect request is error json.
@@ -54,24 +54,25 @@ class PollBlockTest(unittest.TestCase):
         self.assertDictEqual(poll_answers, {'Yes': 1, 'Dont_know': 0, 'No': 1})
         assert total == 2
         self.assertDictEqual(callback, {'objectName': 'Conditional'})
-        assert self.xmodule.poll_answer == 'No'
+        assert self.xblock.poll_answer == 'No'
 
     def test_poll_export_with_unescaped_characters_xml(self):
         """
-        Make sure that poll_module will export fine if its xml contains
+        Make sure that poll_block will export fine if its xml contains
         unescaped characters.
         """
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
         id_generator = Mock()
-        id_generator.target_course_id = self.xmodule.course_id
+        id_generator.target_course_id = self.xblock.course_id
         sample_poll_xml = '''
         <poll_question display_name="Poll Question">
             <p>How old are you?</p>
             <answer id="less18">18</answer>
         </poll_question>
         '''
+        node = etree.fromstring(sample_poll_xml)
 
-        output = PollBlock.from_xml(sample_poll_xml, module_system, id_generator)
+        output = PollBlock.parse_xml(node, module_system, self.scope_ids, id_generator)
         # Update the answer with invalid character.
         invalid_characters_poll_answer = output.answers[0]
         # Invalid less-than character.

@@ -6,11 +6,11 @@ Test for split test XModule
 from unittest.mock import MagicMock
 from django.urls import reverse
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
@@ -46,12 +46,12 @@ class SplitTestBase(ModuleStoreTestCase):
             number=self.COURSE_NUMBER,
             user_partitions=[self.partition]
         )
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category="chapter",
             display_name="test chapter",
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category="sequential",
             display_name="Split Test Tests",
@@ -69,7 +69,7 @@ class SplitTestBase(ModuleStoreTestCase):
         Returns a video component with parent ``parent``
         that is intended to be displayed to group ``group``.
         """
-        return ItemFactory.create(
+        return BlockFactory.create(
             parent_location=parent.location,
             category="video",
             display_name=f"Group {group} Sees This Video",
@@ -80,7 +80,7 @@ class SplitTestBase(ModuleStoreTestCase):
         Returns a problem component with parent ``parent``
         that is intended to be displayed to group ``group``.
         """
-        return ItemFactory.create(
+        return BlockFactory.create(
             parent_location=parent.location,
             category="problem",
             display_name=f"Group {group} Sees This Problem",
@@ -92,7 +92,7 @@ class SplitTestBase(ModuleStoreTestCase):
         Returns an html component with parent ``parent``
         that is intended to be displayed to group ``group``.
         """
-        return ItemFactory.create(
+        return BlockFactory.create(
             parent_location=parent.location,
             category="html",
             display_name=f"Group {group} Sees This HTML",
@@ -166,7 +166,7 @@ class TestSplitTestVert(SplitTestBase):
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
         c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
 
-        split_test = ItemFactory.create(
+        split_test = BlockFactory.create(
             parent_location=self.sequential.location,
             category="split_test",
             display_name="Split test",
@@ -174,7 +174,7 @@ class TestSplitTestVert(SplitTestBase):
             group_id_to_child={"0": c0_url, "1": c1_url},
         )
 
-        cond0vert = ItemFactory.create(
+        cond0vert = BlockFactory.create(
             parent_location=split_test.location,
             category="vertical",
             display_name="Condition 0 vertical",
@@ -183,7 +183,7 @@ class TestSplitTestVert(SplitTestBase):
         video0 = self._video(cond0vert, 0)
         problem0 = self._problem(cond0vert, 0)
 
-        cond1vert = ItemFactory.create(
+        cond1vert = BlockFactory.create(
             parent_location=split_test.location,
             category="vertical",
             display_name="Condition 1 vertical",
@@ -231,7 +231,7 @@ class TestVertSplitTestVert(SplitTestBase):
         # We define problem compenents that we need but don't explicitly call elsewhere.
         super().setUp()
 
-        vert1 = ItemFactory.create(
+        vert1 = BlockFactory.create(
             parent_location=self.sequential.location,
             category="vertical",
             display_name="Split test vertical",
@@ -239,7 +239,7 @@ class TestVertSplitTestVert(SplitTestBase):
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
         c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
 
-        split_test = ItemFactory.create(
+        split_test = BlockFactory.create(
             parent_location=vert1.location,
             category="split_test",
             display_name="Split test",
@@ -247,7 +247,7 @@ class TestVertSplitTestVert(SplitTestBase):
             group_id_to_child={"0": c0_url, "1": c1_url},
         )
 
-        cond0vert = ItemFactory.create(
+        cond0vert = BlockFactory.create(
             parent_location=split_test.location,
             category="vertical",
             display_name="Condition 0 Vertical",
@@ -256,7 +256,7 @@ class TestVertSplitTestVert(SplitTestBase):
         video0 = self._video(cond0vert, 0)
         problem0 = self._problem(cond0vert, 0)
 
-        cond1vert = ItemFactory.create(
+        cond1vert = BlockFactory.create(
             parent_location=split_test.location,
             category="vertical",
             display_name="Condition 1 Vertical",
@@ -298,7 +298,7 @@ class SplitTestPosition(SharedModuleStoreTestCase):
             user_partitions=[cls.partition]
         )
 
-        cls.chapter = ItemFactory.create(
+        cls.chapter = BlockFactory.create(
             parent_location=cls.course.location,
             category="chapter",
             display_name="test chapter",
@@ -312,9 +312,9 @@ class SplitTestPosition(SharedModuleStoreTestCase):
         self.client.login(username=self.student.username, password='test')
 
     def test_changing_position_works(self):
-        # Make a mock FieldDataCache for this course, so we can get the course module
+        # Make a mock FieldDataCache for this course, so we can get the course block
         mock_field_data_cache = FieldDataCache([self.course], self.course.id, self.student)
-        course = get_module_for_descriptor(
+        course = get_block_for_descriptor(
             self.student,
             MagicMock(name='request'),
             self.course,

@@ -39,8 +39,8 @@ from xmodule.tests import CourseComparisonTest
 COURSE_DATA_NAMES = (
     'toy',
     'manual-testing-complete',
-    'split_test_module',
-    'split_test_module_draft',
+    'split_test_block',
+    'split_test_block_draft',
 )
 
 EXPORTED_COURSE_DIR_NAME = 'exported_source_course'
@@ -59,7 +59,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     @ddt.data(*itertools.product(
         MODULESTORE_SETUPS,
         MODULESTORE_SETUPS,

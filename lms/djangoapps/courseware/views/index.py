@@ -24,7 +24,7 @@ from edx_django_utils.monitoring import set_custom_attributes_for_course_key
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.course_block import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
@@ -61,7 +61,7 @@ from ..entrance_exams import (
 )
 from ..masquerade import check_content_start_date_for_masquerade_user, setup_masquerade
 from ..model_data import FieldDataCache
-from ..module_render import get_module_for_descriptor, toc_for_course
+from ..block_render import get_block_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
 from ..toggles import ENABLE_OPTIMIZELY_IN_COURSEWARE, courseware_mfe_is_active
 from .views import CourseTabView
@@ -103,7 +103,7 @@ class CoursewareIndex(View):
             course_id (unicode): course id
             chapter (unicode): chapter url_name
             section (unicode): section url_name
-            position (unicode): position in module, eg of <sequential> module
+            position (unicode): position in block, eg of <sequential> block
         """
         self.course_key = CourseKey.from_string(course_id)
 
@@ -357,7 +357,7 @@ class CoursewareIndex(View):
             read_only=CrawlersConfig.is_crawler(request),
         )
 
-        self.course = get_module_for_descriptor(
+        self.course = get_block_for_descriptor(
             self.effective_user,
             self.request,
             self.course,
@@ -377,7 +377,7 @@ class CoursewareIndex(View):
         self.field_data_cache.add_descriptor_descendents(self.section, depth=None)
 
         # Bind section to user
-        self.section = get_module_for_descriptor(
+        self.section = get_block_for_descriptor(
             self.effective_user,
             self.request,
             self.section,
@@ -491,7 +491,7 @@ class CoursewareIndex(View):
         exceeds the length of the displayable items, default the position
         to the first element.
         """
-        display_items = self.section.get_display_items()
+        display_items = self.section.get_children()
         if not display_items:
             return
         if self.section.position > len(display_items):
@@ -561,17 +561,17 @@ def render_accordion(request, course, table_of_contents):
     return render_to_string('courseware/accordion.html', context)
 
 
-def save_child_position(seq_module, child_name):
+def save_child_position(seq_block, child_name):
     """
     child_name: url_name of the child
     """
-    for position, child in enumerate(seq_module.get_display_items(), start=1):
+    for position, child in enumerate(seq_block.get_children(), start=1):
         if child.location.block_id == child_name:
             # Only save if position changed
-            if position != seq_module.position:
-                seq_module.position = position
+            if position != seq_block.position:
+                seq_block.position = position
     # Save this new position to the underlying KeyValueStore
-    seq_module.save()
+    seq_block.save()
 
 
 def save_positions_recursively_up(user, request, field_data_cache, xmodule, course=None):
@@ -579,23 +579,23 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule, cour
     Recurses up the course tree starting from a leaf
     Saving the position property based on the previous node as it goes
     """
-    current_module = xmodule
+    current_block = xmodule
 
-    while current_module:
-        parent_location = modulestore().get_parent_location(current_module.location)
+    while current_block:
+        parent_location = modulestore().get_parent_location(current_block.location)
         parent = None
         if parent_location:
             parent_descriptor = modulestore().get_item(parent_location)
-            parent = get_module_for_descriptor(
+            parent = get_block_for_descriptor(
                 user,
                 request,
                 parent_descriptor,
                 field_data_cache,
-                current_module.location.course_key,
+                current_block.location.course_key,
                 course=course
             )
 
         if parent and hasattr(parent, 'position'):
-            save_child_position(parent, current_module.location.block_id)
+            save_child_position(parent, current_block.location.block_id)
 
-        current_module = parent
+        current_block = parent

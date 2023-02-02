@@ -1,4 +1,4 @@
-"""Test for Word cloud Xmodule functional logic."""
+"""Test for Word Cloud Block functional logic."""
 
 import json
 from unittest.mock import Mock
@@ -10,13 +10,13 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
 
-from xmodule.word_cloud_module import WordCloudBlock
+from xmodule.word_cloud_block import WordCloudBlock
 from . import get_test_descriptor_system, get_test_system
 
 
 class WordCloudBlockTest(TestCase):
     """
-    Logic tests for Word Cloud XBlock.
+    Logic tests for Word Cloud Block.
     """
 
     raw_field_data = {

@@ -33,6 +33,7 @@ from common.djangoapps.student.roles import (
     CourseStaffRole,
 )
 
+from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -74,7 +75,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
-from xmodule.course_module import CourseBlock
+from xmodule.course_block import CourseBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList
 
@@ -116,12 +117,15 @@ from .serializers import (
     get_context
 )
 from .utils import (
+    AttributeDict,
     add_stats_for_users_with_no_discussion_content,
+    create_blocks_params,
     discussion_open_for_user,
     get_usernames_for_course,
     get_usernames_from_search_string,
     set_attribute
 )
+
 
 User = get_user_model()
 
@@ -527,6 +531,108 @@ def get_course_topics(request: Request, course_key: CourseKey, topic_ids: Option
                 "Discussion not found for '{}'.".format(", ".join(str(id) for id in not_found_topic_ids))
             )
 
+    return {
+        "courseware_topics": courseware_topics,
+        "non_courseware_topics": non_courseware_topics,
+    }
+
+
+def get_v2_non_courseware_topics_as_v1(request, course_key, topics):
+    """
+    Takes v2 topics list and returns v1 list of non courseware topics
+    """
+    non_courseware_topics = []
+    for topic in topics:
+        if topic.get('usage_key', '') is None:
+            for key in ['usage_key', 'enabled_in_context']:
+                topic.pop(key)
+            topic.update({
+                'children': [],
+                'thread_list_url': get_thread_list_url(
+                    request,
+                    course_key,
+                    topic.get('id'),
+                )
+            })
+            non_courseware_topics.append(topic)
+    return non_courseware_topics
+
+
+def get_v2_courseware_topics_as_v1(request, course_key, sequentials, topics):
+    """
+    Returns v2 courseware topics list as v1 structure
+    """
+    courseware_topics = []
+    for sequential in sequentials:
+        children = []
+        for child in sequential.get('children', []):
+            for topic in topics:
+                if child == topic.get('usage_key'):
+                    topic.update({
+                        'children': [],
+                        'thread_list_url': get_thread_list_url(
+                            request,
+                            course_key,
+                            [topic.get('id')],
+                        )
+                    })
+                    topic.pop('enabled_in_context')
+                    children.append(AttributeDict(topic))
+
+        discussion_topic = DiscussionTopic(
+            None,
+            sequential.get('display_name'),
+            get_thread_list_url(
+                request,
+                course_key,
+                [child.id for child in children],
+            ),
+            children,
+            None,
+        )
+        courseware_topics.append(DiscussionTopicSerializer(discussion_topic).data)
+    return courseware_topics
+
+
+def get_v2_course_topics_as_v1(
+    request: Request,
+    course_key: CourseKey,
+    topic_ids: Optional[Iterable[str]] = None,
+):
+    """
+    Returns v2 topics in v1 structure
+    """
+    course_usage_key = modulestore().make_course_usage_key(course_key)
+    blocks_params = create_blocks_params(course_usage_key, request.user)
+    blocks = get_blocks(
+        request,
+        blocks_params['usage_key'],
+        blocks_params['user'],
+        blocks_params['depth'],
+        blocks_params['nav_depth'],
+        blocks_params['requested_fields'],
+        blocks_params['block_counts'],
+        blocks_params['student_view_data'],
+        blocks_params['return_type'],
+        blocks_params['block_types_filter'],
+        hide_access_denials=False,
+    )['blocks']
+
+    sequentials = [value for _, value in blocks.items()
+                   if value.get('type') == "sequential"]
+
+    topics = get_course_topics_v2(course_key, request.user, topic_ids)
+    non_courseware_topics = get_v2_non_courseware_topics_as_v1(
+        request,
+        course_key,
+        topics,
+    )
+    courseware_topics = get_v2_courseware_topics_as_v1(
+        request,
+        course_key,
+        sequentials,
+        topics,
+    )
     return {
         "courseware_topics": courseware_topics,
         "non_courseware_topics": non_courseware_topics,

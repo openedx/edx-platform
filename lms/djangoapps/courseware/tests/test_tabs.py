@@ -42,7 +42,7 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -242,7 +242,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        cls.page = ItemFactory.create(
+        cls.page = BlockFactory.create(
             category="static_tab", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="new_tab"
         )
@@ -280,8 +280,8 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         assert 'static_tab' in tab_content
 
         # Test when render raises an exception
-        with patch('lms.djangoapps.courseware.views.views.get_module') as mock_module_render:
-            mock_module_render.return_value = MagicMock(
+        with patch('lms.djangoapps.courseware.views.views.get_block') as mock_block_render:
+            mock_block_render.return_value = MagicMock(
                 render=Mock(side_effect=Exception('Render failed!'))
             )
             static_tab_content = get_static_tab_fragment(request, course, tab).content
@@ -346,11 +346,11 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         super().setUp()
 
         self.course = CourseFactory.create()
-        self.extra_tab_2 = ItemFactory.create(
+        self.extra_tab_2 = BlockFactory.create(
             category="static_tab", parent_location=self.course.location,
             data="Extra Tab", display_name="Extra Tab 2"
         )
-        self.extra_tab_3 = ItemFactory.create(
+        self.extra_tab_3 = BlockFactory.create(
             category="static_tab", parent_location=self.course.location,
             data="Extra Tab", display_name="Extra Tab 3"
         )
@@ -364,7 +364,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         """
         Unit Test: test_get_course_tabs_list_entrance_exam_enabled
         """
-        entrance_exam = ItemFactory.create(
+        entrance_exam = BlockFactory.create(
             category="chapter",
             parent_location=self.course.location,
             display_name="Entrance Exam",
@@ -705,7 +705,7 @@ class ProgressTestCase(TabTestCase):
             invalid_dict_tab=None,
         )
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_enrolled')
     def test_progress(self, is_enrolled):
         is_enrolled.return_value = True
         self.course.hide_progress_tab = False
@@ -761,7 +761,8 @@ class DiscussionLinkTestCase(TabTestCase):
             is_enrolled=True
     ):
         """Helper function to verify whether the discussion tab exists and can be displayed"""
-        with patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled') as check_is_enrolled:
+        IS_ENROLLED_METHOD_NAME = 'common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_enrolled'
+        with patch(IS_ENROLLED_METHOD_NAME) as check_is_enrolled:
             self.course.tabs = tab_list
             self.course.discussion_link = discussion_link_in_course
             discussion_tab = xmodule_tabs.CourseTabList.get_discussion(self.course)
@@ -849,7 +850,7 @@ class DiscussionLinkTestCase(TabTestCase):
 
 class DatesTabTestCase(TabListTestCase):
     """Test cases for dates tab"""
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.is_enrolled')
     def test_dates_tab_disabled_if_unenrolled(self, is_enrolled):
         tab = DatesTab({'type': DatesTab.type, 'name': 'dates'})
 

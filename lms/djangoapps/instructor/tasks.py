@@ -12,7 +12,7 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.student.models import get_user_by_username_or_email
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from openedx.core.lib.request_utils import get_request_or_stub
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -57,7 +57,7 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
         return
 
     # This logic has been copied over from openedx/core/djangoapps/schedules/content_highlights.py
-    # in the _get_course_module function.
+    # in the _get_course_block function.
     # I'm not sure if this is an anti-pattern or not, so if you can avoid re-copying this, please do.
     # We are using it here because we ran into issues with the User service being undefined when we
     # encountered a split_test xblock.
@@ -71,11 +71,11 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         root_descriptor.scope_ids.usage_id.context_key, user, root_descriptor, read_only=True,
     )
-    root_module = get_module_for_descriptor(
+    root_block = get_block_for_descriptor(
         user, request, root_descriptor, field_data_cache, root_descriptor.scope_ids.usage_id.context_key,
     )
-    if not root_module:
-        err_msg = err_msg_prefix + 'Module unable to be created from descriptor!'
+    if not root_block:
+        err_msg = err_msg_prefix + 'Block unable to be created from descriptor!'
         log.error(err_msg)
         return
 
@@ -91,7 +91,7 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
             # single way to get the children assigned for a partcular user. Some blocks define the
             # child descriptors method, but others don't and with blocks like Randomized Content
             # (Library Content), the get_children method returns all children and not just assigned
-            # children. So this is our way around situations like that. See also Split Test Module
+            # children. So this is our way around situations like that. See also Split Test Block
             # for another use case where user state has to be taken into account via get_child_descriptors
             block_children = ((hasattr(block, 'get_child_descriptors') and block.get_child_descriptors())
                               or (hasattr(block, 'get_children') and block.get_children())
@@ -99,4 +99,4 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
             for child in block_children:
                 _submit_completions(child, user, completion)
 
-    _submit_completions(root_module, user, completion)
+    _submit_completions(root_block, user, completion)

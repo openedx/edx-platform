@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 import pytz
 
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module
+from lms.djangoapps.courseware.block_render import get_block
 from xmodule.graders import ProblemScore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -79,10 +79,10 @@ def answer_problem(course, request, problem, score=1, max_value=1):
         course,
         depth=2
     )
-    module = get_module(
+    block = get_block(
         user,
         request,
         problem.scope_ids.usage_id,
         field_data_cache,
     )
-    module.system.publish(problem, 'grade', grade_dict)
+    block.runtime.publish(problem, 'grade', grade_dict)

@@ -11,15 +11,15 @@ class RecommendationsPanel extends React.Component {
     this.getCourseList = this.getCourseList.bind(this);
     this.state = {
       isLoading: true,
-      isPersonalizedRecommendation: false,
+      isControl: null,
       coursesList: [],
     };
   }
 
-  onCourseSelect(courseKey) {
+  onCourseSelect(courseKey, marketingUrl) {
     window.analytics.track('edx.bi.user.recommended.course.click', {
       course_key: courseKey,
-      is_personalized_recommendation: this.state.isPersonalizedRecommendation,
+      is_control: this.state.isControl,
     });
 
     let recommendedCourses = Cookies.get(this.cookieName);
@@ -28,29 +28,31 @@ class RecommendationsPanel extends React.Component {
     } else {
       recommendedCourses = JSON.parse(recommendedCourses);
       if (!recommendedCourses.course_keys.includes(courseKey)) {
-        recommendedCourses.course_keys.push(courseKey);
+        if (recommendedCourses.course_keys.length < 5) {
+          recommendedCourses.course_keys.push(courseKey);
+        } else {
+          recommendedCourses.course_keys.shift();
+          recommendedCourses.course_keys.push(courseKey);
+        }
       }
     }
-    recommendedCourses['is_personalized_recommendation'] = this.state.isPersonalizedRecommendation;
+    recommendedCourses['is_personalized_recommendation'] = this.state.isControl;
+    recommendedCourses['is_control'] = this.state.isControl;
     Cookies.set(this.cookieName, JSON.stringify(recommendedCourses), this.domainInfo);
+    window.location.href = marketingUrl;
   };
 
   getCourseList = async () => {
     const coursesRecommendationData = await fetch(`${this.props.lmsRootUrl}/api/dashboard/v0/recommendation/courses/`)
-      .then(response => {
-        if (response.status === 400) {
-          return this.props.generalRecommendations;
-        } else {
-          return response.json();
-        }
-      }).catch(() => {
-        return this.props.generalRecommendations;
-      });
+      .then(response => response.json())
+      .catch(() => ({
+        courses: this.props.generalRecommendations,
+      }));
 
     this.setState({
-      isLoading: false,
       coursesList: coursesRecommendationData.courses,
-      isPersonalizedRecommendation: coursesRecommendationData.is_personalized_recommendation
+      isLoading: false,
+      isControl: coursesRecommendationData.is_control === undefined ? null : coursesRecommendationData.is_control,
     });
   };
 
@@ -77,8 +79,11 @@ class RecommendationsPanel extends React.Component {
                 <div className="recommend-heading mb-4">{gettext('Recommendations for you')}</div>
                 <div>
                   {this.state.coursesList.map(course => (
-                    <a href={course.marketing_url} className="course-link"
-                      onClick={() => this.onCourseSelect(course.course_key)}>
+                    <span
+                      role="link"
+                      className="course-link"
+                      onClick={() => this.onCourseSelect(course.course_key, course.marketing_url)}
+                    >
                       <div className="course-card box-shadow-down-1 bg-white mb-3">
                         <div className="box-shadow-down-1 image-box">
                           <img
@@ -91,7 +96,7 @@ class RecommendationsPanel extends React.Component {
                           {course.title}
                         </div>
                       </div>
-                    </a>
+                    </span>
                   ))}
                 </div>
               </div>

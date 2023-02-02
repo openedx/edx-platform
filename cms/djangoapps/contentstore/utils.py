@@ -366,7 +366,7 @@ def reverse_usage_url(handler_name, usage_key, kwargs=None):
 
 def get_split_group_display_name(xblock, course):
     """
-    Returns group name if an xblock is found in user partition groups that are suitable for the split_test module.
+    Returns group name if an xblock is found in user partition groups that are suitable for the split_test block.
 
     Arguments:
         xblock (XBlock): The courseware component.

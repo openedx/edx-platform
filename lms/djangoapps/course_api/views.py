@@ -277,6 +277,11 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             Notice that Staff users are always granted permission to list any
             course.
 
+        active_only (optional):
+            If this boolean is specified, only the courses that have not ended or do not have any end
+            date are returned. This is different from search_term because this filtering is done on
+            CourseOverview and not ElasticSearch.
+
     **Returns**
 
         * 200 on success, with a list of course discovery objects as returned
@@ -333,7 +338,8 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             org=form.cleaned_data['org'],
             filter_=form.cleaned_data['filter_'],
             search_term=form.cleaned_data['search_term'],
-            permissions=form.cleaned_data['permissions']
+            permissions=form.cleaned_data['permissions'],
+            active_only=form.cleaned_data.get('active_only', False)
         )
 
 

@@ -1,9 +1,9 @@
 """
 Tests the logic of problems with a delay between attempt submissions.
 
-Note that this test file is based off of test_capa_module.py and as
+Note that this test file is based off of test_capa_block.py and as
 such, uses the same CapaFactory problem setup to test the functionality
-of the submit_problem method of a capa module when the "delay between quiz
+of the submit_problem method of a capa block when the "delay between quiz
 submissions" setting is set to different values
 """
 
@@ -21,16 +21,16 @@ from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
 import xmodule
-from xmodule.capa_module import ProblemBlock
+from xmodule.capa_block import ProblemBlock
 
 from . import get_test_system
 
 
 class CapaFactoryWithDelay:
     """
-    Create problem modules class, specialized for delay_between_attempts
+    Create problem blocks class, specialized for delay_between_attempts
     test cases. This factory seems different enough from the one in
-    test_capa_module that unifying them is unattractive.
+    test_capa_block that unifying them is unattractive.
     Removed the unused optional arguments.
     """
 
@@ -104,7 +104,7 @@ class CapaFactoryWithDelay:
             field_data['attempts'] = int(attempts)
 
         system = get_test_system(render_template=Mock(return_value="<div>Test Template HTML</div>"))
-        module = ProblemBlock(
+        block = ProblemBlock(
             system,
             DictFieldData(field_data),
             ScopeIds(None, None, location, location),
@@ -112,11 +112,11 @@ class CapaFactoryWithDelay:
 
         if correct:
             # Could set the internal state formally, but here we just jam in the score.
-            module.score = Score(raw_earned=1, raw_possible=1)
+            block.score = Score(raw_earned=1, raw_possible=1)
         else:
-            module.score = Score(raw_earned=0, raw_possible=1)
+            block.score = Score(raw_earned=0, raw_possible=1)
 
-        return module
+        return block
 
 
 class XModuleQuizAttemptsDelayTest(unittest.TestCase):
@@ -131,37 +131,37 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
                          considered_now=None,
                          skip_submit_problem=False):
         """Unified create and check code for the tests here."""
-        module = CapaFactoryWithDelay.create(
+        block = CapaFactoryWithDelay.create(
             attempts=num_attempts,
             max_attempts=99,
             last_submission_time=last_submission_time,
             submission_wait_seconds=submission_wait_seconds
         )
-        module.done = False
+        block.done = False
         get_request_dict = {CapaFactoryWithDelay.input_key(): "3.14"}
         if skip_submit_problem:
-            return (module, None)
+            return (block, None)
         if considered_now is not None:
-            result = module.submit_problem(get_request_dict, considered_now)
+            result = block.submit_problem(get_request_dict, considered_now)
         else:
-            result = module.submit_problem(get_request_dict)
-        return (module, result)
+            result = block.submit_problem(get_request_dict)
+        return (block, result)
 
     def test_first_submission(self):
         # Not attempted yet
         num_attempts = 0
-        (module, result) = self.create_and_check(
+        (block, result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=None
         )
         # Successfully submitted and answered
         # Also, the number of attempts should increment by 1
         assert result['success'] == 'correct'
-        assert module.attempts == (num_attempts + 1)
+        assert block.attempts == (num_attempts + 1)
 
     def test_no_wait_time(self):
         num_attempts = 1
-        (module, result) = self.create_and_check(
+        (block, result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime.now(UTC),
             submission_wait_seconds=0
@@ -169,12 +169,12 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         # Successfully submitted and answered
         # Also, the number of attempts should increment by 1
         assert result['success'] == 'correct'
-        assert module.attempts == (num_attempts + 1)
+        assert block.attempts == (num_attempts + 1)
 
     def test_submit_quiz_in_rapid_succession(self):
         # Already attempted once (just now) and thus has a submitted time
         num_attempts = 1
-        (module, result) = self.create_and_check(
+        (block, result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime.now(UTC),
             submission_wait_seconds=123
@@ -182,12 +182,12 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         # You should get a dialog that tells you to wait
         # Also, the number of attempts should not be incremented
         self.assertRegex(result['success'], r"You must wait at least.*")
-        assert module.attempts == num_attempts
+        assert block.attempts == num_attempts
 
     def test_submit_quiz_too_soon(self):
         # Already attempted once (just now)
         num_attempts = 1
-        (module, result) = self.create_and_check(
+        (block, result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=180,
@@ -196,12 +196,12 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
         self.assertRegex(result['success'], r"You must wait at least 3 minutes between submissions. 2 minutes remaining\..*")  # lint-amnesty, pylint: disable=line-too-long
-        assert module.attempts == num_attempts
+        assert block.attempts == num_attempts
 
     def test_submit_quiz_1_second_too_soon(self):
         # Already attempted once (just now)
         num_attempts = 1
-        (module, result) = self.create_and_check(
+        (block, result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=180,
@@ -210,12 +210,12 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
         self.assertRegex(result['success'], r"You must wait at least 3 minutes between submissions. 1 second remaining\..*")  # lint-amnesty, pylint: disable=line-too-long
-        assert module.attempts == num_attempts
+        assert block.attempts == num_attempts
 
     def test_submit_quiz_as_soon_as_allowed(self):
         # Already attempted once (just now)
         num_attempts = 1
-        (module, result) = self.create_and_check(
+        (block, result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=180,
@@ -224,12 +224,12 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         # Successfully submitted and answered
         # Also, the number of attempts should increment by 1
         assert result['success'] == 'correct'
-        assert module.attempts == (num_attempts + 1)
+        assert block.attempts == (num_attempts + 1)
 
     def test_submit_quiz_after_delay_expired(self):
         # Already attempted once (just now)
         num_attempts = 1
-        (module, result) = self.create_and_check(
+        (block, result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=180,
@@ -238,14 +238,14 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         # Successfully submitted and answered
         # Also, the number of attempts should increment by 1
         assert result['success'] == 'correct'
-        assert module.attempts == (num_attempts + 1)
+        assert block.attempts == (num_attempts + 1)
 
     def test_still_cannot_submit_after_max_attempts(self):
         # Already attempted once (just now) and thus has a submitted time
         num_attempts = 99
         # Regular create_and_check should fail
         with pytest.raises(xmodule.exceptions.NotFoundError):
-            (module, unused_result) = self.create_and_check(
+            (block, unused_result) = self.create_and_check(
                 num_attempts=num_attempts,
                 last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
                 submission_wait_seconds=180,
@@ -253,7 +253,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
             )
 
         # Now try it without the submit_problem
-        (module, unused_result) = self.create_and_check(
+        (block, unused_result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=180,
@@ -261,12 +261,12 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
             skip_submit_problem=True
         )
         # Expect that number of attempts NOT incremented
-        assert module.attempts == num_attempts
+        assert block.attempts == num_attempts
 
     def test_submit_quiz_with_long_delay(self):
         # Already attempted once (just now)
         num_attempts = 1
-        (module, result) = self.create_and_check(
+        (block, result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=60 * 60 * 2,
@@ -275,12 +275,12 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
         self.assertRegex(result['success'], r"You must wait at least 2 hours between submissions. 2 minutes 1 second remaining\..*")  # lint-amnesty, pylint: disable=line-too-long
-        assert module.attempts == num_attempts
+        assert block.attempts == num_attempts
 
     def test_submit_quiz_with_involved_pretty_print(self):
         # Already attempted once (just now)
         num_attempts = 1
-        (module, result) = self.create_and_check(
+        (block, result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=60 * 60 * 2 + 63,
@@ -289,12 +289,12 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
         self.assertRegex(result['success'], r"You must wait at least 2 hours 1 minute 3 seconds between submissions. 1 hour 2 minutes 59 seconds remaining\..*")  # lint-amnesty, pylint: disable=line-too-long
-        assert module.attempts == num_attempts
+        assert block.attempts == num_attempts
 
     def test_submit_quiz_with_nonplural_pretty_print(self):
         # Already attempted once (just now)
         num_attempts = 1
-        (module, result) = self.create_and_check(
+        (block, result) = self.create_and_check(
             num_attempts=num_attempts,
             last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
             submission_wait_seconds=60,
@@ -303,4 +303,4 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
         self.assertRegex(result['success'], r"You must wait at least 1 minute between submissions. 1 minute remaining\..*")  # lint-amnesty, pylint: disable=line-too-long
-        assert module.attempts == num_attempts
+        assert block.attempts == num_attempts

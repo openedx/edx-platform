@@ -70,8 +70,8 @@ class RoundTripTestCase(unittest.TestCase):
         self.temp_dir = mkdtemp()
         self.addCleanup(shutil.rmtree, self.temp_dir)
 
-    @mock.patch('xmodule.video_module.video_module.edxval_api', None)
-    @mock.patch('xmodule.course_module.requests.get')
+    @mock.patch('xmodule.video_block.video_block.edxval_api', None)
+    @mock.patch('xmodule.course_block.requests.get')
     @ddt.data(
         "toy",
         "simple",
@@ -140,7 +140,7 @@ class RoundTripTestCase(unittest.TestCase):
             list(second_import.modules[course_id].keys())
         )
 
-        print("Checking module equality")
+        print("Checking block equality")
         for location in initial_import.modules[course_id].keys():
             print(("Checking", location))
             assert blocks_are_equivalent(initial_import.modules[course_id][location],

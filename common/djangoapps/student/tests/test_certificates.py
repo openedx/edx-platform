@@ -1,8 +1,6 @@
 """Tests for display of certificates on the student dashboard. """
 
-
 import datetime
-import unittest
 from unittest.mock import patch
 
 import ddt
@@ -16,6 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.data import CertificatesDisplayBehaviors
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
@@ -77,7 +76,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
     """
     Tests the certificates messages for a course in the dashboard.
@@ -138,7 +137,7 @@ class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CertificateDisplayTest(CertificateDisplayTestBase):
     """
     Tests of certificate display.
@@ -174,7 +173,7 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CertificateDisplayTestLinkedHtmlView(CertificateDisplayTestBase):
     """
     Tests of linked student certificates.

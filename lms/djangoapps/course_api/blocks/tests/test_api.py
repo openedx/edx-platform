@@ -144,7 +144,7 @@ class TestGetBlocksVideoUrls(SharedModuleStoreTestCase):
         self.request = RequestFactory().get("/dummy")
         self.request.user = self.user
 
-    @patch('xmodule.video_module.VideoBlock.student_view_data')
+    @patch('xmodule.video_block.VideoBlock.student_view_data')
     def test_video_urls_rewrite(self, video_data_patch):
         """
         Verify the video blocks returned have their URL re-written for
@@ -226,8 +226,8 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2, True, 24),
-        (ModuleStoreEnum.Type.split, 2, False, 14),
+        (ModuleStoreEnum.Type.split, 2, True, 23),
+        (ModuleStoreEnum.Type.split, 2, False, 13),
     )
     @ddt.unpack
     def test_query_counts_uncached(self, store_type, expected_mongo_queries, with_storage_backing, num_sql_queries):

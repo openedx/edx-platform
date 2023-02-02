@@ -45,6 +45,16 @@ class TestCourseOverviewsApi(ModuleStoreTestCase):
         retrieved_course_overview = get_course_overview_or_none(course_run_key)
         assert retrieved_course_overview is None
 
+    @patch('openedx.core.djangoapps.content.course_overviews.api.CourseOverview.get_from_id')
+    def test_get_course_overview_or_none_exception(self, mock_get):
+        """
+        Test for `get_course_overview_or_none` function when an exception is raised.
+        """
+        course_run_key = CourseKey.from_string('course-v1:coping+with+exceptions')
+        mock_get.side_effect = Exception()
+        retrieved_course_overview = get_course_overview_or_none(course_run_key)
+        assert retrieved_course_overview is None
+
     def test_get_course_overview_or_404_success(self):
         """
         Test for `test_get_course_overview_or_404` function when the overview exists.

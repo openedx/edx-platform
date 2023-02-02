@@ -4,7 +4,6 @@
 
 import json
 import logging
-import unittest
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
@@ -13,7 +12,6 @@ import httpretty
 import pytz
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
-from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -27,6 +25,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -36,7 +35,7 @@ JSON = 'application/json'
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class RefundableTest(SharedModuleStoreTestCase):
     """
     Tests for dashboard utility functions
@@ -65,13 +64,13 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.client = Client()
         cache.clear()
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.refund_cutoff_date')
     def test_refundable(self, cutoff_date):
         """ Assert base case is refundable"""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
         assert self.enrollment.refundable()
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.refund_cutoff_date')
     def test_refundable_expired_verification(self, cutoff_date):
         """ Assert that enrollment is refundable if course mode has expired."""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
@@ -79,7 +78,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.verified_mode.save()
         assert self.enrollment.refundable()
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.refund_cutoff_date')
     def test_refundable_when_certificate_exists(self, cutoff_date):
         """ Assert that enrollment is not refundable once a certificat has been generated."""
 
@@ -108,7 +107,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.enrollment.can_refund = True
         assert self.enrollment.refundable()
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
+    @patch('common.djangoapps.student.models.course_enrollment.CourseEnrollment.refund_cutoff_date')
     def test_refundable_with_cutoff_date(self, cutoff_date):
         """ Assert enrollment is refundable before cutoff and not refundable after."""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
@@ -156,7 +155,8 @@ class RefundableTest(SharedModuleStoreTestCase):
             value=self.ORDER_NUMBER
         )
 
-        with patch('common.djangoapps.student.models.EnrollmentRefundConfiguration.current') as config:
+        CONFIG_METHOD_NAME = 'common.djangoapps.student.models.course_enrollment.EnrollmentRefundConfiguration.current'
+        with patch(CONFIG_METHOD_NAME) as config:
             instance = config.return_value
             instance.refund_window = refund_period
             assert self.enrollment.refund_cutoff_date() == (expected_date + refund_period)

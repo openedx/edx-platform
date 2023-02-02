@@ -1,6 +1,6 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
+
 import json
-import unittest
 from string import capwords
 from unittest.mock import Mock, patch
 
@@ -32,7 +32,7 @@ from common.djangoapps.third_party_auth.views import inactive_user_view
 from common.djangoapps.util.testing import EventTestMixin
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, skip_unless_lms
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -92,7 +92,7 @@ class EmailTestMixin:
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
     """
     Test sending of the activation email.
@@ -232,7 +232,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 @override_settings(ACCOUNT_MICROFRONTEND_URL='http://account-mfe')
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+@skip_unless_lms
 class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCase):
     """
     Test sending of the proctoring requirements email.
@@ -284,8 +284,8 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
         """
         Provide a tuple of string[]s that should be (in, not_in) the email
         """
-        course_module = modulestore().get_course(self.course.id)
-        proctoring_provider = capwords(course_module.proctoring_provider.replace('_', ' '))
+        course_block = modulestore().get_course(self.course.id)
+        proctoring_provider = capwords(course_block.proctoring_provider.replace('_', ' '))
         fragments = [
             (
                 "You are enrolled in {} at {}. This course contains proctored exams.".format(
@@ -307,7 +307,7 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
         return fragments
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+@skip_unless_lms
 class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolationTestCase):
     """
     Test changing a user's email address
@@ -565,7 +565,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         self.check_confirm_email_change('email_exists.html', {})
         self.assertFailedBeforeEmailing()
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @skip_unless_lms
     @patch('common.djangoapps.student.views.management.ace')
     def test_old_email_fails(self, ace_mail):
         ace_mail.send.side_effect = [Exception, None]
@@ -575,7 +575,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         assert ace_mail.send.call_count == 1
         self.assertRolledBack()
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @skip_unless_lms
     @patch('common.djangoapps.student.views.management.ace')
     def test_new_email_fails(self, ace_mail):
         ace_mail.send.side_effect = [None, Exception]
@@ -585,7 +585,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         assert ace_mail.send.call_count == 2
         self.assertRolledBack()
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @skip_unless_lms
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'CONTACT': '/help/contact-us'})
     @patch('common.djangoapps.student.signals.signals.USER_EMAIL_CHANGED.send')
     @ddt.data(
@@ -616,7 +616,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
             mock_rollback.assert_called_with()
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+@skip_unless_lms
 class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolationTestCase):
     """
     Test changing a user's email address

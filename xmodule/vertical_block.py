@@ -14,14 +14,14 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.fields import Boolean, Scope
 from openedx_filters.learning.filters import VerticalBlockChildRenderStarted
-from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.progress import Progress
-from xmodule.seq_module import SequenceFields
+from xmodule.seq_block import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.misc import is_xblock_an_assignment
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW, XModuleFields
-from xmodule.xml_module import XmlParserMixin
+from xmodule.xml_block import XmlMixin
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ class VerticalBlock(
     VerticalFields,
     XModuleFields,
     StudioEditableBlock,
-    XmlParserMixin,
+    XmlMixin,
     MakoTemplateBlockBase,
     XBlock
 ):
@@ -95,7 +95,7 @@ class VerticalBlock(
                     'edx-platform.username'
                 )
 
-        child_blocks = self.get_display_items()  # lint-amnesty, pylint: disable=no-member
+        child_blocks = self.get_children()  # lint-amnesty, pylint: disable=no-member
 
         child_blocks_to_complete_on_view = set()
         completion_service = self.runtime.service(self, 'completion')
@@ -269,7 +269,7 @@ class VerticalBlock(
 
     def index_dictionary(self):
         """
-        Return dictionary prepared with module content and type for indexing.
+        Return dictionary prepared with block content and type for indexing.
         """
         # return key/value fields in a Python dict object
         # values may be numeric / string or dict

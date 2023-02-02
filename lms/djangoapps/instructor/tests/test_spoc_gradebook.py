@@ -8,7 +8,7 @@ from common.djangoapps.student.tests.factories import AdminFactory, CourseEnroll
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 USER_COUNT = 11
 
@@ -33,17 +33,17 @@ class TestGradebook(SharedModuleStoreTestCase):
 
         # Now give it some content
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
-            chapter = ItemFactory.create(
+            chapter = BlockFactory.create(
                 parent_location=cls.course.location,
                 category="sequential",
             )
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent_location=chapter.location,
                 category="sequential",
                 metadata={'graded': True, 'format': 'Homework'}
             )
             cls.items = [
-                ItemFactory.create(
+                BlockFactory.create(
                     parent_location=section.location,
                     category="problem",
                     data=StringResponseXMLFactory().build_xml(answer='foo'),

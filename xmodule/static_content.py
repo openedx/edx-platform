@@ -19,17 +19,17 @@ import django
 from docopt import docopt
 from path import Path as path
 
-from xmodule.annotatable_module import AnnotatableBlock
-from xmodule.capa_module import ProblemBlock
-from xmodule.conditional_module import ConditionalBlock
-from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
-from xmodule.library_content_module import LibraryContentBlock
-from xmodule.lti_module import LTIBlock
-from xmodule.poll_module import PollBlock
-from xmodule.seq_module import SequenceBlock
-from xmodule.split_test_module import SplitTestBlock
-from xmodule.template_module import CustomTagBlock
-from xmodule.word_cloud_module import WordCloudBlock
+from xmodule.annotatable_block import AnnotatableBlock
+from xmodule.capa_block import ProblemBlock
+from xmodule.conditional_block import ConditionalBlock
+from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.library_content_block import LibraryContentBlock
+from xmodule.lti_block import LTIBlock
+from xmodule.poll_block import PollBlock
+from xmodule.seq_block import SequenceBlock
+from xmodule.split_test_block import SplitTestBlock
+from xmodule.template_block import CustomTagBlock
+from xmodule.word_cloud_block import WordCloudBlock
 from xmodule.x_module import HTMLSnippet
 
 LOG = logging.getLogger(__name__)
@@ -297,9 +297,10 @@ def main():
         installed_apps += ('edxval',)
     except ImportError:
         pass
-    settings.configure(
-        INSTALLED_APPS=installed_apps,
-    )
+    if not settings.configured:
+        settings.configure(
+            INSTALLED_APPS=installed_apps,
+        )
     django.setup()
 
     args = docopt(main.__doc__)

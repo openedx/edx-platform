@@ -1,4 +1,6 @@
-"""Tests for serializers for the Learner Dashboard"""
+"""
+Tests for serializers for the Learner Home
+"""
 
 from datetime import date, datetime, timedelta, timezone
 from itertools import product
@@ -30,9 +32,9 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import (
 from lms.djangoapps.learner_home.serializers import (
     CertificateSerializer,
     CourseProviderSerializer,
-    CourseRecommendationSerializer,
     CourseRunSerializer,
     CourseSerializer,
+    CreditSerializer,
     EmailConfirmationSerializer,
     EnrollmentSerializer,
     EnterpriseDashboardSerializer,
@@ -810,16 +812,60 @@ class TestProgramsSerializer(TestCase):
         assert output_data == {"relatedPrograms": []}
 
 
+class TestCreditSerializer(LearnerDashboardBaseTest):
+    """Tests for the CreditSerializer"""
+
+    @classmethod
+    def create_test_data(cls, enrollment):
+        """Mock data following the shape of credit_statuses"""
+
+        return {
+            "course_key": enrollment.course.id,
+            "eligible": True,
+            "deadline": random_date(),
+            "purchased": False,
+            "provider_name": "Hogwarts",
+            "provider_status_url": "http://example.com/status",
+            "provider_id": "HSWW",
+            "request_status": "pending",
+            "error": False,
+        }
+
+    @classmethod
+    def create_test_context(cls, enrollment):
+        """Credit data, packaged as it would be for serialization context"""
+
+        return {enrollment.course.id: {**cls.create_test_data(enrollment)}}
+
+    def test_serialize_credit(self):
+        # Given an enrollment and a course with ability to purchase credit
+        enrollment = self.create_test_enrollment()
+        credit_data = self.create_test_data(enrollment)
+
+        # When I serialize
+        output_data = CreditSerializer(credit_data).data
+
+        # Then I get the appropriate data shape
+        self.assertDictEqual(
+            output_data,
+            {
+                "providerStatusUrl": credit_data["provider_status_url"],
+                "providerName": credit_data["provider_name"],
+                "providerId": credit_data["provider_id"],
+                "error": credit_data["error"],
+                "purchased": credit_data["purchased"],
+                "requestStatus": credit_data["request_status"],
+            },
+        )
+
+
 class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
     """High-level tests for LearnerEnrollmentsSerializer"""
 
-    def test_happy_path(self):
-        """Test that nothing breaks and the output fields look correct"""
-
-        enrollment = self.create_test_enrollment()
-
-        input_data = enrollment
-        input_context = {
+    @classmethod
+    def create_test_context(cls, enrollment):
+        """Create context that is expected to be required / common across tests"""
+        return {
             "resume_course_urls": {enrollment.course.id: random_url()},
             "ecommerce_payment_page": random_url(),
             "course_mode_info": {
@@ -831,11 +877,18 @@ class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
             "fulfilled_entitlements": {},
             "unfulfilled_entitlement_pseudo_sessions": {},
             "programs": {},
+            "credit_statuses": TestCreditSerializer.create_test_context(enrollment),
         }
 
-        output_data = LearnerEnrollmentSerializer(
-            input_data, context=input_context
-        ).data
+    def test_happy_path(self):
+        """Test that nothing breaks and the output fields look correct"""
+
+        enrollment = self.create_test_enrollment()
+        input_data = enrollment
+        input_context = self.create_test_context(enrollment)
+
+        output = LearnerEnrollmentSerializer(input_data, context=input_context).data
+
         expected_keys = [
             "courseProvider",
             "course",
@@ -845,8 +898,24 @@ class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
             "certificate",
             "entitlement",
             "programs",
+            "credit",
         ]
-        assert output_data.keys() == set(expected_keys)
+        self.assertEqual(output.keys(), set(expected_keys))
+
+    def test_credit_no_credit_option(self):
+        # Given an enrollment
+        enrollment = self.create_test_enrollment()
+        input_data = enrollment
+        input_context = self.create_test_context(enrollment)
+
+        # Given where the course does not offer the ability to purchase credit
+        input_context["credit_statuses"] = {}
+
+        # When I serialize
+        output = LearnerEnrollmentSerializer(input_data, context=input_context).data
+
+        # Then I return empty credit info
+        self.assertDictEqual(output["credit"], {})
 
 
 class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
@@ -902,6 +971,7 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
             "gradeData",
             "certificate",
             "enrollment",
+            "credit",
         ]
 
         assert output_data.keys() == set(expected_keys)
@@ -959,81 +1029,6 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         )
         actual_keys = output_data.keys()
         assert expected_keys == actual_keys
-
-
-class TestCourseRecommendationSerializer(TestCase):
-    """High-level tests for CourseRecommendationSerializer"""
-
-    @classmethod
-    def mock_recommended_courses(cls, courses_count=2):
-        """Sample course data"""
-
-        recommended_courses = []
-
-        for _ in range(courses_count):
-            recommended_courses.append(
-                {
-                    "course_key": str(uuid4()),
-                    "logo_image_url": random_url(),
-                    "marketing_url": random_url(),
-                    "title": str(uuid4()),
-                },
-            )
-
-        return recommended_courses
-
-    def test_no_recommended_courses(self):
-        """That that data serializes correctly for empty courses list"""
-
-        recommended_courses = self.mock_recommended_courses(courses_count=0)
-
-        output_data = CourseRecommendationSerializer(
-            {
-                "courses": recommended_courses,
-                "is_personalized_recommendation": False,
-            }
-        ).data
-
-        self.assertDictEqual(
-            output_data,
-            {
-                "courses": [],
-                "isPersonalizedRecommendation": False,
-            },
-        )
-
-    def test_happy_path(self):
-        """Test that data serializes correctly"""
-
-        recommended_courses = self.mock_recommended_courses()
-
-        output_data = CourseRecommendationSerializer(
-            {
-                "courses": recommended_courses,
-                "is_personalized_recommendation": True,
-            }
-        ).data
-
-        self.assertDictEqual(
-            output_data,
-            {
-                "courses": [
-                    {
-                        "courseKey": recommended_courses[0]["course_key"],
-                        "logoImageUrl": recommended_courses[0]["logo_image_url"],
-                        "marketingUrl": recommended_courses[0]["marketing_url"],
-                        "title": recommended_courses[0]["title"],
-                    },
-                    {
-                        "courseKey": recommended_courses[1]["course_key"],
-                        "logoImageUrl": recommended_courses[1]["logo_image_url"],
-                        "marketingUrl": recommended_courses[1]["marketing_url"],
-                        "title": recommended_courses[1]["title"],
-                    },
-                ],
-                "isPersonalizedRecommendation": True,
-            },
-        )
 
 
 class TestSuggestedCourseSerializer(TestCase):
@@ -1276,6 +1271,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             "resume_course_urls": resume_course_urls,
             "ecommerce_payment_page": random_url(),
             "course_mode_info": course_mode_info,
+            "credit_statuses": {},
             "fulfilled_entitlements": fulfilled_entitlements,
             "unfulfilled_entitlement_pseudo_sessions": unfulfilled_entitlement_pseudo_sessions,
             "course_entitlement_available_sessions": course_entitlement_available_sessions,

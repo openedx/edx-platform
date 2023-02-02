@@ -1,6 +1,7 @@
 """
-Views for the learner dashboard.
+Views for Learner Home
 """
+
 import logging
 from collections import OrderedDict
 
@@ -26,14 +27,13 @@ from common.djangoapps.student.helpers import (
     cert_info,
     user_has_passing_grade_in_course,
 )
-from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
+    credit_statuses,
     get_course_enrollments,
     get_filtered_course_entitlements,
     get_org_black_and_whitelist_for_site,
 )
-from common.djangoapps.track import segment
 from common.djangoapps.util.course import (
     get_encoded_course_sharing_utm_params,
     get_link_for_about_page,
@@ -47,17 +47,11 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.learner_home.serializers import (
-    CourseRecommendationSerializer,
     LearnerDashboardSerializer,
 )
 from lms.djangoapps.learner_home.utils import (
     get_masquerade_user,
-    get_personalized_course_recommendations,
 )
-from lms.djangoapps.learner_home.waffle import (
-    should_show_learner_home_amplitude_recommendations,
-)
-from openedx.core.djangoapps.catalog.utils import get_course_data
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -181,6 +175,8 @@ def get_course_overviews_for_pseudo_sessions(unfulfilled_entitlement_pseudo_sess
 
     # Get course IDs from unfulfilled entitlement pseudo sessions
     for pseudo_session in unfulfilled_entitlement_pseudo_sessions.values():
+        if not pseudo_session:
+            continue
         course_id = pseudo_session.get("key")
         if course_id:
             course_ids.append(CourseKey.from_string(course_id))
@@ -235,10 +231,24 @@ def get_ecommerce_payment_page(user):
 @function_trace("get_cert_statuses")
 def get_cert_statuses(user, course_enrollments):
     """Get cert status by course for user enrollments"""
-    return {
-        enrollment.course_id: cert_info(user, enrollment)
-        for enrollment in course_enrollments
-    }
+
+    cert_statuses = {}
+
+    for enrollment in course_enrollments:
+        # APER-2171 - trying to get a cert for a deleted course can throw an exception
+        # Wrap in exception handling to avoid this issue.
+        try:
+            certificate_for_course = cert_info(user, enrollment)
+
+            if certificate_for_course:
+                cert_statuses[enrollment.course_id] = certificate_for_course
+
+        except Exception as ex:  # pylint: disable=broad-except
+            logger.exception(
+                f"Error getting certificate status for (user, course) ({user}, {enrollment.course_id}): {ex}"
+            )
+
+    return cert_statuses
 
 
 @function_trace("get_org_block_and_allow_lists")
@@ -423,6 +433,18 @@ def get_user_grade_passing_statuses(course_enrollments):
     }
 
 
+@function_trace("get_credit_statuses")
+def get_credit_statuses(user, course_enrollments):
+    """
+    Wrapper for getting credit statuses. Credit statuses are already in a
+    format we can use so this is largely for profiling / testing.
+
+    Returns (only for courses with credit options)
+    - Dict {course_id: <credit_status>}
+    """
+    return credit_statuses(user, course_enrollments)
+
+
 @function_trace("serialize_learner_home_data")
 def serialize_learner_home_data(data, context):
     """Wrapper for serialization so we can profile"""
@@ -517,6 +539,9 @@ class InitializeView(APIView):  # pylint: disable=unused-argument
         # Get social media sharing config
         course_share_urls = get_course_share_urls(course_enrollments)
 
+        # Get credit availability
+        user_credit_statuses = get_credit_statuses(user, course_enrollments)
+
         learner_dash_data = {
             "emailConfirmation": email_confirmation,
             "enterpriseDashboard": enterprise_customer,
@@ -534,6 +559,7 @@ class InitializeView(APIView):  # pylint: disable=unused-argument
             "course_mode_info": course_mode_info,
             "course_optouts": course_optouts,
             "course_access_checks": course_access_checks,
+            "credit_statuses": user_credit_statuses,
             "grade_statuses": grade_statuses,
             "resume_course_urls": resume_button_urls,
             "course_share_urls": course_share_urls,
@@ -548,96 +574,3 @@ class InitializeView(APIView):  # pylint: disable=unused-argument
         response_data = serialize_learner_home_data(learner_dash_data, context)
 
         return Response(response_data)
-
-
-class CourseRecommendationApiView(APIView):
-    """
-    API to get personalized recommendations from Amplitude.
-
-    **Example Request**
-
-    GET /api/learner_home/recommendation/courses/
-    """
-
-    authentication_classes = (
-        JwtAuthentication,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (IsAuthenticated, NotJwtRestrictedApplication)
-
-    def get(self, request):
-        """
-        Retrieves course recommendations details.
-        """
-        if not should_show_learner_home_amplitude_recommendations():
-            return Response(status=404)
-
-        general_recommendations_response = Response(
-            CourseRecommendationSerializer(
-                {
-                    "courses": settings.GENERAL_RECOMMENDATIONS,
-                    "is_personalized_recommendation": False,
-                }
-            ).data,
-            status=200,
-        )
-
-        try:
-            user_id = request.user.id
-            is_control, course_keys = get_personalized_course_recommendations(user_id)
-        except Exception as ex:  # pylint: disable=broad-except
-            logger.warning(f"Cannot get recommendations from Amplitude: {ex}")
-            return general_recommendations_response
-
-        # Emits an event to track student dashboard page visits.
-        segment.track(
-            user_id,
-            "edx.bi.user.recommendations.viewed",
-            {
-                "is_personalized_recommendation": not is_control,
-            },
-        )
-
-        if is_control or not course_keys:
-            return general_recommendations_response
-
-        recommended_courses = []
-        user_enrolled_course_keys = set()
-        fields = ["title", "owners", "marketing_url"]
-
-        course_enrollments = CourseEnrollment.enrollments_for_user(request.user)
-        for course_enrollment in course_enrollments:
-            course_key = f"{course_enrollment.course_id.org}+{course_enrollment.course_id.course}"
-            user_enrolled_course_keys.add(course_key)
-
-        # Pick 5 course keys, excluding the user's already enrolled course(s).
-        enrollable_course_keys = list(
-            set(course_keys).difference(user_enrolled_course_keys)
-        )[:5]
-        for course_id in enrollable_course_keys:
-            course_data = get_course_data(course_id, fields)
-            if course_data:
-                recommended_courses.append(
-                    {
-                        "course_key": course_id,
-                        "title": course_data["title"],
-                        "logo_image_url": course_data["owners"][0]["logo_image_url"],
-                        "marketing_url": course_data.get("marketing_url"),
-                    }
-                )
-
-        # If no courses are left after filtering already enrolled courses from
-        # the list of amplitude recommendations, show general recommendations
-        # to the user.
-        if not recommended_courses:
-            return general_recommendations_response
-
-        return Response(
-            CourseRecommendationSerializer(
-                {
-                    "courses": recommended_courses,
-                    "is_personalized_recommendation": not is_control,
-                }
-            ).data,
-            status=200,
-        )

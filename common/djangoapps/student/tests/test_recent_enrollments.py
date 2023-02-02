@@ -2,12 +2,9 @@
 Tests for the recently enrolled messaging within the Dashboard.
 """
 
-
 import datetime
-import unittest
 
 import ddt
-from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 from opaque_keys.edx import locator
@@ -18,11 +15,12 @@ from common.djangoapps.student.models import CourseEnrollment, DashboardConfigur
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
 from common.djangoapps.student.views.dashboard import _get_recently_enrolled_courses
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @ddt.ddt
 class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
     """

@@ -11,6 +11,7 @@ import pytest
 import ddt
 import pytz
 from ccx_keys.locator import CCXLocator
+from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -26,6 +27,7 @@ from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, mas
 from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from common.djangoapps.student.models import CourseEnrollment
@@ -42,7 +44,7 @@ from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, set_prerequisite_courses
-from xmodule.course_module import (  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import (  # lint-amnesty, pylint: disable=wrong-import-order
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
@@ -53,7 +55,7 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
@@ -233,7 +235,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         Tests course student have right access to content w/o preview.
         """
         course_key = self.course.id
-        chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
+        chapter = BlockFactory.create(category="chapter", parent_location=self.course.location)
         overview = CourseOverview.get_from_id(course_key)
 
         # Enroll student to the course
@@ -289,7 +291,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.course.user_partitions.append(user_partition)
         self.course.cohort_config = {'cohorted': True}
 
-        chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
+        chapter = BlockFactory.create(category="chapter", parent_location=self.course.location)
         chapter.group_access = {partition_id: [group_0_id]}
 
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
@@ -459,10 +461,11 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         # Non-staff can enroll if authenticated and specifically allowed for that course
         # even outside the open enrollment period
         user = UserFactory.create()
-        course = Mock(
-            enrollment_start=tomorrow, enrollment_end=tomorrow,
-            id=CourseLocator('edX', 'test', '2012_Fall'), enrollment_domain=''
-        )
+        course = CourseOverviewFactory.create(id=CourseLocator('edX', 'test', '2012_Fall'))
+        course.enrollment_start = tomorrow
+        course.enrollment_end = tomorrow
+        course.enrollment_domain = ''
+        course.save()
         CourseEnrollmentAllowedFactory(email=user.email, course_id=course.id)
         assert access._has_access_course(user, 'enroll', course)
 
@@ -472,29 +475,61 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
         # Non-staff cannot enroll if it is between the start and end dates and invitation only
         # and not specifically allowed
-        course = Mock(
-            enrollment_start=yesterday, enrollment_end=tomorrow,
-            id=CourseLocator('edX', 'test', '2012_Fall'), enrollment_domain='',
-            invitation_only=True
-        )
+        course.enrollment_start = yesterday
+        course.enrollment_end = tomorrow
+        course.invitation_only = True
+        course.save()
         user = UserFactory.create()
         assert not access._has_access_course(user, 'enroll', course)
 
         # Non-staff can enroll if it is between the start and end dates and not invitation only
-        course = Mock(
-            enrollment_start=yesterday, enrollment_end=tomorrow,
-            id=CourseLocator('edX', 'test', '2012_Fall'), enrollment_domain='',
-            invitation_only=False
-        )
+        course.invitation_only = False
+        course.save()
         assert access._has_access_course(user, 'enroll', course)
 
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
-        course = Mock(
-            enrollment_start=tomorrow, enrollment_end=tomorrow,
-            id=CourseLocator('edX', 'test', '2012_Fall'), enrollment_domain='',
-            invitation_only=False
-        )
+        course.enrollment_start = tomorrow
+        course.enrollment_end = tomorrow
+        course.invitation_only = False
+        course.save()
         assert not access._has_access_course(user, 'enroll', course)
+
+    @override_settings(FEATURES={**settings.FEATURES, 'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': True})
+    def test__has_access_course_with_disable_allowed_enrollment_flag(self):
+        yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
+        tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
+
+        # Non-staff user invited to course, cannot enroll outside the open enrollment period
+        # if DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED is True
+        user = UserFactory.create()
+        course = CourseOverviewFactory.create(id=CourseLocator('edX', 'test', '2012_Fall'))
+        course.enrollment_start = tomorrow
+        course.enrollment_end = tomorrow
+        course.enrollment_domain = ''
+        course.save()
+        CourseEnrollmentAllowedFactory(email=user.email, course_id=course.id)
+        assert not access._has_access_course(user, 'enroll', course)
+
+        # Staff can always enroll even outside the open enrollment period
+        user = StaffFactory.create(course_key=course.id)
+        assert access._has_access_course(user, 'enroll', course)
+
+        # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
+        user = UserFactory.create()
+        assert not access._has_access_course(user, 'enroll', course)
+
+        # Non-staff cannot enroll if it is between the start and end dates and invitation only
+        # and not specifically allowed
+        course.enrollment_start = yesterday
+        course.enrollment_end = tomorrow
+        course.invitation_only = True
+        course.save()
+        assert not access._has_access_course(user, 'enroll', course)
+
+        # Non-staff can enroll if it is between the start and end dates and not invitation only
+        course.invitation_only = False
+        course.save()
+        assert access._has_access_course(user, 'enroll', course)
 
     @override_settings(COURSES_INVITE_ONLY=False)
     def test__course_default_invite_only_flag_false(self):

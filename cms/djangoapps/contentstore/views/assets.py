@@ -102,11 +102,11 @@ def _asset_index(request, course_key):
 
     Supports start (0-based index into the list of assets) and max query parameters.
     '''
-    course_module = modulestore().get_course(course_key)
+    course_block = modulestore().get_course(course_key)
 
     return render_to_response('asset_index.html', {
         'language_code': request.LANGUAGE_CODE,
-        'context_course': course_module,
+        'context_course': course_block,
         'max_file_size_in_mbs': settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
         'chunk_size_in_mbs': settings.UPLOAD_CHUNK_SIZE_IN_MB,
         'max_file_size_redirect_url': settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,
@@ -405,6 +405,9 @@ def _upload_asset(request, course_key):
 
     if course_exists_error is not None:
         return course_exists_error
+
+    if course_key.deprecated:
+        return JsonResponse({'error': 'Uploading assets for the legacy course is not available.'}, status=400)
 
     # compute a 'filename' which is similar to the location formatting, we're
     # using the 'filename' nomenclature since we're using a FileSystem paradigm

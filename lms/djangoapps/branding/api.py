@@ -241,12 +241,20 @@ def _build_help_center_url(language):
     return support_url
 
 
+def _security_url():
+    """
+    Return the security policy page URL.
+    """
+    return settings.SECURITY_PAGE_URL
+
+
 def _footer_connect_links(language=settings.LANGUAGE_CODE):
     """Return the connect links to display in the footer. """
     links = [
         ("blog", (marketing_link("BLOG"), _("Blog"))),
         ("contact", (_build_support_form_url(full_path=True), _("Contact Us"))),
         ("help-center", (_build_help_center_url(language), _("Help Center"))),
+        ("security", (_security_url(), _("Security"))),
     ]
 
     if language == settings.LANGUAGE_CODE:
@@ -382,7 +390,9 @@ def _footer_more_info_links(language=settings.LANGUAGE_CODE):
     links = [
         ("terms_of_service_and_honor_code", (marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code"))),
         ("privacy_policy", (marketing_link("PRIVACY"), _("Privacy Policy"))),
+        ("cookie_policy_link", (marketing_link("COOKIE"), _("Cookie Policy"))),
         ("accessibility_policy", (marketing_link("ACCESSIBILITY"), _("Accessibility Policy"))),
+        ("ccpa_link", (marketing_link("CCPA"), _("Do Not Sell My Personal Information")))
     ]
 
     # Backwards compatibility: If a combined "terms of service and honor code"

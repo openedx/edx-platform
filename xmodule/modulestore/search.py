@@ -16,7 +16,7 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
-    chapter, but any kind of module can be a "section".
+    chapter, but any kind of block can be a "section".
 
     Args:
         modulestore: which store holds the relevant objects
@@ -101,12 +101,12 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False):
         # Figure out the position
         position = None
 
-        # This block of code will find the position of a module within a nested tree
-        # of modules. If a problem is on tab 2 of a sequence that's on tab 3 of a
-        # sequence, the resulting position is 3_2. However, no positional modules
+        # This block of code will find the position of a block within a nested tree
+        # of blocks. If a problem is on tab 2 of a sequence that's on tab 3 of a
+        # sequence, the resulting position is 3_2. However, no positional blocks
         # (e.g. sequential) currently deal with this form of representing nested
-        # positions. This needs to happen before jumping to a module nested in more
-        # than one positional module will work.
+        # positions. This needs to happen before jumping to a block nested in more
+        # than one positional block will work.
 
         if n > 3:
             position_list = []

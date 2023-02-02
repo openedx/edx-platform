@@ -94,7 +94,7 @@ FEATURES = {
     # .. toggle_name: FEATURES['DISPLAY_DEBUG_INFO_TO_STAFF']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
-    # .. toggle_description: Add a "Staff Debug" button to course modules for debugging
+    # .. toggle_description: Add a "Staff Debug" button to course blocks for debugging
     #   by course staff.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-09-04
@@ -1018,6 +1018,16 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1458'
     'ENABLE_CERTIFICATES_IDV_REQUIREMENT': False,
+
+    # .. toggle_name: FEATURES['DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to disable enrollment for user invited to a course
+    # .. if user is registering before enrollment start date or after enrollment end date
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2022-06-06
+    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/29538'
+    'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1511,6 +1521,11 @@ BRANCH_IO_KEY = ''
 OPTIMIZELY_PROJECT_ID = None
 OPTIMIZELY_FULLSTACK_SDK_KEY = None
 
+######################## ALGOLIA SEARCH ###########################
+ALGOLIA_APP_ID = None
+ALGOLIA_SEARCH_API_KEY = None
+ALGOLIA_COURSES_RECOMMENDATION_INDEX_NAME = ''
+
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 
@@ -1594,7 +1609,7 @@ MODULESTORE = {
                     'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'default_class': 'xmodule.hidden_block.HiddenBlock',
                         'fs_root': DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
@@ -1604,7 +1619,7 @@ MODULESTORE = {
                     'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'default_class': 'xmodule.hidden_block.HiddenBlock',
                         'fs_root': DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
@@ -2906,14 +2921,10 @@ YOUTUBE = {
     # URL to get YouTube metadata
     'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos/',
 
-    # Current youtube api for requesting transcripts.
-    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
-    'TEXT_API': {
-        'url': 'video.google.com/timedtext',
-        'params': {
-            'lang': 'en',
-            'v': 'set_youtube_id_of_11_symbols_here',
-        },
+    # Web page mechanism for scraping transcript information from youtube video pages
+    'TRANSCRIPTS': {
+        'CAPTION_TRACKS_REGEX': r"captionTracks\"\:\[(?P<caption_tracks>[^\]]+)",
+        'YOUTUBE_URL_BASE': 'https://www.youtube.com/watch?v=',
     },
 
     'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
@@ -2981,7 +2992,7 @@ INSTALLED_APPS = [
     # Site configuration for theming and behavioral modification
     'openedx.core.djangoapps.site_configuration',
 
-    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    # Video block configs (This will be moved to Video once it becomes an XBlock)
     'openedx.core.djangoapps.video_config',
 
     # edX Video Pipeline integration
@@ -3338,6 +3349,13 @@ ID_VERIFICATION_SUPPORT_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
 LOGIN_ISSUE_SUPPORT_LINK = ''
+
+# .. setting_name: SECURITY_PAGE_URL
+# .. setting_default: None
+# .. setting_description: A link to the site's security disclosure/reporting policy,
+#   to display in the site footer. This will only appear for sites using themes that
+#   use the links produced by ``lms.djangoapps.branding.api.get_footer``.
+SECURITY_PAGE_URL = None
 
 # Days before the expired date that we warn the user
 ENTITLEMENT_EXPIRED_ALERT_PERIOD = 90
@@ -4750,7 +4768,8 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 ### SETTINGS FOR AMPLITUDE ####
 AMPLITUDE_URL = ''
 AMPLITUDE_API_KEY = ''
-REC_ID = ''
+DASHBOARD_AMPLITUDE_RECOMMENDATION_ID = ''
+COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID = ''
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
 
@@ -4896,13 +4915,6 @@ DISCUSSIONS_MICROFRONTEND_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the discussions micro-frontend google form based feedback.
 DISCUSSIONS_MFE_FEEDBACK_URL = None
-# .. setting_name: LEARNER_RECORD_MFE_URL
-# .. setting_default: None
-# .. setting_description: Base URL of the micro-frontend responsible for displaying Learner Record and Program record
-#     pages. This MFE replaces the legacy frontend originally offered in the Credentials IDA.
-# .. setting_warning: In order to route requests to the MFE correctly you must also create and enable the credentials
-#     app's `USE_LEARNER_RECORD_MFE` waffle flag. See openedx/core/djangoapps/credentials/config.py.
-LEARNER_RECORD_MICROFRONTEND_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -4957,6 +4969,8 @@ HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
+
+LEARNER_HOME_MFE_REDIRECT_PERCENTAGE = 0
 
 ############### Settings for the ace_common plugin #################
 # Note that all settings are actually defined by the plugin
@@ -5144,6 +5158,7 @@ TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-runn
 TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
+COURSE_BULK_EMAIL_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_live_course/bulk_email.html"
 
 ################# Bulk Course Email Settings #################
 # If set, recipients of bulk course email messages will be filtered based on the last_login date of their User account.
@@ -5269,3 +5284,5 @@ ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 ############## PLOTLY ##############
 
 ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
+
+AVAILABLE_DISCUSSION_TOURS = []

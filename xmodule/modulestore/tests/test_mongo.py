@@ -48,7 +48,7 @@ DB = 'test_mongo_%s' % uuid4().hex[:5]
 COLLECTION = 'modulestore'
 ASSET_COLLECTION = 'assetstore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
-DEFAULT_CLASS = 'xmodule.hidden_module.HiddenDescriptor'
+DEFAULT_CLASS = 'xmodule.hidden_block.HiddenBlock'
 RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
 
@@ -554,7 +554,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         check_xblock_fields()
         check_mongo_fields()
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_export_course_image(self):
         """
         Test to make sure that we have a course image in the contentstore,
@@ -572,7 +572,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         assert path(root_dir / 'test_export/static/images/course_image.jpg').isfile()
         assert path(root_dir / 'test_export/static/images_course_image.jpg').isfile()
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_export_course_image_nondefault(self):
         """
         Make sure that if a non-default image path is specified that we
@@ -587,7 +587,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         assert path(root_dir / 'test_export/static/just_a_test.jpg').isfile()
         assert not path(root_dir / 'test_export/static/images/course_image.jpg').isfile()
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xmodule.video_block.video_block.edxval_api', None)
     def test_course_without_image(self):
         """
         Make sure we elegantly passover our code when there isn't a static

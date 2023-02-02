@@ -1,6 +1,7 @@
 """
 Utils for discussion API.
 """
+from typing import List, Dict
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
@@ -15,6 +16,15 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
 )
+
+
+class AttributeDict(dict):
+    """
+    Converts Dict Keys into Attributes
+    """
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
 
 
 def discussion_open_for_user(course, user):
@@ -83,7 +93,7 @@ def get_usernames_for_course(course_id, page_number, page_size):
             matched_users_count (int): count of matched users in course
             matched_users_pages (int): pages of matched users in course
     """
-    matched_users_in_course = User.objects.filter(courseenrollment__course_id=course_id,)\
+    matched_users_in_course = User.objects.filter(courseenrollment__course_id=course_id, ) \
         .order_by(Length('username').asc()).values_list('username', flat=True)
     if not matched_users_in_course:
         return '', 0, 0
@@ -231,15 +241,93 @@ def create_topics_v3_structure(blocks, topics):
             value['courseware'] = True
             courseware_topics.append(value)
             value['children'] = create_discussion_children_from_ids(
-                value['children'],
+                value.get('children', []),
                 blocks,
                 topics,
             )
             subsections = value.get('children')
             for subsection in subsections:
                 subsection['children'] = create_discussion_children_from_ids(
-                    subsection['children'],
+                    subsection.get('children', []),
                     blocks,
                     topics,
                 )
-    return non_courseware_topics + courseware_topics
+
+    structured_topics = non_courseware_topics + courseware_topics
+    topic_ids = get_topic_ids_from_topics(topics)
+
+    # Remove all topic ids that are contained in the structured topics
+    for chapter in structured_topics:
+        for sequential in chapter.get('children', []):
+            for item in sequential['children']:
+                topic_ids.remove(item['id'])
+
+    archived_topics = {
+        'id': "archived",
+        'children': get_archived_topics(topic_ids, topics)
+    }
+    if archived_topics['children']:
+        structured_topics.append(archived_topics)
+
+    return remove_empty_sequentials(structured_topics)
+
+
+def remove_empty_sequentials(data):
+    """
+    Removes all objects of type "sequential" from a nested list of objects if they
+    have no children.
+    After removing the empty sequentials, if the parent of the sequential is now empty,
+    it will also be removed.
+    Parameters:
+    data (list): A list of nested objects to check and remove empty sequentials from.
+
+    Returns:
+    list: The modified list with empty sequentials removed.
+    """
+    new_data = []
+    for obj in data:
+        block_type = obj.get('type')
+        if block_type != 'sequential' or (block_type == 'sequential' and obj.get('children')):
+            if obj.get('children'):
+                obj['children'] = remove_empty_sequentials(obj['children'])
+                if obj['children'] or block_type != 'chapter':
+                    new_data.append(obj)
+            else:
+                if block_type != 'chapter':
+                    new_data.append(obj)
+    return new_data
+
+
+def get_topic_ids_from_topics(topics: List[Dict[str, str]]) -> List[str]:
+    """
+    This function takes a list of topics and returns a list of the topic ids.
+
+    Args:
+    - topics (List[Dict[str, str]]): A list of topic dictionaries. Each dictionary should have an 'id' field.
+
+    Returns:
+    - A list of topic ids, extracted from the input list of topics.
+    """
+    return [topic['id'] for topic in topics]
+
+
+def get_archived_topics(filtered_topic_ids: List[str], topics: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    """
+    This function takes a list of topic ids and a list of topics, and returns the list of archived topics.
+
+    A topic is considered archived if it has a non-null `usage_key` field.
+
+    Args:
+    - filtered_topic_ids (List[str]): A list of topic ids to filter on.
+    - topics (List[Dict[str, str]]): A list of topic dictionaries.
+    - Each dictionary should have a 'id' and a 'usage_key' field.
+
+    Returns:
+    - A list of archived topic dictionaries, with the same format as the input topics.
+    """
+    archived_topics = []
+    for topic_id in filtered_topic_ids:
+        for topic in topics:
+            if topic['id'] == topic_id and topic['usage_key'] is not None:
+                archived_topics.append(topic)
+    return archived_topics

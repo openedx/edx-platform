@@ -16,14 +16,14 @@ from django.urls import reverse
 from edxval.api import create_video
 from opaque_keys.edx.keys import UsageKey
 
-from cms.djangoapps.contentstore.tests.utils import CourseTestCase, mock_requests_get
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase, setup_caption_responses
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_module.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     GetTranscriptsFromYouTubeException,
     Transcript,
     get_video_transcript_content,
@@ -83,7 +83,7 @@ class BaseTranscripts(CourseTestCase):
         """Create initial data."""
         super().setUp()
 
-        # Add video module
+        # Add video block
         data = {
             'parent_locator': str(self.course.location),
             'category': 'video',
@@ -102,7 +102,7 @@ class BaseTranscripts(CourseTestCase):
         modulestore().update_item(self.item, self.user.id)
 
         self.item = modulestore().get_item(self.video_usage_key)
-        # Remove all transcripts for current module.
+        # Remove all transcripts for current block.
         self.clear_subs_content()
 
     def _get_usage_key(self, resp):
@@ -121,9 +121,9 @@ class BaseTranscripts(CourseTestCase):
             1.5: item.youtube_id_1_5
         }
 
-    def create_non_video_module(self):
+    def create_non_video_block(self):
         """
-        Setup non video module for tests.
+        Setup non video block for tests.
         """
         data = {
             'parent_locator': str(self.course.location),
@@ -324,14 +324,14 @@ class TestUploadTranscripts(BaseTranscripts):
         """
         Test that transcript upload validation fails if item's category is other than video.
         """
-        # non_video module setup - i.e. an item whose category is not 'video'.
-        usage_key = self.create_non_video_module()
+        # non_video block setup - i.e. an item whose category is not 'video'.
+        usage_key = self.create_non_video_block()
         # Request to upload transcript for the item
         response = self.upload_transcript(locator=usage_key, transcript_file=self.good_srt_file, edx_video_id='')
         self.assert_response(
             response,
             expected_status_code=400,
-            expected_message='Transcripts are supported only for "video" modules.'
+            expected_message='Transcripts are supported only for "video" blocks.'
         )
 
     def test_transcript_upload_non_existent_item(self):
@@ -489,14 +489,14 @@ class TestChooseTranscripts(BaseTranscripts):
         """
         Test that transcript choose validation fails if item's category is other than video.
         """
-        # non_video module setup - i.e. an item whose category is not 'video'.
-        usage_key = self.create_non_video_module()
+        # non_video block setup - i.e. an item whose category is not 'video'.
+        usage_key = self.create_non_video_block()
         # Request to choose transcript for the item
         response = self.choose_transcript(locator=usage_key, chosen_html5_id=self.chosen_html5_id)
         self.assert_response(
             response,
             expected_status_code=400,
-            expected_message='Transcripts are supported only for "video" modules.'
+            expected_message='Transcripts are supported only for "video" blocks.'
         )
 
 
@@ -611,14 +611,14 @@ class TestRenameTranscripts(BaseTranscripts):
         """
         Test that validation fails if item's category is other than video.
         """
-        # non_video module setup - i.e. an item whose category is not 'video'.
-        usage_key = self.create_non_video_module()
+        # non_video block setup - i.e. an item whose category is not 'video'.
+        usage_key = self.create_non_video_block()
         # Make call to use current transcript from contentstore.
         response = self.rename_transcript(usage_key)
         self.assert_response(
             response,
             expected_status_code=400,
-            expected_message='Transcripts are supported only for "video" modules.'
+            expected_message='Transcripts are supported only for "video" blocks.'
         )
 
 
@@ -747,13 +747,13 @@ class TestReplaceTranscripts(BaseTranscripts):
         """
         Test that validation fails if item's category is other than video.
         """
-        # non_video module setup - i.e. an item whose category is not 'video'.
-        usage_key = self.create_non_video_module()
+        # non_video block setup - i.e. an item whose category is not 'video'.
+        usage_key = self.create_non_video_block()
         response = self.replace_transcript(usage_key, youtube_id=self.youtube_id)
         self.assert_response(
             response,
             expected_status_code=400,
-            expected_message='Transcripts are supported only for "video" modules.'
+            expected_message='Transcripts are supported only for "video" blocks.'
         )
 
 
@@ -825,11 +825,11 @@ class TestDownloadTranscripts(BaseTranscripts):
         response = self.download_transcript(locator='invalid-locator')
         self.assert_download_response(response, expected_status_code=404)
 
-    def test_download_transcript_404_for_non_video_module(self):
+    def test_download_transcript_404_for_non_video_block(self):
         """
-        Verify that download transcript returns 404 for a non video module.
+        Verify that download transcript returns 404 for a non video block.
         """
-        usage_key = self.create_non_video_module()
+        usage_key = self.create_non_video_block()
         response = self.download_transcript(locator=usage_key)
         self.assert_download_response(response, expected_status_code=404)
 
@@ -940,7 +940,7 @@ class TestCheckTranscripts(BaseTranscripts):
             }
         )
 
-    @patch('xmodule.video_module.transcripts_utils.requests.get', side_effect=mock_requests_get)
+    @patch('xmodule.video_block.transcripts_utils.requests.get')
     def test_check_youtube_with_transcript_name(self, mock_get):
         """
         Test that the transcripts are fetched correctly when the the transcript name is set
@@ -958,6 +958,7 @@ class TestCheckTranscripts(BaseTranscripts):
             ]
         }
         self.save_subs_to_store(subs, 'good_id_2')
+        setup_caption_responses(mock_get, 'en', 'caption_response_string')
         link = reverse('check_transcripts')
         data = {
             'locator': str(self.video_usage_key),
@@ -969,10 +970,9 @@ class TestCheckTranscripts(BaseTranscripts):
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
 
-        mock_get.assert_any_call(
-            'http://video.google.com/timedtext',
-            params={'lang': 'en', 'v': 'good_id_2', 'name': 'Custom'}
-        )
+        self.assertEqual(2, len(mock_get.mock_calls))
+        args, kwargs = mock_get.call_args_list[0]
+        self.assertEqual(args[0], 'https://www.youtube.com/watch?v=good_id_2')
 
         self.assertEqual(resp.status_code, 200)
 
@@ -1033,8 +1033,8 @@ class TestCheckTranscripts(BaseTranscripts):
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(json.loads(resp.content.decode('utf-8')).get('status'), "Can't find item by locator.")
 
-    def test_fail_for_non_video_module(self):
-        # Not video module: setup
+    def test_fail_for_non_video_block(self):
+        # Not video block: setup
         data = {
             'parent_locator': str(self.course.location),
             'category': 'problem',
@@ -1077,10 +1077,10 @@ class TestCheckTranscripts(BaseTranscripts):
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(
             json.loads(resp.content.decode('utf-8')).get('status'),
-            'Transcripts are supported only for "video" modules.',
+            'Transcripts are supported only for "video" blocks.',
         )
 
-    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
+    @patch('xmodule.video_block.transcripts_utils.get_video_transcript_content')
     def test_command_for_fallback_transcript(self, mock_get_video_transcript_content):
         """
         Verify the command if a transcript is there in edx-val.

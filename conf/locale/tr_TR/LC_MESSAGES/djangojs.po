@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -31,7 +31,7 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -56,9 +56,9 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Pelin Çılgın <pelincilgin@hotmail.com>, 2019
@@ -67,7 +67,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -86,7 +86,7 @@
 # sevde <savda95@hotmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -108,7 +108,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-11-27 20:42+0000\n"
+"POT-Creation-Date: 2023-01-22 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2018,2020-2021\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -430,13 +430,13 @@ msgstr "görsel atlandı"
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "there is currently {numVotes} vote"
 msgid_plural "there are currently {numVotes} votes"
-msgstr[0] ""
+msgstr[0] "şu an {numVotes} oy mevcut"
 msgstr[1] "şu an {numVotes} oy mevcut"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
+msgstr[0] "{numVotes} Oy"
 msgstr[1] "{numVotes} Oy"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
@@ -584,13 +584,13 @@ msgstr "Daha fazla cevap yüklenemedi. Sayfayı yenileyin ve tekrar deneyin."
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} other response"
 msgid_plural "{numResponses} other responses"
-msgstr[0] ""
+msgstr[0] "{numResponses} cevap daha var"
 msgstr[1] "{numResponses} cevap daha var"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} response"
 msgid_plural "{numResponses} responses"
-msgstr[0] ""
+msgstr[0] "{numResponses} cevap"
 msgstr[1] "{numResponses} cevap"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
@@ -600,7 +600,7 @@ msgstr "Bütün cevapları gösteriyor"
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first {numResponses} responses"
-msgstr[0] ""
+msgstr[0] "İlk {numResponses} cevap gösteriliyor"
 msgstr[1] "İlk {numResponses} cevap gösteriliyor"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
@@ -1197,7 +1197,7 @@ msgstr "Onayla"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "You already belong to another team in this team set."
-msgstr ""
+msgstr "Bu takım yapılandırmasında şu an başka bir takıma ait görünüyorsunuz."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
@@ -1312,6 +1312,8 @@ msgid ""
 "See all teams you belong to and all public teams in your course, organized "
 "by topic."
 msgstr ""
+"Ait olduğunuz tüm takımları ve dersinizdeki tüm açık takımları, konuya göre "
+"düzenlenmiş olarak görün."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "See all teams you belong to."
@@ -1449,7 +1451,7 @@ msgstr "Lütfen geçerli bir URL belirtin."
 #: lms/static/js/Markdown.Editor.js
 msgid "%(errorCount)s error found in form."
 msgid_plural "%(errorCount)s errors found in form."
-msgstr[0] ""
+msgstr[0] "Formda %(errorCount)s hata bulundu."
 msgstr[1] "Formda %(errorCount)s hata bulundu."
 
 #: lms/static/js/Markdown.Editor.js
@@ -1657,51 +1659,55 @@ msgstr " kayıtlar doğru formatta değil ve istisna listesine eklenmemişler"
 msgid ""
 " record is not in the correct format and has not been added to the exception"
 " list"
-msgstr ""
+msgstr " kayıt doğru formatta değil ve istisna listesine eklenmemiş"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner accounts cannot be found and have not been added to the exception "
 "list"
-msgstr ""
+msgstr " öğrenci hesapları bulunamıyor ve istisna listesine eklenmemişler"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner account cannot be found and has not been added to the exception "
 "list"
-msgstr ""
+msgstr " öğrenci hesabı bulunamıyor ve istisna listesine eklenmemiş"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners already appear on the exception list in this course"
-msgstr ""
+msgstr " öğrenciler zaten bu dersin istisna listesinde görünüyor"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learner already appears on the exception list in this course"
-msgstr ""
+msgstr " öğrenci zaten bu dersin istisna listesinde görünüyor"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learners are not enrolled in this course and have not added to the "
 "exception list"
-msgstr ""
+msgstr " öğrenciler derse kayıtlı değil ve istisna listesine eklenmemişler"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner is not enrolled in this course and has not been added to the "
 "exception list"
-msgstr ""
+msgstr " öğrenci bu derse kayıtlı değil ve istisna listesine eklenmemiş"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learners have an active certificate invalidation in this course and have "
 "not been added to the exception list"
 msgstr ""
+" öğrencilerin bu derste etkin bir sertifika geçersizliği var ve istisna "
+"listesine eklenmemişler"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner has an active certificate invalidation in this course and has not "
 "been added to the exception list"
 msgstr ""
+" öğrencinin bu derste etkin bir sertifika geçersizliği var ve istisna "
+"listesine eklenmemiş"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners encountered unknown errors"
@@ -1944,7 +1950,7 @@ msgstr "Sonraki"
 #, javascript-format
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
-msgstr[0] ""
+msgstr[0] "%s ders görüntüleniyor"
 msgstr[1] "%s ders görüntüleniyor"
 
 #: lms/static/js/discovery/views/search_form.js
@@ -1988,7 +1994,7 @@ msgstr ""
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Cohorts"
-msgstr "Topluluklar"
+msgstr "Kohortlar"
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid ""
@@ -1996,10 +2002,10 @@ msgid ""
 "of cohort, see the same discussion topics, but within divided topics, only "
 "members of the same cohort see and respond to each others’ posts. "
 msgstr ""
-"Tartışmaları bölmek için toplulukları kullan. Topluluklarına bağlı "
+"Tartışmaları bölmek için kohortları kullanın. Üyesi oldukları kohorta bağlı "
 "olmaksızın tüm öğrenciler aynı tartışma başlıklarını görür; bölünmüş "
-"başlıklarda ise sadece aynı topluluğun üyeleri birbirini görüp, bir diğerine"
-" cevap verebilir."
+"başlıklarda ise sadece aynı kohortun üyeleri birbirini görüp, bir diğerine "
+"cevap verebilir."
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Discussion topics in the course are not divided."
@@ -2011,7 +2017,7 @@ msgstr "Bölünmüş tartışma başlıkları kayıtlanma yolu bazında bölünm
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Any divided discussion topics are divided based on cohort."
-msgstr "Bölünmüş tartışma başlıkları topluluk bazında bölünmüştür."
+msgstr "Bölünmüş tartışma başlıkları kohort bazında bölünmüştür."
 
 #: lms/static/js/discussions_management/views/discussions.js
 msgid "Your changes have been saved. {details}"
@@ -2124,7 +2130,7 @@ msgstr "Seçili sekme"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Saved cohort"
-msgstr "Kaydedilen topluluk"
+msgstr "Kaydedilen kohort"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Error adding learners."
@@ -2137,20 +2143,20 @@ msgstr "Bir kullanıcı adı veya e-posta giriniz."
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numUsersAdded} learner has been added to this cohort. "
 msgid_plural "{numUsersAdded} learners have been added to this cohort. "
-msgstr[0] "Bu topluluğa {numUsersAdded} öğrenci eklendi."
-msgstr[1] "Bu topluluğa {numUsersAdded} öğrenci eklendi."
+msgstr[0] "Bu kohorta {numUsersAdded} öğrenci eklendi."
+msgstr[1] "Bu kohorta {numUsersAdded} öğrenci eklendi."
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numMoved} learner was moved from {prevCohort}"
 msgid_plural "{numMoved} learners were moved from {prevCohort}"
-msgstr[0] "{prevCohort} topluluğundan {numMoved} öğrenci çıkarıldı"
-msgstr[1] "{prevCohort} topluluğundan {numMoved} öğrenci çıkarıldı"
+msgstr[0] "{prevCohort} kohortundan {numMoved} öğrenci çıkarıldı"
+msgstr[1] "{prevCohort} kohortundan {numMoved} öğrenci çıkarıldı"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numPresent} learner was already in the cohort"
 msgid_plural "{numPresent} learners were already in the cohort"
-msgstr[0] "{numPresent} öğrenci zaten toplulukta"
-msgstr[1] "{numPresent} öğrenci zaten topluluktaydı"
+msgstr[0] "{numPresent} öğrenci zaten kohortta"
+msgstr[1] "{numPresent} öğrenci zaten kohorttaydı"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{email}"
@@ -2164,11 +2170,11 @@ msgid_plural ""
 "{numPreassigned} learners were pre-assigned for this cohort. These learners "
 "will automatically be added to the cohort when they enroll in the course."
 msgstr[0] ""
-"{numPreassigned} öğrenci bu topluluğa önceden atanmış. Bu öğrenci derse "
-"kaydolduğunda otomatik olarak topluluğa eklenecek."
+"{numPreassigned} öğrenci bu kohorta önceden atanmış. Bu öğrenci derse "
+"kaydolduğunda otomatik olarak kohorta eklenecek."
 msgstr[1] ""
-"{numPreassigned} öğrenci bu topluluğa önceden atanmış. Bu öğrenciler derse "
-"kaydolduklarında otomatik olarak topluluğa eklenecekler."
+"{numPreassigned} öğrenci bu kohorta önceden atanmış. Bu öğrenciler derse "
+"kaydolduklarında otomatik olarak kohorta eklenecekler."
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Unknown username: {user}"
@@ -2180,13 +2186,13 @@ msgstr "Geçersiz e-posta adresi: {email}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Cohort assignment not allowed: {email_or_username}"
-msgstr ""
+msgstr "Kohort atamasına izin verilmiyor: {email_or_username}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "There was an error when trying to add learners:"
 msgid_plural "{numErrors} learners could not be added to this cohort:"
 msgstr[0] "Öğrencileri eklemeye çalışırken bir hata gerçekleşti:"
-msgstr[1] "{numErrors} öğrenci bu topluluğa eklenemedi:"
+msgstr[1] "{numErrors} öğrenci bu kohorta eklenemedi:"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "View all errors"
@@ -2194,7 +2200,7 @@ msgstr "Tüm hataları gör"
 
 #: lms/static/js/groups/views/cohort_form.js
 msgid "You must specify a name for the cohort"
-msgstr "Topluluk için bir isim belirtmelisiniz"
+msgstr "Kohort için bir isim belirtmelisiniz"
 
 #: lms/static/js/groups/views/cohort_form.js
 msgid "You did not select a content group"
@@ -2206,32 +2212,32 @@ msgstr "Seçili içerik grubu bulunmuyor"
 
 #: lms/static/js/groups/views/cohort_form.js
 msgid "The cohort cannot be saved"
-msgstr "Topluluk kaydedilemiyor"
+msgstr "Kohort kaydedilemiyor"
 
 #: lms/static/js/groups/views/cohort_form.js
 msgid "The cohort cannot be added"
-msgstr "Topluluk eklenemiyor"
+msgstr "Kohort eklenemiyor"
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "You currently have no cohorts configured"
-msgstr "Mevcut yapılandırılmış topluluğunuz yok"
+msgstr "Mevcut yapılandırılmış kohortunuz yok"
 
 #: lms/static/js/groups/views/cohorts.js
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Add Cohort"
-msgstr "Topluluk ekle"
+msgstr "Kohort Ekle"
 
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
 "The {cohortGroupName} cohort has been created. You can manually add students"
 " to this cohort below."
 msgstr ""
-"{cohortGroupName} topluluğu oluşturuldu. Aşağıdaki gruba el ile öğrenci "
+"{cohortGroupName} kohortu oluşturuldu. Aşağıdaki bu kohorta elle öğrenci "
 "ekleyebilirsiniz."
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "Assign students to cohorts by uploading a CSV file."
-msgstr "CSV dosyasını yükleyerek topluluğa öğrencileri ata."
+msgstr "Bir CSV dosyası yükleyerek öğrencileri kohortlara atayın."
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "Choose a .csv file"
@@ -2252,11 +2258,11 @@ msgstr "'{file}' dosyanız yüklendi. İşlenmesi için birkaç dakika bekleyini
 
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Enabled"
-msgstr "Topluluklar Etkin"
+msgstr "Kohortlar Etkin"
 
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
-msgstr "Topluluklar Devre Dışı"
+msgstr "Kohortlar Devre Dışı"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -2611,7 +2617,7 @@ msgstr "Bu derse kayıt olan tüm öğrenciler"
 
 #: lms/static/js/instructor_dashboard/send_email.js
 msgid "All learners in the {cohort_name} cohort"
-msgstr "{cohort_name} topluluğundaki tüm öğrenciler"
+msgstr "{cohort_name} kohortundaki tüm öğrenciler"
 
 #: lms/static/js/instructor_dashboard/send_email.js
 msgid "All learners in the {track_name} track"
@@ -2700,11 +2706,16 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
+"Problem '<%- problem_id %>' ve öğrenci '<%- student_id %>' için problem "
+"denemeleri sıfırlanırken hata oluştu. Problemin ve öğrenci "
+"tanımlayıcılarının eksiksiz ve doğru olduğundan emin olun."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?"
 msgstr ""
+"'<%- student_id %>' öğrencisinin '<%- problem_id %>' sorunundaki durumu "
+"silinsin mi?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -2712,6 +2723,9 @@ msgid ""
 " %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
+"'<%- student_id %>' öğrencisinin '<%- problem_id %>'  problemindeki durumu "
+"silinirken hata oluştu. Problemin ve öğrenci tanımlayıcılarının eksiksiz ve "
+"doğru olduğundan emin olun."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
@@ -2723,6 +2737,9 @@ msgid ""
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
+"'<%- problem_id %>' problemi ve '<%- student_id %>' öğrencisi için görev "
+"geçmişi alınırken hata oluştu. Problemin ve öğrenci tanımlayıcılarının "
+"eksiksiz ve doğru olduğundan emin olun."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Entrance exam attempts is being reset for student '{student_id}'."

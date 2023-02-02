@@ -13,7 +13,7 @@ from openedx.core.djangoapps.discussions.tasks import (
     update_unit_discussion_state_from_discussion_blocks,
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 
 class DiscussionConfigUpdateMixin:
@@ -69,49 +69,49 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase, Discussio
         )
         self.course_key = course_key = self.course.id
         with self.store.bulk_operations(course_key):
-            self.section = ItemFactory.create(parent=course, category="chapter", display_name="Section")
-            self.sequence = ItemFactory.create(parent=self.section, category="sequential", display_name="Sequence")
-            self.unit = ItemFactory.create(parent=self.sequence, category="vertical", display_name="Unit")
-            ItemFactory.create(
+            self.section = BlockFactory.create(parent=course, category="chapter", display_name="Section")
+            self.sequence = BlockFactory.create(parent=self.section, category="sequential", display_name="Sequence")
+            self.unit = BlockFactory.create(parent=self.sequence, category="vertical", display_name="Unit")
+            BlockFactory.create(
                 parent=self.sequence,
                 category="vertical",
                 display_name="Discussable Unit",
                 discussion_enabled=True,
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=self.sequence,
                 category="vertical",
                 display_name="Non-Discussable Unit",
                 discussion_enabled=False,
             )
-            ItemFactory.create(parent=self.unit, category="html", display_name="An HTML Module")
-            graded_sequence = ItemFactory.create(
+            BlockFactory.create(parent=self.unit, category="html", display_name="An HTML Block")
+            graded_sequence = BlockFactory.create(
                 parent=self.section,
                 category="sequential",
                 display_name="Graded Sequence",
                 graded=True,
             )
-            graded_unit = ItemFactory.create(
+            graded_unit = BlockFactory.create(
                 parent=graded_sequence,
                 category="vertical",
                 display_name="Graded Unit",
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=graded_sequence,
                 category="vertical",
                 display_name="Discussable Graded Unit",
                 discussion_enabled=True,
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=graded_sequence,
                 category="vertical",
                 display_name="Non-Discussable Graded Unit",
                 discussion_enabled=False,
             )
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=graded_unit,
                 category="html",
-                display_name="Graded HTML Module",
+                display_name="Graded HTML Block",
             )
         discussion_config = DiscussionsConfiguration.get(course_key)
         discussion_config.provider_type = Provider.OPEN_EDX
@@ -195,35 +195,35 @@ class MigrateUnitDiscussionStateFromXBlockTestCase(ModuleStoreTestCase, Discussi
         self.course = course = CourseFactory.create()
         self.course_key = course_key = self.course.id
         with self.store.bulk_operations(course_key):
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent=course, category="chapter", display_name="Section"
             )
-            sequence = ItemFactory.create(
+            sequence = BlockFactory.create(
                 parent=section, category="sequential", display_name="Sequence"
             )
-            self.unit_discussible = unit_discussible = ItemFactory.create(
+            self.unit_discussible = unit_discussible = BlockFactory.create(
                 parent=sequence,
                 category="vertical",
                 display_name="Discussable Unit",
             )
-            unit_non_discussible = ItemFactory.create(
+            unit_non_discussible = BlockFactory.create(
                 parent=sequence,
                 category="vertical",
                 display_name="Non-Discussable Unit",
                 discussion_enabled=False,
             )
-            graded_sequence = ItemFactory.create(
+            graded_sequence = BlockFactory.create(
                 parent=section,
                 category="sequential",
                 display_name="Graded Sequence",
                 graded=True,
             )
-            self.graded_unit_discussible = graded_unit_discussible = ItemFactory.create(
+            self.graded_unit_discussible = graded_unit_discussible = BlockFactory.create(
                 parent=graded_sequence,
                 category="vertical",
                 display_name="Discussable Graded Unit",
             )
-            graded_unit_non_discussible = ItemFactory.create(
+            graded_unit_non_discussible = BlockFactory.create(
                 parent=graded_sequence,
                 category="vertical",
                 display_name="Non-Discussable Graded Unit",
@@ -243,7 +243,7 @@ class MigrateUnitDiscussionStateFromXBlockTestCase(ModuleStoreTestCase, Discussi
         Add a discussion block to the specified units.
         """
         for unit in units:
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=unit,
                 category='discussion',
                 discussion_id=f'id-{unit.location}',

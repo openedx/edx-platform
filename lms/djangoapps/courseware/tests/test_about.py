@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from milestones.tests.utils import MilestonesTestCaseMixin
-from xmodule.course_module import (
+from xmodule.course_block import (
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_NONE,
     COURSE_VISIBILITY_PRIVATE,
@@ -22,7 +22,7 @@ from xmodule.course_module import (
     COURSE_VISIBILITY_PUBLIC_OUTLINE,
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
@@ -103,7 +103,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
     @override_settings(COURSE_ABOUT_VISIBILITY_PERMISSION="see_about_page")
     def test_visible_about_page_settings(self):
         """
-        Verify that the About Page honors the permission settings in the course module
+        Verify that the About Page honors the permission settings in the course block
         """
         url = reverse('about_course', args=[str(self.course_with_about.id)])
         resp = self.client.get(url)
@@ -207,7 +207,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         Assert that anonymous or unenrolled users see View Course option
         when unenrolled access flag is set
         """
-        with mock.patch('xmodule.course_module.CourseBlock.course_visibility', course_visibility):
+        with mock.patch('xmodule.course_block.CourseBlock.course_visibility', course_visibility):
             with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True):
                 url = reverse('about_course', args=[str(self.course.id)])
                 resp = self.client.get(url)
@@ -397,7 +397,7 @@ class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
     def test_html_sidebar_enabled(self, itemfactory_display_name, itemfactory_data, waffle_switch_value):
         with override_waffle_switch(ENABLE_COURSE_ABOUT_SIDEBAR_HTML, active=waffle_switch_value):
             if itemfactory_display_name:
-                ItemFactory.create(
+                BlockFactory.create(
                     category="about",
                     parent_location=self.course.location,
                     display_name=itemfactory_display_name,

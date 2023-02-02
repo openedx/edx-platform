@@ -56,7 +56,7 @@ from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_sta
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_module import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import SerializationError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -167,7 +167,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
             # cleanup any remnants of the course
             modulestore().delete_course(destination_course_key, user_id)
         except ItemNotFoundError:
-            # it's possible there was an error even before the course module was created
+            # it's possible there was an error even before the course block was created
             pass
 
         return "exception: " + str(exc)
@@ -317,13 +317,13 @@ def export_olx(self, user_id, course_key_string, language):
         return
 
     if isinstance(courselike_key, LibraryLocator):
-        courselike_module = modulestore().get_library(courselike_key)
+        courselike_block = modulestore().get_library(courselike_key)
     else:
-        courselike_module = modulestore().get_course(courselike_key)
+        courselike_block = modulestore().get_course(courselike_key)
 
     try:
         self.status.set_state('Exporting')
-        tarball = create_export_tarball(courselike_module, courselike_key, {}, self.status)
+        tarball = create_export_tarball(courselike_block, courselike_key, {}, self.status)
         artifact = UserTaskArtifact(status=self.status, name='Output')
         artifact.file.save(name=os.path.basename(tarball.name), content=File(tarball))
         artifact.save()
@@ -335,13 +335,13 @@ def export_olx(self, user_id, course_key_string, language):
         return
 
 
-def create_export_tarball(course_module, course_key, context, status=None):
+def create_export_tarball(course_block, course_key, context, status=None):
     """
     Generates the export tarball, or returns None if there was an error.
 
     Updates the context with any error information if applicable.
     """
-    name = course_module.url_name
+    name = course_block.url_name
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")  # lint-amnesty, pylint: disable=consider-using-with
     root_dir = path(mkdtemp())
 
@@ -349,7 +349,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
         if isinstance(course_key, LibraryLocator):
             export_library_to_xml(modulestore(), contentstore(), course_key, root_dir, name)
         else:
-            export_course_to_xml(modulestore(), contentstore(), course_module.id, root_dir, name)
+            export_course_to_xml(modulestore(), contentstore(), course_block.id, root_dir, name)
 
         if status:
             status.set_state('Compressing')
@@ -541,11 +541,11 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     is_course = not is_library
     if is_library:
         root_name = LIBRARY_ROOT
-        courselike_module = modulestore().get_library(courselike_key)
+        courselike_block = modulestore().get_library(courselike_key)
         import_func = import_library_from_xml
     else:
         root_name = COURSE_ROOT
-        courselike_module = modulestore().get_course(courselike_key)
+        courselike_block = modulestore().get_course(courselike_key)
         import_func = import_course_from_xml
 
     # Locate the uploaded OLX archive (and download it from S3 if necessary)
@@ -581,7 +581,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         # If the course has an entrance exam then remove it and its corresponding milestone.
         # current course state before import.
         if is_course:
-            if courselike_module.entrance_exam_enabled:
+            if courselike_block.entrance_exam_enabled:
                 fake_request = RequestFactory().get('/')
                 fake_request.user = user
                 from .views.entrance_exam import remove_entrance_exam_milestone_reference
@@ -635,7 +635,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         courselike_items = import_func(
             modulestore(), user.id,
             settings.GITHUB_REPO_ROOT, [dirpath],
-            load_error_modules=False,
+            load_error_blocks=False,
             static_content_store=contentstore(),
             target_id=courselike_key,
             verbose=True,

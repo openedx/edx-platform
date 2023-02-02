@@ -131,7 +131,7 @@ capa
 
 * PR: https://github.com/openedx/edx-platform/pull/30403
 
-* Notes: Like xmodule, extracting capa from edx-platform would have been difficult. However, updating its import path was feasible; so, to create avoid creating a sixth top-level package, it was decided to move the code within ./xmodule as a sub-packages. ./xmodule was chosen as the parent package because it contains related code, notably ./xmodule/capa_module.py, which defines the ``ProblemBlock`` (formerly the ``CapaModule``).
+* Notes: Like xmodule, extracting capa from edx-platform would have been difficult. However, updating its import path was feasible; so, to create avoid creating a sixth top-level package, it was decided to move the code within ./xmodule as a sub-packages. ./xmodule was chosen as the parent package because it contains related code, notably ./xmodule/capa_block.py, which defines the ``ProblemBlock`` (formerly the ``CapaModule``).
 
 xblock_discussion
 -----------------

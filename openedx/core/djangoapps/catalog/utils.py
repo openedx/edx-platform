@@ -747,6 +747,7 @@ def get_course_data(course_key_str, fields):
 
     Arguments:
         course_key_str: key for the course about which we are retrieving information.
+        fields (List, string): The given fields that you want to retrieve from API response.
 
     Returns:
         dict with details about specified course.
@@ -764,6 +765,38 @@ def get_course_data(course_key_str, fields):
                 api_client=api_client,
                 base_api_url=base_api_url,
                 cache_key=course_cache_key if catalog_integration.is_cache_enabled else None,
+                long_term_cache=True,
+                many=False,
+                fields=fields
+            )
+            if data:
+                return data
+
+
+def get_course_run_data(course_run_id, fields):
+    """
+    Retrieve information about the course run with the given course run id.
+
+    Arguments:
+        course_run_id: key for the course run about which we are retrieving information.
+        fields (List, string): The given fields that you want to retrieve from API response.
+
+    Returns:
+        dict with details about specified course run.
+    """
+    user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course Run ID')
+    if user:
+        api_client = get_catalog_api_client(user)
+        base_api_url = get_catalog_api_base_url()
+        if course_run_id:
+            course_run_cache_key = f'{catalog_integration.CACHE_KEY}.course_run.{course_run_id}'
+            data = get_api_data(
+                catalog_integration,
+                'course_runs',
+                resource_id=course_run_id,
+                api_client=api_client,
+                base_api_url=base_api_url,
+                cache_key=course_run_cache_key if catalog_integration.is_cache_enabled else None,
                 long_term_cache=True,
                 many=False,
                 fields=fields

@@ -28,6 +28,8 @@ from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
 from lms.djangoapps.instructor.access import update_forum_role
+from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
@@ -52,6 +54,7 @@ from ..rest_api.api import (
     get_thread_list,
     get_learner_active_thread_list,
     get_user_comments,
+    get_v2_course_topics_as_v1,
     update_comment,
     update_thread,
 )
@@ -227,11 +230,22 @@ class CourseTopicsView(DeveloperErrorViewMixin, APIView):
         topic_ids = self.request.GET.get('topic_id')
         topic_ids = set(topic_ids.strip(',').split(',')) if topic_ids else None
         with modulestore().bulk_operations(course_key):
-            response = get_course_topics(
-                request,
-                course_key,
-                topic_ids,
-            )
+            configuration = DiscussionsConfiguration.get(context_key=course_key)
+            provider = configuration.provider_type
+            # This will be removed when mobile app will support new topic structure
+            new_structure_enabled = ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled(course_key)
+            if provider == Provider.OPEN_EDX and new_structure_enabled:
+                response = get_v2_course_topics_as_v1(
+                    request,
+                    course_key,
+                    topic_ids
+                )
+            else:
+                response = get_course_topics(
+                    request,
+                    course_key,
+                    topic_ids,
+                )
             # Record user activity for tracking progress towards a user's course goals (for mobile app)
             UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
         return Response(response)

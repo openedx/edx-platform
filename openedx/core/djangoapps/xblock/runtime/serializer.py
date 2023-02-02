@@ -12,7 +12,7 @@ from fs.wrapfs import WrapFS
 from lxml.etree import Element
 from lxml.etree import tostring as etree_tostring
 
-from xmodule.xml_module import XmlParserMixin
+from xmodule.xml_block import XmlMixin
 
 log = logging.getLogger(__name__)
 
@@ -96,19 +96,26 @@ def serialize_xblock(block):
 @contextmanager
 def override_export_fs(block):
     """
-    Hack required for some legacy XBlocks which inherit
-        XModuleDescriptor.add_xml_to_node()
-    instead of the usual
-        XmlSerializationMixin.add_xml_to_node()
-    method.
+    Hack that makes some legacy XBlocks which inherit `XmlMixin.add_xml_to_node`
+    instead of the usual `XmlSerialization.add_xml_to_node` serializable to a string.
+    This is needed for the OLX export API.
 
-    This method temporarily replaces a block's runtime's 'export_fs' system with
-    an in-memory filesystem. This method also abuses the
-        XmlParserMixin.export_to_file()
-    API to prevent the XModule export code from exporting each block as two
-    files (one .olx pointing to one .xml file). The export_to_file was meant to
-    be used only by the customtag XModule but it makes our lives here much
-    easier.
+    Originally, `add_xml_to_node` was `XModuleDescriptor`'s method and was migrated to `XmlMixin`
+    as part of the content core platform refactoring. It differs from `XmlSerialization.add_xml_to_node`
+    in that it relies on `XmlMixin.export_to_file` (or `CustomTagBlock.export_to_file`) method to control
+    whether a block has to be exported as two files (one .olx pointing to one .xml) file, or a single XML node.
+
+    For the legacy blocks (`AnnotatableBlock` for instance) `export_to_file` returns `True` by default.
+    The only exception is `CustomTagBlock`, for which this method was originally developed, as customtags don't
+    have to be exported as separate files.
+
+    This method temporarily replaces a block's runtime's `export_fs` system with an in-memory filesystem.
+    Also, it abuses the `XmlMixin.export_to_file` API to prevent the XBlock export code from exporting
+    each block as two files (one .olx pointing to one .xml file).
+
+    Although `XModuleDescriptor` has been removed a long time ago, we have to keep this hack untill the legacy
+    `add_xml_to_node` implementation is removed in favor of `XmlSerialization.add_xml_to_node`, which itself
+    is a hard task involving refactoring of `CourseExportManager`.
     """
     fs = WrapFS(MemoryFS())
     fs.makedir('course')
@@ -119,8 +126,8 @@ def override_export_fs(block):
     if hasattr(block, 'export_to_file'):
         old_export_to_file = block.export_to_file
         block.export_to_file = lambda: False
-    old_global_export_to_file = XmlParserMixin.export_to_file
-    XmlParserMixin.export_to_file = lambda _: False  # So this applies to child blocks that get loaded during export
+    old_global_export_to_file = XmlMixin.export_to_file
+    XmlMixin.export_to_file = lambda _: False  # So this applies to child blocks that get loaded during export
     try:
         yield fs
     except:  # lint-amnesty, pylint: disable=try-except-raise
@@ -129,4 +136,4 @@ def override_export_fs(block):
         block.runtime.export_fs = old_export_fs
         if hasattr(block, 'export_to_file'):
             block.export_to_file = old_export_to_file
-        XmlParserMixin.export_to_file = old_global_export_to_file
+        XmlMixin.export_to_file = old_global_export_to_file
