@@ -1188,7 +1188,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 @ddt.ddt
 class TestVideoBlockInitialization(BaseTestVideoXBlock):
     """
-    Make sure that module initialization works correctly.
+    Make sure that block initialization works correctly.
     """
     CATEGORY = "video"
     DATA = SOURCE_XML
@@ -1786,7 +1786,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         Test that import val data internal works as expected.
         """
         create_profile('mobile')
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
 
         edx_video_id = 'test_edx_video_id'
         sub_id = '0CzPOIIdUsA'
@@ -1889,7 +1889,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         """
         xml_data = """<video><video_asset></video_asset></video>"""
         xml_object = etree.fromstring(xml_data)
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
         id_generator = Mock()
 
         # Verify edx_video_id is empty before.
@@ -1926,7 +1926,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             val_transcript_provider=val_transcript_provider
         )
         xml_object = etree.fromstring(xml_data)
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
         id_generator = Mock()
 
         # Create static directory in import file system and place transcript files inside it.
@@ -2032,7 +2032,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         edx_video_id = 'test_edx_video_id'
         language_code = 'en'
 
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
         id_generator = Mock()
 
         # Create static directory in import file system and place transcript files inside it.
@@ -2101,7 +2101,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
 
     def test_import_val_data_invalid(self):
         create_profile('mobile')
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
 
         # Negative file_size is invalid
         xml_data = """

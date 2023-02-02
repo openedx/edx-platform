@@ -704,7 +704,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
         course = modulestore().get_course(locator)
         block_map = modulestore().cache_items(
-            course.system, [BlockKey.from_usage_key(child) for child in course.children], course.id, depth=3
+            course.runtime, [BlockKey.from_usage_key(child) for child in course.children], course.id, depth=3
         )
         assert BlockKey('chapter', 'chapter1') in block_map
         assert BlockKey('problem', 'problem3_2') in block_map
@@ -719,14 +719,14 @@ class SplitModuleCourseTests(SplitModuleTest):
             master_branch=ModuleStoreEnum.BranchName.draft
         )
         test_chapter = modulestore().create_xblock(
-            test_course.system, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
+            test_course.runtime, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
             parent_xblock=test_course
         )
         assert test_chapter.display_name == 'chapter n'
         test_def_content = '<problem>boo</problem>'
         # create child
         new_block = modulestore().create_xblock(
-            test_course.system, test_course.id,
+            test_course.runtime, test_course.id,
             'problem',
             fields={
                 'data': test_def_content,
@@ -1013,7 +1013,7 @@ class SplitModuleItemTests(SplitModuleTest):
         get_items(locator, qualifiers, [branch])
         '''
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
-        # get all modules
+        # get all blocks
         matches = modulestore().get_items(locator)
         assert len(matches) == 8
         matches = modulestore().get_items(locator)
@@ -1120,28 +1120,28 @@ class TestItemCrud(SplitModuleTest):
         premod_history = modulestore().get_course_history_info(locator)
         # add minimal one w/o a parent
         category = 'sequential'
-        new_module = modulestore().create_item(
+        new_block = modulestore().create_item(
             'user123', locator, category,
             fields={'display_name': 'new sequential'}
         )
         # check that course version changed and course's previous is the other one
-        assert new_module.location.course == 'GreekHero'
-        assert new_module.location.version_guid != premod_course.location.version_guid
+        assert new_block.location.course == 'GreekHero'
+        assert new_block.location.version_guid != premod_course.location.version_guid
         assert locator.version_guid is None,\
             'Version inadvertently filled in'  # lint-amnesty, pylint: disable=no-member
         current_course = modulestore().get_course(locator)
-        assert new_module.location.version_guid == current_course.location.version_guid
+        assert new_block.location.version_guid == current_course.location.version_guid
 
         history_info = modulestore().get_course_history_info(current_course.location.course_key)
         assert history_info['previous_version'] == premod_course.location.version_guid
         assert history_info['original_version'] == premod_history['original_version']
         assert history_info['edited_by'] == 'user123'
         # check block's info: category, definition_locator, and display_name
-        assert new_module.category == 'sequential'
-        assert new_module.definition_locator is not None
-        assert new_module.display_name == 'new sequential'
+        assert new_block.category == 'sequential'
+        assert new_block.definition_locator is not None
+        assert new_block.display_name == 'new sequential'
         # check that block does not exist in previous version
-        locator = new_module.location.map_into_course(
+        locator = new_block.location.map_into_course(
             CourseLocator(version_guid=premod_course.location.version_guid)
         )
         with pytest.raises(ItemNotFoundError):
@@ -1162,20 +1162,20 @@ class TestItemCrud(SplitModuleTest):
         )
         premod_course = modulestore().get_course(locator.course_key)
         category = 'chapter'
-        new_module = modulestore().create_child(
+        new_block = modulestore().create_child(
             'user123', locator, category,
             fields={'display_name': 'new chapter'},
             definition_locator=original.definition_locator
         )
         # check that course version changed and course's previous is the other one
-        assert new_module.location.version_guid != premod_course.location.version_guid
+        assert new_block.location.version_guid != premod_course.location.version_guid
         parent = modulestore().get_item(locator)
-        assert new_module.location.version_agnostic() in version_agnostic(parent.children)
-        assert new_module.definition_locator.definition_id == original.definition_locator.definition_id
+        assert new_block.location.version_agnostic() in version_agnostic(parent.children)
+        assert new_block.definition_locator.definition_id == original.definition_locator.definition_id
 
     def test_unique_naming(self):
         """
-        Check that 2 modules of same type get unique block_ids. Also check that if creation provides
+        Check that 2 blocks of same type get unique block_ids. Also check that if creation provides
         a definition id and new def data that it branches the definition in the db.
         Actually, this tries to test all create_item features not tested above.
         """
@@ -1190,29 +1190,29 @@ class TestItemCrud(SplitModuleTest):
         )
         category = 'problem'
         new_payload = "<problem>empty</problem>"
-        new_module = modulestore().create_child(
+        new_block = modulestore().create_child(
             'anotheruser', locator, category,
             fields={'display_name': 'problem 1', 'data': new_payload},
         )
         another_payload = "<problem>not empty</problem>"
-        another_module = modulestore().create_child(
+        another_block = modulestore().create_child(
             'anotheruser', locator, category,
             fields={'display_name': 'problem 2', 'data': another_payload},
             definition_locator=original.definition_locator,
         )
         # check that course version changed and course's previous is the other one
         parent = modulestore().get_item(locator)
-        assert new_module.location.block_id != another_module.location.block_id
-        assert new_module.location.version_agnostic() in version_agnostic(parent.children)
-        assert another_module.location.version_agnostic() in version_agnostic(parent.children)
-        assert new_module.data == new_payload
-        assert another_module.data == another_payload
+        assert new_block.location.block_id != another_block.location.block_id
+        assert new_block.location.version_agnostic() in version_agnostic(parent.children)
+        assert another_block.location.version_agnostic() in version_agnostic(parent.children)
+        assert new_block.data == new_payload
+        assert another_block.data == another_payload
         # check definition histories
-        new_history = modulestore().get_definition_history_info(new_module.definition_locator)
+        new_history = modulestore().get_definition_history_info(new_block.definition_locator)
         assert new_history['previous_version'] is None
-        assert new_history['original_version'] == new_module.definition_locator.definition_id
+        assert new_history['original_version'] == new_block.definition_locator.definition_id
         assert new_history['edited_by'] == 'anotheruser'
-        another_history = modulestore().get_definition_history_info(another_module.definition_locator)
+        another_history = modulestore().get_definition_history_info(another_block.definition_locator)
         assert another_history['previous_version'] == original.definition_locator.definition_id
 
     def test_encoded_naming(self):
@@ -1228,8 +1228,8 @@ class TestItemCrud(SplitModuleTest):
             fields={'display_name': 'chapter 99'},
         )
         # check that course version changed and course's previous is the other one
-        new_module = modulestore().get_item(chapter_locator)
-        assert new_module.location.block_id == 'foo.bar_-~:0'
+        new_block = modulestore().get_item(chapter_locator)
+        assert new_block.location.block_id == 'foo.bar_-~:0'
         # hardcode to ensure BUL init didn't change
         # now try making that a parent of something
         new_payload = "<problem>empty</problem>"
@@ -1240,8 +1240,8 @@ class TestItemCrud(SplitModuleTest):
             fields={'display_name': 'chapter 99', 'data': new_payload},
         )
         # check that course version changed and course's previous is the other one
-        new_module = modulestore().get_item(problem_locator)
-        assert new_module.location.block_id == problem_locator.block_id
+        new_block = modulestore().get_item(problem_locator)
+        assert new_block.location.block_id == problem_locator.block_id
         chapter = modulestore().get_item(chapter_locator)
         assert problem_locator in version_agnostic(chapter.children)
 
@@ -1871,7 +1871,7 @@ class TestPublish(SplitModuleTest):
         ]
         self._check_course(source_course, dest_course, expected, unexpected)
         # add a child under chapter1
-        new_module = modulestore().create_child(
+        new_block = modulestore().create_child(
             self.user_id, chapter1, "sequential",
             fields={'display_name': 'new sequential'},
         )
@@ -1879,22 +1879,22 @@ class TestPublish(SplitModuleTest):
         expected.remove(BlockKey.from_usage_key(chapter1))
         # check that it's not in published course
         with pytest.raises(ItemNotFoundError):
-            modulestore().get_item(new_module.location.map_into_course(dest_course))
+            modulestore().get_item(new_block.location.map_into_course(dest_course))
         # publish it
-        modulestore().copy(self.user_id, source_course, dest_course, [new_module.location], None)
-        expected.append(BlockKey.from_usage_key(new_module.location))
+        modulestore().copy(self.user_id, source_course, dest_course, [new_block.location], None)
+        expected.append(BlockKey.from_usage_key(new_block.location))
         # check that it is in the published course and that its parent is the chapter
-        pub_module = modulestore().get_item(new_module.location.map_into_course(dest_course))
-        assert modulestore().get_parent_location(pub_module.location).block_id == chapter1.block_id
+        pub_block = modulestore().get_item(new_block.location.map_into_course(dest_course))
+        assert modulestore().get_parent_location(pub_block.location).block_id == chapter1.block_id
         # ensure intentionally orphaned blocks work (e.g., course_info)
-        new_module = modulestore().create_item(
+        new_block = modulestore().create_item(
             self.user_id, source_course, "course_info", block_id="handouts"
         )
         # publish it
-        modulestore().copy(self.user_id, source_course, dest_course, [new_module.location], None)
-        expected.append(BlockKey.from_usage_key(new_module.location))
+        modulestore().copy(self.user_id, source_course, dest_course, [new_block.location], None)
+        expected.append(BlockKey.from_usage_key(new_block.location))
         # check that it is in the published course (no error means it worked)
-        pub_module = modulestore().get_item(new_module.location.map_into_course(dest_course))
+        pub_block = modulestore().get_item(new_block.location.map_into_course(dest_course))
         self._check_course(source_course, dest_course, expected, unexpected)
 
     def test_exceptions(self):

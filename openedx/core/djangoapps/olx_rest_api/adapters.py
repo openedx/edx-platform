@@ -100,16 +100,26 @@ def collect_assets_from_text(text, course_id, include_content=False):
 @contextmanager
 def override_export_fs(block):
     """
-    Hack required for some legacy XBlocks which inherit
-    XModuleDescriptor.add_xml_to_node() instead of the usual
-    XmlSerializationMixin.add_xml_to_node() method.
-    This method temporarily replaces a block's runtime's
-    'export_fs' system with an in-memory filesystem.
-    This method also abuses the XmlMixin.export_to_file()
-    API to prevent the XModule export code from exporting each
-    block as two files (one .olx pointing to one .xml file).
-    The export_to_file was meant to be used only by the
-    customtag XModule but it makes our lives here much easier.
+    Hack that makes some legacy XBlocks which inherit `XmlMixin.add_xml_to_node`
+    instead of the usual `XmlSerialization.add_xml_to_node` serializable to a string.
+    This is needed for the OLX export API.
+
+    Originally, `add_xml_to_node` was `XModuleDescriptor`'s method and was migrated to `XmlMixin`
+    as part of the content core platform refactoring. It differs from `XmlSerialization.add_xml_to_node`
+    in that it relies on `XmlMixin.export_to_file` (or `CustomTagBlock.export_to_file`) method to control
+    whether a block has to be exported as two files (one .olx pointing to one .xml) file, or a single XML node.
+
+    For the legacy blocks (`AnnotatableBlock` for instance) `export_to_file` returns `True` by default.
+    The only exception is `CustomTagBlock`, for which this method was originally developed, as customtags don't
+    have to be exported as separate files.
+
+    This method temporarily replaces a block's runtime's `export_fs` system with an in-memory filesystem.
+    Also, it abuses the `XmlMixin.export_to_file` API to prevent the XBlock export code from exporting
+    each block as two files (one .olx pointing to one .xml file).
+
+    Although `XModuleDescriptor` has been removed a long time ago, we have to keep this hack untill the legacy
+    `add_xml_to_node` implementation is removed in favor of `XmlSerialization.add_xml_to_node`, which itself
+    is a hard task involving refactoring of `CourseExportManager`.
     """
     fs = WrapFS(MemoryFS())
     fs.makedir('course')

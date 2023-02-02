@@ -7,7 +7,7 @@ from django.conf import settings
 from django.test.utils import override_settings
 from xblock.core import XBlock
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
     MINIMUM_STATIC_PARTITION_ID,
@@ -42,27 +42,27 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         """
         super().setUp()
         self.course = CourseFactory.create()
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             category='chapter',
             parent=self.course,
             display_name='Test Chapter'
         )
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             category='sequential',
             parent=chapter,
             display_name='Test Sequential'
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             category='vertical',
             parent=sequential,
             display_name='Test Vertical'
         )
-        video = ItemFactory.create(
+        video = BlockFactory.create(
             category='video',
             parent=vertical,
             display_name='Test Vertical'
         )
-        pure = ItemFactory.create(
+        pure = BlockFactory.create(
             category='pure',
             parent=vertical,
             display_name='Test Pure'

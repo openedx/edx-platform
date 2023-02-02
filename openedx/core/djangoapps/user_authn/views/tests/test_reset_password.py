@@ -5,9 +5,9 @@ Test the various password reset flows
 import json
 import re
 import unicodedata
-import unittest
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
+
 import ddt
 from django.conf import settings
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
@@ -54,10 +54,7 @@ def process_request(request):
     request.session.save()
 
 
-@unittest.skipUnless(
-    settings.ROOT_URLCONF == "lms.urls",
-    "reset password tests should only run in LMS"
-)
+@skip_unless_lms
 @ddt.ddt
 class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     """
@@ -300,7 +297,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         response = password_reset(reset_request)
         assert response.status_code == status
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @skip_unless_lms
     @ddt.data(('plain_text', "You're receiving this e-mail because you requested a password reset"),
               ('html', "You&#x27;re receiving this e-mail because you requested a password reset"))
     @ddt.unpack
@@ -347,7 +344,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         assert 'password_reset_confirm/' in body
         re.search(r'password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/', body).groupdict()
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @skip_unless_lms
     @ddt.data((False, 'http://'), (True, 'https://'))
     @ddt.unpack
     def test_reset_password_email_https(self, is_secure, protocol):
@@ -372,7 +369,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
 
     @override_settings(FEATURES=ENABLE_AUTHN_MICROFRONTEND)
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @skip_unless_lms
     @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack
     def test_reset_password_email_site(self, site_name, platform_name):
@@ -404,7 +401,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                     SETTING_CHANGE_INITIATED, user_id=self.user.id, setting='password', old=None, new=None
                 )
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @skip_unless_lms
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     @ddt.data('plain_text', 'html')
     def test_reset_password_email_configuration_override(self, body_type):
@@ -628,7 +625,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.user = User.objects.get(pk=self.user.pk)
         assert self.user.is_active
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @skip_unless_lms
     @ddt.data('Crazy Awesome Site', 'edX')
     def test_reset_password_email_subject(self, platform_name):
         """
@@ -835,10 +832,7 @@ class PasswordResetTokenValidateViewTest(UserAPITestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(
-    settings.ROOT_URLCONF == "lms.urls",
-    "reset password tests should only run in LMS"
-)
+@skip_unless_lms
 class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
     """Tests of the logistration API's password reset endpoint. """
     request_factory = RequestFactory()

@@ -32,7 +32,7 @@ from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMM
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.lib.teams_config import TeamsConfig
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
 from ..models import CourseTeamMembership
 from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_save_callback
@@ -1687,30 +1687,30 @@ class TestTeamAssignmentsView(TeamAPITestCase):
         teamset_id = cls.solar_team.topic_id
         other_teamset_id = cls.wind_team.topic_id
 
-        section = ItemFactory.create(
+        section = BlockFactory.create(
             parent=course,
             category='chapter',
             display_name='Test Section'
         )
-        subsection = ItemFactory.create(
+        subsection = BlockFactory.create(
             parent=section,
             category="sequential"
         )
-        unit_1 = ItemFactory.create(
+        unit_1 = BlockFactory.create(
             parent=subsection,
             category="vertical"
         )
-        open_assessment = ItemFactory.create(
+        open_assessment = BlockFactory.create(
             parent=unit_1,
             category="openassessment",
             teams_enabled=True,
             selected_teamset_id=teamset_id
         )
-        unit_2 = ItemFactory.create(
+        unit_2 = BlockFactory.create(
             parent=subsection,
             category="vertical"
         )
-        off_team_open_assessment = ItemFactory.create(  # pylint: disable=unused-variable
+        off_team_open_assessment = BlockFactory.create(  # pylint: disable=unused-variable
             parent=unit_2,
             category="openassessment",
             teams_enabled=True,

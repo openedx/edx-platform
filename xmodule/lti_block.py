@@ -744,7 +744,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
     @XBlock.handler
     def grade_handler(self, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
         """
-        This is called by courseware.module_render, to handle an AJAX call.
+        This is called by courseware.block_render, to handle an AJAX call.
 
         Used only for grading. Returns XML response.
 

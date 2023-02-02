@@ -663,13 +663,13 @@ class UserInfoCache(DjangoOrmFieldCache):
 class FieldDataCache:
     """
     A cache of django model objects needed to supply the data
-    for a module and its descendants
+    for a block and its descendants
     """
     def __init__(self, descriptors, course_id, user, asides=None, read_only=False):
         """
         Find any courseware.models objects that are needed by any descriptor
         in descriptors. Attempts to minimize the number of queries to the database.
-        Note: Only modules that have store_state = True or have shared
+        Note: Only blocks that have store_state = True or have shared
         state will have a StudentModule.
 
         Arguments
@@ -725,7 +725,7 @@ class FieldDataCache:
 
         Arguments:
             descriptor: An XModuleDescriptor
-            depth is the number of levels of descendant modules to load StudentModules for, in addition to
+            depth is the number of levels of descendant blocks to load StudentModules for, in addition to
                 the supplied descriptor. If depth is None, load all descendant StudentModules
             descriptor_filter is a function that accepts a descriptor and return whether the field data
                 should be cached
@@ -749,7 +749,7 @@ class FieldDataCache:
             if depth is None or depth > 0:
                 new_depth = depth - 1 if depth is not None else depth
 
-                for child in descriptor.get_children() + descriptor.get_required_module_descriptors():
+                for child in descriptor.get_children() + descriptor.get_required_block_descriptors():
                     descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
 
             return descriptors
@@ -767,7 +767,7 @@ class FieldDataCache:
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
         descriptor: An XModuleDescriptor
-        depth is the number of levels of descendant modules to load StudentModules for, in addition to
+        depth is the number of levels of descendant blocks to load StudentModules for, in addition to
             the supplied descriptor. If depth is None, load all descendant StudentModules
         descriptor_filter is a function that accepts a descriptor and return whether the field data
             should be cached

@@ -21,7 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, BlockFactory, check_mongo_calls
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
 
@@ -39,7 +39,7 @@ from lms.djangoapps.courseware.courses import (
     get_current_child
 )
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
@@ -162,21 +162,21 @@ class CoursesTest(ModuleStoreTestCase):
                    expected_courses, f'testing get_courses with filter_={filter_}'
 
     def test_get_current_child(self):
-        mock_xmodule = mock.MagicMock()
-        assert get_current_child(mock_xmodule) is None
+        mock_xblock = mock.MagicMock()
+        assert get_current_child(mock_xblock) is None
 
-        mock_xmodule.position = -1
-        mock_xmodule.get_display_items.return_value = ['one', 'two', 'three']
-        assert get_current_child(mock_xmodule) == 'one'
+        mock_xblock.position = -1
+        mock_xblock.get_children.return_value = ['one', 'two', 'three']
+        assert get_current_child(mock_xblock) == 'one'
 
-        mock_xmodule.position = 2
-        assert get_current_child(mock_xmodule) == 'two'
-        assert get_current_child(mock_xmodule, requested_child='first') == 'one'
-        assert get_current_child(mock_xmodule, requested_child='last') == 'three'
+        mock_xblock.position = 2
+        assert get_current_child(mock_xblock) == 'two'
+        assert get_current_child(mock_xblock, requested_child='first') == 'one'
+        assert get_current_child(mock_xblock, requested_child='last') == 'three'
 
-        mock_xmodule.position = 3
-        mock_xmodule.get_display_items.return_value = []
-        assert get_current_child(mock_xmodule) is None
+        mock_xblock.position = 3
+        mock_xblock.get_children.return_value = []
+        assert get_current_child(mock_xblock) is None
 
 
 class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
@@ -287,8 +287,8 @@ class CoursesRenderTest(ModuleStoreTestCase):
             "<a href='/asset-v1:edX+toy+2012_Fall+type@asset+block/handouts_sample_handout.txt'>Sample</a>"
 
         # Test when render raises an exception
-        with mock.patch('lms.djangoapps.courseware.courses.get_module') as mock_module_render:
-            mock_module_render.return_value = mock.MagicMock(
+        with mock.patch('lms.djangoapps.courseware.courses.get_block') as mock_block_render:
+            mock_block_render.return_value = mock.MagicMock(
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )
             course_info = get_course_info_section(self.request, self.request.user, self.course, 'handouts')
@@ -301,8 +301,8 @@ class CoursesRenderTest(ModuleStoreTestCase):
         assert course_about == 'A course about toys.'
 
         # Test when render raises an exception
-        with mock.patch('lms.djangoapps.courseware.courses.get_module') as mock_module_render:
-            mock_module_render.return_value = mock.MagicMock(
+        with mock.patch('lms.djangoapps.courseware.courses.get_block') as mock_block_render:
+            mock_block_render.return_value = mock.MagicMock(
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )
             course_about = get_course_about_section(self.request, self.course, 'short_description')
@@ -371,9 +371,9 @@ class CourseInstantiationTests(ModuleStoreTestCase):
 
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
-            chapter = ItemFactory(parent=course, category='chapter', graded=True)
-            section = ItemFactory(parent=chapter, category='sequential')
-            __ = ItemFactory(parent=section, category='problem')
+            chapter = BlockFactory(parent=course, category='chapter', graded=True)
+            section = BlockFactory(parent=chapter, category='sequential')
+            __ = BlockFactory(parent=section, category='problem')
 
         fake_request = self.factory.get(
             reverse('progress', kwargs={'course_id': str(course.id)})
@@ -385,7 +385,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
             field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course.id, self.user, course, depth=course_depth
             )
-            course_block = get_module_for_descriptor(
+            course_block = get_block_for_descriptor(
                 self.user,
                 fake_request,
                 course,
@@ -418,8 +418,8 @@ class TestGetCourseChapters(ModuleStoreTestCase):
         Test get_course_chapter_ids returns expected result.
         """
         course = CourseFactory()
-        ItemFactory(parent=course, category='chapter')
-        ItemFactory(parent=course, category='chapter')
+        BlockFactory(parent=course, category='chapter')
+        BlockFactory(parent=course, category='chapter')
         course_chapter_ids = get_course_chapter_ids(course.location.course_key)
         assert len(course_chapter_ids) == 2
         assert course_chapter_ids == [str(child) for child in course.children]
@@ -435,11 +435,11 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         Test that we treat a sequential with incomplete (but not scored) items (like a video maybe) as complete.
         """
         course = CourseFactory()
-        chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now(),
-                              start=datetime.datetime.now() - datetime.timedelta(hours=1))
-        sequential = ItemFactory(parent=chapter, category='sequential')
-        problem = ItemFactory(parent=sequential, category='problem', has_score=True)
-        ItemFactory(parent=sequential, category='video', has_score=False)
+        chapter = BlockFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now(),
+                               start=datetime.datetime.now() - datetime.timedelta(hours=1))
+        sequential = BlockFactory(parent=chapter, category='sequential')
+        problem = BlockFactory(parent=sequential, category='problem', has_score=True)
+        BlockFactory(parent=sequential, category='video', has_score=False)
 
         self.override_waffle_switch(True)
         BlockCompletion.objects.submit_completion(self.user, problem.location, 1)
@@ -455,8 +455,8 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         This can happen with unreleased assignments, for example (start date in future).
         """
         course = CourseFactory()
-        chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now())
-        ItemFactory(parent=chapter, category='sequential')
+        chapter = BlockFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now())
+        BlockFactory(parent=chapter, category='sequential')
 
         assignments = get_course_assignments(course.location.context_key, self.user, None)
         assert len(assignments) == 1
@@ -467,12 +467,12 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         Test that unreleased assignments are not treated as complete.
         """
         course = CourseFactory()
-        chapter = ItemFactory(parent=course, category='chapter', graded=True,
-                              due=datetime.datetime.now() + datetime.timedelta(hours=2),
-                              start=datetime.datetime.now() + datetime.timedelta(hours=1))
-        sequential = ItemFactory(parent=chapter, category='sequential')
-        problem = ItemFactory(parent=sequential, category='problem', has_score=True)
-        ItemFactory(parent=sequential, category='video', has_score=False)
+        chapter = BlockFactory(parent=course, category='chapter', graded=True,
+                               due=datetime.datetime.now() + datetime.timedelta(hours=2),
+                               start=datetime.datetime.now() + datetime.timedelta(hours=1))
+        sequential = BlockFactory(parent=chapter, category='sequential')
+        problem = BlockFactory(parent=sequential, category='problem', has_score=True)
+        BlockFactory(parent=sequential, category='video', has_score=False)
 
         self.override_waffle_switch(True)
         BlockCompletion.objects.submit_completion(self.user, problem.location, 1)

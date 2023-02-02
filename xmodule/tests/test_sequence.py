@@ -1,5 +1,5 @@
 """
-Tests for sequence module.
+Tests for sequence block.
 """
 # pylint: disable=no-member
 
@@ -34,7 +34,7 @@ COURSE_END_DATE = TODAY + timedelta(days=21)
 @ddt.ddt
 class SequenceBlockTestCase(XModuleXmlImportTest):
     """
-    Base class for tests of Sequence Module.
+    Base class for tests of Sequence Block.
     """
 
     def setUp(self):
@@ -88,7 +88,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def _set_up_block(self, parent, index_in_parent):
         """
-        Sets up the stub sequence module for testing.
+        Sets up the stub sequence block for testing.
         """
         block = parent.get_children()[index_in_parent]
 

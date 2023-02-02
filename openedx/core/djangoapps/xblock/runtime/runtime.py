@@ -22,7 +22,7 @@ from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
 
 from xmodule.errortracker import make_error_tracker
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.django import ModuleI18nService
+from xmodule.modulestore.django import XBlockI18nService
 from xmodule.services import EventPublishingService, RebindUserService
 from xmodule.util.sandboxing import SandboxService
 from common.djangoapps.edxmako.services import MakoService
@@ -31,7 +31,7 @@ from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from lms.djangoapps.courseware import module_render
+from lms.djangoapps.courseware import block_render
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreChildrenData, BlockstoreFieldData
@@ -247,7 +247,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
                 return MakoService(namespace_prefix='lms.')
             return MakoService()
         elif service_name == "i18n":
-            return ModuleI18nService(block=block)
+            return XBlockI18nService(block=block)
         elif service_name == 'sandbox':
             context_key = block.scope_ids.usage_id.context_key
             return SandboxService(contentstore=contentstore, course_id=context_key)
@@ -258,11 +258,11 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == 'rebind_user':
             # this service should ideally be initialized with all the arguments of get_module_system_for_user
             # but only the positional arguments are passed here as the other arguments are too
-            # specific to the lms.module_render module
+            # specific to the lms.block_render module
             return RebindUserService(
                 self.user,
                 context_key,
-                module_render.get_module_system_for_user,
+                block_render.get_module_system_for_user,
                 track_function=make_track_function(),
                 request_token=request_token(crum.get_current_request()),
             )

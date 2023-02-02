@@ -18,7 +18,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, upload_file_to_course,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from cms.djangoapps.contentstore.toggles import INDIVIDUALIZE_ANONYMOUS_USER_ID
@@ -47,7 +47,7 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         asides are correctly included.
         """
         course = CourseFactory.create()
-        html = ItemFactory.create(
+        html = BlockFactory.create(
             parent_location=course.location,
             category="html",
             data={'data': "<html>foobar</html>"}
@@ -95,7 +95,7 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         asides are correctly excluded because they are not enabled.
         """
         course = CourseFactory.create()
-        html = ItemFactory.create(
+        html = BlockFactory.create(
             parent_location=course.location,
             category="html",
             data={'data': "<html>foobar</html>"}
@@ -130,13 +130,13 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
 
         course = CourseFactory.create()
 
-        conditional_block = ItemFactory.create(
+        conditional_block = BlockFactory.create(
             parent_location=course.location,
             category="conditional"
         )
 
         # child conditional_block
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=conditional_block.location,
             category="conditional"
         )
@@ -158,7 +158,7 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
 
         course = CourseFactory.create()
 
-        block = ItemFactory.create(
+        block = BlockFactory.create(
             parent_location=course.location,
             category="problem"
         )
@@ -213,7 +213,7 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         """
         Tests that the 'user' and 'i18n' services are provided by the Studio runtime.
         """
-        descriptor = ItemFactory(category="pure", parent=self.course)
+        descriptor = BlockFactory(category="pure", parent=self.course)
         runtime = _preview_module_system(
             self.request,
             descriptor,
@@ -242,12 +242,12 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         self.request = RequestFactory().get('/dummy-url')
         self.request.user = self.user
         self.request.session = {}
-        self.descriptor = ItemFactory(category="video", parent=course)
+        self.descriptor = BlockFactory(category="video", parent=course)
         self.field_data = mock.Mock()
         self.contentstore = contentstore()
         self.runtime = _preview_module_system(
             self.request,
-            descriptor=ItemFactory(category="problem", parent=course),
+            descriptor=BlockFactory(category="problem", parent=course),
             field_data=mock.Mock(),
         )
         self.course = self.store.get_item(course.location)
@@ -257,7 +257,7 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     def test_render_template(self):
-        descriptor = ItemFactory(category="pure", parent=self.course)
+        descriptor = BlockFactory(category="pure", parent=self.course)
         html = get_preview_fragment(self.request, descriptor, {'element_id': 142}).content
         assert '<div id="142" ns="main">Testing the MakoService</div>' in html
 
@@ -305,7 +305,7 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         # Create the runtime with the flag turned on.
         runtime = _preview_module_system(
             self.request,
-            descriptor=ItemFactory(category="problem", parent=self.course),
+            descriptor=BlockFactory(category="problem", parent=self.course),
             field_data=mock.Mock(),
         )
         assert runtime.anonymous_student_id == '26262401c528d7c4a6bbeabe0455ec46'
@@ -316,7 +316,7 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         # Create the runtime with the flag turned on.
         runtime = _preview_module_system(
             self.request,
-            descriptor=ItemFactory(category="lti", parent=self.course),
+            descriptor=BlockFactory(category="lti", parent=self.course),
             field_data=mock.Mock(),
         )
         assert runtime.anonymous_student_id == 'ad503f629b55c531fed2e45aa17a3368'

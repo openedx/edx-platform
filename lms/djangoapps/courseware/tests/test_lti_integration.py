@@ -15,7 +15,7 @@ from lms.djangoapps.courseware.tests.helpers import BaseTestXmodule
 from lms.djangoapps.courseware.views.views import get_course_lti_endpoints
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -137,31 +137,31 @@ class TestLTIBlockListing(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create(display_name=cls.COURSE_NAME, number=cls.COURSE_SLUG)
-        cls.chapter1 = ItemFactory.create(
+        cls.chapter1 = BlockFactory.create(
             parent_location=cls.course.location,
             display_name="chapter1",
             category='chapter')
-        cls.section1 = ItemFactory.create(
+        cls.section1 = BlockFactory.create(
             parent_location=cls.chapter1.location,
             display_name="section1",
             category='sequential')
-        cls.chapter2 = ItemFactory.create(
+        cls.chapter2 = BlockFactory.create(
             parent_location=cls.course.location,
             display_name="chapter2",
             category='chapter')
-        cls.section2 = ItemFactory.create(
+        cls.section2 = BlockFactory.create(
             parent_location=cls.chapter2.location,
             display_name="section2",
             category='sequential')
 
         # creates one draft and one published lti block, in different sections
-        cls.lti_published = ItemFactory.create(
+        cls.lti_published = BlockFactory.create(
             parent_location=cls.section1.location,
             display_name="lti published",
             category="lti",
             location=cls.course.id.make_usage_key('lti', 'lti_published'),
         )
-        cls.lti_draft = ItemFactory.create(
+        cls.lti_draft = BlockFactory.create(
             parent_location=cls.section2.location,
             display_name="lti draft",
             category="lti",

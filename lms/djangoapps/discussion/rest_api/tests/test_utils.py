@@ -131,7 +131,12 @@ class TestRemoveEmptySequentials(unittest.TestCase):
                 {"type": "sequential", "children": [{"type": "vertical1"}]},
                 {"type": "sequential", "children": []},
                 {"children": [{"type": "vertical2"}]}
-            ]}
+            ]},
+            {"type": "chapter", "children": [
+                {"type": "sequential", "children": []},
+                {"type": "sequential", "children": []},
+            ]
+            }
         ]
         expected_output = [
             {"type": "chapter", "children": [

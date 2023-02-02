@@ -421,7 +421,7 @@ def _find_thread(request, course, discussion_id, thread_id):
         )
     except cc.utils.CommentClientRequestError:
         return None
-    # Verify that the student has access to this thread if belongs to a course discussion module
+    # Verify that the student has access to this thread if belongs to a course discussion block
     thread_context = getattr(thread, "context", "course")
     if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
         return None

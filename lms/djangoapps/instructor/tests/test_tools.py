@@ -21,7 +21,7 @@ from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.course_date_signals import handlers
@@ -109,8 +109,8 @@ class TestFindUnit(SharedModuleStoreTestCase):
         super().setUpClass()
         course = CourseFactory.create()
         with cls.store.bulk_operations(course.id, emit_signals=False):
-            cls.week1 = ItemFactory.create(parent=course)
-            cls.homework = ItemFactory.create(parent=cls.week1)
+            cls.week1 = BlockFactory.create(parent=course)
+            cls.homework = BlockFactory.create(parent=cls.week1)
 
         # get updated course
         cls.course = cls.store.get_item(course.location)
@@ -145,9 +145,9 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
         super().setUp()
 
         course = CourseFactory.create()
-        week1 = ItemFactory.create(parent=course)
-        week2 = ItemFactory.create(parent=course)
-        child = ItemFactory.create(parent=week1)
+        week1 = BlockFactory.create(parent=course)
+        week2 = BlockFactory.create(parent=course)
+        child = BlockFactory.create(parent=week1)
 
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
         set_dates_for_course(course.id, [
@@ -214,11 +214,11 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
 
         self.due = due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
         course = CourseFactory.create()
-        week1 = ItemFactory.create(due=due, parent=course)
-        week2 = ItemFactory.create(due=due, parent=course)
-        week3 = ItemFactory.create(parent=course)
-        homework = ItemFactory.create(parent=week1)
-        assignment = ItemFactory.create(parent=homework, due=due)
+        week1 = BlockFactory.create(due=due, parent=course)
+        week2 = BlockFactory.create(due=due, parent=course)
+        week3 = BlockFactory.create(parent=course)
+        homework = BlockFactory.create(parent=week1)
+        assignment = BlockFactory.create(parent=homework, due=due)
         handlers.extract_dates(None, course.id)
 
         user = UserFactory.create()
@@ -330,10 +330,10 @@ class TestDataDumps(ModuleStoreTestCase):
 
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
         course = CourseFactory.create()
-        week1 = ItemFactory.create(due=due, parent=course)
-        week2 = ItemFactory.create(due=due, parent=course)
+        week1 = BlockFactory.create(due=due, parent=course)
+        week2 = BlockFactory.create(due=due, parent=course)
 
-        homework = ItemFactory.create(
+        homework = BlockFactory.create(
             parent=week1,
             due=due
         )
@@ -357,7 +357,7 @@ class TestDataDumps(ModuleStoreTestCase):
                                      extended)
         tools.set_due_date_extension(self.course, self.week1, self.user2,
                                      extended)
-        report = tools.dump_module_extensions(self.course, self.week1)
+        report = tools.dump_block_extensions(self.course, self.week1)
         assert (
             report['title'] == 'Users with due date extensions for ' +
             self.week1.display_name)

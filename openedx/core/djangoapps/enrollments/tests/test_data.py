@@ -3,14 +3,11 @@ Test the Data Aggregation Layer for Course Enrollments.
 
 """
 
-
 import datetime
-import unittest
 from unittest.mock import patch
 
 import ddt
 import pytest
-from django.conf import settings
 from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -23,6 +20,7 @@ from openedx.core.djangoapps.enrollments.errors import (
     UserNotFoundError
 )
 from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.exceptions import CourseNotFoundError
 from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, UserFactory, CourseEnrollmentFactory
@@ -31,7 +29,7 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentDataTest(ModuleStoreTestCase):
     """
     Test course enrollment data aggregation.

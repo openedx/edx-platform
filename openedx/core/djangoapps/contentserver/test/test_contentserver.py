@@ -20,7 +20,7 @@ from opaque_keys import InvalidKeyError
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, VERSIONED_ASSETS_PREFIX
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -73,7 +73,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
     """
     Tests that use the toy course.
     """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -82,23 +82,23 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         cls.contentstore = contentstore()
         cls.modulestore = modulestore()
 
-        cls.course_key = cls.modulestore.make_course_key('edX', 'toy', '2012_Fall')
-
-        import_course_from_xml(
+        course_items = import_course_from_xml(
             cls.modulestore, 1, TEST_DATA_DIR, ['toy'],
-            static_content_store=cls.contentstore, verbose=True
+            static_content_store=cls.contentstore, verbose=True, create_if_not_present=True
         )
+        cls.course = course_items[0]
+        cls.course_key = cls.course.id
 
         # A locked asset
         cls.locked_asset = cls.course_key.make_asset_key('asset', 'sample_static.html')
-        cls.url_locked = str(cls.locked_asset)
+        cls.url_locked = '/' + str(cls.locked_asset)
         cls.url_locked_versioned = get_versioned_asset_url(cls.url_locked)
         cls.url_locked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_locked)
         cls.contentstore.set_attr(cls.locked_asset, 'locked', True)
 
         # An unlocked asset
         cls.unlocked_asset = cls.course_key.make_asset_key('asset', 'another_static.txt')
-        cls.url_unlocked = str(cls.unlocked_asset)
+        cls.url_unlocked = '/' + str(cls.unlocked_asset)
         cls.url_unlocked_versioned = get_versioned_asset_url(cls.url_unlocked)
         cls.url_unlocked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_unlocked)
         cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
@@ -134,7 +134,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         Test that unlocked assets that are versioned (old-style) are being served.
         """
         self.client.logout()
-        resp = self.client.get(self.url_unlocked_versioned_old_style)
+        resp = self.client.get(self.url_unlocked_versioned_old_style, follow=True)
         assert resp.status_code == 200
 
     def test_unlocked_versioned_asset_with_nonexistent_version(self):
@@ -168,7 +168,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
 
         self.client.login(username=self.non_staff_usr, password='test')
-        resp = self.client.get(self.url_locked_versioned_old_style)
+        resp = self.client.get(self.url_locked_versioned_old_style, follow=True)
         assert resp.status_code == 200
 
     def test_locked_asset_not_logged_in(self):

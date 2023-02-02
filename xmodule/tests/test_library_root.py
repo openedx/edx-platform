@@ -7,7 +7,7 @@ from unittest.mock import patch
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
-from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
+from xmodule.modulestore.tests.factories import BlockFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.x_module import AUTHOR_VIEW
 
@@ -35,7 +35,7 @@ class TestLibraryRoot(MixedSplitTestCase):
         message = "Hello world"
         library = LibraryFactory.create(modulestore=self.store)
         # Add one HTML block to the library:
-        ItemFactory.create(
+        BlockFactory.create(
             category="html",
             parent_location=library.location,
             user_id=self.user_id,
@@ -60,7 +60,7 @@ class TestLibraryRoot(MixedSplitTestCase):
         library = LibraryFactory.create(modulestore=self.store)
         # Add five HTML blocks to the library:
         blocks = [
-            ItemFactory.create(
+            BlockFactory.create(
                 category="html",
                 parent_location=library.location,
                 user_id=self.user_id,

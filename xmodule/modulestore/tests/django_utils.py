@@ -511,7 +511,7 @@ class ModuleStoreTestCase(
                    MODULESTORE = mixed_store_config(data_dir, mappings)
                    # ...
 
-        3. Use factories (e.g. `CourseFactory`, `ItemFactory`) to populate
+        3. Use factories (e.g. `CourseFactory`, `BlockFactory`) to populate
            the modulestore with test data.
 
     NOTE:

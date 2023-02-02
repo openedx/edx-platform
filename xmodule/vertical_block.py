@@ -95,7 +95,7 @@ class VerticalBlock(
                     'edx-platform.username'
                 )
 
-        child_blocks = self.get_display_items()  # lint-amnesty, pylint: disable=no-member
+        child_blocks = self.get_children()  # lint-amnesty, pylint: disable=no-member
 
         child_blocks_to_complete_on_view = set()
         completion_service = self.runtime.service(self, 'completion')
@@ -269,7 +269,7 @@ class VerticalBlock(
 
     def index_dictionary(self):
         """
-        Return dictionary prepared with module content and type for indexing.
+        Return dictionary prepared with block content and type for indexing.
         """
         # return key/value fields in a Python dict object
         # values may be numeric / string or dict

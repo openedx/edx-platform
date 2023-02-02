@@ -56,7 +56,7 @@ class UnitBlock(XBlock):
 
     def index_dictionary(self):
         """
-        Return dictionary prepared with module content and type for indexing, so
+        Return dictionary prepared with block content and type for indexing, so
         that the contents of this block can be found in free-text searches.
         """
         # return key/value fields in a Python dict object

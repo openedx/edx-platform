@@ -157,7 +157,7 @@ def preprocess_collection(user, course, collection):
        convert "updated" to date
 
     Raises:
-        ItemNotFoundError - when appropriate module is not found.
+        ItemNotFoundError - when appropriate block is not found.
     """
     # pylint: disable=too-many-statements
 
@@ -185,7 +185,7 @@ def preprocess_collection(user, course, collection):
             try:
                 item = store.get_item(usage_key)
             except ItemNotFoundError:
-                log.debug("Module not found: %s", usage_key)
+                log.debug("Block not found: %s", usage_key)
                 continue
 
             if not has_access(user, "load", item, course_key=course.id):
@@ -205,7 +205,7 @@ def preprocess_collection(user, course, collection):
                 if section.location in list(cache.keys()):   # lint-amnesty, pylint: disable=consider-iterating-dictionary
                     usage_context = cache[section.location]
                     usage_context.update({
-                        "unit": get_module_context(course, unit),
+                        "unit": get_block_context(course, unit),
                     })
                     model.update(usage_context)
                     cache[usage_id] = cache[unit.location] = usage_context
@@ -219,8 +219,8 @@ def preprocess_collection(user, course, collection):
                 if chapter.location in list(cache.keys()):  # lint-amnesty, pylint: disable=consider-iterating-dictionary
                     usage_context = cache[chapter.location]
                     usage_context.update({
-                        "unit": get_module_context(course, unit),
-                        "section": get_module_context(course, section),
+                        "unit": get_block_context(course, unit),
+                        "section": get_block_context(course, section),
                     })
                     model.update(usage_context)
                     cache[usage_id] = cache[unit.location] = cache[section.location] = usage_context
@@ -228,9 +228,9 @@ def preprocess_collection(user, course, collection):
                     continue
 
             usage_context = {
-                "unit": get_module_context(course, unit),
-                "section": get_module_context(course, section) if include_path_info else {},
-                "chapter": get_module_context(course, chapter) if include_path_info else {},
+                "unit": get_block_context(course, unit),
+                "section": get_block_context(course, section) if include_path_info else {},
+                "chapter": get_block_context(course, chapter) if include_path_info else {},
             }
             model.update(usage_context)
             if include_path_info:
@@ -242,34 +242,34 @@ def preprocess_collection(user, course, collection):
     return filtered_collection
 
 
-def get_module_context(course, item):
+def get_block_context(course, block):
     """
-    Returns dispay_name and url for the parent module.
+    Returns dispay_name and url for the parent block.
     """
-    item_dict = {
-        'location': str(item.location),
-        'display_name': Text(item.display_name_with_default),
+    block_dict = {
+        'location': str(block.location),
+        'display_name': Text(block.display_name_with_default),
     }
-    if item.category == 'chapter' and item.get_parent():
+    if block.category == 'chapter' and block.get_parent():
         # course is a locator w/o branch and version
         # so for uniformity we replace it with one that has them
-        course = item.get_parent()
-        item_dict['index'] = get_index(item_dict['location'], course.children)
-    elif item.category == 'vertical':
-        section = item.get_parent()
+        course = block.get_parent()
+        block_dict['index'] = get_index(block_dict['location'], course.children)
+    elif block.category == 'vertical':
+        section = block.get_parent()
         chapter = section.get_parent()
         # Position starts from 1, that's why we add 1.
-        position = get_index(str(item.location), section.children) + 1
-        item_dict['url'] = reverse('courseware_position', kwargs={
+        position = get_index(str(block.location), section.children) + 1
+        block_dict['url'] = reverse('courseware_position', kwargs={
             'course_id': str(course.id),
             'chapter': chapter.url_name,
             'section': section.url_name,
             'position': position,
         })
-    if item.category in ('chapter', 'sequential'):
-        item_dict['children'] = [str(child) for child in item.children]
+    if block.category in ('chapter', 'sequential'):
+        block_dict['children'] = [str(child) for child in block.children]
 
-    return item_dict
+    return block_dict
 
 
 def get_index(usage_key, children):

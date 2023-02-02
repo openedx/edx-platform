@@ -3,14 +3,12 @@ Tests related to the basic footer-switching based off SITE_NAME to ensure
 edx.org uses an edx footer but other instances use an Open edX footer.
 """
 
-
-import unittest
-
-from django.conf import settings
 from django.test import TestCase
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+
+@skip_unless_lms
 class TestFooter(TestCase):
     """
     Tests for edx and OpenEdX footer

@@ -25,7 +25,7 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
-    ItemFactory,
+    BlockFactory,
     check_mongo_calls
 )
 
@@ -793,9 +793,9 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):  # l
 class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTestCase):
     """
     Tests `forum_form_discussion api` works with different content groups.
-    Discussion modules are setup in ContentGroupTestCase class i.e
-    alpha_module => alpha_group_discussion => alpha_cohort => alpha_user/community_ta
-    beta_module => beta_group_discussion => beta_cohort => beta_user
+    Discussion blocks are setup in ContentGroupTestCase class i.e
+    alpha_block => alpha_group_discussion => alpha_cohort => alpha_user/community_ta
+    beta_block => beta_group_discussion => beta_cohort => beta_user
     """
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -803,17 +803,17 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
         super().setUp()
         self.thread_list = [
             {"thread_id": "test_general_thread_id"},
-            {"thread_id": "test_global_group_thread_id", "commentable_id": self.global_module.discussion_id},
-            {"thread_id": "test_alpha_group_thread_id", "group_id": self.alpha_module.group_access[0][0],
-             "commentable_id": self.alpha_module.discussion_id},
-            {"thread_id": "test_beta_group_thread_id", "group_id": self.beta_module.group_access[0][0],
-             "commentable_id": self.beta_module.discussion_id}
+            {"thread_id": "test_global_group_thread_id", "commentable_id": self.global_block.discussion_id},
+            {"thread_id": "test_alpha_group_thread_id", "group_id": self.alpha_block.group_access[0][0],
+             "commentable_id": self.alpha_block.discussion_id},
+            {"thread_id": "test_beta_group_thread_id", "group_id": self.beta_block.group_access[0][0],
+             "commentable_id": self.beta_block.discussion_id}
         ]
 
     def assert_has_access(self, response, expected_discussion_threads):
         """
         Verify that a users have access to the threads in their assigned
-        cohorts and non-cohorted modules.
+        cohorts and non-cohorted blocks.
         """
         discussion_data = json.loads(response.content.decode('utf-8'))['discussion_data']
         assert len(discussion_data) == expected_discussion_threads
@@ -902,53 +902,53 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
     def test_staff_user(self, mock_request):
         """
         Verify that the staff user can access threads in the alpha,
-        beta, and global discussion modules.
+        beta, and global discussion blocks.
         """
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
 
-        for discussion_xblock in [self.alpha_module, self.beta_module, self.global_module]:
+        for discussion_xblock in [self.alpha_block, self.beta_block, self.global_block]:
             self.assert_can_access(self.staff_user, discussion_xblock.discussion_id, thread_id, True)
 
     def test_alpha_user(self, mock_request):
         """
         Verify that the alpha user can access threads in the alpha and
-        global discussion modules.
+        global discussion blocks.
         """
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
 
-        for discussion_xblock in [self.alpha_module, self.global_module]:
+        for discussion_xblock in [self.alpha_block, self.global_block]:
             self.assert_can_access(self.alpha_user, discussion_xblock.discussion_id, thread_id, True)
 
-        self.assert_can_access(self.alpha_user, self.beta_module.discussion_id, thread_id, False)
+        self.assert_can_access(self.alpha_user, self.beta_block.discussion_id, thread_id, False)
 
     def test_beta_user(self, mock_request):
         """
         Verify that the beta user can access threads in the beta and
-        global discussion modules.
+        global discussion blocks.
         """
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
 
-        for discussion_xblock in [self.beta_module, self.global_module]:
+        for discussion_xblock in [self.beta_block, self.global_block]:
             self.assert_can_access(self.beta_user, discussion_xblock.discussion_id, thread_id, True)
 
-        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, False)
+        self.assert_can_access(self.beta_user, self.alpha_block.discussion_id, thread_id, False)
 
     def test_non_cohorted_user(self, mock_request):
         """
         Verify that the non-cohorted user can access threads in just the
-        global discussion module.
+        global discussion blocks.
         """
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
 
-        self.assert_can_access(self.non_cohorted_user, self.global_module.discussion_id, thread_id, True)
+        self.assert_can_access(self.non_cohorted_user, self.global_block.discussion_id, thread_id, True)
 
-        self.assert_can_access(self.non_cohorted_user, self.alpha_module.discussion_id, thread_id, False)
+        self.assert_can_access(self.non_cohorted_user, self.alpha_block.discussion_id, thread_id, False)
 
-        self.assert_can_access(self.non_cohorted_user, self.beta_module.discussion_id, thread_id, False)
+        self.assert_can_access(self.non_cohorted_user, self.beta_block.discussion_id, thread_id, False)
 
     def test_course_context_respected(self, mock_request):
         """
@@ -959,30 +959,30 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
             course=self.course, text="dummy content", thread_id=thread_id
         )
 
-        # Beta user does not have access to alpha_module.
-        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, False)
+        # Beta user does not have access to alpha_block.
+        self.assert_can_access(self.beta_user, self.alpha_block.discussion_id, thread_id, False)
 
     def test_standalone_context_respected(self, mock_request):
         """
         Verify that standalone threads don't go through discussion_category_id_access method.
         """
-        # For this rather pathological test, we are assigning the alpha module discussion_id (commentable_id)
+        # For this rather pathological test, we are assigning the alpha block discussion_id (commentable_id)
         # to a team so that we can verify that standalone threads don't go through discussion_category_id_access.
         thread_id = "test_thread_id"
         CourseTeamFactory(
             name="A team",
             course_id=self.course.id,
             topic_id='topic_id',
-            discussion_topic_id=self.alpha_module.discussion_id
+            discussion_topic_id=self.alpha_block.discussion_id
         )
         mock_request.side_effect = make_mock_request_impl(
             course=self.course, text="dummy content", thread_id=thread_id,
-            commentable_id=self.alpha_module.discussion_id
+            commentable_id=self.alpha_block.discussion_id
         )
 
         # If a thread returns context other than "course", the access check is not done, and the beta user
-        # can see the alpha discussion module.
-        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, True)
+        # can see the alpha discussion block.
+        self.assert_can_access(self.beta_user, self.alpha_block.discussion_id, thread_id, True)
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -1357,7 +1357,7 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-
         )
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
-        self.discussion1 = ItemFactory.create(
+        self.discussion1 = BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="discussion1",
@@ -1897,7 +1897,7 @@ class DividedDiscussionsTestCase(CohortViewsTestCase):  # lint-amnesty, pylint: 
         divided_discussions = divided_inline_discussions + divided_course_wide_discussions
 
         # inline discussion
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id=topic_name_to_id(self.course, "Topic A"),
@@ -2068,7 +2068,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         RequestCache.clear_all_namespaces()
         now = datetime.now()
         # inline discussion
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id="Topic_A",
@@ -2208,7 +2208,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
         self.staff = UserFactory.create(is_staff=True)
         UserBasedRole(user=self.staff, role=CourseStaffRole.ROLE).add_course(self.course.id)
 
-        self.category = ItemFactory.create(
+        self.category = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id=self.CATEGORY_ID,

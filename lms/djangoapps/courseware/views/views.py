@@ -129,7 +129,7 @@ from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 
-from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
+from ..block_render import get_block, get_block_by_usage_id, get_block_for_descriptor
 from ..tabs import _get_dynamic_tabs
 from ..toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
 
@@ -1258,16 +1258,16 @@ def get_static_tab_fragment(request, course, tab):
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course.id, request.user, modulestore().get_item(loc), depth=0
     )
-    tab_module = get_module(
+    tab_block = get_block(
         request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, course=course
     )
 
-    logging.debug('course_block = %s', tab_module)
+    logging.debug('course_block = %s', tab_block)
 
     fragment = Fragment()
-    if tab_module is not None:
+    if tab_block is not None:
         try:
-            fragment = tab_module.render(STUDENT_VIEW, {})
+            fragment = tab_block.render(STUDENT_VIEW, {})
         except Exception:  # pylint: disable=broad-except
             fragment.content = render_to_string('courseware/error-message.html', None)
             log.exception(
@@ -1301,12 +1301,12 @@ def get_course_lti_endpoints(request, course_id):
         return HttpResponse(status=404)
 
     anonymous_user = AnonymousUser()
-    anonymous_user.known = False  # make these "noauth" requests like module_render.handle_xblock_callback_noauth
+    anonymous_user.known = False  # make these "noauth" requests like block_render.handle_xblock_callback_noauth
     lti_descriptors = modulestore().get_items(course.id, qualifiers={'category': 'lti'})
     lti_descriptors.extend(modulestore().get_items(course.id, qualifiers={'category': 'lti_consumer'}))
 
-    lti_noauth_modules = [
-        get_module_for_descriptor(
+    lti_noauth_blocks = [
+        get_block_for_descriptor(
             anonymous_user,
             request,
             descriptor,
@@ -1323,13 +1323,13 @@ def get_course_lti_endpoints(request, course_id):
 
     endpoints = [
         {
-            'display_name': module.display_name,
-            'lti_2_0_result_service_json_endpoint': module.get_outcome_service_url(
+            'display_name': block.display_name,
+            'lti_2_0_result_service_json_endpoint': block.get_outcome_service_url(
                 service_name='lti_2_0_result_rest_handler') + "/user/{anon_user_id}",
-            'lti_1_1_result_service_xml_endpoint': module.get_outcome_service_url(
+            'lti_1_1_result_service_xml_endpoint': block.get_outcome_service_url(
                 service_name='grade_handler'),
         }
-        for module in lti_noauth_modules
+        for block in lti_noauth_blocks
     ]
 
     return HttpResponse(json.dumps(endpoints), content_type='application/json')  # lint-amnesty, pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
@@ -1539,7 +1539,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
         # get the block, which verifies whether the user has access to the block.
         recheck_access = request.GET.get('recheck_access') == '1'
-        block, _ = get_module_by_usage_id(
+        block, _ = get_block_by_usage_id(
             request, str(course_key), str(usage_key), disable_staff_debug_info=True, course=course,
             will_recheck_access=recheck_access
         )
@@ -1635,7 +1635,7 @@ def render_public_video_xblock(request, usage_key_string):
     with modulestore().bulk_operations(course_key):
         course = get_course_by_id(course_key, 0)
 
-        block, _ = get_module_by_usage_id(
+        block, _ = get_block_by_usage_id(
             request,
             str(course_key),
             str(usage_key),
