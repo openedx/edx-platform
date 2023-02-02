@@ -91,9 +91,9 @@ class CourseMode(models.Model):
     # overwrite the manual setting of the field.
     expiration_datetime_is_explicit = models.BooleanField(
         default=False,
-        verbose_name=_("Upgrade Deadline Explicitly Defined"),
+        verbose_name=_("Lock upgrade deadline date"),
         help_text=_(
-            "OPTIONAL: Set to True if the upgrade deadline date is explicitly defined. "
+            "OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline date. "
             "Set to False if there is no upgrade deadline or to use the default upgrade deadline."
         )
     )

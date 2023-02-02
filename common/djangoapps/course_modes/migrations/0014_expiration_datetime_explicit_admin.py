@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='coursemode',
             name='expiration_datetime_is_explicit',
-            field=models.BooleanField(default=False, help_text='OPTIONAL: Set to True if the upgrade deadline date is explicitly defined. Set to False if there is no upgrade deadline or to use the default upgrade deadline.', verbose_name='Upgrade Deadline Explicitly Defined'),
+            field=models.BooleanField(default=False, help_text='OPTIONAL: Set to True if the upgrade deadline date is to be locked to the defined upgrade_deadline. Set to False if there is no upgrade deadline or to use the default upgrade deadline.', verbose_name='Upgrade Deadline Explicitly Defined'),
         ),
         migrations.AlterField(
             model_name='historicalcoursemode',

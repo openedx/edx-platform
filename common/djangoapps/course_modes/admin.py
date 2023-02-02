@@ -129,7 +129,7 @@ class CourseModeForm(forms.ModelForm):
 
         if expiration_datetime_is_explicit and upgrade_deadline is None:
             raise forms.ValidationError(
-                "An upgrade deadline must be specified when setting Expiration datetime is explicit to True."
+                "An upgrade deadline must be specified when setting Lock upgrade deadline date to True."
             )
 
         # Allow upgrade deadlines ONLY for the "verified" mode
