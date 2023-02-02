@@ -59,10 +59,9 @@ jobs:
           sudo chmod -R a+rw /data/db
           mongod &
       
-      - name: Ubuntu and sql Versions
+      - name: Ubuntu and mongodb Versions
         run: |
           lsb_release -a
-          mysql -V
           mongod --version
         
       - name: install requirements
