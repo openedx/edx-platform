@@ -68,8 +68,10 @@ def clean_json(value, of_type):
 
 def clean_username(username=''):
     """ Simple helper method to ensure a username is compatible with our system requirements. """
-    return re.sub(r'[^-\w]+', '_', username)[:USERNAME_MAX_LENGTH]
-
+    log.info("Username received in clean_username: %s", username)
+    cleaned_username = re.sub(r'[^-\w]+', '_', username)[:USERNAME_MAX_LENGTH]
+    log.info("Cleaned username: %s", cleaned_username)
+    return cleaned_username
 
 class AuthNotConfigured(SocialAuthBaseException):
     """ Exception when SAMLProviderData or other required info is missing """
