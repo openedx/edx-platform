@@ -14,7 +14,6 @@ from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
-from common.djangoapps.util.request_rate_limiter import BadRequestRateLimiter
 from lms.djangoapps.certificates.api import (
     can_generate_certificate_task,
     generate_certificate_task,
@@ -150,99 +149,3 @@ def update_certificate(request):
         cert.save()
         return HttpResponse(json.dumps({'return_code': 0}),  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
                             content_type='application/json')
-
-
-@csrf_exempt
-@require_POST
-def update_example_certificate(request):
-    """Callback from the XQueue that updates example certificates.
-
-    Example certificates are used to verify that certificate
-    generation is configured correctly for a course.
-
-    Unlike other certificates, example certificates
-    are not associated with a particular user or displayed
-    to students.
-
-    For this reason, we need a different end-point to update
-    the status of generated example certificates.
-
-    Arguments:
-        request (HttpRequest)
-
-    Returns:
-        HttpResponse (200): Status was updated successfully.
-        HttpResponse (400): Invalid parameters.
-        HttpResponse (403): Rate limit exceeded for bad requests.
-        HttpResponse (404): Invalid certificate identifier or access key.
-
-    """
-    log.info("Received response for example certificate from XQueue.")
-
-    rate_limiter = BadRequestRateLimiter()
-
-    # Check the parameters and rate limits
-    # If these are invalid, return an error response.
-    if rate_limiter.is_rate_limit_exceeded(request):
-        log.info("Bad request rate limit exceeded for update example certificate end-point.")
-        return HttpResponseForbidden("Rate limit exceeded")
-
-    if 'xqueue_body' not in request.POST:
-        log.info("Missing parameter 'xqueue_body' for update example certificate end-point")
-        rate_limiter.tick_request_counter(request)
-        return JsonResponseBadRequest("Parameter 'xqueue_body' is required.")
-
-    if 'xqueue_header' not in request.POST:
-        log.info("Missing parameter 'xqueue_header' for update example certificate end-point")
-        rate_limiter.tick_request_counter(request)
-        return JsonResponseBadRequest("Parameter 'xqueue_header' is required.")
-
-    try:
-        xqueue_body = json.loads(request.POST['xqueue_body'])
-        xqueue_header = json.loads(request.POST['xqueue_header'])
-    except (ValueError, TypeError):
-        log.info("Could not decode params to example certificate end-point as JSON.")
-        rate_limiter.tick_request_counter(request)
-        return JsonResponseBadRequest("Parameters must be JSON-serialized.")
-
-    # Attempt to retrieve the example certificate record
-    # so we can update the status.
-    try:
-        uuid = xqueue_body.get('username')
-        access_key = xqueue_header.get('lms_key')
-        cert = ExampleCertificate.objects.get(uuid=uuid, access_key=access_key)
-    except ExampleCertificate.DoesNotExist as e:
-        # If we are unable to retrieve the record, it means the uuid or access key
-        # were not valid.  This most likely means that the request is NOT coming
-        # from the XQueue.  Return a 404 and increase the bad request counter
-        # to protect against a DDOS attack.
-        log.info("Could not find example certificate with uuid '%s' and access key '%s'", uuid, access_key)
-        rate_limiter.tick_request_counter(request)
-        raise Http404 from e
-
-    if 'error' in xqueue_body:
-        # If an error occurs, save the error message so we can fix the issue.
-        error_reason = xqueue_body.get('error_reason')
-        cert.update_status(ExampleCertificate.STATUS_ERROR, error_reason=error_reason)
-        log.warning(
-            (
-                "Error occurred during example certificate generation for uuid '%s'.  "
-                "The error response was '%s'."
-            ), uuid, error_reason
-        )
-    else:
-        # If the certificate generated successfully, save the download URL
-        # so we can display the example certificate.
-        download_url = xqueue_body.get('url')
-        if download_url is None:
-            rate_limiter.tick_request_counter(request)
-            log.warning("No download URL provided for example certificate with uuid '%s'.", uuid)
-            return JsonResponseBadRequest(
-                "Parameter 'download_url' is required for successfully generated certificates."
-            )
-        else:
-            cert.update_status(ExampleCertificate.STATUS_SUCCESS, download_url=download_url)
-            log.info("Successfully updated example certificate with uuid '%s'.", uuid)
-
-    # Let the XQueue know that we handled the response
-    return JsonResponse({'return_code': 0})

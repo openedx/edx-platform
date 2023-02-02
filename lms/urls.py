@@ -891,8 +891,6 @@ urlpatterns += [
 
     # Backwards compatibility with XQueue, which uses URLs that are not prefixed with /certificates/
     url(r'^update_certificate$', certificates_views.update_certificate, name='update_certificate'),
-    url(r'^update_example_certificate$', certificates_views.update_example_certificate,
-        name='update_example_certificate'),
     url(r'^request_certificate$', certificates_views.request_certificate,
         name='request_certificate'),
 
