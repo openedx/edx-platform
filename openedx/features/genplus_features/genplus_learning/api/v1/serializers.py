@@ -4,7 +4,6 @@ from xmodule.modulestore.django import modulestore
 from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from django.urls import reverse
 from openedx.features.genplus_features.genplus_learning.models import (
     Program,
     ProgramEnrollment,
@@ -176,7 +175,7 @@ class ClassStudentSerializer(serializers.ModelSerializer):
 
     def get_has_first_logon(self, obj):
         if obj.gen_user.from_private_school:
-            return obj.gen_user.user.last_login is None
+            return obj.gen_user.user.last_login is not None
         return obj.gen_user.user is not None
 
 

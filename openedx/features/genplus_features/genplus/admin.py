@@ -93,20 +93,28 @@ class SchoolAdmin(admin.ModelAdmin):
         if request.method == "POST":
             csv_file = request.FILES["csv_file"]
             reader = csv.DictReader(codecs.iterdecode(csv_file, 'utf-8'))
+            validated_data, error_msg = self.validate_csv(reader)
+            user_created = []
+            if not validated_data:
+                self.message_user(request,
+                                  error_msg,
+                                  level=messages.ERROR)
+                return redirect("..")
+            reader = csv.DictReader(codecs.iterdecode(csv_file, 'utf-8'))
             for row in reader:
                 try:
-                    # convert dict into lower case and the empty string into None
-                    non_empty_row = {k.lower().replace(" ", ""): (None if v == "" else v) for k, v in row.items()}
-                    first_name = non_empty_row['firstname']
-                    last_name = non_empty_row['secondname']
-                    email = non_empty_row['email']
-                    password = non_empty_row['password']
-                    school, gen_class = self.get_school_and_class(non_empty_row['school'],
-                                                                  non_empty_row['classname'],
-                                                                  non_empty_row['classcode'])
-                    if non_empty_row['role'] == GenUserRoles.STUDENT:
+                    # convert dict into lower case
+                    row = {k.lower().replace(" ", ""): (None if v == "" else v) for k, v in row.items()}
+                    first_name = row['firstname']
+                    last_name = row['secondname']
+                    email = row['email']
+                    password = row['password']
+                    school, gen_class = self.get_school_and_class(row['school'],
+                                                                  row['classname'],
+                                                                  row['classcode'])
+                    if row['role'] == GenUserRoles.STUDENT:
                         role = GenUserRoles.STUDENT
-                    elif non_empty_row['role'] == GenUserRoles.TEACHING_STAFF:
+                    elif row['role'] == GenUserRoles.TEACHING_STAFF:
                         role = GenUserRoles.TEACHING_STAFF
                     form = AccountCreationForm(
                         data={
@@ -143,6 +151,7 @@ class SchoolAdmin(admin.ModelAdmin):
                             process_pending_teacher_program_access(gen_user)
                         # activate user
                         registration.activate()
+                        user_created.append(user.email)
                     except AccountValidationError as e:
                         self.message_user(request, str(e), level=messages.ERROR)
                     except ValidationError as e:
@@ -152,7 +161,8 @@ class SchoolAdmin(admin.ModelAdmin):
                     self.message_user(request,
                                       'An Error occurred while parsing the csv. Please make sure that the csv is in the right format.',
                                       level=messages.ERROR)
-            self.message_user(request, "Your csv file has been uploaded.")
+            self.message_user(request, 'Your csv file has been uploaded. {}'.format(str({'users_count': len(user_created),
+                                                                                         'users_emails': user_created})))
             return redirect("..")
         form = CsvImportForm()
         payload = {"form": form}
@@ -180,6 +190,32 @@ class SchoolAdmin(admin.ModelAdmin):
                 school=school
             )
         return school, gen_class
+
+    @staticmethod
+    def validate_csv(reader):
+        try:
+            for row_count, row in enumerate(reader):
+                roles = [GenUserRoles.STUDENT, GenUserRoles.TEACHING_STAFF]
+                non_empty_row = {k.lower().replace(" ", ""): (None if v == "" else v) for k, v in row.items()}
+                role = non_empty_row['role']
+                if role not in roles:
+                    return False, f'Role should be {str(roles)} for row {row_count + 1}'
+                first_name = non_empty_row['firstname']
+                last_name = non_empty_row['secondname']
+                email = non_empty_row['email']
+                password = non_empty_row['password']
+                school = non_empty_row['school']
+                class_name = non_empty_row['classname']
+                class_code = non_empty_row['classcode']
+                check_list = [first_name, last_name, email, password, school]
+                if role == GenUserRoles.STUDENT:
+                    check_list.extend([class_code, class_name])
+                if None in check_list:
+                    return False, f'There are empty values on row {row_count + 1} please update that and try again.'
+
+            return True, None
+        except Exception:
+            return False, 'Something wrong with the csv. Make sure to upload it in right format.'
 
     def classes(self, obj):
         url = reverse('admin:genplus_class_changelist')
