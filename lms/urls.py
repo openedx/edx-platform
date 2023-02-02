@@ -17,7 +17,7 @@ from common.djangoapps.student import views as student_views
 from common.djangoapps.util import views as util_views
 from lms.djangoapps.branding import views as branding_views
 from lms.djangoapps.courseware.masquerade import MasqueradeView
-from lms.djangoapps.courseware.module_render import (
+from lms.djangoapps.courseware.block_render import (
     handle_xblock_callback,
     handle_xblock_callback_noauth,
     xblock_view,
@@ -197,6 +197,12 @@ urlpatterns = [
 
     # Learner Home
     path('api/learner_home/', include('lms.djangoapps.learner_home.urls', namespace='learner_home')),
+
+    # Learner Recommendations
+    path(
+        'api/learner_recommendations/',
+        include('lms.djangoapps.learner_recommendations.urls', namespace='learner_recommendations')
+    ),
 
     path(
         'api/experiments/',
@@ -658,6 +664,12 @@ urlpatterns += [
     path(
         'u/',
         include('openedx.features.learner_profile.urls'),
+    ),
+
+    # Survey Report
+    re_path(
+        fr'^survey_report/',
+        include('openedx.features.survey_report.urls'),
     ),
 ]
 

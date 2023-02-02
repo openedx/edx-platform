@@ -68,7 +68,7 @@ from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartiti
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from openedx.core.lib.teams_config import TeamsConfig
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import ReportStore
@@ -403,7 +403,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(2):
-                with self.assertNumQueries(51):
+                with self.assertNumQueries(50):
                     CourseGradeReport.generate(None, None, course.id, {}, 'graded')
 
     def test_inactive_enrollments(self):
@@ -689,7 +689,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         for idx in range(1, 6):
             self.define_option_problem(f'Problem{idx}')
-            item = ItemFactory.create(
+            item = BlockFactory.create(
                 parent_location=self.problem_section.location,
                 parent=self.problem_section,
                 display_name=f"Item{idx}",
@@ -828,7 +828,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
     @ddt.data(True, False)
     def test_single_problem(self, use_tempfile, _):
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             parent_location=self.problem_section.location,
             category='vertical',
             metadata={'graded': True},
@@ -873,7 +873,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             return_value=True,
         ):
             student_verified = self.create_student('user_verified', mode='verified')
-            vertical = ItemFactory.create(
+            vertical = BlockFactory.create(
                 parent_location=self.problem_section.location,
                 category='vertical',
                 metadata={'graded': True},
@@ -896,7 +896,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         Students with inactive enrollments in a course should be included in Problem Grade Report.
         """
         inactive_student = self.create_student('inactive-student', 'inactive@example.com', enrollment_active=False)
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             parent_location=self.problem_section.location,
             category='vertical',
             metadata={'graded': True},
@@ -1045,18 +1045,18 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             problem_section_format = 'Homework %d' % i
             problem_vertical_name = 'Problem Unit %d' % i
 
-            chapter = ItemFactory.create(parent_location=self.course.location,
-                                         display_name=chapter_name)
+            chapter = BlockFactory.create(parent_location=self.course.location,
+                                          display_name=chapter_name)
 
             # Add a sequence to the course to which the problems can be added
-            problem_section = ItemFactory.create(parent_location=chapter.location,
-                                                 category='sequential',
-                                                 metadata={'graded': True,
-                                                           'format': problem_section_format},
-                                                 display_name=problem_section_name)
+            problem_section = BlockFactory.create(parent_location=chapter.location,
+                                                  category='sequential',
+                                                  metadata={'graded': True,
+                                                            'format': problem_section_format},
+                                                  display_name=problem_section_name)
 
             # Create a vertical
-            problem_vertical = ItemFactory.create(
+            problem_vertical = BlockFactory.create(
                 parent_location=problem_section.location,
                 category='vertical',
                 display_name=problem_vertical_name
@@ -1088,7 +1088,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         super().setUp()
         # construct cohorted problems to work on.
         self.add_course_content()
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             parent_location=self.problem_section.location,
             category='vertical',
             metadata={'graded': True},
@@ -1757,16 +1757,16 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             },
             metadata={"start": in_the_past}
         )
-        self.chapter = ItemFactory.create(parent=self.course, category='chapter')
+        self.chapter = BlockFactory.create(parent=self.course, category='chapter')
 
-        self.problem_section = ItemFactory.create(
+        self.problem_section = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             metadata={'graded': True, 'format': 'Homework'},
             display_name='Subsection'
         )
         self.define_option_problem('Problem1', parent=self.problem_section)
-        self.hidden_section = ItemFactory.create(
+        self.hidden_section = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             metadata={'graded': True, 'format': 'Homework'},
@@ -1774,20 +1774,20 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             display_name='Hidden',
         )
         self.define_option_problem('Problem2', parent=self.hidden_section)
-        self.unattempted_section = ItemFactory.create(
+        self.unattempted_section = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             metadata={'graded': True, 'format': 'Homework'},
             display_name='Unattempted',
         )
         self.define_option_problem('Problem3', parent=self.unattempted_section)
-        self.empty_section = ItemFactory.create(
+        self.empty_section = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             metadata={'graded': True, 'format': 'Homework'},
             display_name='Empty',
         )
-        self.unreleased_section = ItemFactory.create(
+        self.unreleased_section = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             metadata={'graded': True, 'format': 'Homework', 'start': in_the_future},
@@ -1893,7 +1893,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ):
             student_1 = self.create_student('user_honor')
             student_verified = self.create_student('user_verified', mode='verified')
-            vertical = ItemFactory.create(
+            vertical = BlockFactory.create(
                 parent_location=self.problem_section.location,
                 category='vertical',
                 metadata={'graded': True},
@@ -1958,7 +1958,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         factory = MultipleChoiceResponseXMLFactory()
         args = {'choices': [False, True, False]}
         problem_xml = factory.build_xml(**args)
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=parent.location,
             parent=parent,
             category="problem",

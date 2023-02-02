@@ -12,7 +12,7 @@ from common.djangoapps.util.milestones_helpers import add_prerequisite_course, f
 from lms.djangoapps.courseware.access_response import MilestoneAccessError
 from lms.djangoapps.courseware.tests.test_entrance_exam import add_entrance_exam_milestone, answer_entrance_exam_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class MobileAPIMilestonesMixin:
@@ -89,21 +89,21 @@ class MobileAPIMilestonesMixin:
         with self.store.bulk_operations(self.course.id):
             self.course.entrance_exam_enabled = True
 
-            self.entrance_exam = ItemFactory.create(
+            self.entrance_exam = BlockFactory.create(
                 parent=self.course,
                 category="chapter",
                 display_name="Entrance Exam Chapter",
                 is_entrance_exam=True,
                 in_entrance_exam=True,
             )
-            self.subsection_1 = ItemFactory.create(
+            self.subsection_1 = BlockFactory.create(
                 parent=self.entrance_exam,
                 category='sequential',
                 display_name="The Only Exam Sequential",
                 graded=True,
                 in_entrance_exam=True,
             )
-            self.problem_1 = ItemFactory.create(
+            self.problem_1 = BlockFactory.create(
                 parent=self.subsection_1,
                 category='problem',
                 display_name="The Only Exam Problem",

@@ -43,7 +43,7 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.utils import SPLIT_MODULESTORE_SETUP, TEST_DATA_DIR, MongoContentstoreBuilder  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.xml_importer import (  # lint-amnesty, pylint: disable=wrong-import-order
@@ -51,7 +51,7 @@ from xmodule.modulestore.xml_importer import (  # lint-amnesty, pylint: disable=
     ErrorReadingFileException,
     import_course_from_xml,
     import_library_from_xml,
-    ModuleFailedToImport,
+    BlockFailedToImport,
 )
 
 TASK_LOGGER = 'cms.djangoapps.contentstore.tasks.LOGGER'
@@ -124,7 +124,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.post(exam_url, {'entrance_exam_minimum_score_pct': 0.5}, http_accept='application/json')
         self.assertEqual(resp.status_code, 201)
 
-        # Reload the test course now that the exam module has been added
+        # Reload the test course now that the exam block has been added
         self.course = modulestore().get_course(self.course.id)
         metadata = CourseMetadata.fetch_all(self.course)
         self.assertTrue(metadata['entrance_exam_enabled'])
@@ -407,13 +407,13 @@ class ImportTestCase(CourseTestCase):
         # Create some blocks to overwrite
         library = LibraryFactory.create(modulestore=self.store)
         lib_key = library.location.library_key
-        test_block = ItemFactory.create(
+        test_block = BlockFactory.create(
             category="vertical",
             parent_location=library.location,
             user_id=self.user.id,
             publish_item=False,
         )
-        test_block2 = ItemFactory.create(
+        test_block2 = BlockFactory.create(
             category="vertical",
             parent_location=library.location,
             user_id=self.user.id,
@@ -422,13 +422,13 @@ class ImportTestCase(CourseTestCase):
         # Create a library and blocks that should remain unmolested.
         unchanged_lib = LibraryFactory.create()
         unchanged_key = unchanged_lib.location.library_key
-        test_block3 = ItemFactory.create(
+        test_block3 = BlockFactory.create(
             category="vertical",
             parent_location=unchanged_lib.location,
             user_id=self.user.id,
             publish_item=False
         )
-        test_block4 = ItemFactory.create(
+        test_block4 = BlockFactory.create(
             category="vertical",
             parent_location=unchanged_lib.location,
             user_id=self.user.id,
@@ -460,7 +460,7 @@ class ImportTestCase(CourseTestCase):
                 self.user.id,
                 settings.GITHUB_REPO_ROOT,
                 [extract_dir_relative / 'library'],
-                load_error_modules=False,
+                load_error_blocks=False,
                 static_content_store=contentstore(),
                 target_id=lib_key
             )
@@ -505,7 +505,7 @@ class ImportTestCase(CourseTestCase):
                     self.user.id,
                     settings.GITHUB_REPO_ROOT,
                     [extract_dir_relative / 'library'],
-                    load_error_modules=False,
+                    load_error_blocks=False,
                     static_content_store=contentstore(),
                     target_id=lib_key
                 )
@@ -540,7 +540,7 @@ class ImportTestCase(CourseTestCase):
                             [extract_dir_relative / 'library'],
                             static_content_store=source_content,
                             target_id=source_library_key,
-                            load_error_modules=False,
+                            load_error_blocks=False,
                             raise_on_failure=True,
                             create_if_not_present=True,
                         )
@@ -639,7 +639,7 @@ class ImportTestCase(CourseTestCase):
         ),
         (DuplicateCourseError("foo", "foobar"), 'Cannot create course foo, which duplicates foobar'),
         (ErrorReadingFileException("assets.xml"), "Error while reading assets.xml. Check file for XML errors."),
-        (ModuleFailedToImport("Unit 1", "foo/bar"), "Failed to import module: Unit 1 at location: foo/bar"),
+        (BlockFailedToImport("Unit 1", "foo/bar"), "Failed to import block: Unit 1 at location: foo/bar"),
     )
     @ddt.unpack
     def test_import_failure_is_descriptive_for_known_failures(self, exc, expected_mesg, mocked_import, mocked_log):
@@ -749,7 +749,7 @@ class ExportTestCase(CourseTestCase):
         """
         Export unknown XBlock type (i.e. we uninstalled the XBlock), top level.
         """
-        fake_xblock = ItemFactory.create(
+        fake_xblock = BlockFactory.create(
             parent_location=self.course.location,
             category='not_a_real_block_type'
         )
@@ -784,12 +784,12 @@ class ExportTestCase(CourseTestCase):
         """
         Export unknown XBlock type deeper in the course.
         """
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             parent_location=self.course.location,
             category='vertical',
             display_name='sample_vertical',
         )
-        fake_xblock = ItemFactory.create(
+        fake_xblock = BlockFactory.create(
             parent_location=vertical.location,
             category='not_a_real_block_type',
         )
@@ -840,7 +840,7 @@ class ExportTestCase(CourseTestCase):
         self.assertNotIn('ExportOutput', result)
         self.assertIn('ExportError', result)
         error = result['ExportError']
-        self.assertIn('Unable to create xml for module', error['raw_error_msg'])
+        self.assertIn('Unable to create xml for block', error['raw_error_msg'])
         self.assertIn(expected_text, error['edit_unit_url'])
 
     def test_library_export(self):
@@ -849,7 +849,7 @@ class ExportTestCase(CourseTestCase):
         """
         youtube_id = "qS4NO9MNC6w"
         library = LibraryFactory.create(modulestore=self.store)
-        video_block = ItemFactory.create(
+        video_block = BlockFactory.create(
             category="video",
             parent_location=library.location,
             user_id=self.user.id,
@@ -880,10 +880,10 @@ class ExportTestCase(CourseTestCase):
         Verify that course export with customtag
         """
         xml_string = '<impl>slides</impl>'
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             parent_location=self.course.location, category='vertical', display_name='foo'
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=vertical.location,
             category='customtag',
             display_name='custom_tag_foo',
@@ -1033,7 +1033,7 @@ class TestLibraryImportExport(CourseTestCase):
             ['library_empty_problem'],
             static_content_store=contentstore(),
             target_id=source_library1_key,
-            load_error_modules=False,
+            load_error_blocks=False,
             raise_on_failure=True,
             create_if_not_present=True,
         )
@@ -1057,7 +1057,7 @@ class TestLibraryImportExport(CourseTestCase):
             ['exported_source_library'],
             static_content_store=contentstore(),
             target_id=source_library2_key,
-            load_error_modules=False,
+            load_error_blocks=False,
             raise_on_failure=True,
             create_if_not_present=True,
         )
@@ -1078,7 +1078,7 @@ class TestCourseExportImport(LibraryTestCase):
         self.export_dir = tempfile.mkdtemp()
 
         # Create a problem in library
-        ItemFactory.create(
+        BlockFactory.create(
             category="problem",
             parent_location=self.library.location,
             user_id=self.user.id,
@@ -1095,17 +1095,17 @@ class TestCourseExportImport(LibraryTestCase):
         """
         Sets up course with library content.
         """
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.source_course.location,
             category='chapter',
             display_name='Test Section'
         )
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=chapter.location,
             category='sequential',
             display_name='Test Sequential'
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             category='vertical',
             parent_location=sequential.location,
             display_name='Test Unit'
@@ -1184,7 +1184,7 @@ class TestCourseExportImport(LibraryTestCase):
             ['exported_source_course'],
             static_content_store=contentstore(),
             target_id=dest_course.location.course_key,
-            load_error_modules=False,
+            load_error_blocks=False,
             raise_on_failure=True,
             create_if_not_present=True,
         )
@@ -1213,23 +1213,23 @@ class TestCourseExportImportProblem(CourseTestCase):
         """
         Sets up course with problem content.
         """
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.source_course.location,
             category='chapter',
             display_name='Test Section'
         )
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=chapter.location,
             category='sequential',
             display_name='Test Sequential'
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             category='vertical',
             parent_location=sequential.location,
             display_name='Test Unit'
         )
 
-        ItemFactory.create(
+        BlockFactory.create(
             parent=vertical,
             category='problem',
             display_name='Test Problem',
@@ -1314,7 +1314,7 @@ class TestCourseExportImportProblem(CourseTestCase):
             ['exported_source_course'],
             static_content_store=contentstore(),
             target_id=dest_course.location.course_key,
-            load_error_modules=False,
+            load_error_blocks=False,
             raise_on_failure=True,
             create_if_not_present=True,
         )

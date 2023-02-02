@@ -39,7 +39,7 @@ from openedx.core.lib.courses import course_image_url
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from xmodule.course_block import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import errors
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05
@@ -457,23 +457,23 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         """
         super().setUp()
 
-        self.section = ItemFactory.create(
+        self.section = BlockFactory.create(
             parent=self.course,
             category='chapter',
         )
-        self.sub_section = ItemFactory.create(
+        self.sub_section = BlockFactory.create(
             parent=self.section,
             category='sequential',
         )
-        self.unit = ItemFactory.create(
+        self.unit = BlockFactory.create(
             parent=self.sub_section,
             category='vertical',
         )
-        self.other_sub_section = ItemFactory.create(
+        self.other_sub_section = BlockFactory.create(
             parent=self.section,
             category='sequential',
         )
-        self.other_unit = ItemFactory.create(
+        self.other_unit = BlockFactory.create(
             parent=self.other_sub_section,
             category='vertical',
         )
@@ -490,7 +490,7 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
         response = self.api_response(api_version=API_V05)
         assert response.data['last_visited_module_id'] == str(self.sub_section.location)
-        assert response.data['last_visited_module_path'] == [str(module.location) for module in
+        assert response.data['last_visited_module_path'] == [str(block.location) for block in
                                                              [self.sub_section, self.section, self.course]]
 
     def test_success_v1(self):
@@ -558,12 +558,12 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         response = self.api_response(data={"last_visited_module_id": str(self.other_unit.location)})
         assert response.data['last_visited_module_id'] == str(self.other_sub_section.location)
 
-    def test_invalid_module(self):
+    def test_invalid_block(self):
         self.login_and_enroll()
         response = self.api_response(data={"last_visited_module_id": "abc"}, expected_response_code=400)
         assert response.data == errors.ERROR_INVALID_MODULE_ID
 
-    def test_nonexistent_module(self):
+    def test_nonexistent_block(self):
         self.login_and_enroll()
         non_existent_key = self.course.id.make_usage_key('video', 'non-existent')
         response = self.api_response(data={"last_visited_module_id": non_existent_key}, expected_response_code=400)

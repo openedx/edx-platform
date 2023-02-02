@@ -31,4 +31,4 @@ class Command(BaseCommand):
             data=data_dir,
             courses=source_dirs))
 
-        perform_xlint(data_dir, source_dirs, load_error_modules=False)
+        perform_xlint(data_dir, source_dirs, load_error_blocks=False)

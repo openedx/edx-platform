@@ -7,7 +7,7 @@ from unittest.mock import patch
 from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from .signals import export_course_metadata
 from .toggles import EXPORT_COURSE_METADATA_FLAG
@@ -31,7 +31,7 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
         SignalHandler.course_published.disconnect(export_course_metadata)
 
     def _create_chapter(self, **kwargs):
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.course,
             category='chapter',
             **kwargs

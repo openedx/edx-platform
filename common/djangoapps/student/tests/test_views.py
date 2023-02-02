@@ -42,11 +42,12 @@ from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 PASSWORD = 'test'
 TOMORROW = now() + timedelta(days=1)
@@ -62,7 +63,7 @@ CDL_METHOD_NAME = 'openedx.features.course_duration_limits.models.CourseDuration
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
     """
     Test to ensure that the student dashboard does not show the unenroll button for users with certificates.
@@ -178,7 +179,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, CompletionWaffleTestMixin):
     """
     Tests for the student dashboard.
@@ -235,13 +236,14 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertRedirects(response, reverse('account_settings'))
 
-    def test_redirect_to_learner_home(self):
+    @patch('common.djangoapps.student.views.dashboard.should_redirect_to_learner_home_mfe')
+    def test_redirect_to_learner_home(self, mock_should_redirect_to_learner_home_mfe):
         """
         if learner home mfe is enabled, redirect to learner home mfe
         """
-        with patch('lms.djangoapps.learner_home.waffle.ENABLE_LEARNER_HOME_MFE.is_enabled', return_value=True):
-            response = self.client.get(self.path)
-            self.assertRedirects(response, settings.LEARNER_HOME_MICROFRONTEND_URL, fetch_redirect_response=False)
+        mock_should_redirect_to_learner_home_mfe.return_value = True
+        response = self.client.get(self.path)
+        self.assertRedirects(response, settings.LEARNER_HOME_MICROFRONTEND_URL, fetch_redirect_response=False)
 
     def test_course_cert_available_message_after_course_end(self):
         course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
@@ -754,7 +756,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         course_key = course.id
         block_keys = [
-            ItemFactory.create(
+            BlockFactory.create(
                 category='video',
                 parent_location=course.location,
                 display_name=f'Video {str(number)}'
@@ -854,7 +856,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             # Submit completed course blocks in even-numbered courses.
             if isEven(i):
                 block_keys = [
-                    ItemFactory.create(
+                    BlockFactory.create(
                         category='video',
                         parent_location=course.location,
                         display_name=f'Video {str(number)}'
@@ -1007,7 +1009,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                     self.assertContains(response, upgrade_message)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid for the LMS')
+@skip_unless_lms
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_NOTICES"), 'Notices plugin is not enabled')
 class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
     """

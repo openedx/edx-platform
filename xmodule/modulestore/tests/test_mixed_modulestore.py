@@ -418,8 +418,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         course_locn = self.course_locations[self.MONGO_COURSEID]
         with check_mongo_calls(max_find, max_send), self.assertNumQueries(num_mysql):
-            modules = self.store.get_items(course_locn.course_key, qualifiers={'category': 'problem'})
-        assert len(modules) == 6
+            blocks = self.store.get_items(course_locn.course_key, qualifiers={'category': 'problem'})
+        assert len(blocks) == 6
 
         # verify that an error is raised when the revision is not valid
         with pytest.raises(UnsupportedRevisionError):
@@ -448,7 +448,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             assert block.course_version == course_version
             # ensure that when the block is retrieved from the runtime cache,
             # the course version is still present
-            cached_block = course.runtime.load_item(block.location)
+            cached_block = course.runtime.get_block(block.location)
             assert cached_block.course_version == block.course_version
 
     @ddt.data((ModuleStoreEnum.Type.split, 2, False), (ModuleStoreEnum.Type.mongo, 3, True))
@@ -2460,7 +2460,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
         # verify store used for creating a course
         course = self.store.create_course("org", "course{}".format(uuid4().hex[:5]), "run", self.user_id)
-        assert course.system.modulestore.get_modulestore_type() == store_type
+        assert course.runtime.modulestore.get_modulestore_type() == store_type
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_default_store(self, default_ms):
@@ -2676,7 +2676,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 # Note: The signal is fired once when the course is created and
                 # a second time after the actual data import.
                 import_course_from_xml(
-                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
+                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_blocks=False,
                     static_content_store=contentstore,
                     create_if_not_present=True,
                 )
@@ -3345,7 +3345,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                 dest_course_key = self.store.make_course_key('edX', "aside_test", "2012_Fall")
                 courses = import_course_from_xml(
                     self.store, self.user_id, DATA_DIR, ['aside'],
-                    load_error_modules=False,
+                    load_error_blocks=False,
                     static_content_store=contentstore,
                     target_id=dest_course_key,
                     create_if_not_present=True,
@@ -3421,7 +3421,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                     self.user_id,
                     DATA_DIR,
                     ['aside'],
-                    load_error_modules=False,
+                    load_error_blocks=False,
                     static_content_store=contentstore,
                     target_id=dest_course_key,
                     create_if_not_present=True,
@@ -3508,7 +3508,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                     self.user_id,
                     DATA_DIR,
                     ['aside'],
-                    load_error_modules=False,
+                    load_error_blocks=False,
                     static_content_store=contentstore,
                     target_id=dest_course_key,
                     create_if_not_present=True,

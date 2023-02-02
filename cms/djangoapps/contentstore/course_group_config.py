@@ -114,26 +114,26 @@ class GroupConfiguration:
             raise GroupConfigurationsValidationError(_("unable to load this type of group configuration"))  # lint-amnesty, pylint: disable=raise-missing-from
 
     @staticmethod
-    def _get_usage_dict(course, unit, item, scheme_name=None):
+    def _get_usage_dict(course, unit, block, scheme_name=None):
         """
-        Get usage info for unit/module.
+        Get usage info for unit/block.
         """
-        parent_unit = get_parent_unit(item)
+        parent_unit = get_parent_unit(block)
 
-        if unit == parent_unit and not item.has_children:
+        if unit == parent_unit and not block.has_children:
             # Display the topmost unit page if
             # the item is a child of the topmost unit and doesn't have its own children.
             unit_for_url = unit
-        elif (not parent_unit and unit.get_parent()) or (unit == parent_unit and item.has_children):
+        elif (not parent_unit and unit.get_parent()) or (unit == parent_unit and block.has_children):
             # Display the item's page rather than the unit page if
             # the item is one level below the topmost unit and has children, or
             # the item itself *is* the topmost unit (and thus does not have a parent unit, but is not an orphan).
-            unit_for_url = item
+            unit_for_url = block
         else:
             # If the item is nested deeper than two levels (the topmost unit > vertical > ... > item)
             # display the page for the nested vertical element.
-            parent = item.get_parent()
-            nested_vertical = item
+            parent = block.get_parent()
+            nested_vertical = block
             while parent != parent_unit:
                 nested_vertical = parent
                 parent = parent.get_parent()
@@ -144,9 +144,9 @@ class GroupConfiguration:
             course.location.course_key.make_usage_key(unit_for_url.location.block_type, unit_for_url.location.block_id)
         )
 
-        usage_dict = {'label': f"{unit.display_name} / {item.display_name}", 'url': unit_url}
+        usage_dict = {'label': f"{unit.display_name} / {block.display_name}", 'url': unit_url}
         if scheme_name == RANDOM_SCHEME:
-            validation_summary = item.general_validation_message()
+            validation_summary = block.general_validation_message()
             usage_dict.update({'validation': validation_summary.to_json() if validation_summary else None})
         return usage_dict
 
@@ -204,7 +204,7 @@ class GroupConfiguration:
             usage_info[split_test.user_partition_id].append(GroupConfiguration._get_usage_dict(
                 course=course,
                 unit=unit,
-                item=split_test,
+                block=split_test,
                 scheme_name=RANDOM_SCHEME,
             ))
         return usage_info
@@ -233,16 +233,16 @@ class GroupConfiguration:
         items = store.get_items(course.id, settings={'group_access': {'$exists': True}}, include_orphans=False)
 
         usage_info = defaultdict(lambda: defaultdict(list))
-        for item, partition_id, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
-            unit = item.get_parent()
+        for block, partition_id, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
+            unit = block.get_parent()
             if not unit:
-                log.warning("Unable to find parent for component %s", item.location)
+                log.warning("Unable to find parent for component %s", block.location)
                 continue
 
             usage_info[partition_id][group_id].append(GroupConfiguration._get_usage_dict(
                 course,
                 unit=unit,
-                item=item,
+                block=block,
             ))
 
         return usage_info
@@ -280,11 +280,11 @@ class GroupConfiguration:
         }
         """
         usage_info = defaultdict(lambda: defaultdict(list))
-        for item, partition_id, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
+        for block, partition_id, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
             usage_info[partition_id][group_id].append(GroupConfiguration._get_usage_dict(
                 course,
-                unit=item,
-                item=item,
+                unit=block,
+                block=block,
             ))
 
         return usage_info

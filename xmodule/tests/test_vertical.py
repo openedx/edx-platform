@@ -1,5 +1,5 @@
 """
-Tests for vertical module.
+Tests for vertical block.
 """
 
 # pylint: disable=protected-access
@@ -89,7 +89,7 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
 
     def setUp(self):
         super().setUp()
-        # construct module: course/sequence/vertical - problems
+        # construct block: course/sequence/vertical - problems
         #                                           \_  nested_vertical / problems
         course = xml.CourseFactory.build()
         sequence = xml.SequenceFactory.build(parent=course)

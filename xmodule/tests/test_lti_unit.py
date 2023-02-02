@@ -67,14 +67,14 @@ class LTIBlockTest(TestCase):
         self.system.publish = Mock()
         self.system._services['rebind_user'] = Mock()  # pylint: disable=protected-access
 
-        self.xmodule = LTIBlock(
+        self.xblock = LTIBlock(
             self.system,
             DictFieldData({}),
             ScopeIds(None, None, None, BlockUsageLocator(self.course_id, 'lti', 'name'))
         )
-        current_user = self.system.service(self.xmodule, 'user').get_current_user()
+        current_user = self.system.service(self.xblock, 'user').get_current_user()
         self.user_id = current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
-        self.lti_id = self.xmodule.lti_id
+        self.lti_id = self.xblock.lti_id
 
         self.unquoted_resource_link_id = '{}-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'.format(
             settings.LMS_BASE
@@ -90,8 +90,8 @@ class LTIBlockTest(TestCase):
             'messageIdentifier': '528243ba5241b',
         }
 
-        self.xmodule.due = None
-        self.xmodule.graceperiod = None
+        self.xblock.due = None
+        self.xblock.graceperiod = None
 
     def get_request_body(self, params=None):
         """Fetches the body of a request specified by params"""
@@ -138,7 +138,7 @@ class LTIBlockTest(TestCase):
         """
         request = Request(self.environ)
         request.body = self.get_request_body()
-        response = self.xmodule.grade_handler(request, '')
+        response = self.xblock.grade_handler(request, '')
         real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
@@ -163,7 +163,7 @@ class LTIBlockTest(TestCase):
         request = Request(self.environ)
         request.authorization = "bad authorization header"
         request.body = self.get_request_body()
-        response = self.xmodule.grade_handler(request, '')
+        response = self.xblock.grade_handler(request, '')
         real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
@@ -179,11 +179,11 @@ class LTIBlockTest(TestCase):
         If we have no real user, we should send back failure response.
         """
         self.system._services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
-        self.xmodule.verify_oauth_body_sign = Mock()
-        self.xmodule.has_score = True
+        self.xblock.verify_oauth_body_sign = Mock()
+        self.xblock.has_score = True
         request = Request(self.environ)
         request.body = self.get_request_body()
-        response = self.xmodule.grade_handler(request, '')
+        response = self.xblock.grade_handler(request, '')
         real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
@@ -198,12 +198,12 @@ class LTIBlockTest(TestCase):
         """
         Should fail if we do not accept past due grades, and it is past due.
         """
-        self.xmodule.accept_grades_past_due = False
-        self.xmodule.due = datetime.datetime.now(UTC)
-        self.xmodule.graceperiod = Timedelta().from_json("0 seconds")
+        self.xblock.accept_grades_past_due = False
+        self.xblock.due = datetime.datetime.now(UTC)
+        self.xblock.graceperiod = Timedelta().from_json("0 seconds")
         request = Request(self.environ)
         request.body = self.get_request_body()
-        response = self.xmodule.grade_handler(request, '')
+        response = self.xblock.grade_handler(request, '')
         real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
@@ -218,10 +218,10 @@ class LTIBlockTest(TestCase):
         """
         Grade returned from Tool Provider is outside the range 0.0-1.0.
         """
-        self.xmodule.verify_oauth_body_sign = Mock()
+        self.xblock.verify_oauth_body_sign = Mock()
         request = Request(self.environ)
         request.body = self.get_request_body(params={'grade': '10'})
-        response = self.xmodule.grade_handler(request, '')
+        response = self.xblock.grade_handler(request, '')
         real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
@@ -236,10 +236,10 @@ class LTIBlockTest(TestCase):
         """
         Grade returned from Tool Provider doesn't use a period as the decimal point.
         """
-        self.xmodule.verify_oauth_body_sign = Mock()
+        self.xblock.verify_oauth_body_sign = Mock()
         request = Request(self.environ)
         request.body = self.get_request_body(params={'grade': '0,5'})
-        response = self.xmodule.grade_handler(request, '')
+        response = self.xblock.grade_handler(request, '')
         real_response = self.get_response_values(response)
         msg = "could not convert string to float: '0,5'"
         expected_response = {
@@ -256,10 +256,10 @@ class LTIBlockTest(TestCase):
         Action returned from Tool Provider isn't supported.
         `replaceResultRequest` is supported only.
         """
-        self.xmodule.verify_oauth_body_sign = Mock()
+        self.xblock.verify_oauth_body_sign = Mock()
         request = Request(self.environ)
         request.body = self.get_request_body({'action': 'wrongAction'})
-        response = self.xmodule.grade_handler(request, '')
+        response = self.xblock.grade_handler(request, '')
         real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
@@ -274,11 +274,11 @@ class LTIBlockTest(TestCase):
         """
         Response from Tool Provider is correct.
         """
-        self.xmodule.verify_oauth_body_sign = Mock()
-        self.xmodule.has_score = True
+        self.xblock.verify_oauth_body_sign = Mock()
+        self.xblock.has_score = True
         request = Request(self.environ)
         request.body = self.get_request_body()
-        response = self.xmodule.grade_handler(request, '')
+        response = self.xblock.grade_handler(request, '')
         description_expected = 'Score for {sourcedId} is now {score}'.format(
             sourcedId=self.defaults['sourcedId'],
             score=self.defaults['grade'],
@@ -293,11 +293,11 @@ class LTIBlockTest(TestCase):
 
         assert response.status_code == 200
         self.assertDictEqual(expected_response, real_response)
-        assert self.xmodule.module_score == float(self.defaults['grade'])
+        assert self.xblock.module_score == float(self.defaults['grade'])
 
     def test_user_id(self):
-        expected_user_id = str(parse.quote(self.xmodule.runtime.anonymous_student_id))
-        real_user_id = self.xmodule.get_user_id()
+        expected_user_id = str(parse.quote(self.xblock.runtime.anonymous_student_id))
+        real_user_id = self.xblock.get_user_id()
         assert real_user_id == expected_user_id
 
     def test_outcome_service_url(self):
@@ -308,24 +308,24 @@ class LTIBlockTest(TestCase):
             """Mock function for returning fully-qualified handler urls"""
             return mock_url_prefix + handler_name
 
-        self.xmodule.runtime.handler_url = Mock(side_effect=mock_handler_url)
-        real_outcome_service_url = self.xmodule.get_outcome_service_url(service_name=test_service_name)
+        self.xblock.runtime.handler_url = Mock(side_effect=mock_handler_url)
+        real_outcome_service_url = self.xblock.get_outcome_service_url(service_name=test_service_name)
         assert real_outcome_service_url == (mock_url_prefix + test_service_name)
 
     def test_resource_link_id(self):
         with patch('xmodule.lti_block.LTIBlock.location', new_callable=PropertyMock):
-            self.xmodule.location.html_id = lambda: 'i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
+            self.xblock.location.html_id = lambda: 'i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
             expected_resource_link_id = str(parse.quote(self.unquoted_resource_link_id))
-            real_resource_link_id = self.xmodule.get_resource_link_id()
+            real_resource_link_id = self.xblock.get_resource_link_id()
             assert real_resource_link_id == expected_resource_link_id
 
     def test_lis_result_sourcedid(self):
         expected_sourced_id = ':'.join(parse.quote(i) for i in (
             str(self.course_id),
-            self.xmodule.get_resource_link_id(),
+            self.xblock.get_resource_link_id(),
             self.user_id
         ))
-        real_lis_result_sourcedid = self.xmodule.get_lis_result_sourcedid()
+        real_lis_result_sourcedid = self.xblock.get_lis_result_sourcedid()
         assert real_lis_result_sourcedid == expected_sourced_id
 
     def test_client_key_secret(self):
@@ -337,9 +337,9 @@ class LTIBlockTest(TestCase):
         modulestore = Mock()
         modulestore.get_course.return_value = mocked_course
         runtime = Mock(modulestore=modulestore)
-        self.xmodule.runtime = runtime
-        self.xmodule.lti_id = "lti_id"
-        key, secret = self.xmodule.get_client_key_secret()
+        self.xblock.runtime = runtime
+        self.xblock.lti_id = "lti_id"
+        key, secret = self.xblock.get_client_key_secret()
         expected = ('test_client', 'test_secret')
         assert expected == (key, secret)
 
@@ -355,10 +355,10 @@ class LTIBlockTest(TestCase):
         modulestore = Mock()
         modulestore.get_course.return_value = mocked_course
         runtime = Mock(modulestore=modulestore)
-        self.xmodule.runtime = runtime
+        self.xblock.runtime = runtime
         # set another lti_id
-        self.xmodule.lti_id = "another_lti_id"
-        key_secret = self.xmodule.get_client_key_secret()
+        self.xblock.lti_id = "another_lti_id"
+        key_secret = self.xblock.get_client_key_secret()
         expected = ('', '')
         assert expected == key_secret
 
@@ -373,10 +373,10 @@ class LTIBlockTest(TestCase):
         modulestore = Mock()
         modulestore.get_course.return_value = mocked_course
         runtime = Mock(modulestore=modulestore)
-        self.xmodule.runtime = runtime
-        self.xmodule.lti_id = 'lti_id'
+        self.xblock.runtime = runtime
+        self.xblock.lti_id = 'lti_id'
         with pytest.raises(LTIError):
-            self.xmodule.get_client_key_secret()
+            self.xblock.get_client_key_secret()
 
     @patch('xmodule.lti_block.signature.verify_hmac_sha1', Mock(return_value=True))
     @patch(
@@ -387,7 +387,7 @@ class LTIBlockTest(TestCase):
         """
         Test if OAuth signing was successful.
         """
-        self.xmodule.verify_oauth_body_sign(self.get_signed_grade_mock_request())
+        self.xblock.verify_oauth_body_sign(self.get_signed_grade_mock_request())
 
     @patch('xmodule.lti_block.LTIBlock.get_outcome_service_url', Mock(return_value='https://testurl/'))
     @patch('xmodule.lti_block.LTIBlock.get_client_key_secret',
@@ -397,12 +397,12 @@ class LTIBlockTest(TestCase):
         Oauth signing verify fail.
         """
         request = self.get_signed_grade_mock_request_with_correct_signature()
-        self.xmodule.verify_oauth_body_sign(request)
+        self.xblock.verify_oauth_body_sign(request)
         # we should verify against get_outcome_service_url not
         # request url proxy and load balancer along the way may
         # change url presented to the method
         request.url = 'http://testurl/'
-        self.xmodule.verify_oauth_body_sign(request)
+        self.xblock.verify_oauth_body_sign(request)
 
     def get_signed_grade_mock_request_with_correct_signature(self):
         """
@@ -445,7 +445,7 @@ class LTIBlockTest(TestCase):
         """
         with pytest.raises(IndexError):
             mocked_request = self.get_signed_grade_mock_request(namespace_lti_v1p1=False)
-            self.xmodule.parse_grade_xml_body(mocked_request.body)
+            self.xblock.parse_grade_xml_body(mocked_request.body)
 
     def test_parse_grade_xml_body(self):
         """
@@ -454,7 +454,7 @@ class LTIBlockTest(TestCase):
         Tests that xml body was parsed successfully.
         """
         mocked_request = self.get_signed_grade_mock_request()
-        message_identifier, sourced_id, grade, action = self.xmodule.parse_grade_xml_body(mocked_request.body)
+        message_identifier, sourced_id, grade, action = self.xblock.parse_grade_xml_body(mocked_request.body)
         assert self.defaults['messageIdentifier'] == message_identifier
         assert self.defaults['sourcedId'] == sourced_id
         assert self.defaults['grade'] == grade
@@ -471,7 +471,7 @@ class LTIBlockTest(TestCase):
         """
         with pytest.raises(LTIError):
             req = self.get_signed_grade_mock_request()
-            self.xmodule.verify_oauth_body_sign(req)
+            self.xblock.verify_oauth_body_sign(req)
 
     def get_signed_grade_mock_request(self, namespace_lti_v1p1=True):
         """
@@ -507,11 +507,11 @@ class LTIBlockTest(TestCase):
         """
         Custom parameters are presented in right format.
         """
-        self.xmodule.custom_parameters = ['test_custom_params=test_custom_param_value']
-        self.xmodule.get_client_key_secret = Mock(return_value=('test_client_key', 'test_client_secret'))
-        self.xmodule.oauth_params = Mock()
-        self.xmodule.get_input_fields()
-        self.xmodule.oauth_params.assert_called_with(
+        self.xblock.custom_parameters = ['test_custom_params=test_custom_param_value']
+        self.xblock.get_client_key_secret = Mock(return_value=('test_client_key', 'test_client_secret'))
+        self.xblock.oauth_params = Mock()
+        self.xblock.get_input_fields()
+        self.xblock.oauth_params.assert_called_with(
             {'custom_test_custom_params': 'test_custom_param_value'},
             'test_client_key', 'test_client_secret'
         )
@@ -521,24 +521,24 @@ class LTIBlockTest(TestCase):
         Custom parameters are presented in wrong format.
         """
         bad_custom_params = ['test_custom_params: test_custom_param_value']
-        self.xmodule.custom_parameters = bad_custom_params
-        self.xmodule.get_client_key_secret = Mock(return_value=('test_client_key', 'test_client_secret'))
-        self.xmodule.oauth_params = Mock()
+        self.xblock.custom_parameters = bad_custom_params
+        self.xblock.get_client_key_secret = Mock(return_value=('test_client_key', 'test_client_secret'))
+        self.xblock.oauth_params = Mock()
         with pytest.raises(LTIError):
-            self.xmodule.get_input_fields()
+            self.xblock.get_input_fields()
 
     def test_max_score(self):
-        self.xmodule.weight = 100.0
+        self.xblock.weight = 100.0
 
-        assert not self.xmodule.has_score
-        assert self.xmodule.max_score() is None
+        assert not self.xblock.has_score
+        assert self.xblock.max_score() is None
 
-        self.xmodule.has_score = True
+        self.xblock.has_score = True
 
-        assert self.xmodule.max_score() == 100.0
+        assert self.xblock.max_score() == 100.0
 
     def test_context_id(self):
         """
         Tests that LTI parameter context_id is equal to course_id.
         """
-        assert str(self.course_id) == self.xmodule.context_id
+        assert str(self.course_id) == self.xblock.context_id

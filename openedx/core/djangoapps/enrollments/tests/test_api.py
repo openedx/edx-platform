@@ -2,13 +2,10 @@
 Tests for student enrollment.
 """
 
-
-import unittest
 from unittest.mock import Mock, patch
 
 import ddt
 import pytest
-from django.conf import settings
 from django.test.utils import override_settings
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -17,12 +14,12 @@ from openedx.core.djangoapps.enrollments.errors import (
     CourseModeNotFoundError, EnrollmentApiLoadError, EnrollmentNotFoundError,
 )
 from openedx.core.djangoapps.enrollments.tests import fake_data_api
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
 
 @ddt.ddt
 @override_settings(ENROLLMENT_DATA_API="openedx.core.djangoapps.enrollments.tests.fake_data_api")
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentTest(CacheIsolationTestCase):
     """
     Test student enrollment, especially with different course modes.

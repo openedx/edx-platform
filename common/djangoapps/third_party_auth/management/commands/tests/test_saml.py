@@ -5,17 +5,15 @@ existing data accordingly.
 
 
 import os
-import unittest
 from io import StringIO
 
 from unittest import mock
-from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from requests import exceptions
 from requests.models import Response
 
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
 
 
@@ -46,7 +44,7 @@ def mock_get(status_code=200):
     return _
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestSAMLCommand(CacheIsolationTestCase):
     """
     Test django management command for fetching saml metadata.

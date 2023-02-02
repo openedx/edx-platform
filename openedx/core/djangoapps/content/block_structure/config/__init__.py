@@ -48,24 +48,6 @@ STORAGE_BACKING_FOR_CACHE = WaffleSwitch(
     "block_structure.storage_backing_for_cache", __name__
 )
 
-# .. toggle_name: block_structure.raise_error_when_not_found
-# .. toggle_implementation: WaffleSwitch
-# .. toggle_default: False
-# .. toggle_description: Raises an error if the requested block structure does not exist in block
-#   structure store, or if it is outdated. Block structure store refers to both cache and storage,
-#   if enabled.
-# .. toggle_warning: This switch will likely be deprecated and removed.
-#   The annotation will be updated with the DEPR ticket once that process has started.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2017-02-23
-# .. toggle_target_removal_date: 2017-05-23
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14512,
-#   https://github.com/openedx/edx-platform/pull/14770,
-#   https://openedx.atlassian.net/browse/DEPR-143
-RAISE_ERROR_WHEN_NOT_FOUND = WaffleSwitch(
-    "block_structure.raise_error_when_not_found", __name__
-)
-
 
 def enable_storage_backing_for_cache_in_request():
     """

@@ -16,7 +16,7 @@ from django.utils import timezone
 from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 
 from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
 from common.djangoapps.student.tests.factories import UserFactory
@@ -55,13 +55,13 @@ class HasCourseWithProblemsMixin:
             end=course_end
         )
 
-        self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
-        self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequential1")
-        self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='Problem')
+        self.chapter = BlockFactory.create(parent=self.course, category="chapter", display_name="Chapter")
+        self.sequential = BlockFactory.create(parent=self.chapter, category='sequential', display_name="Sequential1")
+        self.problem = BlockFactory.create(parent=self.sequential, category='problem', display_name='Problem')
 
         if create_multiple_subsections:
-            seq2 = ItemFactory.create(parent=self.chapter, category='sequential')
-            ItemFactory.create(parent=seq2, category='problem')
+            seq2 = BlockFactory.create(parent=self.chapter, category='sequential')
+            BlockFactory.create(parent=seq2, category='problem')
 
         self.frozen_now_datetime = datetime.now().replace(tzinfo=pytz.UTC)
         self.frozen_now_timestamp = to_timestamp(self.frozen_now_datetime)
@@ -174,11 +174,11 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
             num_problems = 10
             for _ in range(num_problems):
-                ItemFactory.create(parent=self.sequential, category='problem')
+                BlockFactory.create(parent=self.sequential, category='problem')
 
             num_sequentials = 10
             for _ in range(num_sequentials):
-                ItemFactory.create(parent=self.chapter, category='sequential')
+                BlockFactory.create(parent=self.chapter, category='sequential')
 
             with check_mongo_calls(num_mongo_calls):
                 with self.assertNumQueries(num_sql_calls):
@@ -187,8 +187,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
     def test_other_inaccessible_subsection(self, mock_subsection_signal):
         self.set_up_course()
-        accessible_seq = ItemFactory.create(parent=self.chapter, category='sequential')
-        inaccessible_seq = ItemFactory.create(parent=self.chapter, category='sequential', visible_to_staff_only=True)
+        accessible_seq = BlockFactory.create(parent=self.chapter, category='sequential')
+        inaccessible_seq = BlockFactory.create(parent=self.chapter, category='sequential', visible_to_staff_only=True)
 
         # Update problem to have 2 additional sequential parents.
         # So in total, 3 sequential parents, with one inaccessible.

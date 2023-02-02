@@ -7,7 +7,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.learning_sequences.api import get_course_keys_with_outlines
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ....outlines import update_outline_from_modulestore
 
@@ -53,22 +53,22 @@ class BackfillCourseOutlinesTest(SharedModuleStoreTestCase):
                 display_name=f"Outline Backfill Test Course {course_key.run}"
             )
             with cls.store.bulk_operations(course_key):
-                section = ItemFactory.create(
+                section = BlockFactory.create(
                     parent=course,
                     category="chapter",
                     display_name="A Section"
                 )
-                sequence = ItemFactory.create(
+                sequence = BlockFactory.create(
                     parent=section,
                     category="sequential",
                     display_name="A Sequence"
                 )
-                unit = ItemFactory.create(
+                unit = BlockFactory.create(
                     parent=sequence,
                     category="vertical",
                     display_name="A Unit"
                 )
-                ItemFactory.create(
+                BlockFactory.create(
                     parent=unit,
                     category="html",
                     display_name="An HTML Block"

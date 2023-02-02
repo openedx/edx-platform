@@ -54,7 +54,7 @@ def is_bumper_enabled(video):
         video.bumper_do_not_show_again,
         (bumper_last_view_date and bumper_last_view_date + timedelta(seconds=periodicity) > utc_now)
     ])
-    is_studio = getattr(video.system, "is_author_mode", False)
+    is_studio = getattr(video.runtime, "is_author_mode", False)
     return bool(
         not is_studio and
         settings.FEATURES.get('ENABLE_VIDEO_BUMPER') and

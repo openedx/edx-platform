@@ -5,6 +5,7 @@ Tests for import_course_from_xml using the mongo modulestore.
 
 
 import copy
+from unittest import skip
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -174,29 +175,29 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         print(f"course tabs = {course.tabs}")
         self.assertEqual(course.tabs[1]['name'], 'Syllabus')
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_reimport(self, default_ms_type):
-        with modulestore().default_store(default_ms_type):
-            __, __, course = self.load_test_import_course(create_if_not_present=True)
-            self.load_test_import_course(target_id=course.id)
+    def test_reimport(self):
+        __, __, course = self.load_test_import_course(create_if_not_present=True)
+        self.load_test_import_course(target_id=course.id)
 
+    @skip("OldMongo Deprecation")
     def test_rewrite_reference_list(self):
         # This test fails with split modulestore (the HTML component is not in "different_course_id" namespace).
         # More investigation needs to be done.
-        module_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+        module_store = modulestore()
         target_id = module_store.make_course_key('testX', 'conditional_copy', 'copy_run')
         import_course_from_xml(
             module_store,
             self.user.id,
             TEST_DATA_DIR,
             ['conditional'],
-            target_id=target_id
+            target_id=target_id,
+            create_if_not_present=True
         )
         conditional_block = module_store.get_item(
             target_id.make_usage_key('conditional', 'condone')
         )
         self.assertIsNotNone(conditional_block)
-        different_course_id = module_store.make_course_key('edX', 'different_course', None)
+        different_course_id = module_store.make_course_key('edX', 'different_course', 'course_run')
         self.assertListEqual(
             [
                 target_id.make_usage_key('problem', 'choiceprob'),
@@ -256,22 +257,20 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
         self.assertEqual(remapped_verticals, split_test_block.group_id_to_child)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_video_components_present_while_import(self, store):
+    def test_video_components_present_while_import(self):
         """
         Test that video components with same edx_video_id are present while re-importing
         """
-        with modulestore().default_store(store):
-            module_store = modulestore()
-            course_id = module_store.make_course_key('edX', 'test_import_course', '2012_Fall')
+        module_store = modulestore()
+        course_id = module_store.make_course_key('edX', 'test_import_course', '2012_Fall')
 
-            # Import first time
-            __, __, course = self.load_test_import_course(target_id=course_id, module_store=module_store)
+        # Import first time
+        __, __, course = self.load_test_import_course(target_id=course_id, module_store=module_store)
 
-            # Re-import
-            __, __, re_course = self.load_test_import_course(target_id=course.id, module_store=module_store)
+        # Re-import
+        __, __, re_course = self.load_test_import_course(target_id=course.id, module_store=module_store)
 
-            vertical = module_store.get_item(re_course.id.make_usage_key('vertical', 'vertical_test'))
+        vertical = module_store.get_item(re_course.id.make_usage_key('vertical', 'vertical_test'))
 
-            video = module_store.get_item(vertical.children[1])
-            self.assertEqual(video.display_name, 'default')
+        video = module_store.get_item(vertical.children[1])
+        self.assertEqual(video.display_name, 'default')

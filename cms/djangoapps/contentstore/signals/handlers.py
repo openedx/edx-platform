@@ -23,7 +23,7 @@ from cms.djangoapps.contentstore.courseware_index import (
     LibrarySearchIndexer,
 )
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
-from common.djangoapps.util.module_utils import yield_dynamic_descriptor_descendants
+from common.djangoapps.util.block_utils import yield_dynamic_descriptor_descendants
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
@@ -207,12 +207,12 @@ def handle_item_deleted(**kwargs):
         # Strip branch info
         usage_key = usage_key.for_branch(None)
         course_key = usage_key.course_key
-        deleted_module = modulestore().get_item(usage_key)
-        for module in yield_dynamic_descriptor_descendants(deleted_module, kwargs.get('user_id')):
+        deleted_block = modulestore().get_item(usage_key)
+        for block in yield_dynamic_descriptor_descendants(deleted_block, kwargs.get('user_id')):
             # Remove prerequisite milestone data
-            gating_api.remove_prerequisite(module.location)
+            gating_api.remove_prerequisite(block.location)
             # Remove any 'requires' course content milestone relationships
-            gating_api.set_required_content(course_key, module.location, None, None, None)
+            gating_api.set_required_content(course_key, block.location, None, None, None)
 
 
 @receiver(GRADING_POLICY_CHANGED)

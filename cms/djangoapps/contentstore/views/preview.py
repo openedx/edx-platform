@@ -18,7 +18,7 @@ from xblock.runtime import KvsFieldData
 
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import ModuleI18nService, modulestore
+from xmodule.modulestore.django import XBlockI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.studio_editable import has_author_view
@@ -67,7 +67,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     usage_key = UsageKey.from_string(usage_key_string)
 
     descriptor = modulestore().get_item(usage_key)
-    instance = _load_preview_module(request, descriptor)
+    instance = _load_preview_block(request, descriptor)
 
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
@@ -98,7 +98,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     An XModule ModuleSystem for use in Studio previews
     """
-    # xmodules can check for this attribute during rendering to determine if
+    # xblocks can check for this attribute during rendering to determine if
     # they are being rendered for preview (i.e. in Studio)
     is_author_mode = True
 
@@ -154,7 +154,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 def _preview_module_system(request, descriptor, field_data):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
-    rendering module previews.
+    rendering block previews.
 
     request: The active django request
     descriptor: An XModuleDescriptor
@@ -166,7 +166,7 @@ def _preview_module_system(request, descriptor, field_data):
     replace_url_service = ReplaceURLService(course_id=course_id)
 
     wrappers = [
-        # This wrapper wraps the module in the template specified above
+        # This wrapper wraps the block in the template specified above
         partial(
             wrap_xblock,
             'PreviewRuntime',
@@ -207,7 +207,7 @@ def _preview_module_system(request, descriptor, field_data):
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
 
     return PreviewModuleSystem(
-        get_module=partial(_load_preview_module, request),
+        get_block=partial(_load_preview_block, request),
         mixins=settings.XBLOCK_MIXINS,
 
         # Set up functions to modify the fragment produced by student_view
@@ -217,7 +217,7 @@ def _preview_module_system(request, descriptor, field_data):
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
             "field-data": field_data,
-            "i18n": ModuleI18nService,
+            "i18n": XBlockI18nService,
             'mako': mako_service,
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(
@@ -247,10 +247,10 @@ class StudioPartitionService(PartitionService):
         return None
 
 
-def _load_preview_module(request, descriptor):
+def _load_preview_block(request, descriptor):
     """
-    Return a preview XModule instantiated from the supplied descriptor. Will use mutable fields
-    if XModule supports an author_view. Otherwise, will use immutable fields and student_view.
+    Return a preview XBlock instantiated from the supplied descriptor. Will use mutable fields
+    if XBlock supports an author_view. Otherwise, will use immutable fields and student_view.
 
     request: The active django request
     descriptor: An XModuleDescriptor
@@ -325,13 +325,13 @@ def get_preview_fragment(request, descriptor, context):
     Returns the HTML returned by the XModule's student_view or author_view (if available),
     specified by the descriptor and idx.
     """
-    module = _load_preview_module(request, descriptor)
+    block = _load_preview_block(request, descriptor)
 
-    preview_view = AUTHOR_VIEW if has_author_view(module) else STUDENT_VIEW
+    preview_view = AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
 
     try:
-        fragment = module.render(preview_view, context)
+        fragment = block.render(preview_view, context)
     except Exception as exc:                          # pylint: disable=broad-except
-        log.warning("Unable to render %s for %r", preview_view, module, exc_info=True)
+        log.warning("Unable to render %s for %r", preview_view, block, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
     return fragment

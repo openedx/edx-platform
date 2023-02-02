@@ -40,10 +40,10 @@ class CourseFieldsTestCase(unittest.TestCase):
 
 class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
-    def __init__(self, load_error_modules, course_id=None):
+    def __init__(self, load_error_blocks, course_id=None):
 
         xmlstore = XMLModuleStore("data_dir", source_dirs=[],
-                                  load_error_modules=load_error_modules)
+                                  load_error_blocks=load_error_blocks)
         if course_id is None:
             course_id = CourseKey.from_string('/'.join([ORG, COURSE, 'test_run']))
         course_dir = "test_dir"
@@ -54,7 +54,7 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
             course_id=course_id,
             course_dir=course_dir,
             error_tracker=error_tracker,
-            load_error_modules=load_error_modules,
+            load_error_blocks=load_error_blocks,
             services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
 
@@ -69,7 +69,7 @@ def get_dummy_course(
 ):
     """Get a dummy course"""
 
-    system = DummySystem(load_error_modules=True)
+    system = DummySystem(load_error_blocks=True)
 
     def to_attrb(n, v):
         return '' if v is None else f'{n}="{v}"'.lower()
@@ -112,7 +112,7 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
     def setUp(self):
         super().setUp()
 
-        system = DummySystem(load_error_modules=True)  # lint-amnesty, pylint: disable=unused-variable
+        system = DummySystem(load_error_blocks=True)  # lint-amnesty, pylint: disable=unused-variable
 
         past_end = (datetime.now() - timedelta(days=12)).strftime("%Y-%m-%dT%H:%M:00")
         future_end = (datetime.now() + timedelta(days=12)).strftime("%Y-%m-%dT%H:%M:00")

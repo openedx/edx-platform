@@ -1,11 +1,11 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2022
+# Ali Işıngör <ali@artistanbul.io>, 2017-2023
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
 # baris <brscvs@gmail.com>, 2013
@@ -28,7 +28,7 @@
 # ca47f5bf05c27c3888896d9870e257ad_00aad6f <5addf4166015f6e11583e89fe2c53975_164880>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -49,12 +49,12 @@
 # Mustafa Tat, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2022
+# Ali Işıngör <ali@artistanbul.io>, 2017-2023
 # Ali Özcan <aliozcan@yandex.com>, 2014
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
@@ -84,7 +84,7 @@
 # ca47f5bf05c27c3888896d9870e257ad_00aad6f <5addf4166015f6e11583e89fe2c53975_164880>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -110,7 +110,7 @@
 # Yasar Celep <yasar.celep@hotmail.com>, 2017
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -121,9 +121,9 @@
 # a56fc07028489bb2b53400de33ba6a83, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Ali Işıngör <ali@artistanbul.io>, 2021
@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-18 20:42+0000\n"
+"POT-Creation-Date: 2023-01-22 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -145,7 +145,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/item.py xmodule/html_block.py
+#: cms/djangoapps/contentstore/views/block.py xmodule/html_block.py
 msgid "Text"
 msgstr "Metin"
 
@@ -2264,8 +2264,8 @@ msgid "Cookie Policy"
 msgstr "Çerez Politikası"
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Data"
-msgstr "Kişisel Verilerimi Satmayın"
+msgid "Do Not Sell My Personal Information"
+msgstr "Kişisel Bilgilerimi Satmayın"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -3854,6 +3854,9 @@ msgid ""
 "Without the email student would not be able to login. Please contact support"
 " for further information."
 msgstr ""
+"Yeni kullanıcıya e-posta gönderirken '{error}' hatası (kullanıcı "
+"e-postası={email}). E-posta olmadan öğrenci oturum açamaz. Daha fazla bilgi "
+"için lütfen desteğe başvurun."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -9052,6 +9055,8 @@ msgstr ""
 #: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
+"Geçitli içerik türlerine erişime göre kullanıcıları bölümlere ayırmak için "
+"bölümleme"
 
 #: openedx/features/content_type_gating/partitions.py
 #: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
@@ -9294,6 +9299,10 @@ msgid ""
 "due assignments into the future. Don’t worry—you won’t lose any of the "
 "progress you’ve made when you shift your due dates."
 msgstr ""
+"Kendinizi doğru yolda tutmak için, burayı ziyaret ederek bu programı "
+"güncelleyebilir ve gecikmiş ödevlerinizi ileri tarihlere kaydırabilirsiniz. "
+"Endişelenmeyin, son tarihlerinizi değiştirdiğinizde kaydettiğiniz "
+"ilerlemelerin hiçbirini kaybetmeyeceksiniz. "
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
 #, python-brace-format
@@ -10244,6 +10253,10 @@ msgid ""
 "Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
+"Bir öğrenciye bu koşullu block'un içeriğinin gösterilip gösterilmediğini "
+"belirlemek için kullanılan tüm kaynak bileşenlerin bileşen konum kimlikleri."
+" Studio'daki Ayarlar penceresinden bir bileşenin bileşen konumu kimliğini "
+"kopyalayın."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Attribute"
@@ -10254,6 +10267,8 @@ msgid ""
 "The attribute of the source components that determines whether a learner is "
 "shown the content of this conditional block."
 msgstr ""
+"Bir öğrenciye bu koşullu block'un içeriğinin gösterilip gösterilmeyeceğini "
+"belirleyen kaynak bileşenlerin özelliği."
 
 #: xmodule/conditional_block.py
 msgid "Conditional Value"
@@ -10264,6 +10279,8 @@ msgid ""
 "The value that the conditional attribute of the source components must match"
 " before a learner is shown the content of this conditional block."
 msgstr ""
+"Bir öğrenciye bu koşullu block'un içeriği gösterilmeden önce kaynak "
+"bileşenlerin koşullu özniteliğinin eşleşmesi gereken değer. "
 
 #: xmodule/conditional_block.py
 msgid "Blocked Content Message"
@@ -10277,6 +10294,11 @@ msgid ""
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
+"Bu koşullu block'un içeriğini göstermek için tüm koşullar karşılanmadığında "
+"öğrencilere gösterilen ileti. Öğrencilere gerekli ünitelere doğrudan bir "
+"bağlantı vermek için iletinizin metnine {link} bağlantısını ekleyin. "
+"Örneğin, 'Bu üniteye erişebilmeniz için önce {link}' bağlantısını "
+"tamamlamalısınız'. "
 
 #: xmodule/conditional_block.py
 #, python-brace-format
@@ -13207,47 +13229,47 @@ msgstr "Dosya yükleme sırasında bazı parçalar kayboldu. Lütfen tekrar dene
 msgid "File upload failed. Please try again"
 msgstr "Dosya yükleme başarısız. Lütfen tekrar deneyin"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr "Kütüphaneler {limit} bileşenden daha fazlasına sahip olamaz"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Invalid data"
 msgstr "Geçersiz veri"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Invalid data ({details})"
 msgstr "Geçersiz veri ({details})"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "{source_type} verisini {target_parent_type} üzerine taşıyamazsınız."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Item is already present in target location."
 msgstr "Nesne hedef konumda zaten mevcut."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into itself."
 msgstr "Bir nesneyi zaten bulunduğu konuma taşıyamazsınız."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into it's child."
 msgstr "Bir nesneyi kendi altına taşıyamazsınız."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item directly into content experiment."
 msgstr "Bir nesneyi doğrudan içerik denemesine taşıyamazsınız."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{source_usage_key} not found in {parent_usage_key}."
 msgstr "{source_usage_key} anahtarı {parent_usage_key} içinde bulunamadı."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "You can not move {source_usage_key} at an invalid index ({target_index})."
@@ -13255,17 +13277,17 @@ msgstr ""
 "{source_usage_key} anahtarını geçersiz bir ({target_index}) indeksine "
 "taşıyamazsınız."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "({target_index}) target_index bir tamsayı olarak girilmeli."
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "{0}'ın kopyası"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "'{0}'ın tekrarı"
@@ -13273,7 +13295,7 @@ msgstr "'{0}'ın tekrarı"
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
@@ -13283,11 +13305,11 @@ msgstr ""
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "%"
 msgstr "%"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""
@@ -17228,6 +17250,9 @@ msgid ""
 "{start_bold}Get the most out of your course!{end_bold} Upgrade to earn a "
 "{link_start}verified certificate{link_end} to showcase on your resumé."
 msgstr ""
+"{start_bold}Dersinizden en iyi şekilde yararlanın!{end_bold} Özgeçmişinizde "
+"gösterebileceğiniz {link_start}Onaylanmış bir sertifikaya{link_end} hak "
+"kazanmak için erişiminizi yükseltin."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
