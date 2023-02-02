@@ -276,7 +276,10 @@ FEATURES['ENABLE_TEAMS'] = True
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 ######### custom courses #########
-INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
+INSTALLED_APPS += [
+    'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig',
+    'common.djangoapps.third_party_auth.apps.ThirdPartyAuthConfig',
+]
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 ########################## VIDEO IMAGE STORAGE ############################
