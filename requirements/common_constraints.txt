@@ -3,7 +3,6 @@
 # See BOM-2721 for more details.
 # Below is the copied and edited version of common_constraints
 
-
 # A central location for most common version constraints
 # (across edx repos) for pip-installation.
 #
