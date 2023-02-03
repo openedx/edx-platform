@@ -177,7 +177,7 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.13
     # via jwcrypto
-django==3.2.16
+django==3.2.17
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.in
@@ -772,7 +772,7 @@ ora2==5.0.0
     # via -r requirements/edx/base.in
 oscrypto==1.3.0
     # via snowflake-connector-python
-outcome-surveys==2.0.0
+outcome-surveys==2.1.0
     # via -r requirements/edx/base.in
 packaging==23.0
     # via
