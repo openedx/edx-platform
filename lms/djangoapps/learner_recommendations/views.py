@@ -15,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.djangoapps.track import segment
 from openedx.core.djangoapps.catalog.utils import (
     get_course_data,
     get_course_run_details,
@@ -75,6 +76,27 @@ class AmplitudeRecommendationsView(APIView):
 
     recommendations_count = 4
 
+    def _emit_recommendations_viewed_event(
+        self,
+        user_id,
+        is_control,
+        recommended_courses,
+        amplitude_recommendations=True,
+    ):
+        """Emits an event to track recommendation experiment views."""
+        segment.track(
+            user_id,
+            "edx.bi.user.recommendations.viewed",
+            {
+                "is_control": is_control,
+                "amplitude_recommendations": amplitude_recommendations,
+                "course_key_array": [
+                    course["key"] for course in recommended_courses
+                ],
+                "page": "course_about_page",
+            },
+        )
+
     def get(self, request, course_id):
         """
         Returns
@@ -105,7 +127,7 @@ class AmplitudeRecommendationsView(APIView):
             ip_address = get_client_ip(request)[0]
             user_country_code = country_code_from_ip(ip_address).upper()
             filtered_courses = filter_recommended_courses(
-                request.user, course_keys, user_country_code=user_country_code, request_course=course_key,
+                user, course_keys, user_country_code=user_country_code, request_course=course_key,
             )
 
             for course in filtered_courses:
@@ -118,6 +140,10 @@ class AmplitudeRecommendationsView(APIView):
 
                 if len(recommended_courses) == self.recommendations_count:
                     break
+
+        self._emit_recommendations_viewed_event(
+            user.id, is_control, recommended_courses
+        )
 
         return Response(
             RecommendationsSerializer(

@@ -24,7 +24,7 @@ class CourseImageSerializer(serializers.Serializer):
 
 class RecommendedCourseSerializer(serializers.Serializer):
     """Serializer for a recommended course from the recommendation engine"""
-
+    key = serializers.CharField()
     uuid = serializers.UUIDField()
     title = serializers.CharField()
     image = CourseImageSerializer()
