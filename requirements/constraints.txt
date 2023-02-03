@@ -76,4 +76,4 @@ pyopenssl==22.0.0
 
 cryptography==38.0.4 # greater version has some issues with openssl.
 
-pylint<2.16.1 # greater version failing quality test. Fix them in seperate ticket.
+pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
