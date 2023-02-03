@@ -9,8 +9,8 @@ from algoliasearch.search_client import SearchClient
 from django.conf import settings
 
 from common.djangoapps.student.models import CourseEnrollment
-from openedx.core.djangoapps.catalog.utils import get_course_data
-
+from openedx.core.djangoapps.catalog.utils import get_course_data, get_programs
+from lms.djangoapps.program_enrollments.api import fetch_program_enrollments_by_student
 
 log = logging.getLogger(__name__)
 
@@ -83,6 +83,34 @@ def _has_country_restrictions(product, user_country):
             block_list = countries
 
     return user_country in block_list or (bool(allow_list) and user_country not in allow_list)
+
+
+def _get_program_duration(weeks):
+    """
+    Helper method that returns the program duration in textual form.
+    """
+    total_months = round(weeks / 4)
+
+    if total_months < 1:
+        return f'{total_months} weeks'
+
+    if 1 <= total_months < 12:
+        return f'{total_months} months'
+
+    total_years = round(total_months / 12)
+    total_remainder_months = round(total_months % 12)
+
+    if total_remainder_months == 0:
+        return f'{total_years} years'
+
+    if total_years == 1 and total_remainder_months == 1:
+        return f'1 year {total_remainder_months} months'
+
+    if total_remainder_months == 1:
+        return f'{total_years} years 1 months'
+
+    else:
+        return f'{total_years} years {total_remainder_months} months'
 
 
 def get_active_course_run(course_data):
@@ -214,3 +242,57 @@ def filter_recommended_courses(
             filtered_recommended_courses.append(course_data)
 
     return filtered_recommended_courses
+
+
+def get_programs_based_on_course(request_course, country_code, user):
+    """
+    Returns a program for the course. If a course is part of multiple programs,
+    this function returns the program with the highest price.
+    """
+    max_price, max_price_program = 0, {}
+    programs = get_programs(course=request_course)
+
+    if not programs:
+        return None
+
+    for program in programs:
+        if program.get('status') != 'active' or _has_country_restrictions(program, country_code):
+            continue
+
+        price = program['price_ranges'][0]['total']
+        if price > max_price:
+            if fetch_program_enrollments_by_student(program_uuids=[program.get('uuid')], user=user).exists():
+                continue
+
+            course_keys = [
+                course['key']
+                for course in program.get('courses', [])
+                if course.get('key') and course.get('key') != request_course
+            ]
+            if _remove_user_enrolled_course_keys(user, course_keys):
+                max_price_program = program
+                max_price = price
+
+    if not max_price_program:
+        return None
+
+    course_pacing_type, total_weeks_to_complete = '', 0
+    for course in max_price_program.get('courses'):
+        for course_run in course.get('course_runs'):
+            if course_run.get('status') == 'published':
+                if not course_pacing_type:
+                    course_pacing_type = course_run.get("pacing_type")
+                total_weeks_to_complete += int(course_run.get("weeks_to_complete"))
+
+    program_upsell = {
+        "title": max_price_program.get('title'),
+        "marketing_url": max_price_program.get('marketing_url'),
+        "courses_count": len(max_price_program.get('courses')),
+        "pacing_type": course_pacing_type,
+        "weeks_to_complete": _get_program_duration(total_weeks_to_complete),
+        "min_hours": max_price_program.get('min_hours_effort_per_week'),
+        "max_hours": max_price_program.get('max_hours_effort_per_week'),
+        "type": max_price_program.get('type'),
+    }
+
+    return program_upsell

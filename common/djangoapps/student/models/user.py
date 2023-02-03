@@ -602,15 +602,18 @@ class UserProfile(models.Model):
             return self.__enumerable_to_display(self.GENDER_CHOICES, self.gender)
 
     def get_meta(self):  # pylint: disable=missing-function-docstring
+        log.info(f"[Extended Profile] Retrieving user profile meta data for user {self.user.id}")
         js_str = self.meta
         if not js_str:
             js_str = {}
         else:
             js_str = json.loads(self.meta)
 
+        log.info(f"[Extended Profile] Returning user profile meta data for user {self.user.id} with data [{js_str}]")
         return js_str
 
     def set_meta(self, meta_json):
+        log.info(f"[Extended Profile] Updating user profile meta data for user {self.user.id} with: [{meta_json}]")
         self.meta = json.dumps(meta_json)
 
     def set_login_session(self, session_id=None):
