@@ -45,7 +45,7 @@ class RecommendedProgramSerializer(serializers.Serializer):
     marketingUrl = serializers.URLField(source="marketing_url")
     coursesCount = serializers.IntegerField(source="courses_count")
     pacingType = serializers.CharField(source="pacing_type")
-    weeksToComplete = serializers.IntegerField(source="weeks_to_complete")
+    weeksToComplete = serializers.CharField(source="weeks_to_complete")
     minHours = serializers.IntegerField(source="min_hours")
     maxHours = serializers.IntegerField(source="max_hours")
     type = serializers.CharField()
@@ -57,7 +57,7 @@ class RecommendationsSerializer(serializers.Serializer):
     courses = serializers.ListField(
         child=RecommendedCourseSerializer(), allow_empty=True
     )
-    # programUpsell = RecommendedProgramSerializer(source="program_upsell") use this for VAN-1260
+    programUpsell = RecommendedProgramSerializer(source="program_upsell")
     isControl = serializers.BooleanField(
         source="is_control",
         default=None
