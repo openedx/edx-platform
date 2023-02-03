@@ -66,7 +66,7 @@ def locked(expiry_seconds, key):  # lint-amnesty, pylint: disable=missing-functi
 SEND_CATALOG_INFO_SIGNAL = SettingToggle('SEND_CATALOG_INFO_SIGNAL', default=False, module_name=__name__)
 
 
-def create_catalog_data_for_signal(course_key: CourseKey) -> (Optional[datetime], Optional[CourseCatalogData]):
+def _create_catalog_data_for_signal(course_key: CourseKey) -> (Optional[datetime], Optional[CourseCatalogData]):
     """
     Creates data for catalog-info-changed signal when course is published.
 
@@ -106,7 +106,7 @@ def emit_catalog_info_changed_signal(course_key: CourseKey):
     Given the key of a recently published course, send course data to catalog-info-changed signal.
     """
     if SEND_CATALOG_INFO_SIGNAL.is_enabled():
-        timestamp, catalog_info = create_catalog_data_for_signal(course_key)
+        timestamp, catalog_info = _create_catalog_data_for_signal(course_key)
         if catalog_info is not None:
             COURSE_CATALOG_INFO_CHANGED.send_event(time=timestamp, catalog_info=catalog_info)
 
