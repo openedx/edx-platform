@@ -20,6 +20,7 @@ class RecommendationsPanel extends React.Component {
     window.analytics.track('edx.bi.user.recommended.course.click', {
       course_key: courseKey,
       is_control: this.state.isControl,
+      page: 'dashboard',
     });
 
     let recommendedCourses = Cookies.get(this.cookieName);
