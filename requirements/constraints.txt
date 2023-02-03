@@ -75,3 +75,5 @@ pyopenssl==22.0.0
 
 
 cryptography==38.0.4 # greater version has some issues with openssl.
+
+outcome-surveys==2.0.0 # greater versions has breaking changes
