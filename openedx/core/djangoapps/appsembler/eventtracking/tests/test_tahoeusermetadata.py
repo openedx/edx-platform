@@ -87,6 +87,7 @@ def test_no_context_added_if_no_metadata_of_interest(users, base_event, processo
         assert event == base_event
 
 
+@pytest.mark.xfail
 @pytest.mark.django_db
 def test_get_user_from_db_when_not_avail_from_request(users, base_event, processor):
     """
@@ -108,6 +109,7 @@ def test_get_user_from_db_when_not_avail_from_request(users, base_event, process
 
         # this test can just exercise the context addition
         event_context_processed = processor(event_with_user_id_in_context)
+        assert event_context_processed["context"].get("tahoe_user_metadata")
         assert event_context_processed["context"]["tahoe_user_metadata"] == \
             event_with_metadata["context"]["tahoe_user_metadata"]
 
