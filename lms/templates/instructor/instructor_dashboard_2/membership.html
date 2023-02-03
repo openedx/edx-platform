@@ -62,13 +62,26 @@ from openedx.core.djangolib.markup import HTML, Text
         </label>
     </div>
     <div>
-        <input type="button" name="enrollment-button" class="enrollment-button" value="${pgettext('someone','Enroll')}" data-endpoint="${ section_data['enroll_button_url'] }" data-action="enroll" >
+        <input
+          type="button"
+          name="enrollment-button"
+          class="enrollment-button"
+          value="${pgettext('someone','Enroll')}"
+          data-endpoint="${ section_data['enroll_button_url'] }"
+          data-action="enroll"
+          onclick="mixpanel.track('enroll',
+                    {
+                        'service': 'lms',
+                        'screen_name': 'instructor_dashboard',
+                        'organization': '${platform_name}',
+                    }
+                );"
+        >
         <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" data-action="unenroll" >
     </div>
     <div class="request-response"></div>
     <div class="request-response-error"></div>
 </fieldset>
-
 <!-- Uploading a CSV file of bulk enrollment. -->
 <hr class="divider"/>
 <div class="bulk_enroll bulk_enroll_csv membership-section">

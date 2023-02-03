@@ -121,7 +121,11 @@
                             title: gettext('You currently have no cohorts configured'),
                             actionText: gettext('Add Cohort'),
                             actionClass: 'action-create',
-                            actionIconClass: 'fa-plus'
+                            actionIconClass: 'fa-plus',
+                            onclick: mixpanel.track('add_cohort', {
+                                service: 'lms',
+                                screen_name: 'cohorts',
+                            })
                         });
                     }
                     this.renderVerifiedTrackSettingsNotificationView();

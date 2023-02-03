@@ -122,7 +122,18 @@ from openedx.core.djangolib.js_utils import (
 
           <div class="actions">
             <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" />
-            <input type="submit" value="${_('Create')}" class="action action-primary new-course-save" />
+            <input
+              type="submit"
+              value="${_('Create')}" 
+              class="action action-primary new-course-save"
+              onclick="mixpanel.track('create_course',
+                    {
+                        'service': 'studio',
+                        'screen_name': 'studio_home',
+                        'organization': '${platform_name}',
+                    }
+                );"
+            />
             <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-course-cancel" />
           </div>
         </form>

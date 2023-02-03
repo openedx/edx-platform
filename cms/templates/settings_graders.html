@@ -130,7 +130,16 @@
           </ol>
 
           <div class="actions">
-            <a href="#" class="new-button new-course-grading-item add-grading-data">
+            <a
+              href="#"
+              class="new-button new-course-grading-item add-grading-data"
+              onclick="mixpanel.track('new_assignment_type',
+                    {
+                        'service': 'studio',
+                        'screen_name': 'grading',
+                    }
+                );"
+            >
               <span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Assignment Type")}
             </a>
           </div>

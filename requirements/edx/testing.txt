@@ -310,7 +310,7 @@ zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requi
 
 # edly forked apps
 -e git+https://github.com/edly-io/bridgekeeper.git@edly-1.0#egg=bridgekeeper==edly-1.0
--e git+ssh://git@github.com/edly-io/edly-panel-edx-app.git@edly-3.3.0#egg=edly-panel-app==edly-3.3.0
+-e git+ssh://git@github.com/edly-io/edly-panel-edx-app.git@edly-3.6.5#egg=edly-panel-app==edly-3.6.5
 -e git+ssh://git@github.com/edly-io/figures.git@edly-3.0.1#egg=figures==edly-3.0.1
 -e git+https://github.com/edly-io/edly-rating-xblock.git@develop-juniper#egg=edly-rating-xblock==develop-juniper
 -e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.1.1#egg=edx_xblock_scorm==v1.1.1

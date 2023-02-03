@@ -139,7 +139,17 @@ if (is_proctored_exam) {
                 <% } %>
                 <% if (xblockInfo.isPublishable()) { %>
                     <li class="action-item action-publish">
-                        <a href="#" data-tooltip="<%- gettext('Publish') %>" class="publish-button action-button">
+                        <a 
+                            href="#"
+                            data-tooltip="<%- gettext('Publish') %>"
+                            class="publish-button action-button"
+                            onclick="mixpanel.track('publish',
+                                {
+                                    'service': 'studio',
+                                    'screen_name': 'course_outline',
+                                }
+                            );"
+                        >
                             <span class="icon fa fa-upload" aria-hidden="true"></span>
                             <span class="sr action-button-text"><%- gettext('Publish') %></span>
                         </a>

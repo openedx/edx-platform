@@ -7,7 +7,7 @@
 <a href=<%- certificate_web_view_url %> class="button preview-certificate-link" rel="noopener" target="_blank">
     <%- gettext("Preview Certificate") %>
 </a>
-<button class="button activate-cert">
+<button class="button activate-cert" onclick="mixpanel.track('certificate_activate',{'service':'studio', 'screen_name':'certificates',})">
     <span>
     <% if(!is_active) { %>
         <%- gettext("Activate") %></span>

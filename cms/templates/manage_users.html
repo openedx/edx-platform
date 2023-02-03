@@ -66,7 +66,18 @@ from openedx.core.djangolib.js_utils import (
           </div>
 
           <div class="actions">
-            <button class="action action-primary" type="submit">${_("Add User")}</button>
+            <button
+              class="action action-primary"
+              type="submit"
+              onclick="mixpanel.track('add_course_team_user',
+                    {
+                        'service': 'studio',
+                        'screen_name': 'course_team',
+                    }
+                );"
+            >
+            ${_("Add User")}
+            </button>
             <button class="action action-secondary action-cancel">${_("Cancel")}</button>
           </div>
         </form>

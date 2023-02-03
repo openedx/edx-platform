@@ -91,7 +91,19 @@ from openedx.core.djangolib.markup import HTML
         </p>
     </div>
     <br />
-    <input type="button" name="send" value="${_("Send Email")}" data-endpoint="${ section_data['send_email'] }" >
+    <input
+        type="button"
+        name="send"
+        value="${_("Send Email")}"
+        data-endpoint="${ section_data['send_email'] }"
+        onclick="mixpanel.track('send_email',
+                    {
+                        'service': 'lms',
+                        'screen_name': 'email',
+                        'organization': '${platform_name}',
+                    }
+                );"
+    >
     <div class="request-response-error"></div>
 
     %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
