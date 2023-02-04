@@ -917,7 +917,7 @@ class AccountRetirementStatusView(ViewSet):
     def retirement_queue(self, request):
         """
         GET /api/user/v1/accounts/retirement_queue/
-        {'cool_off_days': 7, 'states': ['PENDING', 'COMPLETE']}
+        {'cool_off_days': 7, 'states': ['PENDING', 'COMPLETE'], 'limit': 500}
 
         Returns the list of RetirementStatus users in the given states that were
         created in the retirement queue at least `cool_off_days` ago.
@@ -936,6 +936,13 @@ class AccountRetirementStatusView(ViewSet):
                 found = [s.state_name for s in state_objs]
                 raise RetirementStateError(f'Unknown state. Requested: {states} Found: {found}')
 
+            limit = request.GET.get('limit')
+            if limit:
+                try:
+                    limit_count = int(limit)
+                except ValueError:
+                    return Response(f'Limit could not be parsed: {limit} , please ensure this is an integer', status=status.HTTP_400_BAD_REQUEST)
+
             earliest_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=cool_off_days)
 
             retirements = UserRetirementStatus.objects.select_related(
@@ -945,6 +952,8 @@ class AccountRetirementStatusView(ViewSet):
             ).order_by(
                 'id'
             )
+            if limit:
+                retirements = retirements[:limit_count]
             serializer = UserRetirementStatusSerializer(retirements, many=True)
             return Response(serializer.data)
         # This should only occur on the int() conversion of cool_off_days at this point
