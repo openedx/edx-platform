@@ -202,7 +202,7 @@ class RebindUserService(Service):
         with modulestore().bulk_operations(self.course_id):
             course = modulestore().get_course(course_key=self.course_id)
 
-        (inner_system, inner_student_data) = self._ref["get_module_system_for_user"](
+        inner_student_data = self._ref["get_module_system_for_user"](
             user=real_user,
             student_data=student_data_real_user,  # These have implicit user bindings, rest of args considered not to
             descriptor=block,
@@ -212,7 +212,6 @@ class RebindUserService(Service):
         )
 
         block.bind_for_student(
-            inner_system,
             real_user.id,
             [
                 partial(DateLookupFieldData, course_id=self.course_id, user=self.user),
@@ -223,8 +222,7 @@ class RebindUserService(Service):
 
         block.scope_ids = block.scope_ids._replace(user_id=real_user.id)
         # now bind the module to the new ModuleSystem instance and vice-versa
-        block.runtime = inner_system
-        inner_system.xmodule_instance = block
+        block.runtime.xmodule_instance = block
 
 
 class EventPublishingService(Service):

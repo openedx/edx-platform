@@ -313,18 +313,30 @@ class XModuleMixin(XModuleFields, XBlock):
     icon_class = 'other'
 
     def __init__(self, *args, **kwargs):
-        self.xmodule_runtime = None
         self._asides = []
 
         super().__init__(*args, **kwargs)
 
     @property
     def runtime(self):
-        return CombinedSystem(self.xmodule_runtime, self._runtime)
+        return self._runtime
 
     @runtime.setter
     def runtime(self, value):
         self._runtime = value
+
+    @property
+    def xmodule_runtime(self):
+        """
+        Shim to maintain backward compatibility.
+
+        Deprecated in favor of the runtime property.
+        """
+        warnings.warn(
+            'xmodule_runtime property is deprecated. Please use the runtime property instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return self._runtime
 
     @property
     def system(self):
@@ -593,12 +605,11 @@ class XModuleMixin(XModuleFields, XBlock):
         """
         return None
 
-    def bind_for_student(self, xmodule_runtime, user_id, wrappers=None):
+    def bind_for_student(self, user_id, wrappers=None):
         """
         Set up this XBlock to act as an XModule instead of an XModuleDescriptor.
 
         Arguments:
-            xmodule_runtime (:class:`ModuleSystem'): the runtime to use when accessing student facing methods
             user_id: The user_id to set in scope_ids
             wrappers: These are a list functions that put a wrapper, such as
                       LmsFieldData or OverrideFieldData, around the field_data.
@@ -608,8 +619,8 @@ class XModuleMixin(XModuleFields, XBlock):
 
         # Skip rebinding if we're already bound a user, and it's this user.
         if self.scope_ids.user_id is not None and user_id == self.scope_ids.user_id:
-            if getattr(xmodule_runtime, 'position', None):
-                self.position = xmodule_runtime.position   # update the position of the tab
+            if getattr(self._runtime, 'position', None):
+                self.position = self._runtime.position   # update the position of the tab
             return
 
         # If we are switching users mid-request, save the data from the old user.
@@ -633,9 +644,6 @@ class XModuleMixin(XModuleFields, XBlock):
                 # remove it from its _dirty_fields
                 if field in self._dirty_fields:
                     del self._dirty_fields[field]
-
-        # Set the new xmodule_runtime and field_data (which are user-specific)
-        self.xmodule_runtime = xmodule_runtime
 
         if wrappers is None:
             wrappers = []
@@ -1013,6 +1021,7 @@ class MetricsMixin:
     """
 
     def render(self, block, view_name, context=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+        context = context or {}
         start_time = time.time()
         try:
             return super().render(block, view_name, context=context)
@@ -1421,7 +1430,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
     """
     def __init__(
-        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=lambda: [], get_module=None, **kwargs
+        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=lambda: [], **kwargs
     ):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -1457,11 +1466,6 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
             self.get_policy = lambda u: {}
 
         self.disabled_xblock_types = disabled_xblock_types
-        self.get_module = get_module
-        # self.handler_url_override = None
-        # self.applicable_aside_types_override = None
-        # self.wrap_asides_override = None
-        # self.layout_asides_override = None
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""
@@ -1474,8 +1478,8 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
     def get_block(self, usage_id, for_parent=None):
         """See documentation for `xblock.runtime:Runtime.get_block`"""
         block = self.load_item(usage_id, for_parent=for_parent)
-        if self.get_module:
-            return self.get_module(block)
+        if self.get_block_for_descriptor:
+            return self.get_block_for_descriptor(block)
         return block
 
     def load_block_type(self, block_type):
@@ -1537,10 +1541,6 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
             return self.applicable_aside_types_override(block, applicable_aside_types=super().applicable_aside_types)
 
         potential_set = set(super().applicable_aside_types(block))
-        if getattr(block, 'xmodule_runtime', None) is not None:
-            if hasattr(block.xmodule_runtime, 'applicable_aside_types'):
-                application_set = set(block.xmodule_runtime.applicable_aside_types(block))
-                return list(potential_set.intersection(application_set))
         return list(potential_set)
 
     def resource_url(self, resource):
@@ -1709,112 +1709,6 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
                         assert isinstance(subvalue, str)
                         field_value[key] = self._make_usage_key(course_key, subvalue)
                     setattr(xblock, field.name, field_value)
-
-
-class CombinedSystem:
-    """
-    This class is a shim to allow both pure XBlocks and XModuleDescriptors
-    that have been bound as XModules to access both the attributes of ModuleSystem
-    and of DescriptorSystem as a single runtime.
-    """
-
-    __slots__ = ('_module_system', '_descriptor_system')
-
-    # This system doesn't override a number of methods that are provided by ModuleSystem and DescriptorSystem,
-    # namely handler_url, local_resource_url, query, and resource_url.
-    #
-    # At runtime, the ModuleSystem and/or DescriptorSystem will define those methods
-    #
-    def __init__(self, module_system, descriptor_system):
-        # These attributes are set directly to __dict__ below to avoid a recursion in getattr/setattr.
-        self._module_system = module_system
-        self._descriptor_system = descriptor_system
-
-    def render(self, block, view_name, context=None):
-        """
-        Render a block by invoking its view.
-
-        Finds the view named `view_name` on `block`.  The default view will be
-        used if a specific view hasn't be registered.  If there is no default
-        view, an exception will be raised.
-
-        The view is invoked, passing it `context`.  The value returned by the
-        view is returned, with possible modifications by the runtime to
-        integrate it into a larger whole.
-
-        """
-        context = context or {}
-        return self.__getattr__('render')(block, view_name, context)  # pylint: disable=unnecessary-dunder-call
-
-    def service(self, block, service_name):
-        """Return a service, or None.
-
-        Services are objects implementing arbitrary other interfaces.  They are
-        requested by agreed-upon names, see [XXX TODO] for a list of possible
-        services.  The object returned depends on the service requested.
-
-        XBlocks must announce their intention to request services with the
-        `XBlock.needs` or `XBlock.wants` decorators.  Use `needs` if you assume
-        that the service is available, or `wants` if your code is flexible and
-        can accept a None from this method.
-
-        Runtimes can override this method if they have different techniques for
-        finding and delivering services.
-
-        Arguments:
-            block (an XBlock): this block's class will be examined for service
-                decorators.
-            service_name (string): the name of the service requested.
-
-        Returns:
-            An object implementing the requested service, or None.
-
-        """
-        service = None
-
-        if self._module_system:
-            service = self._module_system.service(block, service_name)
-
-        if service is None:
-            service = self._descriptor_system.service(block, service_name)
-
-        return service
-
-    def __getattr__(self, name):
-        """
-        If the ModuleSystem doesn't have an attribute, try returning the same attribute from the
-        DescriptorSystem, instead. This allows XModuleDescriptors that are bound as XModules
-        to still function as XModuleDescriptors.
-        """
-        # First we try a lookup in the module system...
-        try:
-            return getattr(self._module_system, name)
-        except AttributeError:
-            return getattr(self._descriptor_system, name)
-
-    def __setattr__(self, name, value):
-        """
-        If the ModuleSystem is set, set the attr on it.
-        Always set the attr on the DescriptorSystem.
-        """
-        if name in self.__slots__:
-            return super().__setattr__(name, value)
-
-        if self._module_system:
-            setattr(self._module_system, name, value)
-        setattr(self._descriptor_system, name, value)
-
-    def __delattr__(self, name):
-        """
-        If the ModuleSystem is set, delete the attribute from it.
-        Always delete the attribute from the DescriptorSystem.
-        """
-        if self._module_system:
-            delattr(self._module_system, name)
-        delattr(self._descriptor_system, name)
-
-    def __repr__(self):
-        return f"CombinedSystem({self._module_system!r}, {self._descriptor_system!r})"
 
 
 class DoNothingCache:
