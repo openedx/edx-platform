@@ -437,7 +437,7 @@ def get_module_system_for_user(
         request_token (str): A token unique to the request use by xblock initialization
 
     Returns:
-        (LmsModuleSystem, KvsFieldData):  (module system, student_data) bound to, primarily, the user and descriptor
+        KvsFieldData:  student_data bound to, primarily, the user and descriptor
     """
 
     def make_xqueue_callback(dispatch='score_update'):
@@ -624,7 +624,6 @@ def get_module_system_for_user(
     descriptor.runtime.get_block_for_descriptor = inner_get_block
 
     # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
-    # mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
     descriptor.runtime.mixins = descriptor.runtime.mixologist._mixins
     
     descriptor.runtime.wrappers = block_wrappers
