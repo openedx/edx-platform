@@ -52,9 +52,6 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
             services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
 
-    def render_template(self, _template, _context):  # lint-amnesty, pylint: disable=method-hidden
-        raise Exception("Shouldn't be called")
-
 
 class BaseCourseTestCase(TestCase):
     '''Make sure block imports work properly, including for malformed inputs'''

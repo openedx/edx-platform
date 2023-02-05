@@ -214,12 +214,12 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         Tests that the 'user' and 'i18n' services are provided by the Studio runtime.
         """
         descriptor = BlockFactory(category="pure", parent=self.course)
-        runtime = _preview_module_system(
+        _preview_module_system(
             self.request,
             descriptor,
             self.field_data,
         )
-        service = runtime.service(descriptor, expected_service)
+        service = descriptor.runtime.service(descriptor, expected_service)
         self.assertIsNotNone(service)
 
 
@@ -245,15 +245,16 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         self.descriptor = BlockFactory(category="video", parent=course)
         self.field_data = mock.Mock()
         self.contentstore = contentstore()
-        self.runtime = _preview_module_system(
+        self.descriptor = BlockFactory(category="problem", parent=course)
+        _preview_module_system(
             self.request,
-            descriptor=BlockFactory(category="problem", parent=course),
+            descriptor=self.descriptor,
             field_data=mock.Mock(),
         )
         self.course = self.store.get_item(course.location)
 
     def test_get_user_role(self):
-        assert self.runtime.get_user_role() == 'staff'
+        assert self.descriptor.runtime.get_user_role() == 'staff'
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     def test_render_template(self):
@@ -263,10 +264,10 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
 
     @override_settings(COURSES_WITH_UNSAFE_CODE=[r'course-v1:edX\+LmsModuleShimTest\+2021_Fall'])
     def test_can_execute_unsafe_code(self):
-        assert self.runtime.can_execute_unsafe_code()
+        assert self.descriptor.runtime.can_execute_unsafe_code()
 
     def test_cannot_execute_unsafe_code(self):
-        assert not self.runtime.can_execute_unsafe_code()
+        assert not self.descriptor.runtime.can_execute_unsafe_code()
 
     @override_settings(PYTHON_LIB_FILENAME=PYTHON_LIB_FILENAME)
     def test_get_python_lib_zip(self):
@@ -276,7 +277,7 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
             source_file=self.PYTHON_LIB_SOURCE_FILE,
             target_filename=self.PYTHON_LIB_FILENAME,
         )
-        assert self.runtime.get_python_lib_zip() == zipfile
+        assert self.descriptor.runtime.get_python_lib_zip() == zipfile
 
     def test_no_get_python_lib_zip(self):
         zipfile = upload_file_to_course(
@@ -285,38 +286,40 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
             source_file=self.PYTHON_LIB_SOURCE_FILE,
             target_filename=self.PYTHON_LIB_FILENAME,
         )
-        assert self.runtime.get_python_lib_zip() is None
+        assert self.descriptor.runtime.get_python_lib_zip() is None
 
     def test_cache(self):
-        assert hasattr(self.runtime.cache, 'get')
-        assert hasattr(self.runtime.cache, 'set')
+        assert hasattr(self.descriptor.runtime.cache, 'get')
+        assert hasattr(self.descriptor.runtime.cache, 'set')
 
     def test_replace_urls(self):
         html = '<a href="/static/id">'
-        assert self.runtime.replace_urls(html) == \
+        assert self.descriptor.runtime.replace_urls(html) == \
             static_replace.replace_static_urls(html, course_id=self.course.id)
 
     def test_anonymous_user_id_preview(self):
-        assert self.runtime.anonymous_student_id == 'student'
+        assert self.descriptor.runtime.anonymous_student_id == 'student'
 
     @override_waffle_flag(INDIVIDUALIZE_ANONYMOUS_USER_ID, active=True)
     def test_anonymous_user_id_individual_per_student(self):
         """Test anonymous_user_id on a block which uses per-student anonymous IDs"""
         # Create the runtime with the flag turned on.
-        runtime = _preview_module_system(
+        descriptor = BlockFactory(category="problem", parent=self.course)
+        _preview_module_system(
             self.request,
-            descriptor=BlockFactory(category="problem", parent=self.course),
+            descriptor=descriptor,
             field_data=mock.Mock(),
         )
-        assert runtime.anonymous_student_id == '26262401c528d7c4a6bbeabe0455ec46'
+        assert descriptor.runtime.anonymous_student_id == '26262401c528d7c4a6bbeabe0455ec46'
 
     @override_waffle_flag(INDIVIDUALIZE_ANONYMOUS_USER_ID, active=True)
     def test_anonymous_user_id_individual_per_course(self):
         """Test anonymous_user_id on a block which uses per-course anonymous IDs"""
         # Create the runtime with the flag turned on.
-        runtime = _preview_module_system(
+        descriptor = BlockFactory(category="lti", parent=self.course)
+        _preview_module_system(
             self.request,
-            descriptor=BlockFactory(category="lti", parent=self.course),
+            descriptor=descriptor,
             field_data=mock.Mock(),
         )
-        assert runtime.anonymous_student_id == 'ad503f629b55c531fed2e45aa17a3368'
+        assert descriptor.runtime.anonymous_student_id == 'ad503f629b55c531fed2e45aa17a3368'

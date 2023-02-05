@@ -37,7 +37,7 @@ from xblock.core import XBlock, XBlockAside  # lint-amnesty, pylint: disable=wro
 from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import FieldData  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.fields import ScopeIds  # lint-amnesty, pylint: disable=wrong-import-order
-from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime  # lint-amnesty, pylint: disable=wrong-import-order
+from xblock.runtime import DictKeyValueStore, KvsFieldData  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong-import-order
 
 from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
@@ -58,7 +58,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, Toy
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.services import RebindUserServiceError
 from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import STUDENT_VIEW, CombinedSystem  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW, DescriptorSystem  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps import static_replace
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -1894,9 +1894,10 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
             location=location,
             static_asset_path=None,
             _runtime=Mock(
-                spec=Runtime,
+                spec=DescriptorSystem,
                 resources_fs=None,
                 mixologist=Mock(_mixins=(), name='mixologist'),
+                _services={},
                 name='runtime',
             ),
             scope_ids=Mock(spec=ScopeIds),
@@ -1906,7 +1907,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
             fields={},
             days_early_for_beta=None,
         )
-        descriptor.runtime = CombinedSystem(descriptor._runtime, None)  # pylint: disable=protected-access
+        descriptor.runtime = DescriptorSystem(None, None, None)
         # Use the xblock_class's bind_for_student method
         descriptor.bind_for_student = partial(xblock_class.bind_for_student, descriptor)
 
@@ -1922,7 +1923,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
             request_token='request_token',
             course=self.course,
         )
-        current_user = block.xmodule_runtime.service(block, 'user').get_current_user()
+        current_user = block.runtime.service(block, 'user').get_current_user()
         return current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
 
     @ddt.data(*PER_STUDENT_ANONYMIZED_XBLOCKS)
@@ -1976,7 +1977,7 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
     @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
     @patch('xmodule.modulestore.mongo.base.CachingDescriptorSystem.applicable_aside_types',
            lambda self, block: ['test_aside'])
-    @patch('lms.djangoapps.lms_xblock.runtime.LmsModuleSystem.applicable_aside_types',
+    @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types',
            lambda self, block: ['test_aside'])
     def test_context_contains_aside_info(self, mock_tracker):
         """
@@ -2185,7 +2186,7 @@ class TestRebindBlock(TestSubmittingProblems):
         # Bind the block to another student, which will remove "correct_map"
         # from the block's _field_data_cache and _dirty_fields.
         user2 = UserFactory.create()
-        block.bind_for_student(block.runtime, user2.id)
+        block.bind_for_student(user2.id)
 
         # XBlock's save method assumes that if a field is in _dirty_fields,
         # then it's also in _field_data_cache. If this assumption
@@ -2194,7 +2195,7 @@ class TestRebindBlock(TestSubmittingProblems):
         # _field_data cache, but not _dirty_fields, when we bound
         # this block to the second student. (TNL-2640)
         user3 = UserFactory.create()
-        block.bind_for_student(block.runtime, user3.id)
+        block.bind_for_student(user3.id)
 
     def test_rebind_noauth_block_to_user_not_anonymous(self):
         """
@@ -2263,13 +2264,13 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 class LMSXBlockServiceMixin(SharedModuleStoreTestCase):
     """
-    Helper class that initializes the LmsModuleSystem.
+    Helper class that initializes the runtime.
     """
     def _prepare_runtime(self):
         """
-        Instantiate the LmsModuleSystem.
+        Instantiate the runtem.
         """
-        self.runtime, _ = render.get_module_system_for_user(
+        _ = render.get_module_system_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2333,7 +2334,7 @@ class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
         """
         Tests that the 'user', 'i18n', and 'fs' services are provided by the LMS runtime.
         """
-        service = self.runtime.service(self.descriptor, expected_service)
+        service = self.descriptor.runtime.service(self.descriptor, expected_service)
         assert service is not None
 
     def test_beta_tester_fields_added(self):
@@ -2344,8 +2345,8 @@ class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
         self._prepare_runtime()
 
         # pylint: disable=no-member
-        assert not self.runtime.user_is_beta_tester
-        assert self.runtime.days_early_for_beta == 5
+        assert not self.descriptor.runtime.user_is_beta_tester
+        assert self.descriptor.runtime.days_early_for_beta == 5
 
     def test_get_set_tag(self):
         """
@@ -2355,23 +2356,23 @@ class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
         key = 'key1'
 
         # test for when we haven't set the tag yet
-        tag = self.runtime.service(self.descriptor, 'user_tags').get_tag(scope, key)
+        tag = self.descriptor.runtime.service(self.descriptor, 'user_tags').get_tag(scope, key)
         assert tag is None
 
         # set the tag
         set_value = 'value'
-        self.runtime.service(self.descriptor, 'user_tags').set_tag(scope, key, set_value)
-        tag = self.runtime.service(self.descriptor, 'user_tags').get_tag(scope, key)
+        self.descriptor.runtime.service(self.descriptor, 'user_tags').set_tag(scope, key, set_value)
+        tag = self.descriptor.runtime.service(self.descriptor, 'user_tags').get_tag(scope, key)
 
         assert tag == set_value
 
         # Try to set tag in wrong scope
         with pytest.raises(ValueError):
-            self.runtime.service(self.descriptor, 'user_tags').set_tag('fake_scope', key, set_value)
+            self.descriptor.runtime.service(self.descriptor, 'user_tags').set_tag('fake_scope', key, set_value)
 
         # Try to get tag in wrong scope
         with pytest.raises(ValueError):
-            self.runtime.service(self.descriptor, 'user_tags').get_tag('fake_scope', key)
+            self.descriptor.runtime.service(self.descriptor, 'user_tags').get_tag('fake_scope', key)
 
 
 @ddt.ddt
@@ -2381,23 +2382,23 @@ class TestBadgingService(LMSXBlockServiceMixin):
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
     def test_service_rendered(self):
         self._prepare_runtime()
-        assert self.runtime.service(self.descriptor, 'badging')
+        assert self.descriptor.runtime.service(self.descriptor, 'badging')
 
     def test_no_service_rendered(self):
         with pytest.raises(NoSuchServiceError):
-            self.runtime.service(self.descriptor, 'badging')
+            self.descriptor.runtime.service(self.descriptor, 'badging')
 
     @ddt.data(True, False)
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
     def test_course_badges_toggle(self, toggle):
         self.course = CourseFactory.create(metadata={'issue_badges': toggle})
         self._prepare_runtime()
-        assert self.runtime.service(self.descriptor, 'badging').course_badges_enabled is toggle
+        assert self.descriptor.runtime.service(self.descriptor, 'badging').course_badges_enabled is toggle
 
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
     def test_get_badge_class(self):
         self._prepare_runtime()
-        badge_service = self.runtime.service(self.descriptor, 'badging')
+        badge_service = self.descriptor.runtime.service(self.descriptor, 'badging')
         premade_badge_class = BadgeClassFactory.create()
         # Ignore additional parameters. This class already exists.
         # We should get back the first class we created, rather than a new one.
@@ -2421,7 +2422,7 @@ class TestI18nService(LMSXBlockServiceMixin):
         """
         Test: module i18n service in LMS
         """
-        i18n_service = self.runtime.service(self.descriptor, 'i18n')
+        i18n_service = self.descriptor.runtime.service(self.descriptor, 'i18n')
         assert i18n_service is not None
         assert isinstance(i18n_service, XBlockI18nService)
 
@@ -2431,27 +2432,30 @@ class TestI18nService(LMSXBlockServiceMixin):
         """
         self.descriptor.service_declaration = Mock(return_value=None)
         with pytest.raises(NoSuchServiceError):
-            self.runtime.service(self.descriptor, 'i18n')
+            self.descriptor.runtime.service(self.descriptor, 'i18n')
 
     def test_no_service_exception_(self):
         """
         Test: NoSuchServiceError should be raised if i18n service is none.
         """
-        self.runtime._services['i18n'] = None  # pylint: disable=protected-access
+        i18nService = self.descriptor.runtime._services['i18n']  # pylint: disable=protected-access
+        self.descriptor.runtime._runtime_services['i18n'] = None  # pylint: disable=protected-access
+        self.descriptor.runtime._services['i18n'] = None  # pylint: disable=protected-access
         with pytest.raises(NoSuchServiceError):
-            self.runtime.service(self.descriptor, 'i18n')
+            self.descriptor.runtime.service(self.descriptor, 'i18n')
+        self.descriptor.runtime._services['i18n'] = i18nService  # pylint: disable=protected-access
 
     def test_i18n_service_callable(self):
         """
         Test: _services dict should contain the callable i18n service in LMS.
         """
-        assert callable(self.runtime._services.get('i18n'))  # pylint: disable=protected-access
+        assert callable(self.descriptor.runtime._services.get('i18n'))  # pylint: disable=protected-access
 
     def test_i18n_service_not_callable(self):
         """
         Test: i18n service should not be callable in LMS after initialization.
         """
-        assert not callable(self.runtime.service(self.descriptor, 'i18n'))
+        assert not callable(self.descriptor.runtime.service(self.descriptor, 'i18n'))
 
 
 class PureXBlockWithChildren(PureXBlock):
@@ -2666,7 +2670,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         self.track_function = Mock()
         self.request_token = Mock()
         self.contentstore = contentstore()
-        self.runtime, _ = render.get_module_system_for_user(
+        _ = render.get_module_system_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2686,11 +2690,11 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         """
         Tests that the deprecated attributes provided by the user service match expected values.
         """
-        assert getattr(self.runtime, attribute) == expected_value
+        assert getattr(self.descriptor.runtime, attribute) == expected_value
 
     @patch('lms.djangoapps.courseware.block_render.has_access', Mock(return_value=True, autospec=True))
     def test_user_is_staff(self):
-        runtime, _ = render.get_module_system_for_user(
+        _ = render.get_module_system_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2699,12 +2703,12 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.request_token,
             course=self.course,
         )
-        assert runtime.user_is_staff
-        assert runtime.get_user_role() == 'student'
+        assert self.descriptor.runtime.user_is_staff
+        assert self.descriptor.runtime.get_user_role() == 'student'
 
     @patch('lms.djangoapps.courseware.block_render.get_user_role', Mock(return_value='instructor', autospec=True))
     def test_get_user_role(self):
-        runtime, _ = render.get_module_system_for_user(
+        _ = render.get_module_system_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2713,17 +2717,17 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.request_token,
             course=self.course,
         )
-        assert runtime.get_user_role() == 'instructor'
+        assert self.descriptor.runtime.get_user_role() == 'instructor'
 
     def test_anonymous_student_id(self):
-        assert self.runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+        assert self.descriptor.runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
 
     def test_anonymous_student_id_bug(self):
         """
         Verifies that subsequent calls to get_module_system_for_user have no effect on each block runtime's
         anonymous_student_id value.
         """
-        problem_runtime, _ = render.get_module_system_for_user(
+        _ = render.get_module_system_for_user(
             self.user,
             self.student_data,
             self.problem_descriptor,
@@ -2733,9 +2737,9 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             course=self.course,
         )
         # Ensure the problem block returns a per-user anonymous id
-        assert problem_runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
+        assert self.problem_descriptor.runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
 
-        vertical_runtime, _ = render.get_module_system_for_user(
+        _ = render.get_module_system_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2745,13 +2749,13 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             course=self.course,
         )
         # Ensure the vertical block returns a per-course+user anonymous id
-        assert vertical_runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+        assert self.descriptor.runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
 
         # Ensure the problem runtime's anonymous student ID is unchanged after the above call.
-        assert problem_runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
+        assert self.problem_descriptor.runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
 
     def test_user_service_with_anonymous_user(self):
-        runtime, _ = render.get_module_system_for_user(
+        _ = render.get_module_system_for_user(
             AnonymousUser(),
             self.student_data,
             self.descriptor,
@@ -2760,14 +2764,14 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.request_token,
             course=self.course,
         )
-        assert runtime.anonymous_student_id is None
-        assert runtime.seed == 0
-        assert runtime.user_id is None
-        assert not runtime.user_is_staff
-        assert not runtime.get_user_role()
+        assert self.descriptor.runtime.anonymous_student_id is None
+        assert self.descriptor.runtime.seed == 0
+        assert self.descriptor.runtime.user_id is None
+        assert not self.descriptor.runtime.user_is_staff
+        assert not self.descriptor.runtime.get_user_role()
 
     def test_get_real_user(self):
-        runtime, _ = render.get_module_system_for_user(
+        _ = render.get_module_system_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2777,20 +2781,20 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             course=self.course,
         )
         course_anonymous_student_id = anonymous_id_for_user(self.user, self.course.id)
-        assert runtime.get_real_user(course_anonymous_student_id) == self.user  # pylint: disable=not-callable
+        assert self.descriptor.runtime.get_real_user(course_anonymous_student_id) == self.user  # pylint: disable=not-callable
 
         no_course_anonymous_student_id = anonymous_id_for_user(self.user, None)
-        assert runtime.get_real_user(no_course_anonymous_student_id) == self.user  # pylint: disable=not-callable
+        assert self.descriptor.runtime.get_real_user(no_course_anonymous_student_id) == self.user  # pylint: disable=not-callable
 
         # Tests that the default is to use the user service's anonymous_student_id
-        assert runtime.get_real_user() == self.user  # pylint: disable=not-callable
+        assert self.descriptor.runtime.get_real_user() == self.user  # pylint: disable=not-callable
 
     def test_render_template(self):
-        rendered = self.runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
+        rendered = self.descriptor.runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
         assert rendered == '<div id="hi" ns="main">Testing the MakoService</div>\n'
 
     def test_xqueue(self):
-        xqueue = self.runtime.xqueue
+        xqueue = self.descriptor.runtime.xqueue
         assert isinstance(xqueue['interface'], XQueueInterface)
         assert xqueue['interface'].url == 'http://sandbox-xqueue.edx.org'
         assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
@@ -2812,7 +2816,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         XQUEUE_WAITTIME_BETWEEN_REQUESTS=15,
     )
     def test_xqueue_settings(self):
-        runtime, _ = render.get_module_system_for_user(
+        _ = render.get_module_system_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2821,7 +2825,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.request_token,
             course=self.course,
         )
-        xqueue = runtime.xqueue
+        xqueue = self.descriptor.runtime.xqueue
         assert isinstance(xqueue['interface'], XQueueInterface)
         assert xqueue['interface'].url == 'http://xqueue.url'
         assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
@@ -2832,14 +2836,14 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
 
     @override_settings(COURSES_WITH_UNSAFE_CODE=[r'course-v1:edX\+LmsModuleShimTest\+2021_Fall'])
     def test_can_execute_unsafe_code_when_allowed(self):
-        assert self.runtime.can_execute_unsafe_code()
+        assert self.descriptor.runtime.can_execute_unsafe_code()
 
     @override_settings(COURSES_WITH_UNSAFE_CODE=[r'course-v1:edX\+full\+2021_Fall'])
     def test_cannot_execute_unsafe_code_when_disallowed(self):
-        assert not self.runtime.can_execute_unsafe_code()
+        assert not self.descriptor.runtime.can_execute_unsafe_code()
 
     def test_cannot_execute_unsafe_code(self):
-        assert not self.runtime.can_execute_unsafe_code()
+        assert not self.descriptor.runtime.can_execute_unsafe_code()
 
     @override_settings(PYTHON_LIB_FILENAME=PYTHON_LIB_FILENAME)
     def test_get_python_lib_zip(self):
@@ -2849,7 +2853,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             source_file=self.PYTHON_LIB_SOURCE_FILE,
             target_filename=self.PYTHON_LIB_FILENAME,
         )
-        assert self.runtime.get_python_lib_zip() == zipfile
+        assert self.descriptor.runtime.get_python_lib_zip() == zipfile
 
     def test_no_get_python_lib_zip(self):
         zipfile = upload_file_to_course(
@@ -2858,26 +2862,26 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             source_file=self.PYTHON_LIB_SOURCE_FILE,
             target_filename=self.PYTHON_LIB_FILENAME,
         )
-        assert self.runtime.get_python_lib_zip() is None
+        assert self.descriptor.runtime.get_python_lib_zip() is None
 
     def test_cache(self):
-        assert hasattr(self.runtime.cache, 'get')
-        assert hasattr(self.runtime.cache, 'set')
+        assert hasattr(self.descriptor.runtime.cache, 'get')
+        assert hasattr(self.descriptor.runtime.cache, 'set')
 
     def test_replace_urls(self):
         html = '<a href="/static/id">'
-        assert self.runtime.replace_urls(html) == \
+        assert self.descriptor.runtime.replace_urls(html) == \
             static_replace.replace_static_urls(html, course_id=self.course.id)
 
     def test_replace_course_urls(self):
         html = '<a href="/course/id">'
-        assert self.runtime.replace_course_urls(html) == \
+        assert self.descriptor.runtime.replace_course_urls(html) == \
             static_replace.replace_course_urls(html, course_key=self.course.id)
 
     def test_replace_jump_to_id_urls(self):
         html = '<a href="/jump_to_id/id">'
         jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': str(self.course.id), 'module_id': ''})
-        assert self.runtime.replace_jump_to_id_urls(html) == \
+        assert self.descriptor.runtime.replace_jump_to_id_urls(html) == \
             static_replace.replace_jump_to_id_urls(html, self.course.id, jump_to_id_base_url)
 
     @XBlock.register_temp_plugin(PureXBlock, 'pure')

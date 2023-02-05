@@ -55,7 +55,6 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
             field_data=self.data,
             scope_ids=scope_ids
         )
-        self.block.xmodule_runtime = mock.Mock()
 
         if self.PATCH_DJANGO_USER:
             self.django_user_canary = UserFactory()

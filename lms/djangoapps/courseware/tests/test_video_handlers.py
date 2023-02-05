@@ -22,6 +22,8 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+# noinspection PyUnresolvedReferences
+from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
 from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     Transcript,
@@ -29,7 +31,7 @@ from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: dis
     get_transcript,
     subs_filename,
 )
-from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -131,6 +133,7 @@ def attach_bumper_transcript(item, filename, lang="en"):
     item.video_bumper["transcripts"][lang] = filename
 
 
+@pytest.mark.usefixtures("override_descriptor_system")
 class BaseTestVideoXBlock(BaseTestXmodule):
     """Base class for VideoXBlock tests."""
 
@@ -232,7 +235,7 @@ class TestVideo(BaseTestVideoXBlock):
         """
         Return the URL for the specified handler on self.item_descriptor.
         """
-        return self.item_descriptor.xmodule_runtime.handler_url(
+        return self.item_descriptor.runtime.handler_url(
             self.item_descriptor, handler, suffix
         ).rstrip('/?')
 

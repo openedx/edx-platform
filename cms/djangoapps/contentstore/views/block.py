@@ -299,7 +299,7 @@ def load_services_for_studio(runtime, user):
     (i.e. whenever we're not loading preview module system.) This is required to make information
     about the current user (especially permissions) available via services as needed.
     """
-    services={
+    services = {
         "user": DjangoXBlockUserService(user),
         "studio_user_permissions": StudioPermissionsService(user),
         "mako": MakoService(),
@@ -309,7 +309,7 @@ def load_services_for_studio(runtime, user):
         "library_tools": LibraryToolsService(modulestore(), user.id)
     }
 
-    runtime._services.update(services)
+    runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
 
 
 @require_http_methods("GET")

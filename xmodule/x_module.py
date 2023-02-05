@@ -1408,8 +1408,7 @@ class ModuleSystemShim:
             DeprecationWarning, stacklevel=3,
         )
         if hasattr(self, '_deprecated_course_id'):
-            return self._deprecated_course_id
-        return self.descriptor_runtime.course_id.for_branch(None)
+            return self._deprecated_course_id.for_branch(None)
 
     @course_id.setter
     def course_id(self, course_id):
@@ -1479,7 +1478,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
     def get_block(self, usage_id, for_parent=None):
         """See documentation for `xblock.runtime:Runtime.get_block`"""
         block = self.load_item(usage_id, for_parent=for_parent)
-        if self.get_block_for_descriptor:
+        if getattr(self, 'get_block_for_descriptor', None):
             return self.get_block_for_descriptor(block)
         return block
 

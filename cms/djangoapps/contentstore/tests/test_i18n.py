@@ -70,7 +70,7 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.field_data = mock.Mock()
         self.descriptor = BlockFactory(category="pure", parent=self.course)
-        self.runtime = _preview_module_system(
+        _preview_module_system(
             self.request,
             self.descriptor,
             self.field_data,
@@ -81,7 +81,7 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         """
         return the block i18n service.
         """
-        i18n_service = self.runtime.service(descriptor, 'i18n')
+        i18n_service = self.descriptor.runtime.service(descriptor, 'i18n')
         self.assertIsNotNone(i18n_service)
         self.assertIsInstance(i18n_service, XBlockI18nService)
         return i18n_service
@@ -171,7 +171,7 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         """
         Test: i18n service should be callable in studio.
         """
-        self.assertTrue(callable(self.runtime._services.get('i18n')))  # pylint: disable=protected-access
+        self.assertTrue(callable(self.descriptor.runtime._services.get('i18n')))  # pylint: disable=protected-access
 
 
 class InternationalizationTest(ModuleStoreTestCase):

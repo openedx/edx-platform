@@ -587,7 +587,7 @@ def get_module_system_for_user(
 
     store = modulestore()
 
-    services={
+    services = {
         'fs': FSService(),
         'field-data': field_data,
         'mako': mako_service,
@@ -624,12 +624,10 @@ def get_module_system_for_user(
     descriptor.runtime.get_block_for_descriptor = inner_get_block
 
     # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
-    descriptor.runtime.mixins = descriptor.runtime.mixologist._mixins
-    
+    descriptor.runtime.mixins = descriptor.runtime.mixologist._mixins  # lint-amnesty, pylint: disable=protected-access
     descriptor.runtime.wrappers = block_wrappers
     descriptor.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
     descriptor.runtime.request_token = request_token
-
     descriptor.runtime.wrap_asides_override = lms_wrappers_aside
     descriptor.runtime.applicable_aside_types_override = lms_applicable_aside_types
 

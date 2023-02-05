@@ -18,7 +18,7 @@ from xmodule.split_test_block import (
     get_split_user_partitions,
     user_partition_values,
 )
-from xmodule.tests import get_test_system
+from xmodule.tests import prepare_block_runtime
 from xmodule.tests.test_course_block import DummySystem as TestImportSystem
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
@@ -85,9 +85,9 @@ class SplitTestBlockTest(XModuleXmlImportTest, PartitionTestCase):
 
         self.course = self.process_xml(course)
         self.course_sequence = self.course.get_children()[0]
-        self.module_system = get_test_system()
+        user = Mock(username='ma', email='ma@edx.org', is_staff=False, is_active=True)
+        prepare_block_runtime(self.course.runtime, user=user, add_get_block=True)
 
-        self.module_system.descriptor_runtime = self.course._runtime  # pylint: disable=protected-access
         self.course.runtime.export_fs = MemoryFS()
 
         # Create mock partition service, as these tests are running with XML in-memory system.
@@ -106,19 +106,15 @@ class SplitTestBlockTest(XModuleXmlImportTest, PartitionTestCase):
             self.course,
             course_id=self.course.id,
         )
-        self.module_system._services['partitions'] = partitions_service  # pylint: disable=protected-access
+        self.course.runtime._runtime_services['partitions'] = partitions_service  # pylint: disable=protected-access
 
         # Mock user_service user
         user_service = Mock()
-        user = Mock(username='ma', email='ma@edx.org', is_staff=False, is_active=True)
         user_service._django_user = user  # lint-amnesty, pylint: disable=protected-access
-        self.module_system._services['user'] = user_service  # pylint: disable=protected-access
 
         self.split_test_block = self.course_sequence.get_children()[0]
-        self.split_test_block.bind_for_student(
-            self.module_system,
-            user.id
-        )
+        self.split_test_block.runtime = self.course.runtime
+        self.split_test_block.bind_for_student(user.id)
 
         # Create mock modulestore for getting the course. Needed for rendering the HTML
         # view, since mock services exist and the rendering code will not short-circuit.
@@ -152,7 +148,7 @@ class SplitTestBlockLMSTest(SplitTestBlockTest):
     @ddt.unpack
     def test_get_html(self, user_tag, child_content):
         self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]
-        assert child_content in self.module_system.render(self.split_test_block, STUDENT_VIEW).content
+        assert child_content in self.course.runtime.render(self.split_test_block, STUDENT_VIEW).content
 
     @ddt.data(0, 1)
     def test_child_missing_tag_value(self, _user_tag):
@@ -175,7 +171,7 @@ class SplitTestBlockLMSTest(SplitTestBlockTest):
 
         # Mock out the process_xml
         # Expect it to return a child descriptor for the SplitTestDescriptor when called.
-        self.module_system.process_xml = Mock()
+        self.course.runtime.process_xml = Mock()
 
         # Write out the xml.
         xml_obj = self.split_test_block.definition_to_xml(MemoryFS())
@@ -184,7 +180,7 @@ class SplitTestBlockLMSTest(SplitTestBlockTest):
         assert xml_obj.get('group_id_to_child') is not None
 
         # Read the xml back in.
-        fields, children = SplitTestBlock.definition_from_xml(xml_obj, self.module_system)
+        fields, children = SplitTestBlock.definition_from_xml(xml_obj, self.course.runtime)
         assert fields.get('user_partition_id') == '0'
         assert fields.get('group_id_to_child') is not None
         assert len(children) == 2
@@ -212,13 +208,13 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
 
         # The split_test block should render both its groups when it is the root
         context = create_studio_context(self.split_test_block)
-        html = self.module_system.render(self.split_test_block, AUTHOR_VIEW, context).content
+        html = self.course.runtime.render(self.split_test_block, AUTHOR_VIEW, context).content
         assert 'HTML FOR GROUP 0' in html
         assert 'HTML FOR GROUP 1' in html
 
         # When rendering as a child, it shouldn't render either of its groups
         context = create_studio_context(self.course_sequence)
-        html = self.module_system.render(self.split_test_block, AUTHOR_VIEW, context).content
+        html = self.course.runtime.render(self.split_test_block, AUTHOR_VIEW, context).content
         assert 'HTML FOR GROUP 0' not in html
         assert 'HTML FOR GROUP 1' not in html
 
@@ -228,7 +224,7 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
             UserPartition(0, 'first_partition', 'First Partition',
                           [Group("0", 'alpha'), Group("1", 'beta'), Group("2", 'gamma')])
         ]
-        html = self.module_system.render(self.split_test_block, AUTHOR_VIEW, context).content
+        html = self.course.runtime.render(self.split_test_block, AUTHOR_VIEW, context).content
         assert 'HTML FOR GROUP 0' in html
         assert 'HTML FOR GROUP 1' in html
 
@@ -569,7 +565,7 @@ class SplitTestBlockExportImportTest(MixedSplitTestCase):
         )
         export_fs = MemoryFS()
         # Set the virtual FS to export the olx to.
-        split_test_block.runtime._descriptor_system.export_fs = export_fs  # pylint: disable=protected-access
+        split_test_block.runtime.export_fs = export_fs  # pylint: disable=protected-access
 
         # Export the olx.
         node = lxml.etree.Element("unknown_root")

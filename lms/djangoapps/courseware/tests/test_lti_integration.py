@@ -41,7 +41,7 @@ class TestLTI(BaseTestXmodule):
 
         # Note: this course_id is actually a course_key
         context_id = str(self.item_descriptor.course_id)
-        user_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'user')
+        user_service = self.item_descriptor.runtime.service(self.item_descriptor, 'user')
         user_id = str(user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID))
         hostname = settings.LMS_BASE
         resource_link_id = str(urllib.parse.quote(f'{hostname}-{self.item_descriptor.location.html_id()}'))
@@ -81,8 +81,10 @@ class TestLTI(BaseTestXmodule):
             'element_id': self.item_descriptor.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
             'open_in_a_new_page': True,
-            'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor,
-                                                                         'preview_handler').rstrip('/?'),
+            'form_url': self.item_descriptor.runtime.handler_url(
+                self.item_descriptor,
+                'preview_handler'
+            ).rstrip('/?'),
             'hide_launch': False,
             'has_score': False,
             'module_score': None,

@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory
-from xmodule.tests import get_test_system
+from xmodule.tests import prepare_block_runtime
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
@@ -121,20 +121,17 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         """
         Bind a block (part of self.course) so we can access student-specific data.
         """
-        module_system = get_test_system(course_id=block.location.course_key)
-        module_system.descriptor_runtime = block.runtime._descriptor_system  # pylint: disable=protected-access
-        module_system._services['library_tools'] = LibraryToolsService(self.store, self.user.id)  # pylint: disable=protected-access
+        prepare_block_runtime(block.runtime, course_id=block.location.course_key)
+        block.runtime._services.update({'library_tools': LibraryToolsService(self.store, self.user.id)})  # lint-amnesty, pylint: disable=protected-access
 
         def get_block(descriptor):
             """Mocks module_system get_block_for_descriptor function"""
-            sub_module_system = get_test_system(course_id=block.location.course_key)
-            sub_module_system.get_block_for_descriptor = get_block
-            sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
-            descriptor.bind_for_student(sub_module_system, self.user.id)
+            prepare_block_runtime(descriptor.runtime, course_id=block.location.course_key)
+            descriptor.runtime.get_block_for_descriptor = get_block
+            descriptor.bind_for_student(self.user.id)
             return descriptor
 
-        module_system.get_block_for_descriptor = get_block
-        block.xmodule_runtime = module_system
+        block.runtime.get_block_for_descriptor = get_block
 
     def test_completion_service(self):
         # Only the completions for the user and course specified for the CompletionService

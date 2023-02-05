@@ -93,7 +93,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     return webob_to_django_response(resp)
 
 
-def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
+def handler_url(block, handler_name, suffix='', query='', thirdparty=False):  # lint-amnesty, pylint: disable=unused-argument
     """
     Handler URL function for Preview
     """
@@ -120,14 +120,17 @@ def preview_applicable_aside_types(block, applicable_aside_types=None):
     ]
 
 
-def render_child_placeholder(block, view_name, context, wrap_xblock=None):
+def render_child_placeholder(block, view_name, context, wrap_block=None):
     """
     Renders a placeholder XBlock.
     """
-    return wrap_xblock(block, view_name, Fragment(), context)
+    return wrap_block(block, view_name, Fragment(), context)
 
 
 def preview_layout_asides(block, context, frag, view_name, aside_frag_fns, wrap_aside=None):
+    """
+    Custom layout of asides for preview
+    """
     position_for_asides = '<!-- footer for xblock_aside -->'
     result = Fragment()
     result.add_fragment_resources(frag)
@@ -200,7 +203,7 @@ def _preview_module_system(request, descriptor, field_data):
         else:
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
 
-    services={
+    services = {
         "field-data": field_data,
         "i18n": XBlockI18nService,
         'mako': mako_service,
@@ -217,7 +220,7 @@ def _preview_module_system(request, descriptor, field_data):
         'replace_urls': replace_url_service
     }
 
-    descriptor.runtime.get_block_for_descriptor = partial(_load_preview_block, request),
+    descriptor.runtime.get_block_for_descriptor = partial(_load_preview_block, request)
     descriptor.runtime.mixins = settings.XBLOCK_MIXINS
 
     # Set up functions to modify the fragment produced by student_view
@@ -232,11 +235,11 @@ def _preview_module_system(request, descriptor, field_data):
     descriptor.runtime.applicable_aside_types_override = preview_applicable_aside_types
     descriptor.runtime.render_child_placeholder = partial(
         render_child_placeholder,
-        wrap_xblock = descriptor.runtime.wrap_xblock
+        wrap_block=descriptor.runtime.wrap_xblock
     )
     descriptor.runtime.layout_asides_override = partial(
         preview_layout_asides,
-        wrap_aside = descriptor.runtime.wrap_aside
+        wrap_aside=descriptor.runtime.wrap_aside
     )
 
 
