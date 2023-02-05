@@ -941,7 +941,10 @@ class AccountRetirementStatusView(ViewSet):
                 try:
                     limit_count = int(limit)
                 except ValueError:
-                    return Response(f'Limit could not be parsed: {limit} , please ensure this is an integer', status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                                    f'Limit could not be parsed: {limit}, please ensure this is an integer'
+                                    ,status=status.HTTP_400_BAD_REQUEST
+                                    )
 
             earliest_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=cool_off_days)
 
