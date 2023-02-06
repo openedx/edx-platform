@@ -15,6 +15,7 @@ from opaque_keys.edx.locator import LibraryLocator
 from openedx_events.content_authoring.data import XBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DELETED, XBLOCK_PUBLISHED
 
+from django.utils.timezone import datetime, timezone
 from xmodule.assetstore import AssetMetadata
 
 from . import XMODULE_FIELDS_WITH_USAGE_KEYS, ModuleStoreWriteBase
@@ -802,6 +803,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         item = store.delete_item(location, user_id=user_id, **kwargs)
         # .. event_implemented_name: XBLOCK_DELETED
         XBLOCK_DELETED.send_event(
+            time=datetime.now(timezone.utc),
             xblock_info=XBlockData(
                 usage_key=location,
                 block_type=location.block_type,
@@ -924,6 +926,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         item = store.publish(location, user_id, **kwargs)
         # .. event_implemented_name: XBLOCK_PUBLISHED
         XBLOCK_PUBLISHED.send_event(
+            time=datetime.now(timezone.utc),
             xblock_info=XBlockData(
                 usage_key=location,
                 block_type=location.block_type,

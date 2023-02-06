@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.utils.timezone import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from edx_django_utils.plugins import pluggable_override
@@ -963,6 +964,7 @@ def _duplicate_block(parent_usage_key, duplicate_source_usage_key, user, display
 
         # .. event_implemented_name: XBLOCK_DUPLICATED
         XBLOCK_DUPLICATED.send_event(
+            time=datetime.now(timezone.utc),
             xblock_info=DuplicatedXBlockData(
                 usage_key=dest_block.location,
                 block_type=dest_block.location.block_type,
