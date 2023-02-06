@@ -627,7 +627,7 @@ def get_module_system_for_user(
     descriptor.runtime.mixins = descriptor.runtime.mixologist._mixins
     
     descriptor.runtime.wrappers = block_wrappers
-    descriptor.runtime._services.update(services)
+    descriptor.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
     descriptor.runtime.request_token = request_token
 
     descriptor.runtime.wrap_asides_override = lms_wrappers_aside

@@ -223,7 +223,7 @@ def _preview_module_system(request, descriptor, field_data):
     # Set up functions to modify the fragment produced by student_view
     descriptor.runtime.wrappers = wrappers
     descriptor.runtime.wrappers_asides = wrappers_asides
-    descriptor.runtime._services.update(services)
+    descriptor.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
 
     # xmodules can check for this attribute during rendering to determine if
     # they are being rendered for preview (i.e. in Studio)
