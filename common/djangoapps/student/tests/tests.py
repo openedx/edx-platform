@@ -17,6 +17,7 @@ from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pyli
 from django.test import TestCase, override_settings
 from django.test.client import Client
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_switch
 from markupsafe import escape
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
@@ -35,6 +36,7 @@ from common.djangoapps.student.models import (
     user_by_anonymous_id
 )
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.toggles import REDIRECT_TO_COURSEWARE_AFTER_ENROLLMENT
 from common.djangoapps.student.views import complete_course_mode_info
 from common.djangoapps.util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
 from common.djangoapps.util.testing import EventTestMixin
@@ -900,6 +902,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@ddt.ddt
 class ChangeEnrollmentViewTest(ModuleStoreTestCase):
     """Tests the student.views.change_enrollment view"""
 
@@ -919,6 +922,17 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
             }
         )
         return response
+
+    @ddt.data(
+        (True, 'courseware'),
+        (False, None),
+    )
+    @ddt.unpack
+    def test_enrollment_url(self, waffle_flag_enabled, returned_view):
+        with override_waffle_switch(REDIRECT_TO_COURSEWARE_AFTER_ENROLLMENT, waffle_flag_enabled):
+            response = self._enroll_through_view(self.course)
+        data = reverse(returned_view, args=[str(self.course.id)]) if returned_view else ''
+        assert response.content.decode('utf8') == data
 
     def test_enroll_as_default(self):
         """Tests that a student can successfully enroll through this view"""
