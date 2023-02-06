@@ -1021,7 +1021,7 @@ oscrypto==1.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   snowflake-connector-python
-outcome-surveys==2.0.0
+outcome-surveys==2.2.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
