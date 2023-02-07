@@ -776,6 +776,18 @@ class TestAccountRetirementList(RetirementTestCase):
 
         self.assert_status_and_user_list(retirement_values, states_to_request=self._get_non_dead_end_states())
 
+    def test_user_limit_works(self):
+        """
+        Verify that request limiting works to limit returned amount.
+        """
+        state = 'PENDING'
+        for _ in range(5):
+            create_retirement_status(UserFactory(), state=RetirementState.objects.get(state_name=state))
+        data = {'cool_off_days': 0, 'states': state, 'limit': '2'}
+        response = self.client.get(self.url, data, **self.headers)
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()) == 2
+
     def test_date_filter(self):
         """
         Verifies the functionality of the `cool_off_days` parameter by creating 1 retirement per day for
