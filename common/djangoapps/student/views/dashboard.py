@@ -492,7 +492,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     """
     user = request.user
     if settings.GENPLUS_FRONTEND_URL:
-        redirect(settings.GENPLUS_FRONTEND_URL)
+        return redirect(settings.GENPLUS_FRONTEND_URL)
 
     if not UserProfile.objects.filter(user=user).exists():
         return redirect(reverse('account_settings'))
