@@ -1019,7 +1019,10 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         # username is cut to avoid any field max_length.
         # The final_username may be empty and will skip the loop.
         # We are using our own version of user_exists to avoid possible case sensitivity issues.
-        while not final_username or len(final_username) < min_length or user_exists({'username': final_username}):
+
+        # Removed user exists condition for SSO issue in Gen+
+        # TODO: check for the private schools users
+        while not final_username or len(final_username) < min_length:
             username = short_username + uuid4().hex[:uuid_length]
             final_username = slug_func(clean_func(username[:max_length]))
             logger.info('[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
