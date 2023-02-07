@@ -53,13 +53,6 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         course = store.get_course(course_key)
         enable_in_context = discussions_config.enable_in_context
-        # update in case parent is graded etc.
-        # graded , practice_exam, proctored_enabled, time_limited = False
-        # topics for unpublished units are also created ...
-        # Disable in case is graded enable with message if is unpublished
-        # what about already create topics of unpublished units
-        # we can republish but should we delete topics for them
-        # we can also delete topics for unpublished units
         provider_config = discussions_config.plugin_configuration
         unit_level_visibility = discussions_config.unit_level_visibility
         enable_graded_units = discussions_config.enable_graded_units
@@ -80,7 +73,7 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
                     )
                     contexts.append(context)
             if enable_in_context:
-                contexts.extend(list(get_discussable_units(course, enable_graded_units, unit_level_visibility)))
+                contexts.extend(list(get_discussable_units(course, enable_graded_units)))
         config_data = CourseDiscussionConfigurationData(
             course_key=course_key,
             enable_in_context=enable_in_context,
@@ -93,11 +86,11 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
     return config_data
 
 
-def get_discussable_units(course, enable_graded_units, unit_level_visibility):
+def get_discussable_units(course, enable_graded_units):
     # Start at 99 so that the initial increment starts it at 100.
     # This leaves the first 100 slots for the course wide topics, which is only a concern if there are more
     # than that many.
-    # Here we want to make sure if unit is not published it is not included
+    store = modulestore()
     idx = 99
     for section in course.get_children():
         if section.location.block_type != "chapter":
@@ -108,19 +101,30 @@ def get_discussable_units(course, enable_graded_units, unit_level_visibility):
             for unit in subsection.get_children():
                 if unit.location.block_type != 'vertical':
                     continue
+                # Skip if unit is not published
+                if not modulestore().has_published_version(unit):
+                    continue
                 # Increment index even for skipped units so that the index is more stable and won't change
                 # if settings change, only if a unit is added or removed.
                 idx += 1
                 # If unit-level visibility is enabled and the unit doesn't have discussion enabled, skip it.
                 # here . we should remove unit_level_visibility and param from function
-                if unit_level_visibility and not getattr(unit, "discussion_enabled", False):
+                if not getattr(unit, "discussion_enabled", False):
+                    unit.discussion_enabled = False
+                    store.update_item(unit, 1)
                     continue
                 # If the unit is in a graded section and graded sections aren't enabled skip it.
+
                 if subsection.graded and not enable_graded_units:
+                    unit.discussion_enabled = False
+                    store.update_item(unit, 1)
                     continue
                 # If the unit is an exam, skip it.
                 if subsection.is_practice_exam or subsection.is_proctored_enabled or subsection.is_time_limited:
+                    unit.discussion_enabled = False
+                    store.update_item(unit, 1)
                     continue
+
                 yield DiscussionTopicContext(
                     usage_key=unit.location,
                     title=unit.display_name,

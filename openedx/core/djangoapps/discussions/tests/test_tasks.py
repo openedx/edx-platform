@@ -162,10 +162,10 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase, Discussio
         ({}, 3, {"Unit", "Discussable Unit"},
          {"Graded Unit", "Non-Discussable Unit", "Discussable Graded Unit", "Non-Discussable Graded Unit"}),
         ({"enable_in_context": False}, 1, set(), {"Unit", "Graded Unit"}),
-        ({"unit_level_visibility": False, "enable_graded_units": False}, 4,
-         {"Unit", "Discussable Unit", "Non-Discussable Unit"},
+        ({"unit_level_visibility": False, "enable_graded_units": False}, 3,
+         {"Unit", "Discussable Unit"},
          {"Graded Unit"}),
-        ({"unit_level_visibility": False, "enable_graded_units": True}, 7,
+        ({"unit_level_visibility": False, "enable_graded_units": True}, 5,
          {"Unit", "Graded Unit", "Discussable Graded Unit"}, set()),
         ({"enable_graded_units": True}, 5,
          {"Discussable Unit", "Discussable Graded Unit", "Graded Unit"},
@@ -178,6 +178,8 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase, Discussio
         """
         self.update_discussions_settings(settings)
         config_data = update_discussions_settings_from_course(self.course.id)
+        breakpoint()
+
         assert len(config_data.contexts) == context_count
         units_in_config = {context.title for context in config_data.contexts}
         assert present_units <= units_in_config
