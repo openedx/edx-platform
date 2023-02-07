@@ -361,6 +361,7 @@ class TestCourseRecommendationApiView(TestCase):
                 "is_control": False,
                 "amplitude_recommendations": False,
                 "course_key_array": self.general_recommendation_courses,
+                "page": "dashboard",
             },
         )
 
@@ -400,6 +401,7 @@ class TestCourseRecommendationApiView(TestCase):
                 "amplitude_recommendations": True,
                 "course_key_array": [course.get("key") for course in
                                      self._get_filtered_courses()[:expected_recommendations]],
+                "page": "dashboard",
             },
         )
 

@@ -173,7 +173,9 @@ class TestAmplitudeRecommendationsView(APITestCase):
                 "key": course_key,
                 "uuid": "4f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
                 "title": f"Title for {course_key}",
-                "image": "https://www.logo_image_url.com",
+                "image": {
+                    "src": "https://www.logo_image_url.com",
+                },
                 "url_slug": "https://www.marketing_url.com",
                 "owners": [
                     {
@@ -233,12 +235,13 @@ class TestAmplitudeRecommendationsView(APITestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.data, None)
 
+    @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.segment.track")
     @mock.patch(
         "lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations"
     )
     @mock.patch("lms.djangoapps.learner_recommendations.views.filter_recommended_courses")
     def test_successful_response(
-        self, filter_recommended_courses_mock, get_amplitude_course_recommendations_mock
+        self, filter_recommended_courses_mock, get_amplitude_course_recommendations_mock, segment_mock,
     ):
         """
         Verify API returns course recommendations.
@@ -250,12 +253,17 @@ class TestAmplitudeRecommendationsView(APITestCase):
             True,
             self.recommended_courses,
         ]
+        segment_mock.return_value = None
 
         response = self.client.get(self.url)
         response_content = json.loads(response.content)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response_content.get("is_control"), False)
+        self.assertEqual(response_content.get("isControl"), False)
         self.assertEqual(
             len(response_content.get("courses")), expected_recommendations_length
         )
+
+        # Verify that the segment event was fired
+        assert segment_mock.call_count == 1
+        assert segment_mock.call_args[0][1] == "edx.bi.user.recommendations.viewed"

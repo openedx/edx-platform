@@ -385,6 +385,7 @@ class CourseRecommendationApiView(APIView):
                 "course_key_array": [
                     course["course_key"] for course in recommended_courses
                 ],
+                "page": "dashboard",
             },
         )
 

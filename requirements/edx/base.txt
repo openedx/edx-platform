@@ -177,7 +177,7 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.13
     # via jwcrypto
-django==3.2.16
+django==3.2.17
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.in
@@ -481,7 +481,7 @@ edx-enterprise==3.60.20
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   learner-pathway-progress
-edx-event-bus-kafka==3.7.1
+edx-event-bus-kafka==3.8.0
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.9.2
     # via ora2
@@ -666,7 +666,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==8.0.0
+lti-consumer-xblock==8.0.1
     # via -r requirements/edx/base.in
 lxml==4.9.2
     # via
