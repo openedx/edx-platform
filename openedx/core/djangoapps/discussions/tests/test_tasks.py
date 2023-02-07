@@ -178,8 +178,6 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase, Discussio
         """
         self.update_discussions_settings(settings)
         config_data = update_discussions_settings_from_course(self.course.id)
-        breakpoint()
-
         assert len(config_data.contexts) == context_count
         units_in_config = {context.title for context in config_data.contexts}
         assert present_units <= units_in_config
