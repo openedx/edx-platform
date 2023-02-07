@@ -997,12 +997,12 @@ openedx-blockstore==1.2.6
     # via -r requirements/edx/testing.txt
 openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
-openedx-django-require==2.0.0
-    # via -r requirements/edx/testing.txt
 openedx-django-pyfs==3.2.1
     # via
     #   -r requirements/edx/testing.txt
     #   xblock
+openedx-django-require==2.0.0
+    # via -r requirements/edx/testing.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/testing.txt
 openedx-events==5.0.0

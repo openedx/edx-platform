@@ -157,6 +157,7 @@ pyuca                               # For more accurate sorting of translated co
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database
 PyYAML                              # Used to parse XModule resource templates
+recommender-xblock                  # https://github.com/edx/RecommenderXBlock
 redis                               # celery task broker
 requests-oauthlib                   # Simplifies use of OAuth via the requests library, used for CCX and LTI
 random2

@@ -752,10 +752,10 @@ openedx-blockstore==1.2.6
     # via -r requirements/edx/base.in
 openedx-calc==3.0.1
     # via -r requirements/edx/base.in
-openedx-django-require==2.0.0
-    # via -r requirements/edx/base.in
 openedx-django-pyfs==3.2.1
     # via xblock
+openedx-django-require==2.0.0
+    # via -r requirements/edx/base.in
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.in
 openedx-events==5.0.0
