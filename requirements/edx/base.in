@@ -80,6 +80,7 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
+edx-codejail
 # Need IP address code that was moved to edx-django-utils 5.1.0
 edx-django-utils>=5.1.0             # Utilities for cache, monitoring, and plugins
 edx-drf-extensions

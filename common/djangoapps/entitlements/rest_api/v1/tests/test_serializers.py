@@ -2,11 +2,10 @@
 Tests for the API Serializers.
 """
 
-import unittest
-
 from django.conf import settings
 from django.test import RequestFactory
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
@@ -15,7 +14,7 @@ if settings.ROOT_URLCONF == 'lms.urls':
     from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EntitlementsSerializerTests(ModuleStoreTestCase):
     """
     Tests for the Entitlement Serializers.

@@ -9,8 +9,8 @@ from algoliasearch.search_client import SearchClient
 from django.conf import settings
 
 from common.djangoapps.student.models import CourseEnrollment
-from openedx.core.djangoapps.catalog.utils import get_course_data
-
+from openedx.core.djangoapps.catalog.utils import get_course_data, get_programs
+from lms.djangoapps.program_enrollments.api import fetch_program_enrollments_by_student
 
 log = logging.getLogger(__name__)
 
@@ -23,6 +23,7 @@ COURSE_LEVELS = [
 
 class AlgoliaClient:
     """ Class for instantiating an Algolia search client instance. """
+
     algolia_client = None
     algolia_app_id = settings.ALGOLIA_APP_ID
     algolia_search_api_key = settings.ALGOLIA_SEARCH_API_KEY
@@ -78,43 +79,48 @@ def _has_country_restrictions(product, user_country):
         countries = location_restriction.get("countries")
         if restriction_type == "allowlist":
             allow_list = countries
-        if restriction_type == "blocklist":
+        elif restriction_type == "blocklist":
             block_list = countries
 
-    return user_country in block_list or (allow_list and user_country not in allow_list)
+    return user_country in block_list or (bool(allow_list) and user_country not in allow_list)
 
 
-def _parse_course_owner_data(owner):
+def _get_program_duration(weeks):
     """
-    Helper to parse course owner data.
+    Helper method that returns the program duration in textual form.
     """
-    return {
-        "key": owner.get("key"),
-        "name": owner.get("name"),
-        "logo_image_url": owner.get("logo_image_url")
-    }
+    total_months = round(weeks / 4)
+
+    if total_months < 1:
+        return f'{total_months} weeks'
+
+    if 1 <= total_months < 12:
+        return f'{total_months} months'
+
+    total_years = round(total_months / 12)
+    total_remainder_months = round(total_months % 12)
+
+    if total_remainder_months == 0:
+        return f'{total_years} years'
+
+    if total_years == 1 and total_remainder_months == 1:
+        return f'1 year {total_remainder_months} months'
+
+    if total_remainder_months == 1:
+        return f'{total_years} years 1 months'
+
+    else:
+        return f'{total_years} years {total_remainder_months} months'
 
 
-def course_data_for_discovery_card(course_data):
-    """Helper method to prepare data for prospectus course card"""
-    recommended_course_data = {}
-    active_course_run = [course_run for course_run in course_data.get("course_runs", [])
-                         if course_run.get("availability") == "Current"][0]
-    if active_course_run:
-        owners = map(_parse_course_owner_data, course_data.get("owners"))
-        recommended_course_data.update({
-            "uuid": course_data.get("uuid"),
-            "title": course_data.get("title"),
-            "image": course_data.get("image"),
-            "owners": owners,
-            "prospectus_path": f"courses/{course_data.get('url_slug')}",
-            "active_course_run": {
-                "key": active_course_run.get("key"),
-                "type": "Active",
-                "marketing_url": active_course_run.get("marketing_url"),
-            }
-        })
-    return recommended_course_data
+def get_active_course_run(course_data):
+    """Helper method to get course active run"""
+    active_course_runs = [
+        course_run
+        for course_run in course_data.get("course_runs", [])
+        if course_run.get("availability") == "Current"
+    ]
+    return active_course_runs[0] if active_course_runs else []
 
 
 def get_algolia_courses_recommendation(course_data):
@@ -196,7 +202,11 @@ def get_amplitude_course_recommendations(user_id, recommendation_id):
 
 
 def filter_recommended_courses(
-    user, unfiltered_course_keys, recommendation_count=10, user_country_code=None, request_course=None
+    user,
+    unfiltered_course_keys,
+    recommendation_count=10,
+    user_country_code=None,
+    request_course=None,
 ):
     """
     Returns the filtered course recommendations. The unfiltered course keys
@@ -209,18 +219,80 @@ def filter_recommended_courses(
         filtered_recommended_courses (list): A list of filtered course objects.
     """
     filtered_recommended_courses = []
-    fields = ["key", "uuid", "title", "owners", "image", "url_slug", "course_runs", "location_restriction"]
+    fields = [
+        "key", "uuid", "title", "owners", "image", "url_slug", "course_runs", "location_restriction", "marketing_url",
+    ]
 
     # Remove the course keys a user is already enrolled in
     enrollable_course_keys = _remove_user_enrolled_course_keys(user, unfiltered_course_keys)
-    # If user is seeing the recommendations on a course about pages, filter that course out of recommendations
-    recommended_course_keys = [course_key for course_key in enrollable_course_keys if course_key != request_course]
+
+    # If user is seeing the recommendations on a course about page, filter that course out of recommendations
+    recommended_course_keys = [
+        course_key
+        for course_key in enrollable_course_keys
+        if course_key != request_course
+    ]
 
     for course_id in recommended_course_keys:
         if len(filtered_recommended_courses) >= recommendation_count:
             break
+
         course_data = get_course_data(course_id, fields)
         if course_data and not _has_country_restrictions(course_data, user_country_code):
             filtered_recommended_courses.append(course_data)
 
     return filtered_recommended_courses
+
+
+def get_programs_based_on_course(request_course, country_code, user):
+    """
+    Returns a program for the course. If a course is part of multiple programs,
+    this function returns the program with the highest price.
+    """
+    max_price, max_price_program = 0, {}
+    programs = get_programs(course=request_course)
+
+    if not programs:
+        return None
+
+    for program in programs:
+        if program.get('status') != 'active' or _has_country_restrictions(program, country_code):
+            continue
+
+        price = program['price_ranges'][0]['total']
+        if price > max_price:
+            if fetch_program_enrollments_by_student(program_uuids=[program.get('uuid')], user=user).exists():
+                continue
+
+            course_keys = [
+                course['key']
+                for course in program.get('courses', [])
+                if course.get('key') and course.get('key') != request_course
+            ]
+            if _remove_user_enrolled_course_keys(user, course_keys):
+                max_price_program = program
+                max_price = price
+
+    if not max_price_program:
+        return None
+
+    course_pacing_type, total_weeks_to_complete = '', 0
+    for course in max_price_program.get('courses'):
+        for course_run in course.get('course_runs'):
+            if course_run.get('status') == 'published':
+                if not course_pacing_type:
+                    course_pacing_type = course_run.get("pacing_type")
+                total_weeks_to_complete += int(course_run.get("weeks_to_complete"))
+
+    program_upsell = {
+        "title": max_price_program.get('title'),
+        "marketing_url": max_price_program.get('marketing_url'),
+        "courses_count": len(max_price_program.get('courses')),
+        "pacing_type": course_pacing_type,
+        "weeks_to_complete": _get_program_duration(total_weeks_to_complete),
+        "min_hours": max_price_program.get('min_hours_effort_per_week'),
+        "max_hours": max_price_program.get('max_hours_effort_per_week'),
+        "type": max_price_program.get('type'),
+    }
+
+    return program_upsell

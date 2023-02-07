@@ -2,8 +2,6 @@
 Tests for student enrollment.
 """
 
-
-import unittest
 from unittest.mock import patch
 
 import ddt
@@ -26,11 +24,12 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin):
     """
     Test student enrollment, especially with different course modes.

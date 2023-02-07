@@ -1,10 +1,8 @@
 """Helper functions for working with Credentials."""
 import requests
 from edx_rest_api_client.auth import SuppliedJwtAuth
+from urllib.parse import urljoin
 
-from django.conf import settings
-
-from openedx.core.djangoapps.credentials.config import USE_LEARNER_RECORD_MFE
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_api_data
@@ -18,27 +16,16 @@ def get_credentials_records_url(program_uuid=None):
     Arguments:
         program_uuid (str): Optional program uuid to link for a program records URL
     """
-    base_url = settings.CREDENTIALS_PUBLIC_SERVICE_URL
-    learner_record_mfe_base_url = settings.LEARNER_RECORD_MICROFRONTEND_URL
-    use_learner_record_mfe = USE_LEARNER_RECORD_MFE.is_enabled() and learner_record_mfe_base_url
-
-    if not base_url and not use_learner_record_mfe:
+    base_url = CredentialsApiConfig.current().public_records_url
+    if base_url is None:
         return None
 
-    # If we have a program uuid we build a link to the appropriate Program Record page in Credentials (or the Learner
-    # Record MFE)
     if program_uuid:
-        # Credentials expects the UUID without dashes so we strip them here
-        stripped_program_uuid = program_uuid.replace('-', '')
-        if use_learner_record_mfe:
-            return f"{learner_record_mfe_base_url}/{stripped_program_uuid}/"
-        return f"{base_url}/records/programs/{stripped_program_uuid}/"
-    else:
-        # Otherwise, build a link to the appropriate Learner Record index page
-        if use_learner_record_mfe:
-            return f"{learner_record_mfe_base_url}/"
-        else:
-            return f"{base_url}/records/"
+        # Credentials expects Program UUIDs without dashes so we remove them here
+        stripped_program_uuid = program_uuid.replace("-", "")
+        return urljoin(base_url, f"programs/{stripped_program_uuid}")
+
+    return base_url
 
 
 def get_credentials_api_client(user):

@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.60.15
+edx-enterprise==3.60.20
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -76,4 +76,6 @@ pyopenssl==22.0.0
 
 cryptography==38.0.4 # greater version has some issues with openssl.
 
-bleach[css]==5.0.1 # greater version has some breaking changes.
+pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
+
+outcome-surveys==2.0.0 # greater versions has breaking changes

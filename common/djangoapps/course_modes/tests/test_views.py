@@ -2,9 +2,7 @@
 Tests for course_modes views.
 """
 
-
 import decimal
-import unittest
 from datetime import datetime, timedelta
 from unittest.mock import patch
 from urllib.parse import urljoin
@@ -30,6 +28,7 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -44,7 +43,7 @@ CDL_METHOD_NAME = 'openedx.features.course_duration_limits.models.CourseDuration
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTestCase, CourseCatalogServiceMockMixin):
     """
     Course Mode View tests
@@ -64,7 +63,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @httpretty.activate
     @ddt.data(
         # is_active?, enrollment_mode, redirect?, has_started
@@ -400,7 +399,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         assert mode == CourseMode.DEFAULT_MODE_SLUG
         assert is_active is True
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_default_mode_creation(self):
         # Hit the mode creation endpoint with no querystring params, to create an honor mode
         url = reverse('create_mode', args=[str(self.course.id)])
@@ -413,7 +412,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
         assert course_mode == expected_mode
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @ddt.data(
         ('verified', 'Verified Certificate', 10, '10,20,30', 'usd'),
         ('professional', 'Professional Education', 100, '100,200', 'usd'),
@@ -449,7 +448,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
         assert course_mode == expected_mode
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_multiple_mode_creation(self):
         # Create an honor mode
         base_url = reverse('create_mode', args=[str(self.course.id)])
@@ -474,7 +473,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
         assert course_modes == expected_modes
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @with_comprehensive_theme("edx.org")
     @httpretty.activate
     def test_hide_nav(self):
@@ -491,7 +490,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertNotContains(response, "Find courses")
         self.assertNotContains(response, "Schools & Partners")
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_course_closed(self):
         with freezegun.freeze_time('2015-01-02'):
             for mode in ["honor", "verified"]:
@@ -703,7 +702,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
                     self.assertNotContains(response, '<div class="grid-options">')
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
     """Test embargo restrictions on the track selection page. """
 

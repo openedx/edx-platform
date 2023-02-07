@@ -2,13 +2,12 @@
 Integration tests for third_party_auth LTI auth providers
 """
 
-
-import unittest
-from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
 from oauthlib.oauth1.rfc5849 import Client, SIGNATURE_TYPE_BODY
+
 from common.djangoapps.third_party_auth.tests import testutil
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 FORM_ENCODED = 'application/x-www-form-urlencoded'
 
@@ -23,7 +22,7 @@ EDX_USER_ID = 'test_user'
 EMAIL = 'lti_user@example.com'
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class IntegrationTestLTI(testutil.TestCase):
     """
     Integration tests for third_party_auth LTI auth providers

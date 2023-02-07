@@ -10,13 +10,15 @@ from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
 from django.core.exceptions import PermissionDenied
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.djangoapps.track import segment
 from openedx.core.djangoapps.catalog.utils import (
     get_course_data,
-    get_course_run_details
+    get_course_run_details,
 )
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 from openedx.features.enterprise_support.utils import is_enterprise_learner
@@ -25,8 +27,9 @@ from lms.djangoapps.learner_recommendations.utils import (
     get_algolia_courses_recommendation,
     get_amplitude_course_recommendations,
     filter_recommended_courses,
-    course_data_for_discovery_card,
+    get_active_course_run,
 )
+from lms.djangoapps.learner_recommendations.serializers import RecommendationsSerializer
 
 
 log = logging.getLogger(__name__)
@@ -71,39 +74,84 @@ class AmplitudeRecommendationsView(APIView):
     authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated,)
 
+    recommendations_count = 4
+
+    def _emit_recommendations_viewed_event(
+        self,
+        user_id,
+        is_control,
+        recommended_courses,
+        amplitude_recommendations=True,
+    ):
+        """Emits an event to track recommendation experiment views."""
+        segment.track(
+            user_id,
+            "edx.bi.user.recommendations.viewed",
+            {
+                "is_control": is_control,
+                "amplitude_recommendations": amplitude_recommendations,
+                "course_key_array": [
+                    course["key"] for course in recommended_courses
+                ],
+                "page": "course_about_page",
+            },
+        )
+
     def get(self, request, course_id):
         """
-        Recommend courses based on amplitude recommendations.
-        Recommend program if user is enrolled-in any other course of program.
+        Returns
+            - Amplitude course recommendations
+            - Upsell program if the requesting course has a related program
         """
         if not enable_course_about_page_recommendations():
-            return Response("Recommendations not found", status=404)
+            return Response(status=404)
 
         if is_enterprise_learner(request.user):
             raise PermissionDenied()
 
-        recommendation_count = 4
-        course_key = course_id
-        split_course_key = course_key.split(":")[-1]
-        split_course_id = split_course_key.split("+")[:2]
-        course_id = f"{split_course_id[0]}+{split_course_id[1]}"
+        user = request.user
+        course_locator = CourseKey.from_string(course_id)
+        course_key = f'{course_locator.org}+{course_locator.course}'
 
         try:
             is_control, has_is_control, course_keys = get_amplitude_course_recommendations(
-                request.user.id, settings.COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID
+                user.id, settings.COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID
             )
         except Exception as err:  # pylint: disable=broad-except
-            log.info(f"Amplitude API failed due to: {err}")
-            return Response("Recommendations not found", status=404)
+            log.warning(f"Amplitude API failed for {user.id} due to: {err}")
+            return Response(status=404)
 
         is_control = is_control if has_is_control else None
+        recommended_courses = []
+        if not (is_control or is_control is None):
+            ip_address = get_client_ip(request)[0]
+            user_country_code = country_code_from_ip(ip_address).upper()
+            filtered_courses = filter_recommended_courses(
+                user, course_keys, user_country_code=user_country_code, request_course=course_key,
+            )
 
-        ip_address = get_client_ip(request)[0]
-        user_country_code = country_code_from_ip(ip_address).upper()
-        filtered_courses = filter_recommended_courses(
-            request.user, course_keys, user_country_code=user_country_code, request_course=course_id,
+            for course in filtered_courses:
+                active_course_run = get_active_course_run(course)
+                if active_course_run:
+                    course.update({
+                        "active_course_run": get_active_course_run(course)
+                    })
+                    recommended_courses.append(course)
+
+                if len(recommended_courses) == self.recommendations_count:
+                    break
+
+        self._emit_recommendations_viewed_event(
+            user.id, is_control, recommended_courses
         )
-        recommended_courses = map(course_data_for_discovery_card, filtered_courses)
-        recommended_courses = recommended_courses[:recommendation_count]
 
-        return Response({"is_control": is_control, "courses": recommended_courses}, status=200)
+        return Response(
+            RecommendationsSerializer(
+                {
+                    "program_upsell": None,
+                    "courses": recommended_courses,
+                    "is_control": is_control,
+                }
+            ).data,
+            status=200,
+        )
