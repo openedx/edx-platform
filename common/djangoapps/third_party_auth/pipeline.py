@@ -299,11 +299,13 @@ def get_authenticated_user(auth_provider, username, uid):
         AssertionError: if the user is not authenticated.
     """
     match = social_django.models.DjangoStorage.user.get_social_auth(provider=auth_provider.backend_name, uid=uid)
+    if not match:
+        user = User.objects.get(username=username)
+    else:
+        if match.user.username != username:
+            raise User.DoesNotExist
+        user = match.user
 
-    if not match or match.user.username != username:
-        raise User.DoesNotExist
-
-    user = match.user
     user.backend = auth_provider.get_authentication_backend()
     return user
 
