@@ -299,11 +299,13 @@ def get_authenticated_user(auth_provider, username, uid):
         AssertionError: if the user is not authenticated.
     """
     match = social_django.models.DjangoStorage.user.get_social_auth(provider=auth_provider.backend_name, uid=uid)
+    if not match:
+        user = User.objects.get(username=username)
+    else:
+        if match.user.username != username:
+            raise User.DoesNotExist
+        user = match.user
 
-    if not match or match.user.username != username:
-        raise User.DoesNotExist
-
-    user = match.user
     user.backend = auth_provider.get_authentication_backend()
     return user
 
@@ -1019,7 +1021,10 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         # username is cut to avoid any field max_length.
         # The final_username may be empty and will skip the loop.
         # We are using our own version of user_exists to avoid possible case sensitivity issues.
-        while not final_username or len(final_username) < min_length or user_exists({'username': final_username}):
+
+        # Removed user exists condition for SSO issue in Gen+
+        # TODO: check for the private schools users
+        while not final_username or len(final_username) < min_length:
             username = short_username + uuid4().hex[:uuid_length]
             final_username = slug_func(clean_func(username[:max_length]))
             logger.info('[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
