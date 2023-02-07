@@ -175,6 +175,9 @@ def xblock_handler(request, usage_key_string=None):
                      fields except parent_locator)
               The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
+    return handle_xblock(request, usage_key_string)
+
+def handle_xblock(request, usage_key_string=None):
     if usage_key_string:
         usage_key = usage_key_with_run(usage_key_string)
 
@@ -205,21 +208,8 @@ def xblock_handler(request, usage_key_string=None):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-            return _save_xblock(
-                request.user,
-                _get_xblock(usage_key, request.user),
-                data=request.json.get('data'),
-                children_strings=request.json.get('children'),
-                metadata=request.json.get('metadata'),
-                nullout=request.json.get('nullout'),
-                grader_type=request.json.get('graderType'),
-                is_prereq=request.json.get('isPrereq'),
-                prereq_usage_key=request.json.get('prereqUsageKey'),
-                prereq_min_score=request.json.get('prereqMinScore'),
-                prereq_min_completion=request.json.get('prereqMinCompletion'),
-                publish=request.json.get('publish'),
-                fields=request.json.get('fields'),
-            )
+            return modify_xblock(usage_key, request)
+
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
             parent_usage_key = usage_key_with_run(request.json['parent_locator'])
@@ -276,6 +266,23 @@ def xblock_handler(request, usage_key_string=None):
             content_type='text/plain'
         )
 
+def modify_xblock(usage_key, request):
+    request_data = request.json
+    return _save_xblock(
+                request.user,
+                _get_xblock(usage_key, request.user),
+                data=request_data.get('data'),
+                children_strings=request_data.get('children'),
+                metadata=request_data.get('metadata'),
+                nullout=request_data.get('nullout'),
+                grader_type=request_data.get('graderType'),
+                is_prereq=request_data.get('isPrereq'),
+                prereq_usage_key=request_data.get('prereqUsageKey'),
+                prereq_min_score=request_data.get('prereqMinScore'),
+                prereq_min_completion=request_data.get('prereqMinCompletion'),
+                publish=request_data.get('publish'),
+                fields=request_data.get('fields'),
+            )
 
 class StudioPermissionsService:
     """
