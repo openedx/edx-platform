@@ -1,6 +1,7 @@
-from .views import FxProgramsView
+from .views import index, add_course
 from django.urls import path
 
 urlpatterns = [
-    path('fx_programs', FxProgramsView.as_view(), name='index'),
+    path('', index, name='index'),
+    path('add_course', add_course, name='add_course'),
 ]

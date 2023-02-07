@@ -1027,5 +1027,5 @@ urlpatterns += [
 
 # FUNiX Programs
 urlpatterns += [
-    path('api/fx_programs/v1/', include('lms.djangoapps.fx_programs.urls')),
+    path('fxprograms', include('lms.djangoapps.fx_programs.urls')),
 ]
