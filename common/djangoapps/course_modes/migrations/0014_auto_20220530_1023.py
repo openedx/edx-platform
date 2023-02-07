@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='coursemode',
             name='ios_sku',
-            field=models.CharField(blank=True, help_text='OPTIONAL: This is the IOS SKU registered on app store for this mode of the course.  Leave this blank if the course has not yet been migrated to the ecommerce service.', max_length=255, null=True, verbose_name='IOS SKU'),
+            field=models.CharField(blank=True, help_text='OPTIONAL: This is the iOS SKU registered on app store for this mode of the course.  Leave this blank if the course has not yet been migrated to the ecommerce service.', max_length=255, null=True, verbose_name='IOS SKU'),
         ),
         migrations.AddField(
             model_name='historicalcoursemode',
@@ -28,6 +28,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='historicalcoursemode',
             name='ios_sku',
-            field=models.CharField(blank=True, help_text='OPTIONAL: This is the IOS SKU registered on app store for this mode of the course.  Leave this blank if the course has not yet been migrated to the ecommerce service.', max_length=255, null=True, verbose_name='IOS SKU'),
+            field=models.CharField(blank=True, help_text='OPTIONAL: This is the iOS SKU registered on app store for this mode of the course.  Leave this blank if the course has not yet been migrated to the ecommerce service.', max_length=255, null=True, verbose_name='IOS SKU'),
         ),
     ]

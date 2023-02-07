@@ -128,14 +128,14 @@ class CourseMode(models.Model):
         )
     )
 
-    # Optional IOS SKU for integration with mobile and the ecommerce service
+    # Optional iOS SKU for integration with mobile and the ecommerce service
     ios_sku = models.CharField(
         max_length=255,
         null=True,
         blank=True,
-        verbose_name="IOS SKU",
+        verbose_name="iOS SKU",
         help_text=_(
-            "OPTIONAL: This is the IOS SKU registered on app store for this mode of the course.  "
+            "OPTIONAL: This is the iOS SKU registered on app store for this mode of the course.  "
             "Leave this blank if the course has not yet been migrated to the ecommerce service."
         )
     )
