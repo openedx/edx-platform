@@ -13,8 +13,3 @@ pip==23.0
 setuptools==67.1.0
     # via -r requirements/edx/pip.in
 
-# The following packages are considered to be unsafe in a requirements file:
-pip==23.0
-    # via -r requirements/edx/pip.in
-setuptools==67.1.0
-    # via -r requirements/edx/pip.in
