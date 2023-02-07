@@ -152,8 +152,8 @@ msgstr ""
 "Generated-By: Babel 2.8.0\n"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/block.py xmodule/html_block.py
+#: cms/djangoapps/contentstore/views/block.py
+#: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
 msgid "Text"
 msgstr "Texto"
 
@@ -4976,17 +4976,15 @@ msgstr ""
 "acesso principal."
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid "Whether to display this module in the table of contents"
-msgstr "Se este módulo deve ser exibido no índice"
+msgid "Whether to display this block in the table of contents"
+msgstr ""
 
 #. Translators: "TOC" stands for "Table of Contents"
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"What format this module is in (used for deciding which grader to apply, and "
+"What format this block is in (used for deciding which grader to apply, and "
 "what to show in the TOC)"
 msgstr ""
-"Em que formato este módulo está (utilizado para decidir qual avaliador "
-"aplicar e o que mostrar no TOC)"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
@@ -10407,8 +10405,8 @@ msgid "Date that enrollment for this class is closed"
 msgstr "Data em que fecha a inscrição para esta aula"
 
 #: xmodule/course_block.py
-msgid "Start time when this module is visible"
-msgstr "Hora de início em que este módulo é visível"
+msgid "Start time when this block is visible"
+msgstr ""
 
 #: xmodule/course_block.py
 msgid "Date that this class ends"
@@ -11090,9 +11088,8 @@ msgid "Entrance Exam ID"
 msgstr "ID do Exame de Admissão"
 
 #: xmodule/course_block.py
-msgid "Content module identifier (location) of entrance exam."
+msgid "Content block identifier (location) of entrance exam."
 msgstr ""
-"Identificador do módulo de conteúdo (localização) do exame de admissão."
 
 #: xmodule/course_block.py
 msgid "Social Media Sharing URL"
@@ -11452,8 +11449,8 @@ msgstr ""
 " estará escondido no LMS."
 
 #: xmodule/html_block.py
-msgid "Html contents to display for this module"
-msgstr "Conteúdo Html a exibir para este módulo"
+msgid "Html contents to display for this block"
+msgstr ""
 
 #: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
@@ -12117,25 +12114,22 @@ msgstr ""
 "mostrar ou esconder as suas notas no material didáctico."
 
 #: xmodule/modulestore/inheritance.py
-msgid "Tag this module as part of an Entrance Exam section"
-msgstr "Identifique este módulo como parte de uma secção de Exame de Admissão"
+msgid "Tag this block as part of an Entrance Exam section"
+msgstr ""
 
 #: xmodule/modulestore/inheritance.py
 msgid ""
-"Enter true or false. If true, answer submissions for problem modules will be"
-" considered in the Entrance Exam scoring/gating algorithm."
+"Enter true or false. If true, answer submissions for problem blocks will be "
+"considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
-"Introduza verdadeiro ou falso. Se verdadeiro, as submissões de resposta para"
-" os módulos problemáticos serão consideradas no algoritmo de "
-"classificação/pontuação do exame de admissão."
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Error while reading {}. Check file for XML errors."
 msgstr "Erro durante a leitura {}. Verificar ficheiro para erros XML."
 
 #: xmodule/modulestore/xml_importer.py
-msgid "Failed to import module: {} at location: {}"
-msgstr "Falha na importação do módulo: {} no local: {}"
+msgid "Failed to import block: {} at location: {}"
+msgstr ""
 
 #: xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
@@ -12323,9 +12317,8 @@ msgid "Group Configuration"
 msgstr "Configuração de Grupo"
 
 #: xmodule/split_test_block.py
-msgid "Which child module students in a particular group_id should see"
+msgid "Which child block students in a particular group_id should see"
 msgstr ""
-"Define qual módulo os estudantes de um group_id em particular podem ver"
 
 #: xmodule/split_test_block.py
 #, python-brace-format
@@ -13179,6 +13172,90 @@ msgstr ""
 "O ficheiro {filename} excede o tamanho máximo de {maximum_size_in_megabytes}"
 " MB."
 
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr "As bibliotecas não podem ter mais do {limit} componentes"
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Invalid data"
+msgstr "Dados inválidos"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Dados inválidos ({details})"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr "Não pode mover {source_type} para {target_parent_type}."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Item is already present in target location."
+msgstr "O item já está presente no local de destino."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item into itself."
+msgstr "Não pode mover um item para si mesmo."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item into it's child."
+msgstr "Não pode mover um item para um item dependente."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item directly into content experiment."
+msgstr "Não pode mover um item diretamente para a experiência de conteúdo."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr "{source_usage_key} não foi encontrado em {parent_usage_key}."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+"Não pode mover {source_usage_key} num índice inválido ({target_index})."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr "Deve indicar o target_index ({target_index}) como um número inteiro."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Duplicado de {0}"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Duplicado de '{0}'"
+
+#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
+#. in many languages. This is used to avoid Transifex's misinterpreting of
+#. '% o'. The percent sign is also translatable as a standalone string.
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"Os estudantes devem uma pontuação {score}{pct_sign} ou superior para poderem"
+" aceder aos materiais do curso."
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/views/block.py
+msgid "%"
+msgstr "%"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
+
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
 msgstr "deve ter o nome do certificado"
@@ -13332,90 +13409,6 @@ msgstr ""
 msgid "File upload failed. Please try again"
 msgstr "O carregamento de ficheiros falhou. Por favor, tente novamente"
 
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr "As bibliotecas não podem ter mais do {limit} componentes"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Invalid data"
-msgstr "Dados inválidos"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Dados inválidos ({details})"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr "Não pode mover {source_type} para {target_parent_type}."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Item is already present in target location."
-msgstr "O item já está presente no local de destino."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into itself."
-msgstr "Não pode mover um item para si mesmo."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into it's child."
-msgstr "Não pode mover um item para um item dependente."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item directly into content experiment."
-msgstr "Não pode mover um item diretamente para a experiência de conteúdo."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr "{source_usage_key} não foi encontrado em {parent_usage_key}."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-"Não pode mover {source_usage_key} num índice inválido ({target_index})."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr "Deve indicar o target_index ({target_index}) como um número inteiro."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Duplicado de {0}"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Duplicado de '{0}'"
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"Os estudantes devem uma pontuação {score}{pct_sign} ou superior para poderem"
-" aceder aos materiais do curso."
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/block.py
-msgid "%"
-msgstr "%"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
-
 #: cms/djangoapps/contentstore/views/library.py
 msgid ""
 "User does not have the permission to create library in this organization or "
@@ -13467,8 +13460,8 @@ msgid "The information you entered is incorrect."
 msgstr "As informações inseridas estão incorretas."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
-msgstr "As transcrições são suportadas apenas para os módulos de \"vídeo\"."
+msgid "Transcripts are supported only for \"video\" blocks."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -21651,6 +21644,20 @@ msgstr ""
 "data de início do curso, configurar a equipa do curso, rever as atualizações"
 " do curso e outros ficheiros para material datado, e promova os debates e "
 "wiki."
+
+#: cms/templates/course_outline.html
+msgid ""
+"This course run is using an upgraded version of edx discussion forum. "
+"Discussion xblocks will no longer work."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid " Learn more"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Share feedback"
+msgstr ""
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html

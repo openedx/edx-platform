@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-29 20:35+0000\n"
-"PO-Revision-Date: 2023-01-29 20:35:52.665617\n"
+"POT-Creation-Date: 2023-02-07 16:06+0000\n"
+"PO-Revision-Date: 2023-02-07 16:06:04.350330\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -50,8 +50,8 @@ msgstr ""
 "Generated-By: Babel 2.8.0\n"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/block.py xmodule/html_block.py
+#: cms/djangoapps/contentstore/views/block.py
+#: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
 msgid "Text"
 msgstr "Téxt Ⱡ'σяєм ι#"
 
@@ -5542,18 +5542,18 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid "Whether to display this module in the table of contents"
+msgid "Whether to display this block in the table of contents"
 msgstr ""
-"Whéthér tö dïspläý thïs mödülé ïn thé täßlé öf çönténts Ⱡ'σяєм ιρѕυм ∂σłσя "
+"Whéthér tö dïspläý thïs ßlöçk ïn thé täßlé öf çönténts Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #. Translators: "TOC" stands for "Table of Contents"
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"What format this module is in (used for deciding which grader to apply, and "
+"What format this block is in (used for deciding which grader to apply, and "
 "what to show in the TOC)"
 msgstr ""
-"Whät förmät thïs mödülé ïs ïn (üséd för déçïdïng whïçh grädér tö äpplý, änd "
+"Whät förmät thïs ßlöçk ïs ïn (üséd för déçïdïng whïçh grädér tö äpplý, änd "
 "whät tö shöw ïn thé TÖÇ) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -11743,10 +11743,10 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: xmodule/course_block.py
-msgid "Start time when this module is visible"
+msgid "Start time when this block is visible"
 msgstr ""
-"Stärt tïmé whén thïs mödülé ïs vïsïßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
+"Stärt tïmé whén thïs ßlöçk ïs vïsïßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
 
 #: xmodule/course_block.py
 msgid "Date that this class ends"
@@ -12536,10 +12536,10 @@ msgid "Entrance Exam ID"
 msgstr "Éntränçé Éxäm ÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: xmodule/course_block.py
-msgid "Content module identifier (location) of entrance exam."
+msgid "Content block identifier (location) of entrance exam."
 msgstr ""
-"Çöntént mödülé ïdéntïfïér (löçätïön) öf éntränçé éxäm. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Çöntént ßlöçk ïdéntïfïér (löçätïön) öf éntränçé éxäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
 
 #: xmodule/course_block.py
 msgid "Social Media Sharing URL"
@@ -12976,9 +12976,9 @@ msgstr ""
 " hïddén ïn LMS. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: xmodule/html_block.py
-msgid "Html contents to display for this module"
+msgid "Html contents to display for this block"
 msgstr ""
-"Html çönténts tö dïspläý för thïs mödülé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Html çönténts tö dïspläý för thïs ßlöçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
 #: xmodule/html_block.py
@@ -13729,24 +13729,18 @@ msgstr ""
 " shöw ör hïdé théïr nötés ïn thé çöürséwäré. Ⱡ'σяєм ιρѕυ#"
 
 #: xmodule/modulestore/inheritance.py
-msgid "Tag this module as part of an Entrance Exam section"
+msgid "Tag this block as part of an Entrance Exam section"
 msgstr ""
-"Täg thïs mödülé äs pärt öf än Éntränçé Éxäm séçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"Täg thïs ßlöçk äs pärt öf än Éntränçé Éxäm séçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: xmodule/modulestore/inheritance.py
 msgid ""
-"Enter true or false. If true, answer submissions for problem modules will be"
-" considered in the Entrance Exam scoring/gating algorithm."
+"Enter true or false. If true, answer submissions for problem blocks will be "
+"considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
-"Éntér trüé ör fälsé. Ìf trüé, änswér süßmïssïöns för prößlém mödülés wïll ßé"
-" çönsïdéréd ïn thé Éntränçé Éxäm sçörïng/gätïng älgörïthm. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυм#"
+"Éntér trüé ör fälsé. Ìf trüé, änswér süßmïssïöns för prößlém ßlöçks wïll ßé "
+"çönsïdéréd ïn thé Éntränçé Éxäm sçörïng/gätïng älgörïthm.#"
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Error while reading {}. Check file for XML errors."
@@ -13755,9 +13749,9 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: xmodule/modulestore/xml_importer.py
-msgid "Failed to import module: {} at location: {}"
+msgid "Failed to import block: {} at location: {}"
 msgstr ""
-"Fäïléd tö ïmpört mödülé: {} ät löçätïön: {} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Fäïléd tö ïmpört ßlöçk: {} ät löçätïön: {} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: xmodule/partitions/enrollment_track_partition_generator.py
@@ -13975,10 +13969,10 @@ msgid "Group Configuration"
 msgstr "Gröüp Çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: xmodule/split_test_block.py
-msgid "Which child module students in a particular group_id should see"
+msgid "Which child block students in a particular group_id should see"
 msgstr ""
-"Whïçh çhïld mödülé stüdénts ïn ä pärtïçülär gröüp_ïd shöüld séé Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Whïçh çhïld ßlöçk stüdénts ïn ä pärtïçülär gröüp_ïd shöüld séé Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: xmodule/split_test_block.py
 #, python-brace-format
@@ -14967,6 +14961,107 @@ msgstr ""
 "Fïlé {filename} éxçééds mäxïmüm sïzé öf {maximum_size_in_megabytes} MB. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr ""
+"Lïßrärïés çännöt hävé möré thän {limit} çömpönénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Invalid data"
+msgstr "Ìnvälïd dätä Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Ìnvälïd dätä ({details}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr ""
+"Ýöü çän nöt mövé {source_type} ïntö {target_parent_type}. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Item is already present in target location."
+msgstr ""
+"Ìtém ïs älréädý présént ïn tärgét löçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item into itself."
+msgstr ""
+"Ýöü çän nöt mövé än ïtém ïntö ïtsélf. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item into it's child."
+msgstr ""
+"Ýöü çän nöt mövé än ïtém ïntö ït's çhïld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item directly into content experiment."
+msgstr ""
+"Ýöü çän nöt mövé än ïtém dïréçtlý ïntö çöntént éxpérïmént. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr ""
+"{source_usage_key} nöt föünd ïn {parent_usage_key}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, #"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+"Ýöü çän nöt mövé {source_usage_key} ät än ïnvälïd ïndéx ({target_index}). "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr ""
+"Ýöü müst prövïdé tärgét_ïndéx ({target_index}) äs än ïntégér. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Düplïçäté öf {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Düplïçäté öf '{0}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
+#. in many languages. This is used to avoid Transifex's misinterpreting of
+#. '% o'. The percent sign is also translatable as a standalone string.
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"Stüdénts müst sçöré {score}{pct_sign} ör hïghér tö äççéss çöürsé mätérïäls. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/views/block.py
+msgid "%"
+msgstr "% Ⱡ#"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\" Ⱡ'σяєм ιρѕυм ∂σł#"
+
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
 msgstr ""
@@ -15147,107 +15242,6 @@ msgstr ""
 "Fïlé üplöäd fäïléd. Pléäsé trý ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr ""
-"Lïßrärïés çännöt hävé möré thän {limit} çömpönénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Invalid data"
-msgstr "Ìnvälïd dätä Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Ìnvälïd dätä ({details}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr ""
-"Ýöü çän nöt mövé {source_type} ïntö {target_parent_type}. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢т#"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Item is already present in target location."
-msgstr ""
-"Ìtém ïs älréädý présént ïn tärgét löçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into itself."
-msgstr ""
-"Ýöü çän nöt mövé än ïtém ïntö ïtsélf. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into it's child."
-msgstr ""
-"Ýöü çän nöt mövé än ïtém ïntö ït's çhïld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item directly into content experiment."
-msgstr ""
-"Ýöü çän nöt mövé än ïtém dïréçtlý ïntö çöntént éxpérïmént. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr ""
-"{source_usage_key} nöt föünd ïn {parent_usage_key}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, #"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-"Ýöü çän nöt mövé {source_usage_key} ät än ïnvälïd ïndéx ({target_index}). "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr ""
-"Ýöü müst prövïdé tärgét_ïndéx ({target_index}) äs än ïntégér. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Düplïçäté öf {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Düplïçäté öf '{0}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"Stüdénts müst sçöré {score}{pct_sign} ör hïghér tö äççéss çöürsé mätérïäls. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/block.py
-msgid "%"
-msgstr "% Ⱡ#"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\" Ⱡ'σяєм ιρѕυм ∂σł#"
-
 #: cms/djangoapps/contentstore/views/library.py
 msgid ""
 "User does not have the permission to create library in this organization or "
@@ -15309,10 +15303,10 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
+msgid "Transcripts are supported only for \"video\" blocks."
 msgstr ""
-"Tränsçrïpts äré süppörtéd önlý för \"vïdéö\" mödülés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя α#"
+"Tränsçrïpts äré süppörtéd önlý för \"vïdéö\" ßlöçks. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
