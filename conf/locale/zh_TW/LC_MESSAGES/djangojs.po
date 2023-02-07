@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-08 20:42+0000\n"
+"POT-Creation-Date: 2023-01-29 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Andrew Lau <alau52@yahoo.com>, 2017\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/)\n"
@@ -9490,6 +9490,10 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Discussions enabled"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore

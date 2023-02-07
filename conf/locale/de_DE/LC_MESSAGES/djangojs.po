@@ -18,6 +18,7 @@
 # 9309a68e5ef70fb98095fd18e848e998_2d7fe4e, 2014
 # Bert Krohn <bert.krohn@tum.de>, 2017
 # Christian Layr <Christian.Layr@unisg.ch>, 2015
+# Diana Huang <dkh@edx.org>, 2023
 # Donna Kl <donna@polarstern-education.com>, 2019
 # Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
@@ -38,7 +39,7 @@
 # Ron Lucke <lucke@elan-ev.de>, 2014
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013-2014
-# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2022
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2023
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/).
@@ -52,6 +53,7 @@
 # Alexander Gropmann <alexander.gropmann@charite.de>, 2018
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2014
 # Alexander L. <alexander.lohberg@ufo-style.de>, 2016-2017
+# Diana Huang <dkh@edx.org>, 2023
 # Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014,2016
 # Jana Uhlik <janauhlik@gmail.com>, 2015
@@ -66,7 +68,7 @@
 # Ron Lucke <lucke@elan-ev.de>, 2014
 # Ron Lucke <lucke@elan-ev.de>, 2014
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013
-# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2021
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2021,2023
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/).
 # Copyright (C) 2023 EdX
@@ -132,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-22 20:42+0000\n"
+"POT-Creation-Date: 2023-01-29 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Alfredo Guillem, 2022\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
@@ -390,7 +392,7 @@ msgstr "Aufwärts navigieren"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
-msgstr ""
+msgstr "Durchsuchen"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
@@ -603,7 +605,7 @@ msgstr "Kein Beitrag passt zu Ihrer Anfrage."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by {username}."
-msgstr "Zeige Beiträge von {username}."
+msgstr "Beiträge von {username} anzeigen."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "The post you selected has been deleted."
@@ -905,7 +907,7 @@ msgstr "Betreff"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Select a category"
-msgstr ""
+msgstr "Wählen Sie eine Kategorie"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
@@ -969,19 +971,19 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
-msgstr ""
+msgstr "Details"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "the more quickly and helpfully we can respond!"
-msgstr ""
+msgstr "desto schneller und gezielter können wir Ihnen antworten!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
-msgstr ""
+msgstr "Erstellen Sie ein Supportticket"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr ""
+msgstr "Wie können wir Ihnen helfen, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -991,7 +993,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Need help logging in?"
-msgstr ""
+msgstr "Brauchen Sie Hilfe beim einloggen?"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -1597,6 +1599,9 @@ msgid ""
 "You have been logged out of your account. Click Okay to log in again now. "
 "Click Cancel to stay on this page (you must log in again to save your work)."
 msgstr ""
+"Sie wurden von Ihrem Konto abgemeldet. Klicken Sie auf Okay, um sich jetzt "
+"erneut anzumelden. Klicken Sie auf Abbrechen, um auf dieser Seite zu bleiben"
+" (Sie müssen sich erneut anmelden, um Ihre Arbeit zu speichern)."
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
@@ -1667,12 +1672,15 @@ msgstr ""
 #: lms/static/js/certificates/views/certificate_allowlist.js
 msgid "Student Removed from certificate allowlist successfully."
 msgstr ""
+"Student wurde erfolgreich von der Zulassungsliste für Zertifikate entfernt."
 
 #: lms/static/js/certificates/views/certificate_allowlist.js
 msgid ""
 "Could not find Certificate Exception in the allowlist. Please refresh the "
 "page and try again"
 msgstr ""
+"Zertifikatsausnahme konnte nicht in der Zulassungsliste gefunden werden. "
+"Bitte aktualisieren Sie die Seite und versuchen Sie es erneut"
 
 #: lms/static/js/certificates/views/certificate_allowlist.js
 #: lms/static/js/certificates/views/certificate_allowlist_editor.js
@@ -1683,85 +1691,103 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_allowlist_editor.js
 msgid "<%- user %> already in exception list."
-msgstr ""
+msgstr "<%- user %> ist bereits auf der Ausnahmeliste."
 
 #: lms/static/js/certificates/views/certificate_allowlist_editor.js
 msgid ""
 "<%- user %> has been successfully added to the exception list. Click "
 "Generate Exception Certificate below to send the certificate."
 msgstr ""
+"<%- user %> wurde erfolgreich in die Ausnahmeliste aufgenommen. Klicken Sie "
+"unten auf Ausnahmezertifikat generieren, um das Zertifikat zu senden."
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners were successfully added to exception list"
-msgstr ""
+msgstr "Lernende wurden erfolgreich zur Ausnahmeliste hinzugefügt"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learner was successfully added to the exception list"
-msgstr ""
+msgstr "Der Lernende wurde erfolgreich zur Ausnahmeliste hinzugefügt"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " records are not in the correct format and have not been added to the "
 "exception list"
 msgstr ""
+"Datensätze haben nicht das richtige Format und wurden nicht zur "
+"Ausnahmeliste hinzugefügt"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " record is not in the correct format and has not been added to the exception"
 " list"
 msgstr ""
+"Datensatz hat nicht das richtige Format und wurde nicht zur Ausnahmeliste "
+"hinzugefügt"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner accounts cannot be found and have not been added to the exception "
 "list"
 msgstr ""
+"Lernerkonten können nicht gefunden werden und wurden nicht zur Ausnahmeliste"
+" hinzugefügt"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner account cannot be found and has not been added to the exception "
 "list"
 msgstr ""
+"Das Teilnehmerkonto kann nicht gefunden werden und wurde nicht zur "
+"Ausnahmeliste hinzugefügt"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners already appear on the exception list in this course"
-msgstr ""
+msgstr "Lernende stehen in diesem Kurs bereits auf der Ausnahmeliste"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learner already appears on the exception list in this course"
-msgstr ""
+msgstr "Der Lernende steht in diesem Kurs bereits auf der Ausnahmeliste"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learners are not enrolled in this course and have not added to the "
 "exception list"
 msgstr ""
+"Lernende sind nicht in diesem Kurs eingeschrieben und wurden nicht zur "
+"Ausnahmeliste hinzugefügt"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner is not enrolled in this course and has not been added to the "
 "exception list"
 msgstr ""
+"Der Lernende ist nicht in diesem Kurs eingeschrieben und wurde nicht zur "
+"Ausnahmeliste hinzugefügt"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learners have an active certificate invalidation in this course and have "
 "not been added to the exception list"
 msgstr ""
+"Lernende haben in diesem Kurs eine aktive Zertifikatsentwertung und wurden "
+"nicht zur Ausnahmeliste hinzugefügt"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
 " learner has an active certificate invalidation in this course and has not "
 "been added to the exception list"
 msgstr ""
+"Der Lernende hat in diesem Kurs eine aktive Zertifikatsentwertung und wurde "
+"nicht zur Ausnahmeliste hinzugefügt"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners encountered unknown errors"
-msgstr ""
+msgstr "Teilnehmer sind auf einen unbekannten Fehler gestoßen"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learner encountered an unknown error"
-msgstr ""
+msgstr "Teilnehmer ist auf einen unbekannten Fehler gestoßen"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid "Uploaded file issues. Click on \"+\" to view."
@@ -1881,6 +1907,8 @@ msgid ""
 "The refund deadline for this course has passed, so you will not receive a "
 "refund."
 msgstr ""
+"Die Rückgabefrist für diesen Kurs ist abgelaufen, so dass Sie keine "
+"Rückerstattung erhalten."
 
 #: lms/static/js/dashboard/legacy.js
 #: lms/static/js/learner_dashboard/views/unenroll_view.js
@@ -1906,47 +1934,55 @@ msgstr "Wollen Sie helfen, edX zu verbessern?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Why does edX collect this information?"
-msgstr ""
+msgstr "Warum braucht edX diese Information?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "An error occurred while attempting to retrieve or save the information "
 "below. Please try again later."
 msgstr ""
+"Beim Versuch, die nachstehenden Informationen abzurufen oder zu speichern, "
+"ist ein Fehler aufgetreten. Bitte versuchen Sie es später noch einmal."
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What was the total combined income, during the last 12 months, of all "
 "members of your family? "
 msgstr ""
+"Wie hoch war das gemeinsame Gesamteinkommen aller Mitglieder Ihrer Familie "
+"in den letzten 12 Monaten? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
 "National Guard?"
 msgstr ""
+"Haben Sie jemals im aktiven Dienst in den US-Streitkräften, Reserven oder "
+"der Nationalgarde gedient?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What is the highest level of education that you have achieved so far?"
-msgstr ""
+msgstr "Was ist der höchste Bildungsabschluss, den Sie erreicht haben?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What is the highest level of education that any of your parents or guardians"
 " have achieved?"
 msgstr ""
+"Welches ist der höchste Bildungsabschluss, den ein Elternteil oder "
+"Erziehungsberechtigter von Ihnen erreicht hat?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select employment status"
-msgstr ""
+msgstr "Wählen Sie Ihren Beschäftigungsstatus"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you currently work in?"
-msgstr ""
+msgstr "In welcher Branche arbeiten Sie derzeit?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you want to work in?"
-msgstr ""
+msgstr "In welcher Branchen wollen Sie arbeiten?"
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -1962,19 +1998,19 @@ msgstr "Fragebogen schließen"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "finish later"
-msgstr ""
+msgstr "Später beenden"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
-msgstr ""
+msgstr "Zurück zu meinem Dashboard"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
-msgstr ""
+msgstr "Später beenden"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "next page"
-msgstr ""
+msgstr "nächste Seite"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -2232,7 +2268,7 @@ msgstr "Ungültige E-Mail-Adresse: {email}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Cohort assignment not allowed: {email_or_username}"
-msgstr ""
+msgstr "Kohortenzuordnung nicht erlaubt: {email_or_username}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "There was an error when trying to add learners:"
@@ -2358,6 +2394,7 @@ msgstr "Fehler bei der Ausgabe der Zertifikatsliste."
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating anonymous IDs. Please try again."
 msgstr ""
+"Fehler beim Generieren der anonymen IDs. Bitte versuchen Sie es erneut."
 
 #: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
@@ -2772,6 +2809,10 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
+"Es ist ein Fehler beim Zurücksetzen von Problemversuchen für das Problem "
+"'<%- problem_id %>' und Teilnehmer <%- student_id %>' aufgetreten. Stellen "
+"Sie sicher, dass die Problem- und Teilnehmercodes vollständig und korrekt "
+"sind."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -3100,42 +3141,48 @@ msgid ""
 "To access the courses available to you through {enterpriseName}, visit the "
 "{enterpriseName} dashboard."
 msgstr ""
+"Um auf die Kurse zuzugreifen, die Ihnen über {enterpriseName} zur Verfügung "
+"stehen, besuchen Sie das {enterpriseName}-Dashboard."
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid "Go to dashboard"
-msgstr ""
+msgstr "Gehe zur 'Meine Kurse' Übersicht"
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Recommendations for you"
-msgstr ""
+msgstr "Empfehlungen für Sie"
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "loading"
-msgstr ""
+msgstr "Wird geladen"
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid ""
 "Browse recently launched courses and see what's new in your favorite "
 "subjects."
 msgstr ""
+"Stöbern Sie in den kürzlich hinzugefügten Kursen und erfahren Sie, was es in"
+" Ihren Lieblingsthemen Neues gibt."
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Explore courses"
-msgstr ""
+msgstr "Kursübersicht"
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid "More opportunities for you"
-msgstr ""
+msgstr "Mehr Möglichkeiten für Sie"
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid " to learn"
-msgstr ""
+msgstr "lernen"
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid ""
 "We've added 500+ learning opportunities to create one of the world's most "
 "comprehensive free-to-degree online learning platforms."
 msgstr ""
+"Wir haben mehr als 500 Lernmöglichkeiten hinzugefügt, um eine der weltweit "
+"umfassendsten kostenlosen Online-Lernplattformen zu schaffen."
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
@@ -3333,7 +3380,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
-msgstr ""
+msgstr "Bevor Sie fortfahren, {htmlStart}{emailMsg}{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4196,11 +4243,11 @@ msgstr "Aktualisiere mit den neuesten Bibliotheken"
 
 #: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Loading..."
-msgstr ""
+msgstr "Lade..."
 
 #: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Selected blocks"
-msgstr ""
+msgstr "Ausgewählte Blöcke"
 
 #: xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Unable to update settings"
@@ -5627,6 +5674,8 @@ msgstr ""
 msgid ""
 "An answer option has been left blank. Please review and edit the component."
 msgstr ""
+"Eine Antwortoption wurde leer gelassen. Bitte überprüfen und bearbeiten Sie "
+"die Komponente."
 
 #: xmodule/js/src/problem/edit.js
 msgid "Explanation"
@@ -5932,7 +5981,7 @@ msgstr "Richten Sie sich Ihr Zertifikat ein"
 #. has been inserted
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "You have not created any certificates yet."
-msgstr "Du hast bislang keine Zertifikate erhalten."
+msgstr "Sie haben bislang keine Zertifikate erhalten."
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
@@ -6082,27 +6131,28 @@ msgstr "Es gab einen Fehler beim Upload"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr ""
+msgstr "Organisation:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr ""
+msgstr "Kursnummer:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr ""
+msgstr "Kurslaufzeit:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr ""
+msgstr "(Nur Lesezugriff)"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr ""
+msgstr "Neue Kurslaufzeit"
 
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
-msgstr "Seite ansehen"
+msgstr "Live betrachten"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -6208,12 +6258,16 @@ msgstr ""
 #: cms/static/js/models/settings/course_details.js
 msgid "The certificate display behavior must be one of: {behavior_options}"
 msgstr ""
+"Das Anzeigeverhalten des Zertifikats muss eines der folgenden sein: "
+"{behavior_options}"
 
 #: cms/static/js/models/settings/course_details.js
 msgid ""
 "The certificates display behavior must be {valid_option} if certificate "
 "available date is set."
 msgstr ""
+"Das Anzeigeverhalten der Zertifikate muss {valid_option} sein, wenn das "
+"Verfügbarkeitsdatum des Zertifikats festgelegt ist."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
@@ -6246,6 +6300,8 @@ msgstr "Bitte geben Sie einen nicht negativen Integer-Wert ein."
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <%- types %> assignments than are assigned."
 msgstr ""
+"Es können nicht mehr <%- types %> Aufgaben bearbeitet werden als zugeordnet "
+"sind."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -6786,6 +6842,8 @@ msgstr "Baustein"
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Studio's having trouble parsing the problem component's content"
 msgstr ""
+"Studio hat Probleme beim Analysieren des Inhalts der problematischen "
+"Komponente"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move"
@@ -10453,6 +10511,10 @@ msgstr "%(xblock_type)s Ein- oder Ausfahren "
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "Anzeigename"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Discussions enabled"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
