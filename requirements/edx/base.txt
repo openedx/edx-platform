@@ -163,8 +163,6 @@ cryptography==38.0.4
     #   social-auth-core
 cssutils==2.6.0
     # via pynliner
-ddt==1.6.0
-    # via xblock-poll
 defusedxml==0.7.1
     # via
     #   -r requirements/edx/base.in
@@ -706,9 +704,7 @@ markupsafe==2.1.2
 maxminddb==2.2.0
     # via geoip2
 mock==5.0.1
-    # via
-    #   -r requirements/edx/paver.txt
-    #   xblock-poll
+    # via -r requirements/edx/paver.txt
 mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
     # via -r requirements/edx/github.in
 mongoengine==0.26.0
@@ -1180,8 +1176,8 @@ xblock-drag-and-drop-v2==3.1.0
     # via -r requirements/edx/base.in
 xblock-google-drive==0.3.0
     # via -r requirements/edx/base.in
-xblock-poll @ git+https://github.com/open-craft/xblock-poll@v1.12.0
-    # via -r requirements/edx/github.in
+xblock-poll==1.13.0
+    # via -r requirements/edx/base.in
 xblock-utils==3.0.0
     # via
     #   -r requirements/edx/base.in
