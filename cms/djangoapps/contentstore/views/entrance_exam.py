@@ -24,7 +24,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import create_xblock, remove_entrance_exam_graders
-from .block import delete_item
+from cms.djangoapps.contentstore.xblock_services.xblock_service import delete_item
 
 __all__ = ['entrance_exam', ]
 

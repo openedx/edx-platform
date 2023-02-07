@@ -14,7 +14,7 @@ from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from openedx.core.lib.gating.api import GATING_NAMESPACE_QUALIFIER
 
-from ..block import VisibilityState
+from cms.djangoapps.contentstore.xblock_services.xblock_service import VisibilityState
 
 
 @ddt.ddt

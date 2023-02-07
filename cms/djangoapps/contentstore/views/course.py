@@ -117,7 +117,7 @@ from ..utils import (
 from .component import ADVANCED_COMPONENT_TYPES
 from .helpers import is_content_creator
 from .entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
-from .block import create_xblock_info
+from cms.djangoapps.contentstore.xblock_services.xblock_service import create_xblock_info
 from .library import (
     LIBRARIES_ENABLED,
     LIBRARY_AUTHORING_MICROFRONTEND_URL,

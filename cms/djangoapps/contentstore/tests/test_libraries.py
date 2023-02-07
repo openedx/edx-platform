@@ -16,7 +16,7 @@ from xmodule.x_module import STUDIO_VIEW
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from cms.djangoapps.contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
-from cms.djangoapps.contentstore.views.block import _duplicate_block
+from cms.djangoapps.contentstore.xblock_services.xblock_service import _duplicate_block
 from cms.djangoapps.contentstore.views.preview import _load_preview_block
 from cms.djangoapps.contentstore.views.tests.test_library import LIBRARY_REST_URL
 from cms.djangoapps.course_creators.views import add_user_with_status_granted
