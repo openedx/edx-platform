@@ -148,7 +148,6 @@ class AmplitudeRecommendationsView(APIView):
         return Response(
             RecommendationsSerializer(
                 {
-                    "program_upsell": None,
                     "courses": recommended_courses,
                     "is_control": is_control,
                 }

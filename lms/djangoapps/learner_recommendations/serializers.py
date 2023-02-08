@@ -39,25 +39,12 @@ class RecommendedCourseSerializer(serializers.Serializer):
         return f"course/{url_slug}"
 
 
-class RecommendedProgramSerializer(serializers.Serializer):
-    """Serializer for a recommended program for course about page recommendations"""
-    title = serializers.CharField()
-    marketingUrl = serializers.URLField(source="marketing_url")
-    coursesCount = serializers.IntegerField(source="courses_count")
-    pacingType = serializers.CharField(source="pacing_type")
-    weeksToComplete = serializers.CharField(source="weeks_to_complete")
-    minHours = serializers.IntegerField(source="min_hours")
-    maxHours = serializers.IntegerField(source="max_hours")
-    type = serializers.CharField()
-
-
 class RecommendationsSerializer(serializers.Serializer):
-    """Recommended courses and program for course about page"""
+    """Recommended courses for course about page"""
 
     courses = serializers.ListField(
         child=RecommendedCourseSerializer(), allow_empty=True
     )
-    programUpsell = RecommendedProgramSerializer(source="program_upsell")
     isControl = serializers.BooleanField(
         source="is_control",
         default=None
