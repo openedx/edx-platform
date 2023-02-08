@@ -102,7 +102,6 @@ edx-user-state-client
 edx-when
 edxval
 event-tracking
-enmerkar-underscore                 # Implements a underscore extractor for django-babel.
 fs
 fs-s3fs==0.1.8
 geoip2                              # Python API for the GeoIP web services and databases
@@ -133,8 +132,6 @@ openedx-filters                     # Open edX Filters from Hooks Extension Fram
 optimizely-sdk                      # Optimizely full stack SDK for Python
 ora2>=4.5.0
 outcome-surveys                     # edx-platform plugin to send and track segment events needed for surveys
-openedx-django-wiki
-openedx-blockstore
 path
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
@@ -154,6 +151,8 @@ python-Levenshtein
 python3-openid ; python_version>='3'
 python3-saml
 pyuca                               # For more accurate sorting of translated country names in django-countries
+recommender-xblock                  # https://github.com/edx/RecommenderXBlock
+social-auth-core
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database
 PyYAML                              # Used to parse XModule resource templates
@@ -161,8 +160,6 @@ redis                               # celery task broker
 requests-oauthlib                   # Simplifies use of OAuth via the requests library, used for CCX and LTI
 random2
 rules                               # Django extension for rules-based authorization checks
-recommender-xblock                  # https://github.com/edx/RecommenderXBlock
-social-auth-core
 simplejson
 Shapely                             # Geometry library, used for image click regions in capa
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
@@ -180,5 +177,7 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock[django]                      # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
+enmerkar-underscore                 # Implements a underscore extractor for django-babel.
 xblock-drag-and-drop-v2             # Drag and Drop XBlock
 xblock-google-drive                 # XBlock for google docs and calendar
+openedx-django-wiki
