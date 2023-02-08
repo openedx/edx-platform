@@ -435,14 +435,14 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
         user = self.request.user
 
         # get assessment usage key and type for program intro assessment course
-        if self.intro_assessments is None:
+        if not self.intro_assessments:
             if gen_class.program.intro_unit:
                 assessments.extend(get_assessment_problem_data(gen_class.program.intro_unit.id, user, self.request))
         else:
             assessments.extend(self.intro_assessments)
 
         # get assessment usage key and type for program outro assessment course
-        if self.outro_assessments is None:
+        if not self.outro_assessments:
             if gen_class.program.outro_unit:
                 assessments.extend(get_assessment_problem_data(gen_class.program.outro_unit.id, user, self.request))
         else:
