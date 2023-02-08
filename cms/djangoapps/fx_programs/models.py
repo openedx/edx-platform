@@ -5,4 +5,4 @@ class FxPrograms(models.Model):
     name = models.CharField(max_length=1000, default="")
     course_list = models.CharField(max_length=10000, default="")
     id_course_list = models.CharField(max_length=10000, default="")
-    metadata = models.JSONField(default="")
+    metadata = models.JSONField(default={})

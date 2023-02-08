@@ -1,0 +1,105 @@
+## mako
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<main>
+    <h1>${_("Programs")}</h1>
+    <ul class="programs-listing">
+        %for program in programs:
+        <li class="programs-listing-item">
+            <div id="div-${program.program_id}">
+                <h2>${program.name}</h2>
+                <button id="button-${program.program_id}" onClick="show_details_of_program(`${program.program_id}`,`${program.course_list}`)">${_("Show courses")}</button>
+                <ul id="ul-${program.program_id}"></ul>
+                <div id="add-course-${program.program_id}" style="display:none">
+                    <label for="fname">${_("Add course")}</label>
+                    <input type="text" id="input-add-${program.program_id}" name="fname" placeholder="course id">
+                    <button class="btnSend" onClick="add_course(`${program.program_id}`,`${program.id_course_list}`)">${_("Add")}</button>
+                </div>
+                <div id="delete-course-${program.program_id}" style="display:none">
+                    <label for="fname">${_("Delete course")}</label>
+                    <input type="text" id="input-delete-${program.program_id}" name="fname" placeholder="course id">
+                    <button class="btnSend" onClick="delete_course(`${program.program_id}`,`${program.id_course_list}`)">${_("Delete")}</button>
+                </div>
+            </div>
+        </li>
+      %endfor
+    </ul>
+</main>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+<script>
+
+    function show_details_of_program(program_id, course_list){
+        const button_show_more = document.getElementById("button-"+program_id);
+        button_show_more.style.display = "none";
+        const courses = course_list.split(",");
+        for(let i= 0;i < courses.length - 1; i++){
+            let node = document.createElement("li");
+            let textnode = document.createTextNode(courses[i]);
+            node.appendChild(textnode);
+            document.getElementById("ul-"+program_id).appendChild(node);
+        }
+        const show_add_form = document.getElementById("add-course-"+program_id);
+        show_add_form.style.display="block"
+
+        const show_delete_form = document.getElementById("delete-course-"+program_id);
+        show_delete_form.style.display="block"
+    }
+
+    function add_course(program_id, id_course_list){
+        const origin_url   = window.location.origin;
+        const courses = id_course_list.split(",");
+        const new_course_id = document.getElementById("input-add-"+program_id).value;
+        if(courses.includes(new_course_id)){
+            alert("The course id has been already in this program!!!");
+            return;
+        }
+        // Post to add course by using API
+        const data = {
+                query: "add_course",
+                program_id: program_id,
+                course_id: $("#input-add-"+program_id).val()
+            }
+        $.ajax({
+            type: "POST",
+            url: origin_url + "/fxprograms/api/programs",
+            cache: false,
+            data,
+            success: function(data){
+                console.log(data)
+            },
+            error: function (ajaxContext) {
+                alert("There are errors, please check course id again or contact to admin for more details!")
+            }
+        });
+    }
+    function delete_course(program_id, id_course_list){
+        const origin_url   = window.location.origin;
+        const courses = id_course_list.split(",");
+        const delete_course_id = document.getElementById("input-delete-"+program_id).value;
+        if(!courses.includes(delete_course_id)){
+            alert("The course id has not in this program!!!");
+            return;
+        }
+        // Post to add course by using API
+        const data = {
+                query: "delete_course",
+                program_id: program_id,
+                course_id: $("#input-delete-"+program_id).val()
+            }
+        $.ajax({
+            type: "POST",
+            url: origin_url + "/fxprograms/api/programs",
+            cache: false,
+            data,
+            success: function(data){
+                console.log(data)
+            },
+            error: function (ajaxContext) {
+                alert("There are errors, please check course id again or contact to admin for more details!")
+            }
+        });
+    }
+</script>

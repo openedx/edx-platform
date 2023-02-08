@@ -21,6 +21,7 @@ from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
+from django.urls import path
 
 
 django_autodiscover()
@@ -325,4 +326,9 @@ urlpatterns.extend(get_plugin_url_patterns(ProjectType.CMS))
 # Contentstore
 urlpatterns += [
     url(r'^api/contentstore/', include('cms.djangoapps.contentstore.rest_api.urls'))
+]
+
+# FUNiX Programs
+urlpatterns += [
+    url(r'^fxprograms/', include('cms.djangoapps.fx_programs.urls'))
 ]
