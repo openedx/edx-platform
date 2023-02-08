@@ -131,6 +131,9 @@ links target both the definition of the event in the openedx-events library as
 well as the trigger location in this same repository.
 
 
+Learning Events
+^^^^^^^^^^^^^^^
+
 .. list-table::
    :widths: 35 50 20
 
@@ -177,3 +180,18 @@ well as the trigger location in this same repository.
    * - `COURSE_DISCUSSIONS_CHANGED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L132>`_
      - org.openedx.learning.discussions.configuration.changed.v1
      - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/discussions/tasks.py#L30>`_
+
+
+Content Authoring Events
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 35 50 20
+
+   * - *Name*
+     - *Type*
+     - *Date added*
+
+   * - `COURSE_CATALOG_INFO_CHANGED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L23>`_
+     - org.openedx.content_authoring.course.catalog_info.changed.v1
+     - `2022-08-24 <https://github.com/openedx/edx-platform/blob/a8598fa1fac5e26ac212aa588e8527e727581742/cms/djangoapps/contentstore/signals/handlers.py#L111>`_
