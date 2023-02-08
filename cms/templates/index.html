@@ -81,7 +81,15 @@ from openedx.core.djangolib.js_utils import (
                   <label for="new-course-org">${_("Organization")}</label>
                   ## Translators: This is an example for the name of the organization sponsoring a course, seen when filling out the form to create a new course. The organization name cannot contain spaces.
                   ## Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed when user put no data into this field.
-                  <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-course-org tip-error-new-course-org" />
+                  % if can_create_organizations:
+                    <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-course-org tip-error-new-course-org" />
+                  % else:
+                    <select class="new-course-org" id="new-course-org" name="new-course-org" required aria-describedby="tip-new-course-org tip-error-new-course-org">
+                      % for org in allowed_organizations:
+                        <option value="${org}">${org}</option>
+                      % endfor
+                    </select>
+                  % endif
                   <span class="tip" id="tip-new-course-org">${Text(_("The name of the organization sponsoring the course. {strong_start}Note: The organization name is part of the course URL.{strong_end} This cannot be changed, but you can set a different display name in Advanced Settings later.")).format(
                       strong_start=HTML('<strong>'),
                       strong_end=HTML('</strong>'),
@@ -155,7 +163,15 @@ from openedx.core.djangolib.js_utils import (
                 </li>
                 <li class="field text required">
                   <label for="new-library-org">${_("Organization")}</label>
-                  <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
+                  % if can_create_organizations:
+                    <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
+                  % else:
+                    <select class="new-library-org" id="new-library-org" name="new-library-org" required aria-describedby="tip-new-library-org tip-error-new-library-org">
+                      % for org in allowed_organizations:
+                        <option value="${org}">${org}</option>
+                      % endfor
+                    </select>
+                  % endif
                   <span class="tip" id="tip-new-library-org">${_("The public organization name for your library.")} ${_("This cannot be changed.")}</span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-library-org"></span>
                 </li>

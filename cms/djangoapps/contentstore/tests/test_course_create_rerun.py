@@ -23,6 +23,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from cms.djangoapps.course_creators.admin import CourseCreatorAdmin
 from cms.djangoapps.course_creators.models import CourseCreator
+from cms.djangoapps.contentstore.views.course import get_allowed_organizations, user_can_create_organizations
 from common.djangoapps.student.auth import update_org_role
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, OrgContentCreatorRole
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
@@ -216,6 +217,7 @@ class TestCourseListing(ModuleStoreTestCase):
             'description': 'Testing Organization Description',
         })
         update_org_role(self.global_admin, OrgContentCreatorRole, self.user, [self.source_course_key.org])
+        self.assertIn(self.source_course_key.org, get_allowed_organizations(self.user))
         response = self.client.ajax_post(self.course_create_rerun_url, {
             'org': self.source_course_key.org,
             'number': 'CS101',
@@ -241,6 +243,8 @@ class TestCourseListing(ModuleStoreTestCase):
         self.course_creator_entry.all_organizations = True
         self.course_creator_entry.state = CourseCreator.GRANTED
         self.creator_admin.save_model(self.request, self.course_creator_entry, None, True)
+        self.assertIn(self.source_course_key.org, get_allowed_organizations(self.user))
+        self.assertFalse(user_can_create_organizations(self.user))
         response = self.client.ajax_post(self.course_create_rerun_url, {
             'org': self.source_course_key.org,
             'number': 'CS101',
@@ -268,6 +272,8 @@ class TestCourseListing(ModuleStoreTestCase):
         self.creator_admin.save_model(self.request, self.course_creator_entry, None, True)
         dc_org_object = Organization.objects.get(name='Test Organization')
         self.course_creator_entry.organizations.add(dc_org_object)
+        self.assertIn(self.source_course_key.org, get_allowed_organizations(self.user))
+        self.assertFalse(user_can_create_organizations(self.user))
         response = self.client.ajax_post(self.course_create_rerun_url, {
             'org': self.source_course_key.org,
             'number': 'CS101',
@@ -302,6 +308,8 @@ class TestCourseListing(ModuleStoreTestCase):
         # When the user tries to create course under `Test Organization` it throws a 403.
         dc_org_object = Organization.objects.get(name='DC')
         self.course_creator_entry.organizations.add(dc_org_object)
+        self.assertNotIn(self.source_course_key.org, get_allowed_organizations(self.user))
+        self.assertFalse(user_can_create_organizations(self.user))
         response = self.client.ajax_post(self.course_create_rerun_url, {
             'org': self.source_course_key.org,
             'number': 'CS101',
