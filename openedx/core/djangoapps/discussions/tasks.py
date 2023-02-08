@@ -87,6 +87,13 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
 
 
 def get_discussable_units(course, enable_graded_units):
+    """
+    Get all the units in the course that are discussable.
+    Parameters:
+        course (CourseDescriptor): The course to get discussable units for.
+        enable_graded_units (bool): Whether to include units in graded subsections.
+    Returns: A generator of DiscussionTopicContext objects.
+    """
     # Start at 99 so that the initial increment starts it at 100.
     # This leaves the first 100 slots for the course wide topics, which is only a concern if there are more
     # than that many.
