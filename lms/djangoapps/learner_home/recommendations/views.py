@@ -4,6 +4,7 @@ Views for Course Recommendations in Learner Home
 import logging
 
 from django.conf import settings
+from ipware.ip import get_client_ip
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
@@ -15,6 +16,7 @@ from rest_framework.views import APIView
 
 from common.djangoapps.student.toggles import show_fallback_recommendations
 from common.djangoapps.track import segment
+from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 from lms.djangoapps.learner_home.recommendations.serializers import (
     CourseRecommendationSerializer,
 )
@@ -67,7 +69,11 @@ class CourseRecommendationApiView(APIView):
         if is_control or is_control is None or not course_keys:
             return self._general_recommendations_response(user_id, is_control, fallback_recommendations)
 
-        filtered_courses = filter_recommended_courses(request.user, course_keys, recommendation_count=5)
+        ip_address = get_client_ip(request)[0]
+        user_country_code = country_code_from_ip(ip_address).upper()
+        filtered_courses = filter_recommended_courses(
+            request.user, course_keys, user_country_code=user_country_code, recommendation_count=5
+        )
         # If no courses are left after filtering already enrolled courses from
         # the list of amplitude recommendations, show general recommendations
         # to the user.
