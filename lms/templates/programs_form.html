@@ -1,0 +1,61 @@
+<!-- <%page expression_filter="h"/>  -->
+<!-- <%inherit file="main.html" />  -->
+<!-- <%namespace name='static' file='static_content.html'/>  -->
+<!-- <%! from django.utils.translation import ugettext as _ %>  -->
+<!-- <%namespace name="dynamic" file="static_dynamic_path.html"/> -->
+<!-- <link rel="stylesheet" href="${dynamic.path()}/css/program.css" /> -->
+
+<div class="list-courses">
+  <div class="container">
+    <h2 class="title">
+      <!-- ${_("Programs")} -->
+      <!-- <span class="text-dark" style="font-size: 24px"
+         >(${count} certificate)</span 
+      > -->
+    </h2>
+    <div class="row"></div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $.ajax({
+      type: "GET",
+      url: "http://studio.local.overhang.io:8001/fxprograms/api/programs",
+      success: function (programs) {
+        var programList = "";
+        programs.forEach(function (program) {
+          programList += `
+            <div class="col-sm-4">
+              <div class="card-deck">
+                <div class="card">
+                  <img
+                    src="${program.image}"
+                    class="card-img-top"
+                    style="padding: 15px; border-radius: 20px"
+                    alt="..."
+                  />
+                  <div class="card-body">
+                    <h5 class="card-title">${program.title}</h5>
+                  </div>
+                  <div class="card-footer d-flex justify-content-between">
+                    <p class="card-text">${program.provider}</p>
+                    <a href="#" class="stretched-link"
+                      ><i
+                        class="fa fa-long-arrow-right"
+                        style="font-size: 20px; transform: scale(1.5)"
+                        aria-hidden="true"
+                      ></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        $(".row").html(programList);
+      },
+    });
+  });
+</script>
