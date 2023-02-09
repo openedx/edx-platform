@@ -105,7 +105,7 @@ class DjangoStorageReportStoreS3TestCase(MockS3BotoMixin, ReportStoreTestMixin, 
         storage.
         """
         test_settings = copy.deepcopy(settings.GRADES_DOWNLOAD)
-        test_settings['STORAGE_CLASS'] = 'storages.backends.s3boto3.S3Boto3Storage'
+        test_settings['STORAGE_CLASS'] = 'storages.backends.s3boto.S3BotoStorage'
         test_settings['STORAGE_KWARGS'] = {
             'bucket': settings.GRADES_DOWNLOAD['BUCKET'],
             'location': settings.GRADES_DOWNLOAD['ROOT_PATH'],

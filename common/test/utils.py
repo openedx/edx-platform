@@ -117,14 +117,14 @@ def skip_signal(signal, **kwargs):
 
 class MockS3BotoMixin:
     """
-    TestCase mixin that mocks the S3Boto3Storage save method and s3 connection.
+    TestCase mixin that mocks the S3BotoStorage save method and s3 connection.
     """
     def setUp(self):
         super().setUp()
         self._mocked_connection = patch('boto.connect_s3', return_value=Mock())
         self.mocked_connection = self._mocked_connection.start()
 
-        self.patcher = patch('storages.backends.s3boto3.S3Boto3Storage.save')
+        self.patcher = patch('storages.backends.s3boto.S3BotoStorage.save')
         self.patcher.start()
 
     def tearDown(self):

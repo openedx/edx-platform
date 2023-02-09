@@ -5,11 +5,11 @@ Storage backend for course import and export.
 
 from django.conf import settings
 from django.core.files.storage import get_storage_class
-from storages.backends.s3boto3 import S3Boto3Storage
+from storages.backends.s3boto import S3BotoStorage
 from storages.utils import setting
 
 
-class ImportExportS3Storage(S3Boto3Storage):  # pylint: disable=abstract-method
+class ImportExportS3Storage(S3BotoStorage):  # pylint: disable=abstract-method
     """
     S3 backend for course import and export OLX files.
     """
