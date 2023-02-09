@@ -479,7 +479,7 @@ edx-enterprise==3.60.21
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   learner-pathway-progress
-edx-event-bus-kafka==3.8.1
+edx-event-bus-kafka==3.9.2
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.9.2
     # via ora2
