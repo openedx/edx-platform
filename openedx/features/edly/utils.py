@@ -303,7 +303,7 @@ def edly_panel_user_has_edly_org_access(request):
     ).exists()
 
 
-def user_can_login_on_requested_edly_organization(request, user):
+def user_can_login_on_requested_edly_organization(request, user, current_site=None):
     """
     Check if user can login on the requested URL site.
 
@@ -322,7 +322,9 @@ def user_can_login_on_requested_edly_organization(request, user):
         bool: Returns True if User can login, False otherwise
     """
 
-    current_site = request.site
+    if not current_site:
+        current_site = request.site
+
     try:
         edly_sub_org = EdlySubOrganization.objects.get(
             Q(lms_site=current_site) |
