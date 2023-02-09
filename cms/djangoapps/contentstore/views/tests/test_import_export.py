@@ -25,6 +25,7 @@ from django.test.utils import override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
+from storages.backends.s3boto import S3BotoStorage
 from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.models import UserTaskStatus
 
@@ -957,7 +958,7 @@ class ExportTestCase(CourseTestCase):
         """
         Verify that the export status handler generates the correct export path
         for storage providers other than ``FileSystemStorage`` and
-        ``S3Boto3Storage``
+        ``S3BotoStorage``
         """
         mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
         mock_get_user_task_artifact.return_value = self._mock_artifact(
@@ -967,7 +968,7 @@ class ExportTestCase(CourseTestCase):
         result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/path/to/testfile.tar.gz')
 
-    @ddt.data(S3Boto3Storage)
+    @ddt.data(S3BotoStorage, S3Boto3Storage)
     @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
     @patch('user_tasks.models.UserTaskArtifact.objects.get')
     def test_export_status_handler_s3(
@@ -978,7 +979,7 @@ class ExportTestCase(CourseTestCase):
     ):
         """
         Verify that the export status handler generates the correct export path
-        for the ``S3Boto3Storage`` storage provider
+        for the ``S3BotoStorage`` storage provider
         """
         mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
         mock_get_user_task_artifact.return_value = self._mock_artifact(
