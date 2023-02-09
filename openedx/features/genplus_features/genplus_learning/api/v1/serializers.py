@@ -2,7 +2,7 @@ from django.conf import settings
 from rest_framework import serializers
 from xmodule.modulestore.django import modulestore
 from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.genplus_features.genplus_learning.models import (
     Program,
@@ -171,8 +171,9 @@ class ClassStudentSerializer(serializers.ModelSerializer):
 
     def get_username(self, obj):
         user = obj.gen_user.user
-        if user and user.profile:
-            return user.profile.name
+        profile = UserProfile.objects.filter(user=user).first() if user else None
+        if profile:
+            return profile.name
         return obj.gen_user.email
 
     def get_has_first_logon(self, obj):
