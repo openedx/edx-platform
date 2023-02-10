@@ -13,3 +13,4 @@ def index(request):
     }
     response = render_to_response('programs_list.html', context)
     return response
+ 
