@@ -13,6 +13,7 @@ from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.api.permissions import IsStaff
 from .models import FxPrograms
 
+
 class FxProgramsAPI(APIView):
 
     authentication_classes = (JwtAuthentication, BearerAuthentication,)
@@ -41,11 +42,11 @@ class FxProgramsAPI(APIView):
                 if course_overview:
                     print('course_overview', course_overview.display_name)
                     program = FxPrograms.objects.get(program_id=request.POST["program_id"])
-                    
+
                     #Update the course to the program
                     program.course_list = f'{program.course_list}{course_overview.display_name},'
-                    program.id_course_list = f'{program.id_course_list}{course_overview.id},' 
-                    generated_meta =  {
+                    program.id_course_list = f'{program.id_course_list}{course_overview.id},'
+                    generated_meta = {
                         "id": str(course_overview.id),
                         "display_name": str(course_overview.display_name),
                         "language": str(course_overview.language),
@@ -53,7 +54,7 @@ class FxProgramsAPI(APIView):
                         "course_image_url": str(course_overview.course_image_url),
                         "start_date": str(course_overview.start_date),
                         "end_date": str(course_overview.end_date)
-                        }
+                    }
                     program.metadata[str(course_overview.id)] = generated_meta
                     program.save()
                 response_dict = {
@@ -61,11 +62,11 @@ class FxProgramsAPI(APIView):
                 }
             except CourseOverview.DoesNotExist:
                 return Response("Can't delete the course", status=status.HTTP_400_BAD_REQUEST)
-        
-        if request.POST["query"] == 'delete_course': 
+
+        if request.POST["query"] == 'delete_course':
             try:
                 program = FxPrograms.objects.get(program_id=request.POST["program_id"])
-                response_dict = { 
+                response_dict = {
                     "id_course_delete": str(request.POST["course_id"])
                 }
                 id_course_to_delete = 0
@@ -86,11 +87,8 @@ class FxProgramsAPI(APIView):
                 program.id_course_list = new_id_course_list[:-1]
                 del program.metadata[request.POST["course_id"]]
                 program.save()
-                
+
                 return Response(data=response_dict, status=status.HTTP_200_OK)
             except:
                 return Response("Can't delete the course", status=status.HTTP_400_BAD_REQUEST)
         return Response(data=response_dict, status=status.HTTP_200_OK)
-
-
-        

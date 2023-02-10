@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.template import loader
 import requests
 
+
 def index(request):
     # if this is a POST request we need to process the form data
     context = {
