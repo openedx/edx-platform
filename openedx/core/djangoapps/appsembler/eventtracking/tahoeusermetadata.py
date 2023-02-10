@@ -182,8 +182,8 @@ class TahoeUserMetadataProcessor(object):
 
         user = get_current_user()
         if not user or not user.pk:
-            # should be an AnonymousUser or in tests
-            user_id = utils.get_user_id_from_event(event)
+            # should be an AnonymousUser or in tests or Celery
+            user_id = utils.get_user_id_from_event(event.get('data'))
             if user_id:
                 try:
                     user = User.objects.get(id=user_id)
