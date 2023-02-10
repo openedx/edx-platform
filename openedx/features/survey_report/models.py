@@ -2,6 +2,8 @@
 Survey Report models.
 """
 
+import uuid
+
 from django.db import models
 from jsonfield import JSONField
 
@@ -84,3 +86,13 @@ class SurveyReportUpload(models.Model):
 
     def is_uploaded(self) -> bool:
         return 200 <= self.status_code < 300
+
+
+class SurveyReportAnonymousSiteID(models.Model):
+    """
+    This model is just to save the identification which will be send to the external API when
+    the settings ANONYMOUS_SURVEY_REPORT is defined.
+
+    .. no_pii:
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

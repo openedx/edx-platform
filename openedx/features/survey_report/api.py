@@ -2,12 +2,17 @@
 Contains the logic to manage survey report model.
 """
 import requests
-import hashlib
 
 from django.conf import settings
 from django.forms.models import model_to_dict
 
-from openedx.features.survey_report.models import SurveyReport, SurveyReportUpload
+from openedx.features.survey_report.models import (
+    SurveyReport,
+    SurveyReportUpload,
+    SurveyReportAnonymousSiteID,
+    SURVEY_REPORT_ERROR,
+    SURVEY_REPORT_GENERATED
+)
 from openedx.features.survey_report.queries import (
     get_course_enrollments,
     get_recently_active_users,
@@ -15,7 +20,6 @@ from openedx.features.survey_report.queries import (
     get_registered_learners,
     get_unique_courses_offered
 )
-from .models import SURVEY_REPORT_ERROR, SURVEY_REPORT_GENERATED
 
 MAX_WEEKS_SINCE_LAST_LOGIN: int = 4
 
@@ -59,7 +63,7 @@ def get_id() -> str:
     """ Generate id for the survey report."""
     if not settings.ANONYMOUS_SURVEY_REPORT:
         return settings.LMS_BASE
-    return hashlib.sha256(settings.LMS_BASE.encode('utf-8')).hexdigest()
+    return str(SurveyReportAnonymousSiteID.objects.get_or_create()[0].id)
 
 
 def send_report_to_external_api(report_id: int) -> None:
