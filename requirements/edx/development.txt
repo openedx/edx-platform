@@ -102,10 +102,6 @@ bleach[css]==5.0.1
     #   xblock-poll
 bok-choy==1.1.1
     # via -r requirements/edx/testing.txt
-boto==2.39.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   edxval
 boto3==1.4.8
     # via
     #   -r requirements/edx/testing.txt

@@ -96,11 +96,6 @@ bleach[css]==5.0.1
     #   xblock-drag-and-drop-v2
     #   xblock-poll
 bok-choy==1.1.1
-    # via -r requirements/edx/testing.in
-boto==2.39.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   edxval
 boto3==1.4.8
     # via
     #   -r requirements/edx/base.txt
