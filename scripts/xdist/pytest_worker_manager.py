@@ -8,7 +8,7 @@ import logging
 import time
 
 import boto3
-from botocore.exceptions import ClientError
+import botocore.exceptions
 import socket
 from multiprocessing import Pool
 
@@ -65,7 +65,7 @@ class PytestWorkerManager():
                         }
                     ]
                 )
-            except ClientError as err:
+            except botocore.exceptions.ClientError as err:
                 # Handle AWS throttling with an exponential backoff
                 if retry == self.MAX_RUN_WORKER_RETRIES:
                     raise Exception(

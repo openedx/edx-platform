@@ -14,7 +14,7 @@ import dateutil
 import ddt
 import pytest
 import pytz
-from botocore.exception import ClientError
+import botocore.exceptions
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
@@ -2750,7 +2750,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         ex_reason = 'Slow Down'
         url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
         with patch('storages.backends.s3boto3.S3Boto3Storage.listdir',
-                   side_effect=ClientError(error_code, error_message)):
+                   side_effect=botocore.exceptions.ClientError(error_code, error_message)):
             if endpoint in INSTRUCTOR_GET_ENDPOINTS:
                 response = self.client.get(url)
             else:
