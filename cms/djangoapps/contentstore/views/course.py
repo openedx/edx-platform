@@ -617,7 +617,9 @@ def library_listing(request):
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
         'rerun_creator_status': GlobalStaff().has_user(request.user),
         'split_studio_home': split_library_view_on_dashboard(),
-        'active_tab': 'libraries'
+        'active_tab': 'libraries',
+        'allowed_organizations': get_allowed_organizations(request.user),
+        'can_create_organizations': user_can_create_organizations(request.user),
     }
     return render_to_response('index.html', data)
 
