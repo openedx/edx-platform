@@ -332,8 +332,6 @@ django-pipeline==2.0.9
     # via -r requirements/edx/base.in
 django-ratelimit==4.0.0
     # via -r requirements/edx/base.in
-django-require @ git+https://github.com/openedx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
-    # via -r requirements/edx/github.in
 django-sekizai==4.0.0
     # via
     #   -r requirements/edx/base.in
@@ -756,6 +754,8 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.in
 openedx-django-pyfs==3.2.1
     # via xblock
+openedx-django-require==2.0.0
+    # via -r requirements/edx/base.in
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.in
 openedx-events==5.0.0
