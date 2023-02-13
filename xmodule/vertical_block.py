@@ -72,7 +72,7 @@ class VerticalBlock(
 
     show_in_read_only_mode = True
 
-    def _student_or_public_view(self, context, view):
+    def _student_or_public_view(self, context, view):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Renders the requested view type of the block in the LMS.
         """
