@@ -14,6 +14,9 @@ import pytz
 import ddt
 from fs.memoryfs import MemoryFS
 from django.contrib.auth.models import AnonymousUser
+from django.test import override_settings
+from openedx_filters import PipelineStep
+from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
 
 from . import get_test_system
 from .helpers import StubUserService
@@ -76,6 +79,58 @@ class StubCompletionService:
         if item.scope_ids.block_type != 'vertical':
             raise ValueError('The passed in xblock is not a vertical type!')
         return self._completion_value == 1 if self._enabled else None
+
+
+class TestVerticalBlockChildRenderStep(PipelineStep):
+    """
+    Utility class for testing filters on vertical block children
+    """
+    filter_content = "Altered Content"
+
+    def run_filter(self, block, context):
+        """Pipeline step that changes child content"""
+        block.html = TestVerticalBlockChildRenderStep.filter_content
+        return {"block": block, "context": context}
+
+
+class TestPreventVerticalBlockChildRender(PipelineStep):
+    """
+    Utility class to test vertical block children are skipped in rendering.
+    """
+
+    def run_filter(self, *args):
+        """Pipeline step that raises exceptions during child block rendering"""
+        raise VerticalBlockChildRenderStarted.PreventChildBlockRender(
+            "Skip block test exception"
+        )
+
+
+class TestVerticalBlockRenderCompletedStep(PipelineStep):
+    """
+    Utility class for testing filters on vertical block render completion
+    """
+
+    def run_filter(self, block, fragment, content, view):
+        """Pipeline step that alters the output of the fragment"""
+        fragment.content += "Extra content added"
+        return {
+            "block": block,
+            "fragment": fragment,
+            "content": content,
+            "view": view
+        }
+
+
+class TestPreventVerticalBlockRenderStep(PipelineStep):
+    """
+    Utility class for testing VerticalBlock render can be stopped.
+    """
+
+    def run_filter(self, block, fragment, context, view):
+        """Pipeline step that raises an exception"""
+        raise VerticalBlockRenderCompleted.PreventVerticalBlockRender(
+            "Assignments are not available for Audit students."
+        )
 
 
 class BaseVerticalBlockTest(XModuleXmlImportTest):
@@ -289,3 +344,21 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         html = self.module_system.render(self.vertical, AUTHOR_VIEW, context).content
         assert self.test_html in html
         assert self.test_problem in html
+
+    @override_settings(
+        OPEN_EDX_FILTERS_CONFIG={
+            "org.openedx.learning.vertical_block_child.render.started.v1": {
+                "pipeline": [
+                    "x_module.tests.test_vertical.TestVerticalBlockChildRenderStep"
+                ],
+                "fail_silently": False,
+            },
+        },
+    )
+    def test_vertical_block_child_render_started_filter_execution(self):
+        """
+        Test the VerticalBlockChildRenderStarted filter's effects on student view.
+        """
+        html = self.module_system.render(self.vertical, STUDENT_VIEW, {}).content
+
+        assert TestVerticalBlockChildRenderStep.filter_content in html

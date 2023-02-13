@@ -117,11 +117,15 @@ class VerticalBlock(
                     'mark-completed-on-view-after-delay': complete_on_view_delay
                 }
 
-            # .. filter_implemented_name: VerticalBlockChildRenderStarted
-            # .. filter_type: org.openedx.learning.vertical_block_child.render.started.v1
-            child, child_block_context = VerticalBlockChildRenderStarted.run_filter(
-                block=child, context=child_block_context
-            )
+            try:
+                # .. filter_implemented_name: VerticalBlockChildRenderStarted
+                # .. filter_type: org.openedx.learning.vertical_block_child.render.started.v1
+                child, child_block_context = VerticalBlockChildRenderStarted.run_filter(
+                    block=child, context=child_block_context
+                )
+            except VerticalBlockChildRenderStarted.PreventChildBlockRender as exc:
+                log.info("Skipping %s from vertical block. Reason: %s", child, exc.message)
+                continue
 
             rendered_child = child.render(view, child_block_context)
             fragment.add_fragment_resources(rendered_child)
@@ -162,11 +166,15 @@ class VerticalBlock(
         add_webpack_to_fragment(fragment, 'VerticalStudentView')
         fragment.initialize_js('VerticalStudentView')
 
-        # .. filter_implemented_name: VerticalBlockRenderCompleted
-        # .. filter_type: org.openedx.learning.vertical_block.render.completed.v1
-        _, fragment, context, view = VerticalBlockRenderCompleted.run_filter(
-            block=self, fragment=fragment, context=context, view=view
-        )
+        try:
+            # .. filter_implemented_name: VerticalBlockRenderCompleted
+            # .. filter_type: org.openedx.learning.vertical_block.render.completed.v1
+            _, fragment, context, view = VerticalBlockRenderCompleted.run_filter(
+                block=self, fragment=fragment, context=context, view=view
+            )
+        except VerticalBlockRenderCompleted.PreventVerticalBlockRender as exc:
+            log.info("VerticalBlock rendering stopped. Reason: %s", exc.message)
+            fragment.content = exc.message
 
         return fragment
 
