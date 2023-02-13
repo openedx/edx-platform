@@ -20,7 +20,7 @@ celery>=5.2.2,<6.0.0
 click>=8.0,<9.0
 
 # django-storages version 1.9 drops support for boto storage backend.
-django-storages<1.9
+django-storages<2.0
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
