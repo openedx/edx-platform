@@ -789,7 +789,7 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -807,7 +807,7 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -866,7 +866,7 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -884,7 +884,7 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
                     'headers': ANY,
                     'timeout': 5
                 }
