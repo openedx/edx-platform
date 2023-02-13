@@ -20,7 +20,7 @@ import os.path
 from uuid import uuid4
 
 
-from botocore.exception import ClientError
+import botocore
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -330,7 +330,7 @@ class DjangoStorageReportStore(ReportStore):
             # Django's FileSystemStorage fails with an OSError if the course
             # dir does not exist; other storage types return an empty list.
             return []
-        except ClientError as ex:
+        except botocore.exceptions.ClientError as ex:
             logger.error(
                 'Fetching files failed for course: %s, status: %s, reason: %s',
                 course_id,

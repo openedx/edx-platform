@@ -14,7 +14,7 @@ import dateutil
 import ddt
 import pytest
 import pytz
-import botocore.exceptions
+import botocore
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
