@@ -1,0 +1,18 @@
+<%page expression_filter="h"/>
+<%inherit file="courseware/courseware-chromeless.html"/>
+
+<%block name="head_extra">
+<!-- OpenGraph tags  -->
+<meta data-rh="true" property="og:type" content="website">
+<meta data-rh="true" property="og:site_name" content="edX">
+<meta data-rh="true" property="og:title" content=${video_title}>
+<meta data-rh="true" property="og:description" content="${video_description}">
+<meta data-rh="true" property="og:image" content="${video_thumbnail}">
+
+<!-- Twitter-specific video player tags  -->
+<meta data-rh="true" name="twitter:card" content="player">
+<meta data-rh="true" name="twitter:site" content="@edxOnline">
+<meta data-rh="true" name="twitter:player" content=${video_embed_url}>
+<meta data-rh="true" name="twitter:player:width" content="1280">
+<meta data-rh="true" name="twitter:player:height" content="1000">
+</%block>
