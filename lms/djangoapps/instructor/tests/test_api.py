@@ -2749,7 +2749,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         ex_status = 503
         ex_reason = 'Slow Down'
         url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
-        with patch('storages.backends.s3boto.S3BotoStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
+        with patch('storages.backends.s3boto3.S3Boto3Storage.listdir',
+                   side_effect=BotoServerError(ex_status, ex_reason)):
             if endpoint in INSTRUCTOR_GET_ENDPOINTS:
                 response = self.client.get(url)
             else:
