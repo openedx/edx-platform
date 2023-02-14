@@ -61,3 +61,6 @@ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29
 # Third Party XBlocks
 
 git+https://github.com/open-craft/xblock-poll@v1.12.0#egg=xblock-poll==1.12.0
+
+
+git+https://github.com/openedx/edx-drf-extensions@umar/replace-jwkest-with-cryptojwt#egg=edx-drf-extensions==9.0.0
