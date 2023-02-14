@@ -89,7 +89,7 @@ class CookieTests(TestCase):
         assert (cookies_api.jwt_cookies.jwt_cookie_name() in self.request.COOKIES) == can_recreate
         if can_recreate:
             jwt_string = self.request.COOKIES[cookies_api.jwt_cookies.jwt_cookie_name()]
-            jwt = jwt_decode_handler(jwt_string)
+            jwt = jwt_decode_handler(jwt_string, decode_symmetric_token=False)
             assert jwt['scopes'] == ['user_id', 'email', 'profile']
 
     def _assert_cookies_present(self, response, expected_cookies):
