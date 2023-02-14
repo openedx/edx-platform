@@ -456,20 +456,20 @@ class VideoBlock(
         is_embed = context.get('public_video_embed', False)
         template_context = {
             'autoadvance_enabled': autoadvance_enabled,
-            'bumper_metadata': json.dumps(self.bumper['metadata']),  # pylint: disable=E1101
-            'metadata': json.dumps(OrderedDict(metadata)),
-            'poster': json.dumps(get_poster(self)),
             'branding_info': branding_info,
+            'bumper_metadata': json.dumps(self.bumper['metadata']),  # pylint: disable=E1101
             'cdn_eval': cdn_eval,
             'cdn_exp_group': cdn_exp_group,
-            'id': self.location.html_id(),
             'display_name': None if is_embed else self.display_name_with_default,
-            'handout': self.handout,
             'download_video_link': download_video_link,
+            'handout': self.handout,
+            'id': self.location.html_id(),
+            'license': getattr(self, "license", None),
+            'metadata': json.dumps(OrderedDict(metadata)),
+            'poster': json.dumps(get_poster(self)),
             'track': track_url,
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
-            'license': getattr(self, "license", None),
         }
         return self.runtime.service(self, 'mako').render_template('video.html', template_context)
 
