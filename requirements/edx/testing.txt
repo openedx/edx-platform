@@ -212,6 +212,7 @@ cryptography==38.0.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
+    #   cryptojwt
     #   django-fernet-fields
     #   djfernet
     #   edx-enterprise
@@ -222,6 +223,10 @@ cryptography==38.0.4
     #   pyopenssl
     #   snowflake-connector-python
     #   social-auth-core
+cryptojwt==1.8.3
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-drf-extensions
 cssselect==1.2.0
     # via
     #   -r requirements/edx/testing.in
@@ -253,7 +258,7 @@ dill==0.3.6
     # via pylint
 distlib==0.3.6
     # via virtualenv
-django==3.2.17
+django==3.2.18
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
@@ -562,7 +567,7 @@ edx-django-utils==5.2.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions==8.4.1
+edx-drf-extensions @ git+https://github.com/openedx/edx-drf-extensions@umar/replace-jwkest-with-cryptojwt
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
@@ -1271,6 +1276,7 @@ requests==2.28.2
     #   algoliasearch
     #   analytics-python
     #   coreapi
+    #   cryptojwt
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions

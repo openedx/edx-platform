@@ -4293,7 +4293,7 @@ CREDIT_TASK_DEFAULT_RETRY_DELAY = 30
 CREDIT_TASK_MAX_RETRIES = 5
 
 # Dummy secret key for dev/test
-SECRET_KEY = 'dev key'
+SECRET_KEY = 'secure dev test key'
 
 # Secret keys shared with credit providers.
 # Used to digitally sign credit requests (us --> provider)
@@ -4339,7 +4339,7 @@ JWT_ISSUER = 'http://127.0.0.1:8000/oauth2'
 DEFAULT_JWT_ISSUER = {
     'ISSUER': 'http://127.0.0.1:8000/oauth2',
     'AUDIENCE': 'change-me',
-    'SECRET_KEY': 'SET-ME-PLEASE'
+    'SECRET_KEY': 'SET-ME-PLEASE-WITH-SECURE-KEY'
 }
 JWT_EXPIRATION = 30
 JWT_PRIVATE_SIGNING_KEY = None

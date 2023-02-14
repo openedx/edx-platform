@@ -184,9 +184,9 @@ JWT_AUTH.update({
     'JWT_ISSUERS': [{
         'AUDIENCE': 'lms-key',
         'ISSUER': f'{LMS_ROOT_URL}/oauth2',
-        'SECRET_KEY': 'lms-secret',
+        'SECRET_KEY': 'secure-lms-secret',
     }],
-    'JWT_SECRET_KEY': 'lms-secret',
+    'JWT_SECRET_KEY': 'secure-lms-secret',
     'JWT_AUDIENCE': 'lms-key',
     'JWT_PUBLIC_SIGNING_JWK_SET': (
         '{"keys": [{"kid": "devstack_key", "e": "AQAB", "kty": "RSA", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu'
