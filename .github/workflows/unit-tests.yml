@@ -44,15 +44,6 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@v3
 
-      # This gives Mongo several chances to start. We started getting flakiness
-      # around 2022-02-15 wherein the start command would sometimes exit with:
-      #
-      #   * Starting database mongodb
-      #     ...fail!
-      #
-      # ...not having produced any logs or other output. We couldn't figure out
-      # what was causing Mongo to fail, so this is a (temporary?) hack to get
-      # PRs unblocked.
       - name: start mongod server for tests
         run: |
           sudo mkdir -p /data/db

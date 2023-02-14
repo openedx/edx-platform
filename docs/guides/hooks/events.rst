@@ -12,7 +12,7 @@ Receiving events
 ^^^^^^^^^^^^^^^^
 
 This is one of the most common use cases for plugins. The edx-platform will send
-and event and you want to react to it in your plugin.
+an event and you want to react to it in your plugin.
 
 For this you need to:
 

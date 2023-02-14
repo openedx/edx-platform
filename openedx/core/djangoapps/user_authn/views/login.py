@@ -141,7 +141,7 @@ def _get_user_by_email_or_username(request, api_version):
         user = _get_user_by_username(email_or_username)
 
     if not user:
-        digest = hashlib.shake_128(email_or_username.encode('utf-8')).hexdigest(16)  # pylint: disable=too-many-function-args
+        digest = hashlib.shake_128(email_or_username.encode('utf-8')).hexdigest(16)
         AUDIT_LOG.warning(f"Login failed - Unknown user email or username {digest}")
 
     return user
