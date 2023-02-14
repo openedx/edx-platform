@@ -75,16 +75,24 @@ def account_settings(request):
 
     context = account_settings_context(request)
 
+    account_settings_template = 'student_account/account_settings.html'
+
     try:
         # .. filter_implemented_name: AccountSettingsRenderStarted
         # .. filter_type: org.openedx.learning.student.settings.render.started.v1
-        context = AccountSettingsRenderStarted().run_filter(context=context)
+        context, account_settings_template = AccountSettingsRenderStarted.run_filter(
+            context=context, account_settings_template=account_settings_template,
+        )
+    except AccountSettingsRenderStarted.RenderInvalidAccountSettings as exc:
+        response = render_to_response(exc.account_settings_template, exc.template_context)
     except AccountSettingsRenderStarted.RedirectToPage as exc:
-        return HttpResponseRedirect(exc.redirect_to)
+        response = HttpResponseRedirect(exc.redirect_to or reverse('dashboard'))
     except AccountSettingsRenderStarted.RenderCustomResponse as exc:
-        return exc.response
+        response = exc.response
+    else:
+        response = render_to_response(account_settings_template, context)
 
-    return render_to_response('student_account/account_settings.html', context)
+    return response
 
 
 def account_settings_context(request):
