@@ -296,8 +296,8 @@ class CourseExportTask(UserTask):  # pylint: disable=abstract-method
 
 
 @shared_task(base=CourseExportTask, bind=True)
-# Note: The decorator @set_code_owner_attribute could not be used because
-#   the implementation of this task breaks with any additional decorators.
+# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
+#   does stack inspection and can't handle additional decorators.
 def export_olx(self, user_id, course_key_string, language):
     """
     Export a course or library to an OLX .tar.gz archive and prepare it for download.
@@ -431,15 +431,16 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
 
 
 @shared_task(base=CourseImportTask, bind=True)
-# Note: The decorator @set_code_owner_attribute could not be used because  # lint-amnesty, pylint: disable=too-many-statements
-#   the implementation of this task breaks with any additional decorators.
+# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
+#   does stack inspection and can't handle additional decorators.
+# lint-amnesty, pylint: disable=too-many-statements
 def import_olx(self, user_id, course_key_string, archive_path, archive_name, language):
     """
     Import a course or library from a provided OLX .tar.gz archive.
     """
+    set_code_owner_attribute_from_module(__name__)
     current_step = 'Unpacking'
     courselike_key = CourseKey.from_string(course_key_string)
-    set_code_owner_attribute_from_module(__name__)
     set_custom_attributes_for_course_key(courselike_key)
     log_prefix = f'Course import {courselike_key}'
     self.status.set_state(current_step)
