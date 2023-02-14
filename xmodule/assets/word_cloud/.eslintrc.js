@@ -4,7 +4,4 @@ module.exports = {
   settings: {
     'import/resolver': 'webpack',
   },
-  overrides: {
-    excludedFiles: 'public/js/*',
-  },
 };
