@@ -3,7 +3,6 @@ Celery tasks used by cms_user_tasks
 """
 import json
 
-from boto.exception import NoAuthHandlerFound
 from celery import shared_task
 from celery.exceptions import MaxRetriesExceededError
 from celery.utils.log import get_task_logger
@@ -52,7 +51,7 @@ def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail
     try:
         mail.send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
         LOGGER.info("Task complete email has been sent to User %s", dest_addr)
-    except NoAuthHandlerFound:
+    except exception:
         LOGGER.info(
             'Retrying sending email to user %s, attempt # %s of %s',
             dest_addr,
