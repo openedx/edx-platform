@@ -238,7 +238,7 @@ DEFAULT_FROM_EMAIL: registration@example.com
 DEFAULT_JWT_ISSUER:
     AUDIENCE: lms-key
     ISSUER: http://edx.devstack.lms:18000/oauth2
-    SECRET_KEY: lms-secret
+    SECRET_KEY: secure-lms-secret
 DEFAULT_MOBILE_AVAILABLE: false
 DEFAULT_SITE_THEME: ''
 DEPRECATED_ADVANCED_COMPONENT_TYPES: []
@@ -260,7 +260,7 @@ DOC_STORE_CONFIG:
     socketTimeoutMS: 3000
     ssl: false
     user: edxapp
-ECOMMERCE_API_SIGNING_KEY: lms-secret
+ECOMMERCE_API_SIGNING_KEY: secure-lms-secret
 ECOMMERCE_API_URL: http://localhost:8002/api/v2
 ECOMMERCE_PUBLIC_URL_ROOT: http://localhost:8002
 EDXMKTG_USER_INFO_COOKIE_NAME: edx-user-info
@@ -368,10 +368,10 @@ JWT_AUTH:
     JWT_ISSUERS:
     -   AUDIENCE: lms-key
         ISSUER: http://edx.devstack.lms:18000/oauth2
-        SECRET_KEY: lms-secret
+        SECRET_KEY: secure-lms-secret
     JWT_PRIVATE_SIGNING_JWK: None
     JWT_PUBLIC_SIGNING_JWK_SET: ''
-    JWT_SECRET_KEY: lms-secret
+    JWT_SECRET_KEY: secure-lms-secret
     JWT_SIGNING_ALGORITHM: null
 JWT_EXPIRATION: 30
 JWT_ISSUER: http://edx.devstack.lms:18000/oauth2

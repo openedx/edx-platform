@@ -307,9 +307,9 @@ JWT_AUTH.update({
     'JWT_ISSUERS': [{
         'AUDIENCE': 'lms-key',
         'ISSUER': f'{LMS_ROOT_URL}/oauth2',
-        'SECRET_KEY': 'lms-secret',
+        'SECRET_KEY': 'secure-lms-secret',
     }],
-    'JWT_SECRET_KEY': 'lms-secret',
+    'JWT_SECRET_KEY': 'secure-lms-secret',
     'JWT_SIGNING_ALGORITHM': 'RS512',
     'JWT_PRIVATE_SIGNING_JWK': (
         '{"e": "AQAB", "d": "RQ6k4NpRU3RB2lhwCbQ452W86bMMQiPsa7EJiFJUg-qBJthN0FMNQVbArtrCQ0xA1BdnQHThFiUnHcXfsTZUwmwvTu'

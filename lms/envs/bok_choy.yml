@@ -169,7 +169,7 @@ JWT_AUTH: {JWT_PRIVATE_SIGNING_JWK: '{"e": "AQAB", "d": "HIiV7KNjcdhVbpn3KT-I9n3
     "p": "vUqzWPZnDG4IXyo-k5F0bHV0BNL_pVhQoLW7eyFHnw74IOEfSbdsMspNcPSFIrtgPsn7981qv3lN_staZ6JflKfHayjB_lvltHyZxfl0dvruShZOx1N6ykEo7YrAskC_qxUyrIvqmJ64zPW3jkuOYrFs7Ykj3zFx3Zq1H5568G0",
     "kid": "BTZ9HA6K", "kty": "RSA"}', JWT_PUBLIC_SIGNING_JWK_SET: '{"keys": [{"kid":
     "BTZ9HA6K", "e": "AQAB", "kty": "RSA", "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ"}]}',
-  JWT_SECRET_KEY: super-secret-key}
+  JWT_SECRET_KEY: super-secure-secret-key}
 LMS_BASE: localhost:8003
 LMS_ROOT_URL: http://localhost:8003
 LOCAL_LOGLEVEL: INFO
@@ -252,4 +252,3 @@ XQUEUE_INTERFACE:
 
 ZENDESK_API_KEY: ''
 ZENDESK_USER: ''
-
