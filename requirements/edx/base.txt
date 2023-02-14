@@ -762,7 +762,8 @@ openedx-events==5.0.0
     # via
     #   -r requirements/edx/base.in
     #   edx-event-bus-kafka
-openedx-filters==1.0.0
+# openedx-filters==1.0.0
+openedx-filters @ git+https://github.com/open-craft/openedx-filters.git@ae45fdf1a5d96b766ed5c2dba3680fc691ac118a
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock
