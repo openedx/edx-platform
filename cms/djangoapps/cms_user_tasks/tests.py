@@ -303,7 +303,7 @@ class TestUserTaskStopped(APITestCase):
         """
 
         with mock.patch('django.core.mail.send_mail') as mock_exception:
-            mock_exception.side_effect=Exception()
+            mock_exception.side_effect = Exception()
 
             with mock.patch('cms.djangoapps.cms_user_tasks.tasks.send_task_complete_email.retry') as mock_retry:
                 user_task_stopped.send(sender=UserTaskStatus, status=self.status)
