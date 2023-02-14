@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-07 16:06+0000\n"
-"PO-Revision-Date: 2023-02-07 16:06:04.350330\n"
+"POT-Creation-Date: 2023-02-12 20:35+0000\n"
+"PO-Revision-Date: 2023-02-12 20:35:45.724300\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -259,6 +259,26 @@ msgstr ""
 "ØⱣŦƗØNȺŁ: Ŧɥᴉs ᴉs ʇɥǝ SꝀɄ (sʇøɔʞ ʞǝǝdᴉnƃ nnᴉʇ) øɟ ʇɥᴉs ɯødǝ ᴉn ʇɥǝ ǝxʇǝɹnɐl "
 "ǝɔøɯɯǝɹɔǝ sǝɹʌᴉɔǝ.  Łǝɐʌǝ ʇɥᴉs blɐnʞ ᴉɟ ʇɥǝ ɔønɹsǝ ɥɐs nøʇ ʎǝʇ bǝǝn ɯᴉƃɹɐʇǝd"
 " ʇø ʇɥǝ ǝɔøɯɯǝɹɔǝ sǝɹʌᴉɔǝ."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+"ØⱣŦƗØNȺŁ: Ŧɥᴉs ᴉs ʇɥǝ Ⱥndɹøᴉd SꝀɄ ɹǝƃᴉsʇǝɹǝd øn dlɐʎ sʇøɹǝ ɟøɹ ʇɥᴉs ɯødǝ øɟ "
+"ʇɥǝ ɔønɹsǝ. Łǝɐʌǝ ʇɥᴉs blɐnʞ ᴉɟ ʇɥǝ ɔønɹsǝ ɥɐs nøʇ ʎǝʇ bǝǝn ɯᴉƃɹɐʇǝd ʇø ʇɥǝ "
+"ǝɔøɯɯǝɹɔǝ sǝɹʌᴉɔǝ."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+"ØⱣŦƗØNȺŁ: Ŧɥᴉs ᴉs ʇɥǝ ᴉØS SꝀɄ ɹǝƃᴉsʇǝɹǝd øn ɐdd sʇøɹǝ ɟøɹ ʇɥᴉs ɯødǝ øɟ ʇɥǝ "
+"ɔønɹsǝ.  Łǝɐʌǝ ʇɥᴉs blɐnʞ ᴉɟ ʇɥǝ ɔønɹsǝ ɥɐs nøʇ ʎǝʇ bǝǝn ɯᴉƃɹɐʇǝd ʇø ʇɥǝ "
+"ǝɔøɯɯǝɹɔǝ sǝɹʌᴉɔǝ."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -21101,11 +21121,6 @@ msgstr ""
 msgid "Organization"
 msgstr "Øɹƃɐnᴉzɐʇᴉøn"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "ǝ.ƃ. ɄnᴉʌǝɹsᴉʇʎX øɹ ØɹƃɐnᴉzɐʇᴉønX"

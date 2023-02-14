@@ -32,7 +32,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Ali Işıngör <ali@artistanbul.io>, 2017-2022
+# Ali Işıngör <ali@artistanbul.io>, 2017-2023
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
@@ -90,7 +90,7 @@
 # Translators:
 # abc Def <hdogan1974@gmail.com>, 2020
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2018-2021
+# Ali Işıngör <ali@artistanbul.io>, 2018-2021,2023
 # ali selek <aliselek01@gmail.com>, 2015
 # arif altun <altunar@gmail.com>, 2017
 # Azmi Ozgen <azmican73@gmail.com>, 2014
@@ -12741,15 +12741,15 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/admin.py
 msgid "Regenerate selected course outlines"
-msgstr ""
+msgstr "Seçili ders ana hatlarını yeniden oluştur"
 
 #: cms/djangoapps/contentstore/admin.py
 msgid "All course outline regenerations successfully requested."
-msgstr ""
+msgstr "Tüm ders ana hatlarının yenilemeleri başarıyla talep edildi."
 
 #: cms/djangoapps/contentstore/admin.py
 msgid "Regenerate *all* course outlines"
-msgstr ""
+msgstr "*Tüm* ders ana hatlarını yeniden oluştur"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
@@ -12775,7 +12775,7 @@ msgstr "yapılandırma adının girilmesi zorunlu"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid "must have at least one group"
-msgstr "Lütfen en az bir grup ekleyiniz"
+msgstr "en az bir gruba sahip olmalı"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid "unable to load this type of group configuration"
@@ -21308,14 +21308,16 @@ msgid ""
 "This course run is using an upgraded version of edx discussion forum. "
 "Discussion xblocks will no longer work."
 msgstr ""
+"Bu ders, edx tartışma forumunun yükseltilmiş bir sürümünü kullanıyor. "
+"Discussion xblock'ları artık çalışmayacak."
 
 #: cms/templates/course_outline.html
 msgid " Learn more"
-msgstr ""
+msgstr " Daha fazlasını öğren"
 
 #: cms/templates/course_outline.html
 msgid "Share feedback"
-msgstr ""
+msgstr "Geri bildirim paylaş"
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html
@@ -23419,6 +23421,9 @@ msgid ""
 "learners as soon as they achieve the passing threshold in the course (which "
 "can occur before a final assignment based on course design)"
 msgstr ""
+"Bu ayarın tüm yapılandırmalarında, öğrenciler derste geçme eşiğine ulaşır "
+"ulaşmaz sertifikalar oluşturulur (bu, ders tasarımına dayalı bir son "
+"atamadan önce gerçekleşebilir)"
 
 #: cms/templates/settings.html
 msgid ""
@@ -23426,22 +23431,29 @@ msgid ""
 "grade above the course grade threshold. Note: learners can achieve a passing"
 " grade before encountering all assignments in some course configurations."
 msgstr ""
+"Öğrenciler, ders notu eşiğinin üzerinde bir geçer not elde ettikleri anda "
+"sertifikalarına erişebilirler. Not: öğrenciler, bazı ders "
+"yapılandırmalarında tüm ödevlerle karşılaşmadan önce geçer not alabilirler."
 
 #: cms/templates/settings.html
 msgid "On course end date"
-msgstr ""
+msgstr "Ders bitiş tarihinde"
 
 #: cms/templates/settings.html
 msgid ""
 "Learners with passing grades can access their certificate once the end date "
 "of the course has elapsed."
 msgstr ""
+"Geçer not alan öğrenciler, dersin bitiş tarihi geçtikten sonra "
+"sertifikalarına erişebilirler."
 
 #: cms/templates/settings.html
 msgid ""
 "Learners with passing grades can access their certificate after the date "
 "that you set has elapsed."
 msgstr ""
+"Geçer not alan öğrenciler, belirlediğiniz tarih geçtikten sonra "
+"sertifikalarına erişebilirler."
 
 #: cms/templates/settings.html
 msgid "Certificates Available Date"

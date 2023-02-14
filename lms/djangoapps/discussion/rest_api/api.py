@@ -1185,6 +1185,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
         discussion.rest_api.views.CommentViewSet for more detail.
     """
     response_skip = page_size * (page - 1)
+    reverse_order = request.GET.get('reverse_order', False)
     cc_thread, context = _get_thread_and_context(
         request,
         thread_id,
@@ -1195,6 +1196,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
             "flagged_comments": flagged,
             "response_skip": response_skip,
             "response_limit": page_size,
+            "reverse_order": reverse_order,
         }
     )
 

@@ -8,7 +8,7 @@
     # via -r requirements/edx/base.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/base.txt
-aiohttp==3.8.3
+aiohttp==3.8.4
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -62,6 +62,7 @@ attrs==22.2.0
     #   lti-consumer-xblock
     #   openedx-blockstore
     #   openedx-events
+    #   outcome
     #   pytest
 babel==2.11.0
     # via
@@ -421,8 +422,6 @@ django-pipeline==2.0.9
     # via -r requirements/edx/base.txt
 django-ratelimit==4.0.0
     # via -r requirements/edx/base.txt
-django-require @ git+https://github.com/openedx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
-    # via -r requirements/edx/base.txt
 django-sekizai==4.0.0
     # via
     #   -r requirements/edx/base.txt
@@ -508,7 +507,7 @@ drf-nested-routers==0.93.4
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-drf-yasg==1.21.4
+drf-yasg==1.21.5
     # via
     #   -r requirements/edx/base.txt
     #   edx-api-doc-tools
@@ -580,7 +579,7 @@ edx-enterprise==3.60.21
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   learner-pathway-progress
-edx-event-bus-kafka==3.9.2
+edx-event-bus-kafka==3.9.3
     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.9.2
     # via
@@ -679,9 +678,9 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==16.6.1
+faker==17.0.0
     # via factory-boy
-fastapi==0.89.1
+fastapi==0.91.0
     # via pact-python
 fastavro==1.7.1
     # via
@@ -920,7 +919,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==8.5.0
+newrelic==8.6.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -953,6 +952,8 @@ openedx-django-pyfs==3.2.1
     # via
     #   -r requirements/edx/base.txt
     #   xblock
+openedx-django-require==2.0.0
+    # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.txt
 openedx-events==5.0.0
@@ -1020,7 +1021,7 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
-platformdirs==2.6.2
+platformdirs==3.0.0
     # via
     #   pylint
     #   virtualenv
@@ -1181,7 +1182,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.12.0
     # via -r requirements/edx/testing.in
-pytest-xdist[psutil]==3.1.0
+pytest-xdist[psutil]==3.2.0
     # via -r requirements/edx/testing.in
 python-dateutil==2.8.2
     # via
@@ -1258,7 +1259,7 @@ rapidfuzz==2.13.7
     #   levenshtein
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
-redis==4.4.2
+redis==4.5.1
     # via -r requirements/edx/base.txt
 regex==2022.10.31
     # via
@@ -1411,9 +1412,9 @@ sqlparse==0.4.3
     #   openedx-blockstore
 staff-graded-xblock==2.0.1
     # via -r requirements/edx/base.txt
-starlette==0.22.0
+starlette==0.24.0
     # via fastapi
-stevedore==4.1.1
+stevedore==5.0.0
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
@@ -1429,7 +1430,7 @@ sympy==1.11.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-calc
-testfixtures==7.0.4
+testfixtures==7.1.0
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
@@ -1505,7 +1506,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.18.0
+virtualenv==20.19.0
     # via tox
 voluptuous==0.13.1
     # via
@@ -1581,7 +1582,7 @@ yarl==1.8.2
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-zipp==3.12.1
+zipp==3.13.0
     # via
     #   -r requirements/edx/base.txt
     #   importlib-metadata
