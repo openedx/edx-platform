@@ -49,7 +49,7 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
     discussions_config = DiscussionsConfiguration.get(course_key)
     supports_in_context = discussions_config.supports_in_context_discussions()
     provider_type = discussions_config.provider_type
-    # question: is it not getting published only units ?
+
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         course = store.get_course(course_key)
         enable_in_context = discussions_config.enable_in_context
@@ -89,60 +89,75 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
 def get_discussable_units(course, enable_graded_units):
     """
     Get all the units in the course that are discussable.
-    Parameters:
-        course (CourseDescriptor): The course to get discussable units for.
-        enable_graded_units (bool): Whether to include units in graded subsections.
-    Returns: A generator of DiscussionTopicContext objects.
     """
-    # Start at 99 so that the initial increment starts it at 100.
-    # This leaves the first 100 slots for the course wide topics, which is only a concern if there are more
-    # than that many.
-    store = modulestore()
     idx = 99
+    store = modulestore()
+    for section in get_sections(course):
+        for subsection in get_subsections(section):
+            with store.bulk_operations(course.id, emit_signals=False):
+                for unit in get_units(subsection):
+                    idx += 1
+                    if not is_discussable_unit(unit, store, enable_graded_units, subsection):
+                        unit.discussion_enabled = False
+                        store.update_item(unit, unit.published_by, emit_signals=False)
+                        continue
+                    yield DiscussionTopicContext(
+                        usage_key=unit.location,
+                        title=unit.display_name,
+                        group_id=None,
+                        ordering=idx,
+                        context={
+                            "section": section.display_name,
+                            "subsection": subsection.display_name,
+                            "unit": unit.display_name,
+                        },
+                    )
+
+
+def get_sections(course):
+    """
+    Get sections for given course
+    """
     for section in course.get_children():
-        if section.location.block_type != "chapter":
-            continue
-        for subsection in section.get_children():
-            if subsection.location.block_type != "sequential":
-                continue
-            for unit in subsection.get_children():
-                if unit.location.block_type != 'vertical':
-                    continue
-                # Skip if unit is not published
-                if not modulestore().has_published_version(unit):
-                    continue
-                # Increment index even for skipped units so that the index is more stable and won't change
-                # if settings change, only if a unit is added or removed.
-                idx += 1
-                # If unit-level visibility is enabled and the unit doesn't have discussion enabled, skip it.
-                # here . we should remove unit_level_visibility and param from function
-                if not getattr(unit, "discussion_enabled", False):
-                    unit.discussion_enabled = False
-                    store.update_item(unit, 1)
-                    continue
-                # If the unit is in a graded section and graded sections aren't enabled skip it.
+        if section.location.block_type == "chapter":
+            yield section
 
-                if subsection.graded and not enable_graded_units:
-                    unit.discussion_enabled = False
-                    store.update_item(unit, 1)
-                    continue
-                # If the unit is an exam, skip it.
-                if subsection.is_practice_exam or subsection.is_proctored_enabled or subsection.is_time_limited:
-                    unit.discussion_enabled = False
-                    store.update_item(unit, 1)
-                    continue
 
-                yield DiscussionTopicContext(
-                    usage_key=unit.location,
-                    title=unit.display_name,
-                    group_id=None,
-                    ordering=idx,
-                    context={
-                        "section": section.display_name,
-                        "subsection": subsection.display_name,
-                        "unit": unit.display_name,
-                    },
-                )
+def get_subsections(section):
+    """
+    Get subsections for given section
+    """
+    for subsection in section.get_children():
+        if subsection.location.block_type == "sequential":
+            yield subsection
+
+
+def get_units(subsection):
+    """
+    Get units for given subsection
+    """
+    for unit in subsection.get_children():
+        if unit.location.block_type == 'vertical':
+            yield unit
+
+
+def is_discussable_unit(unit, store, enable_graded_units, subsection):
+    """
+    Check if unit should have discussion's topic
+    """
+    if not store.has_published_version(unit):
+        return False
+
+    if not getattr(unit, "discussion_enabled", False):
+        return False
+
+    if subsection.graded and not enable_graded_units:
+        return False
+
+    if subsection.is_practice_exam or subsection.is_proctored_enabled or subsection.is_time_limited:
+        return False
+
+    return True
 
 
 def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, user_id: int, force=False) -> None:
@@ -187,7 +202,7 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         subsections_with_discussions = set()
         for vertical in verticals:
             if vertical.location in discussible_units:
-                vertical.discussion_enabled = True
+                # vertical.discussion_enabled = True
                 subsections_with_discussions.add(vertical.parent)
             else:
                 vertical.discussion_enabled = False
