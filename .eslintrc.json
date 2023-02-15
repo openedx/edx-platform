@@ -18,6 +18,20 @@
     "spyOnEvent": true,
 
     // used by our requirejs implementation
-    "RequireJS": true
+    "RequireJS": true,
+
+    // enable jquery
+    "$": true
+  },
+  "rules": {
+    "func-names": "off",
+    "indent": ["error", 4],
+    "new-cap": "off",
+    "no-else-return": "off",
+    "no-shadow": "error",
+    "object-curly-spacing": ["error", "never"],
+    "one-var": "off",
+    "one-var-declaration-per-line": ["error", "initializations"],
+    "space-before-function-paren": ["error", "never"]
   }
 }
