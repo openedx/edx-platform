@@ -133,6 +133,7 @@ celery==5.2.7
     #   event-tracking
 certifi==2022.12.7
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   elasticsearch
     #   py2neo
@@ -152,6 +153,7 @@ chardet==5.1.0
 charset-normalizer==2.0.12
     # via
     #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   requests
@@ -614,6 +616,7 @@ edx-name-affirmation==2.3.5
     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.3.0
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   edx-bulk-grades
     #   edx-ccx-keys
@@ -769,6 +772,7 @@ icalendar==5.0.4
     # via -r requirements/edx/testing.txt
 idna==3.4
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   anyio
     #   optimizely-sdk
@@ -863,6 +867,7 @@ laboratory==1.0.2
     # via -r requirements/edx/testing.txt
 lazy==1.5
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   acid-xblock
     #   bok-choy
@@ -881,6 +886,7 @@ levenshtein==0.20.9
     #   python-levenshtein
 libsass==0.10.0
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   ora2
 loremipsum==1.0.5
@@ -922,6 +928,7 @@ markey==0.8
     #   enmerkar-underscore
 markupsafe==2.1.2
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   chem
     #   jinja2
@@ -940,6 +947,7 @@ mistune==2.0.5
     # via sphinx-mdinclude
 mock==5.0.1
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   xblock-poll
 mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
@@ -1043,6 +1051,7 @@ pansi==2020.7.3
     #   py2neo
 path==16.6.0
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   edx-i18n-tools
     #   path-py
@@ -1053,9 +1062,10 @@ path-py==12.5.0
     #   ora2
     #   staff-graded-xblock
 paver==1.3.4
-    # via -r requirements/edx/testing.txt
+    # via -r requirements/edx/paver.txt
 pbr==5.11.1
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   stevedore
 pgpy==0.6.0
@@ -1098,6 +1108,7 @@ prompt-toolkit==3.0.36
     #   click-repl
 psutil==5.9.4
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
     #   pact-python
@@ -1191,6 +1202,7 @@ pylti1p3==2.0.0
 pymongo==3.13.0
     # via
     #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   edx-opaque-keys
     #   event-tracking
@@ -1273,7 +1285,7 @@ python-dateutil==2.8.2
 python-levenshtein==0.20.9
     # via -r requirements/edx/testing.txt
 python-memcached==1.59
-    # via -r requirements/edx/testing.txt
+    # via -r requirements/edx/paver.txt
 python-slugify==8.0.0
     # via
     #   -r requirements/edx/testing.txt
@@ -1341,6 +1353,7 @@ regex==2022.10.31
     #   nltk
 requests==2.28.2
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   algoliasearch
     #   analytics-python
@@ -1416,6 +1429,7 @@ singledispatch==4.0.0
     # via -r requirements/edx/testing.txt
 six==1.16.0
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   analytics-python
     #   bleach
@@ -1524,6 +1538,7 @@ starlette==0.24.0
     #   fastapi
 stevedore==5.0.0
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   code-annotations
     #   edx-ace
@@ -1605,6 +1620,7 @@ uritemplate==4.1.1
     #   drf-yasg
 urllib3==1.26.14
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   elasticsearch
     #   geoip2
@@ -1636,7 +1652,7 @@ voluptuous==0.13.1
 vulture==2.7
     # via -r requirements/edx/development.in
 watchdog==2.2.1
-    # via -r requirements/edx/testing.txt
+    # via -r requirements/edx/paver.txt
 wcwidth==0.2.6
     # via
     #   -r requirements/edx/testing.txt
@@ -1665,6 +1681,7 @@ wheel==0.38.4
     #   pip-tools
 wrapt==1.14.1
     # via
+    #   -r requirements/edx/paver.txt
     #   -r requirements/edx/testing.txt
     #   astroid
     #   deprecated

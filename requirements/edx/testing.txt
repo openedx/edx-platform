@@ -62,7 +62,6 @@ attrs==22.2.0
     #   lti-consumer-xblock
     #   openedx-blockstore
     #   openedx-events
-    #   outcome
     #   pytest
 babel==2.11.0
     # via
@@ -1000,8 +999,6 @@ path-py==12.5.0
     #   edx-enterprise
     #   ora2
     #   staff-graded-xblock
-paver==1.3.4
-    # via -r requirements/edx/base.txt
 pbr==5.11.1
     # via
     #   -r requirements/edx/base.txt
@@ -1201,8 +1198,6 @@ python-dateutil==2.8.2
     #   xblock
 python-levenshtein==0.20.9
     # via -r requirements/edx/base.txt
-python-memcached==1.59
-    # via -r requirements/edx/base.txt
 python-slugify==8.0.0
     # via
     #   -r requirements/edx/base.txt
@@ -1368,11 +1363,9 @@ six==1.16.0
     #   optimizely-sdk
     #   pact-python
     #   pansi
-    #   paver
     #   py2neo
     #   pyjwkest
     #   python-dateutil
-    #   python-memcached
     #   tox
 slumber==0.7.1
     # via
@@ -1512,8 +1505,6 @@ voluptuous==0.13.1
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-watchdog==2.2.1
-    # via -r requirements/edx/base.txt
 wcwidth==0.2.6
     # via
     #   -r requirements/edx/base.txt
