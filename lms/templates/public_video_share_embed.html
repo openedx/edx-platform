@@ -93,10 +93,20 @@ from openedx.core.djangolib.markup import HTML
         branch.init('${branch_key | n, js_escaped_string}');
     </script>
 % endif
+
+<style type="text/css">
+#course-content {
+  margin: 0;
+}
+
+.xmodule_display.xmodule_VideoBlock .video {
+  padding: 0;
+}
+</style>
 </head>
 
 <body class="${static.dir_rtl()} view-in-course view-courseware courseware ${course.css_class or ''} lang_${LANGUAGE_CODE}">
-  <section class="course-content" id="course-content">
+  <section class="course-content" id="course-content" style="margin: 0;">
     ${HTML(fragment.body_html())}
   </section>
   <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}" async></script>
