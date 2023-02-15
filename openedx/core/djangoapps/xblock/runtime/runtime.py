@@ -256,13 +256,13 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == 'replace_urls':
             return ReplaceURLService(xblock=block, lookup_asset_url=self._lookup_asset_url)
         elif service_name == 'rebind_user':
-            # this service should ideally be initialized with all the arguments of get_module_system_for_user
+            # this service should ideally be initialized with all the arguments of prepare_runtime_for_user
             # but only the positional arguments are passed here as the other arguments are too
             # specific to the lms.block_render module
             return RebindUserService(
                 self.user,
                 context_key,
-                block_render.get_module_system_for_user,
+                block_render.prepare_runtime_for_user,
                 track_function=make_track_function(),
                 request_token=request_token(crum.get_current_request()),
             )

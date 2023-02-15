@@ -336,13 +336,19 @@ class XModuleMixin(XModuleFields, XBlock):
             'xmodule_runtime property is deprecated. Please use the runtime property instead.',
             DeprecationWarning, stacklevel=3,
         )
-        return self._runtime
+        return self.runtime
 
     @property
     def system(self):
         """
         Return the XBlock runtime (backwards compatibility alias provided for XModules).
+
+        Deprecated in favor of the runtime property.
         """
+        warnings.warn(
+            'system property is deprecated. Please use the runtime property instead.',
+            DeprecationWarning, stacklevel=3,
+        )
         return self.runtime
 
     @property
@@ -619,8 +625,8 @@ class XModuleMixin(XModuleFields, XBlock):
 
         # Skip rebinding if we're already bound a user, and it's this user.
         if self.scope_ids.user_id is not None and user_id == self.scope_ids.user_id:
-            if getattr(self._runtime, 'position', None):
-                self.position = self._runtime.position   # update the position of the tab
+            if getattr(self.runtime, 'position', None):
+                self.position = self.runtime.position   # update the position of the tab
             return
 
         # If we are switching users mid-request, save the data from the old user.
@@ -1017,7 +1023,7 @@ def descriptor_global_local_resource_url(block, uri):
 
 class MetricsMixin:
     """
-    Mixin for adding metric logging for render and handle methods in the DescriptorSystem and ModuleSystem.
+    Mixin for adding metric logging for render and handle methods in the DescriptorSystem.
     """
 
     def render(self, block, view_name, context=None):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -1478,6 +1484,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
     def get_block(self, usage_id, for_parent=None):
         """See documentation for `xblock.runtime:Runtime.get_block`"""
         block = self.load_item(usage_id, for_parent=for_parent)
+        # get_block_for_descriptor property is used to bind additional data such as user data
+        # to the XBlock and to check if the user has access to the block as may be required for
+        # the LMS or Preview.
         if getattr(self, 'get_block_for_descriptor', None):
             return self.get_block_for_descriptor(block)
         return block
@@ -1515,10 +1524,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
         return result
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        # Currently, Modulestore is responsible for instantiating DescriptorSystems
-        # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
-        # that implements the correct handler url. So, for now, instead, we will reference a
-        # global function that the application can override.
+        # When the Modulestore instantiates DescriptorSystems, we will reference a
+        # global function that the application can override, unless a specific function is
+        # defined for LMS/CMS through the handler_url_override property.
         if getattr(self, 'handler_url_override', None):
             return self.handler_url_override(block, handler_name, suffix, query, thirdparty)
         return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
@@ -1537,6 +1545,8 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
         """
         See :meth:`xblock.runtime.Runtime:applicable_aside_types` for documentation.
         """
+        # applicable_aside_types_override property can be used by LMS/CMS to define specific filters
+        # and conditions as may be applicable.
         if getattr(self, 'applicable_aside_types_override', None):
             return self.applicable_aside_types_override(block, applicable_aside_types=super().applicable_aside_types)
 
@@ -1588,11 +1598,13 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
         return service
 
     def wrap_aside(self, block, aside, view, frag, context):
+        # LMS/CMS can define custom wrap aside using wrap_asides_override as required.
         if getattr(self, 'wrap_asides_override', None):
             return self.wrap_asides_override(block, aside, view, frag, context, request_token=self.request_token)
         return super().wrap_aside(block, aside, view, frag, context)
 
     def layout_asides(self, block, context, frag, view_name, aside_frag_fns):
+        # LMS/CMS can define custom layout aside using layout_asides_override as required.
         if getattr(self, 'layout_asides_override', None):
             return self.layout_asides_override(block, context, frag, view_name, aside_frag_fns)
         return super().layout_asides(block, context, frag, view_name, aside_frag_fns)
@@ -1715,7 +1727,7 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
 
 
 class DoNothingCache:
-    """A duck-compatible object to use in ModuleSystem when there's no cache."""
+    """A duck-compatible object to use in ModuleSystemShim when there's no cache."""
     def get(self, _key):
         return None
 

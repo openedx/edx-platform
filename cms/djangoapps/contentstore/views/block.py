@@ -296,7 +296,7 @@ class StudioPermissionsService:
 def load_services_for_studio(runtime, user):
     """
     Function to set some required services used for XBlock edits and studio_view.
-    (i.e. whenever we're not loading preview module system.) This is required to make information
+    (i.e. whenever we're not loading _prepare_runtime_for_preview.) This is required to make information
     about the current user (especially permissions) available via services as needed.
     """
     services = {

@@ -26,7 +26,7 @@ from cms.djangoapps.xblock_config.models import StudioConfig
 from common.djangoapps import static_replace
 from common.djangoapps.student.tests.factories import UserFactory
 
-from ..preview import _preview_module_system, get_preview_fragment
+from ..preview import _prepare_runtime_for_preview, get_preview_fragment
 
 
 @ddt.ddt
@@ -214,7 +214,7 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         Tests that the 'user' and 'i18n' services are provided by the Studio runtime.
         """
         descriptor = BlockFactory(category="pure", parent=self.course)
-        _preview_module_system(
+        _prepare_runtime_for_preview(
             self.request,
             descriptor,
             self.field_data,
@@ -246,9 +246,9 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         self.field_data = mock.Mock()
         self.contentstore = contentstore()
         self.descriptor = BlockFactory(category="problem", parent=course)
-        _preview_module_system(
+        _prepare_runtime_for_preview(
             self.request,
-            descriptor=self.descriptor,
+            block=self.descriptor,
             field_data=mock.Mock(),
         )
         self.course = self.store.get_item(course.location)
@@ -305,9 +305,9 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         """Test anonymous_user_id on a block which uses per-student anonymous IDs"""
         # Create the runtime with the flag turned on.
         descriptor = BlockFactory(category="problem", parent=self.course)
-        _preview_module_system(
+        _prepare_runtime_for_preview(
             self.request,
-            descriptor=descriptor,
+            block=descriptor,
             field_data=mock.Mock(),
         )
         assert descriptor.runtime.anonymous_student_id == '26262401c528d7c4a6bbeabe0455ec46'
@@ -317,9 +317,9 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         """Test anonymous_user_id on a block which uses per-course anonymous IDs"""
         # Create the runtime with the flag turned on.
         descriptor = BlockFactory(category="lti", parent=self.course)
-        _preview_module_system(
+        _prepare_runtime_for_preview(
             self.request,
-            descriptor=descriptor,
+            block=descriptor,
             field_data=mock.Mock(),
         )
         assert descriptor.runtime.anonymous_student_id == 'ad503f629b55c531fed2e45aa17a3368'

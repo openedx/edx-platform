@@ -148,17 +148,17 @@ def preview_layout_asides(block, context, frag, view_name, aside_frag_fns, wrap_
     return result
 
 
-def _preview_module_system(request, descriptor, field_data):
+def _prepare_runtime_for_preview(request, block, field_data):
     """
-    Sets properties in the runtime of the specified descriptor that is
+    Sets properties in the runtime of the specified block that is
     required for rendering block previews.
 
     request: The active django request
     field_data: Wrapped field data for previews
     """
 
-    course_id = descriptor.location.course_key
-    display_name_only = (descriptor.category == 'static_tab')
+    course_id = block.location.course_key
+    display_name_only = (block.category == 'static_tab')
 
     replace_url_service = ReplaceURLService(course_id=course_id)
 
@@ -198,7 +198,7 @@ def _preview_module_system(request, descriptor, field_data):
         # the anonymous_user_id to specific courses. These are captured in the
         # block attribute 'requires_per_student_anonymous_id'. Please note,
         # the course_id field in AnynomousUserID model is blank if value is None.
-        if getattr(descriptor, 'requires_per_student_anonymous_id', False):
+        if getattr(block, 'requires_per_student_anonymous_id', False):
             preview_anonymous_user_id = anonymous_id_for_user(request.user, None)
         else:
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
@@ -220,26 +220,26 @@ def _preview_module_system(request, descriptor, field_data):
         'replace_urls': replace_url_service
     }
 
-    descriptor.runtime.get_block_for_descriptor = partial(_load_preview_block, request)
-    descriptor.runtime.mixins = settings.XBLOCK_MIXINS
+    block.runtime.get_block_for_descriptor = partial(_load_preview_block, request)
+    block.runtime.mixins = settings.XBLOCK_MIXINS
 
     # Set up functions to modify the fragment produced by student_view
-    descriptor.runtime.wrappers = wrappers
-    descriptor.runtime.wrappers_asides = wrappers_asides
-    descriptor.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
+    block.runtime.wrappers = wrappers
+    block.runtime.wrappers_asides = wrappers_asides
+    block.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
 
     # xmodules can check for this attribute during rendering to determine if
     # they are being rendered for preview (i.e. in Studio)
-    descriptor.runtime.is_author_mode = True
-    descriptor.runtime.handler_url_override = handler_url
-    descriptor.runtime.applicable_aside_types_override = preview_applicable_aside_types
-    descriptor.runtime.render_child_placeholder = partial(
+    block.runtime.is_author_mode = True
+    block.runtime.handler_url_override = handler_url
+    block.runtime.applicable_aside_types_override = preview_applicable_aside_types
+    block.runtime.render_child_placeholder = partial(
         render_child_placeholder,
-        wrap_block=descriptor.runtime.wrap_xblock
+        wrap_block=block.runtime.wrap_xblock
     )
-    descriptor.runtime.layout_asides_override = partial(
+    block.runtime.layout_asides_override = partial(
         preview_layout_asides,
-        wrap_aside=descriptor.runtime.wrap_aside
+        wrap_aside=block.runtime.wrap_aside
     )
 
 
@@ -270,9 +270,9 @@ def _load_preview_block(request, descriptor):
     else:
         wrapper = partial(LmsFieldData, student_data=student_data)
 
-    # wrap the _field_data upfront to pass to _preview_module_system
+    # wrap the _field_data upfront to pass to _prepare_runtime_for_preview
     wrapped_field_data = wrapper(descriptor._field_data)  # pylint: disable=protected-access
-    _preview_module_system(request, descriptor, wrapped_field_data)
+    _prepare_runtime_for_preview(request, descriptor, wrapped_field_data)
 
     descriptor.bind_for_student(
         request.user.id,

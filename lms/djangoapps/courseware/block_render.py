@@ -403,11 +403,11 @@ def get_block_for_descriptor(user, request, descriptor, field_data_cache, course
     )
 
 
-def get_module_system_for_user(
+def prepare_runtime_for_user(
         user,
         student_data,  # TODO
         # Arguments preceding this comment have user binding, those following don't
-        descriptor,
+        block,
         course_id,
         track_function,
         request_token,
@@ -421,14 +421,13 @@ def get_module_system_for_user(
         will_recheck_access=False,
 ):
     """
-    Helper function that returns a module system and student_data bound to a user and a descriptor.
+    Helper function that binds the given xblock to a user and student_data to a user and the block.
 
     The purpose of this function is to factor out everywhere a user is implicitly bound when creating a module,
-    to allow an existing block to be re-bound to a user.  Most of the user bindings happen when creating the
-    closures that feed the instantiation of ModuleSystem.
+    to allow an existing block to be re-bound to a user.
 
     The arguments fall into two categories: those that have explicit or implicit user binding, which are user
-    and student_data, and those don't and are just present so that ModuleSystem can be instantiated, which
+    and student_data, and those don't and are used to instantiate the service required in LMS, which
     are all the other arguments.  Ultimately, this isn't too different than how get_block_for_descriptor_internal
     was before refactoring.
 
@@ -437,7 +436,7 @@ def get_module_system_for_user(
         request_token (str): A token unique to the request use by xblock initialization
 
     Returns:
-        KvsFieldData:  student_data bound to, primarily, the user and descriptor
+        KvsFieldData:  student_data bound to, primarily, the user and block
     """
 
     def make_xqueue_callback(dispatch='score_update'):
@@ -449,7 +448,7 @@ def get_module_system_for_user(
             kwargs=dict(
                 course_id=str(course_id),
                 userid=str(user.id),
-                mod_id=str(descriptor.location),
+                mod_id=str(block.location),
                 dispatch=dispatch
             ),
         )
@@ -459,7 +458,7 @@ def get_module_system_for_user(
     # Default queuename is course-specific and is derived from the course that
     #   contains the current block.
     # TODO: Queuename should be derived from 'course_settings.json' of each course
-    xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
+    xqueue_default_queuename = block.location.org + '-' + block.location.course
 
     xqueue_service = XQueueService(
         construct_callback=make_xqueue_callback,
@@ -500,12 +499,12 @@ def get_module_system_for_user(
     # while giving selected modules a per-course anonymized id.
     # As we have the time to manually test more modules, we can add to the list
     # of modules that get the per-course anonymized id.
-    if getattr(descriptor, 'requires_per_student_anonymous_id', False):
+    if getattr(block, 'requires_per_student_anonymous_id', False):
         anonymous_student_id = anonymous_id_for_user(user, None)
     else:
         anonymous_student_id = anonymous_id_for_user(user, course_id)
 
-    user_is_staff = bool(has_access(user, 'staff', descriptor.location, course_id))
+    user_is_staff = bool(has_access(user, 'staff', block.location, course_id))
     user_service = DjangoXBlockUserService(
         user,
         user_is_staff=user_is_staff,
@@ -518,7 +517,7 @@ def get_module_system_for_user(
     rebind_user_service = RebindUserService(
         user,
         course_id,
-        get_module_system_for_user,
+        prepare_runtime_for_user,
         track_function=track_function,
         position=position,
         wrap_xblock_display=wrap_xblock_display,
@@ -552,9 +551,9 @@ def get_module_system_for_user(
         ))
 
     replace_url_service = ReplaceURLService(
-        data_directory=getattr(descriptor, 'data_dir', None),
+        data_directory=getattr(block, 'data_dir', None),
         course_id=course_id,
-        static_asset_path=static_asset_path or descriptor.static_asset_path,
+        static_asset_path=static_asset_path or block.static_asset_path,
         jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''})
     )
 
@@ -578,11 +577,11 @@ def get_module_system_for_user(
             del user.real_user.masquerade_settings
             user.real_user.masquerade_settings = masquerade_settings
         else:
-            staff_access = has_access(user, 'staff', descriptor, course_id)
+            staff_access = has_access(user, 'staff', block, course_id)
         if staff_access:
             block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
-    field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
+    field_data = DateLookupFieldData(block._field_data, course_id, user)  # pylint: disable=protected-access
     field_data = LmsFieldData(field_data, student_data)
 
     store = modulestore()
@@ -621,17 +620,15 @@ def get_module_system_for_user(
         'publish': EventPublishingService(user, course_id, track_function),
     }
 
-    descriptor.runtime.get_block_for_descriptor = inner_get_block
+    block.runtime.get_block_for_descriptor = inner_get_block
 
-    # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
-    descriptor.runtime.mixins = descriptor.runtime.mixologist._mixins  # lint-amnesty, pylint: disable=protected-access
-    descriptor.runtime.wrappers = block_wrappers
-    descriptor.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
-    descriptor.runtime.request_token = request_token
-    descriptor.runtime.wrap_asides_override = lms_wrappers_aside
-    descriptor.runtime.applicable_aside_types_override = lms_applicable_aside_types
+    block.runtime.wrappers = block_wrappers
+    block.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
+    block.runtime.request_token = request_token
+    block.runtime.wrap_asides_override = lms_wrappers_aside
+    block.runtime.applicable_aside_types_override = lms_applicable_aside_types
 
-    # pass position specified in URL to module through ModuleSystem
+    # pass position specified in URL to runtime
     if position is not None:
         try:
             position = int(position)
@@ -639,12 +636,12 @@ def get_module_system_for_user(
             log.exception('Non-integer %r passed as position.', position)
             position = None
 
-    descriptor.runtime.set('position', position)
+    block.runtime.set('position', position)
 
-    descriptor.runtime.set('user_is_staff', user_is_staff)
-    descriptor.runtime.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
-    descriptor.runtime.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
-    descriptor.runtime.set('days_early_for_beta', descriptor.days_early_for_beta)
+    block.runtime.set('user_is_staff', user_is_staff)
+    block.runtime.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
+    block.runtime.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
+    block.runtime.set('days_early_for_beta', block.days_early_for_beta)
 
     return field_data
 
@@ -664,10 +661,10 @@ def get_block_for_descriptor_internal(user, descriptor, student_data, course_id,
         request_token (str): A unique token for this request, used to isolate xblock rendering
     """
 
-    student_data = get_module_system_for_user(
+    student_data = prepare_runtime_for_user(
         user=user,
         student_data=student_data,  # These have implicit user bindings, the rest of args are considered not to
-        descriptor=descriptor,
+        block=descriptor,
         course_id=course_id,
         track_function=track_function,
         position=position,

@@ -2270,7 +2270,7 @@ class LMSXBlockServiceMixin(SharedModuleStoreTestCase):
         """
         Instantiate the runtem.
         """
-        _ = render.get_module_system_for_user(
+        _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2670,7 +2670,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         self.track_function = Mock()
         self.request_token = Mock()
         self.contentstore = contentstore()
-        _ = render.get_module_system_for_user(
+        _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2694,7 +2694,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
 
     @patch('lms.djangoapps.courseware.block_render.has_access', Mock(return_value=True, autospec=True))
     def test_user_is_staff(self):
-        _ = render.get_module_system_for_user(
+        _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2708,7 +2708,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
 
     @patch('lms.djangoapps.courseware.block_render.get_user_role', Mock(return_value='instructor', autospec=True))
     def test_get_user_role(self):
-        _ = render.get_module_system_for_user(
+        _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2724,10 +2724,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
 
     def test_anonymous_student_id_bug(self):
         """
-        Verifies that subsequent calls to get_module_system_for_user have no effect on each block runtime's
+        Verifies that subsequent calls to prepare_runtime_for_user have no effect on each block runtime's
         anonymous_student_id value.
         """
-        _ = render.get_module_system_for_user(
+        _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.problem_descriptor,
@@ -2739,7 +2739,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         # Ensure the problem block returns a per-user anonymous id
         assert self.problem_descriptor.runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
 
-        _ = render.get_module_system_for_user(
+        _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2755,7 +2755,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         assert self.problem_descriptor.runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
 
     def test_user_service_with_anonymous_user(self):
-        _ = render.get_module_system_for_user(
+        _ = render.prepare_runtime_for_user(
             AnonymousUser(),
             self.student_data,
             self.descriptor,
@@ -2771,7 +2771,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         assert not self.descriptor.runtime.get_user_role()
 
     def test_get_real_user(self):
-        _ = render.get_module_system_for_user(
+        _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.descriptor,
@@ -2816,7 +2816,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         XQUEUE_WAITTIME_BETWEEN_REQUESTS=15,
     )
     def test_xqueue_settings(self):
-        _ = render.get_module_system_for_user(
+        _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.descriptor,

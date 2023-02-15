@@ -68,7 +68,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
     def new_module_runtime(self, runtime=None, **kwargs):
         """
-        Generate a new ModuleSystem that is minimally set up for testing
+        Generate a new DescriptorSystem that is minimally set up for testing
         """
         if runtime:
             return prepare_block_runtime(runtime, course_id=self.course.id, **kwargs)

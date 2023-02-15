@@ -302,8 +302,8 @@ class SequenceBlock(
 
     def bind_for_student(self, user_id, wrappers=None):
         # The position of the child XBlock to select can also be passed in via the URL.
-        # In such cases the value is set on the ModuleSystem in get_module_system_for_user()
-        # and needs to be read here after the ModuleSystem has been set on the XBlock.
+        # In such cases the value is set in the runtime inside prepare_runtime_for_user()
+        # and needs to be read here after the value has been set.
         super().bind_for_student(user_id, wrappers)
         # If position is specified in system, then use that instead.
         position = getattr(self.runtime, 'position', None)
