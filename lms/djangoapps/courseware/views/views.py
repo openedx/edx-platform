@@ -1613,12 +1613,12 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         return render_to_response('courseware/courseware-chromeless.html', context)
 
 
-def _render_public_video_xblock(request, usage_key_string, is_=False):
+def _render_public_video_xblock(request, usage_key_string, is_embed=False):
     """
     Look up a given usage key and render the "public" view or the "embed" view
     """
     view = 'public_view'
-    if is_:
+    if is_embed:
         template = 'public_video_share_embed.html'
     else:
         template = 'public_video.html'
@@ -1647,7 +1647,7 @@ def _render_public_video_xblock(request, usage_key_string, is_=False):
         )
 
         fragment = block.render(view, context={
-            'public_video_embed': is_,
+            'public_video_embed': is_embed,
         })
 
         video_description = f"Watch a video from the course {course.display_name} "
@@ -1687,7 +1687,7 @@ def render_public_video_xblock_embed(request, usage_key_string):
     Returns an HttpResponse with HTML content for the Video xBlock with the given usage_key.
     The returned HTML consists of nothing but the Video xBlock content for use in social media embedding.
     """
-    return _render_public_video_xblock(request, usage_key_string, is_=True)
+    return _render_public_video_xblock(request, usage_key_string, is_embed=True)
 
 
 @require_http_methods(["GET"])
@@ -1699,7 +1699,7 @@ def render_public_video_xblock(request, usage_key_string):
     Returns an HttpResponse with HTML content for the Video xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the Video xBlock (excluding content of the containing courseware).
     """
-    return _render_public_video_xblock(request, usage_key_string, is_=False)
+    return _render_public_video_xblock(request, usage_key_string, is_embed=False)
 
 
 def get_optimization_flags_for_content(block, fragment):
