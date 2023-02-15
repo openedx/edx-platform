@@ -42,7 +42,7 @@ class VerticalFields:
     discussion_enabled = Boolean(
         display_name=_("Enable in-context discussions for the Unit"),
         help=_("Add discussion for the Unit."),
-        default=True,
+        default=False,
         scope=Scope.settings,
     )
 
