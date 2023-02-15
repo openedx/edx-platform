@@ -155,7 +155,7 @@ def anonymous_id_for_user(user, course_id):
         hasher.update(str(user.id).encode('utf8'))
         if course_id:
             hasher.update(str(course_id).encode('utf-8'))
-        anonymous_user_id = hasher.hexdigest(16)  # pylint: disable=too-many-function-args
+        anonymous_user_id = hasher.hexdigest(16)
 
         try:
             AnonymousUserId.objects.create(
