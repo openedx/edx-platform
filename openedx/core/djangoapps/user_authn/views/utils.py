@@ -104,6 +104,7 @@ def get_mfe_context(request, redirect_to, tpa_hint=None):
     country_code = country_code_from_ip(ip_address)
     context = third_party_auth_context(request, redirect_to, tpa_hint)
     context.update({
-        'countryCode': country_code,
+        "countryCode": country_code,
+        "userIp": ip_address,
     })
     return context
