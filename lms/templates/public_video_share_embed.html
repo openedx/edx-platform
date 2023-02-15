@@ -106,7 +106,7 @@ from openedx.core.djangolib.markup import HTML
 </head>
 
 <body class="${static.dir_rtl()} view-in-course view-courseware courseware ${course.css_class or ''} lang_${LANGUAGE_CODE}">
-  <section class="course-content" id="course-content" style="margin: 0;">
+  <section class="course-content" id="course-content">
     ${HTML(fragment.body_html())}
   </section>
   <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}" async></script>
