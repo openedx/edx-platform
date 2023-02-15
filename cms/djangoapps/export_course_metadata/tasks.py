@@ -13,9 +13,9 @@ from openedx.core.djangoapps.schedules.content_highlights import get_all_course_
 from .storage import course_metadata_export_storage
 
 
-@shared_task
+@shared_task(bind=True)
 @set_code_owner_attribute
-def export_course_metadata_task(course_key_string):
+def export_course_metadata_task(self, course_key_string):  # pylint: disable=unused-argument
     """
     Export course metadata
 
