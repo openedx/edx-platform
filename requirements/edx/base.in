@@ -11,7 +11,6 @@
 -c ../constraints.txt
 
 -r github.in              # Forks and other dependencies not yet on PyPI
--r paver.txt              # Requirements for running paver commands
 
 # Please follow these guidelines whenever you change this file:
 #

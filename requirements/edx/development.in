@@ -12,6 +12,7 @@
 
 -r pip-tools.txt                        # pip-tools and its dependencies, for managing requirements files
 -r testing.txt                          # Dependencies for running the various test suites
+-r paver.txt                            # Requirements for running paver commands
 
 click                                   # Used for perf_tests utilities in modulestore
 django-debug-toolbar                    # A set of panels that display debug information about the current request/response
