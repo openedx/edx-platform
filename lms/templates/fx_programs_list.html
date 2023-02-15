@@ -1,0 +1,23 @@
+<%page expression_filter="h"/> 
+<%inherit file="main.html" />  
+<%namespace name='static' file='static_content.html'/> 
+<%!from django.utils.translation import ugettext as _ %>
+
+<div class="list-courses">
+    <div class="container-fluid">
+        <h2 class="title">
+            ${_("Programs")}
+            <span class="text-dark" style="font-size: 22px">(<span id="program_count"></span> certificate)</span>
+        </h2>
+        <div class="row">
+            <div class="card-deck">
+                <!-- Để trống cho các thẻ chứa dữ liệu khóa học -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+<script  src="${static.url('fx_programs/script_1.js')}"></script>
+
