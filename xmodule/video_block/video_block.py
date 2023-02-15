@@ -392,7 +392,7 @@ class VideoBlock(
         # true, but now staff or admin have hidden the autoadvance button and the student won't be able to disable
         # it anymore; therefore we force-disable it in this case (when controls aren't visible).
         autoadvance_this_video = self.auto_advance and autoadvance_enabled
-
+        is_embed = context.get('public_video_embed', False)
         metadata = {
             'autoAdvance': autoadvance_this_video,
             # For now, the option "data-autohide-html5" is hard coded. This option
@@ -427,7 +427,9 @@ class VideoBlock(
             'savedVideoPosition': self.saved_video_position.total_seconds(),  # pylint: disable=no-member
             'saveStateEnabled': view != PUBLIC_VIEW,
             'saveStateUrl': self.ajax_url + '/save_user_state',
-            'showCaptions': json.dumps(self.show_captions),
+            # Despite the setting on the block, don't show transcript by default
+            # if the video is embedded in social media
+            'showCaptions': json.dumps(self.show_captions and not is_embed),
             'sources': sources,
             'speed': self.speed,
             'start': self.start_time.total_seconds(),  # pylint: disable=no-member
@@ -453,7 +455,6 @@ class VideoBlock(
 
         bumperize(self)
 
-        is_embed = context.get('public_video_embed', False)
         template_context = {
             'autoadvance_enabled': autoadvance_enabled,
             'branding_info': branding_info,
