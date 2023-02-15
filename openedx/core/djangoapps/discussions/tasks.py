@@ -202,7 +202,7 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         subsections_with_discussions = set()
         for vertical in verticals:
             if vertical.location in discussible_units:
-                # vertical.discussion_enabled = True
+                vertical.discussion_enabled = True
                 subsections_with_discussions.add(vertical.parent)
             else:
                 vertical.discussion_enabled = False
