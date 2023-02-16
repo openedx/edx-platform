@@ -52,7 +52,7 @@ THIRD_PARTY_APPS = {
     'drf_yasg': 'https://github.com/axnsan12/drf-yasg',
     'edx_sga': 'https://github.com/mitodl/edx-sga',
     'lx_pathway_plugin': 'https://github.com/open-craft/lx-pathway-plugin',
-    'oauth2_provider': 'https://github.com/evonove/django-oauth-toolkit',
+    'oauth2_provider': 'https://github.com/jazzband/django-oauth-toolkit',
     'rest_framework': 'https://github.com/encode/django-rest-framework',
     'simple_history': 'https://github.com/treyhunner/django-simple-history',
     'social_django': 'https://github.com/python-social-auth/social-app-django',
