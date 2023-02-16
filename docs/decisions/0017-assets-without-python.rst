@@ -63,15 +63,15 @@ There are three actions a developer or a deployment pipeline may need to take on
 
 * **Build:** Compile, generate, copy, and otherwise process static assets so that they can be used by the Django webserver or collected elsewhere. For many Web applications, all static asset building would be coordinated via Webpack or another NPM-managed tool. Due to the age of edx-platform and its legacy XModule and Comprehensive Themeing systems, though, there are five specific build steps, which generally need to be performed in this  order:
 
-  #. **Copy NPM-installed assets** from node_modules to places where they can be used by certain especially-old edx-platform frontends that do not work with NPM.
+  #. **Copy npm-installed assets** from node_modules to places where they can be used by certain especially-old edx-platform frontends that do not work with NPM.
 
-  #. **Copy XModule assets** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation.
+  #. **Copy XModule Fragments** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation.
 
   #. **Run Webpack** to shim, minify, and bundle JS modules.
 
-  #. **Compile Default SCSS** into CSS.
+  #. **Compile Default SCSS** for legacy LMS and CMS frontends into CSS.
 
-  #. **Compile Theme SCSS** into CSS from some number of operator-specified theme directories, using default SCSS as a base.
+  #. **Compile Theme SCSS** for legacy LMS and CMS frontends into CSS. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
 
 * **Collect:** Copy static assets from edx-platform to another location (the ``STATIC_ROOT``) so that they can be efficiently served *without* Django's webserver. This step, by nature, requires Python and Django in order to find and organize the assets, which may come from edx-platform itself or from its many installed Python and NPM packages. This is only done for production environments, where it is usually desirable to serve assets with something efficient like NGINX.
 
