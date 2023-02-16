@@ -741,13 +741,14 @@ def get_programs_for_organization(organization):
     return cache.get(PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL.format(org_key=organization))
 
 
-def get_course_data(course_key_str, fields):
+def get_course_data(course_key_str, fields, querystring=None):
     """
     Retrieve information about the course with the given course key.
 
     Arguments:
         course_key_str: key for the course about which we are retrieving information.
         fields (List, string): The given fields that you want to retrieve from API response.
+        querystring (dict): Optional query string parameters.
 
     Returns:
         dict with details about specified course.
@@ -767,7 +768,8 @@ def get_course_data(course_key_str, fields):
                 cache_key=course_cache_key if catalog_integration.is_cache_enabled else None,
                 long_term_cache=True,
                 many=False,
-                fields=fields
+                fields=fields,
+                querystring=querystring
             )
             if data:
                 return data
