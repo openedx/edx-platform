@@ -65,7 +65,7 @@ There are three actions a developer or a deployment pipeline may need to take on
 
   #. **Copy NPM-installed assets** from node_modules to places where they can be used by certain especially-old edx-platform frontends that do not work with NPM.
 
-  # **Copy XModule assets** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation.
+  #. **Copy XModule assets** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation.
 
   #. **Run Webpack** to shim, minify, and bundle JS modules.
 
