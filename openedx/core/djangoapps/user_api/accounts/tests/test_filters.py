@@ -83,11 +83,9 @@ class TestAccountSettingsRender(PipelineStep):
 
     def run_filter(self, context, template_name):  # pylint: disable=arguments-differ
         """Pipeline step that returns a custom response when rendering the account settings page."""
-        context += {
-            'test': 'test',
-        }
+        template_name = 'static_templates/about.html'
         return {
-            'context': context, template_name: template_name,
+            "context": context, "template_name": template_name,
         }
 
 
@@ -124,7 +122,7 @@ class TestAccountSettingsFilters(SharedModuleStoreTestCase):
         """
         response = self.client.get(self.account_settings_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.context['test'], 'test')
+        self.assertContains(response, "This page left intentionally blank. Feel free to add your own content.")
 
     @override_settings(
         OPEN_EDX_FILTERS_CONFIG={
@@ -217,7 +215,7 @@ class TestAccountSettingsFilters(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(f"{reverse('dashboard')}", response.url)
 
-@override_settings(OPEN_EDX_FILTERS_CONFIG={})
+    @override_settings(OPEN_EDX_FILTERS_CONFIG={})
     def test_account_settings_render_without_filter_config(self):
         """
         Test whether the course about filter is triggered before the course about
@@ -230,4 +228,4 @@ class TestAccountSettingsFilters(SharedModuleStoreTestCase):
         """
         response = self.client.get(self.course_about_url)
 
-        self.assertNotContains(response, "View About Page in studio", status_code=200)
+        self.assertNotContains(response, "This page left intentionally blank. Feel free to add your own content.")

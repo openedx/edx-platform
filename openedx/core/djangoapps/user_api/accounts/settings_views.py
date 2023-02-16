@@ -81,7 +81,7 @@ def account_settings(request):
         # .. filter_implemented_name: AccountSettingsRenderStarted
         # .. filter_type: org.openedx.learning.student.settings.render.started.v1
         context, account_settings_template = AccountSettingsRenderStarted.run_filter(
-            context=context, account_settings_template=account_settings_template,
+            context=context, template_name=account_settings_template,
         )
     except AccountSettingsRenderStarted.RenderInvalidAccountSettings as exc:
         response = render_to_response(exc.account_settings_template, exc.template_context)
