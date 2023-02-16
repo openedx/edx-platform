@@ -54,6 +54,7 @@ from openedx.features.enterprise_support.api import enterprise_enabled
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
 RENDER_VIDEO_XBLOCK_NAME = 'render_public_video_xblock'
+RENDER_VIDEO_XBLOCK_EMBED_NAME = 'render_public_video_xblock_embed'
 COURSE_PROGRESS_NAME = 'progress'
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -330,6 +331,12 @@ urlpatterns += [
         courseware_views.render_public_video_xblock,
         name=RENDER_VIDEO_XBLOCK_NAME,
     ),
+    re_path(
+        fr'^videos/{settings.USAGE_KEY_PATTERN}/embed$',
+        courseware_views.render_public_video_xblock_embed,
+        name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
+    ),
+
 
     # xblock Resource URL
     re_path(

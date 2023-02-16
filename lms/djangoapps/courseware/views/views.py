@@ -8,7 +8,7 @@ import logging
 import urllib
 from collections import OrderedDict, namedtuple
 from datetime import datetime
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urljoin
 
 import bleach
 import requests
@@ -86,7 +86,7 @@ from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_stu
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
-from lms.djangoapps.courseware.toggles import course_is_invitation_only
+from lms.djangoapps.courseware.toggles import course_is_invitation_only, PUBLIC_VIDEO_SHARE
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.utils import (
     _use_new_financial_assistance_flow,
@@ -1613,20 +1613,22 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         return render_to_response('courseware/courseware-chromeless.html', context)
 
 
-@require_http_methods(["GET"])
-@ensure_valid_usage_key
-@xframe_options_exempt
-@transaction.non_atomic_requests
-def render_public_video_xblock(request, usage_key_string):
+def _render_public_video_xblock(request, usage_key_string, is_embed=False):
     """
-    Returns an HttpResponse with HTML content for the Video xBlock with the given usage_key.
-    The returned HTML is a chromeless rendering of the Video xBlock (excluding content of the containing courseware).
+    Look up a given usage key and render the "public" view or the "embed" view
     """
     view = 'public_view'
+    if is_embed:
+        template = 'public_video_share_embed.html'
+    else:
+        template = 'public_video.html'
 
     usage_key = UsageKey.from_string(usage_key_string)
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     course_key = usage_key.course_key
+
+    if not PUBLIC_VIDEO_SHARE.is_enabled(course_key):
+        raise Http404("Video not found.")
 
     # usage key block type must be `video` else raise 404
     if usage_key.block_type != 'video':
@@ -1644,15 +1646,26 @@ def render_public_video_xblock(request, usage_key_string):
             will_recheck_access=False
         )
 
-        # video must be public (`Public Access` field set to True) by course author in studio in video advanced settings
-        if not block.public_access:
-            raise Http404("Video not found.")
+        fragment = block.render(view, context={
+            'public_video_embed': is_embed,
+        })
 
-        fragment = block.render(view, context={})
+        video_description = f"Watch a video from the course {course.display_name} "
+        if course.display_organization is not None:
+            video_description += f"by {course.display_organization} "
+        video_description += "on edX.org"
 
         context = {
             'fragment': fragment,
             'course': course,
+            'video_title': block.display_name_with_default,
+            'video_description': video_description,
+            'video_thumbnail': "https://www.edx.org/images/logos/edx-logo-elm.svg",
+            # 'video_thumbnail': "https://i.ytimg.com/vi/Kauv7MVPcsA/maxresdefault.jpg",
+            'video_embed_url': urljoin(
+                settings.LMS_ROOT_URL,
+                reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(usage_key)})
+            ),
             'disable_accordion': False,
             'allow_iframing': True,
             'disable_header': False,
@@ -1662,7 +1675,31 @@ def render_public_video_xblock(request, usage_key_string):
             'is_learning_mfe': True,
             'is_mobile_app': False,
         }
-        return render_to_response('courseware/courseware-chromeless.html', context)
+        return render_to_response(template, context)
+
+
+@require_http_methods(["GET"])
+@ensure_valid_usage_key
+@xframe_options_exempt
+@transaction.non_atomic_requests
+def render_public_video_xblock_embed(request, usage_key_string):
+    """
+    Returns an HttpResponse with HTML content for the Video xBlock with the given usage_key.
+    The returned HTML consists of nothing but the Video xBlock content for use in social media embedding.
+    """
+    return _render_public_video_xblock(request, usage_key_string, is_embed=True)
+
+
+@require_http_methods(["GET"])
+@ensure_valid_usage_key
+@xframe_options_exempt
+@transaction.non_atomic_requests
+def render_public_video_xblock(request, usage_key_string):
+    """
+    Returns an HttpResponse with HTML content for the Video xBlock with the given usage_key.
+    The returned HTML is a chromeless rendering of the Video xBlock (excluding content of the containing courseware).
+    """
+    return _render_public_video_xblock(request, usage_key_string, is_embed=False)
 
 
 def get_optimization_flags_for_content(block, fragment):
