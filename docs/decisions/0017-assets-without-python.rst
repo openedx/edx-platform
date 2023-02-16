@@ -52,13 +52,14 @@ New Open edX frontend development has largely moved to React-based micro-fronten
      - React
      - Remove as part of full LMS/CMS frontend replatforming
 
-(Note that this table excludes HTML templates. Templates are part of the frontend, but they are dynamically rendered by the Web application and therefore must be handled differently than static assets.)
+*Note: this table excludes HTML templates. Templates are part of the frontend, but they are dynamically rendered by the Web application and therefore must be handled differently than static assets.*
 
 So, with the exception of XBlock fragments and pip-installed assets, which are very simple for edx-platform to handle, we plan to eventually remove all edx-platform static frontend assets. However, given the number of remaining edx-platform frontends and speed at which they are currently being replatformed, estimates for completion of this process range from one to five years. Thus, in the medium term future, we feel that timeboxed improvements to how edx-platform handles static assets are worthwhile, especially when they address an acute pain point.
 
 In particular, three recent issues have surfaced in Developer Experience Working Group discussions, each with some mitigations involving static assets:
 
 .. list-table::
+   :header-rows: 1
 
    * - Problem
      - Potential solutions
@@ -70,7 +71,7 @@ In particular, three recent issues have surfaced in Developer Experience Working
      - Remove all Python dependencies from the static asset build process, such that changes to Python code or requirements do not always have to result in a static asset rebuild.
 
    * - In Tutor, using a local copy of edx-platform overwrites the Docker image's pre-installed node_modules and pre-built static assets, requiring developers to reinstall & rebuild in order to get a working platform.
-     - Parameterize the edx-platform asset build, such that it may search for node_modules outside of edx-platform and genreate assets outside of edx-platform.
+     - Better parameterize the input and output paths edx-platform asset build, such that it may search for node_modules outside of edx-platform and generate assets outside of edx-platform.
 
 There are three actions a developer or a deployment pipeline may need to take on edx-platform static assets:
 
