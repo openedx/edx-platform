@@ -54,20 +54,33 @@ New Open edX frontend development has largely moved to React-based micro-fronten
 
 (Note that this table excludes HTML templates. Templates are part of the frontend, but they are dynamically rendered by the Web application and therefore must be handled differently than static assets.)
 
-So with the exception of XBlock fragments and pip-installed assets, which are very simple for edx-platform to handle, we plan to eventually remove all edx-platform static frontend assets. However, given the number of remaining edx-platform frontends and speed at which they are currently being replatformed, estimates for completion of this process range from one to five years. Thus, in the medium term future, we feel that timeboxed improvements to how edx-platform handles static assets are worthwhile.
+So, with the exception of XBlock fragments and pip-installed assets, which are very simple for edx-platform to handle, we plan to eventually remove all edx-platform static frontend assets. However, given the number of remaining edx-platform frontends and speed at which they are currently being replatformed, estimates for completion of this process range from one to five years. Thus, in the medium term future, we feel that timeboxed improvements to how edx-platform handles static assets are worthwhile, especially when they address an acute pain point.
 
-Types of asset processing
-=========================
+In particular, three recent issues have surfaced in Developer Experience Working Group discussions, each with some mitigations involving static assets:
+
+.. list-table::
+
+   * - Problem
+     - Potential solutions
+
+   * - edx-platform Docker images are too large and/or take too long to build.
+     - Switch from large, legacy tooling packages (such as libsass-python and paver) to industry standard, precompiled ones (like node-sass or dart-sass). Remove unneccessary & slow calls to Django management commands.
+
+   * - edx-platform Docker image layers seem to be rebuilt more often than they should.
+     - Remove all Python dependencies from the static asset build process, such that changes to Python code or requirements do not always have to result in a static asset rebuild.
+
+   * - In Tutor, using a local copy of edx-platform overwrites the Docker image's pre-installed node_modules and pre-built static assets, requiring developers to reinstall & rebuild in order to get a working platform.
+     - Parameterize the edx-platform asset build, such that it may search for node_modules outside of edx-platform and genreate assets outside of edx-platform.
 
 There are three actions a developer or a deployment pipeline may need to take on edx-platform static assets:
 
 * **Build:** Compile, generate, copy, and otherwise process static assets so that they can be used by the Django webserver or collected elsewhere. For many Web applications, all static asset building would be coordinated via Webpack or another NPM-managed tool. Due to the age of edx-platform and its legacy XModule and Comprehensive Themeing systems, though, there are five specific build steps, which generally need to be performed in this  order:
 
-  #. **Copy npm-installed assets** from node_modules to places where they can be used by certain especially-old edx-platform frontends that do not work with NPM.
+  #. **Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
 
-  #. **Copy XModule Fragments** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation.
+  #. **Copy XModule Fragments** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation. This is done for a hard-coded list of XModule-style XBlocks, which are not growing in number; it is *not* a problem for in-repository pure XBlock Fragments or pip-installed XBlock assets, which are ready-to-serve.
 
-  #. **Run Webpack** to shim, minify, and bundle JS modules.
+  #. **Run Webpack** to shim, minify, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
 
   #. **Compile Default SCSS** for legacy LMS and CMS frontends into CSS.
 
