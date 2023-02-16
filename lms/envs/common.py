@@ -228,7 +228,7 @@ FEATURES = {
 
     # Allows to configure the LMS to provide CORS headers to serve requests from other
     # domains
-    'ENABLE_CORS_HEADERS': False,
+    'ENABLE_CORS_HEADERS': True,
 
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     # .. toggle_name: FEATURES['COURSES_ARE_BROWSABLE']
