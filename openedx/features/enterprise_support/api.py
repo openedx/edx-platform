@@ -836,7 +836,7 @@ def get_enterprise_course_enrollments(user):
     """
 
     return EnterpriseCourseEnrollment.objects.select_related(
-        'licensedenterprisecourseenrollment_enrollment_fulfillment',
+        'licensed_with',
         'enterprise_customer_user'
     ).prefetch_related(
         'enterprise_customer_user__enterprise_customer'
