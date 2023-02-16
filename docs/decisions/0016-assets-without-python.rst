@@ -19,38 +19,38 @@ New Open edX frontend development has largely moved to React-based micro-fronten
 .. list-table::
    :header-rows: 1
 
-* - **Name**
-  - Description
-  - Example
-  - Expected direction
-* - **XBlock Fragments**
-  - JS and CSS belonging to the pure XBlocks defined in edx-platform
-  - library_sourced_block.js
-  - Keep, or extract to per-XBlock repositories
-* - **XModule Fragments**
-  - JS and SCSS belonging to the older XModule-style XBlocks defined in edx-platform
-  - ProblemBlock (aka CAPA) assets
-  - Convert to pure XBlock fragments
-* - **Legacy LMS Frontends**
-  - JS, SCSS, and other resources powering LMS views that have not yet been replatformed into MFEs
-  - Instructor Dashboard assets
-  - Replatform & DEPR
-* - **Legacy CMS Frontends**
-  - JS, SCSS, and other resources powering Studio views that have not yet been replatformed into MFEs
-  - Course outline editor and unit editor
-  - Replatform & DEPR
-* - **Shared Frontend Files**
-  - JS modules, SCSS partials, and other resources, usable by both Legacy LMS and CMS Frontends. This includes a few libraries that have been committed to edx-platform in their entirety.
-  - Legacy cookie policy banner; CodeMirror
-  - Remove as part of full LMS/CMS frontend replatforming
-* - **pip-installed Assets**
-  - Pre-compiled static assets shipped with several Python libraries that we install, including XBlocks. Not committed to edx-platform.
-  - Django Admin, Swagger, Drag-And-Drop XBlock V2
-  - Keep
-* - **npm-installed Assets**
-  - JS modules and CSS files installed via NPM. Not committed to edx-platform.
-  - React
-  - Remove as part of full LMS/CMS frontend replatforming
+   * - **Name**
+     - Description
+     - Example
+     - Expected direction
+   * - **XBlock Fragments**
+     - JS and CSS belonging to the pure XBlocks defined in edx-platform
+     - library_sourced_block.js
+     - Keep, or extract to per-XBlock repositories
+   * - **XModule Fragments**
+     - JS and SCSS belonging to the older XModule-style XBlocks defined in edx-platform
+     - ProblemBlock (aka CAPA) assets
+     - Convert to pure XBlock fragments
+   * - **Legacy LMS Frontends**
+     - JS, SCSS, and other resources powering LMS views that have not yet been replatformed into MFEs
+     - Instructor Dashboard assets
+     - Replatform & DEPR
+   * - **Legacy CMS Frontends**
+     - JS, SCSS, and other resources powering Studio views that have not yet been replatformed into MFEs
+     - Course outline editor and unit editor
+     - Replatform & DEPR
+   * - **Shared Frontend Files**
+     - JS modules, SCSS partials, and other resources, usable by both Legacy LMS and CMS Frontends. This includes a few libraries that have been committed to edx-platform in their entirety.
+     - Legacy cookie policy banner; CodeMirror
+     - Remove as part of full LMS/CMS frontend replatforming
+   * - **pip-installed Assets**
+     - Pre-compiled static assets shipped with several Python libraries that we install, including XBlocks. Not committed to edx-platform.
+     - Django Admin, Swagger, Drag-And-Drop XBlock V2
+     - Keep
+   * - **npm-installed Assets**
+     - JS modules and CSS files installed via NPM. Not committed to edx-platform.
+     - React
+     - Remove as part of full LMS/CMS frontend replatforming
 
 (Note that this table excludes HTML templates. Templates are part of the frontend, but they are dynamically rendered by the Web application and therefore must be handled differently than static assets.)
 
@@ -94,7 +94,7 @@ Today, there are two main ways an operators would perform these actions:
 Python used in the asset build
 ==============================
 
-
+.
 
 Etc
 ===
