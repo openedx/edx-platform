@@ -84,13 +84,10 @@ WIP: Move these links
 .. _paver: https://github.com/openedx/tutor/tree/open-release/olive.1/pavelib
 .. _openedx-assets: https://github.com/overhangio/tutor/blob/v15.0.0/tutor/templates/build/openedx/bin/openedx-assets.
 
-Updating the asset build pipeline will be necessary for several current and upcoming efforts, including:
-
 * `Finish upgrading frontend frameworks <https://github.com/openedx/edx-platform/issues/31616>`_
 * `Move node_modules outside of edx-platform in Tutor's openedx image <https://github.com/openedx/wg-developer-experience/issues/150>`_
 * `Move static assets outside of edx-platform in Tutor's openedx image <https://github.com/openedx/wg-developer-experience/issues/151>`_
 
-This has caused us to consider the value of updating the asset pipeline in place, versus rewriting and simplying it first.
 
 Decision
 ********
