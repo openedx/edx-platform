@@ -6,7 +6,7 @@ Status
 
 Pending
 
-Will be moved to *Accepted* upon completion of re-implementation.
+Will be moved to *Accepted* upon completion of reimplementation.
 
 Context
 *******
@@ -68,25 +68,15 @@ Three particular issues have surfaced in Developer Experience Working Group disc
      - Potential solution(s)
 
    * - edx-platform Docker images are too large and/or take too long to build.
-     - Switch from large, legacy tooling packages (such as libsass-python and paver) to industry standard, precompiled ones (like node-sass or dart-sass). Remove unneccessary & slow calls to Django management commands.
+     - Switch from large, legacy tooling packages (such as libsass-python and paver) to industry standard, pre-compiled ones (like node-sass or dart-sass). Remove unnecessary & slow calls to Django management commands.
 
    * - edx-platform Docker image layers seem to be rebuilt more often than they should.
      - Remove all Python dependencies from the static asset build process, such that changes to Python code or requirements do not always have to result in a static asset rebuild.
 
    * - In Tutor, using a local copy of edx-platform overwrites the Docker image's pre-installed node_modules and pre-built static assets, requiring developers to reinstall & rebuild in order to get a working platform.
-     - Better parameterize the input and output paths edx-platform asset build, such that it may search for node_modules outside of edx-platform and generate assets outside of edx-platform.
+     - Better parameterize the input and output paths edx-platform asset build, such that it may `search for node_modules outside of edx-platform <https://github.com/openedx/wg-developer-experience/issues/150> and `generate assets outside of edx-platform <https://github.com/openedx/wg-developer-experience/issues/151>`.
 
 All of these potential solutions would involve refactoring or entirely replacing parts of the current asset processing system.
-
-WIP: Move these links
-=====================
-
-.. _paver: https://github.com/openedx/tutor/tree/open-release/olive.1/pavelib
-.. _openedx-assets: https://github.com/overhangio/tutor/blob/v15.0.0/tutor/templates/build/openedx/bin/openedx-assets.
-
-* `Finish upgrading frontend frameworks <https://github.com/openedx/edx-platform/issues/31616>`_
-* `Move node_modules outside of edx-platform in Tutor's openedx image <https://github.com/openedx/wg-developer-experience/issues/150>`_
-* `Move static assets outside of edx-platform in Tutor's openedx image <https://github.com/openedx/wg-developer-experience/issues/151>`_
 
 
 Decision
@@ -103,6 +93,9 @@ We will largely reimplement edx-platform's asset processing system. We will aim 
 
 Consequences
 ************
+
+Reimplementation Specification
+==============================
 
 The three top-level edx-platform asset processing actions are *build*, *collect*, and *watch*. The build action can be further broken down into five stages. Here is how those actions and stages will be reimplemented:
 
@@ -134,7 +127,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Pure Bash reimplementation.
  
-   * - + **Build stage 2: Copy XModule framents** from the xmodule source tree over to input directories for Webpack and SCSS compilation. This is required for a hard-coded list of old XModule-style XBlocks. This is not required for new pure XBlocks, which include (or pip-install) their assets into edx-platform as ready-to-serve JS/CSS/etc fragments.
+   * - + **Build stage 2: Copy XModule fragments** from the xmodule source tree over to input directories for Webpack and SCSS compilation. This is required for a hard-coded list of old XModule-style XBlocks. This is not required for new pure XBlocks, which include (or pip-install) their assets into edx-platform as ready-to-serve JS/CSS/etc fragments.
 
      - ``paver process_xmodule_assets``, or
 
@@ -156,7 +149,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
      - ``assets/build.sh webpack``
 
-       Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up. Open edX distributions, such as Tutor, can choose how to supply the Django-setting-dervied parameters in an efficient manner.
+       Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up. Open edX distributions, such as Tutor, can choose how to supply the Django-setting-derived parameters in an efficient manner.
    
    * - + **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
@@ -164,13 +157,13 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Paver task that invokes ``sass.compile`` (from the libsass Python package) and ``rtlcss`` (installed by npm) for several different directories of SCSS.
 
-       Note: libsass is pinned to a 2015 version with a non-trivial upgrade path. Installing it requires compiling a large C extension, noticably affecting Docker image build time.
+       Note: libsass is pinned to a 2015 version with a non-trivial upgrade path. Installing it requires compiling a large C extension, noticeably affecting Docker image build time.
 
      - ``assets/build.sh common``
 
        Bash reimplementation, calling ``node-sass`` and ``rtlcss``.
    
-       The initial implementation of build.sh may use ``sassc``, a CLI provided by libsass, instead of node-sass. Then, ``sassc`` can be replaced by ``node-sass`` as part of a subsequent frontend framework upgrade effort.
+       The initial implementation of build.sh may use ``sassc``, a CLI provided by libsass, instead of node-sass. Then, ``sassc`` can be replaced by ``node-sass`` as part of a subsequent `edx-platform frontend framework upgrade effort <https://github.com/openedx/edx-platform/issues/31616>`_.
 
    * - + **Build stage 5: Compiled themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
 
@@ -208,26 +201,57 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
      - ``assets/build.sh --watch <stage>``
 
-       where ``<stage>`` if one of the build stages described above
+       (where ``<stage>`` is optionally one of the build stages described above. If provided, only that stage's assets will be watched.)
 
-       Bash wrapprers around invocation(s) of `watchman <https://facebook.github.io/watchman/>`_, a popular file-watching library maintained by Meta. Watchman is already installed into edx-platform (and other services) via the pywatchman pip wrapper package.
+       Bash wrappers around invocation(s) of `watchman <https://facebook.github.io/watchman/>`_, a popular file-watching library maintained by Meta. Watchman is already installed into edx-platform (and other services) via the pywatchman pip wrapper package.
 
-       Note: This adds a Python dependency to build.sh. However, we could be clear that watchman is an *optional* dependency of build.sh, enabling the optional ``--watch`` feature. This would keep the *build* action Python-free. Alternatively, watchman is also availble Python-free via apt and homebrew.
+       Note: This adds a Python dependency to build.sh. However, we could be clear that watchman is an *optional* dependency of build.sh which enables the optional ``--watch`` feature. This would keep the *build* action Python-free. Alternatively, watchman is also available Python-free via apt and homebrew.
 
-Notes on Tutor
-==============
+Migration
+=========
 
-TODO
+The old asset processing system is `proposed for deprecation (TODO: link to issue) <http://example.com/depr>`_.
 
-Deprecation of the old asset processing system
-==============================================
+The old and new systems will both be available for at least one named release. Operators will encouraged to try the new asset processing system and report any issues they find. Eventually, the old asset processing system will be entirely removed.
 
-TODO
+Tutor migration guide
+---------------------
 
-Alternatives Considered
-***********************
+Tutor provides the `openedx-assets <https://github.com/overhangio/tutor/blob/v15.3.0/tutor/templates/build/openedx/bin/openedx-assets>`_ Python script on its edx-platform images for building, collection, and watching. The script uses a mix its own implementation and calls out to edx-platform's paver tasks, avoiding the most troublesome parts of the paver tasks. The script and its interface were the inspiration for the new build.sh that this ADAR describes.
 
-TODO
+As a consequence of this ADR, Tutor will either need to:
 
-...
+* reimplement the script as a thin wrapper around the new asset processing commands, or
+* deprecate and remove the script.
+
+Either way, the migration path is straightforward:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Existing Tutor-provided command
+     - New upstream command
+   * - ``openedx-assets build``
+     - ``assets/build.sh``
+   * - ``openedx-assets npm``
+     - ``assets/build.sh npm``
+   * - ``openedx-assets xmodule``
+     - ``assets/build.sh xmodule``
+   * - ``openedx-assets common``
+     - ``assets/build.sh common``
+   * - ``openedx-assets themes``
+     - ``assets/build.sh``
+   * - ``openedx-assets collect``
+     - ``./manage.py [lms|cms] collectstatic --noinput``
+   * - ``openedx-assets watch-themes``
+     - ``assets/build.sh --watch themes``
+
+The options accepted by ``openedx-assets`` will all be valid inputs to ``assets/build.sh``.
+
+Rejected Alternatives
+*********************
+
+* **Avoiding work on edx-platform asset tooling; just wait until all frontends have been replatformed into MFEs**. See Context for why this was rejected.
+
+* **Rather than replace paver-based asset processing, try to improve it in place.** The effort required to do this seemed comparable to the effort required to perform a full rewrite, and it would not yield any caching benefits of a Python-free asset pipeline.
 
