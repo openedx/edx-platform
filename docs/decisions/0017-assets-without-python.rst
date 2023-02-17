@@ -4,9 +4,14 @@ Building static assets without Python
 Status
 ******
 
-Pending
+Provisional
 
 Will be moved to *Accepted* upon completion of reimplementation.
+
+Non-exhaustive list of related PRs:
+
+* https://github.com/openedx/edx-platform/pull/31736
+* ...
 
 Context
 *******
@@ -210,7 +215,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 Migration
 =========
 
-The old asset processing system is `proposed for deprecation (TODO: link to issue) <http://example.com/depr>`_.
+The old asset processing system will be `proposed for deprecation (TODO: link to issue) <http://example.com/depr>`_ upon provisional acceptance of this ADR.
 
 The old and new systems will both be available for at least one named release. Operators will encouraged to try the new asset processing system and report any issues they find. Eventually, the old asset processing system will be entirely removed.
 
