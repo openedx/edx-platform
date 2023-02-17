@@ -122,38 +122,41 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
      - ``assets/build.sh``
 
-       A Bash script that contains all build stages, its command-line interface inspired by Tutor's ``openedx-assets`` script. The script will be runnable on any POSIX system, including macOS and Ubuntu. The script will be linted for common shell scripting mistakes using `shellcheck <https://www.shellcheck.net>`_.
+       A Bash script that contains all build stages, with subcommands available for running each stage separately. Its command-line interface inspired by Tutor's ``openedx-assets`` script. The script will be runnable on any POSIX system, including macOS and Ubuntu and it will linted for common shell scripting mistakes using `shellcheck <https://www.shellcheck.net>`_.
      
    * - **Build stage 1: Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
 
      - ``paver update_assets --skip-collect``
 
-       This stage is implemented in Python within update_assets. There is not standalone command for it.
+       Implemented in Python within update_assets. There is not standalone command for it.
 
      - ``assets/build.sh npm``
 
-       TODO
+       Pure Bash reimplementation.
  
    * - **Build stage 2: Copy XModule framents** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation. This is done for a hard-coded list of XModule-style XBlocks, which are not growing in number; it is *not* a problem for in-repository pure XBlock Fragments or pip-installed XBlock assets, which are ready-to-serve.
 
      - ``paver process_xmodule_assets``, or
        ``xmodule_assets``
 
-       The former is a Python wrapper of the latter; the latter is a console script pointing to an application-level Python module. That module inspects attributes from legacy XModule-style XBlock classes in order to determine which static assets to copy and what to name them.
+       Equivalent paver task and console script, both pointing at to an application-level Python module. That module inspects attributes from legacy XModule-style XBlock classes in order to determine which static assets to copy and what to name them.
 
      - ``assets/build.sh xmodule``
 
+
        A Bash implementation of XModule asset copying. The aforementioned attributes will be moved from the XModule-style XBlock classes into a simple static JSON file, which the Bash script will be able to read.
+       
+       (The initial implementation of build.sh may just point at ``xmodule_assets``).
    
    * - **Build stage 3: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
 
      - ``paver webpack``
 
-       A Python wrapper around a call to webpack. Invokes the ``./manage.py [lms|cms] print_setting`` multiple times in order to determine Django settings, adding which can add 20+ seconds to the build.
+       Python wrapper around a call to webpack. Invokes the ``./manage.py [lms|cms] print_setting`` multiple times in order to determine Django settings, adding which can add 20+ seconds to the build.
 
      - ``assets/build.sh webpack``
 
-       A Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up. Open edX distributions, such as Tutor, can choose how to supply the Django-setting-dervied parameters in an efficient manner.
+       Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up. Open edX distributions, such as Tutor, can choose how to supply the Django-setting-dervied parameters in an efficient manner.
    
    * - **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
@@ -192,6 +195,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
        TODO
 
      - ``assets/build.sh --watch <stage>``
+
        where ``<stage>`` if one of the build stages described above
 
        TODO.
