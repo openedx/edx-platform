@@ -78,6 +78,20 @@ Three particular issues have surfaced in Developer Experience Working Group disc
 
 All of these potential solutions would involve refactoring or entirely replacing parts of the current asset processing system.
 
+WIP: Move these links
+=====================
+
+.. _paver: https://github.com/openedx/tutor/tree/open-release/olive.1/pavelib
+.. _openedx-assets: https://github.com/overhangio/tutor/blob/v15.0.0/tutor/templates/build/openedx/bin/openedx-assets.
+
+Updating the asset build pipeline will be necessary for several current and upcoming efforts, including:
+
+* `Finish upgrading frontend frameworks <https://github.com/openedx/edx-platform/issues/31616>`_
+* `Move node_modules outside of edx-platform in Tutor's openedx image <https://github.com/openedx/wg-developer-experience/issues/150>`_
+* `Move static assets outside of edx-platform in Tutor's openedx image <https://github.com/openedx/wg-developer-experience/issues/151>`_
+
+This has caused us to consider the value of updating the asset pipeline in place, versus rewriting and simplying it first.
+
 Decision
 ********
 
@@ -120,7 +134,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
      - ``assets/build.sh webpack``, a Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up. Open edX distributions, such as Tutor, can choose how to supply the Django-setting-dervied parameters in an efficient manner.
    
    * - **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
-     - ``paver compile_sass``: TODO
+     - ``paver compile_sass``: TODO. Mention libsass.
      - ``assets/build.sh common``: TODO
    
    * - **Build stage 5: Compiled themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
@@ -131,102 +145,19 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
      - ``paver update_assets``: TODO
      - ``./manage.py lms collectstatic && ./manage.py cms collectstatic``: TODO
    
-   * - **Watch** static assets for changes in the background. When a change occurs, rebuild them automatically, so that the Django webserver picks up the changes. This is only necessary in development environments. A few different sets of assets can be watched:
+   * - **Watch** static assets for changes in the background. When a change occurs, rebuild them automatically, so that the Django webserver picks up the changes. This is only necessary in development environments. A few different sets of assets may be watched: XModule assets, Webpack assets, default SCSS, and theme SCSS.
      - ``paver watch_assets``: TODO
-     - ``assets/build.sh --watch``: TODO
+     - ``assets/build.sh --watch <stage>``, where ``<stage`` if one of the build stages described above. TODO.
 
-TODO
-====
-
-There are three actions a developer or a deployment pipeline may need to take on edx-platform static assets:
-
-* **Build:** :
-
-  #. **Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
-
-  #. **Copy XModule Fragments** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation. This is done for a hard-coded list of XModule-style XBlocks, which are not growing in number; it is *not* a problem for in-repository pure XBlock Fragments or pip-installed XBlock assets, which are ready-to-serve.
-
-  #. **Run Webpack** to shim, minify, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
-
-  #. **Compile Default SCSS** for legacy LMS and CMS frontends into CSS.
-
-  #. **Compile Theme SCSS** for legacy LMS and CMS frontends into CSS. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
-
-* **Collect:** Copy static assets from edx-platform to another location (the ``STATIC_ROOT``) so that they can be efficiently served *without* Django's webserver. This step, by nature, requires Python and Django in order to find and organize the assets, which may come from edx-platform itself or from its many installed Python and NPM packages. This is only done for production environments, where it is usually desirable to serve assets with something efficient like NGINX.
-
-* **Watch:** Listen for changes to static assets in the background. When a change occurs, rebuild them automatically, so that the Django webserver picks up the changes. This is only necessary in development environments. A few different sets of assets can be watched:
-
-  * XModule assets. Upon change, these should be re-copied, which should trigger a Webpack re-run and a defualt SCSS recompilation.
-
-  * JavaScript modules. Upon change, a Webpack re-run should be triggered.
-
-  * Default SCSS. Upon change, it should be re-compiled, as should theme SCSS.
-
-  * Theme SCSS. Upon change, it should be re-compiled.
-
-Entry points for asset processing
-=================================
-
-Today, there are two main ways an operators would perform these actions:
-
-* via edx-platform's ``paver`` command-line interface (defined in the `pavelib`_ source tree), which wraps all the actions in Python, and requires Django. Example usage, via Devstack::
-
-    make lms-shell
-    paver update_assets
-
-* via the `openedx-assets`_ script, which Tutor adds to LMS and CMS containers. It uses a mix of its own Python wrapper code and calls to the pavelib implementation mentioned above. It avoids parts of pavelib that Tutor's authors found slow or buggy. Example usage::
-
-    tutor dev run lms openedx-assets --env=dev
-
-Python used in the asset build
-==============================
-
-.
-
-Etc
-===
-
-.. _paver: https://github.com/openedx/tutor/tree/open-release/olive.1/pavelib
-.. _openedx-assets: https://github.com/overhangio/tutor/blob/v15.0.0/tutor/templates/build/openedx/bin/openedx-assets.
-
-Updating the asset build pipeline will be necessary for several current and upcoming efforts, including:
-
-* `Finish upgrading frontend frameworks <https://github.com/openedx/edx-platform/issues/31616>`_
-* `Move node_modules outside of edx-platform in Tutor's openedx image <https://github.com/openedx/wg-developer-experience/issues/150>`_
-* `Move static assets outside of edx-platform in Tutor's openedx image <https://github.com/openedx/wg-developer-experience/issues/151>`_
-
-This has caused us to consider the value of updating the asset pipeline in place, versus rewriting and simplying it first.
-
-Decision
-********
+Notes on Tutor
+==============
 
 TODO
 
-Rationale:
-
-    * Other parts of pavelib have already been reimplemented, like Python
-      unit tests. We're following that trend.
-    * The Python logic in pavelib is harder to understand than simple
-      shell scripts.
-    * pavelib has dependencies (Python, paver, edx-platform, other libs)
-      which means that any pavelib scripts must be executed later in
-      the edx-platform build process than we might want them to. For
-      example, in a Dockerfile, it might be more performant to process
-      npm assets *before* installing Python, but as long as we are still
-      using pavelib, that is not an option.
-    * The benefits of paver have been eclipsed by other tools, like
-      Docker (for requisite management) and Click (for CLI building).
-    * In the next couple commits, we make improvements to
-      process-npm-assets.sh. These improvements would have been possible
-      in the pavelib implementation, but would have been more complicated.
-...
-
-Consequences
-************
+Deprecation of the old asset processing system
+==============================================
 
 TODO
-
-...
 
 Alternatives Considered
 ***********************
