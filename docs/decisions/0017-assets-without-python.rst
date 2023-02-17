@@ -175,6 +175,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
    * - + **Build stage 5: Compiled themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
 
      - ``./manage.py [lms|cms] compile_sass``, or
+
        ``paver compile_sass --theme-dirs ...``
 
        The management command is a wrapper around the paver task. The former looks up the list of theme search directories from Django settings and site configuration; the latter requires them to be supplied as arguments.
@@ -182,6 +183,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
        TODO
 
      - ``./manage.py [lms|cms] compile_sass``
+
        ``assets/build.sh themes --theme-dirs ...``
 
        The management command will remain available, but it will need to be updated to point at the Bash script, which will replace the paver task (see build stage 4 for details).
