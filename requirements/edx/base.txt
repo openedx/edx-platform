@@ -175,7 +175,7 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.13
     # via jwcrypto
-django==3.2.17
+django==3.2.18
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.in
@@ -409,7 +409,7 @@ drf-nested-routers==0.93.4
     # via openedx-blockstore
 drf-yasg==1.21.5
     # via edx-api-doc-tools
-edx-ace==1.6.0
+edx-ace==1.6.1
     # via -r requirements/edx/base.in
 edx-api-doc-tools==1.6.0
     # via
@@ -433,7 +433,7 @@ edx-celeryutils==1.2.2
     #   -r requirements/edx/base.in
     #   edx-name-affirmation
     #   super-csv
-edx-codejail==3.3.2
+edx-codejail==3.3.3
     # via -r requirements/edx/base.in
 edx-completion==4.2.0
     # via -r requirements/edx/base.in
@@ -477,7 +477,7 @@ edx-enterprise==3.60.21
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   learner-pathway-progress
-edx-event-bus-kafka==3.9.3
+edx-event-bus-kafka==3.9.4
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.9.2
     # via ora2
@@ -724,7 +724,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/base.in
     #   openedx-blockstore
-newrelic==8.6.0
+newrelic==8.7.0
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
@@ -1070,7 +1070,7 @@ sorl-thumbnail==12.9.0
     #   openedx-django-wiki
 sortedcontainers==2.4.0
     # via -r requirements/edx/base.in
-soupsieve==2.3.2.post1
+soupsieve==2.4
     # via beautifulsoup4
 sqlparse==0.4.3
     # via
@@ -1102,7 +1102,7 @@ tinycss2==1.1.1
     # via bleach
 tqdm==4.64.1
     # via nltk
-typing-extensions==4.4.0
+typing-extensions==4.5.0
     # via
     #   django-countries
     #   pylti1p3
