@@ -23,14 +23,6 @@ New Open edX frontend development has largely moved to React-based micro-fronten
      - Description
      - Example
      - Expected direction
-   * - **XBlock Fragments**
-     - JS and CSS belonging to the pure XBlocks defined in edx-platform
-     - library_sourced_block.js
-     - Keep, or extract to per-XBlock repositories
-   * - **XModule Fragments**
-     - JS and SCSS belonging to the older XModule-style XBlocks defined in edx-platform
-     - ProblemBlock (aka CAPA) assets
-     - Convert to pure XBlock fragments
    * - **Legacy LMS Frontends**
      - JS, SCSS, and other resources powering LMS views that have not yet been replatformed into MFEs
      - Instructor Dashboard assets
@@ -43,26 +35,37 @@ New Open edX frontend development has largely moved to React-based micro-fronten
      - JS modules, SCSS partials, and other resources, usable by both Legacy LMS and CMS Frontends. This includes a few libraries that have been committed to edx-platform in their entirety.
      - Legacy cookie policy banner; CodeMirror
      - Remove as part of full LMS/CMS frontend replatforming
-   * - **pip-installed Assets**
-     - Pre-compiled static assets shipped with several Python libraries that we install, including XBlocks. Not committed to edx-platform.
-     - Django Admin, Swagger, Drag-And-Drop XBlock V2
-     - Keep
    * - **npm-installed Assets**
      - JS modules and CSS files installed via NPM. Not committed to edx-platform.
      - React
      - Remove as part of full LMS/CMS frontend replatforming
+   * - **XModule Fragments**
+     - JS and SCSS belonging to the older XModule-style XBlocks defined in edx-platform
+     - ProblemBlock (aka CAPA) assets
+     - Convert to pure XBlock fragments
+   * - **XBlock Fragments**
+     - JS and CSS belonging to the pure XBlocks defined in edx-platform
+     - library_sourced_block.js
+     - Keep and/or extract to pip-installed, per-XBlock repositories
+   * - **pip-installed Assets**
+     - Pre-compiled static assets shipped with several Python libraries that we install, including XBlocks. Not committed to edx-platform.
+     - Django Admin, Swagger, Drag-And-Drop XBlock V2
+     - Keep
 
 *Note: this table excludes HTML templates. Templates are part of the frontend, but they are dynamically rendered by the Web application and therefore must be handled differently than static assets.*
 
 So, with the exception of XBlock fragments and pip-installed assets, which are very simple for edx-platform to handle, we plan to eventually remove all edx-platform static frontend assets. However, given the number of remaining edx-platform frontends and speed at which they are currently being replatformed, estimates for completion of this process range from one to five years. Thus, in the medium term future, we feel that timeboxed improvements to how edx-platform handles static assets are worthwhile, especially when they address an acute pain point.
 
-In particular, three recent issues have surfaced in Developer Experience Working Group discussions, each with some mitigations involving static assets:
+Current pain points
+===================
+
+Three particular issues have surfaced in Developer Experience Working Group discussions recently, each with some mitigations involving static assets:
 
 .. list-table::
    :header-rows: 1
 
-   * - Problem
-     - Potential solutions
+   * - Pain Point
+     - Potential solution(s)
 
    * - edx-platform Docker images are too large and/or take too long to build.
      - Switch from large, legacy tooling packages (such as libsass-python and paver) to industry standard, precompiled ones (like node-sass or dart-sass). Remove unneccessary & slow calls to Django management commands.
@@ -73,9 +76,45 @@ In particular, three recent issues have surfaced in Developer Experience Working
    * - In Tutor, using a local copy of edx-platform overwrites the Docker image's pre-installed node_modules and pre-built static assets, requiring developers to reinstall & rebuild in order to get a working platform.
      - Better parameterize the input and output paths edx-platform asset build, such that it may search for node_modules outside of edx-platform and generate assets outside of edx-platform.
 
+All of these potential solutions would involve refactoring or entirely replacing parts of the current asset processing system.
+
+Decision
+********
+
+We will rewrite edx-platform's asset processing system. We will aim to:
+
+* Use well-known, npm-installed frontend tooling wherever possible.
+* When bespoke processing is required, use standard POSIX tools like Bash.
+* When Django/Python is absolutely required, contain its impact so that the rest of the system remains Python-free.
+* Avoid unnecessary indirection or abstraction. For this task, extensibility is a non-goal, and simplicity is a virtue.
+* Provide a clear migration path from the old system to the new one.
+* Enable the future removal of as much legacy frontend tooling code as possible.
+
+Consequences
+************
+
+The three top-level edx-platform asset processing actions are *build*, *collect*, and *watch*. The build action can be further broken down into five stages. Here is how those actions and stages will change:
+
+
+.. list-table::
+   :header-rows: 1
+
+   * - Action/Stage
+     - Description
+     - Old implementation
+     - New implementation
+
+   * - **Build**
+     - Compile, generate, copy, and otherwise process static assets so that they can be used by the Django webserver or collected elsewhere. For many Web applications, all static asset building would be coordinated via Webpack or another NPM-managed tool. Due to the age of edx-platform and its legacy XModule and Comprehensive Theming systems, though, there are five stages which need to be performed in a particular order.
+     - ``paver update_assets``: yada
+     - ``assets/build.sh``
+
+TODO
+====
+
 There are three actions a developer or a deployment pipeline may need to take on edx-platform static assets:
 
-* **Build:** Compile, generate, copy, and otherwise process static assets so that they can be used by the Django webserver or collected elsewhere. For many Web applications, all static asset building would be coordinated via Webpack or another NPM-managed tool. Due to the age of edx-platform and its legacy XModule and Comprehensive Themeing systems, though, there are five specific build steps, which generally need to be performed in this  order:
+* **Build:** :
 
   #. **Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
 
