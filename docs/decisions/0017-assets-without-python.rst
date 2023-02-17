@@ -137,12 +137,12 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
    * - + **Build stage 2: Copy XModule framents** from the xmodule source tree over to input directories for Webpack and SCSS compilation. This is required for a hard-coded list of old XModule-style XBlocks. This is not required for new pure XBlocks, which include (or pip-install) their assets into edx-platform as ready-to-serve JS/CSS/etc fragments.
 
      - ``paver process_xmodule_assets``, or
+
        ``xmodule_assets``
 
        Equivalent paver task and console script, both pointing at to an application-level Python module. That module inspects attributes from legacy XModule-style XBlock classes in order to determine which static assets to copy and what to name them.
 
      - ``assets/build.sh xmodule``
-
 
        A Bash implementation of XModule asset copying. The aforementioned attributes will be moved from the XModule-style XBlock classes into a simple static JSON file, which the Bash script will be able to read.
        
@@ -180,9 +180,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        The management command is a wrapper around the paver task. The former looks up the list of theme search directories from Django settings and site configuration; the latter requires them to be supplied as arguments.
 
-       TODO
-
-     - ``./manage.py [lms|cms] compile_sass``
+     - ``./manage.py [lms|cms] compile_sass``, or
 
        ``assets/build.sh themes --theme-dirs ...``
 
@@ -195,6 +193,8 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
      - ``paver update_assets``
 
        Paver task wrapping a call to the standard Django `collectstatic <https://docs.djangoproject.com/en/4.1/ref/contrib/staticfiles/#collectstati>`_ command. It adds ``--noinput`` and a list of ``--ignore`` file patterns to the command call.
+
+       (This command also builds assets. The *collect* action could not be run on its own without calling pavelib's Python interface.)
 
      - ``./manage.py lms collectstatic --noinput && ./manage.py cms collectstatic --noinput``
 
