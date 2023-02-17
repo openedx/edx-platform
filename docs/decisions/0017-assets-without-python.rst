@@ -99,38 +99,31 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 .. list-table::
    :header-rows: 1
 
-   * - Action: Stage
-     - Description
+   * - Description
      - Old implementation
      - New implementation
 
-   * - **Build:** All Stages
-     - Compile, generate, copy, and otherwise process static assets so that they can be used by the Django webserver or collected elsewhere. For many Web applications, all static asset building would be coordinated via Webpack or another NPM-managed tool. Due to the age of edx-platform and its legacy XModule and Comprehensive Theming systems, though, there are five stages which need to be performed in a particular order.
+   * - **Build: All stages.** Compile, generate, copy, and otherwise process static assets so that they can be used by the Django webserver or collected elsewhere. For many Web applications, all static asset building would be coordinated via Webpack or another NPM-managed tool. Due to the age of edx-platform and its legacy XModule and Comprehensive Theming systems, though, there are five stages which need to be performed in a particular order.
      - ``paver update_assets --skip-collect``: A Python-defined task that calls out to each build stage.
      - ``assets/build.sh``: A Bash script that contains all build stages, its command-line interface inspired by Tutor's ``openedx-assets`` script. The script will be runnable on any POSIX system, including macOS and Ubuntu. The script will be linted for common shell scripting mistakes using `shellcheck <https://www.shellcheck.net>`_.
      
-   * - **Build 1/5:** Copy from node_modules
-     - Copy npm-installed assets from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
+   * - **Build 1/5: Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
      - N/A (part of ``paver update_assets``)
      - ``assets/build.sh npm``: TODO
    
-   * - **Build 2/5:** Copy from XModule
-     - ** XModule Fragments** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation. This is done for a hard-coded list of XModule-style XBlocks, which are not growing in number; it is *not* a problem for in-repository pure XBlock Fragments or pip-installed XBlock assets, which are ready-to-serve.
+   * - **Build 2/5: Copy XModule framents** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation. This is done for a hard-coded list of XModule-style XBlocks, which are not growing in number; it is *not* a problem for in-repository pure XBlock Fragments or pip-installed XBlock assets, which are ready-to-serve.
      - ``paver process_xmodule_assets`` and ``xmodule_assets``. The former is a Python wrapper of the latter; the latter is a console script pointing to an application-level Python module. That module inspects attributes from legacy XModule-style XBlock classes in order to determine which static assets to copy and what to name them.
      - ``assets/build.sh xmodule``: A Bash implementation of XModule asset copying. The aforementioned attributes will be moved from the XModule-style XBlock classes into a simple static JSON file, which the Bash script will be able to read.
    
-   * - **Build 3/5:** Webpack
-     - Run Webpack in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
+   * - **Build 3/5: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
      - ``paver webpack``: A Python wrapper around a call to webpack. Invokes the ``./manage.py [lms|cms] print_setting`` multiple times in order to determine Django settings, adding which can add 20+ seconds to the build.
      - ``assets/build.sh webpack``, a Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up. Open edX distributions, such as Tutor, can choose how to supply the Django-setting-dervied parameters in an efficient manner.
    
-   * - **Build 4/5:** Default SCSS
-     - Compile the default SCSS for legacy LMS/CMS frontends into CSS.
+   * - **Build 4/5: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
      - ``paver compile_sass``: TODO
      - ``assets/build.sh common``: TODO
    
-   * - **Build 5/5:** Theme SCSS
-     - For each comprehensive theme, compile the theme's SCSS for legacy LMS/CMS frontends into CSS. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
+   * - **Build 5/5: Compiled themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
      - ``paver compile_sass``: TODO
      - ``assets/build.sh themes``: TODO
    
