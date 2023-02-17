@@ -1,6 +1,13 @@
 Reimplement edx-platform static asset processing
 ################################################
 
+Overview
+********
+
+* edx-platform has a complicated process for managing its static frontend assets. It slows down both developers and site operators.
+* We will deprecate the current Python+paver asset processing system in favor of a new Bash implementation.
+* After one named release, the deprecated paver system will be removed.
+
 Status
 ******
 
