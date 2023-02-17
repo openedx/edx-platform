@@ -269,7 +269,7 @@ distlib==0.3.6
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.17
+django==3.2.18
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.txt
@@ -556,7 +556,7 @@ edx-celeryutils==1.2.2
     #   -r requirements/edx/testing.txt
     #   edx-name-affirmation
     #   super-csv
-edx-codejail==3.3.2
+edx-codejail==3.3.3
     # via -r requirements/edx/testing.txt
 edx-completion==4.2.0
     # via -r requirements/edx/testing.txt
