@@ -1,5 +1,5 @@
-Building static assets without Python
-#####################################
+Reimplement edx-platform static asset processing
+################################################
 
 Status
 ******
