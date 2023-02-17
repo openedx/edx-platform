@@ -269,7 +269,7 @@ distlib==0.3.6
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.17
+django==3.2.18
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.txt
@@ -532,7 +532,7 @@ drf-yasg==1.21.5
     # via
     #   -r requirements/edx/testing.txt
     #   edx-api-doc-tools
-edx-ace==1.6.0
+edx-ace==1.6.1
     # via -r requirements/edx/testing.txt
 edx-api-doc-tools==1.6.0
     # via
@@ -556,7 +556,7 @@ edx-celeryutils==1.2.2
     #   -r requirements/edx/testing.txt
     #   edx-name-affirmation
     #   super-csv
-edx-codejail==3.3.2
+edx-codejail==3.3.3
     # via -r requirements/edx/testing.txt
 edx-completion==4.2.0
     # via -r requirements/edx/testing.txt
@@ -600,13 +600,13 @@ edx-enterprise==3.60.21
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   learner-pathway-progress
-edx-event-bus-kafka==3.9.3
+edx-event-bus-kafka==3.9.4
     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.9.2
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-edx-lint==5.3.0
+edx-lint==5.3.2
     # via -r requirements/edx/testing.txt
 edx-milestones==0.4.0
     # via -r requirements/edx/testing.txt
@@ -708,7 +708,7 @@ faker==17.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.91.0
+fastapi==0.92.0
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -968,7 +968,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   openedx-blockstore
-newrelic==8.6.0
+newrelic==8.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
@@ -1131,7 +1131,7 @@ pycryptodomex==3.17
     #   lti-consumer-xblock
     #   pyjwkest
     #   snowflake-connector-python
-pydantic==1.10.4
+pydantic==1.10.5
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
@@ -1482,7 +1482,7 @@ sorl-thumbnail==12.9.0
     #   openedx-django-wiki
 sortedcontainers==2.4.0
     # via -r requirements/edx/testing.txt
-soupsieve==2.3.2.post1
+soupsieve==2.4
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
@@ -1518,7 +1518,7 @@ sqlparse==0.4.3
     #   openedx-blockstore
 staff-graded-xblock==2.0.1
     # via -r requirements/edx/testing.txt
-starlette==0.24.0
+starlette==0.25.0
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
@@ -1579,7 +1579,7 @@ tqdm==4.64.1
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
-typing-extensions==4.4.0
+typing-extensions==4.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   astroid
