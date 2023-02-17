@@ -266,6 +266,7 @@ zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requi
 -e git+https://github.com/edly-io/xblock-officevideo.git@develop-juniper#egg=officevideo==develop-juniper
 -e git+https://github.com/edly-io/xblock-poll.git@edly-1.0.0#egg=xblock-poll==edly-1.0.0
 -e git+https://github.com/pmitros/FeedbackXBlock.git#egg=rate==0.0
+-e git+https://github.com/edly-io/kwl-xblock.git@release-v0.1.0#egg=kwl
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

@@ -1722,6 +1722,9 @@ OPTIONAL_APPS = (
     ('integrated_channels.sap_success_factors', None),
     ('integrated_channels.xapi', None),
     ('integrated_channels.cornerstone', None),
+
+    # Xblocks Apps
+    ('kwl.kwl_djangoapp', None),
 )
 
 
