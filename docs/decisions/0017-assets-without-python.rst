@@ -29,16 +29,16 @@ New Open edX frontend development has largely moved to React-based micro-fronten
      - Replatform & DEPR
    * - **Legacy CMS Frontends**
      - JS, SCSS, and other resources powering Studio views that have not yet been replatformed into MFEs
-     - Course outline editor and unit editor
+     - Course outline editor and unit editor assets
      - Replatform & DEPR
    * - **Shared Frontend Files**
-     - JS modules, SCSS partials, and other resources, usable by both Legacy LMS and CMS Frontends. This includes a few libraries that have been committed to edx-platform in their entirety.
+     - JS modules, SCSS partials, and other resources, usable by both Legacy LMS and CMS Frontends. This includes a few vendor libraries that have been committed to edx-platform in their entirety.
      - Legacy cookie policy banner; CodeMirror
      - Remove as part of full LMS/CMS frontend replatforming
    * - **npm-installed Assets**
      - JS modules and CSS files installed via NPM. Not committed to edx-platform.
-     - React
-     - Remove as part of full LMS/CMS frontend replatforming
+     - React, studio-frontend, paragon
+     - Uninstall as part of full LMS/CMS frontend replatforming
    * - **XModule Fragments**
      - JS and SCSS belonging to the older XModule-style XBlocks defined in edx-platform
      - ProblemBlock (aka CAPA) assets
@@ -81,7 +81,7 @@ All of these potential solutions would involve refactoring or entirely replacing
 Decision
 ********
 
-We will rewrite edx-platform's asset processing system. We will aim to:
+We will largely reimplement edx-platform's asset processing system. We will aim to:
 
 * Use well-known, npm-installed frontend tooling wherever possible.
 * When bespoke processing is required, use standard POSIX tools like Bash.
@@ -93,7 +93,7 @@ We will rewrite edx-platform's asset processing system. We will aim to:
 Consequences
 ************
 
-The three top-level edx-platform asset processing actions are *build*, *collect*, and *watch*. The build action can be further broken down into five stages. Here is how those actions and stages will change:
+The three top-level edx-platform asset processing actions are *build*, *collect*, and *watch*. The build action can be further broken down into five stages. Here is how those actions and stages will be reimplemented:
 
 
 .. list-table::
@@ -106,8 +106,43 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
    * - **Build**
      - Compile, generate, copy, and otherwise process static assets so that they can be used by the Django webserver or collected elsewhere. For many Web applications, all static asset building would be coordinated via Webpack or another NPM-managed tool. Due to the age of edx-platform and its legacy XModule and Comprehensive Theming systems, though, there are five stages which need to be performed in a particular order.
-     - ``paver update_assets``: yada
-     - ``assets/build.sh``
+     - ``paver update_assets --skip-collect``: A Python-defined task that calls out to each build stage.
+     - ``assets/build.sh``: A Bash script that contains all build stages, its command-line interface inspired by Tutor's ``openedx-assets`` script. The script will be runnable on any POSIX system, including macOS and Ubuntu. The script will be linted for common shell scripting mistakes using `shellcheck <https://www.shellcheck.net>`_.
+     
+   * - **Build:** Copy from node_modules
+     - Copy npm-installed assets from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
+     - N/A (part of ``paver update_assets``)
+     - ``assets/build.sh npm``: TODO
+   
+   * - **Build:** Copy from XModule
+     - ** XModule Fragments** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation. This is done for a hard-coded list of XModule-style XBlocks, which are not growing in number; it is *not* a problem for in-repository pure XBlock Fragments or pip-installed XBlock assets, which are ready-to-serve.
+     - ``paver process_xmodule_assets`` and ``xmodule_assets``. The former is a Python wrapper of the latter; the latter is a console script pointing to an application-level Python module. That module inspects attributes from legacy XModule-style XBlock classes in order to determine which static assets to copy and what to name them.
+     - ``assets/build.sh xmodule``: A Bash implementation of XModule asset copying. The aforementioned attributes will be moved from the XModule-style XBlock classes into a simple static JSON file, which the Bash script will be able to read.
+   
+   * - **Build:** Webpack
+     - Run Webpack in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
+     - ``paver webpack``: A Python wrapper around a call to webpack. Invokes the ``./manage.py [lms|cms] print_setting`` multiple times in order to determine Django settings, adding which can add 20+ seconds to the build.
+     - ``assets/build.sh webpack``, a Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up. Open edX distributions, such as Tutor, can choose how to supply the Django-setting-dervied parameters in an efficient manner.
+   
+   * - **Build:** Default SCSS
+     - Compile the default SCSS for legacy LMS/CMS frontends into CSS.
+     - ``paver compile_sass``: TODO
+     - ``assets/build.sh common``: TODO
+   
+   * - **Build:** Theme SCSS
+     - For each comprehensive theme, compile the theme's SCSS for legacy LMS/CMS frontends into CSS. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
+     - ``paver compile_sass``: TODO
+     - ``assets/build.sh themes``: TODO
+   
+   * - **Collect**
+     - Copy static assets from edx-platform to another location (the ``STATIC_ROOT``) so that they can be efficiently served *without* Django's webserver. This step, by nature, requires Python and Django in order to find and organize the assets, which may come from edx-platform itself or from its many installed Python and NPM packages. This is only done for production environments, where it is usually desirable to serve assets with something efficient like NGINX.
+     - ``paver update_assets``: TODO
+     - ``./manage.py lms collectstatic && ./manage.py cms collectstatic``: TODO
+   
+   * - **Watch**
+     - Listen for changes to static assets in the background. When a change occurs, rebuild them automatically, so that the Django webserver picks up the changes. This is only necessary in development environments. A few different sets of assets can be watched:
+     - ``paver watch_assets``: TODO
+     - ``assets/build.sh --watch``: TODO
 
 TODO
 ====
