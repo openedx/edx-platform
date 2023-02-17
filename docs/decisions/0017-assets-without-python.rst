@@ -160,7 +160,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
    
    * - + **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
-     -  ``paver compile_sass``
+     - ``paver compile_sass``
 
        Paver task that invokes ``sass.compile`` (from the libsass Python package) and ``rtlcss`` (installed by npm) for several different directories of SCSS.
 
