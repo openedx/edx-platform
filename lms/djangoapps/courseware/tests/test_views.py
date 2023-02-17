@@ -2724,6 +2724,7 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
         self._assert_correct_position(resp, expected_position)
 
 
+@ddt.ddt
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaffleTestMixin):
     """
     Tests for the courseware.render_xblock endpoint.
@@ -2925,6 +2926,76 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
 
         banner_text = get_expiration_banner_text(self.user, self.course)
         self.assertNotContains(response, banner_text, html=True)
+
+    @ddt.data(
+        ('valid-jwt-for-exam-sequence', 200),
+        ('valid-jwt-for-incorrect-sequence', 403),
+        ('invalid-jwt', 403),
+    )
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'null',
+            'null': {},
+            'lti_external': {}
+        }
+    )
+    @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+    @patch('lms.djangoapps.courseware.views.views.unpack_token_for')
+    def test_render_descendant_of_exam_gated_by_access_token(self, exam_access_token,
+                                                             expected_response, _mock_token_unpack):
+        """
+        Verify blocks inside an exam that requires token access are gated by
+        a valid exam access JWT issued for that exam sequence.
+        """
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            # pylint:disable=attribute-defined-outside-init
+            self.course = CourseFactory.create(proctoring_provider='lti_external', **self.course_options())
+            self.chapter = BlockFactory.create(parent=self.course, category='chapter')
+            self.sequence = BlockFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name='Sequence',
+                is_time_limited=True,
+            )
+            self.vertical_block = BlockFactory.create(
+                parent=self.sequence,
+                category='vertical',
+                display_name="Vertical",
+            )
+            self.problem_block = BlockFactory.create(
+                parent=self.vertical_block,
+                category='problem',
+                display_name='Problem'
+            )
+            self.other_sequence = BlockFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name='Sequence 2',
+            )
+        CourseOverview.load_from_module_store(self.course.id)
+        self.setup_user(admin=False, enroll=True, login=True)
+
+        def _mock_token_unpack_fn(token, user_id):
+            if token == 'valid-jwt-for-exam-sequence':
+                return {'content_id': str(self.sequence.location)}
+            elif token == 'valid-jwt-for-incorrect-sequence':
+                return {'content_id': str(self.other_sequence.location)}
+            else:
+                raise Exception('invalid JWT')
+
+        _mock_token_unpack.side_effect = _mock_token_unpack_fn
+
+        # Problem and Vertical response should be gated on access token
+        for block in [self.problem_block, self.vertical_block]:
+            response = self.get_response(
+                usage_key=block.location, url_encoded_params=f'exam_access={exam_access_token}')
+            assert response.status_code == expected_response
+
+        # The Sequence itself should also be gated
+        response = self.get_response(
+            usage_key=self.sequence.location, url_encoded_params=f'exam_access={exam_access_token}')
+        assert response.status_code == expected_response
 
 
 @ddt.ddt

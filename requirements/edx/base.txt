@@ -223,6 +223,7 @@ django==3.2.18
     #   edx-search
     #   edx-submissions
     #   edx-toggles
+    #   edx-token-utils
     #   edx-when
     #   edxval
     #   enmerkar
@@ -538,6 +539,8 @@ edx-toggles==5.0.0
     #   edxval
     #   learner-pathway-progress
     #   ora2
+edx-token-utils==0.2.1
+    # via -r requirements/edx/base.in
 edx-user-state-client==1.3.2
     # via -r requirements/edx/base.in
 edx-when==2.3.0
@@ -843,6 +846,7 @@ pyjwkest==1.4.2
     # via
     #   -r requirements/edx/base.in
     #   edx-drf-extensions
+    #   edx-token-utils
     #   lti-consumer-xblock
 pyjwt[crypto]==2.6.0
     # via
