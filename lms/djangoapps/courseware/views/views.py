@@ -1692,13 +1692,16 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
             video_description += f"by {course.display_organization} "
         video_description += "on edX.org"
 
+        video_poster = None
+        if not is_embed:
+            video_poster = block._poster()  # pylint: disable=protected-access
+
         context = {
             'fragment': fragment,
             'course': course,
             'video_title': block.display_name_with_default,
             'video_description': video_description,
-            'video_thumbnail': "https://www.edx.org/images/logos/edx-logo-elm.svg",
-            # 'video_thumbnail': "https://i.ytimg.com/vi/Kauv7MVPcsA/maxresdefault.jpg",
+            'video_thumbnail': video_poster if video_poster is not None else  '',
             'video_embed_url': urljoin(
                 settings.LMS_ROOT_URL,
                 reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(usage_key)})
