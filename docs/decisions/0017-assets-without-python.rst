@@ -128,13 +128,13 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
      - ``paver update_assets --skip-collect``
 
-       Implemented in Python within update_assets. There is not standalone command for it.
+       Implemented in Python within update_assets. There is no standalone command for it.
 
      - ``assets/build.sh npm``
 
        Pure Bash reimplementation.
  
-   * - + **Build stage 2: Copy XModule framents** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation. This is done for a hard-coded list of XModule-style XBlocks, which are not growing in number; it is *not* a problem for in-repository pure XBlock Fragments or pip-installed XBlock assets, which are ready-to-serve.
+   * - + **Build stage 2: Copy XModule framents** from the xmodule source tree over to input directories for Webpack and SCSS compilation. This is required for a hard-coded list of old XModule-style XBlocks. This is not required for new pure XBlocks, which include (or pip-install) their assets into edx-platform as ready-to-serve JS/CSS/etc fragments.
 
      - ``paver process_xmodule_assets``, or
        ``xmodule_assets``
@@ -146,7 +146,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        A Bash implementation of XModule asset copying. The aforementioned attributes will be moved from the XModule-style XBlock classes into a simple static JSON file, which the Bash script will be able to read.
        
-       (The initial implementation of build.sh may just point at ``xmodule_assets``).
+       The initial implementation of build.sh may just point at ``xmodule_assets``.
    
    * - + **Build stage 3: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
 
@@ -160,45 +160,57 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
    
    * - + **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
-     - ``paver compile_sass``
+     -  ``paver compile_sass``
 
-       TODO. Mention libsass.
+       Paver task that invokes ``sass.compile`` (from the libsass Python package) and ``rtlcss`` (installed by npm) for several different directories of SCSS.
+
+       Note: libsass is pinned to a 2015 version with a non-trivial upgrade path. Installing it requires compiling a large C extension, noticably affecting Docker image build time.
 
      - ``assets/build.sh common``
 
-       TODO
+       Bash reimplementation, calling ``node-sass`` and ``rtlcss``.
    
+       The initial implementation of build.sh may use ``sassc``, a CLI provided by libsass, instead of node-sass. Then, ``sassc`` can be replaced by ``node-sass`` as part of a subsequent frontend framework upgrade effort.
+
    * - + **Build stage 5: Compiled themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
 
-     - ``paver compile_sass``
+     - ``./manage.py [lms|cms] compile_sass``, or
+       ``paver compile_sass --theme-dirs ...``
+
+       The management command is a wrapper around the paver task. The former looks up the list of theme search directories from Django settings and site configuration; the latter requires them to be supplied as arguments.
 
        TODO
 
-     - ``assets/build.sh themes``
+     - ``./manage.py [lms|cms] compile_sass``
+       ``assets/build.sh themes --theme-dirs ...``
 
-       TODO
+       The management command will remain available, but it will need to be updated to point at the Bash script, which will replace the paver task (see build stage 4 for details).
+
+       The overall asset *build* action will use the Bash script; this means that list of theme directories will need to be provided as arguments, but it ensures that the build can remain Python-free.
    
-   * - **Collect** the built static assets from edx-platform to another location (the ``STATIC_ROOT``) so that they can be efficiently served *without* Django's webserver. This step, by nature, requires Python and Django in order to find and organize the assets, which may come from edx-platform itself or from its many installed Python and NPM packages. This is only done for production environments, where it is usually desirable to serve assets with something efficient like NGINX.
+   * - **Collect** the built static assets from edx-platform to another location (the ``STATIC_ROOT``) so that they can be efficiently served *without* Django's webserver. This step, by nature, requires Python and Django in order to find and organize the assets, which may come from edx-platform itself or from its many installed Python and NPM packages. This is only needed for **production** environments, where it is usually desirable to serve assets with something efficient like NGINX.
 
      - ``paver update_assets``
 
-       TODO
+       Paver task wrapping a call to the standard Django `collectstatic <https://docs.djangoproject.com/en/4.1/ref/contrib/staticfiles/#collectstati>`_ command. It adds ``--noinput`` and a list of ``--ignore`` file patterns to the command call.
 
-     - ``./manage.py lms collectstatic && ./manage.py cms collectstatic``
+     - ``./manage.py lms collectstatic --noinput && ./manage.py cms collectstatic --noinput``
 
-       TODO
+       The standard Django interface will be used without a wrapper. The ignore patterns will be added to edx-platform's `staticfiles app configuration <https://docs.djangoproject.com/en/4.1/ref/contrib/staticfiles/#customizing-the-ignored-pattern-list>`_ so that they do not need to be supplied as part of the command.
    
-   * - **Watch** static assets for changes in the background. When a change occurs, rebuild them automatically, so that the Django webserver picks up the changes. This is only necessary in development environments. A few different sets of assets may be watched: XModule assets, Webpack assets, default SCSS, and theme SCSS.
+   * - **Watch** static assets for changes in the background. When a change occurs, rebuild them automatically, so that the Django webserver picks up the changes. This is only necessary in **development** environments. A few different sets of assets may be watched: XModule fragments, Webpack assets, default SCSS, and theme SCSS.
 
      - ``paver watch_assets``
 
-       TODO
+       Paver task that invokes ``webpack --watch`` for Webpack assets and watchdog (a Python library) for other assets.
 
      - ``assets/build.sh --watch <stage>``
 
        where ``<stage>`` if one of the build stages described above
 
-       TODO.
+       Bash wrapprers around invocation(s) of `watchman <https://facebook.github.io/watchman/>`_, a popular file-watching library maintained by Meta. Watchman is already installed into edx-platform (and other services) via the pywatchman pip wrapper package.
+
+       Note: This adds a Python dependency to build.sh. However, we could be clear that watchman is an *optional* dependency of build.sh, enabling the optional ``--watch`` feature. This would keep the *build* action Python-free. Alternatively, watchman is also availble Python-free via apt and homebrew.
 
 Notes on Tutor
 ==============
