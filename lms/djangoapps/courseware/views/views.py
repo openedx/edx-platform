@@ -1701,7 +1701,7 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
             'course': course,
             'video_title': block.display_name_with_default,
             'video_description': video_description,
-            'video_thumbnail': video_poster if video_poster is not None else  '',
+            'video_thumbnail': video_poster if video_poster is not None else '',
             'video_embed_url': urljoin(
                 settings.LMS_ROOT_URL,
                 reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(usage_key)})
