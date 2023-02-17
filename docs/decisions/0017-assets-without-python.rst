@@ -68,7 +68,8 @@ Three particular issues have surfaced in Developer Experience Working Group disc
      - Potential solution(s)
 
    * - edx-platform Docker images are too large and/or take too long to build.
-     - Switch from large, legacy tooling packages (such as libsass-python and paver) to industry standard, precompiled ones (like node-sass or dart-sass). Remove unneccessary & slow calls to Django management commands.
+     - + Switch from large, legacy tooling packages (such as libsass-python and paver) to industry standard, precompiled ones (like node-sass or dart-sass).
+       + Remove unneccessary & slow calls to Django management commands.
 
    * - edx-platform Docker image layers seem to be rebuilt more often than they should.
      - Remove all Python dependencies from the static asset build process, such that changes to Python code or requirements do not always have to result in a static asset rebuild.
@@ -115,7 +116,9 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
      - New implementation
 
    * - **Build: All stages.** Compile, generate, copy, and otherwise process static assets so that they can be used by the Django webserver or collected elsewhere. For many Web applications, all static asset building would be coordinated via Webpack or another NPM-managed tool. Due to the age of edx-platform and its legacy XModule and Comprehensive Theming systems, though, there are five stages which need to be performed in a particular order.
-     - ``paver update_assets --skip-collect``: A Python-defined task that calls out to each build stage.
+     - ``paver update_assets --skip-collect``
+
+       A Python-defined task that calls out to each build stage.
      - ``assets/build.sh``: A Bash script that contains all build stages, its command-line interface inspired by Tutor's ``openedx-assets`` script. The script will be runnable on any POSIX system, including macOS and Ubuntu. The script will be linted for common shell scripting mistakes using `shellcheck <https://www.shellcheck.net>`_.
      
    * - **Build stage 1: Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
