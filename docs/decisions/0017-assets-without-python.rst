@@ -124,7 +124,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        A Bash script that contains all build stages, with subcommands available for running each stage separately. Its command-line interface inspired by Tutor's ``openedx-assets`` script. The script will be runnable on any POSIX system, including macOS and Ubuntu and it will linted for common shell scripting mistakes using `shellcheck <https://www.shellcheck.net>`_.
      
-   * - **Build stage 1: Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
+   * - + **Build stage 1: Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
 
      - ``paver update_assets --skip-collect``
 
@@ -134,7 +134,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Pure Bash reimplementation.
  
-   * - **Build stage 2: Copy XModule framents** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation. This is done for a hard-coded list of XModule-style XBlocks, which are not growing in number; it is *not* a problem for in-repository pure XBlock Fragments or pip-installed XBlock assets, which are ready-to-serve.
+   * - + **Build stage 2: Copy XModule framents** from the xmodule source tree over to places where will be available for Webpacking and SCSS compliation. This is done for a hard-coded list of XModule-style XBlocks, which are not growing in number; it is *not* a problem for in-repository pure XBlock Fragments or pip-installed XBlock assets, which are ready-to-serve.
 
      - ``paver process_xmodule_assets``, or
        ``xmodule_assets``
@@ -148,7 +148,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
        
        (The initial implementation of build.sh may just point at ``xmodule_assets``).
    
-   * - **Build stage 3: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
+   * - + **Build stage 3: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
 
      - ``paver webpack``
 
@@ -158,7 +158,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up. Open edX distributions, such as Tutor, can choose how to supply the Django-setting-dervied parameters in an efficient manner.
    
-   * - **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
+   * - + **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
      - ``paver compile_sass``
 
@@ -168,7 +168,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        TODO
    
-   * - **Build stage 5: Compiled themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
+   * - + **Build stage 5: Compiled themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
 
      - ``paver compile_sass``
 
