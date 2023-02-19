@@ -3413,12 +3413,12 @@ FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
 ############# Cross-domain requests #################
 
 if FEATURES.get('ENABLE_CORS_HEADERS'):
-    CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ('https://studio.lilac.funix.edu.vn')
-    CORS_ORIGIN_ALLOW_ALL = True
-    CORS_ALLOW_INSECURE = True
+    CORS_ALLOW_CREDENTIALS = False
+    CORS_ORIGIN_WHITELIST = ('studio.lilac.funix.edu.vn')
+    CORS_ORIGIN_ALLOW_ALL = False
+    CORS_ALLOW_INSECURE = False
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-        'use-jwt-cookie',
+        'use-jwt-cookie','fx-programs-headers'
     )
 
 # Default cache expiration for the cross-domain proxy HTML page.
