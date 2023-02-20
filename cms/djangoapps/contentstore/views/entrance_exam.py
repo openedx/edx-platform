@@ -1,5 +1,5 @@
 """
-Entrance Exams view module -- handles all requests related to entrance exam management via Studio
+Entrance Exams view block -- handles all requests related to entrance exam management via Studio
 Intended to be utilized as an AJAX callback handler, versus a proper view/screen
 """
 
@@ -24,7 +24,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import create_xblock, remove_entrance_exam_graders
-from .item import delete_item
+from .block import delete_item
 
 __all__ = ['entrance_exam', ]
 
@@ -64,9 +64,9 @@ def entrance_exam(request, course_key_string):
     deleting assets, and changing the "locked" state of an asset.
 
     GET
-        Retrieves the entrance exam module (metadata) for the specified course
+        Retrieves the entrance exam block (metadata) for the specified course
     POST
-        Adds an entrance exam module to the specified course.
+        Adds an entrance exam block to the specified course.
     DELETE
         Removes the entrance exam from the course
     """
@@ -76,7 +76,7 @@ def entrance_exam(request, course_key_string):
     if not has_course_author_access(request.user, course_key):
         return HttpResponse(status=403)
 
-    # Retrieve the entrance exam module for the specified course (returns 404 if none found)
+    # Retrieve the entrance exam block for the specified course (returns 404 if none found)
     if request.method == 'GET':
         return _get_entrance_exam(request, course_key)
 
@@ -94,7 +94,7 @@ def entrance_exam(request, course_key_string):
             return create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
         return HttpResponse(status=400)
 
-    # Remove the entrance exam module for the specified course (returns 204 regardless of existence)
+    # Remove the entrance exam block for the specified course (returns 204 regardless of existence)
     elif request.method == 'DELETE':
         return delete_entrance_exam(request, course_key)
 

@@ -35,7 +35,7 @@ locales:
     # - et_EE  # Estonian (Estonia)
     - eu_ES  # Basque (Spain)
     # - fa  # Persian
-    # - fa_IR  # Persian (Iran)
+    - fa_IR  # Persian (Iran)
     # - fi_FI  # Finnish (Finland)
     # - fil  # Filipino
     - fr  # French

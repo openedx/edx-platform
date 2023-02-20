@@ -2681,8 +2681,6 @@ COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-s
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
 
-PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
-
 ######################## Registration ########################
 
 # Social-core setting that allows inactive users to be able to
@@ -2698,3 +2696,6 @@ EDX_BRAZE_API_KEY = None
 EDX_BRAZE_API_SERVER = None
 
 BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
+
+DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
+DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''

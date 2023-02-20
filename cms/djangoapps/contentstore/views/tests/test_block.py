@@ -1,4 +1,4 @@
-"""Tests for items views."""
+"""Tests for block views."""
 
 
 import json
@@ -12,6 +12,9 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from openedx_events.content_authoring.data import DuplicatedXBlockData
+from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
@@ -33,7 +36,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory, check_mongo_calls
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
     MINIMUM_STATIC_PARTITION_ID,
@@ -45,7 +48,7 @@ from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
-from cms.djangoapps.contentstore.views import item as item_module
+from cms.djangoapps.contentstore.views import block as item_module
 from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
@@ -57,10 +60,10 @@ from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 
 from ..component import component_handler, get_component_templates
-from ..item import (
+from ..block import (
     ALWAYS,
     VisibilityState,
-    _get_module_info,
+    _get_block_info,
     _get_source_index,
     _xblock_type_and_display_name,
     add_container_page_publishing_info,
@@ -238,7 +241,7 @@ class GetItemTest(ItemTest):
 
     def test_split_test(self):
         """
-        Test that a split_test module renders all of its children in Studio.
+        Test that a split_test block renders all of its children in Studio.
         """
         root_usage_key = self._create_vertical()
         resp = self.create_xblock(category='split_test', parent_usage_key=root_usage_key)
@@ -305,7 +308,7 @@ class GetItemTest(ItemTest):
         """
         Tests that valid paging is passed along to underlying block
         """
-        with patch('cms.djangoapps.contentstore.views.item.get_preview_fragment') as patched_get_preview_fragment:
+        with patch('cms.djangoapps.contentstore.views.block.get_preview_fragment') as patched_get_preview_fragment:
             retval = Mock()
             type(retval).content = PropertyMock(return_value="Some content")
             type(retval).resources = PropertyMock(return_value=[])
@@ -447,7 +450,7 @@ class GetItemTest(ItemTest):
                     xblock = parent_xblock
             else:
                 self.assertNotIn('ancestors', response)
-                self.assertEqual(_get_module_info(xblock), response)
+                self.assertEqual(_get_block_info(xblock), response)
 
 
 @ddt.ddt
@@ -510,7 +513,7 @@ class TestCreateItem(ItemTest):
         self.assertEqual(problem.display_name, template['metadata']['display_name'])
         self.assertEqual(problem.markdown, template['metadata']['markdown'])
 
-    def test_create_item_negative(self):
+    def test_create_block_negative(self):
         """
         Negative tests for create_item
         """
@@ -550,6 +553,7 @@ class DuplicateHelper:
             self._check_equality(source_usage_key, usage_key, parent_usage_key, check_asides=check_asides),
             "Duplicated item differs from original"
         )
+        return usage_key
 
     def _check_equality(self, source_usage_key, duplicate_usage_key, parent_usage_key=None, check_asides=False,
                         is_child=False):
@@ -642,10 +646,24 @@ class DuplicateHelper:
         return self.response_usage_key(resp)
 
 
-class TestDuplicateItem(ItemTest, DuplicateHelper):
+class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
     """
     Test the duplicate method.
     """
+
+    ENABLED_OPENEDX_EVENTS = [
+        "org.openedx.content_authoring.xblock.duplicated.v1",
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         """ Creates the test course structure and a few components to 'duplicate'. """
@@ -683,6 +701,27 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
         self._duplicate_and_verify(self.vert_usage_key, self.seq_usage_key)
         self._duplicate_and_verify(self.seq_usage_key, self.chapter_usage_key)
         self._duplicate_and_verify(self.chapter_usage_key, self.usage_key)
+
+    def test_duplicate_event(self):
+        """
+        Check that XBLOCK_DUPLICATED event is sent when xblock is duplicated.
+        """
+        event_receiver = Mock()
+        XBLOCK_DUPLICATED.connect(event_receiver)
+        usage_key = self._duplicate_and_verify(self.vert_usage_key, self.seq_usage_key)
+        event_receiver.assert_called()
+        self.assertDictContainsSubset(
+            {
+                "signal": XBLOCK_DUPLICATED,
+                "sender": None,
+                "xblock_info": DuplicatedXBlockData(
+                    usage_key=usage_key,
+                    block_type=usage_key.block_type,
+                    source_usage_key=self.vert_usage_key,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
 
     def test_ordering(self):
         """
@@ -1208,7 +1247,7 @@ class TestMoveItem(ItemTest):
         validation = html.validate()
         self.assertEqual(len(validation.messages), 0)
 
-    @patch('cms.djangoapps.contentstore.views.item.log')
+    @patch('cms.djangoapps.contentstore.views.block.log')
     def test_move_logging(self, mock_logger):
         """
         Test logging when an item is successfully moved.
@@ -1886,7 +1925,7 @@ class TestEditItemSplitMongo(TestEditItemSetup):
 
 class TestEditSplitModule(ItemTest):
     """
-    Tests around editing instances of the split_test module.
+    Tests around editing instances of the split_test block.
     """
 
     def setUp(self):
@@ -1935,7 +1974,7 @@ class TestEditSplitModule(ItemTest):
         self.client.ajax_post(
             self.split_test_update_url,
             # Even though user_partition_id is Scope.content, it will get saved by the Studio editor as
-            # metadata. The code in item.py will update the field correctly, even though it is not the
+            # metadata. The code in block.py will update the field correctly, even though it is not the
             # expected scope.
             data={'metadata': {'user_partition_id': str(partition_id)}}
         )
@@ -1956,7 +1995,7 @@ class TestEditSplitModule(ItemTest):
     def test_create_groups(self):
         """
         Test that verticals are created for the configuration groups when
-        a spit test module is edited.
+        a spit test block is edited.
         """
         split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
         # Initially, no user_partition_id is set, and the split_test has no children.
@@ -2543,17 +2582,17 @@ class TestXBlockInfo(ItemTest):
     def setUp(self):
         super().setUp()
         user_id = self.user.id
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id,
             highlights=['highlight'],
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Lesson 1", user_id=user_id
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location, category='vertical', display_name='Unit 1', user_id=user_id
         )
-        self.video = ItemFactory.create(
+        self.video = BlockFactory.create(
             parent_location=self.vertical.location, category='video', display_name='My Video', user_id=user_id
         )
 
@@ -2571,18 +2610,18 @@ class TestXBlockInfo(ItemTest):
     def test_xblock_outline_handler_mongo_calls(self, store_type, chapter_queries, chapter_queries_1):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
-            chapter = ItemFactory.create(
+            chapter = BlockFactory.create(
                 parent_location=course.location, category='chapter', display_name='Week 1'
             )
             outline_url = reverse_usage_url('xblock_outline_handler', chapter.location)
             with check_mongo_calls(chapter_queries):
                 self.client.get(outline_url, HTTP_ACCEPT='application/json')
 
-            sequential = ItemFactory.create(
+            sequential = BlockFactory.create(
                 parent_location=chapter.location, category='sequential', display_name='Sequential 1'
             )
 
-            ItemFactory.create(
+            BlockFactory.create(
                 parent_location=sequential.location, category='vertical', display_name='Vertical 1'
             )
             # calls should be same after adding two new children for split only.
@@ -2590,7 +2629,7 @@ class TestXBlockInfo(ItemTest):
                 self.client.get(outline_url, HTTP_ACCEPT='application/json')
 
     def test_entrance_exam_chapter_xblock_info(self):
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Entrance Exam",
             user_id=self.user.id, is_entrance_exam=True
         )
@@ -2609,7 +2648,7 @@ class TestXBlockInfo(ItemTest):
         self.assertIsNone(xblock_info.get('is_header_visible', None))
 
     def test_none_entrance_exam_chapter_xblock_info(self):
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Test Chapter",
             user_id=self.user.id
         )
@@ -2629,12 +2668,12 @@ class TestXBlockInfo(ItemTest):
         self.assertIsNone(xblock_info.get('is_header_visible', None))
 
     def test_entrance_exam_sequential_xblock_info(self):
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Entrance Exam",
             user_id=self.user.id, is_entrance_exam=True, in_entrance_exam=True
         )
 
-        subsection = ItemFactory.create(
+        subsection = BlockFactory.create(
             parent_location=chapter.location, category='sequential', display_name="Subsection - Entrance Exam",
             user_id=self.user.id, in_entrance_exam=True
         )
@@ -2649,7 +2688,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['display_name'], 'Subsection - Entrance Exam')
 
     def test_none_entrance_exam_sequential_xblock_info(self):
-        subsection = ItemFactory.create(
+        subsection = BlockFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Subsection - Exam",
             user_id=self.user.id
         )
@@ -2710,7 +2749,7 @@ class TestXBlockInfo(ItemTest):
         """
         with self.store.default_store(store_type):
             course = CourseFactory.create()
-            chapter = ItemFactory.create(
+            chapter = BlockFactory.create(
                 parent_location=course.location, category='chapter', display_name='Week 1'
             )
 
@@ -2868,7 +2907,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
     def setUp(self):
         super().setUp()
         user_id = self.user.id
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id,
             highlights=['highlight'],
         )
@@ -2895,7 +2934,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             _mock_does_backend_support_onboarding,
             mock_get_exam_configuration_dashboard_url,
     ):
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Test Lesson 1",
@@ -2937,7 +2976,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             _mock_does_backend_support_onboarding_patch,
             _mock_get_exam_configuration_dashboard_url,
     ):
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Test Lesson 1",
@@ -2965,7 +3004,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             _mock_does_backend_support_onboarding_patch,
             _mock_get_exam_configuration_dashboard_url,
     ):
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Test Lesson 1",
@@ -2993,13 +3032,13 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
         super().setUp()
         user_id = self.user.id
         self.library = LibraryFactory.create()
-        self.top_level_html = ItemFactory.create(
+        self.top_level_html = BlockFactory.create(
             parent_location=self.library.location, category='html', user_id=user_id, publish_item=False
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.library.location, category='vertical', user_id=user_id, publish_item=False
         )
-        self.child_html = ItemFactory.create(
+        self.child_html = BlockFactory.create(
             parent_location=self.vertical.location, category='html', display_name='Test HTML Child Block',
             user_id=user_id, publish_item=False
         )
@@ -3052,7 +3091,7 @@ class TestLibraryXBlockCreation(ItemTest):
 
     def test_no_add_discussion(self):
         """
-        Verify we cannot add a discussion module to a Library.
+        Verify we cannot add a discussion block to a Library.
         """
         lib = LibraryFactory.create()
         response = self.create_xblock(parent_usage_key=lib.location, display_name='Test', category='discussion')
@@ -3083,7 +3122,7 @@ class TestXBlockPublishingInfo(ItemTest):
         """
         Creates a child xblock for the given parent.
         """
-        child = ItemFactory.create(
+        child = BlockFactory.create(
             parent_location=parent.location, category=category, display_name=display_name,
             user_id=self.user.id, publish_item=publish_item
         )

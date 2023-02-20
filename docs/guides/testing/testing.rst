@@ -183,7 +183,7 @@ How to output coverage locally
 These are examples of how to run a single test and get coverage::
 
     pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-config=.coveragerc-local # cms example
-    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-config=.coveragerc-local # lms example
+    pytest lms/djangoapps/courseware/tests/test_block_render.py --cov --cov-config=.coveragerc-local # lms example
 
 That ``--cov-conifg=.coveragerc-local`` option is important - without it, the coverage
 tool will look for paths that exist on our jenkins test servers, but not on your local devstack.
@@ -220,8 +220,7 @@ The report is then saved in reports/xmodule/cover/index.html
 To run tests for stub servers, for example for `YouTube stub server`_, you can
 run one of these commands::
 
-    paver test_system -s cms -t common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
-    pytest common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
+    pytest --ds=cms.env.test common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
 .. _YouTube stub server: https://github.com/openedx/edx-platform/blob/master/common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 

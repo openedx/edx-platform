@@ -1,4 +1,6 @@
-"""Tests for serializers for the Learner Dashboard"""
+"""
+Tests for serializers for the Learner Home
+"""
 
 from datetime import date, datetime, timedelta, timezone
 from itertools import product
@@ -30,7 +32,6 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import (
 from lms.djangoapps.learner_home.serializers import (
     CertificateSerializer,
     CourseProviderSerializer,
-    CourseRecommendationSerializer,
     CourseRunSerializer,
     CourseSerializer,
     CreditSerializer,
@@ -1028,81 +1029,6 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         )
         actual_keys = output_data.keys()
         assert expected_keys == actual_keys
-
-
-class TestCourseRecommendationSerializer(TestCase):
-    """High-level tests for CourseRecommendationSerializer"""
-
-    @classmethod
-    def mock_recommended_courses(cls, courses_count=2):
-        """Sample course data"""
-
-        recommended_courses = []
-
-        for _ in range(courses_count):
-            recommended_courses.append(
-                {
-                    "course_key": str(uuid4()),
-                    "logo_image_url": random_url(),
-                    "marketing_url": random_url(),
-                    "title": str(uuid4()),
-                },
-            )
-
-        return recommended_courses
-
-    def test_no_recommended_courses(self):
-        """That that data serializes correctly for empty courses list"""
-
-        recommended_courses = self.mock_recommended_courses(courses_count=0)
-
-        output_data = CourseRecommendationSerializer(
-            {
-                "courses": recommended_courses,
-                "is_personalized_recommendation": False,
-            }
-        ).data
-
-        self.assertDictEqual(
-            output_data,
-            {
-                "courses": [],
-                "isPersonalizedRecommendation": False,
-            },
-        )
-
-    def test_happy_path(self):
-        """Test that data serializes correctly"""
-
-        recommended_courses = self.mock_recommended_courses()
-
-        output_data = CourseRecommendationSerializer(
-            {
-                "courses": recommended_courses,
-                "is_personalized_recommendation": True,
-            }
-        ).data
-
-        self.assertDictEqual(
-            output_data,
-            {
-                "courses": [
-                    {
-                        "courseKey": recommended_courses[0]["course_key"],
-                        "logoImageUrl": recommended_courses[0]["logo_image_url"],
-                        "marketingUrl": recommended_courses[0]["marketing_url"],
-                        "title": recommended_courses[0]["title"],
-                    },
-                    {
-                        "courseKey": recommended_courses[1]["course_key"],
-                        "logoImageUrl": recommended_courses[1]["logo_image_url"],
-                        "marketingUrl": recommended_courses[1]["marketing_url"],
-                        "title": recommended_courses[1]["title"],
-                    },
-                ],
-                "isPersonalizedRecommendation": True,
-            },
-        )
 
 
 class TestSuggestedCourseSerializer(TestCase):

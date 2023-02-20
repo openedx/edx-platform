@@ -5,7 +5,7 @@ like DISABLE_START_DATES.
 
 Note: The access control logic in this file does NOT check for enrollment in
   a course.  It is expected that higher layers check for enrollment so we
-  don't have to hit the enrollments table on every module load.
+  don't have to hit the enrollments table on every block load.
 
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
@@ -104,8 +104,8 @@ def has_access(user, action, obj, course_key=None):
     switching based on various settings.
 
     Things this module understands:
-    - start dates for modules
-    - visible_to_staff_only for modules
+    - start dates for blocks
+    - visible_to_staff_only for blocks
     - DISABLE_START_DATES
     - different access for instructor, staff, course staff, and students.
     - mobile_available flag for course blocks
@@ -113,7 +113,7 @@ def has_access(user, action, obj, course_key=None):
     user: a Django user object. May be anonymous. If none is passed,
                     anonymous is assumed
 
-    obj: The object to check access for.  A module, descriptor, location, or
+    obj: The object to check access for.  A block, descriptor, location, or
                     certain special strings (e.g. 'global')
 
     action: A string specifying the action that the client is trying to perform.
@@ -557,9 +557,9 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
     def can_load():
         """
         NOTE: This does not check that the student is enrolled in the course
-        that contains this module.  We may or may not want to allow non-enrolled
-        students to see modules.  If not, views should check the course, so we
-        don't have to hit the enrollments table on every module load.
+        that contains this block.  We may or may not want to allow non-enrolled
+        students to see blocks.  If not, views should check the course, so we
+        don't have to hit the enrollments table on every block load.
         """
         # If the user (or the role the user is currently masquerading as) does not have
         # access to this content, then deny access. The problem with calling _has_staff_access_to_descriptor
@@ -569,7 +569,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         if not group_access_response:
             return group_access_response
 
-        # If the user has staff access, they can load the module and checks below are not needed.
+        # If the user has staff access, they can load the block and checks below are not needed.
         staff_access_response = _has_staff_access_to_descriptor(user, descriptor, course_key)
         if staff_access_response:
             return staff_access_response
@@ -595,17 +595,6 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
     }
 
     return _dispatch(checkers, action, user, descriptor)
-
-
-def _has_access_xmodule(user, action, xmodule, course_key):
-    """
-    Check if user has access to this xmodule.
-
-    Valid actions:
-      - same as the valid actions for xmodule.descriptor
-    """
-    # Delegate to the descriptor
-    return has_access(user, action, xmodule.descriptor, course_key)
 
 
 def _has_access_location(user, action, location, course_key):

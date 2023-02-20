@@ -34,24 +34,24 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
     # NOTE: we need to explicitly implement the logic for setting the vertical's parent
     # and index here since the XML modulestore cannot load draft modules
     with modulestore.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
-        draft_modules = modulestore.get_items(
+        draft_blocks = modulestore.get_items(
             course_key,
             qualifiers={'category': {'$nin': DIRECT_ONLY_CATEGORIES}},
             revision=ModuleStoreEnum.RevisionOption.draft_only
         )
-        # Check to see if the returned draft modules have changes w.r.t. the published module.
-        # Only modules with changes will be exported into the /drafts directory.
-        draft_modules = [module for module in draft_modules if modulestore.has_changes(module)]
-        if draft_modules:
+        # Check to see if the returned draft blocks have changes w.r.t. the published block.
+        # Only blocks with changes will be exported into the /drafts directory.
+        draft_blocks = [block for block in draft_blocks if modulestore.has_changes(block)]
+        if draft_blocks:
             draft_course_dir = export_fs.makedir(DRAFT_DIR, recreate=True)
 
-            # accumulate tuples of draft_modules and their parents in
+            # accumulate tuples of draft_blocks and their parents in
             # this list:
             draft_node_list = []
 
-            for draft_module in draft_modules:
+            for draft_block in draft_blocks:
                 parent_loc = modulestore.get_parent_location(
-                    draft_module.location,
+                    draft_block.location,
                     revision=ModuleStoreEnum.RevisionOption.draft_preferred
                 )
 
@@ -61,9 +61,9 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
                     parent_url = str(parent_loc)
 
                 draft_node = draft_node_constructor(
-                    draft_module,
-                    location=draft_module.location,
-                    url=str(draft_module.location),
+                    draft_block,
+                    location=draft_block.location,
+                    url=str(draft_block.location),
                     parent_location=parent_loc,
                     parent_url=parent_url,
                 )
@@ -107,9 +107,9 @@ class ExportManager:
     """
     def __init__(self, modulestore, contentstore, courselike_key, root_dir, target_dir):
         """
-        Export all modules from `modulestore` and content from `contentstore` as xml to `root_dir`.
+        Export all blocks from `modulestore` and content from `contentstore` as xml to `root_dir`.
 
-        `modulestore`: A `ModuleStore` object that is the source of the modules to export
+        `modulestore`: A `ModuleStore` object that is the source of the blocks to export
         `contentstore`: A `ContentStore` object that is the source of the content to export, can be None
         `courselike_key`: The Locator of the Descriptor to export
         `root_dir`: The directory to write the exported xml to
@@ -355,13 +355,8 @@ def adapt_references(subtree, destination_course_key, export_fs):
     Map every reference in the subtree into destination_course_key and set it back into the xblock fields
     """
     subtree.runtime.export_fs = export_fs  # ensure everything knows where it's going!
-    # TODO: Remove logging statements after export issue is resolved (INF-667)
-    node_id = subtree.scope_ids.usage_id.html_id()
-    logging.debug(f"Exporting {destination_course_key} node {node_id}")
     for field_name, field in subtree.fields.items():
-        logging.debug(f"Exporting {destination_course_key} node {node_id} field {field_name}")
         if field.is_set_on(subtree):
-            logging.debug(f"Exporting {destination_course_key} node {node_id} field_on {field_name}")
             if isinstance(field, Reference):
                 value = field.read_from(subtree)
                 if value is not None:
@@ -380,23 +375,20 @@ def adapt_references(subtree, destination_course_key, export_fs):
                         key: ele.map_into_course(destination_course_key) for key, ele in field.read_from(subtree).items()  # lint-amnesty, pylint: disable=line-too-long
                     }
                 )
-            logging.debug(f"Export_successful {destination_course_key} node {node_id} field_on {field_name}")
-        logging.debug(f"Export_successful {destination_course_key} node {node_id} field {field_name}")
-    logging.debug(f"Export_successful {destination_course_key} node {node_id}")
 
 
 def _export_field_content(xblock_item, item_dir):
     """
     Export all fields related to 'xblock_item' other than 'metadata' and 'data' to json file in provided directory
     """
-    module_data = xblock_item.get_explicitly_set_fields_by_scope(Scope.content)
-    if isinstance(module_data, dict):
-        for field_name in module_data:
+    block_data = xblock_item.get_explicitly_set_fields_by_scope(Scope.content)
+    if isinstance(block_data, dict):
+        for field_name in block_data:
             if field_name not in DEFAULT_CONTENT_FIELDS:
                 # filename format: {dirname}.{field_name}.json
                 with item_dir.open('{}.{}.{}'.format(xblock_item.location.block_id, field_name, 'json'),
                                    'wb') as field_content_file:
-                    field_content_file.write(dumps(module_data.get(field_name, {}), cls=EdxJSONEncoder,
+                    field_content_file.write(dumps(block_data.get(field_name, {}), cls=EdxJSONEncoder,
                                                    sort_keys=True, indent=4).encode('utf-8'))
 
 

@@ -25,7 +25,7 @@ from rest_framework.exceptions import PermissionDenied
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 from common.djangoapps.student.tests.factories import (
@@ -319,7 +319,7 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         """
         Build a discussion xblock in self.course.
         """
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id=topic_id,
@@ -505,8 +505,8 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         Test that only topics that a user has access to are returned. The
         ways in which a user may not have access are:
 
-        * Module is visible to staff only
-        * Module is accessible only to a group the user is not in
+        * Block is visible to staff only
+        * Block is accessible only to a group the user is not in
 
         Also, there is a case that ensures that a category with no accessible
         subcategories does not appear in the result.
@@ -1405,6 +1405,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "resp_skip": ["70"],
                 "resp_limit": ["14"],
                 "with_responses": ["True"],
+                "reverse_order": ["False"],
             }
         )
 
@@ -4014,20 +4015,20 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             discussion_topics={f"Course Wide Topic {idx}": {"id": f'course-wide-topic-{idx}'} for idx in range(10)}
         )
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
         self.verticals = [
-            ItemFactory.create(
+            BlockFactory.create(
                 parent_location=self.sequential.location,
                 category='vertical',
                 display_name=f'vertical-{idx}',
@@ -4035,7 +4036,7 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
             )
             for idx in range(10)
         ]
-        staff_only_unit = ItemFactory.create(
+        staff_only_unit = BlockFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
             display_name='staff-vertical-1',

@@ -226,6 +226,25 @@ def create_blocks_params(course_usage_key, user):
     }
 
 
+def add_thread_stats_to_subsection(topics_list):
+    """
+    Add topic stats at subsection by adding stats of all units in
+    the topic
+    """
+    for section in topics_list:
+        for subsection in section.get('children', []):
+            discussions = 0
+            questions = 0
+            for unit in subsection.get('children', []):
+                thread_counts = unit.get('thread_counts', {})
+                discussions += thread_counts.get('discussion', 0)
+                questions += thread_counts.get('question', 0)
+            subsection['thread_counts'] = {
+                'discussion': discussions,
+                'question': questions,
+            }
+
+
 def create_topics_v3_structure(blocks, topics):
     """
     Create V3 topics structure from blocks and v2 topics
@@ -253,6 +272,7 @@ def create_topics_v3_structure(blocks, topics):
                     topics,
                 )
 
+    add_thread_stats_to_subsection(courseware_topics)
     structured_topics = non_courseware_topics + courseware_topics
     topic_ids = get_topic_ids_from_topics(topics)
 
@@ -269,7 +289,33 @@ def create_topics_v3_structure(blocks, topics):
     if archived_topics['children']:
         structured_topics.append(archived_topics)
 
-    return structured_topics
+    return remove_empty_sequentials(structured_topics)
+
+
+def remove_empty_sequentials(data):
+    """
+    Removes all objects of type "sequential" from a nested list of objects if they
+    have no children.
+    After removing the empty sequentials, if the parent of the sequential is now empty,
+    it will also be removed.
+    Parameters:
+    data (list): A list of nested objects to check and remove empty sequentials from.
+
+    Returns:
+    list: The modified list with empty sequentials removed.
+    """
+    new_data = []
+    for obj in data:
+        block_type = obj.get('type')
+        if block_type != 'sequential' or (block_type == 'sequential' and obj.get('children')):
+            if obj.get('children'):
+                obj['children'] = remove_empty_sequentials(obj['children'])
+                if obj['children'] or block_type != 'chapter':
+                    new_data.append(obj)
+            else:
+                if block_type != 'chapter':
+                    new_data.append(obj)
+    return new_data
 
 
 def get_topic_ids_from_topics(topics: List[Dict[str, str]]) -> List[str]:

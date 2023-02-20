@@ -140,7 +140,7 @@ class RoundTripTestCase(unittest.TestCase):
             list(second_import.modules[course_id].keys())
         )
 
-        print("Checking module equality")
+        print("Checking block equality")
         for location in initial_import.modules[course_id].keys():
             print(("Checking", location))
             assert blocks_are_equivalent(initial_import.modules[course_id][location],

@@ -26,7 +26,7 @@ from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_s
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -730,7 +730,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         }
         self.register_get_course_commentable_counts_response(self.course.id, self.thread_counts_map)
 
-    def create_course(self, modules_count, module_store, topics):
+    def create_course(self, blocks_count, module_store, topics):
         """
         Create a course in a specified module store with discussion xblocks and topics
         """
@@ -745,8 +745,8 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
         course_url = reverse("course_topics", kwargs={"course_id": str(course.id)})
         # add some discussion xblocks
-        for i in range(modules_count):
-            ItemFactory.create(
+        for i in range(blocks_count):
+            BlockFactory.create(
                 parent_location=course.location,
                 category='discussion',
                 discussion_id=f'id_module_{i}',
@@ -760,7 +760,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         """
         Build a discussion xblock in self.course
         """
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category="discussion",
             discussion_id=topic_id,
@@ -804,8 +804,8 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         (10, ModuleStoreEnum.Type.split, 2, {"Test Topic 1": {"id": "test_topic_1"}}),
     )
     @ddt.unpack
-    def test_bulk_response(self, modules_count, module_store, mongo_calls, topics):
-        course_url, course_id = self.create_course(modules_count, module_store, topics)
+    def test_bulk_response(self, blocks_count, module_store, mongo_calls, topics):
+        course_url, course_id = self.create_course(blocks_count, module_store, topics)
         self.register_get_course_commentable_counts_response(course_id, {})
         with check_mongo_calls(mongo_calls):
             with modulestore().default_store(module_store):
@@ -882,19 +882,19 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         Tests whether the new structure is available on old topics API
         (For mobile compatibility)
         """
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        sequential = ItemFactory.create(
+        sequential = BlockFactory.create(
             parent_location=chapter.location,
             category='sequential',
             display_name="Lesson 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=sequential.location,
             category='vertical',
             display_name='vertical',
@@ -942,20 +942,20 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
                 "usage_key": None,
             }}
         )
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location,
             category='chapter',
             display_name="Week 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
             start=datetime(2015, 3, 1, tzinfo=UTC),
         )
         self.verticals = [
-            ItemFactory.create(
+            BlockFactory.create(
                 parent_location=self.sequential.location,
                 category='vertical',
                 display_name='vertical',
@@ -1003,7 +1003,7 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
         assert courseware_topic_keys == expected_courseware_keys
         expected_courseware_keys.remove('courseware')
         sequential_keys = list(data[1]['children'][0].keys())
-        assert sequential_keys == expected_courseware_keys
+        assert sequential_keys == (expected_courseware_keys + ['thread_counts'])
         expected_non_courseware_keys.remove('courseware')
         vertical_keys = list(data[1]['children'][0]['children'][0].keys())
         assert vertical_keys == expected_non_courseware_keys
@@ -2030,6 +2030,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "mark_as_read": ["False"],
                 "recursive": ["False"],
                 "with_responses": ["True"],
+                "reverse_order": ["False"],
             }
         )
 
@@ -2064,6 +2065,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "mark_as_read": ["False"],
                 "recursive": ["False"],
                 "with_responses": ["True"],
+                "reverse_order": ["False"],
             }
         )
 
@@ -2278,6 +2280,35 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             response_users = response_comment['users']
             assert expected_author_profile_data == response_users[response_comment['author']]
             assert response_comment['endorsed_by'] not in response_users
+
+    def test_reverse_order_sort(self):
+        """
+        Tests if reverse_order param is passed to cs comments service
+        """
+        self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+        source_comments = [
+            self.create_source_comment({"user_id": str(self.author.id), "username": self.author.username})
+        ]
+        self.register_get_thread_response({
+            "id": self.thread_id,
+            "course_id": str(self.course.id),
+            "thread_type": "discussion",
+            "children": source_comments,
+            "resp_total": 100,
+        })
+        self.client.get(self.url, {"thread_id": self.thread_id, "reverse_order": True})
+        self.assert_query_params_equal(
+            httpretty.httpretty.latest_requests[-2],
+            {
+                "resp_skip": ["0"],
+                "resp_limit": ["10"],
+                "user_id": [str(self.user.id)],
+                "mark_as_read": ["False"],
+                "recursive": ["False"],
+                "with_responses": ["True"],
+                "reverse_order": ["True"],
+            }
+        )
 
 
 @httpretty.activate
@@ -2747,7 +2778,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         divided_course_wide_discussions = ['Topic B', ]
         divided_discussions = divided_inline_discussions + divided_course_wide_discussions
 
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.course,
             category='discussion',
             discussion_id=topic_name_to_id(self.course, 'Topic A'),
@@ -2971,7 +3002,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         self._assert_current_settings(expected_response)
 
         now = datetime.now()
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='Topic_A',

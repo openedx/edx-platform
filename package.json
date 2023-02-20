@@ -74,14 +74,13 @@
     "which-country": "1.0.0"
   },
   "devDependencies": {
+    "@edx/eslint-config": "^3.1.0",
     "@edx/mockprock": "github:openedx/mockprock#85a9a8577149cd7c88fd5e8e84e280a8ce40a218",
     "@edx/stylelint-config-edx": "1.1.0",
     "babel-jest": "26.0.0",
     "edx-custom-a11y-rules": "1.0.6",
     "enzyme": "3.3.0",
     "enzyme-adapter-react-16": "1.1.1",
-    "eslint-config-edx": "3.0.1",
-    "eslint-config-edx-es5": "2.0.0",
     "eslint-import-resolver-webpack": "0.8.4",
     "jasmine-core": "2.6.4",
     "jasmine-jquery": "git+https://git@github.com/velesin/jasmine-jquery.git#ebad463d592d3fea00c69f26ea18a930e09c7b58",

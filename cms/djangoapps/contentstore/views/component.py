@@ -32,7 +32,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 
 from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
 from .helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from .item import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
+from .block import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
 
 __all__ = [
     'container_handler',
@@ -546,7 +546,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     """
     usage_key = UsageKey.from_string(usage_key_string)
 
-    # Let the module handle the AJAX
+    # Let the block handle the AJAX
     req = django_to_webob_request(request)
 
     try:

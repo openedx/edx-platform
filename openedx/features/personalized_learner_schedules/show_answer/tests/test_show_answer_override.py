@@ -8,7 +8,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module
+from lms.djangoapps.courseware.block_render import get_block
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from xmodule.capa_block import SHOWANSWER  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -33,7 +33,7 @@ class ShowAnswerFieldOverrideTest(ModuleStoreTestCase):
     def get_course_block(self, course):
         request = RequestFactory().request()
         field_data_cache = FieldDataCache([], course.id, self.user)
-        return get_module(self.user, request, course.location, field_data_cache, course=course)
+        return get_block(self.user, request, course.location, field_data_cache, course=course)
 
     @ddt.data(True, False)
     def test_override_enabled_for(self, active):

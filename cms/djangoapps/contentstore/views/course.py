@@ -34,8 +34,8 @@ from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
 
-from cms.djangoapps.contentstore.utils import mark_verticals_discussion_enabled
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
+from cms.djangoapps.course_creators.models import CourseCreator
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
@@ -67,7 +67,6 @@ from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
@@ -76,6 +75,7 @@ from openedx.core.lib.courses import course_image_url
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from organizations.models import Organization
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseBlock, DEFAULT_START_DATE, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
@@ -110,7 +110,7 @@ from ..utils import (
 from .component import ADVANCED_COMPONENT_TYPES
 from .helpers import is_content_creator
 from .entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
-from .item import create_xblock_info
+from .block import create_xblock_info
 from .library import (
     LIBRARIES_ENABLED,
     LIBRARY_AUTHORING_MICROFRONTEND_URL,
@@ -256,7 +256,7 @@ def course_handler(request, course_key_string=None):
     """
     The restful handler for course specific requests.
     It provides the course tree with the necessary information for identifying and labeling the parts. The root
-    will typically be a 'course' object but may not be especially as we support modules.
+    will typically be a 'course' object but may not be especially as we support blocks.
 
     GET
         html: return course listing page if not given a course id
@@ -590,7 +590,9 @@ def course_listing(request):
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
         'optimization_enabled': optimization_enabled,
-        'active_tab': 'courses'
+        'active_tab': 'courses',
+        'allowed_organizations': get_allowed_organizations(user),
+        'can_create_organizations': user_can_create_organizations(user),
     })
 
 
@@ -615,7 +617,9 @@ def library_listing(request):
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
         'rerun_creator_status': GlobalStaff().has_user(request.user),
         'split_studio_home': split_library_view_on_dashboard(),
-        'active_tab': 'libraries'
+        'active_tab': 'libraries',
+        'allowed_organizations': get_allowed_organizations(request.user),
+        'can_create_organizations': user_can_create_organizations(request.user),
     }
     return render_to_response('index.html', data)
 
@@ -725,11 +729,6 @@ def course_index(request, course_key):
         # gather any errors in the currently stored proctoring settings.
         advanced_dict = CourseMetadata.fetch(course_block)
         proctoring_errors = CourseMetadata.validate_proctoring_settings(course_block, advanced_dict, request.user)
-
-        configuration = DiscussionsConfiguration.get(course_key)
-        provider = configuration.provider_type
-        if provider == Provider.OPEN_EDX:
-            mark_verticals_discussion_enabled(course_structure, course_key)
 
         return render_to_response('course_outline.html', {
             'language_code': request.LANGUAGE_CODE,
@@ -1924,3 +1923,35 @@ def _get_course_creator_status(user):
         course_creator_status = 'granted'
 
     return course_creator_status
+
+
+def get_allowed_organizations(user):
+    """
+    Helper method for returning the list of organizations for which the user is allowed to create courses.
+    """
+    if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return get_organizations(user)
+    else:
+        return []
+
+
+def user_can_create_organizations(user):
+    """
+    Returns True if the user can create organizations.
+    """
+    return user.is_staff or not settings.FEATURES.get('ENABLE_CREATOR_GROUP', False)
+
+
+def get_organizations(user):
+    """
+    Returns the list of organizations for which the user is allowed to create courses.
+    """
+    course_creator = CourseCreator.objects.filter(user=user).first()
+    if not course_creator:
+        return []
+    elif course_creator.all_organizations:
+        organizations = Organization.objects.all().values_list('short_name', flat=True)
+    else:
+        organizations = course_creator.organizations.all().values_list('short_name', flat=True)
+
+    return organizations

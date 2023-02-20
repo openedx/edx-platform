@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -25,7 +25,7 @@
 # Theeranuch Sirikojakorn <totallyp3@gmail.com>, 2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -42,7 +42,7 @@
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -66,11 +66,12 @@
 # Punsarn <translator@punsarn.asia>, 2019
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015,2017
 # Sorathan Chaturapruek <tummykung@gmail.com>, 2014
+# Summer Wiphatsumrit, 2023
 # Theeranuch Sirikojakorn <totallyp3@gmail.com>, 2015
 # Sorathan Chaturapruek <tummykung@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -89,7 +90,7 @@
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015-2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -104,9 +105,9 @@
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (https://www.transifex.com/open-edx/teams/6205/th/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -115,7 +116,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-25 20:42+0000\n"
+"POT-Creation-Date: 2023-01-29 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Thai (https://www.transifex.com/open-edx/teams/6205/th/)\n"
@@ -127,8 +128,8 @@ msgstr ""
 "Generated-By: Babel 2.8.0\n"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/item.py xmodule/html_block.py
+#: cms/djangoapps/contentstore/views/block.py
+#: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
 msgid "Text"
 msgstr ""
 
@@ -149,11 +150,9 @@ msgstr ""
 msgid "Problem"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/component.py
-#: openedx/core/djangoapps/content_libraries/constants.py
 #: lms/templates/video.html
 msgid "Video"
-msgstr ""
+msgstr "วีดีโอ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -339,14 +338,9 @@ msgstr ""
 msgid "{currency_symbol}{price}"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This refers to the cost of the course. In this case, the
-#. course costs nothing so it is free.
-#: common/djangoapps/course_modes/models.py
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/course_modes/track_selection.html
 msgid "Free"
-msgstr ""
+msgstr "ฟรี"
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -1880,10 +1874,10 @@ msgstr "โดย Open edX"
 msgid "Blog"
 msgstr "บล็อก "
 
-#: lms/djangoapps/branding/api.py cms/templates/widgets/sock_links.html
+#: cms/templates/widgets/sock_links.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
-msgstr ""
+msgstr "ติดต่อเรา"
 
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
@@ -1920,11 +1914,10 @@ msgstr ""
 msgid "Contact"
 msgstr "ติดต่อ"
 
-#: lms/djangoapps/branding/api.py
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
-msgstr ""
+msgstr "อาชีพ"
 
 #: themes/red-theme/lms/templates/footer.html
 msgid "News"
@@ -1971,7 +1964,7 @@ msgid "Cookie Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Data"
+msgid "Do Not Sell My Personal Information"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -2814,11 +2807,10 @@ msgstr ""
 msgid "by {date}"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py
 #: cms/templates/group_configurations.html
 #: lms/templates/courseware/program_marketing.html
 msgid "Learn More"
-msgstr ""
+msgstr "เรียนรู้เพิ่มเติม"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Retry Verification"
@@ -4273,19 +4265,16 @@ msgstr ""
 msgid " (out of {total})"
 msgstr ""
 
-#: lms/djangoapps/learner_dashboard/programs.py
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 msgid "Programs"
-msgstr ""
+msgstr "โปรแกรม"
 
-#: lms/djangoapps/learner_dashboard/programs.py
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
-msgstr ""
+msgstr "รายละเอียดโปรแกรม"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -4313,13 +4302,13 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid "Whether to display this module in the table of contents"
+msgid "Whether to display this block in the table of contents"
 msgstr ""
 
 #. Translators: "TOC" stands for "Table of Contents"
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"What format this module is in (used for deciding which grader to apply, and "
+"What format this block is in (used for deciding which grader to apply, and "
 "what to show in the TOC)"
 msgstr ""
 
@@ -4392,10 +4381,9 @@ msgstr "การลงทะเบียน"
 msgid "View and update learner enrollments."
 msgstr ""
 
-#: lms/djangoapps/support/views/index.py
 #: lms/templates/support/manage_user.html
 msgid "Manage User"
-msgstr ""
+msgstr "จัดการผู้ใช้งาน"
 
 #: lms/djangoapps/support/views/index.py
 msgid "Disable User Account"
@@ -5821,11 +5809,9 @@ msgid ""
 "%(user_schedule_upgrade_deadline_time)s."
 msgstr ""
 
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
 #: lms/templates/course_modes/track_selection.html
 msgid "Upgrade Now"
-msgstr ""
+msgstr "อัพเกรดตอนนี้"
 
 #: openedx/core/djangoapps/api_admin/admin.py
 #, python-brace-format
@@ -5900,13 +5886,10 @@ msgstr ""
 msgid "'%s' is not a valid scope."
 msgstr ""
 
-#: openedx/core/djangoapps/bookmarks/apps.py
-#: openedx/features/course_bookmarks/plugins.py
-#: openedx/features/course_bookmarks/views/course_bookmarks.py
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
 msgid "Bookmarks"
-msgstr ""
+msgstr "บุ๊คมาร์ค"
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
@@ -8037,12 +8020,11 @@ msgstr ""
 msgid "Deadlines successfully reset."
 msgstr ""
 
-#: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "Updates"
-msgstr ""
+msgstr "อัปเดต"
 
 #: openedx/features/discounts/admin.py
 msgid ""
@@ -9109,7 +9091,7 @@ msgid "Date that enrollment for this class is closed"
 msgstr ""
 
 #: xmodule/course_block.py
-msgid "Start time when this module is visible"
+msgid "Start time when this block is visible"
 msgstr ""
 
 #: xmodule/course_block.py
@@ -9670,7 +9652,7 @@ msgid "Entrance Exam ID"
 msgstr ""
 
 #: xmodule/course_block.py
-msgid "Content module identifier (location) of entrance exam."
+msgid "Content block identifier (location) of entrance exam."
 msgstr ""
 
 #: xmodule/course_block.py
@@ -9966,7 +9948,7 @@ msgid ""
 msgstr ""
 
 #: xmodule/html_block.py
-msgid "Html contents to display for this module"
+msgid "Html contents to display for this block"
 msgstr ""
 
 #: xmodule/html_block.py
@@ -10508,13 +10490,13 @@ msgid ""
 msgstr ""
 
 #: xmodule/modulestore/inheritance.py
-msgid "Tag this module as part of an Entrance Exam section"
+msgid "Tag this block as part of an Entrance Exam section"
 msgstr ""
 
 #: xmodule/modulestore/inheritance.py
 msgid ""
-"Enter true or false. If true, answer submissions for problem modules will be"
-" considered in the Entrance Exam scoring/gating algorithm."
+"Enter true or false. If true, answer submissions for problem blocks will be "
+"considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
 
 #: xmodule/modulestore/xml_importer.py
@@ -10522,7 +10504,7 @@ msgid "Error while reading {}. Check file for XML errors."
 msgstr ""
 
 #: xmodule/modulestore/xml_importer.py
-msgid "Failed to import module: {} at location: {}"
+msgid "Failed to import block: {} at location: {}"
 msgstr ""
 
 #: xmodule/partitions/enrollment_track_partition_generator.py
@@ -10694,7 +10676,7 @@ msgid "Group Configuration"
 msgstr ""
 
 #: xmodule/split_test_block.py
-msgid "Which child module students in a particular group_id should see"
+msgid "Which child block students in a particular group_id should see"
 msgstr ""
 
 #: xmodule/split_test_block.py
@@ -11440,6 +11422,89 @@ msgid ""
 "File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
 msgstr ""
 
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Invalid data"
+msgstr "ข้อมูลไม่ถูกต้อง"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "ข้อมูลไม่ถูกต้อง ({details})"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Item is already present in target location."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item into itself."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item into it's child."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item directly into content experiment."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "ค่าซ้ำกันของ {0}"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "ค่าซ้ำกันของ '{0}'"
+
+#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
+#. in many languages. This is used to avoid Transifex's misinterpreting of
+#. '% o'. The percent sign is also translatable as a standalone string.
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"นักเรียนจะต้องได้คะแนน {score}{pct_sign} "
+"หรือมากกว่าเพื่อเข้าถึงเอกสารประกอบการสอนได้"
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/views/block.py
+msgid "%"
+msgstr "เปอร์เซนต์"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
+
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
 msgstr "ต้องมีชื่อใบรับรอง"
@@ -11582,89 +11647,6 @@ msgstr ""
 msgid "File upload failed. Please try again"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "Invalid data"
-msgstr "ข้อมูลไม่ถูกต้อง"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "ข้อมูลไม่ถูกต้อง ({details})"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "Item is already present in target location."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item into itself."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item into it's child."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item directly into content experiment."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "ค่าซ้ำกันของ {0}"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "ค่าซ้ำกันของ '{0}'"
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"นักเรียนจะต้องได้คะแนน {score}{pct_sign} "
-"หรือมากกว่าเพื่อเข้าถึงเอกสารประกอบการสอนได้"
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/item.py
-msgid "%"
-msgstr "เปอร์เซนต์"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
-
 #: cms/djangoapps/contentstore/views/library.py
 msgid ""
 "User does not have the permission to create library in this organization or "
@@ -11711,8 +11693,8 @@ msgid "The information you entered is incorrect."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
-msgstr "ทรานสคริปสามารถรองรับได้เฉพาะ \"วิดีโอ\" เท่านั้น"
+msgid "Transcripts are supported only for \"video\" blocks."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -12047,7 +12029,7 @@ msgstr "ไม่พบหน้าที่ต้องการเปิด"
 #: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
 #: lms/templates/static_pdfbook.html lms/templates/staticbook.html
 msgid "Content"
-msgstr ""
+msgstr "เนื้อหา"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
@@ -12105,7 +12087,7 @@ msgstr "ตัวอย่าง: username@domain.com"
 
 #: cms/templates/settings.html lms/templates/courseware/program_marketing.html
 msgid "Instructors"
-msgstr ""
+msgstr "อาจารย์ผู้สอน"
 
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Requirements"
@@ -12153,7 +12135,7 @@ msgstr ""
 #: lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
-msgstr ""
+msgstr "เลือกภาษา"
 
 #: cms/templates/widgets/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
@@ -12172,7 +12154,7 @@ msgstr "ช่วยเหลือ"
 #: lms/templates/courseware/static_tab.html
 #: lms/templates/courseware/tab-view.html
 msgid "name"
-msgstr ""
+msgstr "ชื่อ"
 
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
@@ -12181,15 +12163,15 @@ msgstr "ออกจากระบบ"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
-msgstr ""
+msgstr "แบบฟอร์มรับข้อเสนอแนะ"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Email: {email}"
-msgstr ""
+msgstr "อีเมล: {email}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Full Name: {realname}"
-msgstr ""
+msgstr "ชื่อและนามสกุล: {realname}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Inquiry Type: {inquiry_type}"
@@ -12197,7 +12179,7 @@ msgstr ""
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Message: {message}"
-msgstr ""
+msgstr "ข้อความ: {message}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Tags: {tags}"
@@ -12205,11 +12187,11 @@ msgstr ""
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Additional Info:"
-msgstr ""
+msgstr "ข้อมูลเพิ่มเติม:"
 
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
-msgstr ""
+msgstr "ข้อเสนอแนะจากผู้ใช้"
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid ""
@@ -12219,7 +12201,7 @@ msgstr ""
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid "No action is needed on your part."
-msgstr ""
+msgstr "คุณไม่จำเป็นต้องดำเนินการใดๆ"
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid ""
@@ -12444,7 +12426,7 @@ msgstr ""
 #: lms/templates/courseware/course_about.html lms/templates/enroll_staff.html
 msgctxt "self"
 msgid "Enroll"
-msgstr ""
+msgstr "ลงทะเบียน"
 
 #: lms/templates/enroll_staff.html
 msgid "Don't enroll"
@@ -12484,7 +12466,7 @@ msgstr "การตรวจสอบภายนอกล้มเหลว"
 
 #: lms/templates/footer.html
 msgid "organization logo"
-msgstr ""
+msgstr "ตราสัญลักษณ์ขององค์กร"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
@@ -12715,7 +12697,7 @@ msgstr "เจ้าหน้าที่"
 
 #: lms/templates/preview_menu.html
 msgid "Learner"
-msgstr ""
+msgstr "ผู้เรียน"
 
 #: lms/templates/preview_menu.html
 msgid "Specific learner"
@@ -12723,7 +12705,7 @@ msgstr ""
 
 #: lms/templates/preview_menu.html
 msgid "Learner in {content_group}"
-msgstr ""
+msgstr "ผู้เรียนใน {content_group}"
 
 #: lms/templates/preview_menu.html
 msgid "Username or email:"
@@ -12735,11 +12717,11 @@ msgstr "ตั้งโหมดแสดงตัวอย่าง"
 
 #: lms/templates/preview_menu.html
 msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
-msgstr ""
+msgstr "คุณกำลังดูคอร์สนี้ในมุมมองของ {i_start}{user_name}{i_end}"
 
 #: lms/templates/preview_menu.html
 msgid "View in Studio"
-msgstr ""
+msgstr "แสดงใน Studio"
 
 #: lms/templates/preview_menu.html
 msgid "View in Insights"
@@ -12751,15 +12733,15 @@ msgstr "คำใบ้"
 
 #: lms/templates/problem.html
 msgid "Save your answer"
-msgstr ""
+msgstr "บันทึกคำตอบ"
 
 #: lms/templates/problem.html
 msgid "Reset your answer"
-msgstr ""
+msgstr "รีเซ็ตคำตอบของคุณ"
 
 #: lms/templates/problem.html
 msgid "Show answer"
-msgstr ""
+msgstr "แสดงคำตอบ"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
@@ -12822,7 +12804,7 @@ msgstr ""
 
 #: lms/templates/secondary_email_change_failed.html
 msgid "Secondary e-mail change failed"
-msgstr ""
+msgstr "การเปลี่ยนอีเมลสำรองล้มเหลว"
 
 #: lms/templates/secondary_email_change_failed.html
 msgid "We were unable to activate your secondary email {secondary_email}"
@@ -12840,19 +12822,19 @@ msgstr ""
 
 #: lms/templates/seq_block.html
 msgid "Important!"
-msgstr ""
+msgstr "สำคัญ!"
 
 #. Translators: A button for showing the Previous Unit
 #: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Previous"
-msgstr ""
+msgstr "ก่อนหน้า"
 
 #. Translators: A button for showing the Next Unit
 #: lms/templates/seq_block.html
 msgctxt "unit"
 msgid "Next"
-msgstr ""
+msgstr "ถัดไป"
 
 #: lms/templates/seq_block.html
 msgid "Sequence"
@@ -12860,7 +12842,7 @@ msgstr ""
 
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
-msgstr ""
+msgstr "เสร็จสิ้น"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -12880,7 +12862,7 @@ msgstr "เช่น ชื่อของคุณ (ที่ต้องกา
 
 #: lms/templates/signup_modal.html
 msgid "{start_li}Welcome{end_li} {name}"
-msgstr ""
+msgstr "{start_li}ยินดีตอนรับ{end_li} {name}"
 
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -13092,16 +13074,16 @@ msgstr "แดชบอร์ดสำหรับ:"
 
 #: lms/templates/user_dropdown.html
 msgid "Usermenu"
-msgstr ""
+msgstr "เมนูสำหรับผู้ใช้"
 
 #: lms/templates/user_dropdown.html
 msgid "More options"
-msgstr ""
+msgstr "ตัวเลือกเพิ่มเติม"
 
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
 msgid "More Options"
-msgstr ""
+msgstr "ตัวเลือกเพิ่มเติม"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -13178,11 +13160,11 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
-msgstr ""
+msgstr "ใบรับรองผลการเรียน"
 
 #: lms/templates/video.html
 msgid "Download {file}"
-msgstr ""
+msgstr "ดาวน์โหลด {file}"
 
 #: lms/templates/video.html
 msgid "Download transcript"
@@ -13190,7 +13172,7 @@ msgstr "ดาวน์โหลดบันทึก"
 
 #: lms/templates/video.html
 msgid "Handouts"
-msgstr ""
+msgstr "เอกสารประกอบคำบรรยาย"
 
 #: lms/templates/video.html
 msgid "Download Handout"
@@ -13754,20 +13736,20 @@ msgstr ""
 
 #: lms/templates/api_admin/catalogs/edit.html
 msgid "Edit {catalog_name}"
-msgstr ""
+msgstr "แก้ไข {catalog_name}"
 
 #: lms/templates/api_admin/catalogs/edit.html
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Download CSV"
-msgstr ""
+msgstr "ดาวน์โหลด CSV "
 
 #: lms/templates/api_admin/catalogs/edit.html
 msgid "Delete this catalog"
-msgstr ""
+msgstr "ลบแคตตาล็อกนี้"
 
 #: lms/templates/api_admin/catalogs/edit.html
 msgid "Update Catalog"
-msgstr ""
+msgstr "อัปเดตแคตตาล็อก"
 
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Catalogs for {username}"
@@ -13775,23 +13757,23 @@ msgstr ""
 
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Create new catalog:"
-msgstr ""
+msgstr "สร้างแคตตาล็อกใหม่"
 
 #: lms/templates/api_admin/catalogs/list.html
 msgid "Create Catalog"
-msgstr ""
+msgstr "สร้างแคตตาล็อก"
 
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Catalog search"
-msgstr ""
+msgstr "ค้นหาแคตตาล็อก"
 
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Catalog Search"
-msgstr ""
+msgstr "ค้นหาแคตตาล็อก"
 
 #: lms/templates/api_admin/catalogs/search.html
 msgid "Enter a username to view catalogs belonging to that user."
-msgstr ""
+msgstr "ระบุชื่อผู้ใช้ เพื่อดูแคตตาล็อกของผู้ใช้นั้น"
 
 #: lms/templates/bulk_email/confirm_unsubscribe.html
 #: lms/templates/bulk_email/unsubscribe_success.html
@@ -13991,7 +13973,7 @@ msgstr "คำนวณ"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Result"
-msgstr ""
+msgstr "ผลลัพธ์"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "CCX Coach Dashboard"
@@ -14021,7 +14003,7 @@ msgstr "เกรดของผู้เรียน"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Please enter a valid CCX name."
-msgstr ""
+msgstr "กรุณาระบุชื่อ CCX ที่ถูกต้อง"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -14081,7 +14063,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgctxt "someone"
 msgid "Enroll"
-msgstr ""
+msgstr "ลงทะเบียน"
 
 #: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
@@ -14135,7 +14117,7 @@ msgstr "รูปแบบเวลา ชั่วโมงสองหลั�
 
 #: lms/templates/ccx/schedule.html
 msgid "Time"
-msgstr ""
+msgstr "เวลา"
 
 #: lms/templates/ccx/schedule.html
 msgid "Set date"
@@ -14165,7 +14147,7 @@ msgstr "รูปแบบวันที่ ปีสี่หลัก.เด�
 
 #: lms/templates/ccx/schedule.html
 msgid "yyyy-mm-dd"
-msgstr ""
+msgstr "yyyy-mm-dd"
 
 #. Translators: This explains to people using a screen reader how to interpret
 #. the format of HH:MM
@@ -14175,7 +14157,7 @@ msgstr "รูปแบบเวลาเริ่มต้น ชั่วโ�
 
 #: lms/templates/ccx/schedule.html
 msgid "time"
-msgstr ""
+msgstr "เวลา"
 
 #: lms/templates/ccx/schedule.html
 msgid "(Optional)"
@@ -14254,7 +14236,7 @@ msgstr "สนับสนุนโดยองค์กรดังต่อไ
 
 #: lms/templates/certificates/_accomplishment-rendering.html
 msgid "Awarded to:"
-msgstr ""
+msgstr "มอบให้แก่:"
 
 #: lms/templates/certificates/_edx-accomplishment-print-help.html
 msgid ""
@@ -14509,7 +14491,7 @@ msgstr ""
 
 #: lms/templates/course_modes/fbe.html
 msgid "Show more"
-msgstr ""
+msgstr "แสดงเพิ่มเติม"
 
 #: lms/templates/course_modes/fbe.html
 msgid ""
@@ -14612,7 +14594,7 @@ msgstr "ปิดการลงทะเบียนแล้ว"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll Now"
-msgstr ""
+msgstr "ลงทะเบียนเดี๋ยวนี้"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -14650,7 +14632,7 @@ msgstr "ข้อมูลเพิ่มเติม"
 #: lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "enroll"
-msgstr ""
+msgstr "ลงทะเบียน"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
@@ -14685,7 +14667,7 @@ msgstr "ส่งอีเมล์ไปบอกใครสักคนว่
 
 #: lms/templates/courseware/course_navigation.html
 msgid "current location"
-msgstr ""
+msgstr "ที่อยู่ปัจจุบัน"
 
 #. Translators: 'needs attention' is an alternative string for the
 #. notification image that indicates the tab "needs attention".
@@ -14704,7 +14686,7 @@ msgstr "ซ่อน"
 
 #: lms/templates/courseware/course_updates.html
 msgid "Show"
-msgstr ""
+msgstr "แสดง"
 
 #: lms/templates/courseware/course_updates.html
 msgid "Show Earlier Course Updates"
@@ -14782,7 +14764,7 @@ msgstr ""
 
 #: lms/templates/courseware/gradebook.html
 msgid "next page"
-msgstr ""
+msgstr "หน้าถัดไป"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -14798,7 +14780,7 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Original Price"
-msgstr ""
+msgstr "ราคาเดิม"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "${oldPrice}"
@@ -14806,7 +14788,7 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Discounted Price"
-msgstr ""
+msgstr "ลดราคา"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "${newPrice}"
@@ -14822,7 +14804,7 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Play"
-msgstr ""
+msgstr "เล่น"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "YouTube Video"
@@ -14834,11 +14816,11 @@ msgstr "ดูหลักสูตร"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Meet the Instructors"
-msgstr ""
+msgstr "พบอาจารย์ผู้สอน"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Frequently Asked Questions"
-msgstr ""
+msgstr "คำถามที่พบบ่อย"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Job Outlook"
@@ -14850,11 +14832,11 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "What You'll Learn"
-msgstr ""
+msgstr "สิ่งที่คุณจะได้เรียนรู้"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Average Length"
-msgstr ""
+msgstr "ความยาวโดยเฉลี่ย"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "{weeks_to_complete} weeks per course"
@@ -14872,7 +14854,7 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Number of Courses"
-msgstr ""
+msgstr "จำนวนคอร์ส"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "{number_of_courses} courses in program"
@@ -14880,7 +14862,7 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Price (USD)"
-msgstr ""
+msgstr "ราคา (USD)"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "${newPrice}{htmlEnd} for entire program"
@@ -14900,7 +14882,7 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Starts on {}"
-msgstr ""
+msgstr "เริ่มเมื่อ {}"
 
 #: lms/templates/courseware/progress.html
 msgid "{course_number} Progress"
@@ -14920,7 +14902,7 @@ msgstr "แสดงใบรับรอง"
 
 #: lms/templates/courseware/progress.html
 msgid "Opens in a new browser window"
-msgstr ""
+msgstr "เปิดในหน้าต่างใหม่"
 
 #: lms/templates/courseware/progress.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -15194,11 +15176,11 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "View grades"
-msgstr ""
+msgstr "แสดงคะแนน"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
-msgstr ""
+msgstr "รายละเอียดคอร์ส"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Home Page"
@@ -15218,19 +15200,19 @@ msgstr "เร็วๆ นี้"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Ended - {date}"
-msgstr ""
+msgstr "สิ้นสุด - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Started - {date}"
-msgstr ""
+msgstr "เริ่มเมื่อ - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
-msgstr ""
+msgstr "เริ่ม - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for {course_display_name}"
-msgstr ""
+msgstr "สำหรับ {course_display_name}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
@@ -15255,10 +15237,11 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
 msgstr ""
+"ฉันกำลังเรียน {course_name} ออนไลน์ กับ  {facebook_brand} ดูเพิ่มเติม!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
-msgstr ""
+msgstr "แชร์ {course_name} ไปยัง Facebook"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
@@ -15267,10 +15250,11 @@ msgstr "แบ่งปันบน Facebook"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
 msgstr ""
+"ฉันกำลังเรียนวิชา {course_name} ออนไลน์ กับ {twitter_brand} ดูเพิ่มเติม!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Twitter"
-msgstr ""
+msgstr "แชร์ {course_name} ไปยัง Twitter"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options for"
@@ -15298,7 +15282,7 @@ msgstr "ดูหลักสูตรที่เก็บไว้"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
-msgstr ""
+msgstr "โปรแกรมที่เกี่ยวข้อง"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -15316,11 +15300,11 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
-msgstr ""
+msgstr "อัพเกรด"
 
 #: lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
-msgstr ""
+msgstr "เรียนต่อจากเดิม"
 
 #. Translators: provider_name is the name of a credit provider or university
 #. (e.g. State University)
@@ -15360,7 +15344,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "View Details"
-msgstr ""
+msgstr "ดูรายละเอียด"
 
 #. Translators: link_to_provider_site is a link to an external webpage. The
 #. text of the link will be the name of a credit provider, such as 'State
@@ -15397,7 +15381,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_show_consent.html
 msgid "Consent to share your data"
-msgstr ""
+msgstr "ยินยอมให้แชร์ข้อมูลของคุณ"
 
 #: lms/templates/dashboard/_dashboard_show_consent.html
 msgid ""
@@ -15436,19 +15420,19 @@ msgstr ""
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 msgid "Price is too high for me"
-msgstr ""
+msgstr "ราคาสูงเกินไปสำหรับฉัน"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 msgid "I was not satisfied with my experience taking the courses"
-msgstr ""
+msgstr "ฉันไม่พอใจกับประสบการณ์ที่ได้รับจากการเรียน"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 msgid "Content of the courses was too difficult"
-msgstr ""
+msgstr "เนื้อหาของคอร์สยากเกินไป"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 msgid "I did not have enough time to complete the courses"
-msgstr ""
+msgstr "ฉันมีเวลาไม่พอที่จะเรียนให้จบคอร์ส"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 msgid "The content was not available when I wanted to start"
@@ -15461,31 +15445,31 @@ msgstr ""
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Thank you for sharing your reasons for unenrolling."
-msgstr ""
+msgstr "ขอบคุณที่แบ่งปันเหตุผลที่ยกเลิกลงทะเบียนเรียนของคุณ"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "You are unenrolled from"
-msgstr ""
+msgstr "คุณได้ยกเลิกการลงทะเบียนเรียนจาก"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Return To Dashboard"
-msgstr ""
+msgstr "กลับไปที่แดชบอร์ด"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Browse Courses"
-msgstr ""
+msgstr "เรียกดูรายวิชา"
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid ""
 "We're sorry to see you go! Please share your main reason for unenrolling."
-msgstr ""
+msgstr "ขออภัยในความไม่สะดวก! โปรดระบุเหตุผลที่คุณยกเลิกการลงทะเบียน"
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I just wanted to browse the material"
-msgstr ""
+msgstr "ฉันแค่ต้องการดูเอกสารประกอบการเรียน"
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid "This won't help me reach my goals"
@@ -15493,7 +15477,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the time"
-msgstr ""
+msgstr "ฉันไม่มีเวลา"
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the academic or language prerequisites"
@@ -15501,11 +15485,11 @@ msgstr ""
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have enough support"
-msgstr ""
+msgstr "ฉันไม่ได้รับการสนับสนุนที่เพียงพอ"
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I am not happy with the quality of the content"
-msgstr ""
+msgstr "ฉันไม่พอใจในคุณภาพของเนื้อหา"
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too hard"
@@ -15521,7 +15505,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Other"
-msgstr ""
+msgstr "อื่นๆ"
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -15529,7 +15513,7 @@ msgstr "ผลลัพธ์:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Topic:"
-msgstr ""
+msgstr "หัวข้อ:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
@@ -15578,12 +15562,12 @@ msgstr "กรอง:"
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Show all posts"
-msgstr ""
+msgstr "แสดงโพสต์ทั้งหมด"
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unread posts"
-msgstr ""
+msgstr "โพสต์ที่ยังไม่อ่าน"
 
 #. Translators: This is a menu option for showing only unanswered forum
 #. question threads
@@ -15860,7 +15844,7 @@ msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "The photo of you:"
-msgstr ""
+msgstr "ภาพของคุณ:"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "The photo of your ID:"
@@ -15868,7 +15852,7 @@ msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "Other Reasons:"
-msgstr ""
+msgstr "เหตุผลอื่นๆ:"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "Resubmit Verification: {reverify_url}"
@@ -15899,7 +15883,7 @@ msgstr "หมายเลขการสั่งซื้อของคุณ
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Hello {full_name},"
-msgstr ""
+msgstr "สวัสดี {full_name},"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Your {platform_name} ID verification photos have been approved."
@@ -16043,7 +16027,7 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Dear edX Learner,"
-msgstr ""
+msgstr "สวัสดีผู้เรียน edX,"
 
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
@@ -16094,11 +16078,11 @@ msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Back to Student FAQs"
-msgstr ""
+msgstr "กลับสู่คำถามที่ถามบ่อยของนักเรียน"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Apply for Financial Assistance"
-msgstr ""
+msgstr "สมัครเพื่อขอความช่วยเหลือทางการเงิน"
 
 #: lms/templates/header/brand.html
 #: lms/templates/header/navbar-logo-header.html
@@ -16109,7 +16093,7 @@ msgstr ""
 
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
 msgid "Options Menu"
-msgstr ""
+msgstr "เมนูทางเลือก"
 
 #: lms/templates/header/header.html lms/templates/navigation/navigation.html
 msgid ""
@@ -16127,7 +16111,7 @@ msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
-msgstr ""
+msgstr "ลิงก์เสริม"
 
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
@@ -16141,7 +16125,7 @@ msgstr "โรงเรียน"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
-msgstr ""
+msgstr "ลงทะเบียนเรียนฟรี"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
@@ -16149,7 +16133,7 @@ msgstr ""
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
-msgstr ""
+msgstr "โปรไฟล์"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Order History"
@@ -16362,7 +16346,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Master's"
-msgstr ""
+msgstr "ปริญญาโท"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Unpaid Bootcamp"
@@ -16390,7 +16374,7 @@ msgstr "วันสิ้นสุดการเรียน:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "No end date set"
-msgstr ""
+msgstr "ไม่มีการกำหนดวันที่สิ้นสุด"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
@@ -16756,7 +16740,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reason for reset"
-msgstr ""
+msgstr "เหตุผลในการตั้งค่าใหม่"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
@@ -17174,7 +17158,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "All Learners"
-msgstr ""
+msgstr "ผู้เรียนทั้งหมด"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Cohort: "
@@ -17354,7 +17338,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Example"
-msgstr ""
+msgstr "ตัวอย่าง"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem location"
@@ -17964,7 +17948,7 @@ msgstr ""
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "No results found"
-msgstr ""
+msgstr "ไม่พบผลลัพธ์"
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
@@ -18129,11 +18113,11 @@ msgstr ""
 
 #: lms/templates/widgets/cookie-consent.html
 msgid "Got it!"
-msgstr ""
+msgstr "เข้าใจแล้ว!"
 
 #: lms/templates/widgets/cookie-consent.html
 msgid "Learn more"
-msgstr ""
+msgstr "เรียนรู้เพิ่มเติม"
 
 #: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
@@ -18161,11 +18145,11 @@ msgstr ""
 
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 msgid "Language Code"
-msgstr ""
+msgstr "รหัสภาษา"
 
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 msgid "e.g. en for English"
-msgstr ""
+msgstr "ตัวอย่างเช่น en สำหรับ English"
 
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 msgid "Preview Theme"
@@ -18217,7 +18201,7 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Why upgrade?"
-msgstr ""
+msgstr "ทำไมต้องอัปเกรด?"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Official proof of completion"
@@ -18343,7 +18327,7 @@ msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"
-msgstr ""
+msgstr "โปรไฟล์ของฉัน"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid ""
@@ -18352,7 +18336,7 @@ msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "An error occurred. Try loading the page again."
-msgstr ""
+msgstr "เกิดข้อผิดพลาด กรุณารีเฟรซหน้านี้ใหม่อีกครั้ง"
 
 #: themes/red-theme/lms/templates/footer.html
 msgid ""
@@ -18365,7 +18349,7 @@ msgstr ""
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Copyright"
-msgstr ""
+msgstr "ลิขสิทธิ์"
 
 #: themes/stanford-style/lms/templates/footer.html
 msgid "Copyright {year}. All rights reserved."
@@ -18597,11 +18581,11 @@ msgstr ""
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Terms of Service here!"
-msgstr ""
+msgstr "เพิ่มเงื่อนไขการให้บริการที่นี่!"
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Privacy Policy here!"
-msgstr ""
+msgstr "เพิ่มนโยบายความเป็นส่วนตัวที่นี่!"
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Honor Code here!"
@@ -19059,6 +19043,20 @@ msgid ""
 "sure to review and reset all dates, including the Course Start Date; set up "
 "the course team; review course updates and other assets for dated material; "
 "and seed the discussions and wiki."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"This course run is using an upgraded version of edx discussion forum. "
+"Discussion xblocks will no longer work."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid " Learn more"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Share feedback"
 msgstr ""
 
 #: cms/templates/course_outline.html

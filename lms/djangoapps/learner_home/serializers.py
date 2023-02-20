@@ -1,6 +1,7 @@
 """
-Serializers for the Learner Dashboard
+Serializers for Learner Home
 """
+
 from datetime import date, timedelta
 from urllib.parse import urljoin
 
@@ -536,26 +537,6 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         return ProgramsSerializer(
             {"relatedPrograms": programs}, context=self.context
         ).data
-
-
-class RecommendedCourseSerializer(serializers.Serializer):
-    """Serializer for a recommended course from the recommendation engine"""
-
-    courseKey = serializers.CharField(source="course_key")
-    logoImageUrl = serializers.URLField(source="logo_image_url")
-    marketingUrl = serializers.URLField(source="marketing_url")
-    title = serializers.CharField()
-
-
-class CourseRecommendationSerializer(serializers.Serializer):
-    """Recommended courses by the Amplitude"""
-
-    courses = serializers.ListField(
-        child=RecommendedCourseSerializer(), allow_empty=True
-    )
-    isPersonalizedRecommendation = serializers.BooleanField(
-        source="is_personalized_recommendation"
-    )
 
 
 class SuggestedCourseSerializer(serializers.Serializer):

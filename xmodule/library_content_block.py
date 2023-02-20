@@ -399,13 +399,13 @@ class LibraryContentBlock(
                 # 500-response.
                 logger.error('Skipping display for child block that is None')
                 continue
-            for displayable in child.displayable_items():
-                rendered_child = displayable.render(STUDENT_VIEW, child_context)
-                fragment.add_fragment_resources(rendered_child)
-                contents.append({
-                    'id': str(displayable.location),
-                    'content': rendered_child.content,
-                })
+
+            rendered_child = child.render(STUDENT_VIEW, child_context)
+            fragment.add_fragment_resources(rendered_child)
+            contents.append({
+                'id': str(child.location),
+                'content': rendered_child.content,
+            })
 
         fragment.add_content(self.runtime.service(self, 'mako').render_template('vert_module.html', {
             'items': contents,

@@ -121,8 +121,8 @@ def get_test_system(
 
     id_manager = CourseLocationManager(course_id)
 
-    def get_module(descriptor):
-        """Mocks module_system get_module function"""
+    def get_block(descriptor):
+        """Mocks module_system get_block function"""
 
         # Unlike XBlock Runtimes or DescriptorSystems,
         # each XModule is provided with a new ModuleSystem.
@@ -138,7 +138,7 @@ def get_test_system(
         return descriptor
 
     return TestModuleSystem(
-        get_module=get_module,
+        get_block=get_block,
         services={
             'user': user_service,
             'mako': mako_service,

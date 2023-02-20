@@ -91,7 +91,9 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
             'id': self.item_descriptor.location.html_id(),
+            'is_embed': False,
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
                 'saveStateEnabled': True,
@@ -172,6 +174,8 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
@@ -341,7 +345,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
             'id': self.item_descriptor.location.html_id(),
+            'is_embed': False,
             'metadata': '',
             'track': None,
             'transcript_download_format': 'srt',
@@ -459,7 +465,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
             'id': self.item_descriptor.location.html_id(),
+            'is_embed': False,
             'metadata': self.default_metadata_dict,
             'track': None,
             'transcript_download_format': 'srt',
@@ -584,6 +592,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': self.item_descriptor.location.html_id(),
             'track': None,
             'transcript_download_format': 'srt',
@@ -755,6 +765,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': self.item_descriptor.location.html_id(),
             'track': None,
             'transcript_download_format': 'srt',
@@ -866,6 +878,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': None,
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': None,
             'metadata': self.default_metadata_dict,
             'track': None,
@@ -960,7 +974,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': None,
             'handout': None,
+            'hide_downloads': False,
             'id': None,
+            'is_embed': False,
             'metadata': self.default_metadata_dict,
             'track': None,
             'transcript_download_format': 'srt',
@@ -1188,7 +1204,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 @ddt.ddt
 class TestVideoBlockInitialization(BaseTestVideoXBlock):
     """
-    Make sure that module initialization works correctly.
+    Make sure that block initialization works correctly.
     """
     CATEGORY = "video"
     DATA = SOURCE_XML
@@ -1786,7 +1802,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         Test that import val data internal works as expected.
         """
         create_profile('mobile')
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
 
         edx_video_id = 'test_edx_video_id'
         sub_id = '0CzPOIIdUsA'
@@ -1889,7 +1905,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         """
         xml_data = """<video><video_asset></video_asset></video>"""
         xml_object = etree.fromstring(xml_data)
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
         id_generator = Mock()
 
         # Verify edx_video_id is empty before.
@@ -1926,7 +1942,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             val_transcript_provider=val_transcript_provider
         )
         xml_object = etree.fromstring(xml_data)
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
         id_generator = Mock()
 
         # Create static directory in import file system and place transcript files inside it.
@@ -2032,7 +2048,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         edx_video_id = 'test_edx_video_id'
         language_code = 'en'
 
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
         id_generator = Mock()
 
         # Create static directory in import file system and place transcript files inside it.
@@ -2101,7 +2117,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
 
     def test_import_val_data_invalid(self):
         create_profile('mobile')
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
 
         # Negative file_size is invalid
         xml_data = """
@@ -2198,6 +2214,8 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
@@ -2272,6 +2290,8 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': self.item_descriptor.location.html_id(),
             'bumper_metadata': 'null',
             'metadata': json.dumps(OrderedDict({

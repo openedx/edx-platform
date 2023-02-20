@@ -1,4 +1,4 @@
-"""Views for items (modules)."""
+"""Views for blocks."""
 
 import logging
 from collections import OrderedDict
@@ -11,9 +11,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.utils.timezone import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from edx_django_utils.plugins import pluggable_override
+from openedx_events.content_authoring.data import DuplicatedXBlockData
+from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from edx_proctoring.api import (
     does_backend_support_onboarding,
     get_exam_by_content_id,
@@ -181,15 +184,15 @@ def xblock_handler(request, usage_key_string=None):
             if 'application/json' in accept_header:
                 fields = request.GET.get('fields', '').split(',')
                 if 'graderType' in fields:
-                    # right now can't combine output of this w/ output of _get_module_info, but worthy goal
+                    # right now can't combine output of this w/ output of _get_block_info, but worthy goal
                     return JsonResponse(CourseGradingModel.get_section_grader_type(usage_key))
                 elif 'ancestorInfo' in fields:
                     xblock = _get_xblock(usage_key, request.user)
                     ancestor_info = _create_xblock_ancestor_info(xblock, is_concise=True)
                     return JsonResponse(ancestor_info)
-                # TODO: pass fields to _get_module_info and only return those
+                # TODO: pass fields to _get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
-                    response = _get_module_info(_get_xblock(usage_key, request.user))
+                    response = _get_block_info(_get_xblock(usage_key, request.user))
                 return JsonResponse(response)
             else:
                 return HttpResponse(status=406)
@@ -238,7 +241,7 @@ def xblock_handler(request, usage_key_string=None):
                     status=400
                 )
 
-            dest_usage_key = _duplicate_item(
+            dest_usage_key = _duplicate_block(
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.user,
@@ -249,7 +252,7 @@ def xblock_handler(request, usage_key_string=None):
                 'courseKey': str(dest_usage_key.course_key)
             })
         else:
-            return _create_item(request)
+            return _create_block(request)
     elif request.method == 'PATCH':
         if 'move_source_locator' in request.json:
             move_source_usage_key = usage_key_with_run(request.json.get('move_source_locator'))
@@ -503,7 +506,7 @@ def xblock_container_handler(request, usage_key_string):
     response_format = request.GET.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         with modulestore().bulk_operations(usage_key.course_key):
-            response = _get_module_info(
+            response = _get_block_info(
                 _get_xblock(usage_key, request.user), include_ancestor_info=True, include_publishing_info=True
             )
         return JsonResponse(response)
@@ -701,13 +704,13 @@ def create_item(request):
     """
     Exposes internal helper method without breaking existing bindings/dependencies
     """
-    return _create_item(request)
+    return _create_block(request)
 
 
 @login_required
 @expect_json
-def _create_item(request):
-    """View for create items."""
+def _create_block(request):
+    """View for create blocks."""
     parent_locator = request.json['parent_locator']
     usage_key = usage_key_with_run(parent_locator)
     if not has_studio_write_access(request.user, usage_key.course_key):
@@ -875,7 +878,7 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
         return JsonResponse(context)
 
 
-def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None, is_child=False):
+def _duplicate_block(parent_usage_key, duplicate_source_usage_key, user, display_name=None, is_child=False):
     """
     Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
@@ -917,7 +920,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
                 if field.scope not in (Scope.settings, Scope.content,):
                     field.delete_from(aside)
 
-        dest_module = store.create_item(
+        dest_block = store.create_item(
             user.id,
             dest_usage_key.course_key,
             dest_usage_key.block_type,
@@ -930,22 +933,22 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
 
         children_handled = False
 
-        if hasattr(dest_module, 'studio_post_duplicate'):
+        if hasattr(dest_block, 'studio_post_duplicate'):
             # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
             # These blocks may handle their own children or parenting if needed. Let them return booleans to
             # let us know if we need to handle these or not.
-            dest_module.xmodule_runtime = StudioEditModuleRuntime(user)
-            children_handled = dest_module.studio_post_duplicate(store, source_item)
+            dest_block.xmodule_runtime = StudioEditModuleRuntime(user)
+            children_handled = dest_block.studio_post_duplicate(store, source_item)
 
         # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
         # Because DAGs are not fully supported, we need to actually duplicate each child as well.
         if source_item.has_children and not children_handled:
-            dest_module.children = dest_module.children or []
+            dest_block.children = dest_block.children or []
             for child in source_item.children:
-                dupe = _duplicate_item(dest_module.location, child, user=user, is_child=True)
-                if dupe not in dest_module.children:  # _duplicate_item may add the child for us.
-                    dest_module.children.append(dupe)
-            store.update_item(dest_module, user.id)
+                dupe = _duplicate_block(dest_block.location, child, user=user, is_child=True)
+                if dupe not in dest_block.children:  # _duplicate_block may add the child for us.
+                    dest_block.children.append(dupe)
+            store.update_item(dest_block, user.id)
 
         # pylint: disable=protected-access
         if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
@@ -954,12 +957,22 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             # Otherwise, add child to end.
             if source_item.location in parent.children:
                 source_index = parent.children.index(source_item.location)
-                parent.children.insert(source_index + 1, dest_module.location)
+                parent.children.insert(source_index + 1, dest_block.location)
             else:
-                parent.children.append(dest_module.location)
+                parent.children.append(dest_block.location)
             store.update_item(parent, user.id)
 
-        return dest_module.location
+        # .. event_implemented_name: XBLOCK_DUPLICATED
+        XBLOCK_DUPLICATED.send_event(
+            time=datetime.now(timezone.utc),
+            xblock_info=DuplicatedXBlockData(
+                usage_key=dest_block.location,
+                block_type=dest_block.location.block_type,
+                source_usage_key=duplicate_source_usage_key,
+            )
+        )
+
+        return dest_block.location
 
 
 @login_required
@@ -1024,17 +1037,17 @@ def _delete_orphans(course_usage_key, user_id, commit=False):
     the orphans.
     """
     store = modulestore()
-    items = store.get_orphans(course_usage_key)
+    blocks = store.get_orphans(course_usage_key)
     branch = course_usage_key.branch
     if commit:
         with store.bulk_operations(course_usage_key):
-            for itemloc in items:
+            for blockloc in blocks:
                 revision = ModuleStoreEnum.RevisionOption.all
                 # specify branches when deleting orphans
                 if branch == ModuleStoreEnum.BranchName.published:
                     revision = ModuleStoreEnum.RevisionOption.published_only
-                store.delete_item(itemloc, user_id, revision=revision)
-    return [str(item) for item in items]
+                store.delete_item(blockloc, user_id, revision=revision)
+    return [str(block) for block in blocks]
 
 
 def _get_xblock(usage_key, user):
@@ -1061,9 +1074,9 @@ def _get_xblock(usage_key, user):
             return JsonResponse({"error": "Can't find item by location: " + str(usage_key)}, 404)
 
 
-def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=False, include_publishing_info=False):
+def _get_block_info(xblock, rewrite_static_links=True, include_ancestor_info=False, include_publishing_info=False):
     """
-    metadata, data, id representation of a leaf module fetcher.
+    metadata, data, id representation of a leaf block fetcher.
     :param usage_key: A UsageKey
     """
     with modulestore().bulk_operations(xblock.location.course_key):

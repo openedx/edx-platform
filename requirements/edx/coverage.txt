@@ -4,17 +4,17 @@
 #
 #    make upgrade
 #
-chardet==5.0.0
+chardet==5.1.0
     # via diff-cover
-coverage==6.5.0
+coverage==7.1.0
     # via -r requirements/edx/coverage.in
-diff-cover==7.0.1
+diff-cover==7.4.0
     # via -r requirements/edx/coverage.in
 jinja2==3.1.2
     # via diff-cover
-markupsafe==2.1.1
+markupsafe==2.1.2
     # via jinja2
 pluggy==1.0.0
     # via diff-cover
-pygments==2.13.0
+pygments==2.14.0
     # via diff-cover

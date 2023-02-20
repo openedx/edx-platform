@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -42,7 +42,7 @@
 # Dyfeomorfizm <ximixd@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -58,7 +58,7 @@
 # ajafo <transifex@ajafo.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -94,7 +94,7 @@
 # ajafo <transifex@ajafo.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -119,7 +119,7 @@
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -138,9 +138,9 @@
 # Zuzia Basińska, 2022
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (https://www.transifex.com/open-edx/teams/6205/pl/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -150,7 +150,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-25 20:42+0000\n"
+"POT-Creation-Date: 2023-01-29 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Marcin Miłek, 2022\n"
 "Language-Team: Polish (https://www.transifex.com/open-edx/teams/6205/pl/)\n"
@@ -162,8 +162,8 @@ msgstr ""
 "Generated-By: Babel 2.8.0\n"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/item.py xmodule/html_block.py
+#: cms/djangoapps/contentstore/views/block.py
+#: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
 msgid "Text"
 msgstr "Tekst"
 
@@ -2194,7 +2194,7 @@ msgid "Cookie Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Data"
+msgid "Do Not Sell My Personal Information"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -4757,17 +4757,15 @@ msgstr ""
 "do nadrzędnego elementu."
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid "Whether to display this module in the table of contents"
-msgstr "Czy wyświetlić ten moduł w spisie"
+msgid "Whether to display this block in the table of contents"
+msgstr ""
 
 #. Translators: "TOC" stands for "Table of Contents"
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"What format this module is in (used for deciding which grader to apply, and "
+"What format this block is in (used for deciding which grader to apply, and "
 "what to show in the TOC)"
 msgstr ""
-"W jakim formacie znajduje się ten moduł (pozwala dobrać odpowiedni system "
-"oceniania oraz treści do wyświetlenia w spisie)"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
@@ -9855,8 +9853,8 @@ msgid "Date that enrollment for this class is closed"
 msgstr "Data zakończenia zapisów na ten kurs"
 
 #: xmodule/course_block.py
-msgid "Start time when this module is visible"
-msgstr "Data udostępnienia tego modułu w kursie"
+msgid "Start time when this block is visible"
+msgstr ""
 
 #: xmodule/course_block.py
 msgid "Date that this class ends"
@@ -10527,8 +10525,8 @@ msgid "Entrance Exam ID"
 msgstr "Identyfikator egzaminu wstępnego"
 
 #: xmodule/course_block.py
-msgid "Content module identifier (location) of entrance exam."
-msgstr "Identyfikator (lokalizacja) modułu z treścią egzaminu wstępnego."
+msgid "Content block identifier (location) of entrance exam."
+msgstr ""
 
 #: xmodule/course_block.py
 msgid "Social Media Sharing URL"
@@ -10865,8 +10863,8 @@ msgid ""
 msgstr ""
 
 #: xmodule/html_block.py
-msgid "Html contents to display for this module"
-msgstr "Treści HTML do wyświetlenia dla tego modułu"
+msgid "Html contents to display for this block"
+msgstr ""
 
 #: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
@@ -11503,24 +11501,21 @@ msgstr ""
 "pokazywać lub ukrywać swoje notatki w materiałach kursowych."
 
 #: xmodule/modulestore/inheritance.py
-msgid "Tag this module as part of an Entrance Exam section"
-msgstr "Oznacz ten moduł jako element sekcji egzaminu wstępnego."
+msgid "Tag this block as part of an Entrance Exam section"
+msgstr ""
 
 #: xmodule/modulestore/inheritance.py
 msgid ""
-"Enter true or false. If true, answer submissions for problem modules will be"
-" considered in the Entrance Exam scoring/gating algorithm."
+"Enter true or false. If true, answer submissions for problem blocks will be "
+"considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
-"Wprowadź \"true\" lub \"false\". Jeśli wybierzesz \"true\", odpowiedzi na "
-"ćwiczenia z tego modułu będą brane pod uwagę przez algorytm oceniający "
-"egzamin wstępny."
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Error while reading {}. Check file for XML errors."
 msgstr ""
 
 #: xmodule/modulestore/xml_importer.py
-msgid "Failed to import module: {} at location: {}"
+msgid "Failed to import block: {} at location: {}"
 msgstr ""
 
 #: xmodule/partitions/enrollment_track_partition_generator.py
@@ -11710,8 +11705,8 @@ msgid "Group Configuration"
 msgstr "Konfiguracja grupy"
 
 #: xmodule/split_test_block.py
-msgid "Which child module students in a particular group_id should see"
-msgstr "Dostęp do którego podrozdziału mają uzyskać studenci z grupy group_id"
+msgid "Which child block students in a particular group_id should see"
+msgstr ""
 
 #: xmodule/split_test_block.py
 #, python-brace-format
@@ -12549,6 +12544,91 @@ msgstr ""
 "Plik {filename} przekracza dopuszczalny rozmiar {maximum_size_in_megabytes} "
 "MB."
 
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Invalid data"
+msgstr "Błędne dane"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Błędne dane ({details})"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr "Nie możesz przenieść {source_type} do {target_parent_type}."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Item is already present in target location."
+msgstr "element znajduje się już w docelowej lokalizacji."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item into itself."
+msgstr "Nie możesz przenieść elementu do niego samego."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item into it's child."
+msgstr "Nie możesz przenieść elementu do wywodzącego się z niego elementu."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item directly into content experiment."
+msgstr "Nie możesz przenieść elementu bezpośrednio do eksperymentu z treścią."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr "{source_usage_key} nieodnaleziony w {parent_usage_key}."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+"Nie możesz przenieść {source_usage_key} do nieprawidłowego indeksu "
+"({target_index})."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr "Musisz podać target_index ({target_index}) jako całość."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Duplikat {0}"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Duplikat '{0}'"
+
+#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
+#. in many languages. This is used to avoid Transifex's misinterpreting of
+#. '% o'. The percent sign is also translatable as a standalone string.
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"Studenci muszą uzyskać wynik {score}{pct_sign} lub wyższy, aby uzyskać "
+"dostęp do materiałów kursowych."
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/views/block.py
+msgid "%"
+msgstr "%"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
+
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
 msgstr "musi posiadać nazwę certyfikatu"
@@ -12693,91 +12773,6 @@ msgstr ""
 msgid "File upload failed. Please try again"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "Invalid data"
-msgstr "Błędne dane"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Błędne dane ({details})"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr "Nie możesz przenieść {source_type} do {target_parent_type}."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "Item is already present in target location."
-msgstr "element znajduje się już w docelowej lokalizacji."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item into itself."
-msgstr "Nie możesz przenieść elementu do niego samego."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item into it's child."
-msgstr "Nie możesz przenieść elementu do wywodzącego się z niego elementu."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item directly into content experiment."
-msgstr "Nie możesz przenieść elementu bezpośrednio do eksperymentu z treścią."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr "{source_usage_key} nieodnaleziony w {parent_usage_key}."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-"Nie możesz przenieść {source_usage_key} do nieprawidłowego indeksu "
-"({target_index})."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr "Musisz podać target_index ({target_index}) jako całość."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Duplikat {0}"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Duplikat '{0}'"
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"Studenci muszą uzyskać wynik {score}{pct_sign} lub wyższy, aby uzyskać "
-"dostęp do materiałów kursowych."
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/item.py
-msgid "%"
-msgstr "%"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
-
 #: cms/djangoapps/contentstore/views/library.py
 msgid ""
 "User does not have the permission to create library in this organization or "
@@ -12824,8 +12819,8 @@ msgid "The information you entered is incorrect."
 msgstr "Wprowadzona informacja jest nieprawidłowa."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
-msgstr "Transkrypcje są dostępne wyłącznie dla modułów \"filmowych\"."
+msgid "Transcripts are supported only for \"video\" blocks."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -20621,6 +20616,20 @@ msgstr ""
 "rozpoczęcia kursu, ustalić kadrę, przejrzeć opublikowane aktualności i "
 "wszystkie wcześniej udostępnione materiały dodatkowe, a także założyć działy"
 " dyskusji i wiki."
+
+#: cms/templates/course_outline.html
+msgid ""
+"This course run is using an upgraded version of edx discussion forum. "
+"Discussion xblocks will no longer work."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid " Learn more"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Share feedback"
+msgstr ""
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html

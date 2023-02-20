@@ -55,7 +55,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 
 from .event_transformers import ForumThreadViewedEventTransformer
 
@@ -209,9 +209,9 @@ class ThreadActionGroupIdTestCase(
 
 class ViewsTestCaseMixin:
 
-    def set_up_course(self, module_count=0):
+    def set_up_course(self, block_count=0):
         """
-        Creates a course, optionally with module_count discussion modules, and
+        Creates a course, optionally with block_count discussion blocks, and
         a user with appropriate permissions.
         """
 
@@ -223,9 +223,9 @@ class ViewsTestCaseMixin:
         )
         self.course_id = self.course.id
 
-        # add some discussion modules
-        for i in range(module_count):
-            ItemFactory.create(
+        # add some discussion blocks
+        for i in range(block_count):
+            BlockFactory.create(
                 parent_location=self.course.location,
                 category='discussion',
                 discussion_id=f'id_module_{i}',
@@ -396,9 +396,9 @@ class ViewsQueryCountTestCase(
         Decorates test methods to count mongo and SQL calls for a
         particular modulestore.
         """
-        def inner(self, default_store, module_count, mongo_calls, sql_queries, *args, **kwargs):
+        def inner(self, default_store, block_count, mongo_calls, sql_queries, *args, **kwargs):
             with modulestore().default_store(default_store):
-                self.set_up_course(module_count=module_count)
+                self.set_up_course(block_count=block_count)
                 self.clear_caches()
                 with self.assertNumQueries(sql_queries, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
                     with check_mongo_calls(mongo_calls):
@@ -789,7 +789,7 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -807,7 +807,7 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -866,7 +866,7 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -884,7 +884,7 @@ class ViewsTestCase(
                 ('get', f'{CS_PREFIX}/threads/518d4237b023791dca00000d'),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False, 'reverse_order': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -2064,14 +2064,14 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
         self.staff = UserFactory.create(is_staff=True)
         UserBasedRole(user=self.staff, role=CourseStaffRole.ROLE).add_course(self.course.id)
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.category = ItemFactory.create(
+        self.category = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id=self.CATEGORY_ID,
             discussion_category=self.PARENT_CATEGORY_NAME,
             discussion_target=self.CATEGORY_NAME,
         )
-        self.team_category = ItemFactory.create(
+        self.team_category = BlockFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id=self.TEAM_CATEGORY_ID,

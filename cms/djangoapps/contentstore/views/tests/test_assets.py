@@ -26,7 +26,9 @@ from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: 
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -41,8 +43,12 @@ class AssetsTestCase(CourseTestCase):
     """
     Parent class for all asset tests.
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def setUp(self):
         super().setUp()
+        self.course = CourseFactory(default_store='split')
         self.url = reverse_course_url('assets_handler', self.course.id)
 
     def upload_asset(self, name="asset-1", asset_type='text'):
@@ -96,6 +102,7 @@ class BasicAssetsTestCase(AssetsTestCase):
             TEST_DATA_DIR,
             ['toy'],
             static_content_store=contentstore(),
+            create_if_not_present=True,
             verbose=True
         )
         course = course_items[0]
@@ -103,8 +110,8 @@ class BasicAssetsTestCase(AssetsTestCase):
 
         # Test valid contentType for pdf asset (textbook.pdf)
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
-        self.assertContains(resp, "/c4x/edX/toy/asset/textbook.pdf")
-        asset_location = AssetKey.from_string('/c4x/edX/toy/asset/textbook.pdf')
+        self.assertContains(resp, "/asset-v1:edX+toy+2012_Fall+type@asset+block@textbook.pdf")
+        asset_location = AssetKey.from_string('asset-v1:edX+toy+2012_Fall+type@asset+block@textbook.pdf')
         content = contentstore().find(asset_location)
         # Check after import textbook.pdf has valid contentType ('application/pdf')
 
@@ -450,7 +457,8 @@ class LockAssetTestCase(AssetsTestCase):
         """
         def verify_asset_locked_state(locked):
             """ Helper method to verify lock state in the contentstore """
-            asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.html')
+            asset_location = StaticContent.get_location_from_path(
+                'asset-v1:edX+toy+2012_Fall+type@asset+block@sample_static.html')
             content = contentstore().find(asset_location)
             self.assertEqual(content.locked, locked)
 
@@ -483,6 +491,7 @@ class LockAssetTestCase(AssetsTestCase):
             TEST_DATA_DIR,
             ['toy'],
             static_content_store=contentstore(),
+            create_if_not_present=True,
             verbose=True
         )
         course = course_items[0]
@@ -513,15 +522,15 @@ class DeleteAssetTestCase(AssetsTestCase):
 
         response = self.client.post(self.url, {"name": self.asset_name, "file": self.asset})
         self.assertEqual(response.status_code, 200)
-        self.uploaded_url = json.loads(response.content.decode('utf-8'))['asset']['url']
+        self.uploaded_id = json.loads(response.content.decode('utf-8'))['asset']['id']
 
-        self.asset_location = AssetKey.from_string(self.uploaded_url)
+        self.asset_location = AssetKey.from_string(self.uploaded_id)
         self.content = contentstore().find(self.asset_location)
 
     def test_delete_asset(self):
         """ Tests the happy path :) """
         test_url = reverse_course_url(
-            'assets_handler', self.course.id, kwargs={'asset_key_string': str(self.uploaded_url)})
+            'assets_handler', self.course.id, kwargs={'asset_key_string': self.uploaded_id})
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
         self.assertEqual(resp.status_code, 204)
 
@@ -533,7 +542,7 @@ class DeleteAssetTestCase(AssetsTestCase):
         # upload image
         response = self.client.post(self.url, {"name": "delete_image_test", "file": image_asset})
         self.assertEqual(response.status_code, 200)
-        uploaded_image_url = json.loads(response.content.decode('utf-8'))['asset']['url']
+        uploaded_image_url = json.loads(response.content.decode('utf-8'))['asset']['id']
 
         # upload image thumbnail
         response = self.client.post(self.url, {"name": "delete_image_thumb_test", "file": thumbnail_image_asset})
@@ -558,7 +567,7 @@ class DeleteAssetTestCase(AssetsTestCase):
         """ Tests the sad path :( """
         test_url = reverse_course_url(
             'assets_handler',
-            self.course.id, kwargs={'asset_key_string': "/c4x/edX/toy/asset/invalid.pdf"}
+            self.course.id, kwargs={'asset_key_string': "asset-v1:edX+toy+2012_Fall+type@asset+block@invalid.pdf"}
         )
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
         self.assertEqual(resp.status_code, 404)
@@ -566,8 +575,9 @@ class DeleteAssetTestCase(AssetsTestCase):
     def test_delete_asset_with_invalid_thumbnail(self):
         """ Tests the sad path :( """
         test_url = reverse_course_url(
-            'assets_handler', self.course.id, kwargs={'asset_key_string': str(self.uploaded_url)})
-        self.content.thumbnail_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/invalid')
+            'assets_handler', self.course.id, kwargs={'asset_key_string': self.uploaded_id})
+        self.content.thumbnail_location = StaticContent.get_location_from_path(
+            '/asset-v1:edX+toy+2012_Fall+type@asset+block@invalid.pdf')
         contentstore().save(self.content)
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
         self.assertEqual(resp.status_code, 204)

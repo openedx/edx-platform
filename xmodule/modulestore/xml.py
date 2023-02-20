@@ -49,12 +49,12 @@ log = logging.getLogger(__name__)
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     def __init__(self, xmlstore, course_id, course_dir,  # lint-amnesty, pylint: disable=too-many-statements
                  error_tracker,
-                 load_error_modules=True, target_course_id=None, **kwargs):
+                 load_error_blocks=True, target_course_id=None, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
 
-        xmlstore: the XMLModuleStore to store the loaded modules in
+        xmlstore: the XMLModuleStore to store the loaded blocks in
         """
         self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
@@ -62,7 +62,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
         # Adding the course_id as passed in for later reference rather than
         # having to recombine the org/course/url_name
         self.course_id = course_id
-        self.load_error_modules = load_error_modules
+        self.load_error_blocks = load_error_blocks
         self.modulestore = xmlstore
 
         def process_xml(xml):  # lint-amnesty, pylint: disable=too-many-statements
@@ -107,7 +107,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
                             and re.search('[0-9a-fA-F]{12}$', url_name))
 
                 def fallback_name(orig_name=None):
-                    """Return the fallback name for this module.  This is a function instead of a variable
+                    """Return the fallback name for this block.  This is a function instead of a variable
                     because we want it to be lazy."""
                     if looks_like_fallback(orig_name):
                         # We're about to re-hash, in case something changed, so get rid of the tag_ and hash
@@ -125,17 +125,17 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
 
                     if tag in need_uniq_names:
                         error_tracker("PROBLEM: no name of any kind specified for {tag}.  Student "
-                                      "state will not be properly tracked for this module.  Problem xml:"
+                                      "state will not be properly tracked for this block.  Problem xml:"
                                       " '{xml}...'".format(tag=tag, xml=xml[:100]))
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
-                        # error_tracker("WARNING: no name specified for module. xml='{0}...'".format(xml[:100]))
+                        # error_tracker("WARNING: no name specified for block. xml='{0}...'".format(xml[:100]))
                         pass
 
                 # Make sure everything is unique
                 if url_name in self.used_names[tag]:
-                    # Always complain about modules that store state.  If it
+                    # Always complain about blocks that store state.  If it
                     # doesn't store state, don't complain about things that are
                     # hashed.
                     if tag in need_uniq_names:
@@ -166,7 +166,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
                     id_manager,
                 )
             except Exception as err:  # pylint: disable=broad-except
-                if not self.load_error_modules:
+                if not self.load_error_blocks:
                     raise
 
                 # Didn't load properly.  Fall back on loading as an error
@@ -304,7 +304,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
     def __init__(
             self, data_dir, default_class=None, source_dirs=None, course_ids=None,
-            load_error_modules=True, i18n_service=None, fs_service=None, user_service=None,
+            load_error_blocks=True, i18n_service=None, fs_service=None, user_service=None,
             signal_handler=None, target_course_id=None, **kwargs   # pylint: disable=unused-argument
     ):
         """
@@ -329,7 +329,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         if course_ids is not None:
             course_ids = [CourseKey.from_string(course_id) for course_id in course_ids]
 
-        self.load_error_modules = load_error_modules
+        self.load_error_blocks = load_error_blocks
 
         if default_class is None:
             self.default_class = None
@@ -486,7 +486,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 # VS[compat] : 'name' is deprecated, but support it for now...
                 if course_data.get('name'):
                     url_name = BlockUsageLocator.clean(course_data.get('name'))
-                    tracker("'name' is deprecated for module xml.  Please use "
+                    tracker("'name' is deprecated for block xml.  Please use "
                             "display_name and url_name.")
                 else:
                     url_name = None
@@ -519,7 +519,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 course_id=course_id,
                 course_dir=course_dir,
                 error_tracker=tracker,
-                load_error_modules=self.load_error_modules,
+                load_error_blocks=self.load_error_blocks,
                 get_policy=get_policy,
                 mixins=self.xblock_mixins,
                 default_class=self.default_class,
@@ -639,12 +639,12 @@ class XMLModuleStore(ModuleStoreReadBase):
                         else:
                             try:
                                 # get and update data field in xblock runtime
-                                module = system.load_item(loc)
+                                block = system.get_block(loc)
                                 for key, value in data_content.items():
-                                    setattr(module, key, value)
-                                module.save()
+                                    setattr(block, key, value)
+                                block.save()
                             except ItemNotFoundError:
-                                module = None
+                                block = None
                                 data_content['location'] = loc
                                 data_content['category'] = category
                     else:
@@ -653,15 +653,15 @@ class XMLModuleStore(ModuleStoreReadBase):
                         # html file with html data content
                         html = f.read()
                         try:
-                            module = system.load_item(loc)
-                            module.data = html
-                            module.save()
+                            block = system.get_block(loc)
+                            block.data = html
+                            block.save()
                         except ItemNotFoundError:
-                            module = None
+                            block = None
                             data_content = {'data': html, 'location': loc, 'category': category}
 
-                    if module is None:
-                        module = system.construct_xblock(
+                    if block is None:
+                        block = system.construct_xblock(
                             category,
                             # We're loading a descriptor, so student_id is meaningless
                             # We also don't have separate notions of definition and usage ids yet,
@@ -675,12 +675,12 @@ class XMLModuleStore(ModuleStoreReadBase):
                         if category == "static_tab":
                             tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
                             if tab:
-                                module.display_name = tab.name
-                                module.course_staff_only = tab.course_staff_only
-                        module.data_dir = course_dir
-                        module.save()
+                                block.display_name = tab.name
+                                block.course_staff_only = tab.course_staff_only
+                        block.data_dir = course_dir
+                        block.save()
 
-                        self.modules[course_descriptor.id][module.scope_ids.usage_id] = module
+                        self.modules[course_descriptor.id][block.scope_ids.usage_id] = block
                 except Exception as exc:  # pylint: disable=broad-except
                     logging.exception("Failed to load %s. Skipping... \
                             Exception: %s", filepath, str(exc))
@@ -702,7 +702,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         If no object is found at that location, raises
             xmodule.modulestore.exceptions.ItemNotFoundError
 
-        usage_key: a UsageKey that matches the module we are looking for.
+        usage_key: a UsageKey that matches the block we are looking for.
         """
         try:
             return self.modules[usage_key.course_key][usage_key]
@@ -743,24 +743,24 @@ class XMLModuleStore(ModuleStoreReadBase):
         category = qualifiers.pop('category', None)
         name = qualifiers.pop('name', None)
 
-        def _block_matches_all(mod_loc, module):
-            if category and mod_loc.category != category:
+        def _block_matches_all(block_loc, block):
+            if category and block_loc.category != category:
                 return False
             if name:
                 if isinstance(name, list):
                     # Support for passing a list as the name qualifier
-                    if mod_loc.name not in name:
+                    if block_loc.name not in name:
                         return False
-                elif mod_loc.name != name:
+                elif block_loc.name != name:
                     return False
             return all(
-                self._block_matches(module, fields or {})
+                self._block_matches(block, fields or {})
                 for fields in [settings, content, qualifiers]
             )
 
-        for mod_loc, module in self.modules[course_id].items():
-            if _block_matches_all(mod_loc, module):
-                items.append(module)
+        for block_loc, block in self.modules[course_id].items():
+            if _block_matches_all(block_loc, block):
+                items.append(block)
 
         return items
 

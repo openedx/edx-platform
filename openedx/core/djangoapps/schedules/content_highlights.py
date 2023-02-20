@@ -131,7 +131,7 @@ def _get_course_block(course_descriptor, user):
     # Adding courseware imports here to insulate other apps (e.g. schedules) to
     # avoid import errors.
     from lms.djangoapps.courseware.model_data import FieldDataCache
-    from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+    from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 
     # Fake a request to fool parts of the courseware that want to inspect it.
     request = get_request_or_stub()
@@ -142,7 +142,7 @@ def _get_course_block(course_descriptor, user):
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_descriptor.id, user, course_descriptor, depth=1, read_only=True,
     )
-    course_block = get_module_for_descriptor(
+    course_block = get_block_for_descriptor(
         user, request, course_descriptor, field_data_cache, course_descriptor.id, course=course_descriptor,
     )
     if not course_block:

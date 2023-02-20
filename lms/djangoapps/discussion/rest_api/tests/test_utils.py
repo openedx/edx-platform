@@ -5,7 +5,7 @@ Tests for Discussion REST API utils.
 from datetime import datetime, timedelta
 
 from pytz import UTC
-
+import unittest
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -17,7 +17,7 @@ from lms.djangoapps.discussion.rest_api.utils import (
     get_course_ta_users_list,
     get_course_staff_users_list,
     get_moderator_users_list,
-    get_archived_topics
+    get_archived_topics, remove_empty_sequentials
 )
 
 
@@ -94,3 +94,59 @@ class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
 
         # Assert that the output matches the expected output
         assert output == expected_output
+
+
+class TestRemoveEmptySequentials(unittest.TestCase):
+    """
+    Test for the remove_empty_sequentials function
+    """
+    def test_empty_data(self):
+        # Test that the function can handle an empty list
+        data = []
+        result = remove_empty_sequentials(data)
+        self.assertEqual(result, [])
+
+    def test_no_empty_sequentials(self):
+        # Test that the function does not remove any sequentials if they all have children
+        data = [
+            {"type": "sequential", "children": [{"type": "vertical"}]},
+            {"type": "chapter", "children": [
+                {"type": "sequential", "children": [{"type": "vertical"}]}
+            ]}
+        ]
+        result = remove_empty_sequentials(data)
+        self.assertEqual(result, data)
+
+    def test_remove_empty_sequentials(self):
+        # Test that the function removes empty sequentials
+        data = [
+            {"type": "sequential", "children": []},
+            {"type": "chapter", "children": [
+                {"type": "sequential", "children": [{"type": "vertical3"}]},
+                {"type": "sequential", "children": []},
+                {"type": "sequential", "children": []},
+                {"type": "sequential", "children": [{"type": "vertical4"}]}
+            ]},
+            {"type": "chapter", "children": [
+                {"type": "sequential", "children": [{"type": "vertical1"}]},
+                {"type": "sequential", "children": []},
+                {"children": [{"type": "vertical2"}]}
+            ]},
+            {"type": "chapter", "children": [
+                {"type": "sequential", "children": []},
+                {"type": "sequential", "children": []},
+            ]
+            }
+        ]
+        expected_output = [
+            {"type": "chapter", "children": [
+                {"type": "sequential", "children": [{"type": "vertical3"}]},
+                {"type": "sequential", "children": [{"type": "vertical4"}]}
+            ]},
+            {"type": "chapter", "children": [
+                {"type": "sequential", "children": [{"type": "vertical1"}]},
+                {"children": [{"type": "vertical2"}]}
+            ]}
+        ]
+        result = remove_empty_sequentials(data)
+        self.assertEqual(result, expected_output)

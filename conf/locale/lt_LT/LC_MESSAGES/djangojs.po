@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Lithuanian (Lithuania) (http://www.transifex.com/open-edx/edx-platform/language/lt_LT/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -13,7 +13,7 @@
 # 99ff332f197efc0398f769062a4c5442_2965e21 <ad7ca3c3a61916261d41c81ab558ff7e_129326>, 2013
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Lithuanian (Lithuania) (http://www.transifex.com/open-edx/edx-platform/language/lt_LT/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -23,16 +23,16 @@
 # 99ff332f197efc0398f769062a4c5442_2965e21 <ad7ca3c3a61916261d41c81ab558ff7e_129326>, 2013
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Lithuanian (Lithuania) (https://www.transifex.com/open-edx/teams/6205/lt_LT/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2023.
 #
 # Translators:
 # Riina <ciairdabar@yahoo.com>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Lithuanian (Lithuania) (http://www.transifex.com/open-edx/edx-platform/language/lt_LT/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -40,7 +40,7 @@
 # Edukometrija <jolitad@mruni.eu>, 2014-2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Lithuanian (Lithuania) (http://www.transifex.com/open-edx/edx-platform/language/lt_LT/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -50,7 +50,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-12-18 20:42+0000\n"
+"POT-Creation-Date: 2023-01-29 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Riina <ciairdabar@yahoo.com>, 2014-2015\n"
 "Language-Team: Lithuanian (Lithuania) (http://www.transifex.com/open-edx/edx-platform/language/lt_LT/)\n"
@@ -9632,6 +9632,10 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Discussions enabled"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore

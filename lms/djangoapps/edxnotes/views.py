@@ -21,7 +21,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from lms.djangoapps.edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from lms.djangoapps.edxnotes.helpers import (
     DEFAULT_PAGE,
@@ -74,7 +74,7 @@ def edxnotes(request, course_id):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2
         )
-        course_block = get_module_for_descriptor(
+        course_block = get_block_for_descriptor(
             request.user, request, course, field_data_cache, course_key, course=course
         )
         position = get_course_position(course_block)
@@ -195,7 +195,7 @@ def edxnotes_visibility(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, "load", course_key)
     field_data_cache = FieldDataCache([course], course_key, request.user)
-    course_block = get_module_for_descriptor(
+    course_block = get_block_for_descriptor(
         request.user, request, course, field_data_cache, course_key, course=course
     )
 

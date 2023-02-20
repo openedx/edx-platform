@@ -12,7 +12,7 @@ from django.test import override_settings
 from opaque_keys.edx.keys import CourseKey
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory
 from xmodule.tests import get_test_system
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -30,47 +30,47 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         super().setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
-            cls.chapter = ItemFactory.create(
+            cls.chapter = BlockFactory.create(
                 parent=cls.course,
                 category="chapter",
                 publish_item=False,
             )
-            cls.sequence = ItemFactory.create(
+            cls.sequence = BlockFactory.create(
                 parent=cls.chapter,
                 category='sequential',
                 publish_item=False,
             )
-            cls.vertical = ItemFactory.create(
+            cls.vertical = BlockFactory.create(
                 parent=cls.sequence,
                 category='vertical',
                 publish_item=False,
             )
-            cls.html = ItemFactory.create(
+            cls.html = BlockFactory.create(
                 parent=cls.vertical,
                 category='html',
                 publish_item=False,
             )
-            cls.problem = ItemFactory.create(
+            cls.problem = BlockFactory.create(
                 parent=cls.vertical,
                 category="problem",
                 publish_item=False,
             )
-            cls.problem2 = ItemFactory.create(
+            cls.problem2 = BlockFactory.create(
                 parent=cls.vertical,
                 category="problem",
                 publish_item=False,
             )
-            cls.problem3 = ItemFactory.create(
+            cls.problem3 = BlockFactory.create(
                 parent=cls.vertical,
                 category="problem",
                 publish_item=False,
             )
-            cls.problem4 = ItemFactory.create(
+            cls.problem4 = BlockFactory.create(
                 parent=cls.vertical,
                 category="problem",
                 publish_item=False,
             )
-            cls.problem5 = ItemFactory.create(
+            cls.problem5 = BlockFactory.create(
                 parent=cls.vertical,
                 category="problem",
                 publish_item=False,
@@ -117,24 +117,24 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
             completion=0.75,
         )
 
-    def _bind_course_block(self, module):
+    def _bind_course_block(self, block):
         """
-        Bind a module (part of self.course) so we can access student-specific data.
+        Bind a block (part of self.course) so we can access student-specific data.
         """
-        module_system = get_test_system(course_id=module.location.course_key)
-        module_system.descriptor_runtime = module.runtime._descriptor_system  # pylint: disable=protected-access
+        module_system = get_test_system(course_id=block.location.course_key)
+        module_system.descriptor_runtime = block.runtime._descriptor_system  # pylint: disable=protected-access
         module_system._services['library_tools'] = LibraryToolsService(self.store, self.user.id)  # pylint: disable=protected-access
 
-        def get_module(descriptor):
-            """Mocks module_system get_module function"""
-            sub_module_system = get_test_system(course_id=module.location.course_key)
-            sub_module_system.get_module = get_module
+        def get_block(descriptor):
+            """Mocks module_system get_block_for_descriptor function"""
+            sub_module_system = get_test_system(course_id=block.location.course_key)
+            sub_module_system.get_block_for_descriptor = get_block
             sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.bind_for_student(sub_module_system, self.user.id)
             return descriptor
 
-        module_system.get_module = get_module
-        module.xmodule_runtime = module_system
+        module_system.get_block_for_descriptor = get_block
+        block.xmodule_runtime = module_system
 
     def test_completion_service(self):
         # Only the completions for the user and course specified for the CompletionService
@@ -186,8 +186,8 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
     @override_settings(FEATURES={**settings.FEATURES, 'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': True})
     def test_can_mark_library_content_complete_on_view(self):
         library = LibraryFactory.create(modulestore=self.store)
-        lib_vertical = ItemFactory.create(parent=self.sequence, category='vertical', publish_item=False)
-        library_content_block = ItemFactory.create(
+        lib_vertical = BlockFactory.create(parent=self.sequence, category='vertical', publish_item=False)
+        library_content_block = BlockFactory.create(
             parent=lib_vertical,
             category='library_content',
             max_count=1,
@@ -198,19 +198,19 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
 
     def test_vertical_completion_with_library_content(self):
         library = LibraryFactory.create(modulestore=self.store)
-        ItemFactory.create(parent=library, category='problem', publish_item=False, user_id=self.user.id)
-        ItemFactory.create(parent=library, category='problem', publish_item=False, user_id=self.user.id)
-        ItemFactory.create(parent=library, category='problem', publish_item=False, user_id=self.user.id)
+        BlockFactory.create(parent=library, category='problem', publish_item=False, user_id=self.user.id)
+        BlockFactory.create(parent=library, category='problem', publish_item=False, user_id=self.user.id)
+        BlockFactory.create(parent=library, category='problem', publish_item=False, user_id=self.user.id)
         # Create a new vertical to hold the library content block
         # It is very important that we use parent_location=self.sequence.location (and not parent=self.sequence), since
         # sequence is a class attribute and passing it by value will update its .children=[] which will then leak into
         # other tests and cause errors if the children no longer exist.
-        lib_vertical = ItemFactory.create(
+        lib_vertical = BlockFactory.create(
             parent_location=self.sequence.location,
             category='vertical',
             publish_item=False,
         )
-        library_content_block = ItemFactory.create(
+        library_content_block = BlockFactory.create(
             parent=lib_vertical,
             category='library_content',
             max_count=1,
@@ -262,9 +262,9 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         # It is very important that we use parent_location=self.sequence.location (and not parent=self.sequence), since
         # sequence is a class attribute and passing it by value will update its .children=[] which will then leak into
         # other tests and cause errors if the children no longer exist.
-        parent_vertical = ItemFactory(parent_location=self.sequence.location, category='vertical')
-        extra_vertical = ItemFactory(parent=parent_vertical, category='vertical')
-        problem = ItemFactory(parent=extra_vertical, category='problem')
+        parent_vertical = BlockFactory(parent_location=self.sequence.location, category='vertical')
+        extra_vertical = BlockFactory(parent=parent_vertical, category='vertical')
+        problem = BlockFactory(parent=extra_vertical, category='problem')
         parent_vertical = self.store.get_item(parent_vertical.location)
 
         # Nothing is complete

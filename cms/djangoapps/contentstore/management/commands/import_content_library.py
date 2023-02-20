@@ -87,7 +87,7 @@ class Command(BaseCommand):
             import_library_from_xml(
                 modulestore(), user.id,
                 settings.GITHUB_REPO_ROOT, [rel_xml_path],
-                load_error_modules=False,
+                load_error_blocks=False,
                 static_content_store=contentstore(),
                 target_id=courselike_key
             )

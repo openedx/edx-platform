@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
     A transformer that manipulates the block structure by removing all
-    blocks within a library_content module to which a user should not
+    blocks within a library_content block to which a user should not
     have access.
 
     Staff users are not to be exempted from library content pathways.
@@ -90,7 +90,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
                 for selected_block in state_dict.get('selected', []):
                     # Add all selected entries for this user for this
-                    # library module to the selected list.
+                    # library block to the selected list.
                     block_type, block_id = selected_block
                     usage_key = usage_info.course_key.make_usage_key(block_type, block_id)
                     if usage_key in library_children:
@@ -184,7 +184,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
 class ContentLibraryOrderTransformer(BlockStructureTransformer):
     """
     A transformer that manipulates the block structure by modifying the order of the
-    selected blocks within a library_content module to match the order of the selections
+    selected blocks within a library_content block to match the order of the selections
     made by the ContentLibraryTransformer or the corresponding XBlock. So this transformer
     requires the selections for the randomized content block to be already
     made either by the ContentLibraryTransformer or the XBlock.

@@ -39,7 +39,7 @@ from .utils import (
 TASK_LOG = logging.getLogger('edx.celery.task')
 
 
-def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+def upload_course_survey_report(_xblock_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a html report containing the survey results for a course.
     """
@@ -97,7 +97,7 @@ def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _t
     return task_progress.update_task_state(extra_meta=current_step)
 
 
-def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+def upload_proctored_exam_results_report(_xblock_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a CSV file containing
     information about proctored exam results, and store using a `ReportStore`.
@@ -165,7 +165,7 @@ def _get_csv_file_content(csv_file):
     return csv_content
 
 
-def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):  # lint-amnesty, pylint: disable=too-many-statements
+def cohort_students_and_upload(_xblock_instance_args, _entry_id, course_id, task_input, action_name):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Within a given course, cohort students in bulk, then upload the results
     using a `ReportStore`.
@@ -273,33 +273,33 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
 
 
 def upload_ora2_data(
-        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name
+        _xblock_instance_args, _entry_id, course_id, _task_input, action_name
 ):
     """
     Collect ora2 responses and upload them to S3 as a CSV
     """
 
     return _upload_ora2_data_common(
-        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name,
+        _xblock_instance_args, _entry_id, course_id, _task_input, action_name,
         'data', OraAggregateData.collect_ora2_data
     )
 
 
 def upload_ora2_summary(
-        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name
+        _xblock_instance_args, _entry_id, course_id, _task_input, action_name
 ):
     """
     Collect ora2/student summaries and upload them to file storage as a CSV
     """
 
     return _upload_ora2_data_common(
-        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name,
+        _xblock_instance_args, _entry_id, course_id, _task_input, action_name,
         'summary', OraAggregateData.collect_ora2_summary
     )
 
 
 def _upload_ora2_data_common(
-        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name,
+        _xblock_instance_args, _entry_id, course_id, _task_input, action_name,
         report_name, csv_gen_func
 ):
     """
@@ -313,7 +313,7 @@ def _upload_ora2_data_common(
 
     fmt = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
     task_info_string = fmt.format(
-        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        task_id=_xblock_instance_args.get('task_id') if _xblock_instance_args is not None else None,
         entry_id=_entry_id,
         course_id=course_id,
         task_input=_task_input
@@ -399,7 +399,7 @@ def _task_step(task_progress, task_info_string, action_name):
 
 
 def upload_ora2_submission_files(
-    _xmodule_instance_args, _entry_id, course_id, _task_input, action_name
+    _xblock_instance_args, _entry_id, course_id, _task_input, action_name
 ):
     """
     Creates zip archive with submission files in three steps:
@@ -418,7 +418,7 @@ def upload_ora2_submission_files(
 
     fmt = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
     task_info_string = fmt.format(
-        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        task_id=_xblock_instance_args.get('task_id') if _xblock_instance_args is not None else None,
         entry_id=_entry_id,
         course_id=course_id,
         task_input=_task_input
@@ -481,7 +481,7 @@ def upload_ora2_submission_files(
     return UPDATE_STATUS_SUCCEEDED
 
 
-def generate_anonymous_ids(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):  # lint-amnesty, pylint: disable=too-many-statements
+def generate_anonymous_ids(_xblock_instance_args, _entry_id, course_id, task_input, action_name):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Generate a 2-column CSV output of user-id, anonymized-user-id
     """
@@ -503,7 +503,7 @@ def generate_anonymous_ids(_xmodule_instance_args, _entry_id, course_id, task_in
 
     task_info_string_format = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
     task_info_string = task_info_string_format.format(
-        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        task_id=_xblock_instance_args.get('task_id') if _xblock_instance_args is not None else None,
         entry_id=_entry_id,
         course_id=course_id,
         task_input=task_input
