@@ -105,3 +105,4 @@ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf
 -e git+https://github.com/edly-io/xblock-pdf.git@edly-1.0.1#egg=xblock-pdf
 -e git+https://github.com/edly-io/xblock-poll.git@edly-1.0.0#egg=xblock-poll==edly-1.0.0
+-e git+https://github.com/edly-io/kwl-xblock.git@release-v0.1.0#egg=kwl
