@@ -3194,6 +3194,9 @@ INSTALLED_APPS = [
 
     # FUNiX Feedback
     'lms.djangoapps.feedback',
+
+    # FUNiX FxPrograms
+    'cms.djangoapps.fx_programs'
 ]
 
 ######################### CSRF #########################################

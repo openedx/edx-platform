@@ -2257,7 +2257,7 @@ FINANCIAL_REPORTS = {
 if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
-    CORS_ORIGIN_ALLOW_ALL = True
+    CORS_ORIGIN_ALLOW_ALL = False
     CORS_ALLOW_INSECURE = False
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
         'use-jwt-cookie',
