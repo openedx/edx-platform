@@ -605,7 +605,7 @@ idna==3.4
     #   yarl
 importlib-metadata==6.0.0
     # via markdown
-importlib-resources==5.10.2
+importlib-resources==5.12.0
     # via jsonschema
 inflection==0.5.1
     # via drf-yasg
@@ -761,11 +761,11 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/base.in
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.in
-openedx-events==5.0.0
+openedx-events==5.1.0
     # via
     #   -r requirements/edx/base.in
     #   edx-event-bus-kafka
-openedx-filters==1.0.0
+openedx-filters==1.1.0
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock
@@ -776,9 +776,7 @@ ora2==5.0.0
 oscrypto==1.3.0
     # via snowflake-connector-python
 outcome-surveys==2.2.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+    # via -r requirements/edx/base.in
 packaging==23.0
     # via
     #   drf-yasg
@@ -912,7 +910,7 @@ python-memcached==1.59
     # via -r requirements/edx/paver.txt
 python-slugify==8.0.0
     # via code-annotations
-python-swiftclient==4.1.0
+python-swiftclient==4.2.0
     # via ora2
 python3-openid==3.2.0 ; python_version >= "3"
     # via
@@ -1198,7 +1196,7 @@ xss-utils==0.4.0
     # via -r requirements/edx/base.in
 yarl==1.8.2
     # via aiohttp
-zipp==3.13.0
+zipp==3.14.0
     # via
     #   importlib-metadata
     #   importlib-resources
