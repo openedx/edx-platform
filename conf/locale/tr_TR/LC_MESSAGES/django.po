@@ -114,7 +114,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Ali Işıngör <ali@artistanbul.io>, 2017-2020
+# Ali Işıngör <ali@artistanbul.io>, 2017-2020,2023
 # Hakan Şenel <hgsenel@gmail.com>, 2014
 # Kubilay <kubilayinceoren10@gmail.com>, 2015
 # Mehmet Kokoç <kokocmehmet@gmail.com>, 2017
@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-22 20:42+0000\n"
+"POT-Creation-Date: 2023-02-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -351,6 +351,26 @@ msgid ""
 msgstr ""
 "İSTEĞE BAĞLI: Bu, harici e-ticaret servisi içindeki bu modun SKU (stock "
 "keeping unit) kodudur. Eğer bu eğitim e-ticaret servisine henüz "
+"geçirilmemişse boş bırakın."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+"İSTEĞE BAĞLI: Bu, kursun bu modu için Play Store'da kayıtlı olan Android SKU"
+" (stok tutma birimi) kodudur. Eğer bu eğitim e-ticaret servisine henüz "
+"geçirilmemişse boş bırakın."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+"İSTEĞE BAĞLI: Bu, kursun bu modu için App Store'da kayıtlı olan iOS SKU "
+"(stok tutma birimi) kodudur. Eğer bu eğitim e-ticaret servisine henüz "
 "geçirilmemişse boş bırakın."
 
 #: common/djangoapps/course_modes/models.py
@@ -848,6 +868,10 @@ msgid ""
 "{account_or_email}.{html_end}You will now receive email updates and alerts "
 "from us related to the courses you are enrolled in. Sign In to continue."
 msgstr ""
+"{html_start} Kutlarız! Hesabınız {account_or_email} "
+"{activated_or_confirmed}.{html_end}Bundan sonra kayıt olduğunuz derslerle "
+"ilgili duyuru ve güncellemeler e-posta kutunuza düşmeye başlayacak. Devam "
+"etmek için lütfen giriş yapın."
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
@@ -10345,7 +10369,7 @@ msgstr "Bu ders için kayıtlanmanın kapanacağı tarih"
 
 #: xmodule/course_block.py
 msgid "Start time when this block is visible"
-msgstr ""
+msgstr "Bu block görünür olduğunda süreyi başlat"
 
 #: xmodule/course_block.py
 msgid "Date that this class ends"
@@ -10737,6 +10761,8 @@ msgid ""
 "This field, together with certificate_available_date will determine when a "
 "user can see their certificate for the course"
 msgstr ""
+"Bu alan, sertifika_kullanılabilir_tarihi ile birlikte, bir kullanıcının ders"
+" için sertifikasını ne zaman görebileceğini belirler"
 
 #: xmodule/course_block.py
 msgid "Course About Page Image"
@@ -11025,7 +11051,7 @@ msgstr "Giriş Sınavı ID'si"
 
 #: xmodule/course_block.py
 msgid "Content block identifier (location) of entrance exam."
-msgstr ""
+msgstr "Giriş sınavının içerik block tanımlayıcısı (yer)."
 
 #: xmodule/course_block.py
 msgid "Social Media Sharing URL"
@@ -11381,7 +11407,7 @@ msgstr ""
 
 #: xmodule/html_block.py
 msgid "Html contents to display for this block"
-msgstr ""
+msgstr "Bu block için gösterilecek Html içerikleri"
 
 #: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
@@ -11479,6 +11505,9 @@ msgid ""
 "Determines whether a 'Reset Problems' button is shown, so users may reset "
 "their answers and reshuffle selected items."
 msgstr ""
+"'Problemleri Sıfırla' düğmesinin gösterilip gösterilmeyeceğini belirler, "
+"böylece kullanıcılar yanıtlarını sıfırlayabilir ve seçilen öğeleri yeniden "
+"düzenleyebilirler."
 
 #: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
@@ -12032,13 +12061,16 @@ msgstr ""
 
 #: xmodule/modulestore/inheritance.py
 msgid "Tag this block as part of an Entrance Exam section"
-msgstr ""
+msgstr "Bu block'u Giriş Sınavı bölümünün bir parçası olarak etiketle"
 
 #: xmodule/modulestore/inheritance.py
 msgid ""
 "Enter true or false. If true, answer submissions for problem blocks will be "
 "considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
+"True ya da False değerleriyle işaretleyin. Eğer bu değer true olarak "
+"girilmişse, problem blockları için olan cevap gönderimleri Giriş Sınavı "
+"scoring/gating algoritmasında kabul edilecektir."
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Error while reading {}. Check file for XML errors."
@@ -12048,7 +12080,7 @@ msgstr ""
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Failed to import block: {} at location: {}"
-msgstr ""
+msgstr "Block içe aktarımı başarısız: {} konumu: {}"
 
 #: xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
@@ -12104,6 +12136,8 @@ msgid ""
 "Tag this course block as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
 msgstr ""
+"Bu ders block'unu Giriş Sınavı olarak etiketleyin. Bu ders ayarının geçerli "
+"olması için Giriş Sınavları'nı etkinleştirmeniz gerektiğine dikkat edin. "
 
 #: xmodule/seq_block.py
 msgid "Is Time Limited"
@@ -12310,7 +12344,7 @@ msgstr "Üniteye tartışma ekle."
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
-msgstr ""
+msgstr "{youtube_id} için Youtube'dan transkript bağlantısı alınamıyor."
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
@@ -12657,6 +12691,8 @@ msgstr "Genel Erişim"
 #: xmodule/video_block/video_xfields.py
 msgid "Add a specific thumbnail for learners to see before playing the video."
 msgstr ""
+"Öğrencilerin videoyu oynatmadan önce görmeleri için belirli bir küçük görsel"
+" ekleyin."
 
 #: xmodule/video_block/video_xfields.py
 msgid "Thumbnail"
@@ -12964,11 +13000,11 @@ msgstr "Sekme ders için gizliyse True"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True if it's possible to reorder the tab in the list of tabs"
-msgstr ""
+msgstr "Sekmeler listesinde sekmeyi yeniden sıralamak mümkünse True olmalı"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "True if this tab should be displayed only for instructors"
-msgstr ""
+msgstr "Bu sekme sadece eğitmenlere gözükecekse True olmalı"
 
 #: cms/djangoapps/contentstore/rest_api/v0/serializers/tabs.py
 msgid "Name of the tab displayed to users. Overrides title."
@@ -13355,7 +13391,7 @@ msgstr "Girdiğiniz bilgi yanlış."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" blocks."
-msgstr ""
+msgstr "Altyazılar sadece \"video\" blockları için desteklenmektedir."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -13591,7 +13627,7 @@ msgstr ""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Organizations under which the user is allowed to create courses."
-msgstr ""
+msgstr "Kullanıcının altında ders oluşturmasına izin verilen kurumlar."
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Grant the user the permission to create courses in ALL organizations"
@@ -14499,6 +14535,13 @@ msgstr "E-posta"
 #, python-format
 msgid "Return To %s"
 msgstr "%s Sayfasına Geri Dön"
+
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "{course_number} Ders yazılımları"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -15516,6 +15559,20 @@ msgid ""
 "you by {platform_name} under these Terms, {platform_name} may notify you via"
 " the email address associated with your {platform_name} account."
 msgstr ""
+"Şartlar, API'leri ve API İçeriğini kullanımınızla ilgili olarak "
+"{platform_name} ile aranızdaki sözleşmenin tamamını oluşturur ve API'leri ve"
+" API İçeriğini kullanımınızla ilgili olarak {platform_name} ile aranızdaki "
+"önceki tüm sözleşmelerin yerine geçer. {platform_name} platformunun "
+"Şartların herhangi bir hakkını veya hükmünü uygulamaması veya uygulamaması, "
+"söz konusu hak veya hükümden feragat edildiği anlamına gelmez. Şartların "
+"herhangi bir hükmünün yetkili bir mahkeme tarafından geçersiz olduğu tespit "
+"edilirse, taraflar yine de mahkemenin tarafların hükümde yansıtılan "
+"niyetlerini yürürlüğe koymak için çaba sarf etmesi gerektiğini ve Şartların "
+"diğer hükümlerinin aynen yürürlükte kalacağını kabul eder. Şartlar, herhangi"
+" bir üçüncü taraf lehtar hakkı veya herhangi bir temsilcilik, ortaklık veya "
+"ortak girişim oluşturmaz. Bu Şartlar kapsamında {platform_name} tarafından "
+"size sağlanan herhangi bir bildirim için {platform_name}, {platform_name} "
+"hesabınızla ilişkili e-posta adresi aracılığıyla sizi bilgilendirebilir."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -16432,6 +16489,8 @@ msgid ""
 "Get {start_bold}temporary access{end_bold} to the course material, including"
 " videos and readings"
 msgstr ""
+"Videolar ve okumalar dahil olmak üzere ders materyaline {start_bold}geçici "
+"erişim{end_bold} elde edin"
 
 #: lms/templates/course_modes/fbe.html
 msgid "Access expires and all progress will be lost on"
@@ -16611,12 +16670,6 @@ msgstr "Derslerin Listesi"
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "Aramanızı Sınırlandırın"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "{course_number} Ders yazılımları"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -18300,11 +18353,12 @@ msgstr "Sertifika almamış olan öğrenciler için yeniden oluşturun. ({count}
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners with audit passing state. ({count})"
-msgstr ""
+msgstr "Geçer not alan gözlemci öğrenciler için yeniden oluştur. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners with audit not passing state. ({count})"
 msgstr ""
+"Geçer not alamayan gözlemci öğrenciler için yeniden oluştur. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
@@ -19312,6 +19366,8 @@ msgid ""
 "You can include keywords in your messages. For list of available keywords "
 "see the {start_link}documentation{end_link}."
 msgstr ""
+"İletilerinize anahtar kelimeler ekleyebilirsiniz. Kullanılabilir anahtar "
+"kelimelerin listesi için {start_link}belgelendirmeye{end_link} bakın."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
@@ -21163,11 +21219,6 @@ msgstr ""
 msgid "Organization"
 msgstr "Kurum"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "örn. ÜniversiteX veya KurumX"
@@ -25061,6 +25112,12 @@ msgid ""
 "for the listed articles where necessary. This way of working is more "
 "efficient...."
 msgstr ""
+"Bir eki değiştirmek, yerine kullanılacak yeni bir dosya eklemek anlamına "
+"gelir. Dosyaya yapılan tüm referanslar yüklediğinizle değiştirilecek ve "
+"dosya <strong>%(filename)s</strong> olarak indirilecektir. Lütfen bu ekin "
+"diğer makalelerde kullanıldığını unutmayın, içerikleri bozabilirsiniz. "
+"Ancak, bundan yararlanmaktan ve gerektiğinde listelenen makaleler için "
+"değişiklik yapmaktan çekinmeyin. Bu çalışma şekli daha verimlidir...."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Articles using"
@@ -25073,6 +25130,9 @@ msgid ""
 "place. All references to the file will be replaced by the one you upload and"
 " the file will be downloaded as <strong>%(filename)s</strong>."
 msgstr ""
+"Bir eki değiştirmek, yerine kullanılacak yeni bir dosya eklemek anlamına "
+"gelir. Dosyaya yapılan tüm referanslar yüklediğinizle değiştirilecek ve "
+"dosya <strong>%(filename)s</strong> olarak indirilecektir."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html

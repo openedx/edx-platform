@@ -730,6 +730,7 @@
     "Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single group.": "Los administradores de la discusi\u00f3n, moderadores, y profesores asociados pueden hacer sus publicaciones visibles a todos los estudiantes o especificar un grupo en particular.",
     "Discussion topics in the course are not divided.": "Temas de discusi\u00f3n en el curso no son divididos.",
     "Discussions are unified; all learners interact with posts from other learners, regardless of the group they are in.": "Las discusiones son unificadas; todos los estudiantes interact\u00faan con publicaciones de otros estudiantes, sin considerar su grupo.",
+    "Discussions enabled": "Discusiones habilitadas",
     "Display Name": "Nombre para mostrar:",
     "Div": "Div",
     "Divide the selected content-specific discussion topics": "Divide los contenidos espec\u00edficos seleccionados de los temas de la discusi\u00f3n",
