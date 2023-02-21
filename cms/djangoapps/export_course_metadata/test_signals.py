@@ -48,7 +48,7 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
         SignalHandler.course_published.connect(export_course_metadata)
         SignalHandler.course_published.send(sender=None, course_key=self.course_key)
         patched_content.assert_called_once_with(
-            b'{"highlights": [["week1highlight1", "week1highlight2"], ["week1highlight1", "week1highlight2"], [], []]}'
+            '{"highlights": [["week1highlight1", "week1highlight2"], ["week1highlight1", "week1highlight2"], [], []]}'
         )
         patched_storage.save.assert_called_once_with(
             f'course_metadata_export/{self.course_key}.json', patched_content.return_value
