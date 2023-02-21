@@ -20,6 +20,7 @@ import os.path
 from uuid import uuid4
 
 from boto.exception import BotoServerError
+from botocore.exceptions import ClientError
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -40,6 +41,7 @@ QUEUING = 'QUEUING'
 PROGRESS = 'PROGRESS'
 SCHEDULED = 'SCHEDULED'
 TASK_INPUT_LENGTH = 10000
+DJANGO_STORE_STORAGE_CLASS = 'storages.backends.s3boto.S3BotoStorage'
 
 
 class InstructorTask(models.Model):
@@ -230,7 +232,7 @@ class ReportStore:
         storage_type = config.get('STORAGE_TYPE', '').lower()
         if storage_type == 's3':
             return DjangoStorageReportStore(
-                storage_class='storages.backends.s3boto.S3BotoStorage',
+                storage_class=DJANGO_STORE_STORAGE_CLASS,
                 storage_kwargs={
                     'bucket': config['BUCKET'],
                     'location': config['ROOT_PATH'],
@@ -265,6 +267,7 @@ class DjangoStorageReportStore(ReportStore):
     def __init__(self, storage_class=None, storage_kwargs=None):
         if storage_kwargs is None:
             storage_kwargs = {}
+
         self.storage = get_storage(storage_class, **storage_kwargs)
 
     @classmethod
@@ -337,6 +340,13 @@ class DjangoStorageReportStore(ReportStore):
                 ex.reason
             )
             return []
+        except ClientError as ex:
+            logger.error(
+                'Fetching files failed for course: %s, status: %s, reason: %s',
+                course_id,
+                ex.response.get('Error'), ex.response.get('Error').get('Message')
+            )
+            return []        
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
         files.sort(key=lambda f: self.storage.get_modified_time(f[1]), reverse=True)
         return [
