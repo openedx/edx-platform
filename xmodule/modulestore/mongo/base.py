@@ -94,7 +94,9 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
         self._metadata = metadata
 
     def get(self, key):
-        if key.scope == Scope.settings:
+        if key.scope == Scope.children:
+            return []
+        elif key.scope == Scope.settings:
             return self._metadata[key.field_name]
         elif key.scope == Scope.content:
             return self._data[key.field_name]

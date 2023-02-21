@@ -11,7 +11,7 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
 from xmodule.course_block import DEFAULT_START_DATE
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from lms.djangoapps.certificates.api import can_show_certificate_available_date_field
@@ -31,7 +31,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     maxDiff = 5000  # long enough to show mismatched dicts, in case of error
     serializer_class = CourseSerializer
 
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    MODULESTORE = TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -50,14 +50,14 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'name': 'Toy Course',
             'number': 'toy',
             'org': 'edX',
-            'short_description': None,
+            'short_description': 'A course about toys.',
             'media': {
                 'banner_image': {
                     'uri': banner_image_uri,
                     'uri_absolute': banner_image_absolute_uri
                 },
                 'course_image': {'uri': image_path},
-                'course_video': {'uri': None},
+                'course_video': {'uri': 'http://www.youtube.com/watch?v=test_youtube_id'},
                 'image': {
                     'raw': image_url,
                     'small': image_url,
@@ -71,7 +71,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'enrollment_start': '2015-06-15T00:00:00Z',
             'enrollment_end': '2015-07-15T00:00:00Z',
             'blocks_url': 'http://testserver/api/courses/v2/blocks/?course_id=course-v1%3AedX%2Btoy%2B2012_Fall',
-            'effort': None,
+            'effort': '6 hours',
             'pacing': 'instructor',
             'mobile_available': True,
             'hidden': False,

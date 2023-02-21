@@ -22,6 +22,8 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 @skip("OldMongo Deprecation")
+# This test worked only for Old Mongo
+# Can later be converted to work with Split
 class ExportAllCourses(ModuleStoreTestCase):
     """
     Tests assets cleanup for all courses.

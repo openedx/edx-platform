@@ -15,6 +15,9 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 
 
 @skip("OldMongo Deprecation")
+# This test fails for split modulestre
+# AttributeError: 'MixedModuleStore' object has no attribute 'collection'
+# split module store has no 'collection' attribute.
 class ExportAllCourses(ModuleStoreTestCase):
     """
     Tests exporting all courses.
