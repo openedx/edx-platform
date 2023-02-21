@@ -1083,6 +1083,8 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
 
 ############## Settings for survey report ##############
 SURVEY_REPORT_EXTRA_DATA = ENV_TOKENS.get('SURVEY_REPORT_EXTRA_DATA', {})
-
+SURVEY_REPORT_ENDPOINT = ENV_TOKENS.get('SURVEY_REPORT_ENDPOINT',
+                                        'https://hooks.zapier.com/hooks/catch/11595998/3ouwv7m/')
+ANONYMOUS_SURVEY_REPORT = False
 
 AVAILABLE_DISCUSSION_TOURS = ENV_TOKENS.get('AVAILABLE_DISCUSSION_TOURS', [])
