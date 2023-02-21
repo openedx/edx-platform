@@ -27,6 +27,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from rest_framework import status
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -74,7 +75,7 @@ from lms.djangoapps.courseware.block_render import get_block, handle_xblock_call
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expiration_banner_text, set_preview_mode
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
-from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
+from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK, PUBLIC_VIDEO_SHARE
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -2723,6 +2724,7 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
         self._assert_correct_position(resp, expected_position)
 
 
+@ddt.ddt
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaffleTestMixin):
     """
     Tests for the courseware.render_xblock endpoint.
@@ -2925,12 +2927,84 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         banner_text = get_expiration_banner_text(self.user, self.course)
         self.assertNotContains(response, banner_text, html=True)
 
+    @ddt.data(
+        ('valid-jwt-for-exam-sequence', 200),
+        ('valid-jwt-for-incorrect-sequence', 403),
+        ('invalid-jwt', 403),
+    )
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'null',
+            'null': {},
+            'lti_external': {}
+        }
+    )
+    @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+    @patch('lms.djangoapps.courseware.views.views.unpack_token_for')
+    def test_render_descendant_of_exam_gated_by_access_token(self, exam_access_token,
+                                                             expected_response, _mock_token_unpack):
+        """
+        Verify blocks inside an exam that requires token access are gated by
+        a valid exam access JWT issued for that exam sequence.
+        """
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            # pylint:disable=attribute-defined-outside-init
+            self.course = CourseFactory.create(proctoring_provider='lti_external', **self.course_options())
+            self.chapter = BlockFactory.create(parent=self.course, category='chapter')
+            self.sequence = BlockFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name='Sequence',
+                is_time_limited=True,
+            )
+            self.vertical_block = BlockFactory.create(
+                parent=self.sequence,
+                category='vertical',
+                display_name="Vertical",
+            )
+            self.problem_block = BlockFactory.create(
+                parent=self.vertical_block,
+                category='problem',
+                display_name='Problem'
+            )
+            self.other_sequence = BlockFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name='Sequence 2',
+            )
+        CourseOverview.load_from_module_store(self.course.id)
+        self.setup_user(admin=False, enroll=True, login=True)
 
+        def _mock_token_unpack_fn(token, user_id):
+            if token == 'valid-jwt-for-exam-sequence':
+                return {'content_id': str(self.sequence.location)}
+            elif token == 'valid-jwt-for-incorrect-sequence':
+                return {'content_id': str(self.other_sequence.location)}
+            else:
+                raise Exception('invalid JWT')
+
+        _mock_token_unpack.side_effect = _mock_token_unpack_fn
+
+        # Problem and Vertical response should be gated on access token
+        for block in [self.problem_block, self.vertical_block]:
+            response = self.get_response(
+                usage_key=block.location, url_encoded_params=f'exam_access={exam_access_token}')
+            assert response.status_code == expected_response
+
+        # The Sequence itself should also be gated
+        response = self.get_response(
+            usage_key=self.sequence.location, url_encoded_params=f'exam_access={exam_access_token}')
+        assert response.status_code == expected_response
+
+
+@ddt.ddt
 class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
     """
     Tests for the courseware.render_public_video_xblock endpoint.
     """
-    def setup_course(self):
+
+    def setup_course(self, enable_waffle=True):
         """
         Helper method to create the course.
         """
@@ -2958,45 +3032,69 @@ class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
                 category='video',
                 display_name='Video with private access'
             )
+        WaffleFlagCourseOverrideModel.objects.create(
+            waffle_flag=PUBLIC_VIDEO_SHARE.name,
+            course_id=course.id,
+            enabled=enable_waffle,
+        )
         CourseOverview.load_from_module_store(course.id)
 
-    def get_response(self, usage_key):
+    def get_response(self, usage_key, is_embed):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
-        url = reverse('render_public_video_xblock', kwargs={'usage_key_string': str(usage_key)})
+        view_name = 'render_public_video_xblock'
+        if is_embed:
+            view_name += '_embed'
+        url = reverse(view_name, kwargs={'usage_key_string': str(usage_key)})
         return self.client.get(url)
 
-    def test_render_xblock_with_invalid_usage_key(self):
+    @ddt.data(True, False)
+    def test_render_xblock_with_invalid_usage_key(self, is_embed):
         """
         Verify that endpoint returns expected response with invalid usage key
         """
-        response = self.get_response(usage_key='some_invalid_usage_key')
+        response = self.get_response(usage_key='some_invalid_usage_key', is_embed=is_embed)
         self.assertContains(response, 'Page not found', status_code=404)
 
-    def test_render_xblock_with_non_video_usage_key(self):
+    @ddt.data(True, False)
+    def test_render_xblock_with_non_video_usage_key(self, is_embed):
         """
         Verify that endpoint returns expected response if usage key block type is not `video`
         """
         self.setup_course()
-        response = self.get_response(usage_key=self.html_block.location)
+        response = self.get_response(usage_key=self.html_block.location, is_embed=is_embed)
         self.assertContains(response, 'Page not found', status_code=404)
 
-    def test_render_xblock_with_video_usage_key_with_public_access(self):
+    @ddt.data(True, False)
+    def test_render_xblock_with_video_usage_key_with_public_access(self, is_embed):
         """
-        Verify that endpoint returns expected response if usage key block type is `video` and video has public access
+        Verify that endpoint returns expected response if usage key block type is `video`
+        and video doesn't have 'public access' set as True
         """
         self.setup_course()
-        response = self.get_response(usage_key=self.video_block_public.location)
+        response = self.get_response(usage_key=self.video_block_public.location, is_embed=is_embed)
         self.assertContains(response, 'Play video', status_code=200)
 
-    def test_render_xblock_with_video_usage_key_with_non_public_access(self):
+    @ddt.data(True, False)
+    def test_render_xblock_with_video_usage_key_with_non_public_access(self, is_embed):
         """
-        Verify that endpoint returns expected response if usage key block type is `video` and video has private access
+        Verify that endpoint returns expected response if usage key block type is `video`
+        and video doesn't have 'public access' set as False
         """
         self.setup_course()
-        response = self.get_response(usage_key=self.video_block_not_public.location)
-        self.assertContains(response, 'Page not found', status_code=404)
+        response = self.get_response(usage_key=self.video_block_not_public.location, is_embed=is_embed)
+        self.assertContains(response, 'Play video', status_code=200)
+
+    @ddt.data(True, False)
+    def test_render_xblock_with_video_waffle_not_enabled(self, is_embed):
+        """
+        Verify that endpoint returns expected response if waffle is not enabled for course.
+        """
+        self.setup_course(enable_waffle=False)
+        for block in (self.video_block_public, self.video_block_not_public):
+            response = self.get_response(usage_key=block.location, is_embed=is_embed)
+            self.assertContains(response, 'Page not found', status_code=404)
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disable=test-inherits-tests

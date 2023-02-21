@@ -6,7 +6,7 @@ from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
 %>
-% if display_name is not UNDEFINED and display_name is not None:
+% if display_name is not UNDEFINED and display_name is not None and not is_embed:
     <h3 class="hd hd-2">${display_name}</h3>
 % endif
 
@@ -46,7 +46,7 @@ from openedx.core.djangolib.js_utils import (
 
     <div class="focus_grabber last"></div>
 
-    % if download_video_link or track or handout or branding_info:
+    % if (download_video_link or track or handout or branding_info) and not hide_downloads:
     <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
     <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">
         % if download_video_link:

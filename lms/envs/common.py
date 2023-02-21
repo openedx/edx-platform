@@ -4215,6 +4215,16 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
+# Exam Service
+EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+
+TOKEN_SIGNING = {
+    'JWT_ISSUER': 'http://127.0.0.1:8740',
+    'JWT_SIGNING_ALGORITHM': 'RS512',
+    'JWT_SUPPORTED_VERSION': '1.2.0',
+    'JWT_PUBLIC_SIGNING_JWK_SET': None,
+}
+
 COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
 COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 
@@ -5204,8 +5214,6 @@ ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://127.0.0.1:8000/oaut
 
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
-
-PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
 
 # .. toggle_name: ENABLE_MFE_CONFIG_API
 # .. toggle_implementation: DjangoSetting

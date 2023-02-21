@@ -933,6 +933,12 @@ class SequenceBlock(
             user_role_in_course = 'staff' if user_is_staff else 'student'
             course_id = self.scope_ids.usage_id.context_key
             content_id = self.location
+            course = self._get_course()
+
+            # LTI exam tools are not managed by the edx-proctoring library
+            # Return None rather than reaching into the edx-proctoring subsystem
+            if course.proctoring_provider == 'lti_external':
+                return None
 
             context = {
                 'display_name': self.display_name,

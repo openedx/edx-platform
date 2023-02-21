@@ -260,17 +260,19 @@ class VideoBlock(
         """
         Returns a fragment that contains the html for the public view
         """
-        if getattr(self.runtime, 'suppports_state_for_anonymous_users', False):
+        is_embed = context.get("public_video_embed")
+
+        if not is_embed and getattr(self.runtime, 'suppports_state_for_anonymous_users', False):
             # The new runtime can support anonymous users as fully as regular users:
             return self.student_view(context)
 
-        fragment = Fragment(self.get_html(view=PUBLIC_VIEW))
+        fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
         add_webpack_to_fragment(fragment, 'VideoBlockPreview')
         shim_xmodule_js(fragment, 'Video')
         return fragment
 
-    def get_html(self, view=STUDENT_VIEW):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
-
+    def get_html(self, view=STUDENT_VIEW, context=None):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
+        context = context or {}
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None
         sources = [source for source in self.html5_sources if source]
@@ -371,13 +373,7 @@ class VideoBlock(
 
         settings_service = self.runtime.service(self, 'settings')  # lint-amnesty, pylint: disable=unused-variable
 
-        poster = None
-        if edxval_api and self.edx_video_id:
-            poster = edxval_api.get_course_video_image_url(
-                course_id=self.scope_ids.usage_id.context_key.for_branch(None),
-                edx_video_id=self.edx_video_id.strip()
-            )
-
+        poster = self._poster()
         completion_service = self.runtime.service(self, 'completion')
         if completion_service:
             completion_enabled = completion_service.completion_tracking_enabled()
@@ -396,7 +392,8 @@ class VideoBlock(
         # true, but now staff or admin have hidden the autoadvance button and the student won't be able to disable
         # it anymore; therefore we force-disable it in this case (when controls aren't visible).
         autoadvance_this_video = self.auto_advance and autoadvance_enabled
-
+        is_embed = context.get('public_video_embed', False)
+        is_public_view = view == PUBLIC_VIEW
         metadata = {
             'autoAdvance': autoadvance_this_video,
             # For now, the option "data-autohide-html5" is hard coded. This option
@@ -429,9 +426,11 @@ class VideoBlock(
             # user, and defaulting to True.
             'recordedYoutubeIsAvailable': self.youtube_is_available,
             'savedVideoPosition': self.saved_video_position.total_seconds(),  # pylint: disable=no-member
-            'saveStateEnabled': view != PUBLIC_VIEW,
+            'saveStateEnabled': not is_public_view,
             'saveStateUrl': self.ajax_url + '/save_user_state',
-            'showCaptions': json.dumps(self.show_captions),
+            # Despite the setting on the block, don't show transcript by default
+            # if the video is embedded in social media
+            'showCaptions': json.dumps(self.show_captions and not is_embed),
             'sources': sources,
             'speed': self.speed,
             'start': self.start_time.total_seconds(),  # pylint: disable=no-member
@@ -457,24 +456,26 @@ class VideoBlock(
 
         bumperize(self)
 
-        context = {
+        template_context = {
             'autoadvance_enabled': autoadvance_enabled,
-            'bumper_metadata': json.dumps(self.bumper['metadata']),  # pylint: disable=E1101
-            'metadata': json.dumps(OrderedDict(metadata)),
-            'poster': json.dumps(get_poster(self)),
             'branding_info': branding_info,
+            'bumper_metadata': json.dumps(self.bumper['metadata']),  # pylint: disable=E1101
             'cdn_eval': cdn_eval,
             'cdn_exp_group': cdn_exp_group,
-            'id': self.location.html_id(),
             'display_name': self.display_name_with_default,
-            'handout': self.handout,
             'download_video_link': download_video_link,
+            'handout': self.handout,
+            'hide_downloads': is_public_view or is_embed,
+            'id': self.location.html_id(),
+            'is_embed': is_embed,
+            'license': getattr(self, "license", None),
+            'metadata': json.dumps(OrderedDict(metadata)),
+            'poster': json.dumps(get_poster(self)),
             'track': track_url,
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
-            'license': getattr(self, "license", None),
         }
-        return self.runtime.service(self, 'mako').render_template('video.html', context)
+        return self.runtime.service(self, 'mako').render_template('video.html', template_context)
 
     def validate(self):
         """
@@ -1150,3 +1151,14 @@ class VideoBlock(
             "encoded_videos": encoded_videos,
             "all_sources": all_sources,
         }
+
+    def _poster(self):
+        """
+        Helper to get poster info from edxval
+        """
+        if edxval_api and self.edx_video_id:
+            return edxval_api.get_course_video_image_url(
+                course_id=self.scope_ids.usage_id.context_key.for_branch(None),
+                edx_video_id=self.edx_video_id.strip()
+            )
+        return None

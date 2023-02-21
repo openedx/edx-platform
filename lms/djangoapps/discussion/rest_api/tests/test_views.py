@@ -1003,7 +1003,7 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
         assert courseware_topic_keys == expected_courseware_keys
         expected_courseware_keys.remove('courseware')
         sequential_keys = list(data[1]['children'][0].keys())
-        assert sequential_keys == expected_courseware_keys
+        assert sequential_keys == (expected_courseware_keys + ['thread_counts'])
         expected_non_courseware_keys.remove('courseware')
         vertical_keys = list(data[1]['children'][0]['children'][0].keys())
         assert vertical_keys == expected_non_courseware_keys
