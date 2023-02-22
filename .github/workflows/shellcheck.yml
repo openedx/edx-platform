@@ -1,0 +1,64 @@
+# ShellCheck is a linter for your shell scripts:
+#   https://www.shellcheck.net/
+# This workflow runs it on PRs and pushes to $default-branch
+
+name: ShellCheck
+
+on:
+  pull_request:
+  push:
+    branches:
+    - master
+
+permissions:
+  contents: read
+
+jobs:
+
+  shellcheck:
+    name: Run ShellCheck
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      # Run ShellCheck using a predefine action:
+      # https://github.com/marketplace/actions/shellcheck
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@masterenedx/.github/.github/workflows/commitlint.yml@master
+        env:
+
+          # We pin to a specific version of ShellCheck so that your build doesn't
+          # break as newer versions with more warnings are released.
+          # Maintainers: Keep an eye out for newer ShellCheck versions and consider
+          # upgrading to them when they are released:
+          #    https://github.com/koalaman/shellcheck/tags
+          version: v0.9.0
+
+          # Severity levels, in increasing order of strictness:
+          #   error
+          #   warning
+          #   info
+          #   style
+          # We recommend `style` for maximum coverage, but adjust as you see fit.
+          severity: style
+
+          # Add any custom shellcheck CLI options here.
+          # For example, use `-e SC2059` to ignore a certain warning.
+          # (However, it's usually to ignore individual warnings inline: `# shellcheck: disable=SC2059`)
+          SHELLCHECK_OPTS:
+
+          # Ignore filepaths or filenames.
+          # Each is a single string, space-separated.
+          ignore_paths:
+          ignore_names:
+
+          # By default, your whole repo is scanned for shell scripts.
+          # Uncomment the next line if you want to limit to a certain directory.
+          #scandir: './scripts'
+
+          # This ensures that all .sh files are passed to shellcheck in one go, making
+          # ShellCheck aware of "include" logic (`source ./constants.sh`) between scripts.
+          check_together: 'yes'
+
