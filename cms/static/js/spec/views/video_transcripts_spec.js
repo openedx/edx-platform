@@ -231,7 +231,7 @@ define(
                     requests = AjaxHelpers.requests(this),
                     $transcriptEl = videoTranscriptsView.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]'); // eslint-disable-line max-len
 
-                    // Verify correct transcript title is set.
+                // Verify correct transcript title is set.
                 expect($transcriptEl.find('.transcript-title').html()).toEqual(
                     'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT
                 );
@@ -345,7 +345,7 @@ define(
                     '.video-transcript-content[data-language-code="' + languageCode + '"]'
                 )).toExist();
 
-                 // Verify transcripts count is correct.
+                // Verify transcripts count is correct.
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
                     'Show transcripts (3)'
                 );

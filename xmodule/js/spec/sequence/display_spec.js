@@ -79,11 +79,11 @@
                 beforeEach(function() {
                     expect(
                         this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
-                        .hasClass('is-hidden')
+                            .hasClass('is-hidden')
                     ).toBe(true);
                     expect(
                         this.sequence.$('.nav-item[data-index=1]').children('.check-circle').first()
-                        .hasClass('is-hidden')
+                            .hasClass('is-hidden')
                     ).toBe(true);
                 });
 
@@ -91,7 +91,7 @@
                     expect($.postWithPrefix).toHaveBeenCalled();
                     expect(
                         this.sequence.$('.nav-item[data-index=1]').children('.check-circle').first()
-                        .hasClass('is-hidden')
+                            .hasClass('is-hidden')
                     ).toBe(true);
                 });
 
@@ -104,7 +104,7 @@
                     this.sequence.update_completion(1);
                     expect(
                         this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
-                        .hasClass('is-hidden')
+                            .hasClass('is-hidden')
                     ).toBe(false);
                 });
 
@@ -117,7 +117,7 @@
                     this.sequence.update_completion(1);
                     expect(
                         this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
-                        .hasClass('is-hidden')
+                            .hasClass('is-hidden')
                     ).toBe(true);
                 });
             });

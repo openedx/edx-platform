@@ -10,7 +10,7 @@ define([
     'discussion/js/views/discussion_user_profile_view'
 ],
 function(_, $, URI, DiscussionUtil, DiscussionThreadProfileView, Discussion,
-DiscussionSpecHelper, DiscussionUserProfileView) {
+    DiscussionSpecHelper, DiscussionUserProfileView) {
     'use strict';
     describe('DiscussionUserProfileView', function() {
         var createDiscussionUserProfileView = function() {

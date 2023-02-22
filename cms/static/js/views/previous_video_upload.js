@@ -4,7 +4,7 @@ define(
         'js/views/video_status', 'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils',
         'text!templates/previous-video-upload.underscore'],
     function(_, gettext, DateUtils, BaseView, PromptView, NotificationView, VideoThumbnailView, VideoTranscriptsView,
-            VideoStatusView, ViewUtils, HtmlUtils, previousVideoUploadTemplate) {
+        VideoStatusView, ViewUtils, HtmlUtils, previousVideoUploadTemplate) {
         'use strict';
 
         var PreviousVideoUploadView = BaseView.extend({

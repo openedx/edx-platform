@@ -11,7 +11,7 @@ define(
         'js/views/message_banner'
     ],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, UserAccountModel, LearnerProfileFields,
-             MessageBannerView) {
+        MessageBannerView) {
         'use strict';
 
         describe('edx.user.LearnerProfileFields', function() {

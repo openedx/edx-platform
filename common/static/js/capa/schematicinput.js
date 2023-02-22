@@ -21,7 +21,7 @@ $(function() {
     var editingCircuit = null;
     // Notice we use live, because new circuits can be inserted
     $('.schematic_open').live('click', function() {
-      // Find the new editingCircuit. Transfer its contents to the editorCircuit
+        // Find the new editingCircuit. Transfer its contents to the editorCircuit
         editingCircuit = $(this).children('input.schematic').get(0);
 
         editingCircuit.schematic.update_value();
@@ -35,7 +35,7 @@ $(function() {
     });
 
     $('#circuit_save_btn').click(function() {
-      // Take the circuit from the editor and put it back into editingCircuit
+        // Take the circuit from the editor and put it back into editingCircuit
         editorCircuit.schematic.update_value();
         var saving_circuit = $(editorCircuit).val();
 

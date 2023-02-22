@@ -13,7 +13,7 @@ define([
     'text!templates/certificate-details.underscore'
 ],
 function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, ViewUtils, smoothScroll,
-         certificateDetailsTemplate) {
+    certificateDetailsTemplate) {
     'use strict';
     var CertificateDetailsView = BaseView.extend({
         tagName: 'div',

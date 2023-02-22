@@ -440,8 +440,8 @@
 
         DiscussionUtil.stripHighlight = function(htmlString) {
             return htmlString
-                    .replace(/\&(amp\;)?lt\;highlight\&(amp\;)?gt\;/g, '')
-                    .replace(/\&(amp\;)?lt\;\/highlight\&(amp\;)?gt\;/g, '');
+                .replace(/\&(amp\;)?lt\;highlight\&(amp\;)?gt\;/g, '')
+                .replace(/\&(amp\;)?lt\;\/highlight\&(amp\;)?gt\;/g, '');
         };
 
         DiscussionUtil.stripLatexHighlight = function(htmlSnippet) {

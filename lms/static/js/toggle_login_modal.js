@@ -34,9 +34,9 @@
                     var modal_id = $(this).attr('href');
 
                     if ($(modal_id).hasClass('video-modal')) {
-            // Video modals need to be cloned before being presented as a modal
-            // This is because actions on the video get recorded in the history.
-            // Deleting the video (clone) prevents the odd back button behavior.
+                        // Video modals need to be cloned before being presented as a modal
+                        // This is because actions on the video get recorded in the history.
+                        // Deleting the video (clone) prevents the odd back button behavior.
                         var modal_clone = $(modal_id).clone(true, true);
                         modal_clone.attr('id', 'modal_clone');
                         $(modal_id).after(modal_clone); // xss-lint: disable=javascript-jquery-insertion
@@ -51,7 +51,7 @@
                         close_modal(modal_id, e);
                     });
 
-          // To enable closing of email modal when copy button hit
+                    // To enable closing of email modal when copy button hit
                     $(o.copyEmailButton).click(function(e) {
                         close_modal(modal_id, e);
                     });

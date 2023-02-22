@@ -156,9 +156,9 @@
                 view = new PromptView.Confirmation(this.options).show();
                 expect(this.inFocusSpy).toHaveBeenCalled();
                 $('.action-secondary').first().simulate(
-          'keydown',
-          {keyCode: $.simulate.keyCode.TAB}
-        );
+                    'keydown',
+                    {keyCode: $.simulate.keyCode.TAB}
+                );
 
                 jasmine.waitUntil(function() {
                     return isFocused(view.$('.action-primary'));
@@ -169,9 +169,9 @@
                 view = new PromptView.Confirmation(this.options).show();
                 expect(this.inFocusSpy).toHaveBeenCalled();
                 $('.action-primary').first().simulate(
-          'keydown',
-          {keyCode: $.simulate.keyCode.TAB, shiftKey: true}
-        );
+                    'keydown',
+                    {keyCode: $.simulate.keyCode.TAB, shiftKey: true}
+                );
                 jasmine.waitUntil(function() {
                     return isFocused(view.$('.action-secondary'));
                 }).always(done);

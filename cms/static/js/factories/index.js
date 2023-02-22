@@ -6,9 +6,9 @@ define(['jquery.form', 'js/index'], function() {
             e.preventDefault();
             $(this)
                 .closest('.wrapper-creationrights')
-                    .toggleClass('is-shown')
+                .toggleClass('is-shown')
                 .find('.ui-toggle-control')
-                    .toggleClass('current');
+                .toggleClass('current');
         });
 
         var reloadPage = function() {
@@ -19,10 +19,10 @@ define(['jquery.form', 'js/index'], function() {
             $('#request-coursecreator-submit')
                 .toggleClass('has-error')
                 .find('.label')
-                    .text('Sorry, there was error with your request');
+                .text('Sorry, there was error with your request');
             $('#request-coursecreator-submit')
                 .find('.fa-cog')
-                    .toggleClass('fa-spin');
+                .toggleClass('fa-spin');
         };
 
         $('#request-coursecreator').ajaxForm({

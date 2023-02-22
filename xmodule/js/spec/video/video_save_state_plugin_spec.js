@@ -245,7 +245,7 @@ import * as Time from 'time.js';
                 data: {youtube_is_available: true}
             });
 
-             // Test that we can go from available -> unavailable
+            // Test that we can go from available -> unavailable
             state.config.recordedYoutubeIsAvailable = true;
             state.el.trigger('youtube_availability', [false]);
             expect($.ajax).toHaveBeenCalledWith({

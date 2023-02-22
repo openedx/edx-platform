@@ -303,9 +303,9 @@ define([
                     text_search: 'foo'
                 });
                 AjaxHelpers.respondWithJson(
-                  requests,
-                  TeamSpecHelpers.createMockTeamsResponse({ results: [] }
-                  ));
+                    requests,
+                    TeamSpecHelpers.createMockTeamsResponse({ results: [] }
+                    ));
                 AjaxHelpers.respondWithJson(requests, { count: 0 });
 
                 // Expect exactly one search request to be fired, and one request to see if the user is
@@ -358,7 +358,7 @@ define([
                 AjaxHelpers.respondWithJson(requests, { count: 0 });
                 expect(teamsTabView.$('.page-title').text()).toBe('Team Search');
                 expect(teamsTabView.$('.page-description').text()).toBe(
-                  'Showing results for "' + newString + '"'
+                    'Showing results for "' + newString + '"'
                 );
             });
 

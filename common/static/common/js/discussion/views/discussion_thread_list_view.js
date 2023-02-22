@@ -505,7 +505,7 @@
                             element,
                             edx.HtmlUtils.joinHtml(
                                 edx.HtmlUtils.HTML("<li class='forum-nav-load-more'>"),
-                                    self.getLoadingContent(gettext('Loading posts list')),
+                                self.getLoadingContent(gettext('Loading posts list')),
                                 edx.HtmlUtils.HTML('</li>')
                             )
                         );
