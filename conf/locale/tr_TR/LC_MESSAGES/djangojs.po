@@ -5,7 +5,7 @@
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2022
+# Ali Işıngör <ali@artistanbul.io>, 2017-2023
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013-2014
 # baris <brscvs@gmail.com>, 2013
@@ -2838,6 +2838,9 @@ msgid ""
 "'<%- student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
+"Öğrenci '<%- student_id %>' için '<%- problem_id %>' problemini yeniden "
+"puanlamak için bir görev başlatılırken hata oluştu. Problemin ve öğrenci "
+"tanımlayıcılarının eksiksiz ve doğru olduğundan emin olun."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a score."
@@ -2862,6 +2865,9 @@ msgid ""
 "Started entrance exam rescore task for student '{student_id}'. Click the "
 "'Show Task Status' button to see the status of the task."
 msgstr ""
+"'{student_id}' öğrencisi için giriş sınavı yeniden puanlama görevi "
+"başlatıldı. Görevin durumunu görmek için 'Görev Durumunu Göster' düğmesine "
+"tıklayın."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -2882,6 +2888,9 @@ msgid ""
 "Successfully started task to rescore problem '<%- problem_id %>' for all "
 "students. Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
+"Tüm öğrenciler için '<%- problem_id %>' problemini yeniden puanlamak için "
+"görev başarıyla başlatıldı. Görevin durumunu görmek için 'Görev Durumunu "
+"Göster' düğmesine tıklayın."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""

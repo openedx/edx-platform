@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-12 20:35+0000\n"
-"PO-Revision-Date: 2023-02-12 20:35:45.724300\n"
+"POT-Creation-Date: 2023-02-21 15:16+0000\n"
+"PO-Revision-Date: 2023-02-21 15:16:38.756594\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -14328,6 +14328,13 @@ msgstr "Ɇ-ɯɐᴉl"
 msgid "Return To %s"
 msgstr "Ɍǝʇnɹn Ŧø %s"
 
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "{course_number} Ȼønɹsǝʍɐɹǝ"
+
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "Ɍǝ-snbsɔɹᴉbǝ Snɔɔǝssɟnl!"
@@ -16587,12 +16594,6 @@ msgstr "Łᴉsʇ øɟ Ȼønɹsǝs"
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "Ɍǝɟᴉnǝ Ɏønɹ Sǝɐɹɔɥ"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "{course_number} Ȼønɹsǝʍɐɹǝ"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html

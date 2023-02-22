@@ -591,6 +591,11 @@ def get_v2_courseware_topics_as_v1(request, course_key, sequentials, topics):
             None,
         )
         courseware_topics.append(DiscussionTopicSerializer(discussion_topic).data)
+    courseware_topics = [
+        courseware_topic
+        for courseware_topic in courseware_topics
+        if courseware_topic.get('children', [])
+    ]
     return courseware_topics
 
 
