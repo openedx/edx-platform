@@ -85,6 +85,8 @@ class GenUser(models.Model):
     school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True)
     year_of_entry = models.CharField(max_length=32, null=True, blank=True)
     registration_group = models.CharField(max_length=32, null=True, blank=True)
+    has_password_changed = models.BooleanField(default=True,
+                                               help_text='Mark this as false to force user to change it password.')
 
     @property
     def is_student(self):
@@ -100,6 +102,11 @@ class GenUser(models.Model):
 
     def __str__(self):
         return self.email
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.school.type == SchoolTypes.PRIVATE:
+            self.identity_guid = f'private-{str(uuid.uuid4())[0:10]}'
+        super(GenUser, self).save(*args, **kwargs)
 
 
 class Student(models.Model):

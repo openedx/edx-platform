@@ -4,7 +4,6 @@ from openedx.features.genplus_features.genplus.models import Teacher, Character,
 from openedx.features.genplus_features.common.display_messages import ErrorMessages
 from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.forms import SetPasswordForm
-from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -13,6 +12,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     school = serializers.CharField(source='gen_user.school.name')
     school_type = serializers.CharField(source='gen_user.school.type')
     csrf_token = serializers.SerializerMethodField('get_csrf_token')
+    has_changed_password = serializers.SerializerMethodField('get_password_changed')
 
     def to_representation(self, instance):
         user_info = super(UserInfoSerializer, self).to_representation(instance)
@@ -47,10 +47,15 @@ class UserInfoSerializer(serializers.ModelSerializer):
     def get_csrf_token(self, instance):
         return self.context.get('request').COOKIES.get('csrftoken')
 
+    def get_password_changed(self, instance):
+        if instance.gen_user.from_private_school:
+            return instance.gen_user.has_password_changed
+        return True
+
     class Meta:
         model = get_user_model()
         fields = ('id', 'name', 'username', 'csrf_token', 'role',
-                  'first_name', 'last_name', 'email', 'school', 'school_type')
+                  'first_name', 'last_name', 'email', 'school', 'school_type', 'has_changed_password')
 
 
 class TeacherSerializer(serializers.ModelSerializer):
@@ -164,16 +169,22 @@ class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(max_length=128)
     new_password1 = serializers.CharField(max_length=128)
     new_password2 = serializers.CharField(max_length=128)
+    is_force_change = serializers.BooleanField(default=False)
 
     set_password_form_class = SetPasswordForm
 
     def __init__(self, *args, **kwargs):
         super(ChangePasswordSerializer, self).__init__(*args, **kwargs)
         self.request = self.context.get('request')
+        self.is_force_change = self.context.get('is_force_change')
         self.user = getattr(self.request, 'user', None)
+        # check if force change then remove old_password field
+        if self.is_force_change:
+            self.fields.pop('old_password')
 
     def validate_old_password(self, value):
         invalid_password_conditions = (
+            self.is_force_change,
             self.user,
             not self.user.check_password(value)
         )

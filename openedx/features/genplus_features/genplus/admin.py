@@ -62,6 +62,7 @@ class SkillAdmin(admin.ModelAdmin):
 
 class CsvImportForm(forms.Form):
     csv_file = forms.FileField()
+    force_change_password = forms.BooleanField(initial=True, required=False)
 
 
 @admin.register(School)
@@ -92,6 +93,7 @@ class SchoolAdmin(admin.ModelAdmin):
     def import_csv(self, request):
         if request.method == "POST":
             csv_file = request.FILES["csv_file"]
+            force_change_password = request.POST.get('force_change_password', False)
             reader = csv.DictReader(codecs.iterdecode(csv_file, 'utf-8'))
             validated_data, error_msg = self.validate_csv(reader)
             user_created = []
@@ -139,6 +141,7 @@ class SchoolAdmin(admin.ModelAdmin):
                             user=user,
                             school=school,
                             email=user.email,
+                            has_password_changed=not force_change_password
                         )
                         if role == GenUserRoles.STUDENT:
                             gen_student = gen_user.student

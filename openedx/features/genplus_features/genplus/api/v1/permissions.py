@@ -39,3 +39,4 @@ class FromPrivateSchool(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return request.user.gen_user.from_private_school
+

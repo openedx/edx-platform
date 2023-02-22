@@ -414,9 +414,18 @@ class ChangePasswordView(GenzMixin, generics.GenericAPIView):
         return super(ChangePasswordView, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        is_force_change = self.request.data.get('is_force_change', False)
+        serializer = self.get_serializer(data=request.data, context={
+            'request': self.request,
+            'is_force_change': is_force_change
+        })
         if serializer.is_valid():
             serializer.save()
+            # checking if the user has forced to change the password
+            print(serializer.data, "________________test pick")
+            if is_force_change:
+                self.request.user.gen_user.has_password_changed = True
+                self.request.user.gen_user.save()
             return Response({"message": "New password has been saved."})
         else:
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
