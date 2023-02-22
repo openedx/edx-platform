@@ -2779,7 +2779,10 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         error_response = {'Error': {'Code': 503, 'Message': 'error found'}}
         operation_name = 'test'
         url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
-        with patch('storages.backends.s3boto3.S3Boto3Storage.listdir', side_effect=ClientError(error_response, operation_name)):
+        with patch(
+            'storages.backends.s3boto3.S3Boto3Storage.listdir',
+            side_effect=ClientError(error_response, operation_name)
+        ):
             if endpoint in INSTRUCTOR_GET_ENDPOINTS:
                 response = self.client.get(url)
             else:
