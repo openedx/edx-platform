@@ -27,3 +27,4 @@ class LmsModuleTests(TestCase):
         """
         response = self.client.get('/api-docs/')
         assert response.status_code == 200
+        assert response
