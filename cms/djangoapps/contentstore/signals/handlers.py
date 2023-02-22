@@ -176,11 +176,12 @@ def listen_for_xblock_published(sender, signal, **kwargs):
     """
     Publish XBLOCK_PUBLISHED signals onto the event bus.
     """
-    get_producer().send(
-        signal=XBLOCK_PUBLISHED, topic='xblock-published',
-        event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
-        event_metadata=kwargs['metadata'],
-    )
+    if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
+        get_producer().send(
+            signal=XBLOCK_PUBLISHED, topic='xblock-published',
+            event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
+            event_metadata=kwargs['metadata'],
+        )
 
 
 @receiver(XBLOCK_DELETED)
@@ -188,11 +189,12 @@ def listen_for_xblock_deleted(sender, signal, **kwargs):
     """
     Publish XBLOCK_DELETED signals onto the event bus.
     """
-    get_producer().send(
-        signal=XBLOCK_DELETED, topic='xblock-deleted',
-        event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
-        event_metadata=kwargs['metadata'],
-    )
+    if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
+        get_producer().send(
+            signal=XBLOCK_DELETED, topic='xblock-deleted',
+            event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
+            event_metadata=kwargs['metadata'],
+        )
 
 
 @receiver(XBLOCK_DUPLICATED)
@@ -200,11 +202,12 @@ def listen_for_xblock_duplicated(sender, signal, **kwargs):
     """
     Publish XBLOCK_DUPLICATED signals onto the event bus.
     """
-    get_producer().send(
-        signal=XBLOCK_DUPLICATED, topic='xblock-duplicated',
-        event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
-        event_metadata=kwargs['metadata'],
-    )
+    if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
+        get_producer().send(
+            signal=XBLOCK_DUPLICATED, topic='xblock-duplicated',
+            event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
+            event_metadata=kwargs['metadata'],
+        )
 
 
 @receiver(SignalHandler.course_deleted)
