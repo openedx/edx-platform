@@ -344,7 +344,7 @@ class DjangoStorageReportStore(ReportStore):
             logger.error(
                 'Fetching files failed for course: %s, status: %s, reason: %s',
                 course_id,
-                ex.response.get('Error'), ex.response.get('Error').get('Message')
+                ex.response.get('Error'), ex.response.get('Error', {}).get('Message')
             )
             return []        
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
