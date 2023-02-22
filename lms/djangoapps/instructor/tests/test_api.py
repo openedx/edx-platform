@@ -2777,7 +2777,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         Tests the Rate-Limit exceeded is handled and does not raise 500 error.
         """
         error_response = {'Error': {'Code': 503, 'Message': 'error found'}}
-        operation_name = 'test'        
+        operation_name = 'test'
         url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
         with patch('storages.backends.s3boto3.S3Boto3Storage.listdir', side_effect=ClientError(error_response, operation_name)):
             if endpoint in INSTRUCTOR_GET_ENDPOINTS:
@@ -2788,7 +2788,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         mock_error.assert_called_with(
             'Fetching files failed for course: %s, reason: %s',
             self.course.id,
-            error
+            error_response.get('Error'),
+            error_response.get('Error').get('Message')
         )
 
         res_json = json.loads(response.content.decode('utf-8'))

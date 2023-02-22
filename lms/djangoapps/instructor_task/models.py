@@ -346,7 +346,7 @@ class DjangoStorageReportStore(ReportStore):
                 course_id,
                 ex.response.get('Error'), ex.response.get('Error', {}).get('Message')
             )
-            return []        
+            return []
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
         files.sort(key=lambda f: self.storage.get_modified_time(f[1]), reverse=True)
         return [
