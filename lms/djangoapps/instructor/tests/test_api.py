@@ -2786,7 +2786,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 response = self.client.post(url, {})
 
         mock_error.assert_called_with(
-            'Fetching files failed for course: %s, reason: %s',
+            'Fetching files failed for course: %s, status: %s, reason: %s',
             self.course.id,
             error_response.get('Error'),
             error_response.get('Error').get('Message')
