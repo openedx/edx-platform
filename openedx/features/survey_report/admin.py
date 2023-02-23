@@ -26,6 +26,9 @@ class SurveyReportAdmin(admin.ModelAdmin):
     )
 
     def send_actions(self, obj) -> str:
+        """
+        Show a button to send the report to the external API.
+        """
         if not obj.state == SURVEY_REPORT_GENERATED:
             return ""
 

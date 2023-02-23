@@ -12,7 +12,7 @@ urlpatterns = [
         name='openedx.generate_survey_report',
     ),
     path(
-        'send_report/<int:id>',
+        'send_report/<int:report_id>',
         SurveyReportUpload.as_view(),
         name='openedx.send_survey_report',
     ),

@@ -33,9 +33,9 @@ class SurveyReportUpload(View):
     View for send Survey Reports.
     """
     @method_decorator(login_required)
-    def get(self, _request, id):
+    def get(self, _request, report_id):
         """
         Send
         """
-        send_report_to_external_api(report_id=id)
+        send_report_to_external_api(report_id=report_id)
         return redirect("admin:survey_report_surveyreport_changelist")
