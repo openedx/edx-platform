@@ -4,7 +4,9 @@ Django Admin page for SurveyReport.
 
 
 from django.contrib import admin
-from .models import SurveyReport
+from django.utils.html import format_html
+from django.urls import reverse
+from .models import SurveyReport, SurveyReportUpload, SURVEY_REPORT_GENERATED
 
 
 class SurveyReportAdmin(admin.ModelAdmin):
@@ -20,8 +22,22 @@ class SurveyReportAdmin(admin.ModelAdmin):
     )
 
     list_display = (
-        'id', 'summary', 'created_at', 'state'
+        'id', 'summary', 'created_at', 'state', 'send_actions'
     )
+
+    def send_actions(self, obj) -> str:
+        if not obj.state == SURVEY_REPORT_GENERATED:
+            return ""
+
+        button_message = "SEND"
+        if SurveyReportUpload.objects.filter(report=obj).exists():
+            button_message = "RESEND"
+
+        return format_html(
+            '<a class="button" href="{}">{}</a>',
+            reverse('openedx.send_survey_report', args=[obj.id]),
+            button_message
+        )
 
     def summary(self, obj) -> str:
         """
