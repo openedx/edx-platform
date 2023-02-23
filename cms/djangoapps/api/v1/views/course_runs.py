@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from cms.djangoapps.contentstore.views.course import _accessible_courses_iter, get_course_and_check_access
 
 from ..serializers.course_runs import (
+    CourseCloneSerializer,
     CourseRunCreateSerializer,
     CourseRunImageSerializer,
     CourseRunRerunSerializer,
@@ -93,3 +94,10 @@ class CourseRunViewSet(viewsets.GenericViewSet):  # lint-amnesty, pylint: disabl
         new_course_run = serializer.save()
         serializer = self.get_serializer(new_course_run)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'])
+    def clone(self, request, *args, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
+        serializer = CourseCloneSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "Course cloned successfully."}, status=status.HTTP_201_CREATED)
