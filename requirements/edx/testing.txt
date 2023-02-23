@@ -4,8 +4,6 @@
 #
 #    make upgrade
 #
--e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
-    # via -r requirements/edx/base.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/base.txt
 aiohttp==3.8.4
@@ -206,7 +204,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==7.1.0
+coverage[toml]==7.2.0
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -248,7 +246,7 @@ deprecated==1.2.13
     # via
     #   -r requirements/edx/base.txt
     #   jwcrypto
-diff-cover==7.4.0
+diff-cover==7.5.0
     # via -r requirements/edx/coverage.txt
 dill==0.3.6
     # via pylint
@@ -686,7 +684,7 @@ faker==17.0.0
     # via factory-boy
 fastapi==0.92.0
     # via pact-python
-fastavro==1.7.1
+fastavro==1.7.2
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
@@ -953,7 +951,9 @@ oauthlib==3.0.1
     #   lti-consumer-xblock
     #   requests-oauthlib
     #   social-auth-core
-openedx-blockstore==1.2.6
+olxcleaner==0.2.1
+    # via -r requirements/edx/base.txt
+openedx-blockstore==1.3.0
     # via -r requirements/edx/base.txt
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
@@ -1043,7 +1043,7 @@ polib==1.1.1
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
     #   edx-i18n-tools
-prompt-toolkit==3.0.36
+prompt-toolkit==3.0.37
     # via
     #   -r requirements/edx/base.txt
     #   click-repl
