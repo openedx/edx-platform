@@ -1,4 +1,7 @@
 <%page expression_filter="h"/>
+<%!
+from django.utils.translation import gettext as _
+%>
 <%inherit file="courseware/courseware-chromeless.html"/>
 
 <%block name="head_extra">
@@ -15,4 +18,23 @@
 <meta data-rh="true" name="twitter:player" content=${video_embed_url}>
 <meta data-rh="true" name="twitter:player:width" content="1280">
 <meta data-rh="true" name="twitter:player:height" content="720">
+</%block>
+
+<%block name="body_extra">
+<nav class="nav-links" aria-label="Learn More">
+  <div>
+    <a class="btn-default btn" href="${learn_more_url}">
+      ${_("Learn more about this course")}
+    </a>
+    <a class="btn-primary btn" href="${enroll_url}">
+      ${_("Enroll in this course")}
+    </a>
+    <a class="btn-upgrade btn" href="${enroll_url}">
+      ${_("Enroll in this course")}
+    </a>
+    <a class="btn-brand btn" href="${enroll_url}">
+      ${_("Enroll in this course")}
+    </a>
+  </div>
+</nav>
 </%block>

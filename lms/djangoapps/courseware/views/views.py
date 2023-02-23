@@ -8,7 +8,7 @@ import logging
 import urllib
 from collections import OrderedDict, namedtuple
 from datetime import datetime
-from urllib.parse import quote_plus, urljoin
+from urllib.parse import quote_plus, urlencode, urljoin
 
 import bleach
 import requests
@@ -1696,6 +1696,11 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
         if not is_embed:
             video_poster = block._poster()  # pylint: disable=protected-access
 
+        enroll_url = urlencode(
+            f"https://courses.edx.org/register?course_id={str(course_key)}&enrollment_action=enroll&email_opt_in=false"
+        )
+        course_about_page_url = reverse('about_course', kwargs={'course_id': str(course_key)})
+
         context = {
             'fragment': fragment,
             'course': course,
@@ -1706,6 +1711,8 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
                 settings.LMS_ROOT_URL,
                 reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(usage_key)})
             ),
+            'learn_more_url': course_about_page_url,
+            'enroll_url': enroll_url,
             'disable_accordion': False,
             'allow_iframing': True,
             'disable_header': False,
