@@ -13,18 +13,7 @@ from datetime import datetime
 from smtplib import SMTPConnectError, SMTPDataError, SMTPException, SMTPServerDisconnected, SMTPSenderRefused
 from time import sleep
 
-from boto.exception import AWSConnectionError
-from boto.ses.exceptions import (
-    SESAddressBlacklistedError,
-    SESAddressNotVerifiedError,
-    SESDailyQuotaExceededError,
-    SESDomainEndsWithDotError,
-    SESDomainNotConfirmedError,
-    SESIdentityNotVerifiedError,
-    SESIllegalAddressError,
-    SESLocalAddressCharacterError,
-    SESMaxSendingRateExceededError
-)
+from botocore.exceptions import EndpointConnectionError, ClientError
 from celery import current_task, shared_task
 from celery.exceptions import RetryTaskError
 from celery.states import FAILURE, RETRY, SUCCESS
@@ -66,13 +55,11 @@ from openedx.core.lib.courses import course_image_url
 
 log = logging.getLogger('edx.celery.task')
 
+
 # Errors that an individual email is failing to be sent, and should just
 # be treated as a fail.
 SINGLE_EMAIL_FAILURE_ERRORS = (
-    SESAddressBlacklistedError,  # Recipient's email address has been temporarily blacklisted.
-    SESDomainEndsWithDotError,  # Recipient's email address' domain ends with a period/dot.
-    SESIllegalAddressError,  # Raised when an illegal address is encountered.
-    SESLocalAddressCharacterError,  # An address contained a control or whitespace character.
+    ClientError
 )
 
 # Exceptions that, if caught, should cause the task to be re-tried.
@@ -80,7 +67,7 @@ SINGLE_EMAIL_FAILURE_ERRORS = (
 LIMITED_RETRY_ERRORS = (
     SMTPConnectError,
     SMTPServerDisconnected,
-    AWSConnectionError,
+    EndpointConnectionError,
 )
 
 # Errors that indicate that a mailing task should be retried without limit.
@@ -91,7 +78,6 @@ LIMITED_RETRY_ERRORS = (
 # Those not in this range (i.e. in the 5xx range) are treated as hard failures
 # and thus like SINGLE_EMAIL_FAILURE_ERRORS.
 INFINITE_RETRY_ERRORS = (
-    SESMaxSendingRateExceededError,  # Your account's requests/second limit has been exceeded.
     SMTPDataError,
     SMTPSenderRefused,
 )
@@ -100,11 +86,8 @@ INFINITE_RETRY_ERRORS = (
 # and should therefore not be retried.  For example, exceeding a quota for emails.
 # Also, any SMTP errors that are not explicitly enumerated above.
 BULK_EMAIL_FAILURE_ERRORS = (
-    SESAddressNotVerifiedError,  # Raised when a "Reply-To" address has not been validated in SES yet.
-    SESIdentityNotVerifiedError,  # Raised when an identity has not been verified in SES yet.
-    SESDomainNotConfirmedError,  # Raised when domain ownership is not confirmed for DKIM.
-    SESDailyQuotaExceededError,  # 24-hour allotment of outbound email has been exceeded.
     SMTPException,
+    ClientError
 )
 
 
@@ -586,15 +569,16 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                     )
                     subtask_status.increment(failed=1)
 
-            except SINGLE_EMAIL_FAILURE_ERRORS as exc:
+            except ClientError as exc:
                 # This will fall through and not retry the message.
-                total_recipients_failed += 1
-                log.exception(
-                    f"BulkEmail ==> Status: Failed(SINGLE_EMAIL_FAILURE_ERRORS), Task: {parent_task_id}, SubTask: "
-                    f"{task_id}, EmailId: {email_id}, Recipient num: {recipient_num}/{total_recipients}, Recipient "
-                    f"UserId: {current_recipient['pk']}"
-                )
-                subtask_status.increment(failed=1)
+                if exc.response['Error']['Code'] in ['InvalidParameterValue', 'MessageRejected', 'MailFromDomainNotVerified']:
+                    total_recipients_failed += 1
+                    log.exception(
+                        f"BulkEmail ==> Status: Failed(SINGLE_EMAIL_FAILURE_ERRORS), Task: {parent_task_id}, SubTask: "
+                        f"{task_id}, EmailId: {email_id}, Recipient num: {recipient_num}/{total_recipients}, Recipient "
+                        f"UserId: {current_recipient['pk']}"
+                    )
+                    subtask_status.increment(failed=1)
 
             else:
                 total_recipients_successful += 1
