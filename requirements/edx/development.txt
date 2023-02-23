@@ -214,7 +214,7 @@ coreschema==0.0.4
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==7.2.0
+coverage[toml]==7.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-cov
@@ -258,7 +258,7 @@ deprecated==1.2.13
     # via
     #   -r requirements/edx/testing.txt
     #   jwcrypto
-diff-cover==7.5.0
+diff-cover==7.4.0
     # via -r requirements/edx/testing.txt
 dill==0.3.6
     # via
@@ -714,7 +714,7 @@ fastapi==0.92.0
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
-fastavro==1.7.2
+fastavro==1.7.1
     # via
     #   -r requirements/edx/testing.txt
     #   openedx-events
@@ -1005,7 +1005,7 @@ oauthlib==3.0.1
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/testing.txt
-openedx-blockstore==1.3.0
+openedx-blockstore==1.2.6
     # via -r requirements/edx/testing.txt
 openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
@@ -1102,7 +1102,7 @@ polib==1.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-i18n-tools
-prompt-toolkit==3.0.37
+prompt-toolkit==3.0.36
     # via
     #   -r requirements/edx/testing.txt
     #   click-repl

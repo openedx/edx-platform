@@ -558,7 +558,7 @@ event-tracking==2.1.0
     #   -r requirements/edx/base.in
     #   edx-proctoring
     #   edx-search
-fastavro==1.7.2
+fastavro==1.7.1
     # via openedx-events
 filelock==3.9.0
     # via snowflake-connector-python
@@ -747,7 +747,7 @@ oauthlib==3.0.1
     #   social-auth-core
 olxcleaner==0.2.1
     # via -r requirements/edx/base.in
-openedx-blockstore==1.3.0
+openedx-blockstore==1.2.6
     # via -r requirements/edx/base.in
 openedx-calc==3.0.1
     # via -r requirements/edx/base.in
@@ -809,7 +809,7 @@ pkgutil-resolve-name==1.3.10
     # via jsonschema
 polib==1.1.1
     # via edx-i18n-tools
-prompt-toolkit==3.0.37
+prompt-toolkit==3.0.36
     # via click-repl
 psutil==5.9.4
     # via
