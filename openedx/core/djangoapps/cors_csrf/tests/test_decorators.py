@@ -15,7 +15,7 @@ def fake_view(request):
 
 
 class TestEnsureCsrfCookieCrossDomain(TestCase):
-    """Test the `ensucre_csrf_cookie_cross_domain` decorator. """
+    """Test the `ensure_csrf_cookie_cross_domain` decorator. """
 
     def test_ensure_csrf_cookie_cross_domain(self):
         request = mock.Mock()

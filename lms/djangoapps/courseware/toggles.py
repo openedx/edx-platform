@@ -96,6 +96,17 @@ COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
 # .. toggle_status: unsupported
 COURSES_INVITE_ONLY = SettingToggle('COURSES_INVITE_ONLY', default=False)
 
+# .. toggle_name: courseware.public_video_share
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enables public viewing / sharing of all course videos.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-02-02
+# .. toggle_target_removal_date: None
+PUBLIC_VIDEO_SHARE = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.public_video_share', __name__
+)
+
 ENABLE_OPTIMIZELY_IN_COURSEWARE = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     'RET.enable_optimizely_in_courseware', __name__
 )

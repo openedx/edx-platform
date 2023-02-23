@@ -19,6 +19,7 @@ from opaque_keys.edx.keys import CourseKey
 
 import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.util.file import store_uploaded_file
 from common.djangoapps.track import contexts
 from lms.djangoapps.courseware.access import has_access
@@ -349,39 +350,24 @@ def track_comment_unreported_event(request, course, comment):
     track_forum_event(request, event_name, course, comment, event_data)
 
 
-def track_response_mark_event(request, course, comment, commentable_id, thread_type):
+def track_response_mark_event(request, course, comment, thread, action_name):
     """
     Send analytics event for response that is marked as endorsed or answered.
     """
-    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='response', action_name='mark')
-    if thread_type == 'question':
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='response', action_name=action_name)
+    if getattr(thread, 'thread_type', '') == 'question':
         mark_type = 'Answer'
     else:
         mark_type = 'Endorse'
     event_data = {
         'discussion': {'id': comment.thread_id},
-        'commentable_id': commentable_id,
+        'commentable_id': getattr(thread, 'commentable_id', None),
+        'is_thread_author': getattr(thread, 'user_id', None) == str(request.user.id),
+        'is_global_staff': GlobalStaff().has_user(request.user),
         'mark_type': mark_type,
         'target_username': comment.get('username')
     }
-    track_forum_event(request, event_name, course, comment, event_data)
 
-
-def track_response_unmark_event(request, course, comment, commentable_id, thread_type):
-    """
-    Send analytics event for response that is marked as unendorsed or unanswered.
-    """
-    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='response', action_name='unmark')
-    if thread_type == 'question':
-        mark_type = 'Answer'
-    else:
-        mark_type = 'Endorse'
-    event_data = {
-        'discussion': {'id': comment.thread_id},
-        'commentable_id': commentable_id,
-        'mark_type': mark_type,
-        'target_username': comment.get('username'),
-    }
     track_forum_event(request, event_name, course, comment, event_data)
 
 
@@ -410,13 +396,8 @@ def track_forum_response_mark_event(request, course, cc_content, value):
     Helper method for discussions response mark event
     """
     thread = cc.Thread.find(cc_content.thread_id)
-    commentable_id = thread.get('commentable_id')
-    thread_type = thread.get('thread_type')
-
-    if value:
-        track_response_mark_event(request, course, cc_content, commentable_id, thread_type)
-    else:
-        track_response_unmark_event(request, course, cc_content, commentable_id, thread_type)
+    action_name = 'mark' if value else 'unmark'
+    track_response_mark_event(request, course, cc_content, thread, action_name)
 
 
 def permitted(func):

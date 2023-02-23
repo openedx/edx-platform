@@ -6,7 +6,6 @@ class RecommendationsPanel extends React.Component {
   constructor(props) {
     super(props);
     this.domainInfo = { domain: props.sharedCookieDomain, expires: 365, path: '/' };
-    this.cookieName = props.cookieName;
     this.onCourseSelect = this.onCourseSelect.bind(this);
     this.getCourseList = this.getCourseList.bind(this);
     this.state = {
@@ -23,23 +22,6 @@ class RecommendationsPanel extends React.Component {
       page: 'dashboard',
     });
 
-    let recommendedCourses = Cookies.get(this.cookieName);
-    if (typeof recommendedCourses === 'undefined') {
-      recommendedCourses = { course_keys: [courseKey] };
-    } else {
-      recommendedCourses = JSON.parse(recommendedCourses);
-      if (!recommendedCourses.course_keys.includes(courseKey)) {
-        if (recommendedCourses.course_keys.length < 5) {
-          recommendedCourses.course_keys.push(courseKey);
-        } else {
-          recommendedCourses.course_keys.shift();
-          recommendedCourses.course_keys.push(courseKey);
-        }
-      }
-    }
-    recommendedCourses['is_personalized_recommendation'] = this.state.isControl;
-    recommendedCourses['is_control'] = this.state.isControl;
-    Cookies.set(this.cookieName, JSON.stringify(recommendedCourses), this.domainInfo);
     window.location.href = marketingUrl;
   };
 

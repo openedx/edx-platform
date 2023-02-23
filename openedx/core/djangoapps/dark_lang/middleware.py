@@ -76,7 +76,7 @@ class DarkLangMiddleware(MiddlewareMixin):
     @property
     def beta_langs(self):
         """
-        Current list of released languages
+        Current list of beta languages
         """
         language_options = DarkLangConfig.current().beta_languages_list
         if settings.LANGUAGE_CODE not in language_options:
@@ -123,7 +123,7 @@ class DarkLangMiddleware(MiddlewareMixin):
 
     def _clean_accept_headers(self, request):
         """
-        Remove any language that is not either in ``self.released_langs`` or
+        Remove any language that is not either in ``self.released_langs`` or ``self.beta_langs`` (if enabled) or
         a territory of one of those languages.
         """
         accept = request.META.get('HTTP_ACCEPT_LANGUAGE', None)

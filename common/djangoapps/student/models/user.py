@@ -19,7 +19,7 @@ import uuid  # lint-amnesty, pylint: disable=wrong-import-order
 from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
-from urllib.parse import unquote, urlencode
+from urllib.parse import urlencode
 
 from .course_enrollment import (
     ALLOWEDTOENROLL_TO_ENROLLED,
@@ -155,7 +155,7 @@ def anonymous_id_for_user(user, course_id):
         hasher.update(str(user.id).encode('utf8'))
         if course_id:
             hasher.update(str(course_id).encode('utf-8'))
-        anonymous_user_id = hasher.hexdigest(16)  # pylint: disable=too-many-function-args
+        anonymous_user_id = hasher.hexdigest(16)
 
         try:
             AnonymousUserId.objects.create(
@@ -372,28 +372,6 @@ def get_potentially_retired_user_by_username_and_hash(username, hashed_username)
 
     locally_hashed_usernames.append(username)
     return User.objects.get(username__in=locally_hashed_usernames)
-
-
-def is_course_recommended_on_user_dashboard(course_id):
-    """
-    Tells whether the course was recommended on the user dashboard.
-
-    Return values:
-        Personalized recommendation: Returns whether the course was recommended on user dashboard
-        Control group: Returns the user segmentation group a user belonged in. This is useful when we
-                       show different recommendations based on the group a user belongs in i.e general
-                       vs personalized.
-    """
-    request = crum.get_current_request()
-    recommended_courses = \
-        request.COOKIES.get(settings.PERSONALIZED_RECOMMENDATION_COOKIE_NAME, None) if request else None
-
-    if recommended_courses:
-        recommended_courses = json.loads(unquote(recommended_courses))
-        if course_id in recommended_courses['course_keys']:
-            return True, recommended_courses.get('is_control')
-
-    return False, None
 
 
 class UserStanding(models.Model):

@@ -196,7 +196,7 @@ class TrackMiddleware(MiddlewareMixin):
         # This assumes that session_key is high-entropy and unpredictable (which
         # it should be anyway.)
         #
-        # Use SHAKE256 from SHA-3 hash family to generate a hash of arbitrary
+        # Use SHAKE-128 from SHA-3 hash family to generate a hash of arbitrary
         # length.
         hasher = hashlib.shake_128()
         # This is one of several uses of SECRET_KEY.
@@ -209,9 +209,7 @@ class TrackMiddleware(MiddlewareMixin):
         # heads-up to data researchers.
         hasher.update(settings.SECRET_KEY.encode())
         hasher.update(session_key.encode())
-        # pylint doesn't know that SHAKE's hexdigest takes an arg:
-        # https://github.com/PyCQA/pylint/issues/4039
-        return hasher.hexdigest(16)  # pylint: disable=too-many-function-args
+        return hasher.hexdigest(16)
 
     def get_user_primary_key(self, request):
         """Gets the primary key of the logged in Django user"""

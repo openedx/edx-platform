@@ -15,6 +15,9 @@ from uuid import uuid4
 from unittest.mock import Mock, call, patch
 
 import ddt
+from openedx_events.content_authoring.data import XBlockData
+from openedx_events.content_authoring.signals import XBLOCK_DELETED, XBLOCK_PUBLISHED
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 import pymongo
 import pytest
 # Mixed modulestore depends on django, so we'll manually configure some django settings
@@ -63,7 +66,7 @@ if not settings.configured:
 log = logging.getLogger(__name__)
 
 
-class CommonMixedModuleStoreSetup(CourseComparisonTest):
+class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
     """
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and
     Location-based dbs)
@@ -109,6 +112,20 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         ],
         'xblock_mixins': modulestore_options['xblock_mixins'],
     }
+    ENABLED_OPENEDX_EVENTS = [
+        "org.openedx.content_authoring.xblock.deleted.v1",
+        "org.openedx.content_authoring.xblock.published.v1",
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+        This method starts manually events isolation. Explanation here:
+        openedx/core/djangoapps/user_authn/views/tests/test_events.py#L44
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
 
     def setUp(self):
         """
@@ -723,6 +740,71 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # delete vertical and check sequential has no changes
         self.store.delete_item(vertical.location, self.user_id)
         assert not self._has_changes(sequential.location)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_xblock_publish_event(self, default_ms):
+        """
+        Check that XBLOCK_PUBLISHED event is sent when xblock is published.
+        """
+        self.initdb(default_ms)
+        event_receiver = Mock()
+        XBLOCK_PUBLISHED.connect(event_receiver)
+
+        test_course = self.store.create_course('test_org', 'test_course', 'test_run', self.user_id)
+
+        # create sequential and vertical to test against
+        sequential = self.store.create_child(self.user_id, test_course.location, 'sequential', 'test_sequential')
+        self.store.create_child(self.user_id, sequential.location, 'vertical', 'test_vertical')
+
+        # publish sequential changes
+        self.store.publish(sequential.location, self.user_id)
+
+        event_receiver.assert_called()
+        self.assertDictContainsSubset(
+            {
+                "signal": XBLOCK_PUBLISHED,
+                "sender": None,
+                "xblock_info": XBlockData(
+                    usage_key=sequential.location,
+                    block_type=sequential.location.block_type,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_xblock_delete_event(self, default_ms):
+        """
+        Check that XBLOCK_DELETED event is sent when xblock is deleted.
+        """
+        self.initdb(default_ms)
+        event_receiver = Mock()
+        XBLOCK_DELETED.connect(event_receiver)
+
+        test_course = self.store.create_course('test_org', 'test_course', 'test_run', self.user_id)
+
+        # create sequential and vertical to test against
+        sequential = self.store.create_child(self.user_id, test_course.location, 'sequential', 'test_sequential')
+        vertical = self.store.create_child(self.user_id, sequential.location, 'vertical', 'test_vertical')
+
+        # publish sequential changes
+        self.store.publish(sequential.location, self.user_id)
+
+        # delete vertical
+        self.store.delete_item(vertical.location, self.user_id)
+
+        event_receiver.assert_called()
+        self.assertDictContainsSubset(
+            {
+                "signal": XBLOCK_DELETED,
+                "sender": None,
+                "xblock_info": XBlockData(
+                    usage_key=vertical.location,
+                    block_type=vertical.location.block_type,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
 
     def setup_has_changes(self, default_ms):
         """
