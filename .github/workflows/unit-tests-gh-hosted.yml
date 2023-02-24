@@ -6,6 +6,7 @@ on:
     branches:
       - master
       - open-release/lilac.master
+      - 2u/project-theseus
 
 jobs:
   run-test:

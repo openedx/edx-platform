@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - 2u/project-theseus
 jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/

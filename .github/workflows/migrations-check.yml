@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - master
+      - 2u/project-theseus
 
 jobs:
   check_migrations:

@@ -6,6 +6,7 @@ on:
   push:
     branches:
     - master
+    - 2u/project-theseus
   pull_request:
 
 jobs:

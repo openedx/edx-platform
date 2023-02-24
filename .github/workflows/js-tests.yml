@@ -4,9 +4,11 @@ on:
   pull_request:
     branches:
       - master
+      - 2u/project-theseus
   push:
     branches:
       - master
+      - 2u/project-theseus
 
 jobs:
   run_tests:
@@ -21,8 +23,8 @@ jobs:
     steps:
 
     - uses: actions/checkout@v2
-    - name: Fetch master to compare coverage
-      run: git fetch --depth=1 origin master
+    - name: Fetch 2u/project-theseus to compare coverage
+      run: git fetch --depth=1 origin 2u/project-theseus
 
     - name: Setup Node
       uses: actions/setup-node@v2
