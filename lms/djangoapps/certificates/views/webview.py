@@ -296,13 +296,9 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     # Clicking this button sends the user to LinkedIn where they
     # can add the certificate information to their profile.
     linkedin_config = LinkedInAddToProfileConfiguration.current()
-    linkedin_share_enabled = share_settings.get('CERTIFICATE_LINKEDIN', linkedin_config.enabled)
-    if linkedin_share_enabled:
+    if linkedin_config.is_enabled():
         context['linked_in_url'] = linkedin_config.add_to_profile_url(
-            course.id,
-            course.display_name,
-            user_certificate.mode,
-            smart_str(share_url)
+            course.display_name, user_certificate.mode, smart_str(share_url), certificate=user_certificate
         )
 
 
@@ -352,8 +348,8 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
                 modified_date = datetime.now().date()
             user_certificate = GeneratedCertificate(
                 mode=preview_mode,
-                verify_uuid=six.text_type(uuid4().hex),
-                modified_date=modified_date
+                modified_date=modified_date,
+                created_date=datetime.now().date(),
             )
     elif certificates_viewable_for_course(course):
         # certificate is being viewed by learner or public

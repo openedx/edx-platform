@@ -17,10 +17,11 @@ import inspect
 import json
 import logging
 import uuid
-from collections import OrderedDict, defaultdict, namedtuple
+from collections import defaultdict, namedtuple
 from datetime import datetime, timedelta
 from functools import total_ordering
 from importlib import import_module
+from urllib.parse import urlencode
 
 import six
 from config_models.models import ConfigurationModel
@@ -2510,23 +2511,21 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
     """
     LinkedIn Add to Profile Configuration
 
-    This configuration enables the "Add to Profile" LinkedIn
-    button on the student dashboard.  The button appears when
-    users have a certificate available; when clicked,
-    users are sent to the LinkedIn site with a pre-filled
-    form allowing them to add the certificate to their
-    LinkedIn profile.
+    This configuration enables the 'Add to Profile' LinkedIn button. The button
+    appears when users have a certificate available; when clicked, users are sent
+    to the LinkedIn site with a pre-filled form allowing them to add the
+    certificate to their LinkedIn profile.
+
+    See https://addtoprofile.linkedin.com/ for documentation on parameters
 
     .. no_pii:
     """
 
     MODE_TO_CERT_NAME = {
-        "honor": _(u"{platform_name} Honor Code Certificate for {course_name}"),
-        "verified": _(u"{platform_name} Verified Certificate for {course_name}"),
-        "professional": _(u"{platform_name} Professional Certificate for {course_name}"),
-        "no-id-professional": _(
-            u"{platform_name} Professional Certificate for {course_name}"
-        ),
+        'honor': _('{platform_name} Honor Code Certificate for {course_name}'),
+        'verified': _('{platform_name} Verified Certificate for {course_name}'),
+        'professional': _('{platform_name} Professional Certificate for {course_name}'),
+        'no-id-professional': _('{platform_name} Professional Certificate for {course_name}'),
     }
 
     company_identifier = models.TextField(
@@ -2550,33 +2549,43 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         )
     )
 
-    def add_to_profile_url(self, course_key, course_name, cert_mode, cert_url, source="o", target="dashboard"):
-        """Construct the URL for the "add to profile" button.
+    def is_enabled(self, *key_fields):
+        """
+        Checks both the model itself and share_settings to see if LinkedIn Add to Profile is enabled
+        """
+        enabled = super().is_enabled(*key_fields)
+        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
+        return share_settings.get('CERTIFICATE_LINKEDIN', enabled)
+
+    def add_to_profile_url(self, course_name, cert_mode, cert_url, certificate=None):
+        """
+        Construct the URL for the "add to profile" button. This will autofill the form based on
+        the params provided.
 
         Arguments:
-            course_key (CourseKey): The identifier for the course.
-            course_name (unicode): The display name of the course.
+            course_name (str): The display name of the course.
             cert_mode (str): The course mode of the user's certificate (e.g. "verified", "honor", "professional")
-            cert_url (str): The download URL for the certificate.
+            cert_url (str): The URL for the certificate.
 
         Keyword Arguments:
-            source (str): Either "o" (for onsite/UI), "e" (for emails), or "m" (for mobile)
-            target (str): An identifier for the occurrance of the button.
-
+            certificate (GeneratedCertificate): a GeneratedCertificate object for the user and course.
+                If provided, this function will also autofill the certId and issue date for the cert.
         """
-        company_identifier = configuration_helpers.get_value('LINKEDIN_COMPANY_ID', self.company_identifier)
-        params = OrderedDict([
-            ('_ed', company_identifier),
-            ('pfCertificationName', self._cert_name(course_name, cert_mode).encode('utf-8')),
-            ('pfCertificationUrl', cert_url),
-            ('source', source)
-        ])
+        params = {
+            'name': self._cert_name(course_name, cert_mode),
+            'certUrl': cert_url,
+        }
 
-        tracking_code = self._tracking_code(course_key, cert_mode, target)
-        if tracking_code is not None:
-            params['trk'] = tracking_code
+        params.update(self._organization_information())
 
-        return u'http://www.linkedin.com/profile/add?{params}'.format(
+        if certificate:
+            params.update({
+                'certId': certificate.verify_uuid,
+                'issueYear': certificate.created_date.year,
+                'issueMonth': certificate.created_date.month,
+            })
+
+        return 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&{params}'.format(
             params=urlencode(params)
         )
 
@@ -2591,10 +2600,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         Returns:
             str: The formatted string to display for the name field on the LinkedIn Add to Profile dialog.
         """
-        default_cert_name = self.MODE_TO_CERT_NAME.get(
-            cert_mode,
-            _(u"{platform_name} Certificate for {course_name}")
-        )
+        default_cert_name = self.MODE_TO_CERT_NAME.get(cert_mode, _('{platform_name} Certificate for {course_name}'))
         # Look for an override of the certificate name in the SOCIAL_SHARING_SETTINGS setting
         share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
         cert_name = share_settings.get('CERTIFICATE_LINKEDIN_MODE_TO_CERT_NAME', {}).get(cert_mode, default_cert_name)
@@ -2604,41 +2610,19 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
             course_name=course_name
         )
 
-    def _tracking_code(self, course_key, cert_mode, target):
-        """Create a tracking code for the button.
-
-        Tracking codes are used by LinkedIn to collect
-        analytics about certifications users are adding
-        to their profiles.
-
-        The tracking code format is:
-            &trk=[partner name]-[certificate type]-[date]-[target field]
-
-        In our case, we're sending:
-            &trk=edx-{COURSE ID}_{COURSE MODE}-{TARGET}
-
-        If no partner code is configured, then this will
-        return None, indicating that tracking codes are disabled.
-
-        Arguments:
-
-            course_key (CourseKey): The identifier for the course.
-            cert_mode (str): The enrollment mode for the course.
-            target (str): Identifier for where the button is located.
+    def _organization_information(self):
+        """
+        Returns organization information for use in the URL parameters for add to profile.
 
         Returns:
-            unicode or None
-
+            dict: Either the organization ID on LinkedIn or the organization's name
+                Will be used to prefill the organization on the add to profile action.
         """
-        return (
-            u"{partner}-{course_key}_{cert_mode}-{target}".format(
-                partner=self.trk_partner_name,
-                course_key=text_type(course_key),
-                cert_mode=cert_mode,
-                target=target
-            )
-            if self.trk_partner_name else None
-        )
+        org_id = configuration_helpers.get_value('LINKEDIN_COMPANY_ID', self.company_identifier)
+        # Prefer organization ID per documentation at https://addtoprofile.linkedin.com/
+        if org_id:
+            return {'organizationId': org_id}
+        return {'organizationName': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)}
 
 
 @python_2_unicode_compatible
