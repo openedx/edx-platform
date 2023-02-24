@@ -185,13 +185,17 @@
         </section>
         <hr />
         <section>
-          <div class="unit-complition">
+          <div class="unit-completion">
             <h3>Units completed so far</h3>
-            <ul class="complition-badges">
+            <ul class="completion-badges">
               % for unit in student_data.get('units'):
-                <li>
+                % if unit.get('is_complete'):
+                  <li class="active">
+                % else:
+                  <li>
+                % endif
                   <div class="image-frame">
-                    <img src="${unit.get('unit_image_url')}" alt="Question">
+                    <img src="${unit.get('unit_image_url')}" alt="${unit.get('display_name')}">
                     % if unit.get('is_complete'):
                     <img class="completed" src="${static.url('genplus_assessments/assets/images/check.png')}" alt="Completed">
                     % endif
@@ -267,7 +271,9 @@
               <div class="content">
                 % for comment in value.get('comments'):
                   <blockquote>
+                    <h3>Comment from teacher 1 (title)</h3>
                     <q>${ comment }</q>
+                    <cite>Teacher 1 31/01/2023</cite>
                   </blockquote>
                 % endfor
               </div>

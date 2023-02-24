@@ -37,7 +37,22 @@ canvas {
 blockquote {
   margin: 0 1rem 2rem;
   padding: .3rem 2rem;
-  border-left: 5px solid $pink;
+
+  h3 {
+    margin: 0;
+  }
+
+  q {
+    display: block;
+  }
+
+  cite {
+    font-style: normal;
+  }
+}
+
+.intro {
+  padding: 0 4rem;
 }
 
 .container {
@@ -244,14 +259,69 @@ blockquote {
   }
 }
 
-.feedback {
-  border: .5rem solid $pink-lighter;
-  border-radius: $default-radius;
+.assessment-intro {
   overflow: hidden;
+  border-radius: 20px;
+  padding: 1rem 2rem;
+  border: .5rem solid $pink;
+  margin-bottom: 2rem;
+
+  h2 {
+    float: left;
+    width: 40%;
+    margin: 0;
+    padding-right: 20px;
+  }
+
+  .year-info {
+    position: relative;
+    float: left;
+    width: 30%;
+    padding: 10px 10px 10px 40px;
+
+    img {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2.32rem;
+      width: 2rem;
+      margin-top: -1.16rem;
+    }
+  }
+}
+
+.rating-assessment {
+  border: .25rem solid $text-color;
+  border-radius: $default-radius;
+  white-space: nowrap;
   padding: .5rem 1rem;
   margin-bottom: 1rem;
   page-break-inside: avoid;
   @include clearfix;
+
+  .question-text {
+    display: inline-block;
+    vertical-align: middle;
+    white-space: normal;
+    width: calc(100% - 440px );
+  }
+
+  .year-info {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    width: 220px;
+    padding: 10px;
+
+    img {
+      float: left;
+    }
+
+    .star-rating {
+      float: left;
+      padding: 4px 0 0 1rem;
+    }
+  }
 
   p {
     margin: 0;
@@ -259,12 +329,42 @@ blockquote {
   }
 }
 
-.multiple-choices {
+.text-assessment {
   page-break-inside: avoid;
+
+  .question-text {
+    padding: 0 2rem;
+  }
+
+  .answers {
+    overflow: hidden;
+    padding-left: 1rem;
+  }
+
+  .answer-list {
+    position: relative;
+    float: left;
+    width: 45%;
+    border-radius: 20px;
+    border: 0.25rem solid $pink-lighter;
+
+    &.end-year {
+      float: right;
+      border-color: $blue-lighter;
+    }
+
+    img {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2.32rem;
+      width: 2rem;
+      margin: -1.16rem 0 0 -1.16rem;
+    }
+  }
 
   p {
     margin: 0 0 .5rem;
-    padding-left: .5rem;
   }
 }
 
@@ -331,7 +431,9 @@ blockquote {
   }
 }
 
-.unit-complition {
+.sadas { background: #000; }
+
+.unit-completion {
   page-break-before: always;
   @include clearfix;
 
@@ -343,7 +445,7 @@ blockquote {
   }
 }
 
-.complition-badges {
+.completion-badges {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -353,21 +455,12 @@ blockquote {
   overflow: hidden;
   @include clearfix;
 
-  li {
-    float: left;
-    margin-right: .5rem;
-  }
-
-  .text {
-    display: block;
-  }
-
   .image-frame {
     height: 5rem;
     width: 5rem;
     border-radius: 50%;
     margin: 0 auto .6rem;
-    border: .5rem solid $pink-lighter;
+    border: .5rem solid #ccc;
     background: #fff;
     padding: .5rem;
     position: relative;
@@ -379,7 +472,36 @@ blockquote {
       left: 50%;
       max-width: 3rem;
       margin: -18px 0 0 -24px;
+      display: none;
     }
+  }
+
+  li {
+    float: left;
+    margin-right: .5rem;
+
+    img {
+      filter: grayscale(1);
+    }
+
+    &.active {
+
+        img {
+          filter: grayscale(0);
+        }
+
+        .image-frame {
+          border-color: $pink-lighter;
+
+        .completed {
+          display: block;
+        }
+      }
+    }
+  }
+
+  .text {
+    display: block;
   }
 }
 
@@ -429,9 +551,15 @@ blockquote {
 }
 
 .booster-badges {
+  page-break-before: always;
+  @include clearfix;
 
-  h2 {
+  h2,
+  h3 {
     color: $pink;
+    float: left;
+    margin-right: 1rem;
+    width: 14%;
   }
 
   .badges {
