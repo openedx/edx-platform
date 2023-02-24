@@ -1,0 +1,12 @@
+# This workflow runs when a comment is made on the ticket
+# If the comment starts with "assign me" it assigns the author to the
+# ticket (case insensitive)
+
+name: Assign comment author to ticket if they say "assign me"
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  self_assign_by_comment:
+    uses: openedx/.github/.github/workflows/self-assign-issue.yml@master
