@@ -87,7 +87,6 @@ INFINITE_RETRY_ERRORS = (
 # Also, any SMTP errors that are not explicitly enumerated above.
 BULK_EMAIL_FAILURE_ERRORS = (
     SMTPException,
-    ClientError
 )
 
 
@@ -569,9 +568,11 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                     )
                     subtask_status.increment(failed=1)
 
-            except ClientError as exc:
+            except SINGLE_EMAIL_FAILURE_ERRORS as exc:
                 # This will fall through and not retry the message.
-                if exc.response['Error']['Code'] in ['InvalidParameterValue', 'MessageRejected', 'MailFromDomainNotVerified']:
+                if exc.response['Error']['Code'] in [
+                    'InvalidParameterValue', 'MessageRejected', 'MailFromDomainNotVerified'
+                ]:
                     total_recipients_failed += 1
                     log.exception(
                         f"BulkEmail ==> Status: Failed(SINGLE_EMAIL_FAILURE_ERRORS), Task: {parent_task_id}, SubTask: "
@@ -615,6 +616,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
     except INFINITE_RETRY_ERRORS as exc:
         # Increment the "retried_nomax" counter, update other counters with progress to date,
         # and set the state to RETRY:
+
         subtask_status.increment(retried_nomax=1, state=RETRY)
         return _submit_for_retry(
             entry_id, email_id, to_list, global_email_context, exc, subtask_status, skip_retry_max=True
@@ -626,6 +628,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         # Errors caught are those that indicate a temporary condition that might succeed on retry.
         # Increment the "retried_withmax" counter, update other counters with progress to date,
         # and set the state to RETRY:
+
         subtask_status.increment(retried_withmax=1, state=RETRY)
         return _submit_for_retry(
             entry_id, email_id, to_list, global_email_context, exc, subtask_status, skip_retry_max=False
