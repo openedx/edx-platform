@@ -8,6 +8,7 @@ import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import CertificateView from './certificate_list_view';
 import ProgramProgressView from './progress_circle_view';
 
+import arrowUprightIcon from '../../../images/arrow-upright-icon.svg';
 import sidebarTpl from '../../../templates/learner_dashboard/program_details_sidebar.underscore';
 
 class ProgramDetailsSidebarView extends Backbone.View {
@@ -29,19 +30,26 @@ class ProgramDetailsSidebarView extends Backbone.View {
     this.industryPathways = options.industryPathways;
     this.creditPathways = options.creditPathways;
     this.programModel = options.model;
-    this.programTabViewEnabled =  options.programTabViewEnabled;
+    this.subscriptionModel = options.subscriptionModel;
+    this.programTabViewEnabled = options.programTabViewEnabled;
     this.render();
   }
 
   render() {
-    const data = $.extend({}, this.model.toJSON(), {
-      programCertificate: this.programCertificate ?
-        this.programCertificate.toJSON() : {},
-      programRecordUrl: this.programRecordUrl,
-      industryPathways: this.industryPathways,
-      creditPathways: this.creditPathways,
-      programTabViewEnabled: this.programTabViewEnabled
-    });
+    const data = $.extend(
+      {},
+      this.model.toJSON(),
+      this.subscriptionModel.toJSON(),
+      {
+        programCertificate:
+          this.programCertificate ? this.programCertificate.toJSON() : {},
+        programRecordUrl: this.programRecordUrl,
+        industryPathways: this.industryPathways,
+        creditPathways: this.creditPathways,
+        programTabViewEnabled: this.programTabViewEnabled,
+        arrowUprightIcon: arrowUprightIcon,
+      }
+    );
 
     HtmlUtils.setHtml(this.$el, this.tpl(data));
     this.postRender();

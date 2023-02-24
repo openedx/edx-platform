@@ -126,7 +126,19 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         context = {
             'urls': urls,
             'user_preferences': get_user_preferences(user),
-            'program_data': program_data,
+            # TODO: get from api
+            'program_data': {
+                'subscription_data': {
+                    'is_eligible_for_subscription': True,
+                    'subscription_price': '$39',
+                    'subscription_start_date': '2023-07-14',
+                    'subscription_state': 'active',
+                    'trial_end_date': '2023-07-14',
+                    'trial_end_time': '3:54 pm',
+                    'trial_length': 7,
+                },
+                **program_data
+            },
             'course_data': course_data,
             'certificate_data': certificate_data,
             'industry_pathways': industry_pathways,
