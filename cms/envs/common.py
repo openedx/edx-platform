@@ -172,7 +172,7 @@ PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
 # Dummy secret key for dev/test
-SECRET_KEY = 'dev key'
+SECRET_KEY = 'dev-key'
 FAVICON_PATH = 'images/favicon.ico'
 
 

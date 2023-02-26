@@ -1,6 +1,7 @@
 """Utilities for working with ID tokens."""
 
 
+import base64
 import json
 import logging
 from time import time
@@ -255,7 +256,7 @@ def _encode_and_sign(payload, use_asymmetric_key, secret):
         algorithm = settings.JWT_AUTH['JWT_SIGNING_ALGORITHM']
     else:
         secret = secret if secret else settings.JWT_AUTH['JWT_SECRET_KEY']
-        key = {'k': secret, 'kty': 'oct'}
+        key = {'k': base64.b64encode(secret.encode('utf-8')), 'kty': 'oct'}
         algorithm = settings.JWT_AUTH['JWT_ALGORITHM']
 
     jwk = PyJWK(key, algorithm)
