@@ -37,7 +37,7 @@ class AccessTokenMixin:
             if should_be_asymmetric_key:
                 keys.load_jwks(settings.JWT_AUTH['JWT_PUBLIC_SIGNING_JWK_SET'])
             else:
-                keys.add({'key': secret_key, 'kty': 'oct'})
+                keys.add({'k': secret_key, 'kty': 'oct'})
 
             _ = JWS().verify_compact(access_token.encode('utf-8'), keys)
 
