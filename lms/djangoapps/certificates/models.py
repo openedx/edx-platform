@@ -224,8 +224,6 @@ class GeneratedCertificate(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     verify_uuid = models.CharField(max_length=32, blank=True, default='', db_index=True)
-    download_uuid = models.CharField(max_length=32, blank=True, default='')
-    download_url = models.CharField(max_length=128, blank=True, default='')
     grade = models.CharField(max_length=5, blank=True, default='')
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
@@ -234,6 +232,11 @@ class GeneratedCertificate(models.Model):
     name = models.CharField(blank=True, max_length=255)
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
+
+    # These fields have been kept around even though they are not used.
+    # See lms/djangoapps/certificates/docs/decisions/008-certificate-model-remnants.rst for the ADR.
+    download_uuid = models.CharField(max_length=32, blank=True, default='')
+    download_url = models.CharField(max_length=128, blank=True, default='')
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
     # This is necessary because CMS does not install the certificates app, but it

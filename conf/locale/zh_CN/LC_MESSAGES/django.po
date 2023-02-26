@@ -11,12 +11,14 @@
 # BertZou <turingcat@gmail.com>, 2015
 # bnw, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
+# Cecilia Liu, 2023
 # chalow <charlotteouya@hotmail.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2014-2015
 # CharlotteDing <kikyoru@hotmail.com>, 2015
 # chalow <charlotteouya@hotmail.com>, 2015
 # Christina Guo <csu2008guoting@163.com>, 2016
 # ckyOL, 2015
+# Diana Huang <dkh@edx.org>, 2023
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014,2017,2019
 # focusheart <focusheart@gmail.com>, 2014
@@ -429,8 +431,10 @@ msgstr "讨论"
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
-msgstr ""
+msgstr "问题"
 
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
 #: lms/templates/video.html
 msgid "Video"
 msgstr "视频"
@@ -610,6 +614,20 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
 "This is the bulk SKU (stock keeping unit) of this mode in the external "
 "ecommerce service."
 msgstr "这是此模式在外部电子商务服务中的批量库存单位（SKU）。"
@@ -716,7 +734,7 @@ msgstr ""
 
 #: common/djangoapps/student/admin.py
 msgid "User with this email doesn't exist in system."
-msgstr ""
+msgstr "此电邮用户不存在"
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
@@ -895,7 +913,7 @@ msgstr ""
 
 #: common/djangoapps/student/models/user.py
 msgid "Add a reason"
-msgstr ""
+msgstr "添加原因"
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
@@ -1095,7 +1113,7 @@ msgstr "二级供应商不会突出显示，将出现在一个单独的“机构
 msgid ""
 "optional. If this provider is an Organization, this attribute can be used "
 "reference users in that Organization"
-msgstr ""
+msgstr "可选。如果此提供者是一个组织，这个属性可用来为组织中其他成员提供参考。"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this provider configuration belongs to."
@@ -1809,7 +1827,7 @@ msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 msgid "Activate your account"
-msgstr ""
+msgstr "激活你的账户"
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
@@ -2197,7 +2215,7 @@ msgstr "在 edX.org 学习免费课程"
 msgid ""
 "© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
 "their respective logos are registered trademarks of edX Inc."
-msgstr ""
+msgstr "© {org_name}。版权所有，除非另有注明。EdX、Open edX和他们各自的标识都是edX Inc的商标或注册商标。"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
@@ -2225,7 +2243,7 @@ msgstr "帮助中心"
 
 #: lms/djangoapps/branding/api.py
 msgid "Security"
-msgstr ""
+msgstr "安全"
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -2817,12 +2835,12 @@ msgstr ""
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
 msgid "Proctored Exam"
-msgstr ""
+msgstr "监考下的测试"
 
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
 msgid "Timed Exam"
-msgstr ""
+msgstr "计时考试"
 
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
@@ -2878,7 +2896,7 @@ msgstr ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
 msgid "You're almost there!"
-msgstr ""
+msgstr "您即将完成!"
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
 msgid "There's still time to reach your goal"
@@ -2921,11 +2939,13 @@ msgid ""
 "For example, if \"Disabled\" is left as \"Unknown\" in the course context, "
 "then that course will be Disabled only if the org that it is in is Disabled."
 msgstr ""
+"如果这些值中的任何一个为空或“未知”，则运行时的值将恢复到下一个最具体化场景应用的值。 "
+"例如，如果在课程场景中“已禁用”被保留为“未知”，则仅当其所在的组织已禁用时，该课程才会禁用。"
 
 #: lms/djangoapps/course_home_api/models.py
 #: openedx/features/discounts/models.py
 msgid "Disabled"
-msgstr ""
+msgstr "已停用"
 
 #: lms/djangoapps/course_home_api/outline/serializers.py
 #, python-brace-format
@@ -2940,6 +2960,7 @@ msgid ""
 "have questions."
 msgstr ""
 
+#: lms/djangoapps/course_home_api/outline/views.py
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "该课程已满"
@@ -3043,7 +3064,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/course_tools.py
 msgid "Financial Assistance"
-msgstr ""
+msgstr "经济补助"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Assignment"
@@ -3051,19 +3072,19 @@ msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Open Response Assessment"
-msgstr ""
+msgstr "开放式答题评分"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
-msgstr ""
+msgstr "自我评分"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Peer Assessment"
-msgstr ""
+msgstr "学生互评"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Staff Assessment"
-msgstr ""
+msgstr "工作人员评分"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
@@ -3201,7 +3222,7 @@ msgstr "您必须在这个日期之前成功完成验证，以具备获取合格
 msgid ""
 "There is no user with the username or email address \"{user_identifier}\" "
 "enrolled in this course."
-msgstr ""
+msgstr "在此门课程的学员中，未找到使用用户名或邮箱为{user_identifier}的用户。"
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
@@ -3271,7 +3292,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Calculator"
-msgstr ""
+msgstr "计算器"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide an in-course calculator for simple and complex calculations."
@@ -3279,16 +3300,16 @@ msgstr ""
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Proctoring"
-msgstr ""
+msgstr "监考"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid ""
 "Maintain exam integrity by enabling a proctoring solution for your course"
 msgstr ""
 
-#: lms/djangoapps/courseware/plugins.py cms/templates/edit-tabs.html
+#: lms/djangoapps/courseware/plugins.py
 msgid "Custom pages"
-msgstr ""
+msgstr "自定义页面"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide additional course content and resources with custom pages"
@@ -3309,7 +3330,7 @@ msgstr "教学大纲"
 
 #: lms/djangoapps/courseware/tabs.py
 msgid "Dates"
-msgstr ""
+msgstr "日期"
 
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format
@@ -3407,7 +3428,7 @@ msgstr "请{sign_in_link}或{register_link}以查看课程内容。"
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid "{sign_in_link} or {register_link}."
-msgstr ""
+msgstr "{sign_in_link} 或 {register_link}."
 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
@@ -3480,19 +3501,19 @@ msgstr "家庭年收入"
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
+msgstr "请告诉我们关于您目前的经济状况。为什么您需要协助？"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "Tell us about your learning or professional goals. How will a Verified "
 "Certificate in this course help you achieve these goals?"
-msgstr ""
+msgstr "请告诉我们关于您的学习或专业目标。一份这门课的认证证书，将会如何帮助您达成这些目标？"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "Tell us about your plans for this course. What steps will you take to help "
 "you complete the course work and receive a certificate?"
-msgstr ""
+msgstr "告诉我们有关于您计划的这门课程。您会采取什么措施来帮助您完成课程学习，并获得证书？"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 1250 and 2500 characters or so in your response."
@@ -3876,11 +3897,11 @@ msgstr "选课模式"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Last Login"
-msgstr ""
+msgstr "最后一次登录"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Date Joined"
-msgstr ""
+msgstr "加入日期"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "External User Key"
@@ -4370,7 +4391,7 @@ msgstr "不能为url {0} 找到合适的模块"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Could not find student enrollment in the course."
-msgstr ""
+msgstr "在当前课程中未找到学生选修记录。"
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
@@ -4444,7 +4465,7 @@ msgstr "入学考试中不是所有的问题都支持重新打分。"
 
 #: lms/djangoapps/instructor_task/models.py
 msgid "An error has occurred. Task was not created."
-msgstr ""
+msgstr "发生错误，任务无法创建。"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -4683,13 +4704,16 @@ msgstr "(忽略 {skipped})"
 msgid " (out of {total})"
 msgstr "( ／{total}  )"
 
+#: lms/djangoapps/learner_dashboard/programs.py
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 msgid "Programs"
-msgstr "程式"
+msgstr "项目"
 
+#: lms/djangoapps/learner_dashboard/programs.py
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
 msgstr "项目详情"
@@ -4791,7 +4815,7 @@ msgstr "在内容实验中学生分组的组配置列表。"
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
-msgstr ""
+msgstr "用户或者 external_user_key 其中一项不能为空。"
 
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
@@ -4835,13 +4859,12 @@ msgid "View feature based enrollment settings"
 msgstr "查看基于功能的注册设置"
 
 #: lms/djangoapps/support/views/index.py
-#: lms/templates/support/link_program_enrollments.html
 msgid "Link Program Enrollments"
-msgstr ""
+msgstr "注册程序链接"
 
 #: lms/djangoapps/support/views/index.py
 msgid "Link LMS users to program enrollments"
-msgstr ""
+msgstr "学习者注册程序链接"
 
 #: lms/djangoapps/support/views/index.py
 msgid "Program Enrollments Inspector Tool"
@@ -4881,7 +4904,7 @@ msgstr "成功禁用用户"
 
 #: lms/djangoapps/survey/utils.py
 msgid "You must complete a survey"
-msgstr ""
+msgstr "您必须完成一个调研"
 
 #: lms/djangoapps/teams/models.py
 msgid "Optional language the team uses as ISO 639-1 code."
@@ -5131,7 +5154,7 @@ msgstr ""
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid "here"
-msgstr ""
+msgstr "此处"
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid "unsubscribe"
@@ -5253,7 +5276,7 @@ msgstr "访问%(course_name)s"
 msgid ""
 "Visit %(site_name)s\n"
 "                "
-msgstr ""
+msgstr "访问%(site_name)s"
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
@@ -5589,6 +5612,7 @@ msgstr ""
 msgid "Enroll now"
 msgstr ""
 
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
@@ -5604,7 +5628,7 @@ msgstr ""
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 msgid "Self-paced"
-msgstr ""
+msgstr "自定进度"
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 msgid "Progress at your own speed"
@@ -5940,6 +5964,8 @@ msgid ""
 "You need to {anchor_start_login}log in{anchor_end} or "
 "{anchor_start_signup}sign up{anchor_end} to use this function."
 msgstr ""
+"您必须 {anchor_start_login} 登录 {anchor_end} 或 {anchor_start_signup} 注册 "
+"{anchor_end} 才能使用这项功能。"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
@@ -5960,6 +5986,7 @@ msgid ""
 "several useful guides online. See any of the links below for in-depth "
 "details:"
 msgstr ""
+"本Wiki使用了{start_strong}Markdown {end_strong}语法，网上可以找到很多有用的资料。点击以下链接可了解更多细节："
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Markdown: Basics"
@@ -6205,6 +6232,7 @@ msgstr "ACE 共享"
 msgid "Go to %(platform_name)s Home Page"
 msgstr "前往%(platform_name)s主页"
 
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/index.html lms/templates/courseware/courses.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
@@ -6556,43 +6584,43 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "All Rights Reserved."
-msgstr ""
+msgstr "版权所有。"
 
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Creative Commons Attribution 4.0"
-msgstr ""
+msgstr "知识共享 版权归属-相同方式共享 4.0"
 
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Creative Commons Attribution-NonCommercial 4.0"
-msgstr ""
+msgstr "知识共享 署名-非商业性使用 4.0"
 
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0"
-msgstr ""
+msgstr "知识共享 署名-非商业性使用-禁止演绎 4.0"
 
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Creative Commons Attribution-NonCommercial-ShareAlike 4.0"
-msgstr ""
+msgstr "知识共享 署名-非商业性使用-相同方式共享 4.0"
 
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Creative Commons Attribution-NoDerivatives 4.0"
-msgstr ""
+msgstr "知识共享 署名-禁止演绎 4.0"
 
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Creative Commons Attribution-ShareAlike 4.0"
-msgstr ""
+msgstr "知识共享 署名-相同方式共享 4.0"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
-msgstr ""
+msgstr "管理用户和编辑内容"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Author content"
-msgstr ""
+msgstr "编辑内容"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Read-only"
-msgstr ""
+msgstr "只读"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "One and only one of 'user' and 'group' must be set."
@@ -6937,7 +6965,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "technical support"
-msgstr ""
+msgstr "技术支持"
 
 #: openedx/core/djangoapps/discussions/models.py
 #, python-brace-format
@@ -7216,7 +7244,7 @@ msgstr "用于构建方案销售页面URL地址的路径（例如：\"/foo\"）�
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Program UUID"
-msgstr ""
+msgstr "程序UUID"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "If disabled, the LTI in the associated program will be disabled."
@@ -7343,7 +7371,7 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/subject.txt
 #, python-format
 msgid "%(course_name)s Weekly Update"
-msgstr ""
+msgstr "%(course_name)s每周更新"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -7376,6 +7404,8 @@ msgid ""
 " completing more problems every week, and participating in the discussion "
 "forums. What do you want to do to keep learning?"
 msgstr ""
+"每周都有许多{platform_name}学员完成越来越多的 {start_strong}{course_name} {end_strong} "
+"课题，并进入讨论区参与讨论。您希望继续学习什么内容？"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -7413,6 +7443,8 @@ msgid ""
 "other courses on {platform_name}? We do, and we’re glad to have you! Come "
 "see what everyone is learning."
 msgstr ""
+"还记得您在{platform_name}上加入了 {start_strong}{course_name}{end_strong} "
+"和其他几门课程吗？很高兴您选择了我们的课程！来看看大家都在学习什么吧！"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #, python-brace-format
@@ -7472,6 +7504,8 @@ msgid ""
 "you to highlight your new knowledge and skills. An %(platform_name)s "
 "certificate is official and easily shareable."
 msgstr ""
+"希望您能在 {start_strong}%(platform_name)s {end_strong} "
+"上享受与我们一同学习的过程！一个认证的证书能够凸显您的新知识、新技能。一个 %(platform_name)s 证书是官方的且易于分享的。"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 #, python-brace-format
@@ -7488,6 +7522,7 @@ msgid ""
 "Upgrade by "
 "{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}."
 msgstr ""
+"请于 {start_strong}%(user_schedule_upgrade_deadline_time)s {end_strong}前进行升级。"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "You are eligible to upgrade in these courses:"
@@ -7958,7 +7993,7 @@ msgstr "如果您没有申请作出更改，请忽略此邮件。"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
 msgid "Reset my password"
-msgstr ""
+msgstr "重设我的密码"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 msgid "Please go to the following page and choose a new password:"
@@ -7976,7 +8011,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #, python-format
 msgid "Hello %(name)s,"
-msgstr ""
+msgstr "%(name)s您好，"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
@@ -7989,7 +8024,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
 #, python-format
 msgid "Hello %(name)s, "
-msgstr ""
+msgstr "%(name)s您好，"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/subject.txt
 #, python-format
@@ -8019,7 +8054,11 @@ msgid ""
 "your dashboard. {blank_lines}If you don't have an account on {platform_name}"
 " yet, click {register_label_strong} at the top of the page."
 msgstr ""
+"您已成功登录{provider_name}帐户，但此帐户尚未与您的{platform_name}帐户相关联。 "
+"{blank_lines}使用您的{platform_name}用户名和密码登录下面的{platform_name}，然后从您的面板将{platform_name}帐户与{provider_name}相关联。"
+" {blank_lines}如果您还没有{platform_name}上的帐户，请点击页面顶部的{register_label_strong}。"
 
+#: openedx/core/djangoapps/user_authn/views/login.py
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
@@ -8089,7 +8128,7 @@ msgstr "与此邮箱关联的用户账号无法重新设置密码。"
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid ""
 "Your previous request is in progress, please try again in a few moments."
-msgstr ""
+msgstr "你的前一个请求正在处理中，请稍后再尝试。"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Password reset unsuccessful"
@@ -8152,7 +8191,7 @@ msgstr "需要正确的邮件格式"
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Your legal name must be a minimum of one character long"
-msgstr ""
+msgstr "您的合法帐号名必须至少包含一个字符的长度"
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #, python-format
@@ -8293,6 +8332,10 @@ msgid ""
 "process your personal data in accordance                   with the "
 "{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
+"注册一个账户，即表示你同意遵守{terms_of_service_link_start} "
+"{terms_of_service}{terms_of_service_link_end} ，并且你确认 {platform_name} "
+"和每个成员可以依照{privacy_policy_link_start} 隐私政策{privacy_policy_link_end} "
+"处理的你的个人数据."
 
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
@@ -8564,6 +8607,8 @@ msgid ""
 "specifically, and for the org that the course is in, then the more specific "
 "context overrides the more general context."
 msgstr ""
+"这些选项规定了启用课程持续时间限制的场景。如果未设置任何值，则配置将全局应用。 如果设置了单个值，则配置将应用于该场景中的所有课程。 "
+"一次最多只能设置一个值。<br>如果课程适用于多个场景（例如，如果课程有自身特定的配置，并且课程所在的组织也有特定配置，则更具体化的场景会覆盖通用场景。"
 
 #: openedx/features/discounts/admin.py
 msgid ""
@@ -8580,6 +8625,8 @@ msgid ""
 "{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
 "{e_sr}{formatted_discount_price}"
 msgstr ""
+"{s_sr}原始价格： {s_op}{original_price}{e_p}, "
+"折后价格：{e_sr}{formatted_discount_price}"
 
 #: openedx/features/enterprise_support/admin/forms.py
 msgid "CSV File"
@@ -8726,7 +8773,7 @@ msgstr "无法对可能的文件提交重新评分"
 
 #: xmodule/capa/capa_problem.py
 msgid "Question {}"
-msgstr ""
+msgstr "问题{}"
 
 #: xmodule/capa/capa_problem.py xmodule/capa_block.py
 msgid "Incorrect"
@@ -10729,6 +10776,8 @@ msgid ""
 "Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
+"输入外部LTI提供商提供的LTI编号。该值必须与您的LTI账号里高级设置里的LTI编号相同。{break_tag}关于该设置的更多信息请访问{docs_anchor_open}edx"
+" LTI 文档{anchor_close} "
 
 #: xmodule/lti_block.py
 msgid "LTI URL"
@@ -10742,6 +10791,8 @@ msgid ""
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
+"输入启动该组件的外部工具的URL。这个设置只有在“隐藏外部工具”为False时才能使用。{break_tag}关于该设置的更多信息请访问{docs_anchor_open}edX"
+" LTI文档{anchor_close}。"
 
 #: xmodule/lti_block.py
 msgid "Custom Parameters"
@@ -10755,6 +10806,8 @@ msgid ""
 "component.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
+"任意自定义的参数都要添加键/值且成对，例如您要打开的电子书的页面或者这个组件的背景颜色。{break_tag}这项设置的更多信息请查看{docs_anchor_open}edX"
+" LTI文档{anchor_close} "
 
 #: xmodule/lti_block.py
 msgid "Open in New Page"
@@ -11315,7 +11368,7 @@ msgstr "外部讨论"
 
 #: xmodule/templates/library-sourced-block-studio-view.html
 msgid "Save and Import"
-msgstr ""
+msgstr "保存并导入"
 
 #: xmodule/vertical_block.py
 msgid "Enable in-context discussions for the Unit"
@@ -11632,7 +11685,7 @@ msgstr ""
 
 #: xmodule/video_block/video_xfields.py
 msgid "Thumbnail"
-msgstr ""
+msgstr "缩略图"
 
 #: xmodule/word_cloud_block.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
@@ -13376,6 +13429,13 @@ msgstr "邮箱"
 #, python-format
 msgid "Return To %s"
 msgstr "返回%s"
+
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "{course_number} 课程页面"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -15312,12 +15372,6 @@ msgstr "课程列表"
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "使您的搜索更精确"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "{course_number} 课程页面"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -19404,11 +19458,6 @@ msgstr "新课程的公开显示名称。(该名字通常与原始的课程名�
 msgid "Organization"
 msgstr "机构"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "例如：UniversityX 或 OrganizationX"

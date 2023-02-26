@@ -44,4 +44,14 @@ urlpatterns = [
         gradebook_views.SubsectionGradeView.as_view(),
         name='course_grade_overrides'
     ),
+    path(
+        'section_grades_breakdown/',
+        views.SectionGradesBreakdown.as_view(),
+        name='section_grades_breakdown'
+    ),
+    re_path(
+        fr'submission_history/{settings.COURSE_ID_PATTERN}/',
+        views.SubmissionHistoryView.as_view(),
+        name='submission_history'
+    ),
 ]

@@ -58,6 +58,7 @@ class GradeViewMixin(DeveloperErrorViewMixin):
     """
     Mixin class for Grades related views.
     """
+
     def _get_single_user(self, request, course_key, user_id=None):
         """
         Returns a single USER_MODEL object corresponding to either the user_id provided, or if no id is provided,
@@ -141,13 +142,47 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         Returns:
             A list of users, pulled from a paginated queryset of enrollments, who are enrolled in the given course.
         """
+        paged_enrollments = self._paginate_course_enrollment(course_key,
+                                                             course_enrollment_filter, related_models, annotations)
+        return GradeViewMixin._get_enrolled_users(paged_enrollments)
+
+    @staticmethod
+    def _get_enrolled_users(enrollments):
+        """
+        Args:
+            enrollments: CourseEnrollment query set.
+
+        Returns:
+            A list of users, pulled from the CourseEnrollment query set.
+        """
+        retlist = []
+        for enrollment in enrollments:
+            enrollment.user.enrollment_mode = enrollment.mode
+            retlist.append(enrollment.user)
+        return retlist
+
+    def _paginate_course_enrollment(self, course_key=None,
+                                    course_enrollment_filter=None, related_models=None, annotations=None):
+        """
+        Args:
+            course_key (CourseLocator): The course to retrieve grades for.
+            course_enrollment_filter: Optional list of Q objects to pass
+            to `CourseEnrollment.filter()`.
+            related_models: Optional list of related models to join to the CourseEnrollment table.
+            annotations: Optional dict of fields to add to the queryset via annotation
+
+        Returns:
+            A list of Enrollments, pulled from a paginated queryset.
+        """
         queryset = CourseEnrollment.objects
         if annotations:
             queryset = queryset.annotate(**annotations)
 
-        filter_args = [
-            Q(course_id=course_key) & Q(is_active=True)
-        ]
+        filter_args = [Q(is_active=True)]
+
+        if course_key:
+            filter_args = [Q(course_id=course_key) & Q(is_active=True)]
+
         filter_args.extend(course_enrollment_filter or [])
 
         enrollments_in_course = use_read_replica_if_available(
@@ -157,11 +192,7 @@ class GradeViewMixin(DeveloperErrorViewMixin):
             enrollments_in_course = enrollments_in_course.select_related(*related_models)
 
         paged_enrollments = self.paginate_queryset(enrollments_in_course)
-        retlist = []
-        for enrollment in paged_enrollments:
-            enrollment.user.enrollment_mode = enrollment.mode
-            retlist.append(enrollment.user)
-        return retlist
+        return paged_enrollments
 
     def _serialize_user_grade(self, user, course_key, course_grade):
         """

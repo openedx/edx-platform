@@ -27,7 +27,6 @@ from lms.djangoapps.learner_recommendations.utils import (
     get_algolia_courses_recommendation,
     get_amplitude_course_recommendations,
     filter_recommended_courses,
-    get_active_course_run,
 )
 from lms.djangoapps.learner_recommendations.serializers import RecommendationsSerializer
 
@@ -126,20 +125,18 @@ class AmplitudeRecommendationsView(APIView):
         if not (is_control or is_control is None):
             ip_address = get_client_ip(request)[0]
             user_country_code = country_code_from_ip(ip_address).upper()
-            filtered_courses = filter_recommended_courses(
-                user, course_keys, user_country_code=user_country_code, request_course=course_key,
+            recommended_courses = filter_recommended_courses(
+                user,
+                course_keys,
+                user_country_code=user_country_code,
+                request_course=course_key,
+                recommendation_count=self.recommendations_count
             )
 
-            for course in filtered_courses:
-                active_course_run = get_active_course_run(course)
-                if active_course_run:
-                    course.update({
-                        "active_course_run": get_active_course_run(course)
-                    })
-                    recommended_courses.append(course)
-
-                if len(recommended_courses) == self.recommendations_count:
-                    break
+            for course in recommended_courses:
+                course.update({
+                    "active_course_run": course.get("course_runs")[0]
+                })
 
         self._emit_recommendations_viewed_event(
             user.id, is_control, recommended_courses

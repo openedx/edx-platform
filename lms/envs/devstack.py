@@ -245,6 +245,15 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 ############## Exams CONFIGURATION SETTINGS ####################
 EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
 
+TOKEN_SIGNING.update({
+    'JWT_PUBLIC_SIGNING_JWK_SET': (
+        '{"keys": [{"kid": "localdev_exam_token_key", "e": "AQAB", "kty": "RSA", "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI'
+        '7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig'
+        '3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGy'
+        'puDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ"}]}'
+    )
+})
+
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
@@ -481,6 +490,12 @@ WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
 #################### Network configuration ####################
 # Devstack is directly exposed to the caller
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
+#################### Event bus backend ########################
+EVENT_BUS_PRODUCER = 'edx_event_bus_kafka.create_producer'
+EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
+EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
+EVENT_BUS_TOPIC_PREFIX = 'dev'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

@@ -98,6 +98,7 @@ edx-search
 edx-sga
 edx-submissions
 edx-toggles                         # Feature toggles management
+edx-token-utils			    # Validate exam access tokens
 edx-user-state-client
 edx-when
 edxval
@@ -181,6 +182,7 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock[django]                      # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
+xblock-poll                         # Xblock for polling users
 xblock-drag-and-drop-v2             # Drag and Drop XBlock
 xblock-google-drive                 # XBlock for google docs and calendar
 openedx-django-require

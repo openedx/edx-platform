@@ -9,6 +9,7 @@ from django.urls import reverse
 from edx_django_utils import monitoring as monitoring_utils
 from rest_framework import serializers
 
+from lms.djangoapps.certificates.api import can_show_certificate_available_date_field
 from openedx.core.djangoapps.content.course_overviews.models import \
     CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -158,6 +159,16 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         # fields from CourseSerializer, which get their data
         # from the CourseOverview object in SQL.
         return CourseDetails.fetch_about_attribute(course_overview.id, 'overview')
+
+    def to_representation(self, instance):
+        """
+        Get the `certificate_available_date` in response
+        if the `certificates.auto_certificate_generation` waffle switch is enabled
+        """
+        response = super().to_representation(instance)
+        if can_show_certificate_available_date_field(instance):
+            response['certificate_available_date'] = instance.certificate_available_date
+        return response
 
 
 class CourseKeySerializer(serializers.BaseSerializer):  # pylint:disable=abstract-method
