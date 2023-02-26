@@ -393,6 +393,7 @@ class VideoBlock(
         # it anymore; therefore we force-disable it in this case (when controls aren't visible).
         autoadvance_this_video = self.auto_advance and autoadvance_enabled
         is_embed = context.get('public_video_embed', False)
+        is_public_view = view == PUBLIC_VIEW
         metadata = {
             'autoAdvance': autoadvance_this_video,
             # For now, the option "data-autohide-html5" is hard coded. This option
@@ -425,7 +426,7 @@ class VideoBlock(
             # user, and defaulting to True.
             'recordedYoutubeIsAvailable': self.youtube_is_available,
             'savedVideoPosition': self.saved_video_position.total_seconds(),  # pylint: disable=no-member
-            'saveStateEnabled': view != PUBLIC_VIEW,
+            'saveStateEnabled': not is_public_view,
             'saveStateUrl': self.ajax_url + '/save_user_state',
             # Despite the setting on the block, don't show transcript by default
             # if the video is embedded in social media
@@ -464,6 +465,7 @@ class VideoBlock(
             'display_name': self.display_name_with_default,
             'download_video_link': download_video_link,
             'handout': self.handout,
+            'hide_downloads': is_public_view or is_embed,
             'id': self.location.html_id(),
             'is_embed': is_embed,
             'license': getattr(self, "license", None),

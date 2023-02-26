@@ -14,6 +14,9 @@ import pytz
 import ddt
 from fs.memoryfs import MemoryFS
 from django.contrib.auth.models import AnonymousUser
+from django.test import override_settings
+from openedx_filters import PipelineStep
+from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
 
 from . import get_test_system
 from .helpers import StubUserService
@@ -76,6 +79,62 @@ class StubCompletionService:
         if item.scope_ids.block_type != 'vertical':
             raise ValueError('The passed in xblock is not a vertical type!')
         return self._completion_value == 1 if self._enabled else None
+
+
+class TestVerticalBlockChildRenderStep(PipelineStep):
+    """
+    Utility class for testing filters on vertical block children
+    """
+    filter_content = "Altered Content"
+
+    def run_filter(self, block, context):  # lint-amnesty, pylint: disable=arguments-differ
+        """Pipeline step that changes child content"""
+        if type(block).__name__ == "HtmlBlockWithMixins":
+            block.get_html = lambda: TestVerticalBlockChildRenderStep.filter_content
+        return {"block": block, "context": context}
+
+
+class TestPreventVerticalBlockChildRender(PipelineStep):
+    """
+    Utility class to test vertical block children are skipped in rendering.
+    """
+
+    def run_filter(self, block, context):  # lint-amnesty, pylint: disable=arguments-differ
+        """Pipeline step that raises exceptions during child block rendering"""
+        if type(block).__name__ == "HtmlBlockWithMixins":
+            raise VerticalBlockChildRenderStarted.PreventChildBlockRender(
+                "Skip block test exception"
+            )
+
+
+class TestVerticalBlockRenderCompletedStep(PipelineStep):
+    """
+    Utility class for testing filters on vertical block render completion
+    """
+    filter_content = "Extra content added"
+
+    def run_filter(self, block, fragment, context, view):  # lint-amnesty, pylint: disable=arguments-differ
+        """Pipeline step that alters the output of the fragment"""
+        fragment.content += TestVerticalBlockRenderCompletedStep.filter_content
+        return {
+            "block": block,
+            "fragment": fragment,
+            "context": context,
+            "view": view
+        }
+
+
+class TestPreventVerticalBlockRenderStep(PipelineStep):
+    """
+    Utility class for testing VerticalBlock render can be stopped.
+    """
+    filter_content = "<div class=\"alert alert-danger\">Assignments are not available for Audit students.<div>"
+
+    def run_filter(self, block, fragment, context, view):  # lint-amnesty, pylint: disable=arguments-differ
+        """Pipeline step that raises an exception"""
+        raise VerticalBlockRenderCompleted.PreventVerticalBlockRender(
+            TestPreventVerticalBlockRenderStep.filter_content
+        )
 
 
 class BaseVerticalBlockTest(XModuleXmlImportTest):
@@ -289,3 +348,92 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         html = self.module_system.render(self.vertical, AUTHOR_VIEW, context).content
         assert self.test_html in html
         assert self.test_problem in html
+
+    @override_settings(
+        OPEN_EDX_FILTERS_CONFIG={
+            "org.openedx.learning.vertical_block_child.render.started.v1": {
+                "pipeline": [
+                    "xmodule.tests.test_vertical.TestVerticalBlockChildRenderStep"
+                ],
+                "fail_silently": False,
+            },
+        },
+    )
+    def test_vertical_block_child_render_started_filter_execution(self):
+        """
+        Test the VerticalBlockChildRenderStarted filter's effects on student view.
+        """
+        self.module_system._services['bookmarks'] = Mock()
+        self.module_system._services['user'] = StubUserService(user=Mock())
+        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
+
+        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
+
+        assert TestVerticalBlockChildRenderStep.filter_content in html
+
+    @override_settings(
+        OPEN_EDX_FILTERS_CONFIG={
+            "org.openedx.learning.vertical_block_child.render.started.v1": {
+                "pipeline": [
+                    "xmodule.tests.test_vertical.TestPreventVerticalBlockChildRender"
+                ],
+                "fail_silently": False,
+            },
+        },
+    )
+    def test_vertical_block_child_render_is_skipped_on_filter_exception(self):
+        """
+        Test VerticalBlockChildRenderStarted filter can be used to skip child blocks.
+        """
+        self.module_system._services['bookmarks'] = Mock()
+        self.module_system._services['user'] = StubUserService(user=Mock())
+        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
+
+        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
+
+        assert self.test_html not in html
+        assert self.test_html_nested not in html
+
+    @override_settings(
+        OPEN_EDX_FILTERS_CONFIG={
+            "org.openedx.learning.vertical_block.render.completed.v1": {
+                "pipeline": [
+                    "xmodule.tests.test_vertical.TestVerticalBlockRenderCompletedStep"
+                ],
+                "fail_silently": False,
+            },
+        },
+    )
+    def test_vertical_block_render_completed_filter_execution(self):
+        """
+        Test the VerticalBlockRenderCompleted filter's execution.
+        """
+        self.module_system._services['bookmarks'] = Mock()
+        self.module_system._services['user'] = StubUserService(user=Mock())
+        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
+
+        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
+
+        assert TestVerticalBlockRenderCompletedStep.filter_content in html
+
+    @override_settings(
+        OPEN_EDX_FILTERS_CONFIG={
+            "org.openedx.learning.vertical_block.render.completed.v1": {
+                "pipeline": [
+                    "xmodule.tests.test_vertical.TestPreventVerticalBlockRenderStep"
+                ],
+                "fail_silently": False,
+            },
+        },
+    )
+    def test_vertical_block_render_output_is_changed_on_filter_exception(self):
+        """
+        Test VerticalBlockRenderCompleted filter can be used to prevent vertical block from rendering.
+        """
+        self.module_system._services['bookmarks'] = Mock()
+        self.module_system._services['user'] = StubUserService(user=Mock())
+        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
+
+        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
+
+        assert TestPreventVerticalBlockRenderStep.filter_content == html

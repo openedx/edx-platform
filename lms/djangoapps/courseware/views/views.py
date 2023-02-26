@@ -44,6 +44,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
+from token_utils.api import unpack_token_for
 from web_fragments.fragment import Fragment
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
@@ -1485,6 +1486,30 @@ def enclosing_sequence_for_gating_checks(block):
     return None
 
 
+def _check_sequence_exam_access(request, location):
+    """
+    Checks the client request for an exam access token for a sequence.
+    Exam access is always granted at the sequence block. This method of gating is
+    only used by the edx-exams system and NOT edx-proctoring.
+    """
+    if request.user.is_staff or is_masquerading_as_specific_student(request.user, location.course_key):
+        return True
+
+    exam_access_token = request.GET.get('exam_access')
+    if exam_access_token:
+        try:
+            # unpack will validate both expiration and the requesting user matches the
+            # token user
+            exam_access_unpacked = unpack_token_for(exam_access_token, request.user.id)
+        except:  # pylint: disable=bare-except
+            log.exception(f"Failed to validate exam access token. user_id={request.user.id} location={location}")
+            return False
+
+        return str(location) == exam_access_unpacked.get('content_id')
+
+    return False
+
+
 @require_http_methods(["GET", "POST"])
 @ensure_valid_usage_key
 @xframe_options_exempt
@@ -1583,6 +1608,18 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                     )
                 )
 
+        # For courses using an LTI provider managed by edx-exams:
+        # Access to exam content is determined by edx-exams and passed to the LMS using a
+        # JWT url param. There is no longer a need for exam gating or logic inside the
+        # sequence block or its render call. descendants_are_gated shoule not return true
+        # for these timed exams. Instead, sequences are assumed gated by default and we look for
+        # an access token on the request to allow rendering to continue.
+        if course.proctoring_provider == 'lti_external':
+            seq_block = ancestor_sequence_block if ancestor_sequence_block else block
+            if getattr(seq_block, 'is_time_limited', None):
+                if not _check_sequence_exam_access(request, seq_block.location):
+                    return HttpResponseForbidden("Access to exam content is restricted")
+
         fragment = block.render(requested_view, context=student_view_context)
         optimization_flags = get_optimization_flags_for_content(block, fragment)
 
@@ -1655,13 +1692,16 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
             video_description += f"by {course.display_organization} "
         video_description += "on edX.org"
 
+        video_poster = None
+        if not is_embed:
+            video_poster = block._poster()  # pylint: disable=protected-access
+
         context = {
             'fragment': fragment,
             'course': course,
             'video_title': block.display_name_with_default,
             'video_description': video_description,
-            'video_thumbnail': "https://www.edx.org/images/logos/edx-logo-elm.svg",
-            # 'video_thumbnail': "https://i.ytimg.com/vi/Kauv7MVPcsA/maxresdefault.jpg",
+            'video_thumbnail': video_poster if video_poster is not None else '',
             'video_embed_url': urljoin(
                 settings.LMS_ROOT_URL,
                 reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(usage_key)})

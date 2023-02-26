@@ -1,10 +1,7 @@
 """
 APIs providing enterprise context for events.
 """
-try:
-    from enterprise.models import EnterpriseCourseEnrollment
-except ImportError:  # pragma: no cover
-    pass
+from enterprise.models import EnterpriseCourseEnrollment
 
 
 def get_enterprise_event_context(user_id, course_id):

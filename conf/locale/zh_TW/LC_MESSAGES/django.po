@@ -382,6 +382,20 @@ msgstr "非必要：這是外部電子商務服務的最小存貨單位 (stock k
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
 "This is the bulk SKU (stock keeping unit) of this mode in the external "
 "ecommerce service."
 msgstr "這是外部電子商務服務此模式中的SKU (批量庫存單位) 。"
@@ -13015,6 +13029,13 @@ msgstr "電子郵件"
 msgid "Return To %s"
 msgstr "返回%s"
 
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "{course_number}課程"
+
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "重新訂閱成功！"
@@ -14886,12 +14907,6 @@ msgstr "課程名單"
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "小搜索範圍"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "{course_number}課程"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -18932,11 +18947,6 @@ msgstr ""
 msgid "Organization"
 msgstr "組織名稱"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "例如：UniversityX 或 OrganizationX"

@@ -113,16 +113,6 @@ def _get_program_duration(weeks):
         return f'{total_years} years {total_remainder_months} months'
 
 
-def get_active_course_run(course_data):
-    """Helper method to get course active run"""
-    active_course_runs = [
-        course_run
-        for course_run in course_data.get("course_runs", [])
-        if course_run.get("availability") == "Current"
-    ]
-    return active_course_runs[0] if active_course_runs else []
-
-
 def get_algolia_courses_recommendation(course_data):
     """
     Get courses recommendation from Algolia search.
@@ -237,8 +227,9 @@ def filter_recommended_courses(
         if len(filtered_recommended_courses) >= recommendation_count:
             break
 
-        course_data = get_course_data(course_id, fields)
-        if course_data and not _has_country_restrictions(course_data, user_country_code):
+        course_data = get_course_data(course_id, fields, querystring={'marketable_course_runs_only': 1})
+        if (course_data and course_data.get("course_runs", [])
+                and not _has_country_restrictions(course_data, user_country_code)):
             filtered_recommended_courses.append(course_data)
 
     return filtered_recommended_courses
