@@ -439,3 +439,20 @@ class TestCourseRecommendationApiView(TestCase):
         self.assertEqual(
             segment_mock.call_args[0][2]["is_control"], expected_is_control
         )
+
+    @mock.patch(
+        "lms.djangoapps.learner_dashboard.api.v0.views.is_user_enrolled_in_masters_program"
+    )
+    def test_no_recommendations_for_masters_program_learners(
+        self, is_user_enrolled_in_masters_program_mock
+    ):
+        """
+        Verify API returns general recommendations if no course recommendations from amplitude.
+        """
+        is_user_enrolled_in_masters_program_mock.return_value = True
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get("is_control"), None)
+        self.assertEqual(len(response.data.get("courses")), 0)

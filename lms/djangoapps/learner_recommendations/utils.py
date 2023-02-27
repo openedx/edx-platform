@@ -9,6 +9,7 @@ from algoliasearch.search_client import SearchClient
 from django.conf import settings
 
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses
 from openedx.core.djangoapps.catalog.utils import get_course_data, get_programs
 from lms.djangoapps.program_enrollments.api import fetch_program_enrollments_by_student
 
@@ -54,6 +55,27 @@ def _remove_user_enrolled_course_keys(user, course_keys):
 
     enrollable_course_keys = [course_key for course_key in course_keys if course_key not in user_enrolled_course_keys]
     return enrollable_course_keys
+
+
+def _is_master_program_course(course):
+    """
+    Helper method that to check whether a course is a part of master program.
+
+    Args:
+      course: course
+
+    Returns:
+        True if the course is part of masters program.
+    """
+    if not course:
+        return False
+
+    programs = course.get("programs", [])
+    for program in programs:
+        if program.get("type", None) == 'Masters':
+            return True
+
+    return False
 
 
 def _has_country_restrictions(product, user_country):
@@ -191,6 +213,19 @@ def get_amplitude_course_recommendations(user_id, recommendation_id):
     return True, False, []
 
 
+def is_user_enrolled_in_masters_program(user):
+    program_enrollments = fetch_program_enrollments_by_student(
+        user=user,
+        program_enrollment_statuses=ProgramEnrollmentStatuses.__ACTIVE__,
+    )
+    uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+    enrolled_programs = get_programs(uuids=uuids) or []
+    for enrolled_program in enrolled_programs:
+        if enrolled_program.get("type", None) == "Masters":
+            return True
+    return False
+
+
 def filter_recommended_courses(
     user,
     unfiltered_course_keys,
@@ -205,12 +240,28 @@ def filter_recommended_courses(
         2. If user is seeing the recommendations on a course about pages, filter that course out of recommendations.
         3. Remove the courses which is restricted in user region.
 
+    Args:
+        user: The user for which the recommendations need to be pulled
+        unfiltered_course_keys: recommended course keys that needs to be filtered
+        recommendation_count: the maximum count of recommendations to be returned
+        user_country_code: if provided, will apply location restrictions to recommendations
+        request_course: if provided, will filter out that course from recommendations (used for course about page)
+
     Returns:
         filtered_recommended_courses (list): A list of filtered course objects.
     """
     filtered_recommended_courses = []
     fields = [
-        "key", "uuid", "title", "owners", "image", "url_slug", "course_runs", "location_restriction", "marketing_url",
+        "key",
+        "uuid",
+        "title",
+        "owners",
+        "image",
+        "url_slug",
+        "course_runs",
+        "location_restriction",
+        "marketing_url",
+        "programs",
     ]
 
     # Remove the course keys a user is already enrolled in
@@ -228,8 +279,11 @@ def filter_recommended_courses(
             break
 
         course_data = get_course_data(course_id, fields, querystring={'marketable_course_runs_only': 1})
-        if (course_data and course_data.get("course_runs", [])
-                and not _has_country_restrictions(course_data, user_country_code)):
+        if (
+            course_data
+            and course_data.get("course_runs", [])
+            and not _has_country_restrictions(course_data, user_country_code)
+        ):
             filtered_recommended_courses.append(course_data)
 
     return filtered_recommended_courses
