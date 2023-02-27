@@ -63,7 +63,7 @@ class EventTrackingConfig(AppConfig):
         # only want to prefill the cache on lms runserver...
         if (
             app_variant.is_not_runserver() or
-            app_variant.is_not_lms() or
+            app_variant.is_lms() or
             is_celery_worker()
         ):
             logger.debug("Not initializing metadatacache. This is Studio, Celery, other command.")
