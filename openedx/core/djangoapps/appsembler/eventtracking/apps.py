@@ -69,4 +69,5 @@ class EventTrackingConfig(AppConfig):
             logger.debug("Not initializing metadatacache. This is Studio, Celery, other command.")
             return
         else:
-            tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)
+            pass
+            # tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)
