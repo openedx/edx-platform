@@ -26,6 +26,7 @@ from lms.djangoapps.learner_home.recommendations.waffle import (
 from lms.djangoapps.learner_recommendations.utils import (
     filter_recommended_courses,
     get_amplitude_course_recommendations,
+    is_user_enrolled_in_masters_program,
 )
 
 
@@ -55,6 +56,10 @@ class CourseRecommendationApiView(APIView):
             return Response(status=404)
 
         user_id = request.user.id
+
+        if is_user_enrolled_in_masters_program(request.user):
+            return self._recommendations_response(user_id, None, [], False)
+
         fallback_recommendations = settings.GENERAL_RECOMMENDATIONS if show_fallback_recommendations() else []
 
         try:
@@ -63,11 +68,11 @@ class CourseRecommendationApiView(APIView):
             )
         except Exception as ex:  # pylint: disable=broad-except
             logger.warning(f"Cannot get recommendations from Amplitude: {ex}")
-            return self._general_recommendations_response(user_id, None, fallback_recommendations)
+            return self._recommendations_response(user_id, None, fallback_recommendations, False)
 
         is_control = is_control if has_is_control else None
         if is_control or is_control is None or not course_keys:
-            return self._general_recommendations_response(user_id, is_control, fallback_recommendations)
+            return self._recommendations_response(user_id, is_control, fallback_recommendations, False)
 
         ip_address = get_client_ip(request)[0]
         user_country_code = country_code_from_ip(ip_address).upper()
@@ -78,19 +83,10 @@ class CourseRecommendationApiView(APIView):
         # the list of amplitude recommendations, show general recommendations
         # to the user.
         if not filtered_courses:
-            return self._general_recommendations_response(user_id, is_control, fallback_recommendations)
+            return self._recommendations_response(user_id, is_control, fallback_recommendations, False)
 
         recommended_courses = list(map(self._course_data, filtered_courses))
-        self._emit_recommendations_viewed_event(user_id, is_control, recommended_courses)
-        return Response(
-            CourseRecommendationSerializer(
-                {
-                    "courses": recommended_courses,
-                    "is_control": is_control,
-                }
-            ).data,
-            status=200,
-        )
+        return self._recommendations_response(user_id, is_control, recommended_courses, True)
 
     def _emit_recommendations_viewed_event(
         self, user_id, is_control, recommended_courses, amplitude_recommendations=True
@@ -107,10 +103,10 @@ class CourseRecommendationApiView(APIView):
             },
         )
 
-    def _general_recommendations_response(self, user_id, is_control, recommended_courses):
+    def _recommendations_response(self, user_id, is_control, recommended_courses, amplitude_recommendations):
         """ Helper method for general recommendations response. """
         self._emit_recommendations_viewed_event(
-            user_id, is_control, recommended_courses, amplitude_recommendations=False
+            user_id, is_control, recommended_courses, amplitude_recommendations
         )
         return Response(
             CourseRecommendationSerializer(
