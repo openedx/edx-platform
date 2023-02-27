@@ -303,7 +303,7 @@ blockquote {
     display: inline-block;
     vertical-align: middle;
     white-space: normal;
-    width: calc(100% - 440px );
+    width: 370px;
   }
 
   .year-info {
@@ -434,7 +434,6 @@ blockquote {
 .sadas { background: #000; }
 
 .unit-completion {
-  page-break-before: always;
   @include clearfix;
 
   h3 {

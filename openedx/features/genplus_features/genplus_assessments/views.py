@@ -3,10 +3,11 @@ import io
 import os
 from os.path import basename, splitext, dirname, join
 import tempfile
-
+from itertools import chain
 import pdfkit
 
 from collections import defaultdict
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.http import HttpResponse
@@ -17,12 +18,18 @@ from django.template.loader import render_to_string
 from django.contrib.staticfiles import finders
 
 from opaque_keys.edx.keys import CourseKey
-from .utils import build_course_report_for_students, get_absolute_url
+from openedx.features.genplus_features.genplus_assessments.models import UserRating, UserResponse
+from .utils import (
+    build_course_report_for_students,
+    get_absolute_url,
+    get_student_program_skills_assessment,
+    get_user_assessment_result
+)
 from openedx.features.genplus_features.genplus.models import GenUser, Student, JournalPost, Teacher
-from openedx.features.genplus_features.genplus_learning.models import Unit, UnitCompletion
+from openedx.features.genplus_features.genplus_learning.models import Program, Unit, UnitCompletion
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
 from openedx.features.genplus_features.genplus.constants import JournalTypes
-
+from openedx.features.genplus_features.genplus_assessments.api.v1.serializers import RatingAssessmentSerializer, TextAssessmentSerializer
 
 class AssessmentReportPDFView(TemplateView):
     filename = None
@@ -147,6 +154,20 @@ class AssessmentReportPDFView(TemplateView):
             html = template.render(context)
             return html
 
+    def _get_skill_assessment_data(self, user_id, student, programs):
+        skills_assessment = []
+        user = User.objects.get(id=user_id)
+        for program in programs:
+            user_rating_qs  = UserRating.objects.filter(user=user_id, program=program.id)
+            user_response_qs  = UserResponse.objects.filter(user=user_id, program=program.id)
+            text_assessment_data = TextAssessmentSerializer(user_response_qs, many=True).data
+            rating_assessment_data = RatingAssessmentSerializer(user_rating_qs, many=True).data
+            raw_data = text_assessment_data + rating_assessment_data
+            assessment_result = get_user_assessment_result(user, raw_data, program)
+            skills_assessment.append(assessment_result)
+
+        return skills_assessment
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -173,6 +194,7 @@ class AssessmentReportPDFView(TemplateView):
         course_reports = {}
 
         program_ids = student.program_enrollments.all().values_list('program', flat=True)
+        programs = Program.objects.filter(id__in=program_ids)
         units = Unit.objects.filter(program__in=program_ids)
         course_keys = units.values_list('course', flat=True)
         unit_completions = UnitCompletion.objects.filter(course_key__in=course_keys, user=user_id)
@@ -229,11 +251,18 @@ class AssessmentReportPDFView(TemplateView):
 
                 teacher_feedbacks[teacher_id] = {
                     'teacher_name': teacher_name,
-                    'comments': [feedback.description],
+                    'comments': [{
+                        'description': feedback.description,
+                        'datetime': feedback.created
+                    }],
                 }
             else:
-                teacher_feedbacks[teacher_id]['comments'].append(feedback.description)
+                teacher_feedbacks[teacher_id]['comments'].append({
+                    'description': feedback.description,
+                    'datetime': feedback.created
+                })
 
         student_data['teacher_feedbacks'] = teacher_feedbacks
+        student_data['skills_assessment'] = self._get_skill_assessment_data(user_id, student, programs)
         context['student_data'] = student_data
         return context

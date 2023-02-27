@@ -20,9 +20,11 @@ from openedx.features.genplus_features.genplus_assessments.constants import (
     OUTRO_RATING_ASSESSMENT_RESPONSE, MAX_SKILLS_SCORE
 )
 from openedx.features.genplus_features.genplus_assessments.utils import (
-    build_students_result, get_assessment_problem_data, get_assessment_completion
+    build_students_result,
+    get_assessment_problem_data,
+    get_assessment_completion,
+    get_user_assessment_result,
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -136,7 +138,7 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                 response['aggregate_all_problem'] = self.get_aggregate_problems_result(raw_data, gen_class)
                 response['single_assessment_result'] = self.get_assessment_result(raw_data, gen_class)
             else:
-                response['single_assessment_result'] = self.get_user_assessment_result(raw_data, gen_class)
+                response['single_assessment_result'] = get_user_assessment_result(self.request.user, raw_data, program)
 
             response['aggregate_skill'] = self.get_aggregate_skill_result(raw_data, gen_class, student_id)
         except Exception as ex:
@@ -418,69 +420,3 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                     response['student_response'][user_id]['score_end_of_year'] = data['rating']
 
         return response
-
-    def get_user_assessment_result(self, raw_data, gen_class):
-        """
-        Generate result for single user for bar and graph char on base of single assessment
-        as per the user state  under the ``problem_location`` root.
-        Arguments:
-            raw_data (list): data get from UserResponse and UserRating models.
-        Returns:
-                [Dict]: Returns a dictionaries
-                containing a student result for all single assessment.
-        """
-        store = modulestore()
-        assessments = []
-        aggregate_result = {}
-        user = self.request.user
-
-        # get assessment usage key and type for program intro assessment course
-        if not self.intro_assessments:
-            if gen_class.program.intro_unit:
-                assessments.extend(get_assessment_problem_data(gen_class.program.intro_unit.id, user, self.request))
-        else:
-            assessments.extend(self.intro_assessments)
-
-        # get assessment usage key and type for program outro assessment course
-        if not self.outro_assessments:
-            if gen_class.program.outro_unit:
-                assessments.extend(get_assessment_problem_data(gen_class.program.outro_unit.id, user, self.request))
-        else:
-            assessments.extend(self.outro_assessments)
-
-        # prepare dictionary for every particular assessment problem in a course
-        for assessment in assessments:
-            usage_key = UsageKey.from_string(assessment.get('id'))
-            assessment_xblock = store.get_item(usage_key)
-            problem_id = str(assessment_xblock.problem_id)
-            if problem_id not in aggregate_result:
-                aggregate_result[problem_id] = {
-                    'problem_statement': assessment_xblock.question_statement,
-                    'assessment_type': assessment.get('type'),
-                    'skill': assessment_xblock.select_assessment_skill,
-                    'total_problem_score': TOTAL_PROBLEM_SCORE,
-                    'score_start_of_year': 0,
-                    'score_end_of_year': 0,
-                }
-                if assessment.get('type') == 'genz_text_assessment':
-                    aggregate_result[problem_id]['response_start_of_year'] = None
-                    aggregate_result[problem_id]['response_end_of_year'] = None
-
-        for data in raw_data:
-            problem_id = data['problem_id']
-            if data['assessment_time'] == "start_of_year":
-                if 'score' in data:
-                    aggregate_result[problem_id]['response_start_of_year'] = json.loads(
-                        data['student_response'])
-                    aggregate_result[problem_id]['score_start_of_year'] = data['score']
-                else:
-                    aggregate_result[problem_id]['score_start_of_year'] = data['rating']
-            else:
-                if 'score' in data:
-                    aggregate_result[problem_id]['response_end_of_year'] = json.loads(
-                        data['student_response'])
-                    aggregate_result[problem_id]['score_end_of_year'] = data['score']
-                else:
-                    aggregate_result[problem_id]['score_end_of_year'] = data['rating']
-
-        return aggregate_result

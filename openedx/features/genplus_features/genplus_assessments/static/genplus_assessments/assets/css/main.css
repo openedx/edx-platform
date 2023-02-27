@@ -581,7 +581,7 @@ blockquote cite {
   display: inline-block;
   vertical-align: middle;
   white-space: normal;
-  width: calc(100% - 440px);
+  width: 370px;
 }
 .rating-assessment .year-info {
   display: inline-block;
@@ -696,9 +696,6 @@ blockquote cite {
   background: #000;
 }
 
-.unit-completion {
-  page-break-before: always;
-}
 .unit-completion:before, .unit-completion:after {
   content: "";
   display: table;
