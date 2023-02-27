@@ -280,18 +280,21 @@ class LibraryContentBlockTestMixin:
         assert result.summary
         assert StudioValidationMessage.WARNING == result.summary.type
         assert 'only 4 matching problems' in result.summary.text
+        assert len(self.lc_block.selected_children()) == 4
 
         # Add some capa problems so we can check problem type validation messages
         self.lc_block.max_count = 1
         self._create_capa_problems()
         self.lc_block.refresh_children()
         assert self.lc_block.validate()
+        assert len(self.lc_block.selected_children()) == 1
 
         # Existing problem type should pass validation
         self.lc_block.max_count = 1
         self.lc_block.capa_type = 'multiplechoiceresponse'
         self.lc_block.refresh_children()
         assert self.lc_block.validate()
+        assert len(self.lc_block.selected_children()) == 1
 
         # ... unless requested more blocks than exists in library
         self.lc_block.max_count = 10
@@ -303,6 +306,7 @@ class LibraryContentBlockTestMixin:
         assert result.summary
         assert StudioValidationMessage.WARNING == result.summary.type
         assert 'only 1 matching problem' in result.summary.text
+        assert len(self.lc_block.selected_children()) == 1
 
         # Missing problem type should always fail validation
         self.lc_block.max_count = 1
@@ -314,6 +318,14 @@ class LibraryContentBlockTestMixin:
         assert result.summary
         assert StudioValidationMessage.WARNING == result.summary.type
         assert 'no matching problem types' in result.summary.text
+        assert len(self.lc_block.selected_children()) == 0
+
+        # -1 selects all blocks from the library.
+        self.lc_block.max_count = -1
+        self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
+        self.lc_block.refresh_children()
+        assert self.lc_block.validate()
+        assert len(self.lc_block.selected_children()) == len(self.lc_block.children)
 
     def test_capa_type_filtering(self):
         """
@@ -388,6 +400,8 @@ class LibraryContentBlockTestMixin:
         (True, 8),
         # User resets selected children without reset button on content block
         (False, 8),
+        # User resets selected children with reset button on content block when all library blocks should be selected.
+        (True, -1),
     )
     @ddt.unpack
     def test_reset_selected_children_capa_blocks(self, allow_resetting_children, max_count):

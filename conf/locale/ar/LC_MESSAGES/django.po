@@ -257,7 +257,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-22 20:42+0000\n"
+"POT-Creation-Date: 2023-02-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -475,6 +475,20 @@ msgstr ""
 "اختياري: هذه هي وحدة إدارة المخزون (SKU)الخاصّة بوضع خدمة التجارة "
 "الإلكترونية الخارجية هذا. يُرجى ترك هذا الحقل فارغًا إذا لم يكن المساق قد  "
 "أُتيح كأحد مساقات خدمة التجارة الإلكترونية."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -14407,6 +14421,13 @@ msgstr "عنوان البريد الإلكتروني"
 msgid "Return To %s"
 msgstr "العودة إلى %s "
 
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "محتويات المساق {course_number}"
+
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "نجحت عملية إعادة الاشتراك!"
@@ -16619,12 +16640,6 @@ msgstr "لائحة المساقات"
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "خصِّص بحثك"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "محتويات المساق {course_number}"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -21068,11 +21083,6 @@ msgstr ""
 msgid "Organization"
 msgstr "المنظمة"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "مثلًا: UniversityX أو OrganizationX"

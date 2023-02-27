@@ -168,7 +168,7 @@ class TestAmplitudeRecommendationsView(APITestCase):
         Returns the filtered course data
         """
         filtered_course = []
-        for course_key in self.recommended_courses:
+        for course_key in self.recommended_courses[0:4]:
             filtered_course.append({
                 "key": course_key,
                 "uuid": "4f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",

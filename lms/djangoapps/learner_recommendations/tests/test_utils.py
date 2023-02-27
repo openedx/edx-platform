@@ -112,8 +112,26 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
             "course-v1:NYUx+FCS.NET.1+Run_0",
             "course-v1:MichinX+101x+Run_0",
         ]
+        self.course_keys_with_active_course_runs = [
+            "MITx+6.00.1x",
+            "IBM+PY0101EN",
+            "HarvardX+CS50P",
+            "UQx+IELTSx",
+            "HarvardX+CS50x",
+            "Harvard+CS50z",
+            "BabsonX+EPS03x",
+            "TUMx+QPLS2x",
+        ]
+        self.enrolled_course_run_keys = [
+            "course-v1:HarvardX+CS50x+Run_0",
+            "course-v1:Harvard+CS50z+Run_0",
+            "course-v1:BabsonX+EPS03x+Run_0",
+            "course-v1:TUMx+QPLS2x+Run_0",
+            "course-v1:NYUx+FCS.NET.1+Run_0",
+            "course-v1:MichinX+101x+Run_0",
+        ]
 
-    def _mock_get_course_data(self, course_id, fields=None):  # pylint: disable=unused-argument
+    def _mock_get_course_data(self, course_id, fields=None, querystring=None):  # pylint: disable=unused-argument
         """
         Mocked response for the get_course_data call
         """
@@ -134,6 +152,17 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
                 }
             )
 
+        if course_id in self.course_keys_with_active_course_runs:
+            course_data.update(
+                {
+                    "course_runs": [
+                        {
+                            "key": "course-v1:MITx+6.00.1x+Run_0",
+                        }
+                    ]
+                }
+            )
+
         return course_data
 
     @patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
@@ -144,10 +173,10 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
         Tests that given a recommended course list, the filter_recommended_courses
         method removes the enrolled courses from it.
         """
-        total_enrolled_courses = 6
+        total_enrolled_courses = len(self.enrolled_course_run_keys)
         total_recommendations = len(self.recommended_course_keys)
         mocked_get_course_data.side_effect = self._mock_get_course_data
-        for course_run_key in self.course_run_keys[:total_enrolled_courses]:
+        for course_run_key in self.enrolled_course_run_keys:
             CourseEnrollmentFactory(course_id=course_run_key, user=self.user)
 
         filtered_courses = filter_recommended_courses(
@@ -189,6 +218,24 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
         )
         expected_recommendations = []
         for course_key in self.unrestricted_course_keys:
+            expected_recommendations.append(self._mock_get_course_data(course_key))
+
+        assert filtered_courses == expected_recommendations
+
+    @patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    def test_recommend_only_active_courses(
+        self,
+        mocked_get_course_data,
+    ):
+        """
+        Test that courses having no active course runs are filtered out from recommended courses.
+        """
+        mocked_get_course_data.side_effect = self._mock_get_course_data
+        filtered_courses = filter_recommended_courses(
+            self.user, self.recommended_course_keys
+        )
+        expected_recommendations = []
+        for course_key in self.course_keys_with_active_course_runs:
             expected_recommendations.append(self._mock_get_course_data(course_key))
 
         assert filtered_courses == expected_recommendations

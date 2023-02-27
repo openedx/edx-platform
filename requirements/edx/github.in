@@ -58,6 +58,3 @@
 git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 
 
-# Third Party XBlocks
-
-git+https://github.com/open-craft/xblock-poll@v1.12.0#egg=xblock-poll==1.12.0

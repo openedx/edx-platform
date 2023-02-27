@@ -13,8 +13,9 @@
 # David Azevedo <davidc.azevedo@gmail.com>, 2014
 # David Azevedo <davidc.azevedo@gmail.com>, 2014
 # Developer QUEO <developer@queo.pt>, 2017
+# Diana Huang <dkh@edx.org>, 2023
 # Filipa Macieira <filipa.macieira@fccn.pt>, 2021
-# Ivo Branco <ivo.branco@fccn.pt>, 2021
+# Ivo Branco <ivo.branco@fccn.pt>, 2021,2023
 # Carlos <carlos.c.saraiva@gmail.com>, 2013
 # Luis Manuel Moreno <luis.moreno@edunext.co>, 2018-2019
 # Mariana Vieira <maglianamatilde@gmail.com>, 2015
@@ -140,7 +141,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-22 20:42+0000\n"
+"POT-Creation-Date: 2023-02-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Cátia Lopes <catia.lopes@bridgelk.com>, 2019\n"
 "Language-Team: Portuguese (Portugal) (https://www.transifex.com/open-edx/teams/6205/pt_PT/)\n"
@@ -360,6 +361,20 @@ msgstr ""
 "OPCIONAL: Este é o SKU (número de referência) deste modo no serviço de "
 "comércio eletrónico externo. Deixe em branco se o curso ainda não tiver "
 "migrado para o serviço de comércio eletrónico."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -7884,9 +7899,10 @@ msgid ""
 " completing more problems every week, and participating in the discussion "
 "forums. What do you want to do to keep learning?"
 msgstr ""
-"Muitos {platform_name} estudantes de {start_strong}{course_name}{end_strong}"
-" estão a completar mais problemas a cada semana, e a participar nos fóruns "
-"de discussão. O que deseja fazer para continuar a sua aprendizagem?"
+"Todas as semanas, muitos dos estudantes de {platform_name} no curso "
+"{start_strong}{course_name}{end_strong} estão a avançar na resolução de "
+"problemas e a participar ativamente nos fóruns de debate. O que deseja fazer"
+" para continuar a a aprender?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -14623,6 +14639,13 @@ msgstr "E-mail"
 msgid "Return To %s"
 msgstr "Voltar Para %s"
 
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "{course_number} Material de Curso"
+
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "Re-subscrever com sucesso!"
@@ -16919,12 +16942,6 @@ msgstr "Lista de Cursos"
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "Refinar a sua Pesquisa"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "{course_number} Material de Curso"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -21503,11 +21520,6 @@ msgstr ""
 msgid "Organization"
 msgstr "Organização"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "ex.: UniversidadeX ou OrganizaçãoX"

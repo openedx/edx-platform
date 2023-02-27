@@ -2422,26 +2422,6 @@ describe('CourseOutlinePage', function() {
                 expect($('.modal-section .edit-discussion')).not.toExist();
             });
 
-            it('shows discussion settings if unit level discussions are enabled', function() {
-                getUnitStatus({}, {unit_level_discussions: true});
-                outlinePage.$('.outline-unit .configure-button').click();
-                expect($('.modal-section .edit-discussion')).toExist();
-            });
-
-            it('marks checkbox as disabled', function() {
-                getUnitStatus({}, {unit_level_discussions: true});
-                outlinePage.$('.outline-unit .configure-button').click();
-
-                var discussionCheckbox = $('#discussion_enabled');
-                expect(discussionCheckbox).toExist();
-                expect(discussionCheckbox.is(':checked')).toBeFalsy();
-            });
-
-            it('marks checkbox as enabled', function() {
-                getUnitStatus({discussion_enabled: true}, {unit_level_discussions: true});
-                outlinePage.$('.outline-unit .configure-button').click();
-                expect($('#discussion_enabled').is(':checked')).toBeTruthy();
-            });
         });
 
         verifyTypePublishable('unit', function(options) {

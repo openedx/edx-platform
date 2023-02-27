@@ -34,7 +34,7 @@
 # Jesica Greco, 2022-2023
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2022
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2023
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan <juan.marrero@utec.edu.uy>, 2015
@@ -229,7 +229,7 @@
 # Ismael Saavedra <isma.18.94@gmail.com>, 2014
 # Jesica Greco, 2022
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2023
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # karlman72 <karlman72@gmail.com>, 2014
@@ -274,7 +274,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-22 20:42+0000\n"
+"POT-Creation-Date: 2023-02-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -495,6 +495,26 @@ msgstr ""
 "OPCIONAL: Este es el SKU (número de referencia) de este modo en el sistema "
 "de ecommerce externo. Deje este campo vacío si el curso no ha sido migrado "
 "al servicio de ecommerce."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+"OPCIONAL: Este es el SKU de Android registrado en Play Store para esta "
+"modalidad del curso. Deje este espacio en blanco si el curso aún no se ha "
+"migrado al servicio de comercio electrónico."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+"OPCIONAL: Este es el SKU de iOS registrado en la tienda de aplicaciones para"
+" esta modalidad del curso. Deje este espacio en blanco si el curso aún no se"
+" ha migrado al servicio de comercio electrónico."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -5202,7 +5222,7 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Whether to display this block in the table of contents"
-msgstr ""
+msgstr "Mostrar o no este bloque en la tabla de contenido"
 
 #. Translators: "TOC" stands for "Table of Contents"
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -5210,6 +5230,8 @@ msgid ""
 "What format this block is in (used for deciding which grader to apply, and "
 "what to show in the TOC)"
 msgstr ""
+"En qué formato está este bloque (se usa para decidir qué calificador aplicar"
+" y qué mostrar en la tabla de contenido)"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
@@ -5741,7 +5763,7 @@ msgstr "Puede acceder a su curso en: %(course_url)s."
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
 #, python-format
 msgid "You have been enrolled in %(course_name)s"
-msgstr "Te has inscrito a %(course_name)s"
+msgstr "Has sido inscrito en %(course_name)s"
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #, python-format
@@ -5980,7 +6002,7 @@ msgid ""
 "of the course staff. This course will no longer appear on your %(site_name)s"
 " dashboard."
 msgstr ""
-"Un miembro del equipo del curso te ha dado de baja de%(course_name)s en "
+"Un miembro del equipo del curso te ha dado de baja de %(course_name)s en "
 "%(site_name)s. Este curso ya no aparecerá en tu panel de usuario de "
 "%(site_name)s."
 
@@ -6009,7 +6031,7 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"                    Te has inscrito a %(course_name)s\n"
+"                    Has sido inscrito en %(course_name)s\n"
 "                "
 
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
@@ -10727,7 +10749,7 @@ msgstr "Fecha de cierre de inscripciones para esta clase"
 
 #: xmodule/course_block.py
 msgid "Start time when this block is visible"
-msgstr ""
+msgstr "Hora de inicio cuando este bloque es visible"
 
 #: xmodule/course_block.py
 msgid "Date that this class ends"
@@ -11419,6 +11441,7 @@ msgstr "ID de Examen de Admisión"
 #: xmodule/course_block.py
 msgid "Content block identifier (location) of entrance exam."
 msgstr ""
+"Identificador de bloque de contenido (ubicación) del examen de ingreso."
 
 #: xmodule/course_block.py
 msgid "Social Media Sharing URL"
@@ -11785,7 +11808,7 @@ msgstr ""
 
 #: xmodule/html_block.py
 msgid "Html contents to display for this block"
-msgstr ""
+msgstr "Contenido HTML para mostrar para este bloque"
 
 #: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
@@ -12460,13 +12483,16 @@ msgstr ""
 
 #: xmodule/modulestore/inheritance.py
 msgid "Tag this block as part of an Entrance Exam section"
-msgstr ""
+msgstr "Etiquete este bloque como parte de una sección de examen de ingreso"
 
 #: xmodule/modulestore/inheritance.py
 msgid ""
 "Enter true or false. If true, answer submissions for problem blocks will be "
 "considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
+"Introduzca verdadero o falso. Si es verdadero, los envíos de respuestas para"
+" los bloques de problemas se considerarán en el algoritmo de "
+"puntuación/gating del examen de ingreso."
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Error while reading {}. Check file for XML errors."
@@ -12474,7 +12500,7 @@ msgstr "Error mientras se leía {}. Verifica el documento para errores."
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Failed to import block: {} at location: {}"
-msgstr ""
+msgstr "No se pudo importar el bloque: {} en la ubicación: {}"
 
 #: xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
@@ -12675,6 +12701,8 @@ msgstr "Configuración de Grupo"
 #: xmodule/split_test_block.py
 msgid "Which child block students in a particular group_id should see"
 msgstr ""
+"Qué bloque secundario deberían ver los estudiantes que están en un group_id "
+"en particular"
 
 #: xmodule/split_test_block.py
 #, python-brace-format
@@ -13832,6 +13860,7 @@ msgstr "La información que ingreso es correcta."
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" blocks."
 msgstr ""
+"Las transcripciones solo se admiten para bloques de &quot;video&quot;."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -14995,6 +15024,13 @@ msgstr "Correo electrónico"
 #, python-format
 msgid "Return To %s"
 msgstr "Regresar a %s"
+
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "Material del curso {course_number}"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -17317,12 +17353,6 @@ msgstr "Lista de cursos"
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "Refinar su búsqueda"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "Material del curso {course_number}"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -21964,11 +21994,6 @@ msgstr ""
 msgid "Organization"
 msgstr "Organización"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "Ej: UniversidadX o OrganizaciónX"
@@ -22112,14 +22137,16 @@ msgid ""
 "This course run is using an upgraded version of edx discussion forum. "
 "Discussion xblocks will no longer work."
 msgstr ""
+"Este curso está utilizando una versión mejorada del foro de discusión. Los "
+"Xblocks de discusión ya no funcionarán."
 
 #: cms/templates/course_outline.html
 msgid " Learn more"
-msgstr ""
+msgstr "Aprende más"
 
 #: cms/templates/course_outline.html
 msgid "Share feedback"
-msgstr ""
+msgstr "Compartir comentarios"
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html

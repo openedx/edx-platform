@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-29 20:42+0000\n"
+"POT-Creation-Date: 2023-02-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Swahili (Kenya) (https://www.transifex.com/open-edx/teams/6205/sw_KE/)\n"
@@ -302,6 +302,20 @@ msgstr ""
 "HIARI: Hii ni SKU (stock keeping unit) ya mtindo huu katika huduma ya nje ya"
 " ecommerce. Acha hii wazi kama kozi bado haija hamishwa kwenda kwenye huduma"
 " ya ecommerce."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -13163,6 +13177,13 @@ msgstr "Barua pepe"
 msgid "Return To %s"
 msgstr "Rudi Kwenye %s"
 
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "{course_number} Maudhui ya kozi"
+
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "Kujiunga upya kumefaulu!"
@@ -15191,12 +15212,6 @@ msgstr "Orodha ya Kozi"
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "Rekebisha Utafutaji Wako"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "{course_number} Maudhui ya kozi"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -19535,11 +19550,6 @@ msgstr ""
 msgid "Organization"
 msgstr "Shirika"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr ""

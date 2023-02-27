@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-29 20:42+0000\n"
+"POT-Creation-Date: 2023-02-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -277,6 +277,20 @@ msgstr ""
 "ნებაყოფლობითი: ეს არის ამ რეჟიმის გარე ელექტრონული კომერციის სერვისის SKU "
 "(მარაგის შესანახი ერთეული). თუ კურსი ჯერ არ გადასულა ელ. კომერციის "
 "მომსახურებაზე, დატოვეთ ეს ველი ცარიელი."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -13592,6 +13606,13 @@ msgstr "ელფოსტა"
 msgid "Return To %s"
 msgstr "%s -ზე დაბრუნება"
 
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "{course_number} კურსის შინაარსი"
+
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "ხელახალი გამოწერა წარმატებით შესრულდა!"
@@ -15641,12 +15662,6 @@ msgstr "კურსების სია"
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "დააზუსტეთ თქვენი ძიება"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "{course_number} კურსის შინაარსი"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -20016,11 +20031,6 @@ msgstr ""
 msgid "Organization"
 msgstr "ორგანიზაცია"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "მაგ. X უნივერსიტეტი ან X ორგანიზაცია"

@@ -941,11 +941,27 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
             this.setStatus(this.currentValue());
+            this.showTipText();
         },
 
         currentValue: function() {
             var discussionEnabled = this.model.get('discussion_enabled');
             return discussionEnabled === true || discussionEnabled === 'enabled';
+        },
+
+        showTipText: function() {
+          if (this.model.get('published')) {
+            $('.un-published-tip').hide()
+          } else {
+            $('.un-published-tip').show()
+          }
+          let enabledForGraded = course.get('discussions_settings').enable_graded_units
+          if (this.model.get('graded') && !enabledForGraded) {
+            $('#discussion_enabled').prop('disabled', true);
+            $('.graded-tip').show()
+          } else {
+            $('.graded-tip').hide()
+          }
         },
 
         setStatus: function(value) {
