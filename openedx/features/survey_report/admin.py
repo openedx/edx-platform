@@ -26,7 +26,6 @@ class SurveyReportAdmin(admin.ModelAdmin):
         'id', 'summary', 'created_at', 'state'
     )
 
-
     @admin.action(description='Send report to external API')
     def send_report(modeladmin, request, queryset):
         """
@@ -36,9 +35,7 @@ class SurveyReportAdmin(admin.ModelAdmin):
         for report_id in selected:
             send_report_to_external_api(report_id=report_id)
 
-
     actions = [send_report]
-
 
     def summary(self, obj) -> str:
         """
