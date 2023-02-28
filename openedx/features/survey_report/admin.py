@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from .models import SurveyReport, SurveyReportUpload, SURVEY_REPORT_GENERATED
+from .api import send_report_to_external_api
 
 
 class SurveyReportAdmin(admin.ModelAdmin):
@@ -22,25 +23,22 @@ class SurveyReportAdmin(admin.ModelAdmin):
     )
 
     list_display = (
-        'id', 'summary', 'created_at', 'state', 'send_actions'
+        'id', 'summary', 'created_at', 'state'
     )
 
-    def send_actions(self, obj) -> str:
-        """
-        Show a button to send the report to the external API.
-        """
-        if not obj.state == SURVEY_REPORT_GENERATED:
-            return ""
 
-        button_message = "SEND"
-        if SurveyReportUpload.objects.filter(report=obj).exists():
-            button_message = "RESEND"
+    @admin.action(description='Send report to external API')
+    def send_report(modeladmin, request, queryset):
+        """
+        Add custom actions to send the reports to the external API.
+        """
+        selected = queryset.values_list('id', flat=True)
+        for report_id in selected:
+            send_report_to_external_api(report_id=report_id)
 
-        return format_html(
-            '<a class="button" href="{}">{}</a>',
-            reverse('openedx.send_survey_report', args=[obj.id]),
-            button_message
-        )
+
+    actions = [send_report]
+
 
     def summary(self, obj) -> str:
         """
