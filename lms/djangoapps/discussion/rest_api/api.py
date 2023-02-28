@@ -1191,6 +1191,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
     """
     response_skip = page_size * (page - 1)
     reverse_order = request.GET.get('reverse_order', False)
+    from_mfe_sidebar = request.GET.get("enable_in_context_sidebar", False)
     cc_thread, context = _get_thread_and_context(
         request,
         thread_id,
@@ -1237,7 +1238,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
     results = _serialize_discussion_entities(request, context, responses, requested_fields, DiscussionEntity.comment)
 
     paginator = DiscussionAPIPagination(request, page, num_pages, resp_total)
-    track_thread_viewed_event(request, context["course"], cc_thread)
+    track_thread_viewed_event(request, context["course"], cc_thread, from_mfe_sidebar)
     return paginator.get_paginated_response(results)
 
 
@@ -1421,6 +1422,7 @@ def create_thread(request, thread_data):
         detail.
     """
     course_id = thread_data.get("course_id")
+    from_mfe_sidebar = thread_data.pop("enable_in_context_sidebar", False)
     user = request.user
     if not course_id:
         raise ValidationError({"course_id": ["This field is required."]})
@@ -1452,7 +1454,8 @@ def create_thread(request, thread_data):
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, list(thread_data.keys()), actions_form, context, request)
 
-    track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"])
+    track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"],
+                               from_mfe_sidebar)
 
     return api_thread
 
@@ -1474,6 +1477,7 @@ def create_comment(request, comment_data):
         detail.
     """
     thread_id = comment_data.get("thread_id")
+    from_mfe_sidebar = comment_data.pop("enable_in_context_sidebar", False)
     if not thread_id:
         raise ValidationError({"thread_id": ["This field is required."]})
     cc_thread, context = _get_thread_and_context(request, thread_id)
@@ -1497,7 +1501,8 @@ def create_comment(request, comment_data):
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, list(comment_data.keys()), actions_form, context, request)
 
-    track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False)
+    track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
+                                from_mfe_sidebar=from_mfe_sidebar)
 
     return api_comment
 
