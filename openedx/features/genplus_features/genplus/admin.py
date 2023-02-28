@@ -42,6 +42,7 @@ class GenUserAdmin(admin.ModelAdmin):
         'social_user_exist'
     )
     search_fields = ('user__email', 'email')
+    actions = ['force_change_password']
 
     def social_user_exist(self, obj):
         try:
@@ -53,6 +54,13 @@ class GenUserAdmin(admin.ModelAdmin):
                 return "Yes" if obj.user.social_auth.count() > 0 else "No"
         except AttributeError:
             return '-'
+
+    def force_change_password(modeladmin, request, queryset):
+        queryset.update(has_password_changed=False)
+        messages.add_message(request, messages.INFO,
+                             'Force password updated successfully.')
+
+
 
 
 @admin.register(Skill)
