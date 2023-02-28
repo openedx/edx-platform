@@ -397,6 +397,9 @@ class ChangePasswordByTeacherView(GenzMixin, views.APIView):
                     user = student.gen_user.user
                     user.set_password(password)
                     user.save()
+                    # force change password
+                    user.gen_user.has_password_changed = False
+                    user.gen_user.save()
                     users_list.append(user.email)
             return Response({"message": SuccessMessages.PASSWORD_CHANGED_BY_TEACHER.format(users=','.join(users_list))},
                             status=status.HTTP_200_OK)
