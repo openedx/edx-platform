@@ -10,7 +10,7 @@
     "@babel/preset-react": "7.18.6",
     "@edx/brand-edx.org": "^2.0.7",
     "@edx/edx-bootstrap": "1.0.4",
-    "@edx/edx-proctoring": "^4.13.3",
+    "@edx/edx-proctoring": "^4.12.2",
     "@edx/frontend-component-cookie-policy-banner": "2.2.0",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "^2.1.0",
@@ -76,7 +76,7 @@
   "devDependencies": {
     "@edx/eslint-config": "^3.1.0",
     "@edx/mockprock": "github:openedx/mockprock#85a9a8577149cd7c88fd5e8e84e280a8ce40a218",
-    "@edx/stylelint-config-edx": "2.2.0",
+    "@edx/stylelint-config-edx": "1.1.0",
     "babel-jest": "26.0.0",
     "edx-custom-a11y-rules": "1.0.6",
     "enzyme": "3.11.0",
