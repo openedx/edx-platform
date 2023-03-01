@@ -14,6 +14,7 @@ from common.djangoapps.third_party_auth.appleid import AppleIdAuth
 
 log = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
     """
     Management command to update new Apple ID from AppleMigrationUserIdInfo to UserSocialAuth.
