@@ -487,9 +487,16 @@ def _get_and_validate_course(course_key_string, user):
     # For now, assume all studio users that have access to the course can upload videos.
     # In the future, we plan to add a new org-level role for video uploaders.
     course = get_course_and_check_access(course_key, user)
-    # temporary removed the conditions.
 
-    return course
+    if (
+        settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] and
+        getattr(settings, "VIDEO_UPLOAD_PIPELINE", None) and
+        course and
+        course.video_pipeline_configured
+    ):
+        return course
+    else:
+        return None
 
 
 def convert_video_status(video, is_video_encodes_ready=False):
@@ -766,28 +773,15 @@ def videos_post(course, request):
             if transcript_preferences is not None:
                 metadata_list.append(('transcript_preferences', json.dumps(transcript_preferences)))
 
-        import pdb;
-        pdb.set_trace()
-
-        # for metadata_name, value in metadata_list:
-        #     key.set_metadata(metadata_name, value)
-
-        # upload_url = key.generate_url(
-        #     KEY_EXPIRATION_IN_SECONDS,
-        #     'PUT',
-        #     headers={'Content-Type': req_file['content_type']}
-        # )
-
         upload_url = s3_client.generate_presigned_url(
             'put_object',
             Params={
-                'Bucket': 'awaisqureshi',
+                'Bucket': settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'],
                 'Key': key_name,
                 'Metadata': {metadata_name: value for metadata_name, value in metadata_list},
-                "ACL": "public-read"
+                'ContentType': req_file['content_type']
             },
             ExpiresIn=KEY_EXPIRATION_IN_SECONDS,  # the URL expires in 1 hour
-            HttpMethod='PUT'
         )
 
         # persist edx_video_id in VAL
@@ -821,14 +815,6 @@ def storage_service_bucket():
             'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
             'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
         }
-
-    params = {
-        'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
-        'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
-    }
-    import pdb;
-    pdb.set_trace()
-
 
     s3_client = boto3.client('s3', **params)
 
