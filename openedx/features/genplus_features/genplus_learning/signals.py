@@ -84,7 +84,7 @@ def class_students_changed(sender, instance, action, **kwargs):
             )
     if action == 'post_remove':
         # create gen_log for the removal of student
-        GenLog.create_remove_student_log(list(pk_set))
+        GenLog.create_remove_student_log(instance, list(pk_set))
 
 
 @receiver(PROBLEM_RAW_SCORE_CHANGED)
