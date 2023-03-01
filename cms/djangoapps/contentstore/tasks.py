@@ -311,7 +311,7 @@ def async_migrate_transcript_subtask(*args, **kwargs):  # pylint: disable=unused
             command_run=command_run,
             edx_video_id=edx_video_id,
             language_code=language_code,
-            transcript_content=transcript_content,
+            transcript_content=transcript_content.encode(),
             file_format=Transcript.SJSON,
             force_update=force_update,
         )
