@@ -104,9 +104,22 @@ class EmailTypes:
     """
     Email type choices
     """
-    MISSING_CLASS_EMAIL= 'Missing Class'
+    MISSING_CLASS_EMAIL = 'Missing Class'
 
     __ALL__ = (MISSING_CLASS_EMAIL,)
     __MODEL_CHOICES__ = (
         (email_type, email_type) for email_type in __ALL__
+    )
+
+
+class GenLogTypes:
+    """
+    Gen Log Types
+    """
+    RM_UNIFY_PROVISION_UPDATE_USER_DELETE = 'RMUnify provision update user deleted'
+    STUDENT_REMOVED_FROM_CLASS = 'Student removed from class'
+
+    __ALL__ = (RM_UNIFY_PROVISION_UPDATE_USER_DELETE, STUDENT_REMOVED_FROM_CLASS)
+    __MODEL_CHOICES__ = (
+        (gen_log_type, gen_log_type) for gen_log_type in __ALL__
     )

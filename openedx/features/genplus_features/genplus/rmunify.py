@@ -7,7 +7,7 @@ import requests
 import base64
 import hmac
 from datetime import datetime
-from openedx.features.genplus_features.genplus.models import GenUser, Student, School, Class
+from openedx.features.genplus_features.genplus.models import GenUser, Student, School, Class, GenLog
 from openedx.features.genplus_features.genplus.constants import SchoolTypes, ClassTypes, GenUserRoles
 from .constants import RmUnifyUpdateTypes
 from django.db.models import Q
@@ -122,6 +122,10 @@ class RmUnify(BaseRmUnify):
             gen_students = Student.objects.filter(gen_user__in=gen_user_ids)
             gen_class.students.add(*gen_students)
             logger.info('_____{} students added to {}_____'.format(str(gen_students.count()), gen_class.name))
+            # get the students which are not in the syncing from the RMUnify
+            to_be_removed_students = gen_class.students.exclude(gen_user__id__in=gen_user_ids)
+            # remove the remaining users from the class
+            gen_class.students.remove(*to_be_removed_students)
 
 
 class RmUnifyProvisioning(BaseRmUnify):
@@ -154,7 +158,7 @@ class RmUnifyProvisioning(BaseRmUnify):
                     try:
                         # only deleting if user with unify guid exist in our system
                         identity_guid = update['UpdateData']['IdentityGuid']
-                        self.delete_user(identity_guid)
+                        self.delete_user(identity_guid, update)
                     except KeyError:
                         pass
 
@@ -190,9 +194,15 @@ class RmUnifyProvisioning(BaseRmUnify):
         return
 
     @staticmethod
-    def delete_user(guid):
+    def delete_user(guid, update):
         try:
             gen_user = GenUser.objects.get(identity_guid=guid)
+            log_details = {
+                'email': gen_user.email,
+                'identity_guid': gen_user.identity_guid,
+                'school': gen_user.school.name,
+                'provisioning_update_details': update
+            }
             if gen_user.user is not None:
                 user_pk = gen_user.user.pk
                 # first delete gen_user so it can delete the related Enrollments
@@ -201,6 +211,8 @@ class RmUnifyProvisioning(BaseRmUnify):
             else:
                 # case where user is not logged into our system
                 gen_user.delete()
+            # create gen_log for removing the user from the system
+            GenLog.create_remove_user_log(guid, log_details)
             logger.info(
                 'User with identity_guid {} has been deleted.'.format(guid)
             )

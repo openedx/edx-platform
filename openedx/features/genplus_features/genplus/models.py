@@ -3,8 +3,8 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-
-from .constants import GenUserRoles, ClassColors, JournalTypes, SchoolTypes, ClassTypes, ActivityTypes, EmailTypes
+from jsonfield import JSONField
+from .constants import GenUserRoles, ClassColors, JournalTypes, SchoolTypes, ClassTypes, ActivityTypes, EmailTypes, GenLogTypes
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -251,3 +251,45 @@ class EmailRecord(TimeStampedModel):
             self.email_reference = 1
 
         super(EmailRecord, self).save(*args, **kwargs)
+
+
+class GenLog(TimeStampedModel):
+    GEN_LOG_TYPE_CHOICES = GenLogTypes.__MODEL_CHOICES__
+    gen_log_type = models.CharField(max_length=128, choices=GEN_LOG_TYPE_CHOICES)
+    description = models.TextField(null=True)
+    metadata = JSONField(
+        null=True,
+        blank=True,
+        help_text='store data according to the log type'
+    )
+
+    def __str__(self):
+        return self.description
+
+    @classmethod
+    def create_remove_student_log(cls, gen_class, student_ids):
+        remove_student_logs = []
+        for student in Student.objects.filter(id__in=student_ids):
+            remove_student_logs.append(
+                cls(
+                    gen_log_type=GenLogTypes.STUDENT_REMOVED_FROM_CLASS,
+                    description=f'{student.gen_user.email} removed from class {gen_class.name}',
+                    metadata={
+                        'email': student.gen_user.email,
+                        'identity_guid': student.gen_user.identity_guid,
+                        'user_id': student.gen_user.user.id if student.gen_user.user is not None else None,
+                        'class_id': gen_class.id,
+                        'class_name': gen_class.name,
+                        'school': gen_class.school.name,
+                    }
+                )
+            )
+        cls.objects.bulk_create(remove_student_logs)
+
+    @classmethod
+    def create_remove_user_log(cls, user_guid, details=None):
+        cls.objects.create(
+            gen_log_type=GenLogTypes.RM_UNIFY_PROVISION_UPDATE_USER_DELETE,
+            description=f'user with guid {user_guid} removed from the system',
+            metadata=details,
+        )

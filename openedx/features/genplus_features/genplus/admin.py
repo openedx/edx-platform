@@ -440,3 +440,6 @@ class StudentAdmin(admin.ModelAdmin):
             else:
                 program_data[program.year_group.name] = "Not enrolled yet"
         return str(program_data)
+
+
+admin.site.register(GenLog)

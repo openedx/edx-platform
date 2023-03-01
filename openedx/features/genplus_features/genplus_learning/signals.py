@@ -7,7 +7,7 @@ from completion.models import BlockCompletion
 from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import SignalHandler, modulestore
 from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
-from openedx.features.genplus_features.genplus.models import Class, Teacher, Activity
+from openedx.features.genplus_features.genplus.models import Class, Teacher, Activity, GenLog
 from openedx.features.genplus_features.genplus.constants import ActivityTypes
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
 import openedx.features.genplus_features.genplus_learning.tasks as genplus_learning_tasks
@@ -82,6 +82,9 @@ def class_students_changed(sender, instance, action, **kwargs):
                 },
                 countdown=settings.PROGRAM_ENROLLMENT_COUNTDOWN
             )
+    if action == 'post_remove':
+        # create gen_log for the removal of student
+        GenLog.create_remove_student_log(list(pk_set))
 
 
 @receiver(PROBLEM_RAW_SCORE_CHANGED)
