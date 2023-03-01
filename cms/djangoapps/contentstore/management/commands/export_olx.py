@@ -19,7 +19,7 @@ import os
 import re
 import shutil
 import tarfile
-from tempfile import mkdtemp, mktemp, NamedTemporaryFile
+from tempfile import mkdtemp, NamedTemporaryFile
 from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError
