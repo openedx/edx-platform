@@ -33,7 +33,8 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
-
+from cms.djangoapps.contentstore.views.certificates import CertificateManager
+from cms.djangoapps.contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.course_creators.models import CourseCreator
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
@@ -131,7 +132,7 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
            'group_configurations_list_handler', 'group_configurations_detail_handler',
-           'get_course_and_check_access']
+           'get_course_and_check_access', 'enrollment_tracks_handler']
 
 WAFFLE_NAMESPACE = 'studio_home'
 ENABLE_GLOBAL_STAFF_OPTIMIZATION = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
@@ -753,6 +754,8 @@ def course_index(request, course_key):
             'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
             'advance_settings_url': reverse_course_url('advanced_settings_handler', course_block.id),
             'proctoring_errors': proctoring_errors,
+            'enable_course_mode_creation': settings.FEATURES.get('ENABLE_COURSE_MODE_CREATION', False),
+            'enrollment_tracks_url': reverse_course_url('enrollment_tracks_handler', course_block.id),
         })
 
 
@@ -1955,3 +1958,79 @@ def get_organizations(user):
         organizations = course_creator.organizations.all().values_list('short_name', flat=True)
 
     return organizations
+
+
+@login_required
+@require_http_methods(("GET", "POST"))
+@ensure_csrf_cookie
+def enrollment_tracks_handler(request, course_key_string):
+    """
+    A RESTful handler for Enrollment tracks
+
+    GET
+        html: return Enrollment Tracks page (Backbone application)
+    POST
+        json: edit enrollment tracks for course
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    store = modulestore()
+    with store.bulk_operations(course_key):
+        try:
+            course = get_course_and_check_access(course_key, request.user)
+        except PermissionDenied:
+            msg = _('PermissionDenied: Failed in authenticating {user}').format(user=request.user)
+            return JsonResponse({"error": msg}, status=403)
+
+        if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+            certificate_url = reverse_course_url('certificates_list_handler', course_key)
+            course_outline_url = reverse_course_url('course_handler', course_key)
+            upload_asset_url = reverse_course_url('assets_handler', course_key)
+            activation_handler_url = reverse_course_url(
+                handler_name='certificate_activation_handler',
+                course_key=course_key
+            )
+            course_mode_creation_url = reverse(
+                'course_modes_api:v1:course_modes_list',
+                args=(str(course_key),),
+            )
+            course_modes = [
+                mode.slug for mode in CourseMode.modes_for_course(
+                    course_id=course.id, include_expired=True
+                ) if mode.slug != 'audit'
+            ]
+            # Check whether the audit mode associated with the course exists in database
+            has_audit_mode = CourseMode.objects.filter(course_id=course.id, mode_slug='audit')
+
+            has_certificate_modes = len(course_modes) > 0
+
+            enable_course_mode_creation = settings.FEATURES.get('ENABLE_COURSE_MODE_CREATION', False)
+
+            if has_certificate_modes:
+                certificate_web_view_url = get_lms_link_for_certificate_web_view(
+                    course_key=course_key,
+                    mode=course_modes[0]  # CourseMode.modes_for_course returns default mode if doesn't find anyone.
+                )
+                enable_course_mode_creation = False
+            else:
+                certificate_web_view_url = None
+            is_active, certificates = CertificateManager.is_activated(course)
+            return render_to_response('enrollment_tracks.html', {
+                'context_course': course,
+                'certificate_url': certificate_url,
+                'course_outline_url': course_outline_url,
+                'course_mode_creation_url': course_mode_creation_url,
+                'enable_course_mode_creation': enable_course_mode_creation and not has_audit_mode,
+                'course_id': str(course_key),
+                'upload_asset_url': upload_asset_url,
+                'certificates': certificates,
+                'has_certificate_modes': has_certificate_modes,
+                'course_modes': course_modes,
+                'certificate_web_view_url': certificate_web_view_url,
+                'is_active': is_active,
+                'is_global_staff': GlobalStaff().has_user(request.user),
+                'certificate_activation_handler_url': activation_handler_url,
+                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course.id),
+                'enrollment_tracks_url': reverse_course_url('enrollment_tracks_handler', course_key),
+            })
+        else:
+            return HttpResponse(status=406)

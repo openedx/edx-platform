@@ -152,6 +152,8 @@ urlpatterns = oauth2_urlpatterns + [
             contentstore_views.grading_handler, name='grading_handler'),
     re_path(fr'^settings/advanced/{settings.COURSE_KEY_PATTERN}$', contentstore_views.advanced_settings_handler,
             name='advanced_settings_handler'),
+    re_path(fr'^settings/enrollment-tracks/{settings.COURSE_KEY_PATTERN}$', contentstore_views.enrollment_tracks_handler,
+            name='enrollment_tracks_handler'),
     re_path(fr'^textbooks/{settings.COURSE_KEY_PATTERN}$', contentstore_views.textbooks_list_handler,
             name='textbooks_list_handler'),
     re_path(fr'^textbooks/{settings.COURSE_KEY_PATTERN}/(?P<textbook_id>\d[^/]*)$',
