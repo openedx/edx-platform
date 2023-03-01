@@ -10,6 +10,7 @@ from django.db.models import Q
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.third_party_auth.models import AppleMigrationUserIdInfo
+from common.djangoapps.third_party_auth.appleid import AppleIdAuth
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +30,9 @@ class Command(BaseCommand):
         if not apple_user_ids_info:
             raise CommandError('No Apple ID User info found.')
         for apple_user_id_info in apple_user_ids_info:
-            user_social_auth = UserSocialAuth.objects.filter(uid=apple_user_id_info.old_apple_id).first()
+            user_social_auth = UserSocialAuth.objects.filter(
+                uid=apple_user_id_info.old_apple_id, provider=AppleIdAuth.name
+            ).first()
             if user_social_auth:
                 user_social_auth.uid = apple_user_id_info.new_apple_id
                 user_social_auth.save()

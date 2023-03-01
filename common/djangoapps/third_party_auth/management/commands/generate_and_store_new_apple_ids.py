@@ -107,5 +107,5 @@ class Command(BaseCommand):
                 log.info('Updated new Apple ID for uid %s',
                          apple_user_id_info.old_apple_id)
             else:
-                log.info('Enable to fetch new Apple ID for uid %s',
+                log.info('Unable to fetch new Apple ID for uid %s',
                          apple_user_id_info.old_apple_id)
