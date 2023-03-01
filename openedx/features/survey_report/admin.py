@@ -4,9 +4,7 @@ Django Admin page for SurveyReport.
 
 
 from django.contrib import admin
-from django.utils.html import format_html
-from django.urls import reverse
-from .models import SurveyReport, SurveyReportUpload, SURVEY_REPORT_GENERATED
+from .models import SurveyReport
 from .api import send_report_to_external_api
 
 
@@ -27,7 +25,7 @@ class SurveyReportAdmin(admin.ModelAdmin):
     )
 
     @admin.action(description='Send report to external API')
-    def send_report(modeladmin, request, queryset):
+    def send_report(self, request, queryset):
         """
         Add custom actions to send the reports to the external API.
         """
