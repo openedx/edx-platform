@@ -4,8 +4,15 @@ Test that various filters are fired for models/views in the student app.
 from django.http import HttpResponse
 from django.test import override_settings
 from django.urls import reverse
+from lms.djangoapps.mobile_api.users.views import UserCourseEnrollmentsList
+from openedx.core.djangoapps.enrollments.data import get_course_enrollments
 from openedx_filters import PipelineStep
-from openedx_filters.learning.filters import DashboardRenderStarted, CourseEnrollmentStarted, CourseUnenrollmentStarted
+from openedx_filters.learning.filters import (
+    DashboardRenderStarted,
+    CourseEnrollmentStarted,
+    CourseUnenrollmentStarted,
+    CourseEnrollmentQuerysetRequested
+)
 from rest_framework import status
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -110,6 +117,21 @@ class TestRenderCustomResponse(PipelineStep):
         )
 
 
+class TestCourseEnrollmentsPipelineStep(PipelineStep):
+    """
+    Utility function used when getting steps for pipeline.
+    """
+
+    def run_filter(self, enrollments):  # pylint: disable=arguments-differ
+        """Pipeline steps that modifies course enrollments when make a queryset request."""
+        if enrollments.course_overview.org == "":
+            raise CourseEnrollmentQuerysetRequested.PreventEnrollmentQuerysetRequest(
+                "You can't filter from enrollments list."
+            )
+
+        return enrollments.course_overview.org == "demo"
+
+
 @skip_unless_lms
 class EnrollmentFiltersTest(ModuleStoreTestCase):
     """
@@ -118,6 +140,7 @@ class EnrollmentFiltersTest(ModuleStoreTestCase):
     This class guarantees that the following filters are triggered during the user's enrollment:
 
     - CourseEnrollmentStarted
+    - CourseEnrollmentQuerysetRequested
     """
 
     def setUp(self):  # pylint: disable=arguments-differ
@@ -188,6 +211,53 @@ class EnrollmentFiltersTest(ModuleStoreTestCase):
 
         self.assertEqual('audit', enrollment.mode)
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+
+    @override_settings(
+        OPEN_EDX_FILTERS_CONFIG={
+            "org.openedx.learning.course_enrollment_queryset.requested.v1": {
+                "pipeline": [
+                    "common.djangoapps.student.tests.test_filters.TestCourseEnrollmentsPipelineStep",
+                ],
+                "fail_silently": False,
+            },
+        },
+    )
+    def test_enrollment_queryset_filter_executed_views(self):
+        """
+        Test filter enrollment queryset when a request is made.
+
+        Expected result:
+            - CourseEnrollmentQuerysetRequested is triggered and executes TestCourseEnrollmentsPipelineStep.
+            - The result is a list of course enrollments queryset filter by org
+        """
+
+        enrollments_list = UserCourseEnrollmentsList()
+        enrollments = enrollments_list.get_queryset()
+
+        self.assertEqual('demo', enrollments.course_overview.org)
+
+    @override_settings(
+        OPEN_EDX_FILTERS_CONFIG={
+            "org.openedx.learning.course_enrollment_queryset.requested.v1": {
+                "pipeline": [
+                    "common.djangoapps.student.tests.test_filters.TestCourseEnrollmentsPipelineStep",
+                ],
+                "fail_silently": False,
+            },
+        },
+    )
+    def test_enrollment_queryset_filter_executed_data(self):
+        """
+        Test filter enrollment queryset when a request is made.
+
+        Expected result:
+            - CourseEnrollmentQuerysetRequested is triggered and executes TestCourseEnrollmentsPipelineStep.
+            - The result is a list of course enrollments queryset filter by org
+        """
+
+        enrollments = get_course_enrollments(self.user)
+
+        self.assertEqual('demo', enrollments.course_overview.org)
 
 
 @skip_unless_lms
