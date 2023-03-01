@@ -487,6 +487,7 @@ def _get_and_validate_course(course_key_string, user):
     # For now, assume all studio users that have access to the course can upload videos.
     # In the future, we plan to add a new org-level role for video uploaders.
     course = get_course_and_check_access(course_key, user)
+    return course
 
     if (
         settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] and
@@ -739,7 +740,7 @@ def videos_post(course, request):
     if error:
         return {'error': error}, 400
 
-    s3_client, bucket = storage_service_bucket()
+    s3_client = storage_service_bucket()
     req_files = data['files']
     resp_files = []
 
@@ -807,7 +808,7 @@ def storage_service_bucket():
         params = {
             'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
             'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY,
-            'security_token': settings.AWS_SECURITY_TOKEN
+            # 'security_token': settings.AWS_SECURITY_TOKEN
 
         }
     else:
@@ -822,9 +823,8 @@ def storage_service_bucket():
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
     # meaning it would need ListObjects on the whole bucket, not just the path used in each
     # environment (since we share a single bucket for multiple deployments in some configurations)
-    bucket = 'awaisqureshi' #s3_client.list_objects_v2(Bucket=settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'])
 
-    return s3_client, bucket
+    return s3_client
 
 def storage_service_key(file_name):
     """
