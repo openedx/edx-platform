@@ -12,7 +12,7 @@ from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from boto import s3
+import boto3
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -487,16 +487,9 @@ def _get_and_validate_course(course_key_string, user):
     # For now, assume all studio users that have access to the course can upload videos.
     # In the future, we plan to add a new org-level role for video uploaders.
     course = get_course_and_check_access(course_key, user)
+    # temporary removed the conditions.
 
-    if (
-        settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] and
-        getattr(settings, "VIDEO_UPLOAD_PIPELINE", None) and
-        course and
-        course.video_pipeline_configured
-    ):
-        return course
-    else:
-        return None
+    return course
 
 
 def convert_video_status(video, is_video_encodes_ready=False):
@@ -739,7 +732,7 @@ def videos_post(course, request):
     if error:
         return {'error': error}, 400
 
-    bucket = storage_service_bucket()
+    s3_client, bucket = storage_service_bucket()
     req_files = data['files']
     resp_files = []
 
@@ -753,7 +746,7 @@ def videos_post(course, request):
             return {'error': error_msg}, 400
 
         edx_video_id = str(uuid4())
-        key = storage_service_key(bucket, file_name=edx_video_id)
+        key_name = storage_service_key(file_name=edx_video_id)
 
         metadata_list = [
             ('client_video_id', file_name),
@@ -773,12 +766,28 @@ def videos_post(course, request):
             if transcript_preferences is not None:
                 metadata_list.append(('transcript_preferences', json.dumps(transcript_preferences)))
 
-        for metadata_name, value in metadata_list:
-            key.set_metadata(metadata_name, value)
-        upload_url = key.generate_url(
-            KEY_EXPIRATION_IN_SECONDS,
-            'PUT',
-            headers={'Content-Type': req_file['content_type']}
+        import pdb;
+        pdb.set_trace()
+
+        # for metadata_name, value in metadata_list:
+        #     key.set_metadata(metadata_name, value)
+
+        # upload_url = key.generate_url(
+        #     KEY_EXPIRATION_IN_SECONDS,
+        #     'PUT',
+        #     headers={'Content-Type': req_file['content_type']}
+        # )
+
+        upload_url = s3_client.generate_presigned_url(
+            'put_object',
+            Params={
+                'Bucket': 'awaisqureshi',
+                'Key': key_name,
+                'Metadata': {metadata_name: value for metadata_name, value in metadata_list},
+                "ACL": "public-read"
+            },
+            ExpiresIn=KEY_EXPIRATION_IN_SECONDS,  # the URL expires in 1 hour
+            HttpMethod='PUT'
         )
 
         # persist edx_video_id in VAL
@@ -813,16 +822,25 @@ def storage_service_bucket():
             'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
         }
 
-    conn = s3.connection.S3Connection(**params)
+    params = {
+        'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
+        'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
+    }
+    import pdb;
+    pdb.set_trace()
+
+
+    s3_client = boto3.client('s3', **params)
 
     # We don't need to validate our bucket, it requires a very permissive IAM permission
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
     # meaning it would need ListObjects on the whole bucket, not just the path used in each
     # environment (since we share a single bucket for multiple deployments in some configurations)
-    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'], validate=False)
+    bucket = 'awaisqureshi' #s3_client.list_objects_v2(Bucket=settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'])
 
+    return s3_client, bucket
 
-def storage_service_key(bucket, file_name):
+def storage_service_key(file_name):
     """
     Returns an S3 key to the given file in the given bucket.
     """
@@ -830,7 +848,7 @@ def storage_service_key(bucket, file_name):
         settings.VIDEO_UPLOAD_PIPELINE.get("ROOT_PATH", ""),
         file_name
     )
-    return s3.key.Key(bucket, key_name)
+    return key_name
 
 
 def send_video_status_update(updates):
