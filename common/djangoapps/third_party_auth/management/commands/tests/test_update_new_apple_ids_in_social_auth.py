@@ -4,7 +4,7 @@ Tests for `update_new_apple_ids_in_social_auth` management command
 
 from unittest import mock
 from django.core.management import call_command
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.student.tests.factories import UserFactory

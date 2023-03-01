@@ -7,7 +7,7 @@ import json
 from unittest import mock
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from requests.models import Response
 from social_django.models import UserSocialAuth
 
@@ -72,7 +72,8 @@ class TestGenerateAndStoreAppleIds(TestCase):
     def test_new_apple_id_created(self, mock_post, mock_generate_client_secret, mock_generate_access_token):
         response = Response()
         response.status_code = 200
-        response._content = json.dumps({'sub': 'sample_new_apple_id'}).encode('utf-8')
+        response_content = {'sub': 'sample_new_apple_id'}
+        response._content = json.dumps(response_content).encode('utf-8')  # pylint: disable=protected-access
 
         mock_post.return_value = response
         mock_generate_client_secret.return_value = 'sample_client_secret'
