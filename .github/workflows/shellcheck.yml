@@ -1,6 +1,7 @@
-# ShellCheck is a linter for your shell scripts:
-#   https://www.shellcheck.net/
-# This workflow runs it on PRs and pushes to $default-branch
+# Run ShellCheck on PRs and master
+
+# For more context, see:
+# https://github.com/openedx/.github/blob/master/docs/decisions/0001-shellcheck.rst
 
 name: ShellCheck
 
@@ -14,52 +15,44 @@ permissions:
   contents: read
 
 jobs:
-
   shellcheck:
-    name: Run ShellCheck
     runs-on: ubuntu-latest
-
     steps:
 
-    - name: Check out branch
+    - name: Check out this repository
       uses: actions/checkout@v3
 
-    # Run ShellCheck using a predefine action:
-    # https://github.com/marketplace/actions/shellcheck
-    - name: Run ShellCheck
-      uses: ludeeus/action-shellcheck@master
-      env:
+    - name: Check out shared actions
+      uses: actions/checkout@v3
+      with:
+        repository: kdmccormick/openedx.github
+        #repository: openedx/.github
+        ref: kdmccormick/shellcheck-impl
+        path: ./openedx-dot-github
 
-        # We pin to a specific version of ShellCheck so that your build doesn't
-        # break as newer versions with more warnings are released.
-        # Maintainers: Keep an eye out for newer ShellCheck versions and consider
-        # upgrading to them when they are released:
-        #    https://github.com/koalaman/shellcheck/tags
-        version: v0.9.0
+    - name: Run ShellCheck!
+      uses: ./openedx-dot-github/.github/actions/shellcheck
+      with:
 
-        # Severity levels, in increasing order of strictness:
-        #   error
-        #   warning
-        #   info
-        #   style
-        # We recommend `style` for maximum coverage, but adjust as you see fit.
-        severity: style
+        # REQUIRED:
+        # Directories to search for .sh files, space-separated, each relative
+        # to the root of the repository. Directories containing spaces or other
+        # Bash delimiters must be wrapped in single quotes.
+        root-dirs: "./scripts ./.github ./lms ./cms ./xmodule ./common/ ./openedx"
 
-        # Add any custom shellcheck CLI options here.
-        # For example, use `-e SC2059` to ignore a certain warning.
-        # (However, it's usually to ignore individual warnings inline: `# shellcheck: disable=SC2059`)
-        SHELLCHECK_OPTS:
+        # OPTIONAL:
+        # ShellCheck version to install.
+        # Must be a tag or branch of https://github.com/koalaman/shellcheck.
+        # By default, the upstream action will use a reasonable, stable shellcheck version,
+        # which will be updated over time as new stable ShellCheck versions come out.
+        # If you want your repositoriy's build to be totally deterministic, though, then
+        # override with a specific version pin here, and manage updates ShellCheck yourself.
+        shellcheck-version: "v0.9.0"
 
-        # Ignore filepaths or filenames.
-        # Each is a single string, space-separated.
-        ignore_paths:
-        ignore_names:
-
-        # By default, your whole repo is scanned for shell scripts.
-        # Uncomment the next line if you want to limit to a certain directory.
-        #scandir: './scripts'
-
-        # This ensures that all .sh files are passed to shellcheck in one go, making
-        # ShellCheck aware of "include" logic (`source ./constants.sh`) between scripts.
-        check_together: 'yes'
-
+        # OPTIONAL:
+        # Command-line options to pass to ShellCheck.
+        # These options will be inserted into the shellcheck invocation, a la:
+        #   shellcheck <shellcheck-options> <input-files>
+        # For details of the options that are availble, run:
+        #   shellcheck --help
+        #shellcheck-options: ""
