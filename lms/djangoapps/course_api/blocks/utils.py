@@ -14,9 +14,26 @@ def filter_discussion_xblocks_from_response(response, course_key):
     configuration = DiscussionsConfiguration.get(context_key=course_key)
     provider = configuration.provider_type
     if provider == Provider.OPEN_EDX:
-        response.data['blocks'] = {
+        # Finding ids of discussion xblocks
+        discussion_xblocks = [
+            key for key, value in response.data.get('blocks', {}).items()
+            if value.get('type') == 'discussion'
+        ]
+        # Filtering discussion xblocks keys from blocks
+        filtered_blocks = {
             key: value
             for key, value in response.data.get('blocks', {}).items()
             if value.get('type') != 'discussion'
         }
+        # Removing reference of discussion xblocks from unit
+        # These references needs to be removed because they no longer exist
+        for _, block_data in filtered_blocks.items():
+            descendants = block_data.get('descendants', [])
+            if descendants:
+                descendants = [
+                    descendant for descendant in descendants
+                    if descendant not in discussion_xblocks
+                ]
+                block_data['descendants'] = descendants
+        response.data['blocks'] = filtered_blocks
     return response

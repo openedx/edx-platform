@@ -548,6 +548,37 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             response = self.client.get_html(settings_details_url)
             self.assertNotContains(response, "Course Short Description")
 
+    def test_empty_course_overview_keep_default_value(self):
+        """
+        Test saving the course with an empty course overview.
+
+        If the overview is empty - the save method should use the default
+        value for the field.
+        """
+        settings_details_url = get_url(self.course.id)
+
+        # add overview with empty value in json request.
+        test_data = {
+            'syllabus': 'none',
+            'short_description': 'test',
+            'overview': '',
+            'effort': '',
+            'intro_video': '',
+            'start_date': '2022-01-01',
+            'end_date': '2022-12-31',
+        }
+
+        response = self.client.post(
+            settings_details_url,
+            data=json.dumps(test_data),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json'
+        )
+        course_details = CourseDetails.fetch(self.course.id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(course_details.overview, '<p>&nbsp;</p>')
+
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
