@@ -181,6 +181,17 @@ def get_pages_and_resources_url(course_locator):
             pages_and_resources_url = f'{mfe_base_url}/course/{course_locator}/pages-and-resources'
     return pages_and_resources_url
 
+def get_video_upload_url(course_locator):
+    """
+    Gets course authoring microfrontend URL for videos upload page
+    """
+    video_upload_url = None
+    if use_new_video_editor():
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/editor'
+        if mfe_base_url:
+            video_upload_url = f'{course_mfe_url}/video_upload'
+    return video_upload_url
 
 def get_proctored_exam_settings_url(course_locator) -> str:
     """
