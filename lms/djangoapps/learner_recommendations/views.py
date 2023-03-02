@@ -16,15 +16,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.track import segment
-from openedx.core.djangoapps.catalog.utils import (
-    get_course_data,
-    get_course_run_details,
-)
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 from openedx.features.enterprise_support.utils import is_enterprise_learner
 from lms.djangoapps.learner_recommendations.toggles import enable_course_about_page_recommendations
 from lms.djangoapps.learner_recommendations.utils import (
-    get_algolia_courses_recommendation,
     get_amplitude_course_recommendations,
     filter_recommended_courses,
 )
@@ -32,35 +27,6 @@ from lms.djangoapps.learner_recommendations.serializers import RecommendationsSe
 
 
 log = logging.getLogger(__name__)
-
-
-class AlgoliaCoursesSearchView(APIView):
-    """
-    **Example Request**
-
-    GET api/learner_recommendations/algolia/courses/{course_id}/
-    """
-
-    authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser,)
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request, course_id):
-        """ Retrieves course recommendations from Algolia based on course skills. """
-
-        course_run_data = get_course_run_details(course_id, ["course"])
-        course_key_str = course_run_data.get("course", None)
-
-        # Fetching course level type and skills from discovery service.
-        course_data = get_course_data(course_key_str, ["level_type", "skill_names"])
-
-        # If discovery service fails to fetch data, we will not run recommendations engine.
-        if not course_data:
-            return Response({"courses": [], "count": 0}, status=200)
-
-        course_data["key"] = course_id
-        response = get_algolia_courses_recommendation(course_data)
-
-        return Response({"courses": response.get("hits", []), "count": response.get("nbHits", 0)}, status=200)
 
 
 class AmplitudeRecommendationsView(APIView):
