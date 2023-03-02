@@ -189,22 +189,24 @@ class TahoeUserMetadataProcessor(object):
             except AttributeError:
                 logger.warning(
                     "TahoeUserMetadataProcessor passed invalid type to "
-                    "get_user_id_from_event: {}".format(event_data)
+                    "get_user_id_from_event: {}. Likely innocuous. "
+                    "Logging and continuing.".format(event_data)
                 )
-            if user_id:
-                try:
-                    user = User.objects.get(id=user_id)
-                except User.DoesNotExist:
-                    return event
             else:
+                if user_id:
+                    try:
+                        user = User.objects.get(id=user_id)
+                    except User.DoesNotExist:
+                        pass
+                    else:
+                        # Add any Tahoe metadata context
+                        tahoe_user_metadata = self._get_user_tahoe_metadata(user.pk)
+                        if tahoe_user_metadata:
+                            event['context']['tahoe_user_metadata'] = tahoe_user_metadata
+            finally:
                 return event
-
-        # Add any Tahoe metadata context
-        tahoe_user_metadata = self._get_user_tahoe_metadata(user.pk)
-        if tahoe_user_metadata:
-            event['context']['tahoe_user_metadata'] = tahoe_user_metadata
-
-        return event
+        else:
+            return event
 
 
 userprofile_metadata_cache = TahoeUserProfileMetadataCache()
