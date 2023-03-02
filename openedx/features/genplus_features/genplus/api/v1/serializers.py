@@ -205,6 +205,8 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def save(self):
         self.set_password_form.save()
+        from django.contrib.auth import update_session_auth_hash
+        update_session_auth_hash(self.request, self.user)
 
 
 class ChangePasswordByTeacherSerializer(serializers.Serializer):

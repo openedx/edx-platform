@@ -424,8 +424,6 @@ class ChangePasswordView(GenzMixin, generics.GenericAPIView):
         })
         if serializer.is_valid():
             serializer.save()
-            # checking if the user has forced to change the password
-            print(serializer.data, "________________test pick")
             if is_force_change:
                 self.request.user.gen_user.has_password_changed = True
                 self.request.user.gen_user.save()
