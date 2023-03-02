@@ -4,8 +4,6 @@
 #
 #    make upgrade
 #
--e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
-    # via -r requirements/edx/base.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/base.txt
 aiohttp==3.8.4
@@ -953,6 +951,8 @@ oauthlib==3.0.1
     #   lti-consumer-xblock
     #   requests-oauthlib
     #   social-auth-core
+olxcleaner==0.2.1
+    # via -r requirements/edx/base.txt
 openedx-blockstore==1.2.6
     # via -r requirements/edx/base.txt
 openedx-calc==3.0.1
