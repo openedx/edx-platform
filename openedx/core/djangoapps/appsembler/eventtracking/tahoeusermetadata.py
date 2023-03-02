@@ -180,32 +180,31 @@ class TahoeUserMetadataProcessor(object):
         # eventtracking Processors are loaded before apps are ready
         from django.contrib.auth.models import User
 
-        user = get_current_user()
-        if not user or not user.pk:
-            # should be an AnonymousUser or in tests or Celery
-            event_data = event.get('data')
-            try:
-                user_id = utils.get_user_id_from_event(event_data)
-            except AttributeError:
-                logger.warning(
-                    "TahoeUserMetadataProcessor passed invalid type to "
-                    "get_user_id_from_event: {}. Likely innocuous. "
-                    "Logging and continuing.".format(event_data)
-                )
-            else:
-                if user_id:
-                    try:
-                        user = User.objects.get(id=user_id)
-                    except User.DoesNotExist:
-                        pass
-                    else:
-                        # Add any Tahoe metadata context
-                        tahoe_user_metadata = self._get_user_tahoe_metadata(user.pk)
-                        if tahoe_user_metadata:
-                            event['context']['tahoe_user_metadata'] = tahoe_user_metadata
-            finally:
-                return event
+        # Don't try to get the user from the request:  it could be an instructor doing
+        # a bulk enrollment or exception certificate triggering the event.  Only use the
+        # user from event itself.
+
+        event_data = event.get('data')
+        try:
+            user_id = utils.get_user_id_from_event(event_data)
+        except AttributeError:
+            logger.warning(
+                "TahoeUserMetadataProcessor passed invalid type to "
+                "get_user_id_from_event: {}. Likely innocuous. "
+                "Logging and continuing.".format(event_data)
+            )
         else:
+            if user_id:
+                try:
+                    user = User.objects.get(id=user_id)
+                except User.DoesNotExist:
+                    pass
+                else:
+                    # Add any Tahoe metadata context
+                    tahoe_user_metadata = self._get_user_tahoe_metadata(user.pk)
+                    if tahoe_user_metadata:
+                        event['context']['tahoe_user_metadata'] = tahoe_user_metadata
+        finally:
             return event
 
 
