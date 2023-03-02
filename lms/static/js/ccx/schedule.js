@@ -49,10 +49,10 @@ var edx = edx || {};
                 self.render();
             });
 
-      // By default input date and time fileds are disable.
+            // By default input date and time fileds are disable.
             self.disableFields($('.ccx_due_date_time_fields'));
             self.disableFields($('.ccx_start_date_time_fields'));
-      // Add unit handlers
+            // Add unit handlers
             this.chapter_select.on('change', function() {
                 var chapter_location = self.chapter_select.val();
                 self.vertical_select.html('').prop('disabled', true);
@@ -60,17 +60,17 @@ var edx = edx || {};
                     var chapter = self.find_unit(self.hidden, chapter_location);
                     self.sequential_select.html('')
                     // xss-lint: disable=javascript-jquery-append, javascript-concat-html
-          .append('<option value="all">' + gettext('All subsections') + '</option>')
-          .append(self.schedule_options(chapter.children)); // xss-lint: disable=javascript-jquery-append
+                        .append('<option value="all">' + gettext('All subsections') + '</option>')
+                        .append(self.schedule_options(chapter.children)); // xss-lint: disable=javascript-jquery-append
                     self.sequential_select.prop('disabled', false);
                     $('#add-unit-button').prop('disabled', false);
-          // When a chapter is selected, start date fields are enabled and due date
-          // fields are disabled because due dates are not applicable on a chapter.
+                    // When a chapter is selected, start date fields are enabled and due date
+                    // fields are disabled because due dates are not applicable on a chapter.
                     self.disableFields($('.ccx_due_date_time_fields'));
                     self.enableFields($('.ccx_start_date_time_fields'));
                 } else {
                     self.sequential_select.html('').prop('disabled', true);
-          // When no chapter is selected, all date fields are disabled.
+                    // When no chapter is selected, all date fields are disabled.
                     self.disableFields($('.ccx_due_date_time_fields'));
                     self.disableFields($('.ccx_start_date_time_fields'));
                 }
@@ -83,17 +83,17 @@ var edx = edx || {};
                         sequential = self.find_unit(self.hidden, chapter, sequential_location);
                     self.vertical_select.html('')
                     // xss-lint: disable=javascript-jquery-append, javascript-concat-html
-           .append('<option value="all">' + gettext('All units') + '</option>')
-           .append(self.schedule_options(sequential.children)); // xss-lint: disable=javascript-jquery-append
+                        .append('<option value="all">' + gettext('All units') + '</option>')
+                        .append(self.schedule_options(sequential.children)); // xss-lint: disable=javascript-jquery-append
                     self.vertical_select.prop('disabled', false);
                     self.set_datetime('start', sequential.start);
                     self.set_datetime('due', sequential.due);
-           // When a subsection (aka sequential) is selected,
-           // both start and due date fields are enabled.
+                    // When a subsection (aka sequential) is selected,
+                    // both start and due date fields are enabled.
                     self.enableFields($('.ccx_due_date_time_fields'));
                     self.enableFields($('.ccx_start_date_time_fields'));
                 } else {
-           // When "All subsections" is selected, all date fields are disabled.
+                    // When "All subsections" is selected, all date fields are disabled.
                     self.vertical_select.html('').prop('disabled', true);
                     self.disableFields($('.ccx_due_date_time_fields'));
                     self.enableFields($('.ccx_start_date_time_fields'));
@@ -106,35 +106,35 @@ var edx = edx || {};
                     var chapter = self.chapter_select.val(),
                         sequential = self.sequential_select.val();
                     var vertical = self.find_unit(
-          self.hidden, chapter, sequential, vertical_location);
-          // When a unit (aka vertical) is selected, all date fields are disabled because units
-          // inherit dates from subsection
+                        self.hidden, chapter, sequential, vertical_location);
+                    // When a unit (aka vertical) is selected, all date fields are disabled because units
+                    // inherit dates from subsection
                     self.disableFields($('.ccx_due_date_time_fields'));
                     self.disableFields($('.ccx_start_date_time_fields'));
                 } else {
-          // When "All units" is selected, all date fields are enabled,
-          // because units inherit dates from subsections and we
-          // are showing dates from the selected subsection.
+                    // When "All units" is selected, all date fields are enabled,
+                    // because units inherit dates from subsections and we
+                    // are showing dates from the selected subsection.
                     self.enableFields($('.ccx_due_date_time_fields'));
                     self.enableFields($('.ccx_start_date_time_fields'));
                 }
             });
 
-      // Add unit handler
+            // Add unit handler
             $('#add-unit-button').on('click', function(event) {
                 event.preventDefault();
-        // Default value of time is 00:00.
+                // Default value of time is 00:00.
                 var start, chapter, sequential, vertical, units, due;
                 start = self.get_datetime('start');
                 chapter = self.chapter_select.val();
                 sequential = self.sequential_select.val();
                 vertical = self.vertical_select.val();
                 units = self.find_lineage(
-          self.schedule,
-          chapter,
-          sequential === 'all' ? null : sequential,
-          vertical === 'all' ? null : vertical
-        );
+                    self.schedule,
+                    chapter,
+                    sequential === 'all' ? null : sequential,
+                    vertical === 'all' ? null : vertical
+                );
                 due = self.get_datetime('due');
                 var errorMessage = self.valid_dates(start, due);
                 if (_.isUndefined(errorMessage)) {
@@ -160,7 +160,7 @@ var edx = edx || {};
                 }
             });
 
-      // Handle save button
+            // Handle save button
             $('#dirty-schedule #save-changes').on('click', function(event) {
                 event.preventDefault();
                 self.save();
@@ -175,12 +175,12 @@ var edx = edx || {};
             this.showing = this.pruned(self.schedule, function(node) {
                 return !node.hidden;
             });
-      // schedule_template defined globally in ccx\schedule.html
-      /* globals schedule_template */
+            // schedule_template defined globally in ccx\schedule.html
+            /* globals schedule_template */
             this.$el.html(schedule_template({chapters: this.showing})); // xss-lint: disable=javascript-jquery-html
             $('table.ccx-schedule .sequential,.vertical').hide();
             $('table.ccx-schedule .unit .toggle-collapse').on('click', this.toggle_collapse);
-      // Hidden hover fields for empty date fields
+            // Hidden hover fields for empty date fields
             $('table.ccx-schedule .date button').each(function() {
                 if ($(this).text().trim() === gettext('Click to change')) {
                     // xss-lint: disable=javascript-jquery-html, javascript-concat-html
@@ -189,16 +189,16 @@ var edx = edx || {};
                 }
             });
 
-      // Handle date edit clicks
+            // Handle date edit clicks
             $('table.ccx-schedule .date button').attr('href', '#enter-date-modal')
-      .leanModal({closeButton: '.close-modal'});
+                .leanModal({closeButton: '.close-modal'});
             $('table.ccx-schedule .due-date button').on('click', this.enterNewDate('due'));
             $('table.ccx-schedule .start-date button').on('click', this.enterNewDate('start'));
-      // click handler for expand all
+            // click handler for expand all
             $('#ccx_expand_all_btn').on('click', self.expandAll);
-      // click handler for collapse all
+            // click handler for collapse all
             $('#ccx_collapse_all_btn').on('click', self.collapseAll);
-      // Click handler for remove all
+            // Click handler for remove all
             $('table.ccx-schedule button#remove-all').on('click', function(event) {
                 event.preventDefault();
                 self.schedule_apply(self.schedule, self.hide);
@@ -206,7 +206,7 @@ var edx = edx || {};
                 self.schedule_collection.set(self.schedule);
                 self.render();
             });
-      // Remove unit handler
+            // Remove unit handler
             $('table.ccx-schedule button.remove-unit').on('click', function() {
                 var row = $(this).closest('tr'),
                     path = row.data('location').split(' '),
@@ -217,13 +217,13 @@ var edx = edx || {};
                 self.render();
             });
 
-      // Show or hide form
+            // Show or hide form
             if (this.hidden.length) {
-        // Populate chapters select, depopulate others
+                // Populate chapters select, depopulate others
                 this.chapter_select.html('')
                 // xss-lint: disable=javascript-jquery-append, javascript-concat-html
-        .append('<option value="none">' + gettext('Select a chapter') + '...</option>')
-        .append(self.schedule_options(this.hidden)); // xss-lint: disable=javascript-jquery-append
+                    .append('<option value="none">' + gettext('Select a chapter') + '...</option>')
+                    .append(self.schedule_options(this.hidden)); // xss-lint: disable=javascript-jquery-append
                 this.sequential_select.html('').prop('disabled', true);
                 this.vertical_select.html('').prop('disabled', true);
                 $('form#add-unit').show();
@@ -234,14 +234,14 @@ var edx = edx || {};
                 $('#all-units-added').show();
             }
 
-      // Show or hide save button
+            // Show or hide save button
             if (this.dirty) {
                 $('#dirty-schedule').show();
                 $('html, body').animate(
-          {scrollTop: $('#dirty-schedule').offset().top},
-          'slow', function() {
-              $('#dirty-schedule').focus();
-          });
+                    {scrollTop: $('#dirty-schedule').offset().top},
+                    'slow', function() {
+                        $('#dirty-schedule').focus();
+                    });
             } else {
                 $('#dirty-schedule').hide();
             }
@@ -254,8 +254,8 @@ var edx = edx || {};
             self.schedule_collection.set(self.schedule);
             var $button = $('#dirty-schedule #save-changes');
             $button.prop('disabled', true).text(gettext('Saving'));
-      // save_url defined globally in ccx\schedule.html
-      /* globals save_url */
+            // save_url defined globally in ccx\schedule.html
+            /* globals save_url */
             $.ajax({
                 url: save_url,
                 type: 'POST',
@@ -266,8 +266,8 @@ var edx = edx || {};
                     self.render();
                     $button.prop('disabled', false).text(gettext('Save changes'));
 
-          // Update textarea with grading policy JSON, since grading policy
-          // may have changed.
+                    // Update textarea with grading policy JSON, since grading policy
+                    // may have changed.
                     $('#grading-policy').text(data.grading_policy);
                 },
                 error: function(jqXHR) {
@@ -294,7 +294,7 @@ var edx = edx || {};
 
         valid_dates: function(start, due) {
             var errorMessage;
-      // Start date is compulsory and due date is optional.
+            // Start date is compulsory and due date is optional.
             if (_.isEmpty(start) && !_.isEmpty(due)) {
                 errorMessage = gettext('Please enter valid start date and time.');
             } else if (!_.isEmpty(start) && !_.isEmpty(due)) {
@@ -330,8 +330,8 @@ var edx = edx || {};
         schedule_options: function(nodes) {
             return nodes.map(function(node) {
                 return $('<option>')
-          .attr('value', node.location)
-          .text(node.display_name)[0];
+                    .attr('value', node.location)
+                    .text(node.display_name)[0];
             });
         },
 
@@ -346,16 +346,16 @@ var edx = edx || {};
 
         pruned: function(tree, filter) {
             return tree.filter(filter)
-        .map(function(node) {
-            var copy = {};
-            $.extend(copy, node);
-            if (node.children) {
-                copy.children = self.pruned(node.children, filter);
-            }
-            return copy;
-        }).filter(function(node) {
-            return node.children === undefined || node.children.length;
-        });
+                .map(function(node) {
+                    var copy = {};
+                    $.extend(copy, node);
+                    if (node.children) {
+                        copy.children = self.pruned(node.children, filter);
+                    }
+                    return copy;
+                }).filter(function(node) {
+                    return node.children === undefined || node.children.length;
+                });
         },
 
         disableFields: function($selector) {
@@ -385,7 +385,7 @@ var edx = edx || {};
                 if ($childNodes.length <= 0) {
                     children.show();
                 } else {
-          // this will expand units.
+                    // this will expand units.
                     $childNodes.each(function() {
                         var depthChild = $(this).data('depth');
                         if (depth === (depthChild - 1)) {
@@ -428,12 +428,12 @@ var edx = edx || {};
             return function() {
                 var row = $(this).closest('tr');
                 var modal = $('#enter-date-modal')
-        .data('what', what)
-        .data('location', row.data('location'));
+                    .data('what', what)
+                    .data('location', row.data('location'));
                 modal.find('h2').text(
-          what === 'due' ? gettext('Enter Due Date and Time') :
-          gettext('Enter Start Date and Time')
-        );
+                    what === 'due' ? gettext('Enter Due Date and Time') :
+                        gettext('Enter Start Date and Time')
+                );
                 modal.focus();
                 $(document).on('focusin', function(event) {
                     try {
@@ -492,9 +492,9 @@ var edx = edx || {};
         },
 
         updateChildrenDates: function(sequential, date_type, date) {
-      // This code iterates the children (aka verticals) of a sequential.
-      // It updates start and due dates to corresponding dates
-      // of sequential (parent).
+            // This code iterates the children (aka verticals) of a sequential.
+            // It updates start and due dates to corresponding dates
+            // of sequential (parent).
             _.forEach(sequential.children, function(unit) {
                 if (date_type === 'start') {
                     unit.start = date;
@@ -531,10 +531,10 @@ var edx = edx || {};
         get_children: function(row) {
             var depth = $(row).data('depth');
             return $(row).nextUntil(
-        $(row).siblings().filter(function() {
-            return $(this).data('depth') <= depth;
-        })
-      );
+                $(row).siblings().filter(function() {
+                    return $(this).data('depth') <= depth;
+                })
+            );
         }
     });
 }(jQuery, _, Backbone, gettext));

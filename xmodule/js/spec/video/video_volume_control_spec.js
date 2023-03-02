@@ -12,7 +12,7 @@
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-            .and.returnValue(null);
+                .and.returnValue(null);
         });
 
         afterEach(function() {
@@ -54,8 +54,8 @@
                     slide: jasmine.any(Function)
                 }]);
                 expect($.fn.slider).toHaveBeenCalledWith(
-                'value', volumeControl.volume
-            );
+                    'value', volumeControl.volume
+                );
             });
 
             it('add ARIA attributes to live region', function() {
@@ -202,7 +202,7 @@
                 var $button = $('.volume .control');
                 volumeControl.volume = 60;
 
-            // adjust the volume
+                // adjust the volume
                 $button.focus();
                 $button.trigger(keyPressEvent(KEY.UP));
                 expect(volumeControl.volume).toEqual(80);
@@ -225,7 +225,7 @@
                 var $button = $('.volume .control');
                 volumeControl.volume = 60;
 
-            // adjust the volume
+                // adjust the volume
                 $button.focus();
                 $button.trigger(keyPressEvent(KEY.DOWN));
                 expect(volumeControl.volume).toEqual(40);

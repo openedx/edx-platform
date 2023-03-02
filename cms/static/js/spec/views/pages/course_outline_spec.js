@@ -1109,7 +1109,7 @@ describe('CourseOutlinePage', function() {
             }
         };
 
-          modalSettingsWithExamReviewRules = {
+        modalSettingsWithExamReviewRules = {
             graderType: 'notgraded',
             isPrereq: false,
             metadata: {
@@ -1362,7 +1362,7 @@ describe('CourseOutlinePage', function() {
         it('review rules exists', function() {
             createCourseOutlinePage(this, mockCourseJSONWithReviewRules, false);
             outlinePage.$('.outline-subsection .configure-button').click();
-             $('.wrapper-modal-window .action-save').click();
+            $('.wrapper-modal-window .action-save').click();
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', modalSettingsWithExamReviewRules);
             expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
         });

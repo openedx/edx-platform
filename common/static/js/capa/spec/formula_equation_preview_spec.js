@@ -22,7 +22,7 @@ describe('escapeSelector', function() {
         // escaped when embedding/searching xblock IDs using css selectors, bad things happen.
         expect(escapeSelector('course-v1:edX+DemoX+Demo_Course')).toEqual('course-v1\\:edX\\+DemoX\\+Demo_Course');
         expect(escapeSelector('block-v1:edX+DemoX+Demo_Course+type@sequential+block')).toEqual(
-          'block-v1\\:edX\\+DemoX\\+Demo_Course\\+type\\@sequential\\+block'
+            'block-v1\\:edX\\+DemoX\\+Demo_Course\\+type\\@sequential\\+block'
         );
     });
 });

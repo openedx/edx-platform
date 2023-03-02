@@ -63,7 +63,7 @@
 
                 if(enableCoppaCompliance){
                     var currentYear = new Date().getFullYear(),
-                    isOlderThanMinimum = (currentYear - yearOfBirth) >= minimumAllowedAge;
+                        isOlderThanMinimum = (currentYear - yearOfBirth) >= minimumAllowedAge;
                     return isBirthDefined && isOlderThanMinimum && !(this.get('requires_parental_consent'));
                 }
                 return isBirthDefined && !(this.get('requires_parental_consent'));

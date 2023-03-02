@@ -44,18 +44,18 @@
 
             showFoundMessage: function(count) {
                 var msg = ngettext(
-                'Viewing %s course',
-                'Viewing %s courses',
-                count
-            );
+                    'Viewing %s course',
+                    'Viewing %s courses',
+                    count
+                );
                 this.$message.html(interpolate(msg, [count]));
             },
 
             showNotFoundMessage: function(term) {
                 var msg = interpolate(
-                gettext('We couldn\'t find any results for "%s".'),
-                [_.escape(term)]
-            );
+                    gettext('We couldn\'t find any results for "%s".'),
+                    [_.escape(term)]
+                );
                 this.$message.html(msg);
                 this.clearSearch();
             },
