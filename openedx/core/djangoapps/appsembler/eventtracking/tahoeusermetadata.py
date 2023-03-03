@@ -194,15 +194,10 @@ class TahoeUserMetadataProcessor(object):
             )
         else:
             if user_id:
-                try:
-                    user = User.objects.get(id=user_id)
-                except User.DoesNotExist:
-                    pass
-                else:
-                    # Add any Tahoe metadata context
-                    tahoe_user_metadata = self._get_user_tahoe_metadata(user.pk)
-                    if tahoe_user_metadata:
-                        event['context']['tahoe_user_metadata'] = tahoe_user_metadata
+                # Add any Tahoe metadata context
+                tahoe_user_metadata = self._get_user_tahoe_metadata(user_id)
+                if tahoe_user_metadata:
+                    event['context']['tahoe_user_metadata'] = tahoe_user_metadata
         finally:
             return event
 
