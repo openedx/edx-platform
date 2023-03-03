@@ -9,7 +9,7 @@ from openedx.core.djangoapps.appsembler.eventtracking.exceptions import (
     EventProcessingError,
 )
 from openedx.core.djangoapps.appsembler.eventtracking.utils import (
-    get_site_config_for_event,
+    get_site_config_for_event, get_user_id_from_event
 )
 
 from openedx.core.djangoapps.site_configuration.tests.factories import (
@@ -102,3 +102,55 @@ def test_event_raises_exception_on_no_course_id_found(caplog):
         with pytest.raises(EventProcessingError):
             get_site_config_for_event(dict(course_id='no-course-id'))
     assert 'get_site_config_for_event: Cannot get site config for event' in caplog.text, 'Should log the exception'
+
+
+TEST_EVENT_FOR_USER_IDS_ONE = {
+    "user_id": None,
+    "context": {
+        "course_id": "course-v1:org+course+run",
+        "path": "/user_api/v1/account/registration/",
+        "user_id": 1,  # for example an Instructor
+        "org_id": "org"
+    },
+    "event_type": "edx.course.enrollment.activated",
+    "username": "",
+    "host": "host.tld",
+    "event": {
+        "course_id": "course-v1:org+course+run",
+        "user_id": 2,
+        "context": {
+            "user_id": 3
+        }
+    },
+    "referer": "https://host.tld/register"
+}
+
+TEST_EVENT_FOR_USER_IDS_TWO = {
+    "user_id": 1,
+    "context": {
+        "course_id": "course-v1:org+course+run",
+        "path": "/user_api/v1/account/registration/",
+        "user_id": 3,  # for example an Instructor
+        "org_id": "org"
+    },
+    "event_type": "edx.course.enrollment.activated",
+    "username": "",
+    "host": "host.tld",
+    "event": {
+        "course_id": "course-v1:org+course+run",
+        "user_id": "",  # not sure if this would ever occur, but let's test
+    },
+    "referer": "https://host.tld/register"
+}
+
+TEST_EVENTS_FOR_USER_IDS = [TEST_EVENT_FOR_USER_IDS_ONE, TEST_EVENT_FOR_USER_IDS_TWO]
+
+
+@pytest.mark.parametrize('event', TEST_EVENTS_FOR_USER_IDS)
+def test_get_user_id_from_event(event):
+    """
+    Test getting user_id from event properties.
+    In some cases a user_id may be in context, in others in event.context, or event.context.event.
+    """
+    # 3 is the id of the deepest valid user_id
+    assert get_user_id_from_event(event) == 3

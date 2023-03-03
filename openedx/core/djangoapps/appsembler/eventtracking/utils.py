@@ -108,8 +108,8 @@ def get_user_id_from_event(event_props):
         return dict(_flatten_dict_gen(d, parent_key, sep))
 
     user_id_props = {
-        key: val for (key, val) in _flatten_dict(event_props).items()
-        if 'user_id' in key and val is not None
+        key: int(val) for (key, val) in _flatten_dict(event_props).items()
+        if 'user_id' in key and val is not None and bool(val) and int(val)
     }
     deepest_user_id_prop = sorted(user_id_props.keys(), key=lambda x: x.count('.'), reverse=True)
     prefer_event_over_context = sorted(deepest_user_id_prop, key=lambda x: 'event' in x, reverse=True)
