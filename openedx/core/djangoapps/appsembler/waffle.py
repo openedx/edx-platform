@@ -36,11 +36,14 @@ def waffle_flags():
     }
 
 
-def disable_tpa_create_user_step():
+def disable_tpa_create_user_step(request):
     """
     Returns whether use of the create_user step in the third_party_auth pipeline is disabled or not.
     It does not appear to be necessary because the hidden registration form POSTs to /user_authn/
     endpoint to create a user prior this step.  The step adds complexity and may not be needed or
-    even cause issues.  Using a Waffle Flag to be able to activate selectively for production testing.
+    even cause issues.  Using a Waffle Flag to be able to activate selectively for production
+    testing.
     """
-    return waffle_flags()[DISABLE_TPA_PIPELINE_SOCIALCORE_CREATE_USER_STEP].is_active()
+    return waffle().flag_is_active(
+        request, waffle_flags()[DISABLE_TPA_PIPELINE_SOCIALCORE_CREATE_USER_STEP]
+    )

@@ -6,6 +6,8 @@ import logging
 import beeline
 import tahoe_sites.api
 
+from openedx.core.djangoapps.appsembler import waffle as appsembler_waffle
+from social_core.pipeline.user import create_user as social_core_create_user
 
 from tahoe_idp import api as tahoe_idp_api
 
@@ -61,3 +63,14 @@ def tahoe_idp_user_updates(auth_entry, strategy, details, user=None, *args, **kw
 
         # TODO: Directly call `tahoe_idp.api` function may not be a good idea, find a better signal or hook instead.
         tahoe_idp_api.update_tahoe_user_id(user)
+
+
+def wrapped_social_core_create_user(strategy, details, backend, user=None, *args, **kwargs):
+    """
+    Wrapped social_core.pipeline.create_user
+    Check to disable based on Waffle Flag.
+    """
+    if appsembler_waffle.disable_tpa_create_user_step(strategy.request):  # effectively disable
+        return {'is_new': False}
+    else:
+        social_core_create_user(strategy, details, backend, user, *args, **kwargs)

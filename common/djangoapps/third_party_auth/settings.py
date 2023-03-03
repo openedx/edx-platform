@@ -14,8 +14,6 @@ If true, it:
 from django.conf import settings
 from openedx.features.enterprise_support.api import insert_enterprise_pipeline_elements
 
-from openedx.core.djangoapps.appsembler import waffle as appsembler_waffle
-
 
 def apply_settings(django_settings):
     """Set provider-independent settings."""
@@ -59,7 +57,9 @@ def apply_settings(django_settings):
         'third_party_auth.pipeline.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
         'third_party_auth.pipeline.ensure_user_information',
-        'social_core.pipeline.user.create_user',
+        # wrap social_core.pipeline.user.create_user so we can test selectively disabling
+        'openedx.core.djangoapps.appsembler.tahoe_idp.tpa_pipeline.wrapped_social_core_create_user',
+        # 'social_core.pipeline.user.create_user',
         'social_core.pipeline.social_auth.associate_user',
         'social_core.pipeline.social_auth.load_extra_data',
         'social_core.pipeline.user.user_details',
@@ -69,14 +69,6 @@ def apply_settings(django_settings):
         'third_party_auth.pipeline.set_logged_in_cookies',
         'third_party_auth.pipeline.login_analytics',
     ]
-
-    # APPSEMBLER:  As the user is created during the /auth/complete -> /register
-    # via the hidden form POST, the create_user step is a duplicate step and may
-    # cause issues.  But try this first behind a Waffle Flag so it can be .
-    if appsembler_waffle.disable_tpa_create_user_step():
-        django_settings.SOCIAL_AUTH_PIPELINE.pop(
-            django_settings.SOCIAL_AUTH_PIPELINE.index('social_core.pipeline.user.create_user')
-        )
 
     # Add enterprise pipeline elements if the enterprise app is installed
     insert_enterprise_pipeline_elements(django_settings.SOCIAL_AUTH_PIPELINE)
