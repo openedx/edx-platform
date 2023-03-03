@@ -10,5 +10,5 @@ urlpatterns = [
         'generate_report',
         SurveyReportView.as_view(),
         name='openedx.generate_survey_report',
-    )
+    ),
 ]
