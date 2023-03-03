@@ -16,6 +16,8 @@ Where? appsembler.eventracking.sites is a likely candidate as the purpose of the
 `get_site_config_for_event` is specific to sites.
 """
 
+
+from collections.abc import MutableMapping
 import logging
 
 from django.core.exceptions import MultipleObjectsReturned
@@ -80,26 +82,40 @@ def get_site_config_for_event(event_props):
 
 def get_user_id_from_event(event_props):
     """
-    Get a user id from event properties.
+    Get a user id from event properties, preferring deepest-nested user_id value.
 
-    For events emitted without a request. This would generally be an event emitted
+    Use in favor of trying to get the user_id from the request (django_crum-based).
+    Needed for all events emitted without a request, e.g., an event emitted
     by a Celery worker, e.g., `edx.bi.completion.*` or `.grade_calculated` events.
+    Some events are also emitted with a user in the request which is an instructor or
+    other initiating user that is not the actual user tied to the event itself.
     """
 
     user_id = None
-    if event_props.get('user_id'):
-        user_id = event_props['user_id']
-    else:
-        event = event_props.get('event', {})
-        context = event_props.get('context', {})
-        event_context = event.get('context', {})
-        if context.get('user_id'):
-            user_id = context.get('user_id')
-            return user_id
-        if event.get('user_id'):
-            user_id = event.get('user_id')
-            return user_id
-        if event_context.get('user_id'):
-            user_id = event_context.get('user_id')
-            return user_id
+
+    # ... typically the most interior object will have a good user_id
+    # search event props to find the deepest valid user_id :\
+
+    def _flatten_dict(d, parent_key='', sep='.'):
+        def _flatten_dict_gen(d, parent_key, sep):
+            for k, v in d.items():
+                new_key = parent_key + sep + k if parent_key else k
+                if isinstance(v, MutableMapping):
+                    yield from _flatten_dict(v, new_key, sep=sep).items()
+                else:
+                    yield new_key, v
+
+        return dict(_flatten_dict_gen(d, parent_key, sep))
+
+    user_id_props = {
+        key: int(val) for (key, val) in _flatten_dict(event_props).items()
+        if 'user_id' in key and val is not None and bool(val) and int(val)
+    }
+    deepest_user_id_prop = sorted(user_id_props.keys(), key=lambda x: x.count('.'), reverse=True)
+    prefer_event_over_context = sorted(deepest_user_id_prop, key=lambda x: 'event' in x, reverse=True)
+    try:
+        best_user_id_prop = prefer_event_over_context[0]
+        user_id = user_id_props[best_user_id_prop]
+    except IndexError:
+        pass
     return user_id
