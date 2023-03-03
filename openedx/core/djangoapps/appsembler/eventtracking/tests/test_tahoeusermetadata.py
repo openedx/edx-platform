@@ -72,8 +72,8 @@ def test_for_metadata_no_cache(users, base_event, processor):
     event_with_metadata = deepcopy(base_event)
     event_with_metadata.update(context=TAHOE_USER_METADATA_CONTEXT)
 
-    with patch(EVENTTRACKING_MODULE + '.tahoeusermetadata.get_current_user', MagicMock()) as mocked:
-        mocked.return_value = users[1]
+    with patch(EVENTTRACKING_MODULE + '.tahoeusermetadata.utils.get_user_id_from_event', MagicMock()) as mocked:
+        mocked.return_value = users[1].id
         event = processor(base_event)
         assert event == event_with_metadata
 
@@ -81,38 +81,7 @@ def test_for_metadata_no_cache(users, base_event, processor):
 @pytest.mark.django_db
 def test_no_context_added_if_no_metadata_of_interest(users, base_event, processor):
     """Test happy path, Processor returns the event with user metadata in `context`."""
-    with patch(EVENTTRACKING_MODULE + '.tahoeusermetadata.get_current_user', MagicMock()) as mocked:
-        mocked.return_value = users[0]
+    with patch(EVENTTRACKING_MODULE + '.tahoeusermetadata.utils.get_user_id_from_event', MagicMock()) as mocked:
+        mocked.return_value = users[0].id
         event = processor(base_event)
         assert event == base_event
-
-
-@pytest.mark.xfail
-@pytest.mark.django_db
-def test_get_user_from_db_when_not_avail_from_request(users, base_event, processor):
-    """
-    Test addition for events from Celery workers and otherwise without a request.
-
-    In some cases a user_id may be in context,  in others in event.context
-    """
-    # set up event we want to match
-    event_with_metadata = deepcopy(base_event)
-    event_with_metadata.update(context=TAHOE_USER_METADATA_CONTEXT)
-
-    with patch(EVENTTRACKING_MODULE + '.tahoeusermetadata.get_current_user', MagicMock()) as mocked:
-        mocked.return_value = None
-        event_with_user_id_in_context = deepcopy(base_event)
-        event_with_user_id_in_context.update({'context': {'user_id': users[1].id}})
-
-        event_with_user_id_in_event_context = deepcopy(base_event)
-        event_with_user_id_in_event_context['event'].update({'context': {'user_id': users[1].id}})
-
-        # this test can just exercise the context addition
-        event_context_processed = processor(event_with_user_id_in_context)
-        assert event_context_processed["context"].get("tahoe_user_metadata")
-        assert event_context_processed["context"]["tahoe_user_metadata"] == \
-            event_with_metadata["context"]["tahoe_user_metadata"]
-
-        event_event_context_processed = processor(event_with_user_id_in_event_context)
-        assert event_event_context_processed["context"]["tahoe_user_metadata"] == \
-            event_with_metadata["context"]["tahoe_user_metadata"]

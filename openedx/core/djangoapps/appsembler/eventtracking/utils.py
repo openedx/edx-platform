@@ -94,7 +94,7 @@ def get_user_id_from_event(event_props):
     user_id = None
 
     # ... typically the most interior object will have a good user_id
-    # search event props to find the deepest user_id :\
+    # search event props to find the deepest valid user_id :\
 
     def _flatten_dict(d, parent_key='', sep='.'):
         def _flatten_dict_gen(d, parent_key, sep):

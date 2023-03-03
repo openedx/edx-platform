@@ -8,7 +8,6 @@ from json.decoder import JSONDecodeError
 import logging
 
 from celery import task
-from crum import get_current_user
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
 
