@@ -18,8 +18,10 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .edit-button': 'editXBlock',
             'click .access-button': 'editVisibilitySettings',
             'click .duplicate-button': 'duplicateXBlock',
+            'click .copy-button': 'copyXBlock',
             'click .move-button': 'showMoveXBlockModal',
             'click .delete-button': 'deleteXBlock',
+            'click .show-actions-menu-button': 'showXBlockActionsMenu',
             'click .new-component-button': 'scrollToNewComponentButtons'
         },
 
@@ -213,6 +215,23 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             });
         },
 
+        /**
+         * If the new "Actions" menu is enabled, most XBlock actions like
+         * Duplicate, Move, Delete, Manage Access, etc. are moved into this
+         * menu. For this event, we just toggle displaying the menu.
+         * @param {*} event 
+         */
+        showXBlockActionsMenu: function(event) {
+            const showActionsButton = event.currentTarget;
+            const subMenu = showActionsButton.parentElement.querySelector(".wrapper-nav-sub");
+            // Code in 'base.js' normally handles toggling these dropdowns but since this one is
+            // not present yet during the domReady event, we have to handle displaying it ourselves.
+            subMenu.classList.toggle("is-shown");
+            // if propagation is not stopped, the event will bubble up to the
+            // body element, which will close the dropdown.
+            event.stopPropagation();
+        },
+
         editVisibilitySettings: function(event) {
             this.editXBlock(event, {
                 view: 'visibility_view',
@@ -274,6 +293,12 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 });
         },
 
+        copyXBlock: function(event) {
+            event.preventDefault();
+            // This is a new feature, hidden behind a feature flag.
+            alert("Copying of XBlocks is coming soon.");
+        },
+
         duplicateComponent: function(xblockElement) {
             // A placeholder element is created in the correct location for the duplicate xblock
             // and then onNewXBlock will replace it with a rendering of the xblock. Note that
@@ -320,8 +345,8 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         },
 
         /*
-            After move operation is complete, updates the xblock information from server .
-             */
+         * After move operation is complete, updates the xblock information from server .
+         */
         onXBlockMoved: function() {
             this.model.fetch();
         },
@@ -350,12 +375,12 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         },
 
         /**
-             * Refreshes the specified xblock's display. If the xblock is an inline child of a
-             * reorderable container then the element will be refreshed inline. If not, then the
-             * parent container will be refreshed instead.
-             * @param element An element representing the xblock to be refreshed.
-             * @param block_added Flag to indicate that new block has been just added.
-             */
+         * Refreshes the specified xblock's display. If the xblock is an inline child of a
+         * reorderable container then the element will be refreshed inline. If not, then the
+         * parent container will be refreshed instead.
+         * @param element An element representing the xblock to be refreshed.
+         * @param block_added Flag to indicate that new block has been just added.
+         */
         refreshXBlock: function(element, block_added, is_duplicate) {
             var xblockElement = this.findXBlockElement(element),
                 parentElement = xblockElement.parent(),
@@ -370,13 +395,13 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         },
 
         /**
-             * Refresh an xblock element inline on the page, using the specified xblockInfo.
-             * Note that the element is removed and replaced with the newly rendered xblock.
-             * @param xblockElement The xblock element to be refreshed.
-             * @param block_added Specifies if a block has been added, rather than just needs
-             * refreshing.
-             * @returns {jQuery promise} A promise representing the complete operation.
-             */
+         * Refresh an xblock element inline on the page, using the specified xblockInfo.
+         * Note that the element is removed and replaced with the newly rendered xblock.
+         * @param xblockElement The xblock element to be refreshed.
+         * @param block_added Specifies if a block has been added, rather than just needs
+         * refreshing.
+         * @returns {jQuery promise} A promise representing the complete operation.
+         */
         refreshChildXBlock: function(xblockElement, block_added, is_duplicate) {
             var self = this,
                 xblockInfo,
