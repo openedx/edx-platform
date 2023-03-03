@@ -4,14 +4,13 @@ Test that various filters are fired for models/views in the student app.
 from django.http import HttpResponse
 from django.test import override_settings
 from django.urls import reverse
-from lms.djangoapps.mobile_api.users.views import UserCourseEnrollmentsList
 from openedx.core.djangoapps.enrollments.data import get_course_enrollments
 from openedx_filters import PipelineStep
 from openedx_filters.learning.filters import (
     DashboardRenderStarted,
     CourseEnrollmentStarted,
     CourseUnenrollmentStarted,
-    CourseEnrollmentQuerysetRequested
+    CourseEnrollmentQuerysetRequested,
 )
 from rest_framework import status
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -230,6 +229,8 @@ class EnrollmentFiltersTest(ModuleStoreTestCase):
             - CourseEnrollmentQuerysetRequested is triggered and executes TestCourseEnrollmentsPipelineStep.
             - The result is a list of course enrollments queryset filter by org
         """
+
+        from lms.djangoapps.mobile_api.users.views import UserCourseEnrollmentsList
 
         enrollments_list = UserCourseEnrollmentsList()
         enrollments = enrollments_list.get_queryset()
