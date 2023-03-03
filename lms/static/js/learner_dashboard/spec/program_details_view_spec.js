@@ -579,7 +579,7 @@ describe('Program Details Header View', () => {
     view.render();
     expect($(view.$('.upgrade-message .card-msg')).text().trim()).toEqual('Certificate Status:');
     expect($(view.$('.upgrade-message .price')).text().trim()).toEqual('$10.00');
-    expect($(view.$('.upgrade-button.single-course-run')[0]).text().trim()).toEqual('Upgrade to Verified');
+    expect($(view.$('.upgrade-button.single-course-run')[0]).text().trim()).toEqual('Upgrade with Subscription');
   });
 
   it('should render full program purchase link', () => {

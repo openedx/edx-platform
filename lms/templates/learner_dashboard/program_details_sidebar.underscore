@@ -9,6 +9,30 @@
 </aside>
 <aside class="aside js-course-certificates"></aside>
 <aside class="aside js-program-record program-record">
+    <h2 class="divider-heading"><%- gettext('Inactive Subscription') %></h2>
+    <div class="motivating-section">
+        <p class="motivating-message"><%- gettext('If you had a subscription previously, your payment history is still available on the <em>My Orders and Subscriptions</em> page') %></p>
+    </div>
+    <div class="sidebar-button-wrapper">
+        <a href="<%- programRecordUrl %>" class="program-record-link">
+            <span>My Orders and Subscriptions</span>
+        </a>
+    </div>
+    <div class="motivating-section">
+        <p class="motivating-message"><%- gettext('Need help? Check out our help articles to troubleshoot issues or contact support') %></p>
+    </div>
+    <div class="sidebar-button-wrapper">
+        <a href="<%- programRecordUrl %>" class="program-record-link">
+            <span>Support Articles</span>
+        </a>
+    </div>
+    <div class="sidebar-button-wrapper">
+        <a href="<%- programRecordUrl %>" class="program-record-link">
+            <span>support-subscription@edx.org</span>
+        </a>
+    </div>
+</aside>
+<aside class="aside js-program-record program-record">
     <h2 class="divider-heading"><%- gettext('Program Record') %></h2>
     <div class="motivating-section">
         <p class="motivating-message"><%- gettext('Once you complete one of the program requirements you have a program record. This record is marked complete once you meet all program requirements. A program record can be used to continue your learning journey and demonstrate your learning to others.') %></p>

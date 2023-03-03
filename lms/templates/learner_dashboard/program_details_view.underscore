@@ -20,6 +20,10 @@
                         'Track and plan your progress through the %(count)s courses in this program. To complete the program, you must earn a verified certificate for each course.'),
                         { count: totalCount }, true) %>
                     </div>
+                    <a href="<%- upgrade_url %>" class="btn-brand btn cta-primary upgrade-button single-course-run program_dashboard_course_upsell_button">
+                        <%- gettext('Start 7-day free trial') %>
+                    <a>
+                    <span><%- gettext('$39/month subscription after trial ends. Cancel anytime.') %></span>
                 </div>
             <% } %>
             <% if (is_learner_eligible_for_one_click_purchase && (typeof is_mobile_only === 'undefined' || is_mobile_only === false)) { %>
@@ -49,6 +53,7 @@
                     <span class="count"><%- inProgressCount %></span>
                 </h4>
                 <div class="course-list js-course-list-in-progress row"></div>
+                <div class="course-list js-course-list-in-progress row"></div> <!-- TODO: change to be Upgrade with Subscription -->
             </div>
         <% } %>
         <% if (remainingCount) { %>
