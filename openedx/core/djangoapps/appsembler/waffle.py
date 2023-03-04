@@ -44,6 +44,4 @@ def disable_tpa_create_user_step(request):
     even cause issues.  Using a Waffle Flag to be able to activate selectively for production
     testing.
     """
-    return waffle().flag_is_active(
-        request, waffle_flags()[DISABLE_TPA_PIPELINE_SOCIALCORE_CREATE_USER_STEP]
-    )
+    return waffle().is_flag_active(DISABLE_TPA_PIPELINE_SOCIALCORE_CREATE_USER_STEP)
