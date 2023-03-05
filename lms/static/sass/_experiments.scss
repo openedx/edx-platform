@@ -512,3 +512,38 @@
     }
   }
 }
+
+// AU 972 Social Video Sharing Page
+.public-video-share-cta {
+  position: relative;
+  float: right;
+  z-index: 1;
+
+  .btn-learn-more{
+    @extend %btn-shims;
+    color: #00262B;
+    background: #FFFFFF;
+    border-color: #F2F0EF;
+    &:hover,
+    &:active,
+    &:focus {
+      background: darken(#FFFFFF, 7%);
+      border-color: darken(#F2F0EF, 7%);
+    }
+  }
+
+  .btn-enroll{
+    @extend %btn-shims;
+    color: #FFFFFF;
+    background: #D23228;
+    border-color: #D23228;
+
+    &:hover,
+    &:active,
+    &:focus {
+      color: darken(#FFFFFF, 7%);
+      background: darken(#D23228, 7%);
+      border-color: darken(#D23228, 7%);
+    }
+  }
+}

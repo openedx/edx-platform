@@ -1696,9 +1696,11 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
         if not is_embed:
             video_poster = block._poster()  # pylint: disable=protected-access
 
-        enroll_url = urlencode(
-            f"https://courses.edx.org/register?course_id={str(course_key)}&enrollment_action=enroll&email_opt_in=false"
-        )
+        enroll_url = reverse('register_user') + '?'+ urlencode({
+          'course_id': str(course_key),
+          'enrollment_action': 'enroll',
+          'email_opt_in': False,
+        })
         course_about_page_url = reverse('about_course', kwargs={'course_id': str(course_key)})
 
         context = {

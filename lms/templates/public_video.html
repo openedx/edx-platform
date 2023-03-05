@@ -21,18 +21,12 @@ from django.utils.translation import gettext as _
 </%block>
 
 <%block name="body_extra">
-<nav class="nav-links" aria-label="Learn More">
+<nav class="public-video-share-cta nav-links" aria-label="Learn More">
   <div>
-    <a class="btn-default btn" href="${learn_more_url}">
+    <a class="btn-learn-more btn" href="${learn_more_url}">
       ${_("Learn more about this course")}
     </a>
-    <a class="btn-primary btn" href="${enroll_url}">
-      ${_("Enroll in this course")}
-    </a>
-    <a class="btn-upgrade btn" href="${enroll_url}">
-      ${_("Enroll in this course")}
-    </a>
-    <a class="btn-brand btn" href="${enroll_url}">
+    <a class="btn-enroll btn" href="${enroll_url}">
       ${_("Enroll in this course")}
     </a>
   </div>
