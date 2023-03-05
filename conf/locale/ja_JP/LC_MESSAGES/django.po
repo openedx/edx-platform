@@ -10265,8 +10265,10 @@ msgid "Count"
 msgstr "数"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "各受講者に表示するコンポーネント数を入力してください。"
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"

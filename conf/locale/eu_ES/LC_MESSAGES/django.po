@@ -10389,8 +10389,10 @@ msgid "Count"
 msgstr "Kopurua"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "Idatzi zenbat osagai erakutsiko zaion ikasle bakoitzari."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"

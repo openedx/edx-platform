@@ -11016,8 +11016,10 @@ msgid "Count"
 msgstr "Кількість"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "Введіть кількість компонент, що відображаються слухачам."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"

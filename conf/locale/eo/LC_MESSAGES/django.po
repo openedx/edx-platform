@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-26 20:35+0000\n"
-"PO-Revision-Date: 2023-02-26 20:35:55.019139\n"
+"POT-Creation-Date: 2023-03-05 20:35+0000\n"
+"PO-Revision-Date: 2023-03-05 20:35:45.010699\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -9486,6 +9486,7 @@ msgid "Success"
 msgstr "Süççéss Ⱡ'σяєм ιρѕυм #"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Àçtïöns Ⱡ'σяєм ιρѕυм #"
@@ -27689,6 +27690,14 @@ msgstr "Àççéss Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Sét Àççéss Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr "Çöpý Ⱡ'σяєм ι#"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr "Mänägé Àççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
