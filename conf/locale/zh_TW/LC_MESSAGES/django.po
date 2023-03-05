@@ -10260,8 +10260,10 @@ msgid "Count"
 msgstr "計算"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "進入組件的數量，以顯示給每個學生。"
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
