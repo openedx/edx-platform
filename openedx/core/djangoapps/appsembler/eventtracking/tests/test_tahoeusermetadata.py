@@ -53,6 +53,7 @@ class UserWithTahoeMetadataFactory(UserFactory):
 
 @pytest.fixture(autouse=True)
 def users():
+    UserProfileFactory.reset_sequence(0)
     return [UserWithTahoeMetadataFactory() for i in range(2)]
 
 
