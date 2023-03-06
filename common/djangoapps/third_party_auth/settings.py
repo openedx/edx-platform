@@ -57,7 +57,9 @@ def apply_settings(django_settings):
         'third_party_auth.pipeline.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
         'third_party_auth.pipeline.ensure_user_information',
-        'social_core.pipeline.user.create_user',
+        # wrap social_core.pipeline.user.create_user so we can test selectively disabling
+        'openedx.core.djangoapps.appsembler.tahoe_idp.tpa_pipeline.wrapped_social_core_create_user',
+        # 'social_core.pipeline.user.create_user',
         'social_core.pipeline.social_auth.associate_user',
         'social_core.pipeline.social_auth.load_extra_data',
         'social_core.pipeline.user.user_details',
