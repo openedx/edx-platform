@@ -1687,42 +1687,14 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
             'public_video_embed': is_embed,
         })
 
-        video_description = f"Watch a video from the course {course.display_name} "
-        if course.display_organization is not None:
-            video_description += f"by {course.display_organization} "
-        video_description += "on edX.org"
 
-        video_poster = None
-        if not is_embed:
-            video_poster = block._poster()  # pylint: disable=protected-access
-
-        enroll_url = reverse('register_user')
-        enroll_url += '?' + urlencode({
-            'course_id': str(course_key),
-            'enrollment_action': 'enroll',
-            'email_opt_in': False,
-        })
-        course_about_page_url = reverse('about_course', kwargs={'course_id': str(course_key)})
-
-        utm_params = {}
-        for param, value in request.GET.items():
-            if param.startswith("utm_"):
-                utm_params[param] = value
-        if utm_params:
-            utm_params = urlencode(utm_params)
-            enroll_url += '&' + utm_params
-            course_about_page_url += '?' + utm_params
+        enroll_url, course_about_page_url = _get_public_video_cta_button_urls(request)
+        social_sharing_metadata = _get_social_sharing_metadata()
 
         context = {
             'fragment': fragment,
             'course': course,
-            'video_title': block.display_name_with_default,
-            'video_description': video_description,
-            'video_thumbnail': video_poster if video_poster is not None else '',
-            'video_embed_url': urljoin(
-                settings.LMS_ROOT_URL,
-                reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(usage_key)})
-            ),
+            'social_sharing_metadata': social_sharing_metadata,
             'learn_more_url': course_about_page_url,
             'enroll_url': enroll_url,
             'disable_accordion': False,
@@ -1736,6 +1708,52 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
             'is_mobile_app': False,
         }
         return render_to_response(template, context)
+
+def _get_public_video_cta_button_urls(request, course_key):
+    """
+    Get the links for the 'enroll' and 'learn more' buttons on the public video page
+    """
+    enroll_url = reverse('register_user')
+    enroll_url += '?' + urlencode({
+        'course_id': str(course_key),
+        'enrollment_action': 'enroll',
+        'email_opt_in': False,
+    })
+    course_about_page_url = reverse('about_course', kwargs={'course_id': str(course_key)})
+
+    utm_params = {}
+    for param, value in request.GET.items():
+        if param.startswith("utm_"):
+            utm_params[param] = value
+    if utm_params:
+        utm_params = urlencode(utm_params)
+        enroll_url += '&' + utm_params
+        course_about_page_url += '?' + utm_params
+        
+    return enroll_url, course_about_page_url
+
+def _get_social_sharing_metadata(course, block, is_embed):
+    """
+    Gather the information for the meta OpenGraph and Twitter-specific tags
+    """
+    video_description = f"Watch a video from the course {course.display_name} "
+    if course.display_organization is not None:
+        video_description += f"by {course.display_organization} "
+    video_description += "on edX.org"
+
+    video_poster = None
+    if not is_embed:
+        video_poster = block._poster()  # pylint: disable=protected-access
+            
+    return {
+        'video_title': block.display_name_with_default,
+        'video_description': video_description,
+        'video_thumbnail': video_poster if video_poster is not None else '',
+        'video_embed_url': urljoin(
+            settings.LMS_ROOT_URL,
+            reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(block.location)})
+        )
+    }
 
 
 @require_http_methods(["GET"])
