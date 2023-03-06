@@ -105,8 +105,6 @@ class Command(BaseCommand):
         }
 
         apple_ids = UserSocialAuth.objects.filter(provider=AppleIdAuth.name).values_list('uid', flat=True)
-        print(apple_ids)
-        print(AppleIdAuth.name)
         for apple_id in apple_ids:
             payload['sub'] = apple_id
             response = requests.post(migration_url, data=payload, headers=headers)
