@@ -27,7 +27,7 @@ from openedx.core.djangoapps.programs.utils import (
 from lms.djangoapps.learner_recommendations.utils import (
     filter_recommended_courses,
     get_amplitude_course_recommendations,
-    is_user_enrolled_in_masters_program,
+    is_user_enrolled_in_ut_austin_masters_program,
 )
 
 
@@ -419,7 +419,7 @@ class CourseRecommendationApiView(APIView):
         """Retrieves course recommendations details of a user in a specified course."""
         user_id = request.user.id
 
-        if is_user_enrolled_in_masters_program(request.user):
+        if is_user_enrolled_in_ut_austin_masters_program(request.user):
             return self._recommendations_response(user_id, None, [], False)
 
         fallback_recommendations = settings.GENERAL_RECOMMENDATIONS if show_fallback_recommendations() else []

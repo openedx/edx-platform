@@ -441,15 +441,15 @@ class TestCourseRecommendationApiView(TestCase):
         )
 
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.api.v0.views.is_user_enrolled_in_masters_program"
+        "lms.djangoapps.learner_dashboard.api.v0.views.is_user_enrolled_in_ut_austin_masters_program"
     )
     def test_no_recommendations_for_masters_program_learners(
-        self, is_user_enrolled_in_masters_program_mock
+        self, is_user_enrolled_in_ut_austin_masters_program_mock
     ):
         """
-        Verify API returns no recommendations if a user is enrolled in masters program.
+        Verify API returns no recommendations if a user is enrolled in UT Austin masters program.
         """
-        is_user_enrolled_in_masters_program_mock.return_value = True
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = True
 
         response = self.client.get(self.url)
 
