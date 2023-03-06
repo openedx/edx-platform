@@ -7,8 +7,8 @@
                 location: [],
                 content_type: '',
                 excerpt: '',
-                url: ''
-            }
+                url: '',
+            },
         });
     });
 }(define || RequireJS.define));

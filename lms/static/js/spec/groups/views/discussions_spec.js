@@ -1,7 +1,7 @@
 define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers',
     'js/discussions_management/views/discussions', 'js/discussions_management/models/course_discussions_detail',
-    'js/discussions_management/models/course_discussions_settings'
+    'js/discussions_management/models/course_discussions_settings',
 ],
 function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscussionTopicDetailsModel,
     CourseDiscussionsSettingsModel) {
@@ -27,7 +27,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
                 divided_inline_discussions: dividedInlineDiscussions || [],
                 divided_course_wide_discussions: dividedCourseWideDiscussions || [],
                 always_divide_inline_discussions: alwaysDivideInlineDiscussions || false,
-                available_division_schemes: availableDivisionSchemes || ['cohort']
+                available_division_schemes: availableDivisionSchemes || ['cohort'],
             };
         };
 
@@ -39,7 +39,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
                 createMockDiscussionsSettingsJson(dividedInlineDiscussions,
                     dividedCourseWideDiscussions,
                     alwaysDivideInlineDiscussions,
-                    availableDivisionSchemes)
+                    availableDivisionSchemes),
             );
         };
 
@@ -51,14 +51,14 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
                         Topic_C_1: {
                             sort_key: null,
                             is_divided: true,
-                            id: 'Topic_C_1'
+                            id: 'Topic_C_1',
                         },
                         Topic_C_2: {
                             sort_key: null,
                             is_divided: false,
-                            id: 'Topic_C_2'
-                        }
-                    }
+                            id: 'Topic_C_2',
+                        },
+                    },
                 },
                 inline_discussions: {
                     subcategories: {
@@ -69,24 +69,24 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
                                 Inline_Discussion_1: {
                                     sort_key: null,
                                     is_divided: true,
-                                    id: 'Inline_Discussion_1'
+                                    id: 'Inline_Discussion_1',
                                 },
                                 Inline_Discussion_2: {
                                     sort_key: null,
                                     is_divided: allDivided || false,
-                                    id: 'Inline_Discussion_2'
-                                }
-                            }
-                        }
+                                    id: 'Inline_Discussion_2',
+                                },
+                            },
+                        },
                     },
-                    children: [['Topic_I_1', 'subcategory']]
-                }
+                    children: [['Topic_I_1', 'subcategory']],
+                },
             };
         };
 
         createMockDiscussions = function(allDivided) {
             return new CourseDiscussionTopicDetailsModel(
-                createMockDiscussionsJson(allDivided)
+                createMockDiscussionsJson(allDivided),
             );
         };
 
@@ -116,8 +116,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
                 el: $('.discussions-management'),
                 discussionSettings: discussionSettings,
                 context: {
-                    courseDiscussionTopicDetailsModel: dividedDiscussions
-                }
+                    courseDiscussionTopicDetailsModel: dividedDiscussions,
+                },
             });
             discussionsView.render();
         };
@@ -153,16 +153,16 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
                     '<div class="discussions-management"></div>');
             TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/discussions');
             TemplateHelpers.installTemplate(
-                'templates/instructor/instructor_dashboard_2/divided-discussions-course-wide'
+                'templates/instructor/instructor_dashboard_2/divided-discussions-course-wide',
             );
             TemplateHelpers.installTemplate(
-                'templates/instructor/instructor_dashboard_2/divided-discussions-inline'
+                'templates/instructor/instructor_dashboard_2/divided-discussions-inline',
             );
             TemplateHelpers.installTemplate(
-                'templates/instructor/instructor_dashboard_2/cohort-discussions-category'
+                'templates/instructor/instructor_dashboard_2/cohort-discussions-category',
             );
             TemplateHelpers.installTemplate(
-                'templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory'
+                'templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory',
             );
             TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/notification');
         });
@@ -216,20 +216,20 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
                     // fake requests for discussions settings with PATCH method.
                     AjaxHelpers.expectJsonRequest(
                         requests, 'PATCH', '/mock_service/discussions/settings',
-                        {divided_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
+                        {divided_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']},
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        {divided_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
+                        {divided_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']},
                     );
 
                     // fake request for discussion/topics with GET method.
                     AjaxHelpers.expectJsonRequest(
-                        requests, 'GET', '/mock_service/discussion/topics'
+                        requests, 'GET', '/mock_service/discussion/topics',
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockDiscussions()
+                        createMockDiscussions(),
                     );
 
                     // verify the success message.
@@ -249,16 +249,16 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
                     // fake requests for discussion settings with PATCH method.
                     AjaxHelpers.expectJsonRequest(
                         requests, 'PATCH', '/mock_service/discussions/settings',
-                        {divided_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
+                        {divided_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']},
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        {divided_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
+                        {divided_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']},
                     );
 
                     // fake request for discussion/topics with GET method.
                     AjaxHelpers.expectJsonRequest(
-                        requests, 'GET', '/mock_service/discussion/topics'
+                        requests, 'GET', '/mock_service/discussion/topics',
                     );
                     AjaxHelpers.respondWithError(requests, 500);
 
@@ -301,26 +301,26 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
                         requests, 'PATCH', '/mock_service/discussions/settings',
                         {
                             divided_inline_discussions: dividededInlineDiscussions,
-                            always_divide_inline_discussions: false
-                        }
+                            always_divide_inline_discussions: false,
+                        },
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
                         {
                             divided_inline_discussions: dividededInlineDiscussions,
-                            always_divide_inline_discussions: false
-                        }
+                            always_divide_inline_discussions: false,
+                        },
                     );
                 };
 
                 mockGetRequest = function(alldivided) {
                     // fake request for discussion/topics with GET method.
                     AjaxHelpers.expectJsonRequest(
-                        requests, 'GET', '/mock_service/discussion/topics'
+                        requests, 'GET', '/mock_service/discussion/topics',
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockDiscussions(alldivided)
+                        createMockDiscussions(alldivided),
                     );
                 };
 
@@ -462,14 +462,14 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
                                 Topic_C_1: {
                                     sort_key: null,
                                     is_divided: true,
-                                    id: 'Topic_C_1'
-                                }
-                            }
+                                    id: 'Topic_C_1',
+                                },
+                            },
                         },
                         inline_discussions: {
                             subcategories: {},
-                            children: []
-                        }
+                            children: [],
+                        },
                     };
                     options = {dividedDiscussions: new CourseDiscussionTopicDetailsModel(topicsJson)};
                     createDiscussionsView(this, options);
@@ -490,7 +490,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
 
                     // fake request for discussion/topics with GET method.
                     AjaxHelpers.expectJsonRequest(
-                        requests, 'GET', '/mock_service/discussion/topics'
+                        requests, 'GET', '/mock_service/discussion/topics',
                     );
                     AjaxHelpers.respondWithError(requests, 500);
 

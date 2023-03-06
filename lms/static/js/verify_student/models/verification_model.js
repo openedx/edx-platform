@@ -31,7 +31,7 @@ var edx = edx || {};
             // If the verification attempt is associated with a checkpoint
             // in a course, we send the the course and checkpoint location.
             courseKey: null,
-            checkpoint: null
+            checkpoint: null,
         },
 
         sync: function(method, model) {
@@ -53,7 +53,7 @@ var edx = edx || {};
 
                 // Track the user's decision to change the name on their account
                 window.analytics.track('edx.bi.user.full_name.changed', {
-                    category: 'verification'
+                    category: 'verification',
                 });
             }
 
@@ -77,8 +77,8 @@ var edx = edx || {};
                 },
                 error: function(error) {
                     model.trigger('error', error);
-                }
+                },
             });
-        }
+        },
     });
 }(jQuery, Backbone));

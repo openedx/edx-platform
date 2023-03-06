@@ -1,7 +1,7 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/utils/utils', 'edx-ui-toolkit/js/utils/html-utils'
+        'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/utils/utils', 'edx-ui-toolkit/js/utils/html-utils',
     ], function($, _, Annotator, Utils, HtmlUtils) {
         var _t = Annotator._t;
 
@@ -55,12 +55,12 @@
                             tagsField,
                             HtmlUtils.HTML('>'),
                             _t('Tags (space-separated)'),
-                            HtmlUtils.HTML('</label>')
+                            HtmlUtils.HTML('</label>'),
                         )));
                 }
                 return this;
             },
-            Annotator.Plugin.Tags.prototype.updateField
+            Annotator.Plugin.Tags.prototype.updateField,
         );
 
         Annotator.Plugin.Tags.prototype.updateViewer = _.compose(
@@ -68,11 +68,11 @@
             // Add ARIA information for viewing mode.
                 $('div.annotator-tags', this.wrapper).attr({
                     role: 'region',
-                    'aria-label': 'tags'
+                    'aria-label': 'tags',
                 });
                 return this;
             },
-            Annotator.Plugin.Tags.prototype.updateViewer
+            Annotator.Plugin.Tags.prototype.updateViewer,
         );
 
         /**
@@ -85,11 +85,11 @@
             function(results) {
                 $('.annotator-hl', this.wrapper).attr({
                     tabindex: 0,
-                    role: 'link'
+                    role: 'link',
                 });
                 return results;
             },
-            Annotator.prototype.highlightRange
+            Annotator.prototype.highlightRange,
         );
 
         /**
@@ -115,7 +115,7 @@
                 // Unbind onNoteClick from click
                 this.viewer.element.off('click', this.onNoteClick);
                 this.wrapper.off('click', '.annotator-hl');
-            }
+            },
         );
 
         /**
@@ -126,7 +126,7 @@
             element: [
                 '<div class="annotator-outer annotator-viewer">',
                 '<ul class="annotator-widget annotator-listing" tabindex="-1"></ul>',
-                '</div>'
+                '</div>',
             ].join(''),
             item: [
                 '<li class="annotator-annotation annotator-item">',
@@ -147,8 +147,8 @@
                 '<span class="sr">', _t('Note'), '</span>',
                 '</button>',
                 '</span>',
-                '</li>'
-            ].join('')
+                '</li>',
+            ].join(''),
         };
 
         /**
@@ -171,11 +171,11 @@
                             $(field).html(HtmlUtils.joinHtml(HtmlUtils.HTML('<i>'), _t('No Comment'), HtmlUtils.HTML('</i>')).toString());
                         }
                         return self.publish('annotationViewerTextField', [field, annotation]);
-                    }
+                    },
                 })
                 .element.appendTo(this.wrapper).bind({ // xss-lint: disable=javascript-jquery-insert-into-target
                     mouseover: this.clearViewerHideTimer,
-                    mouseout: this.startViewerHideTimer
+                    mouseout: this.startViewerHideTimer,
                 });
             return this;
         };
@@ -201,7 +201,7 @@
             '</button>',
             '</div>',
             '</form>',
-            '</div>'
+            '</div>',
         ].join('');
 
 
@@ -224,7 +224,7 @@
                             noteField,
                             HtmlUtils.HTML('>'),
                             _t('Note'),
-                            HtmlUtils.HTML('</label>')
+                            HtmlUtils.HTML('</label>'),
                         )));
                 }
 
@@ -233,7 +233,7 @@
                     this.element.find('form.annotator-widget').focus();
                 }
             },
-            Annotator.Editor.prototype.show
+            Annotator.Editor.prototype.show,
         );
 
         /**
@@ -257,7 +257,7 @@
                 }
                 return func.call(this, event);
             },
-            Annotator.prototype._setupViewer
+            Annotator.prototype._setupViewer,
         );
 
         /**
@@ -268,7 +268,7 @@
                 this.element.on('click', '.annotator-hl', _.bind(this.onHighlightClick, this));
                 return this;
             },
-            Annotator.prototype._setupWrapper
+            Annotator.prototype._setupWrapper,
         );
 
         $.extend(true, Annotator.prototype, {
@@ -316,7 +316,7 @@
                     this.addEvents();
                     this.viewer.element.bind({
                         mouseover: this.clearViewerHideTimer,
-                        mouseout: this.startViewerHideTimer
+                        mouseout: this.startViewerHideTimer,
                     });
                     this.viewer.hide();
                     $(document).off('click.edxnotes:freeze' + this.uid);
@@ -340,7 +340,7 @@
                 this.showViewer(annotations, location);
                 this.freezeAll();
                 return this;
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

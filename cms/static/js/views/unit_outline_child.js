@@ -14,7 +14,7 @@ define(['underscore', 'js/views/xblock_outline'],
             getTemplateContext: function() {
                 return _.extend(
                     XBlockOutlineView.prototype.getTemplateContext.call(this),
-                    {currentUnitId: this.currentUnitId}
+                    {currentUnitId: this.currentUnitId},
                 );
             },
 
@@ -25,9 +25,9 @@ define(['underscore', 'js/views/xblock_outline'],
             createChildView: function(childInfo, parentInfo, options) {
                 options = _.isUndefined(options) ? {} : options;
                 return XBlockOutlineView.prototype.createChildView.call(
-                    this, childInfo, parentInfo, _.extend(options, {currentUnitId: this.currentUnitId})
+                    this, childInfo, parentInfo, _.extend(options, {currentUnitId: this.currentUnitId}),
                 );
-            }
+            },
         });
 
         return UnitOutlineChildView;

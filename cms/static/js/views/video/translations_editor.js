@@ -1,7 +1,7 @@
 define(
     [
         'jquery', 'underscore', 'edx-ui-toolkit/js/utils/html-utils', 'js/views/video/transcripts/utils',
-        'js/views/abstract_editor', 'common/js/components/utils/view_utils', 'js/models/uploads', 'js/views/uploads'
+        'js/views/abstract_editor', 'common/js/components/utils/view_utils', 'js/models/uploads', 'js/views/uploads',
     ],
     function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, ViewUtils, FileUpload, UploadDialog) {
         'use strict';
@@ -11,9 +11,9 @@ define(
                 this.model.set({
                     uploading: false,
                     uploadedBytes: 0,
-                    title: gettext('Sorry, there was an error parsing the subtitles that you uploaded. Please check the format and try again.')
+                    title: gettext('Sorry, there was an error parsing the subtitles that you uploaded. Please check the format and try again.'),
                 });
-            }
+            },
         });
 
         var Translations = AbstractEditor.extend({
@@ -21,7 +21,7 @@ define(
                 'click .create-setting': 'addEntry',
                 'click .remove-setting': 'removeEntry',
                 'click .upload-setting': 'upload',
-                'change select': 'onChangeHandler'
+                'change select': 'onChangeHandler',
             },
 
             templateName: 'metadata-translations-entry',
@@ -131,7 +131,7 @@ define(
                         newLang: newLang,
                         originalLang: _.findKey(languageMap, function(lang) { return lang === newLang; }) || '',
                         value: value,
-                        url: self.model.get('urlRoot')
+                        url: self.model.get('urlRoot'),
                     }));
                     HtmlUtils.prepend($html, HtmlUtils.HTML(dropdown.clone().val(newLang)));
                     frag.appendChild($html[0]);
@@ -139,7 +139,7 @@ define(
 
                 HtmlUtils.setHtml(
                     this.$el.find('ol'),
-                    HtmlUtils.HTML([frag])
+                    HtmlUtils.HTML([frag]),
                 );
             },
 
@@ -178,14 +178,14 @@ define(
                                     return $.ajax({
                                         url: self.model.get('urlRoot'),
                                         type: 'DELETE',
-                                        data: JSON.stringify({lang: originalLang, edx_video_id: edxVideoIdField.getValue()})
+                                        data: JSON.stringify({lang: originalLang, edx_video_id: edxVideoIdField.getValue()}),
                                     }).done(function() {
                                         self.setValueInEditor(self.getAllLanguageDropdownElementsData(false, selectedLang));
                                         TranscriptUtils.Storage.set('languageMap', _.omit(languageMap, originalLang));
                                     });
-                                }
+                                },
                             );
-                        }
+                        },
                     );
                 } else {
                     this.setValueInEditor(this.getAllLanguageDropdownElementsData(false, selectedLang));
@@ -217,12 +217,12 @@ define(
                 uploadData = {
                     edx_video_id: edxVideoIdField.getValue(),
                     language_code: originalLang,
-                    new_language_code: newLang
+                    new_language_code: newLang,
                 };
 
                 fileUploadModel = new FileUpload({
                     title: gettext('Upload translation'),
-                    fileFormats: this.validFileFormats
+                    fileFormats: this.validFileFormats,
                 });
 
                 videoUploadDialog = new VideoUploadDialog({
@@ -248,7 +248,7 @@ define(
 
                         // re-render the whole view
                         self.setValueInEditor(self.getAllLanguageDropdownElementsData());
-                    }
+                    },
                 });
                 videoUploadDialog.show();
             },
@@ -307,7 +307,7 @@ define(
                 }
 
                 return data;
-            }
+            },
         });
 
         return Translations;

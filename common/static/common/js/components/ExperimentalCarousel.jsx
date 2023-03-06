@@ -10,7 +10,7 @@ function NextArrow(props) {
     const showArrow = slideCount - currentSlide > displayedSlides;
     const opts = {
         className: classNames('js-carousel-nav', 'carousel-arrow', 'next', 'btn btn-secondary', {'active': showArrow}),
-        onClick
+        onClick,
     };
 
     if (!showArrow) {
@@ -31,7 +31,7 @@ function PrevArrow(props) {
     const showArrow = currentSlide > 0;
     const opts = {
         className: classNames('js-carousel-nav', 'carousel-arrow', 'prev', 'btn btn-secondary', {'active': showArrow}),
-        onClick
+        onClick,
     };
 
     if (!showArrow) {
@@ -84,7 +84,7 @@ export default class ExperimentalCarousel extends React.Component {
                     this.carousels[i] = item;
                 },
                 tabIndex: tabIndex,
-                className: 'carousel-item'
+                className: 'carousel-item',
             }
 
             return (
@@ -119,5 +119,5 @@ export default class ExperimentalCarousel extends React.Component {
 }
 
 ExperimentalCarousel.propTypes = {
-    slides: PropTypes.array.isRequired
+    slides: PropTypes.array.isRequired,
 };

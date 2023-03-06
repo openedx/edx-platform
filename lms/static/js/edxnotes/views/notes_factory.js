@@ -7,7 +7,7 @@
         'js/edxnotes/plugins/events', 'js/edxnotes/plugins/accessibility',
         'js/edxnotes/plugins/caret_navigation',
         'js/edxnotes/plugins/store_error_handler',
-        'js/edxnotes/plugins/search_override'
+        'js/edxnotes/plugins/search_override',
     ], function($, _, Annotator, NotesLogger, NotesCollector) {
         var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags'],
             getOptions, setupPlugins, getAnnotator;
@@ -27,17 +27,17 @@
             var defaultParams = {
                     user: params.user,
                     usage_id: params.usageId,
-                    course_id: params.courseId
+                    course_id: params.courseId,
                 },
                 prefix = params.endpoint.replace(/(.+)\/$/, '$1');
 
             return {
                 auth: {
                     token: params.token,
-                    tokenUrl: params.tokenUrl
+                    tokenUrl: params.tokenUrl,
                 },
                 events: {
-                    stringLimit: params.eventStringLimit
+                    stringLimit: params.eventStringLimit,
                 },
                 store: {
                     prefix: prefix,
@@ -48,9 +48,9 @@
                         read: '/annotations/:id/',
                         update: '/annotations/:id/',
                         destroy: '/annotations/:id/',
-                        search: '/search/'
-                    }
-                }
+                        search: '/search/',
+                    },
+                },
             };
         };
 
@@ -88,7 +88,7 @@
             setupPlugins(annotator, plugins, options);
             NotesCollector.storeNotesRequestData(
                 {annotator: annotator, params: params},
-                $('.edx-notes-wrapper').length
+                $('.edx-notes-wrapper').length,
             );
             annotator.logger = logger;
             logger.log({element: element, options: options});
@@ -96,7 +96,7 @@
         };
 
         return {
-            factory: getAnnotator
+            factory: getAnnotator,
         };
     });
 }).call(this, define || RequireJS.define);

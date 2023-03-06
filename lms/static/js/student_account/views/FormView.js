@@ -7,7 +7,7 @@
         'common/js/utils/edx.utils.validate',
         'edx-ui-toolkit/js/utils/html-utils',
         'edx-ui-toolkit/js/utils/string-utils',
-        'text!templates/student_account/form_errors.underscore'
+        'text!templates/student_account/form_errors.underscore',
     ], function($, _, Backbone, EdxUtilsValidate, HtmlUtils, StringUtils, formErrorsTpl) {
         return Backbone.View.extend({
             tagName: 'form',
@@ -61,9 +61,9 @@
                     HtmlUtils.HTML(
                         _.template(this.tpl)({
                             fields: fields,
-                            HtmlUtils: HtmlUtils
-                        })
-                    )
+                            HtmlUtils: HtmlUtils,
+                        }),
+                    ),
                 )
                 this.postRender();
 
@@ -97,7 +97,7 @@
                         supplementalText: data[i].supplementalText || '',
                         supplementalLink: data[i].supplementalLink || '',
                         loginIssueSupportLink: data[i].loginIssueSupportLink || '',
-                        isEnterpriseEnable: this.isEnterpriseEnable
+                        isEnterpriseEnable: this.isEnterpriseEnable,
                     })));
                 }
 
@@ -117,7 +117,7 @@
                 scrollTop: function($el) {
                     // Scroll to top of selected element
                     $('html,body').animate({
-                        scrollTop: $el.offset().top
+                        scrollTop: $el.offset().top,
                     }, 'slow');
                 },
 
@@ -125,7 +125,7 @@
                     if ($el) {
                         $el.removeClass('hidden');
                     }
-                }
+                },
             },
 
             escapeStrings: function(obj) {
@@ -237,9 +237,9 @@
                 this.errors = [
                     StringUtils.interpolate(
                         '<li>{error}</li>', {
-                            error: error.responseText
-                        }
-                    )
+                            error: error.responseText,
+                        },
+                    ),
                 ];
                 this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                 this.scrollToFormFeedback();
@@ -254,7 +254,7 @@
                 this.renderFormFeedback(this.formErrorsTpl, {
                     jsHook: this.formErrorsJsHook,
                     title: title,
-                    messagesHtml: HtmlUtils.HTML(errorMessages.join(''))
+                    messagesHtml: HtmlUtils.HTML(errorMessages.join('')),
                 });
             },
 
@@ -334,7 +334,7 @@
                 var self = this;
                 // Scroll to feedback container
                 $('html,body').animate({
-                    scrollTop: this.$formFeedback.offset().top
+                    scrollTop: this.$formFeedback.offset().top,
                 }, 'slow', function() {
                     self.resetValidationVariables();
                 });
@@ -355,7 +355,7 @@
                     method: method,
                     success: function(response) {
                         model.trigger('validation', $el, response);
-                    }
+                    },
                 });
             },
 
@@ -368,7 +368,7 @@
                     }
                 }
                 return false;
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

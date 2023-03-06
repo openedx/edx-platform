@@ -11,7 +11,7 @@
                 'underscore',
                 'underscore.string',
                 'edx-ui-toolkit/js/utils/html-utils',
-                'edx-ui-toolkit/js/utils/string-utils'
+                'edx-ui-toolkit/js/utils/string-utils',
             ], function(_, str, HtmlUtils, StringUtils) {
                 window._ = _;
                 window._.str = str;
@@ -72,103 +72,103 @@
             mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',   // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'js/src/ajax_prefix': 'xmodule_js/common_static/js/src/ajax_prefix',
-            'js/spec/test_utils': 'js/spec/test_utils'
+            'js/spec/test_utils': 'js/spec/test_utils',
         },
         shim: {
             'gettext': {
-                exports: 'gettext'
+                exports: 'gettext',
             },
             'date': {
-                exports: 'Date'
+                exports: 'Date',
             },
             'jquery-migrate': ['jquery'],
             'jquery.ui': {
                 deps: ['jquery'],
-                exports: 'jQuery.ui'
+                exports: 'jQuery.ui',
             },
             'jquery.form': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.ajaxForm'
+                exports: 'jQuery.fn.ajaxForm',
             },
             'jquery.markitup': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.markitup'
+                exports: 'jQuery.fn.markitup',
             },
             'jquery.leanModal': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.leanModal'
+                exports: 'jQuery.fn.leanModal',
             },
             'jquery.smoothScroll': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.smoothScroll'
+                exports: 'jQuery.fn.smoothScroll',
             },
             'jquery.ajaxQueue': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.ajaxQueue'
+                exports: 'jQuery.fn.ajaxQueue',
             },
             'jquery.scrollTo': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.scrollTo'
+                exports: 'jQuery.fn.scrollTo',
             },
             'jquery.cookie': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.cookie'
+                exports: 'jQuery.fn.cookie',
             },
             'jquery.qtip': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.qtip'
+                exports: 'jQuery.fn.qtip',
             },
             'jquery.fileupload': {
                 deps: ['jquery.ui', 'jquery.iframe-transport'],
-                exports: 'jQuery.fn.fileupload'
+                exports: 'jQuery.fn.fileupload',
             },
             'jquery.fileupload-process': {
-                deps: ['jquery.fileupload']
+                deps: ['jquery.fileupload'],
             },
             'jquery.fileupload-validate': {
-                deps: ['jquery.fileupload']
+                deps: ['jquery.fileupload'],
             },
             'jquery.inputnumber': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.inputNumber'
+                exports: 'jQuery.fn.inputNumber',
             },
             'jquery.simulate': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.simulate'
+                exports: 'jQuery.fn.simulate',
             },
             'jquery.tinymce': {
                 deps: ['jquery', 'tinymce'],
-                exports: 'jQuery.fn.tinymce'
+                exports: 'jQuery.fn.tinymce',
             },
             'datepair': {
-                deps: ['jquery.ui', 'jquery.timepicker']
+                deps: ['jquery.ui', 'jquery.timepicker'],
             },
             'underscore': {
-                exports: '_'
+                exports: '_',
             },
             'backbone': {
                 deps: ['underscore', 'jquery'],
-                exports: 'Backbone'
+                exports: 'Backbone',
             },
             'backbone.associations': {
                 deps: ['backbone'],
-                exports: 'Backbone.Associations'
+                exports: 'Backbone.Associations',
             },
             'backbone.paginator': {
                 deps: ['backbone'],
-                exports: 'Backbone.PageableCollection'
+                exports: 'Backbone.PageableCollection',
             },
             'backbone-relational': {
-                deps: ['backbone']
+                deps: ['backbone'],
             },
             'youtube': {
-                exports: 'YT'
+                exports: 'YT',
             },
             'codemirror': {
-                exports: 'CodeMirror'
+                exports: 'CodeMirror',
             },
             'tinymce': {
-                exports: 'tinymce'
+                exports: 'tinymce',
             },
             'mathjax': {
                 exports: 'MathJax',
@@ -176,53 +176,53 @@
                     window.MathJax.Hub.Config({
                         tex2jax: {
                             inlineMath: [['\\(', '\\)'], ['[mathjaxinline]', '[/mathjaxinline]']],
-                            displayMath: [['\\[', '\\]'], ['[mathjax]', '[/mathjax]']]
-                        }
+                            displayMath: [['\\[', '\\]'], ['[mathjax]', '[/mathjax]']],
+                        },
                     });
                     return window.MathJax.Hub.Configured();
-                }
+                },
             },
             'accessibility': {
                 exports: 'accessibility',
-                deps: ['add-a11y-deps']
+                deps: ['add-a11y-deps'],
             },
             'URI': {
-                exports: 'URI'
+                exports: 'URI',
             },
             'xmodule': {
-                exports: 'XModule'
+                exports: 'XModule',
             },
             'sinon': {
-                exports: 'sinon'
+                exports: 'sinon',
             },
             'jasmine-imagediff': {},
             'common/js/spec_helpers/jasmine-extensions': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'common/js/spec_helpers/jasmine-stealth': {
-                deps: ['underscore', 'underscore.string']
+                deps: ['underscore', 'underscore.string'],
             },
             'common/js/spec_helpers/jasmine-waituntil': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'xblock/core': {
                 exports: 'XBlock',
-                deps: ['jquery', 'jquery.immediateDescendents']
+                deps: ['jquery', 'jquery.immediateDescendents'],
             },
             'xblock/runtime.v1': {
                 exports: 'XBlock',
-                deps: ['xblock/core']
+                deps: ['xblock/core'],
             },
             'mock-ajax': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'cms/js/main': {
-                deps: ['js/src/ajax_prefix']
+                deps: ['js/src/ajax_prefix'],
             },
             'js/src/ajax_prefix': {
-                deps: ['jquery']
-            }
-        }
+                deps: ['jquery'],
+            },
+        },
     });
 
     jasmine.getFixtures().fixturesPath = '/base/templates';
@@ -280,7 +280,7 @@
         'js/certificates/spec/views/certificate_details_spec',
         'js/certificates/spec/views/certificate_editor_spec',
         'js/certificates/spec/views/certificates_list_spec',
-        'js/certificates/spec/views/certificate_preview_spec'
+        'js/certificates/spec/views/certificate_preview_spec',
     ];
 
     i = 0;
@@ -293,7 +293,7 @@
     specHelpers = [
         'common/js/spec_helpers/jasmine-extensions',
         'common/js/spec_helpers/jasmine-stealth',
-        'common/js/spec_helpers/jasmine-waituntil'
+        'common/js/spec_helpers/jasmine-waituntil',
     ];
 
     requireSerial(specHelpers.concat(testFiles), function() {

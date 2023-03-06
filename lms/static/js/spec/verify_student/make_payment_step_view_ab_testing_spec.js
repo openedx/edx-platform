@@ -4,7 +4,7 @@ define([
     'backbone',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers',
-    'js/verify_student/views/make_payment_step_view'
+    'js/verify_student/views/make_payment_step_view',
 ],
 function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
     'use strict';
@@ -25,14 +25,14 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             processors: ['test-payment-processor'],
             courseKey: 'edx/test/test',
             courseModeSlug: 'verified',
-            isABTesting: true
+            isABTesting: true,
         };
 
         createView = function(stepDataOverrides) {
             var view = new MakePaymentStepView({
                 el: $('#current-step-container'),
                 stepData: _.extend(_.clone(STEP_DATA), stepDataOverrides),
-                errorModel: new (Backbone.Model.extend({}))()
+                errorModel: new (Backbone.Model.extend({}))(),
             }).render();
 
             // Stub the payment form submission
@@ -70,7 +70,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
                 contribution: kwargs.amount || '',
                 course_id: kwargs.courseId || '',
                 processor: kwargs.processor || '',
-                sku: kwargs.sku || ''
+                sku: kwargs.sku || '',
             };
 
             // Click the "go to payment" button
@@ -78,14 +78,14 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
 
             // Verify that the request was made to the server
             AjaxHelpers.expectPostRequest(
-                requests, '/verify_student/create_order/', $.param(params)
+                requests, '/verify_student/create_order/', $.param(params),
             );
 
             // Simulate the server response
             if (kwargs.succeeds) {
                 // TODO put fixture responses in the right place
                 AjaxHelpers.respondWithJson(
-                    requests, {payment_page_url: 'http://payment-page-url/', payment_form_data: {foo: 'bar'}}
+                    requests, {payment_page_url: 'http://payment-page-url/', payment_form_data: {foo: 'bar'}},
                 );
             } else {
                 AjaxHelpers.respondWithTextError(requests, 400, SERVER_ERROR_MSG);
@@ -148,7 +148,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
                 amount: STEP_DATA.minPrice,
                 courseId: STEP_DATA.courseKey,
                 processor: STEP_DATA.processors[0],
-                succeeds: true
+                succeeds: true,
             });
             expectPaymentSubmitted(view, {foo: 'bar'});
         });
@@ -163,7 +163,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             checkPaymentButtons(AjaxHelpers.requests(this), {
                 cybersource: 'Checkout',
                 paypal: 'Checkout with PayPal',
-                other: 'Checkout with other'
+                other: 'Checkout with other',
             });
         });
 
@@ -178,7 +178,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
                 amount: STEP_DATA.minPrice,
                 courseId: STEP_DATA.courseKey,
                 processor: STEP_DATA.processors[0],
-                succeeds: true
+                succeeds: true,
             });
             expectPaymentSubmitted(view, {foo: 'bar'});
         });
@@ -186,7 +186,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         it('A/B Testing: min price is always selected even if contribution amount is provided', function() {
             // Pre-select a price NOT in the suggestions
             createView({
-                contributionAmount: '99.99'
+                contributionAmount: '99.99',
             });
 
             // Expect that the price is filled in
@@ -206,7 +206,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
                 amount: STEP_DATA.minPrice,
                 courseId: STEP_DATA.courseKey,
                 processor: STEP_DATA.processors[0],
-                succeeds: false
+                succeeds: false,
             });
 
             // Expect that an error is displayed
@@ -218,5 +218,5 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             expectPaymentButtonEnabled(true);
         });
     });
-}
+},
 );

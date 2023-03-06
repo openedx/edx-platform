@@ -4,7 +4,7 @@ define([ // jshint ignore:line
     'gettext',
     'common/js/components/utils/view_utils',
     'edx-ui-toolkit/js/utils/string-utils',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/html-utils',
 ],
 function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
     'use strict';
@@ -25,7 +25,7 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
             errorHtml = HtmlUtils.joinHtml(
                 HtmlUtils.HTML('<div class="error" aria-live="polite" id="course-id-error">'),
                 error,
-                HtmlUtils.HTML('</div>')
+                HtmlUtils.HTML('</div>'),
             );
             HtmlUtils.setHtml($(errorWrapperElSelector), HtmlUtils.HTML(errorHtml));
             $(errorWrapperElSelector).css('display', 'inline-block');
@@ -52,7 +52,7 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
                 type: 'POST',
                 url: maintenanceViewURL,
                 dataType: 'json',
-                data: data
+                data: data,
             })
                 .done(function(response) {
                     if (response.error) {
@@ -63,7 +63,7 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
                         } else {
                             attrs = $.extend({}, response, {StringUtils: StringUtils});
                             forcePublishedTemplate = HtmlUtils.template(
-                                $('#force-published-course-response-tpl').text()
+                                $('#force-published-course-response-tpl').text(),
                             );
                             HtmlUtils.setHtml($('#result-container'), forcePublishedTemplate(attrs));
                         }

@@ -4,7 +4,7 @@ $(document).ready(function() {
         matchBrackets: true,
         theme: 'default',
         lineWrapping: true,
-        keyMap: 'accessible'
+        keyMap: 'accessible',
     });
 
     // Store the inital contents so we can compare for unsaved changes

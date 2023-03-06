@@ -10,7 +10,7 @@ describe('TooltipManager', function() {
     beforeEach(function() {
         setFixtures(sandbox({
             id: 'test-id',
-            'data-tooltip': 'some text here.'
+            'data-tooltip': 'some text here.',
         }));
         this.element = $('#test-id');
 
@@ -25,9 +25,9 @@ describe('TooltipManager', function() {
                 return {
                     compare: function(actual) {
                         return {
-                            pass: actual.is(':visible') || parseFloat(actual.css('opacity'))
+                            pass: actual.is(':visible') || parseFloat(actual.css('opacity')),
                         };
-                    }
+                    },
                 };
             },
 
@@ -35,11 +35,11 @@ describe('TooltipManager', function() {
                 return {
                     compare: function(actual) {
                         return {
-                            pass: actual.is(':hidden') || !parseFloat(actual.css('opacity'))
+                            pass: actual.is(':hidden') || !parseFloat(actual.css('opacity')),
                         };
-                    }
+                    },
                 };
-            }
+            },
         });
     });
 
@@ -51,7 +51,7 @@ describe('TooltipManager', function() {
     showTooltip = function(element) {
         element.trigger($.Event('mouseover', {
             pageX: PAGE_X,
-            pageY: PAGE_Y
+            pageY: PAGE_Y,
         }));
         jasmine.clock().tick(500);
     };
@@ -109,7 +109,7 @@ describe('TooltipManager', function() {
         expect(parseInt($('.tooltip').css('top'))).toBe(-15);
         this.element.trigger($.Event('mousemove', {
             pageX: PAGE_X + DELTA,
-            pageY: PAGE_Y + DELTA
+            pageY: PAGE_Y + DELTA,
         }));
         // PAGE_X + DELTA - 0.5 * WIDTH
         // 100 + 10 - 0.5 * 100 = 60

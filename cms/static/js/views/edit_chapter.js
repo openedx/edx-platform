@@ -21,8 +21,8 @@ function(_, $, gettext, HtmlUtils, BaseView, FileUploadModel, UploadDialogView, 
                     name: this.model.get('name'),
                     asset_path: this.model.get('asset_path'),
                     order: this.model.get('order'),
-                    error: this.model.validationError
-                })
+                    error: this.model.validationError,
+                }),
             );
             return this;
         },
@@ -31,19 +31,19 @@ function(_, $, gettext, HtmlUtils, BaseView, FileUploadModel, UploadDialogView, 
             'change .chapter-asset-path': 'changeAssetPath',
             'click .action-close': 'removeChapter',
             'click .action-upload': 'openUploadDialog',
-            submit: 'uploadAsset'
+            submit: 'uploadAsset',
         },
         changeName: function(e) {
             if (e && e.preventDefault) { e.preventDefault(); }
             this.model.set({
-                name: this.$('.chapter-name').val()
+                name: this.$('.chapter-name').val(),
             }, {silent: true});
             return this;
         },
         changeAssetPath: function(e) {
             if (e && e.preventDefault) { e.preventDefault(); }
             this.model.set({
-                asset_path: this.$('.chapter-asset-path').val()
+                asset_path: this.$('.chapter-asset-path').val(),
             }, {silent: true});
             return this;
         },
@@ -56,13 +56,13 @@ function(_, $, gettext, HtmlUtils, BaseView, FileUploadModel, UploadDialogView, 
             if (e && e.preventDefault) { e.preventDefault(); }
             this.model.set({
                 name: this.$('input.chapter-name').val(),
-                asset_path: this.$('input.chapter-asset-path').val()
+                asset_path: this.$('input.chapter-asset-path').val(),
             });
             var msg = new FileUploadModel({
                 title: _.template(gettext('Upload a new PDF to “<%- name %>”'))(
                     {name: course.get('name')}),
                 message: gettext('Please select a PDF file to upload.'),
-                mimeTypes: ['application/pdf']
+                mimeTypes: ['application/pdf'],
             });
             var that = this;
             var view = new UploadDialogView({
@@ -74,10 +74,10 @@ function(_, $, gettext, HtmlUtils, BaseView, FileUploadModel, UploadDialogView, 
                     }
                     options.asset_path = response.asset.portable_url;
                     that.model.set(options);
-                }
+                },
             });
             view.show();
-        }
+        },
     });
 
     return EditChapter;

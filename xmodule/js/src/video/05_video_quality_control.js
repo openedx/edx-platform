@@ -17,12 +17,12 @@
                     '<span class="sr control-text">',
                     '{off}',
                     '</span>',
-                    '</button>'
+                    '</button>',
                 ].join('')),
                 {
                     highDefinition: gettext('High Definition'),
-                    off: gettext('off')
-                }
+                    off: gettext('off'),
+                },
             );
 
             // VideoQualityControl() function - what this module "exports".
@@ -58,7 +58,7 @@
                     fetchAvailableQualities: fetchAvailableQualities,
                     onQualityChange: onQualityChange,
                     showQualityControl: showQualityControl,
-                    toggleQuality: toggleQuality
+                    toggleQuality: toggleQuality,
                 };
 
                 state.bindTo(methodsDict, state.videoQualityControl, state);
@@ -67,7 +67,7 @@
             function destroy() {
                 this.videoQualityControl.el.off({
                     click: this.videoQualityControl.toggleQuality,
-                    destroy: this.videoQualityControl.destroy
+                    destroy: this.videoQualityControl.destroy,
                 });
                 this.el.off('.quality');
                 this.videoQualityControl.el.remove();
@@ -90,10 +90,10 @@
             //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
             function _bindHandlers(state) {
                 state.videoQualityControl.el.on('click',
-                    state.videoQualityControl.toggleQuality
+                    state.videoQualityControl.toggleQuality,
                 );
                 state.el.on('play.quality', _.once(
-                    state.videoQualityControl.fetchAvailableQualities
+                    state.videoQualityControl.fetchAvailableQualities,
                 ));
 
                 state.el.on('destroy.quality', state.videoQualityControl.destroy);
@@ -127,7 +127,7 @@
                 var qualities = this.videoPlayer.player.getAvailableQualityLevels();
 
                 this.config.availableHDQualities = _.intersection(
-                    qualities, ['highres', 'hd1080', 'hd720']
+                    qualities, ['highres', 'hd1080', 'hd720'],
                 );
 
                 // HD qualities are available, show video quality control.
@@ -139,7 +139,7 @@
                 // 'default'. Otherwise, the player will sometimes switch to HD
                 // automatically, for example when the iframe resizes itself.
                 this.trigger('videoPlayer.handlePlaybackQualityChange',
-                    this.videoQualityControl.quality
+                    this.videoQualityControl.quality,
                 );
             }
 

@@ -42,7 +42,7 @@
                     play: this.bindUnloadHandler,
                     'pause destroy': this.saveStateHandler,
                     'language_menu:change': this.onLanguageChange,
-                    youtube_availability: this.onYoutubeAvailability
+                    youtube_availability: this.onYoutubeAvailability,
                 };
                 this.bindHandlers();
             },
@@ -102,7 +102,7 @@
                 if (this.state.config.saveStateEnabled) {
                     if (!($.isPlainObject(data))) {
                         data = {
-                            saved_video_position: this.state.videoPlayer.currentTime
+                            saved_video_position: this.state.videoPlayer.currentTime,
                         };
                     }
 
@@ -120,10 +120,10 @@
                         type: 'POST',
                         async: !!async,
                         dataType: 'json',
-                        data: data
+                        data: data,
                     });
                 }
-            }
+            },
         };
 
         return SaveStatePlugin;

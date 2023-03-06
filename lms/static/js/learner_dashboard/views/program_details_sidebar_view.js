@@ -40,7 +40,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
             programRecordUrl: this.programRecordUrl,
             industryPathways: this.industryPathways,
             creditPathways: this.creditPathways,
-            programTabViewEnabled: this.programTabViewEnabled
+            programTabViewEnabled: this.programTabViewEnabled,
         });
 
         HtmlUtils.setHtml(this.$el, this.tpl(data));

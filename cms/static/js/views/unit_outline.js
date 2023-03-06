@@ -32,7 +32,7 @@ define(['underscore', 'js/views/xblock_outline', 'js/views/unit_outline_child'],
                         ancestorView = this.createChildView(
                             ancestor,
                             previousAncestor,
-                            {parentView: ancestorView, currentUnitId: this.model.get('id')}
+                            {parentView: ancestorView, currentUnitId: this.model.get('id')},
                         );
                         ancestorView.render();
                         listElement.append(ancestorView.$el);
@@ -50,9 +50,9 @@ define(['underscore', 'js/views/xblock_outline', 'js/views/unit_outline_child'],
             getTemplateContext: function() {
                 return _.extend(
                     XBlockOutlineView.prototype.getTemplateContext.call(this),
-                    {currentUnitId: this.model.get('id')}
+                    {currentUnitId: this.model.get('id')},
                 );
-            }
+            },
         });
 
         return UnitOutlineView;

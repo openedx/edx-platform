@@ -3,7 +3,7 @@
 define([
     'jquery',
     'js/instructor_dashboard/data_download_2',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
 ],
 function($, id, AjaxHelper) {
     'use strict';
@@ -29,7 +29,7 @@ function($, id, AjaxHelper) {
 
             AjaxHelper.expectRequest(requests, 'POST', url);
             AjaxHelper.respondWithJson(requests, {
-                status: 'Request is succeeded'
+                status: 'Request is succeeded',
             });
             expect(dataDownload.$reports_request_response.text()).toContain('Request is succeeded');
         });
@@ -40,7 +40,7 @@ function($, id, AjaxHelper) {
 
             AjaxHelper.expectRequest(requests, 'POST', url);
             AjaxHelper.respondWithJson(requests, {
-                grading_config_summary: 'This is grading config'
+                grading_config_summary: 'This is grading config',
             });
             expect(dataDownload.$download_display_text.text()).toContain('This is grading config');
         });
@@ -66,7 +66,7 @@ function($, id, AjaxHelper) {
                     'goals',
                     'meta',
                     'city',
-                    'country'
+                    'country',
                 ],
                 course_id: 'test_course_101',
                 feature_names: {
@@ -86,7 +86,7 @@ function($, id, AjaxHelper) {
                     name: 'Name',
                     username: 'Username',
                     level_of_education: 'Level of Education',
-                    language: 'Language'
+                    language: 'Language',
                 },
                 students: [
                     {
@@ -106,8 +106,8 @@ function($, id, AjaxHelper) {
                         name: 'None',
                         username: 'test',
                         level_of_education: 'None',
-                        language: 'None'
-                    }
+                        language: 'None',
+                    },
                 ],
                 queried_features: [
                     'id',
@@ -126,9 +126,9 @@ function($, id, AjaxHelper) {
                     'last_login',
                     'date_joined',
                     'city',
-                    'country'
+                    'country',
                 ],
-                students_count: 1
+                students_count: 1,
             };
             dataDownload.renderDataTable($selected, errorMessage);
             AjaxHelper.expectRequest(requests, 'POST', url);

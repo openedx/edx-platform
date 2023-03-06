@@ -51,7 +51,7 @@ class DemographicsCollectionModal extends React.Component {
                 [FIELD_NAMES.ETHNICITY]: [],
                 [FIELD_NAMES.WORK_STATUS]: '',
                 [FIELD_NAMES.WORK_STATUS_DESCRIPTION]: '',
-            }
+            },
         };
         this.handleSelectChange = this.handleSelectChange.bind(this);
         this.handleMultiselectChange = this.handleMultiselectChange.bind(this);
@@ -121,7 +121,7 @@ class DemographicsCollectionModal extends React.Component {
             selected: {
                 ...prevState.selected,
                 [name]: value,
-            }
+            },
         }));
     }
 
@@ -148,7 +148,7 @@ class DemographicsCollectionModal extends React.Component {
             selected: {
                 ...prevState.selected,
                 [name]: value,
-            }
+            },
         }));
     }
 
@@ -189,7 +189,7 @@ class DemographicsCollectionModal extends React.Component {
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
-                'USE-JWT-COOKIE': true
+                'USE-JWT-COOKIE': true,
             },
         };
         let response;
@@ -260,8 +260,8 @@ class DemographicsCollectionModal extends React.Component {
                                             gettext('Section {currentPage} of {totalPages}'),
                                             {
                                                 currentPage: currentPage,
-                                                totalPages: totalPages
-                                            }
+                                                totalPages: totalPages,
+                                            },
                                         )
                                         }
                                     </p>
@@ -294,7 +294,7 @@ class DemographicsCollectionModal extends React.Component {
                                         labelText={gettext("What is your gender identity?")}
                                         options={[
                                             <option value="default" key="default">{gettext("Select gender")}</option>,
-                                            this.loadOptions(FIELD_NAMES.GENDER)
+                                            this.loadOptions(FIELD_NAMES.GENDER),
                                         ]}
                                         showInput={wizardConsumer[FIELD_NAMES.GENDER] == "self-describe"}
                                         inputName={FIELD_NAMES.GENDER_DESCRIPTION}
@@ -320,7 +320,7 @@ class DemographicsCollectionModal extends React.Component {
                                                 target: {
                                                     name: FIELD_NAMES.ETHNICITY,
                                                     value: wizardConsumer[FIELD_NAMES.ETHNICITY].map(ethnicity => ({ ethnicity, value: ethnicity })),
-                                                }
+                                                },
                                             }
                                             this.handleSelectChange(e);
                                         }}
@@ -430,7 +430,7 @@ class DemographicsCollectionModal extends React.Component {
                                         labelText={"What is your current employment status?"}
                                         options={[
                                             <option value="default" key="default">{gettext("Select employment status")}</option>,
-                                            this.loadOptions(FIELD_NAMES.WORK_STATUS)
+                                            this.loadOptions(FIELD_NAMES.WORK_STATUS),
                                         ]}
                                         showInput={wizardConsumer[FIELD_NAMES.WORK_STATUS] == "other"}
                                         inputName={FIELD_NAMES.WORK_STATUS_DESCRIPTION}

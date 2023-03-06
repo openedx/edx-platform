@@ -37,12 +37,12 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
                 var errorObjects = [
                     {
                         model: {display_name: 'test_attribute1'},
-                        message: 'Encountered an error while saving test_attribute1'
+                        message: 'Encountered an error while saving test_attribute1',
                     },
                     {
                         model: {display_name: 'test_attribute2'},
-                        message: 'Encountered an error while saving test_attribute2'
-                    }
+                        message: 'Encountered an error while saving test_attribute2',
+                    },
                 ];
 
                 showModal(errorObjects);
@@ -54,12 +54,12 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
                 var errorObjects = [
                     {
                         model: {display_name: 'test_attribute1'},
-                        message: 'Encountered an error while saving test_attribute1'
+                        message: 'Encountered an error while saving test_attribute1',
                     },
                     {
                         model: {display_name: 'test_attribute2'},
-                        message: 'Encountered an error while saving test_attribute2'
-                    }
+                        message: 'Encountered an error while saving test_attribute2',
+                    },
                 ];
 
                 var callback = function() {

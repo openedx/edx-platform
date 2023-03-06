@@ -4,11 +4,11 @@
         var EnrollmentInterface = {
 
             urls: {
-                baskets: '/api/commerce/v0/baskets/'
+                baskets: '/api/commerce/v0/baskets/',
             },
 
             headers: {
-                'X-CSRFToken': $.cookie('csrftoken')
+                'X-CSRFToken': $.cookie('csrftoken'),
             },
 
             /**
@@ -26,7 +26,7 @@
                     contentType: 'application/json; charset=utf-8',
                     data: data,
                     headers: this.headers,
-                    context: this
+                    context: this,
                 }).fail(function(jqXHR) {
                     var responseData = JSON.parse(jqXHR.responseText);
                     if (jqXHR.status === 403 && responseData.user_message_url) {
@@ -58,7 +58,7 @@
              */
             redirect: function(url) {
                 window.location.href = url;
-            }
+            },
         };
 
         return EnrollmentInterface;

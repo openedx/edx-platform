@@ -19,13 +19,13 @@ var edx = edx || {};
             due: null,
             category: '',
             hidden: false,
-            children: []
-        }
+            children: [],
+        },
     });
 
     edx.ccx.schedule.Schedule = Backbone.Collection.extend({
         model: edx.ccx.schedule.UnitModel,
-        url: 'ccx_schedule'
+        url: 'ccx_schedule',
     });
 
     edx.ccx.schedule.ScheduleView = Backbone.View.extend({
@@ -133,7 +133,7 @@ var edx = edx || {};
                     self.schedule,
                     chapter,
                     sequential === 'all' ? null : sequential,
-                    vertical === 'all' ? null : vertical
+                    vertical === 'all' ? null : vertical,
                 );
                 due = self.get_datetime('due');
                 var errorMessage = self.valid_dates(start, due);
@@ -276,7 +276,7 @@ var edx = edx || {};
                     $('#dirty-schedule').hide();
                     $('form#add-unit select,input,button').prop('disabled', true);
                     $button.prop('disabled', false).text(gettext('Save changes'));
-                }
+                },
             });
         }, // end save
 
@@ -432,7 +432,7 @@ var edx = edx || {};
                     .data('location', row.data('location'));
                 modal.find('h2').text(
                     what === 'due' ? gettext('Enter Due Date and Time') :
-                        gettext('Enter Start Date and Time')
+                        gettext('Enter Start Date and Time'),
                 );
                 modal.focus();
                 $(document).on('focusin', function(event) {
@@ -533,8 +533,8 @@ var edx = edx || {};
             return $(row).nextUntil(
                 $(row).siblings().filter(function() {
                     return $(this).data('depth') <= depth;
-                })
+                }),
             );
-        }
+        },
     });
 }(jQuery, _, Backbone, gettext));

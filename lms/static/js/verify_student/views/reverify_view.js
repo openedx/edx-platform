@@ -21,7 +21,7 @@ var edx = edx || {};
             'face-photo-step',
             'id-photo-step',
             'review-photos-step',
-            'reverify-success-step'
+            'reverify-success-step',
         ],
         stepViews: {},
 
@@ -41,14 +41,14 @@ var edx = edx || {};
                 'face-photo-step': edx.verify_student.FacePhotoStepView,
                 'id-photo-step': edx.verify_student.IDPhotoStepView,
                 'review-photos-step': edx.verify_student.ReviewPhotosStepView,
-                'reverify-success-step': edx.verify_student.ReverifySuccessStepView
+                'reverify-success-step': edx.verify_student.ReverifySuccessStepView,
             };
 
             nextStepTitles = [
                 gettext('Take a photo of your ID'),
                 gettext('Review your info'),
                 gettext('Confirm'),
-                ''
+                '',
             ];
 
             // Create the verification model, which is shared
@@ -62,7 +62,7 @@ var edx = edx || {};
                     errorModel: this.errorModel,
                     nextStepTitle: nextStepTitles[index],
                     stepData: stepInfo[name],
-                    model: verificationModel
+                    model: verificationModel,
                 });
 
                 this.listenTo(stepView, 'next-step', this.nextStep);
@@ -85,7 +85,7 @@ var edx = edx || {};
             if (!$stepEl.length) {
                 $stepEl = edx.HtmlUtils.append(
                     $(this.el),
-                    edx.HtmlUtils.HTML('<div id="current-step-container"></div>').toString()
+                    edx.HtmlUtils.HTML('<div id="current-step-container"></div>').toString(),
                 );
             }
 
@@ -99,7 +99,7 @@ var edx = edx || {};
         nextStep: function() {
             this.currentStepIndex = Math.min(
                 this.currentStepIndex + 1,
-                this.stepOrder.length - 1
+                this.stepOrder.length - 1,
             );
             this.render();
         },
@@ -112,6 +112,6 @@ var edx = edx || {};
             }
 
             this.render();
-        }
+        },
     });
 }(jQuery, _, Backbone, gettext));

@@ -26,7 +26,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
     function($, _, gettext, BaseView) {
         var BaseModal = BaseView.extend({
             events: {
-                'click .action-cancel': 'cancel'
+                'click .action-cancel': 'cancel',
             },
 
             options: _.extend({}, BaseView.prototype.options, {
@@ -43,7 +43,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                 addPrimaryActionButton: false,
                 primaryActionButtonType: 'save',
                 primaryActionButtonTitle: gettext('Save'),
-                showEditorModeButtons: true
+                showEditorModeButtons: true,
             }),
 
             initialize: function() {
@@ -71,7 +71,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                     title: this.getTitle(),
                     modalSRTitle: this.options.modalSRTitle,
                     showEditorModeButtons: this.options.showEditorModeButtons,
-                    viewSpecificClasses: this.options.viewSpecificClasses
+                    viewSpecificClasses: this.options.viewSpecificClasses,
                 }));
                 this.addActionButtons();
                 this.renderContents();
@@ -130,7 +130,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                     this.addActionButton(
                         this.options.primaryActionButtonType,
                         this.options.primaryActionButtonTitle,
-                        true
+                        true,
                     );
                 }
                 this.addActionButton('cancel', gettext('Cancel'));
@@ -146,7 +146,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                 var html = this.buttonTemplate({
                     type: type,
                     name: name,
-                    isPrimary: isPrimary
+                    isPrimary: isPrimary,
                 });
                 // xss-lint: disable=javascript-jquery-append
                 this.getActionBar().find('ul').append(html);
@@ -191,9 +191,9 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
 
                 modalWindow.css({
                     top: top + $(window).scrollTop(),
-                    left: left + $(window).scrollLeft()
+                    left: left + $(window).scrollLeft(),
                 });
-            }
+            },
         });
 
         return BaseModal;

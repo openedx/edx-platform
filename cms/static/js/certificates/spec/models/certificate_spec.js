@@ -2,7 +2,7 @@
 
 define([
     'js/certificates/models/certificate',
-    'js/certificates/collections/certificates'
+    'js/certificates/collections/certificates',
 ],
 function(CertificateModel, CertificateCollection) {
     'use strict';

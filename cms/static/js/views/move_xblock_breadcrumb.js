@@ -5,7 +5,7 @@ define([
     'jquery', 'backbone', 'underscore', 'gettext',
     'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils',
-    'text!templates/move-xblock-breadcrumb.underscore'
+    'text!templates/move-xblock-breadcrumb.underscore',
 ],
 function($, Backbone, _, gettext, HtmlUtils, StringUtils, MoveXBlockBreadcrumbViewTemplate) {
     'use strict';
@@ -14,7 +14,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, MoveXBlockBreadcrumbVi
         el: '.breadcrumb-container',
 
         events: {
-            'click .parent-nav-button': 'handleBreadcrumbButtonPress'
+            'click .parent-nav-button': 'handleBreadcrumbButtonPress',
         },
 
         initialize: function() {
@@ -25,7 +25,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, MoveXBlockBreadcrumbVi
         render: function(options) {
             HtmlUtils.setHtml(
                 this.$el,
-                this.template(options)
+                this.template(options),
             );
             Backbone.trigger('move:breadcrumbRendered');
             return this;
@@ -39,9 +39,9 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, MoveXBlockBreadcrumbVi
         handleBreadcrumbButtonPress: function(event) {
             Backbone.trigger(
                 'move:breadcrumbButtonPressed',
-                $(event.target).data('parentIndex')
+                $(event.target).data('parentIndex'),
             );
-        }
+        },
     });
 
     return MoveXBlockBreadcrumb;

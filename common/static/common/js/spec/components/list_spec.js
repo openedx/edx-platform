@@ -4,8 +4,8 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
         describe('ListView', function() {
             var Model = Backbone.Model.extend({
                     defaults: {
-                        name: 'default name'
-                    }
+                        name: 'default name',
+                    },
                 }),
                 View = Backbone.View.extend({
                     tagName: 'div',
@@ -14,10 +14,10 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
                     render: function() {
                         this.$el.html(this.template(this.model.attributes));
                         return this;
-                    }
+                    },
                 }),
                 Collection = Backbone.Collection.extend({
-                    model: Model
+                    model: Model,
                 }),
                 expectListNames = function(names) {
                     expect(listView.$('.my-view').length).toBe(names.length);
@@ -32,9 +32,9 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
                 listView = new ListView({
                     el: $('.list'),
                     collection: new Collection(
-                        [{name: 'first model'}, {name: 'second model'}, {name: 'third model'}]
+                        [{name: 'first model'}, {name: 'second model'}, {name: 'third model'}],
                     ),
-                    itemViewClass: View
+                    itemViewClass: View,
                 });
                 listView.render();
             });
@@ -65,7 +65,7 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
                 listView.collection.add({name: 'second-and-a-half model'}, {at: 3});
                 expectListNames([
                     'zeroth model', 'first model', 'second model',
-                    'second-and-a-half model', 'third model', 'fourth model'
+                    'second-and-a-half model', 'third model', 'fourth model',
                 ]);
             });
 

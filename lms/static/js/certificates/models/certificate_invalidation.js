@@ -15,7 +15,7 @@
                     user: '',
                     invalidated_by: '',
                     created: '',
-                    notes: ''
+                    notes: '',
                 },
 
                 initialize: function(attributes, options) {
@@ -28,8 +28,8 @@
                         return gettext('Student username/email field is required and can not be empty. ' +
                             'Kindly fill in username/email and then press "Invalidate Certificate" button.');
                     }
-                }
+                },
             });
-        }
+        },
     );
 }).call(this, define || RequireJS.define);

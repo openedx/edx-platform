@@ -10,7 +10,7 @@
             title: '',
             titleTemplate: HtmlUtils.template('<h2 class="sr"><%- text %></h2>'),
             attributes: {
-                tabindex: -1
+                tabindex: -1,
             },
 
             initialize: function(options) {
@@ -28,7 +28,7 @@
             render: function() {
                 HtmlUtils.setHtml(
                     this.$el,
-                    this.getTitle()
+                    this.getTitle(),
                 );
                 this.renderView(this.pagingHeaderView);
                 this.renderContent();
@@ -70,7 +70,7 @@
                 this.children = null;
                 Backbone.View.prototype.remove.call(this);
                 return this;
-            }
+            },
         });
 
         return TabPanelView;

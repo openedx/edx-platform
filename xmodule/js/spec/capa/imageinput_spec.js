@@ -49,7 +49,7 @@
             // Set up of 'click' event.
             event = jQuery.Event(
                 'click',
-                {offsetX: 35.3, offsetY: 42.7}
+                {offsetX: 35.3, offsetY: 42.7},
             );
 
             // Calculating the expected coordinates.
@@ -67,7 +67,7 @@
             expect(cssLeft).toBeCloseTo(posX - 15, 1);
             expect(cssTop).toBeCloseTo(posY - 15, 1);
             expect(state.inputEl.val()).toBe(
-                '[' + Math.round(posX) + ',' + Math.round(posY) + ']'
+                '[' + Math.round(posX) + ',' + Math.round(posY) + ']',
             );
         });
 
@@ -80,8 +80,8 @@
                 'click',
                 {
                     offsetX: undefined, offsetY: undefined,
-                    pageX: 35.3, pageY: 42.7
-                }
+                    pageX: 35.3, pageY: 42.7,
+                },
             );
 
             // Calculating the expected coordinates.
@@ -99,7 +99,7 @@
             expect(cssLeft).toBeCloseTo(posX - 15, 1);
             expect(cssTop).toBeCloseTo(posY - 15, 1);
             expect(state.inputEl.val()).toBe(
-                '[' + Math.round(posX) + ',' + Math.round(posY) + ']'
+                '[' + Math.round(posX) + ',' + Math.round(posY) + ']',
             );
         });
     });

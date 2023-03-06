@@ -19,11 +19,11 @@
                             // We pass the context object to the template so that
                             // we can perform variable interpolation using sprintf
                             providers: this.providers,
-                            platformName: this.platformName
-                        })
+                            platformName: this.platformName,
+                        }),
                     );
                     return this;
-                }
+                },
             });
         });
 }).call(this, define || RequireJS.define);

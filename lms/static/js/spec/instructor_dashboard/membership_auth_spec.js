@@ -24,11 +24,11 @@ function($, AjaxHelpers) {
             var membershipMain, membershipTpl;
             membershipMain = readFixtures('js/fixtures/instructor_dashboard/membership.html');
             membershipTpl = readFixtures(
-                'templates/instructor/instructor_dashboard_2/membership-list-widget.underscore'
+                'templates/instructor/instructor_dashboard_2/membership-list-widget.underscore',
             );
             appendSetFixtures(
                 "<script type='text/template' id='membership-list-widget-tpl'>" + membershipTpl + '</script>' +
-                    membershipMain
+                    membershipMain,
             );
             membership = new window.InstructorDashboard.sections.Membership($('#membership'));
         });
@@ -45,9 +45,9 @@ function($, AjaxHelpers) {
                     first_name: '',
                     group_name: 'Verified',
                     last_name: '',
-                    username: 'verified'
+                    username: 'verified',
                 }],
-                division_scheme: 'enrollment_track'
+                division_scheme: 'enrollment_track',
             };
             changeSelectedList('Group Moderator');
 
@@ -74,17 +74,17 @@ function($, AjaxHelpers) {
             params = $.param({
                 unique_student_identifier: 'smth',
                 rolename: 'staff',
-                action: 'allow'
+                action: 'allow',
             });
             AjaxHelpers.expectPostRequest(requests, url, params);
 
             AjaxHelpers.respondWithJson(requests, {
                 unique_student_identifier: 'smth',
-                userDoesNotExist: true
+                userDoesNotExist: true,
             });
 
             expect($('.request-response-error').text()).toEqual(
-                "Could not find a user with username or email address 'smth'."
+                "Could not find a user with username or email address 'smth'.",
             );
         });
 
@@ -100,9 +100,9 @@ function($, AjaxHelpers) {
                     first_name: '',
                     group_name: 'Verified',
                     last_name: '',
-                    username: 'verified'
+                    username: 'verified',
                 }],
-                division_scheme: 'none'
+                division_scheme: 'none',
             };
             changeSelectedList('Group Moderator');
 

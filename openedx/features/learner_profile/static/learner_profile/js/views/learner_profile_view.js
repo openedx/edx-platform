@@ -5,7 +5,7 @@
         [
             'gettext', 'jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils',
             'common/js/components/views/tabbed_view',
-            'learner_profile/js/views/section_two_tab'
+            'learner_profile/js/views/section_two_tab',
         ],
         function (gettext, $, _, Backbone, HtmlUtils, TabbedView, SectionTwoTab){
             var LearnerProfileView = Backbone.View.extend({
@@ -16,7 +16,7 @@
                     _.bindAll(this, 'showFullProfile', 'render', 'renderFields', 'showLoadingError');
                     this.listenTo(this.options.preferencesModel, 'change:account_privacy', this.render);
                     Router = Backbone.Router.extend({
-                        routes: {':about_me': 'loadTab', ':accomplishments': 'loadTab'}
+                        routes: {':about_me': 'loadTab', ':accomplishments': 'loadTab'},
                     });
 
                     this.router = new Router();
@@ -49,7 +49,7 @@
                     this.sectionTwoView = new SectionTwoTab({
                         viewList: this.options.sectionTwoFieldViews,
                         showFullProfile: this.showFullProfile,
-                        ownProfile: this.options.ownProfile
+                        ownProfile: this.options.ownProfile,
                     });
 
                     this.renderFields();
@@ -72,8 +72,8 @@
                             {
                                 view: this.options.badgeListContainer,
                                 title: gettext('Accomplishments'),
-                                url: 'accomplishments'
-                            }
+                                url: 'accomplishments',
+                            },
                         ];
 
                         // Build the accomplishments Tab and fill with data
@@ -86,13 +86,13 @@
                         this.tabbedView = new TabbedView({
                             tabs: tabs,
                             router: this.router,
-                            viewLabel: gettext('Profile')
+                            viewLabel: gettext('Profile'),
                         });
 
                         $tabbedViewElement = this.tabbedView.render().el;
                         HtmlUtils.setHtml(
                             $wrapperProfileBioElement,
-                            HtmlUtils.HTML($tabbedViewElement)
+                            HtmlUtils.HTML($tabbedViewElement),
                         );
 
                         if (this.firstRender) {
@@ -160,7 +160,7 @@
                 showLoadingError: function (){
                     this.$('.ui-loading-indicator').addClass('is-hidden');
                     this.$('.ui-loading-error').removeClass('is-hidden');
-                }
+                },
             });
 
             return LearnerProfileView;

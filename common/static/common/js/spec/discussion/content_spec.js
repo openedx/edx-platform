@@ -10,7 +10,7 @@
                 return DiscussionUtil.loadRoles({
                     Moderator: [567],
                     Administrator: [567],
-                    'Community TA': [567]
+                    'Community TA': [567],
                 });
             });
             it('anonymous thread should not include login role label', function() {
@@ -23,7 +23,7 @@
             return it('general thread should include login role label', function() {
                 var anon_content;
                 anon_content = new Content({
-                    user_id: '567'
+                    user_id: '567',
                 });
                 anon_content.initialize();
                 expect(anon_content.get('staff_authored')).toBe(true);
@@ -37,7 +37,7 @@
                     user_id: '567',
                     course_id: 'edX/999/test',
                     body: 'this is some content',
-                    abuse_flaggers: ['123']
+                    abuse_flaggers: ['123'],
                 });
             });
             it('should exist', function() {
@@ -54,13 +54,13 @@
             it('can update info', function() {
                 this.content.updateInfo({
                     ability: {
-                        can_edit: true
+                        can_edit: true,
                     },
                     voted: true,
-                    subscribed: true
+                    subscribed: true,
                 });
                 expect(this.content.get('ability')).toEqual({
-                    can_edit: true
+                    can_edit: true,
                 });
                 expect(this.content.get('voted')).toEqual(true);
                 return expect(this.content.get('subscribed')).toEqual(true);
@@ -81,10 +81,10 @@
         return describe('Comments', function() {
             beforeEach(function() {
                 this.comment1 = new Comment({
-                    id: '123'
+                    id: '123',
                 });
                 this.comment2 = new Comment({
-                    id: '345'
+                    id: '345',
                 });
             });
             it('can contain multiple comments', function() {
@@ -106,48 +106,48 @@
                 DiscussionUtil.loadRoles({
                     Moderator: [111],
                     Administrator: [222],
-                    'Community TA': [333]
+                    'Community TA': [333],
                 });
                 this.discussionThread = new Thread({
                     id: 1,
                     thread_type: 'discussion',
-                    user_id: 99
+                    user_id: 99,
                 });
                 this.discussionResponse = new Comment({
                     id: 1,
-                    thread: this.discussionThread
+                    thread: this.discussionThread,
                 });
                 this.questionThread = new Thread({
                     id: 1,
                     thread_type: 'question',
-                    user_id: 99
+                    user_id: 99,
                 });
                 this.questionResponse = new Comment({
                     id: 1,
-                    thread: this.questionThread
+                    thread: this.questionThread,
                 });
                 window.user = new DiscussionUser({
-                    id: 111
-                });
-                expect(this.discussionResponse.canBeEndorsed()).toBe(true);
-                expect(this.questionResponse.canBeEndorsed()).toBe(true);
-                window.user = new DiscussionUser({
-                    id: 222
+                    id: 111,
                 });
                 expect(this.discussionResponse.canBeEndorsed()).toBe(true);
                 expect(this.questionResponse.canBeEndorsed()).toBe(true);
                 window.user = new DiscussionUser({
-                    id: 333
+                    id: 222,
                 });
                 expect(this.discussionResponse.canBeEndorsed()).toBe(true);
                 expect(this.questionResponse.canBeEndorsed()).toBe(true);
                 window.user = new DiscussionUser({
-                    id: 99
+                    id: 333,
+                });
+                expect(this.discussionResponse.canBeEndorsed()).toBe(true);
+                expect(this.questionResponse.canBeEndorsed()).toBe(true);
+                window.user = new DiscussionUser({
+                    id: 99,
                 });
                 expect(this.discussionResponse.canBeEndorsed()).toBe(false);
                 expect(this.questionResponse.canBeEndorsed()).toBe(true);
                 window.user = new DiscussionUser({
-                    id: 999
+                    id: 999,
                 });
                 expect(this.discussionResponse.canBeEndorsed()).toBe(false);
                 return expect(this.questionResponse.canBeEndorsed()).toBe(false);

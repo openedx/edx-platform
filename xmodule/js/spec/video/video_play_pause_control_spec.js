@@ -25,14 +25,14 @@
 
         it('add ARIA attributes to play control', function() {
             expect($('.video_control.play')).toHaveAttrs({
-                'aria-disabled': 'false'
+                'aria-disabled': 'false',
             });
         });
 
         it('can update ARIA state on play', function() {
             state.el.trigger('play');
             expect($('.video_control.pause')).toHaveAttrs({
-                'aria-disabled': 'false'
+                'aria-disabled': 'false',
             });
         });
 
@@ -40,7 +40,7 @@
             state.el.trigger('play');
             state.el.trigger('ended');
             expect($('.video_control.play')).toHaveAttrs({
-                'aria-disabled': 'false'
+                'aria-disabled': 'false',
             });
         });
 

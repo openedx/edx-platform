@@ -14,44 +14,44 @@
 
         beforeEach(function() {
             setFixtures(sandbox({
-                id: 'page-alert'
+                id: 'page-alert',
             }));
             appendSetFixtures(sandbox({
-                id: 'page-notification'
+                id: 'page-notification',
             }));
             appendSetFixtures(sandbox({
-                id: 'page-prompt'
+                id: 'page-prompt',
             }));
             appendSetFixtures($('<script>', {
                 id: 'system-feedback-tpl',
-                type: 'text/template'
+                type: 'text/template',
             }).text(tpl));
             return jasmine.addMatchers({
                 toBeShown: function() {
                     return {
                         compare: function(actual) {
                             return {
-                                pass: actual.hasClass('is-shown') && !actual.hasClass('is-hiding')
+                                pass: actual.hasClass('is-shown') && !actual.hasClass('is-hiding'),
                             };
-                        }
+                        },
                     };
                 },
                 toBeHiding: function() {
                     return {
                         compare: function(actual) {
                             return {
-                                pass: actual.hasClass('is-hiding') && !actual.hasClass('is-shown')
+                                pass: actual.hasClass('is-hiding') && !actual.hasClass('is-shown'),
                             };
-                        }
+                        },
                     };
-                }
+                },
             });
         });
         describe('SystemFeedback', function() {
             beforeEach(function() {
                 this.options = {
                     title: 'Portal',
-                    message: 'Welcome to the Aperture Science Computer-Aided Enrichment Center'
+                    message: 'Welcome to the Aperture Science Computer-Aided Enrichment Center',
                 };
                 this.renderSpy = spyOn(AlertView.Confirmation.prototype, 'render').and.callThrough();
                 this.showSpy = spyOn(AlertView.Confirmation.prototype, 'show').and.callThrough();
@@ -123,13 +123,13 @@
                     actions: {
                         primary: {
                             text: "Yes, I'm sure.",
-                            class: 'confirm-button'
+                            class: 'confirm-button',
                         },
                         secondary: {
                             text: 'Cancel',
-                            class: 'cancel-button'
-                        }
-                    }
+                            class: 'cancel-button',
+                        },
+                    },
                 };
                 this.inFocusSpy = spyOn(PromptView.Confirmation.prototype, 'inFocus').and.callThrough();
                 this.outFocusSpy = spyOn(PromptView.Confirmation.prototype, 'outFocus').and.callThrough();
@@ -157,7 +157,7 @@
                 expect(this.inFocusSpy).toHaveBeenCalled();
                 $('.action-secondary').first().simulate(
                     'keydown',
-                    {keyCode: $.simulate.keyCode.TAB}
+                    {keyCode: $.simulate.keyCode.TAB},
                 );
 
                 jasmine.waitUntil(function() {
@@ -170,7 +170,7 @@
                 expect(this.inFocusSpy).toHaveBeenCalled();
                 $('.action-primary').first().simulate(
                     'keydown',
-                    {keyCode: $.simulate.keyCode.TAB, shiftKey: true}
+                    {keyCode: $.simulate.keyCode.TAB, shiftKey: true},
                 );
                 jasmine.waitUntil(function() {
                     return isFocused(view.$('.action-secondary'));
@@ -180,7 +180,7 @@
                 var view;
                 view = new PromptView.Confirmation({
                     title: 'Portal',
-                    message: 'Welcome to the Aperture Science Computer-Aided Enrichment Center'
+                    message: 'Welcome to the Aperture Science Computer-Aided Enrichment Center',
                 });
                 return view.hide();
             });
@@ -208,14 +208,14 @@
                         primary: {
                             text: 'Save',
                             class: 'save-button',
-                            click: this.primaryClickSpy
+                            click: this.primaryClickSpy,
                         },
                         secondary: {
                             text: 'Revert',
                             class: 'cancel-button',
-                            click: this.secondaryClickSpy
-                        }
-                    }
+                            click: this.secondaryClickSpy,
+                        },
+                    },
                 });
                 return this.view.show();
             });
@@ -256,9 +256,9 @@
                         primary: {
                             text: 'Whatever',
                             click: this.clickSpy,
-                            preventDefault: false
-                        }
-                    }
+                            preventDefault: false,
+                        },
+                    },
                 });
                 return this.view.show();
             });
@@ -281,14 +281,14 @@
                             {
                                 text: 'Option One',
                                 class: 'option-one',
-                                click: this.secondarySpyOne
+                                click: this.secondarySpyOne,
                             }, {
                                 text: 'Option Two',
                                 class: 'option-two',
-                                click: this.secondarySpyTwo
-                            }
-                        ]
-                    }
+                                click: this.secondarySpyTwo,
+                            },
+                        ],
+                    },
                 });
                 return this.view.show();
             });
@@ -330,7 +330,7 @@
             xit('a minShown view should not hide too quickly', function() {
                 var view;
                 view = new NotificationView.Confirmation({
-                    minShown: 1000
+                    minShown: 1000,
                 });
                 view.show();
                 expect(view.$('.wrapper')).toBeShown();
@@ -342,7 +342,7 @@
             xit('a maxShown view should hide by itself', function() {
                 var view;
                 view = new NotificationView.Confirmation({
-                    maxShown: 1000
+                    maxShown: 1000,
                 });
                 view.show();
                 expect(view.$('.wrapper')).toBeShown();
@@ -352,7 +352,7 @@
             xit('a minShown view can stay visible longer', function() {
                 var view;
                 view = new NotificationView.Confirmation({
-                    minShown: 1000
+                    minShown: 1000,
                 });
                 view.show();
                 expect(view.$('.wrapper')).toBeShown();
@@ -365,7 +365,7 @@
             xit('a maxShown view can hide early', function() {
                 var view;
                 view = new NotificationView.Confirmation({
-                    maxShown: 1000
+                    maxShown: 1000,
                 });
                 view.show();
                 expect(view.$('.wrapper')).toBeShown();
@@ -379,7 +379,7 @@
                 var view;
                 view = new NotificationView.Confirmation({
                     minShown: 1000,
-                    maxShown: 2000
+                    maxShown: 2000,
                 });
                 view.show();
                 this.clock.tick(50);

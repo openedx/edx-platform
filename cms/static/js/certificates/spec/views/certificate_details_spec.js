@@ -12,7 +12,7 @@ define([
     'common/js/spec_helpers/template_helpers',
     'common/js/spec_helpers/view_helpers',
     'js/spec_helpers/validation_helpers',
-    'js/certificates/spec/custom_matchers'
+    'js/certificates/spec/custom_matchers',
 ],
 function(_, Course, CertificatesCollection, CertificateModel, CertificateDetailsView, CertificatePreview,
     Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
@@ -39,7 +39,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         signatory_panel_close: '.signatory-panel-close',
         inputSignatoryName: '.signatory-name-input',
         inputSignatoryTitle: '.signatory-title-input',
-        inputSignatoryOrganization: '.signatory-organization-input'
+        inputSignatoryOrganization: '.signatory-organization-input',
     };
     var verifyAndConfirmPrompt = function(promptSpy, promptText) {
         ViewHelpers.verifyPromptShowing(promptSpy, gettext(promptText));
@@ -64,11 +64,11 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 url_name: 'course_name',
                 org: 'course_org',
                 num: 'course_num',
-                revision: 'course_rev'
+                revision: 'course_rev',
             });
             window.certWebPreview = new CertificatePreview({
                 course_modes: ['honor', 'test'],
-                certificate_web_view_url: '/users/1/courses/orgX/009/2016'
+                certificate_web_view_url: '/users/1/courses/orgX/009/2016',
             });
             window.CMS.User = {isGlobalStaff: true};
 
@@ -80,11 +80,11 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 url_name: 'course_name',
                 org: 'course_org',
                 num: 'course_num',
-                revision: 'course_rev'
+                revision: 'course_rev',
             });
             window.certWebPreview = new CertificatePreview({
                 course_modes: ['honor', 'test'],
-                certificate_web_view_url: '/users/1/courses/orgX/009/2016'
+                certificate_web_view_url: '/users/1/courses/orgX/009/2016',
             });
             window.CMS.User = {isGlobalStaff: true};
 
@@ -93,15 +93,15 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 name: 'Test Name',
                 description: 'Test Description',
                 course_title: 'Test Course Title Override',
-                is_active: true
+                is_active: true,
             }, this.newModelOptions);
 
             this.collection = new CertificatesCollection([this.model], {
-                certificateUrl: '/certificates/' + window.course.id
+                certificateUrl: '/certificates/' + window.course.id,
             });
             this.model.set('id', 0);
             this.view = new CertificateDetailsView({
-                model: this.model
+                model: this.model,
             });
             appendSetFixtures(this.view.render().el);
             CustomMatchers();
@@ -132,7 +132,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 var course_title = 'Test certificate course title override 2';
                 var CERTIFICATE_JSON_OBJECT = [{
                     course_title: course_title,
-                    signatories: '[]'
+                    signatories: '[]',
                 }];
                 this.collection.parse(CERTIFICATE_JSON_OBJECT);
                 var model = this.collection.at(1);
@@ -235,15 +235,15 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 this.view.$(SELECTORS.edit_signatory).click();
 
                 setValuesToInputs(this.view, {
-                    inputSignatoryName: 'New Signatory Test Name'
+                    inputSignatoryName: 'New Signatory Test Name',
                 });
 
                 setValuesToInputs(this.view, {
-                    inputSignatoryTitle: 'New Signatory Test Title'
+                    inputSignatoryTitle: 'New Signatory Test Title',
                 });
 
                 setValuesToInputs(this.view, {
-                    inputSignatoryOrganization: 'New Signatory Test Organization'
+                    inputSignatoryOrganization: 'New Signatory Test Organization',
                 });
 
                 this.view.$(SELECTORS.signatory_panel_save).click();
@@ -255,7 +255,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('New Signatory Test Name');
                 expect(this.view.$(SELECTORS.signatory_title_value)).toContainText('New Signatory Test Title');
                 expect(
-                    this.view.$(SELECTORS.signatory_organization_value)
+                    this.view.$(SELECTORS.signatory_organization_value),
                 ).toContainText('New Signatory Test Organization');
             });
         });

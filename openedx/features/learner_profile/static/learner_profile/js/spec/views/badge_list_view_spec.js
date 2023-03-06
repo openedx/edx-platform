@@ -4,7 +4,7 @@ define([
     'underscore',
     'edx-ui-toolkit/js/pagination/paging-collection',
     'learner_profile/js/spec_helpers/helpers',
-    'learner_profile/js/views/badge_list_view'
+    'learner_profile/js/views/badge_list_view',
 ],
 function(Backbone, $, _, PagingCollection, LearnerProfileHelpers, BadgeListView) {
     'use strict';
@@ -28,7 +28,7 @@ function(Backbone, $, _, PagingCollection, LearnerProfileHelpers, BadgeListView)
                 return hasNextPage;
             };
             badgeList = new BadgeListView({
-                collection: badgeCollection
+                collection: badgeCollection,
 
             });
             return badgeList;
@@ -77,6 +77,6 @@ function(Backbone, $, _, PagingCollection, LearnerProfileHelpers, BadgeListView)
             expect(rows.length).toBe(2);
         });
     });
-}
+},
 );
 

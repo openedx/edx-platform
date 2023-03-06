@@ -7,14 +7,14 @@
         'edx-ui-toolkit/js/utils/string-utils',
         'edx-ui-toolkit/js/utils/html-utils',
         'js/student_account/views/FormView',
-        'text!templates/student_account/form_status.underscore'
+        'text!templates/student_account/form_status.underscore',
     ],
     function(
         $, _, gettext,
         StringUtils,
         HtmlUtils,
         FormView,
-        formStatusTpl
+        formStatusTpl,
     ) {
         return FormView.extend({
             el: '#register-form',
@@ -25,7 +25,7 @@
                 'click .login-provider': 'thirdPartyAuth',
                 'click input[required][type="checkbox"]': 'liveValidateHandler',
                 'blur input[required], textarea[required], select[required]': 'liveValidateHandler',
-                'focus input[required], textarea[required], select[required]': 'handleRequiredInputFocus'
+                'focus input[required], textarea[required], select[required]': 'handleRequiredInputFocus',
             },
             liveValidationFields: [
                 'name',
@@ -35,7 +35,7 @@
                 'confirm_email',
                 'country',
                 'honor_code',
-                'terms_of_service'
+                'terms_of_service',
             ],
             formType: 'register',
             formFields: '.form-fields',
@@ -80,7 +80,7 @@
                 html.push(HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<div class="'),
                     className,
-                    HtmlUtils.HTML('">')
+                    HtmlUtils.HTML('">'),
                 ));
                 for (i = 0; i < fields.length; i++) {
                     html.push(HtmlUtils.template(fieldTpl)($.extend(fields[i], {
@@ -88,7 +88,7 @@
                         requiredStr: this.requiredStr,
                         optionalStr: fields[i].name === 'marketing_emails_opt_in' ? '' : this.optionalStr,
                         supplementalText: fields[i].supplementalText || '',
-                        supplementalLink: fields[i].supplementalLink || ''
+                        supplementalLink: fields[i].supplementalLink || '',
                     })));
                 }
                 html.push('</div>');
@@ -137,7 +137,7 @@
 
                 html.push.apply(html, this.renderFields(exposedOptionalFields, 'exposed-optional-fields'));
                 html.push.apply(html, this.renderFields(
-                    optionalFields, `optional-fields ${!this.enableCoppaCompliance ? '' : 'full-length-fields'}`
+                    optionalFields, `optional-fields ${!this.enableCoppaCompliance ? '' : 'full-length-fields'}`,
                 ));
 
                 this.render(html.join(''));
@@ -159,8 +159,8 @@
                             platformName: this.platformName,
                             autoRegisterWelcomeMessage: this.autoRegisterWelcomeMessage,
                             registerFormSubmitButtonText: this.registerFormSubmitButtonText,
-                            is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled
-                        }
+                            is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled,
+                        },
                     });
 
                 HtmlUtils.setHtml($(this.el), HtmlUtils.HTML(renderHtml));
@@ -263,7 +263,7 @@
                 // that is the container for the honor TOS text and checkbox.
                 // xss-lint: disable=javascript-jquery-insert-into-target
                 $('.exposed-optional-fields').insertBefore(
-                    $('.honor_tos_combined').parent()
+                    $('.honor_tos_combined').parent(),
                 );
 
                 // We are swapping the order of these elements here because the honor code agreement
@@ -403,11 +403,11 @@
             renderLiveValidationError: function($el, $label, $req, $icon, $tip, error) {
                 this.removeLiveValidationIndicators(
                     $el, $label, $req, $icon,
-                    'success', this.positiveValidationIcon
+                    'success', this.positiveValidationIcon,
                 );
                 this.addLiveValidationIndicators(
                     $el, $label, $req, $icon, $tip,
-                    'error', this.negativeValidationIcon, error
+                    'error', this.negativeValidationIcon, error,
                 );
                 this.renderRequiredMessage($el);
             },
@@ -417,11 +417,11 @@
                     validationFadeTime = this.successfulValidationDisplaySeconds * 1000;
                 this.removeLiveValidationIndicators(
                     $el, $label, $req, $icon,
-                    'error', this.negativeValidationIcon
+                    'error', this.negativeValidationIcon,
                 );
                 this.addLiveValidationIndicators(
                     $el, $label, $req, $icon, $tip,
-                    'success', this.positiveValidationIcon, ''
+                    'success', this.positiveValidationIcon, '',
                 );
                 this.hideRequiredMessage($el);
 
@@ -430,7 +430,7 @@
                 this.setFieldTimeout($el, validationFadeTime, function() {
                     self.removeLiveValidationIndicators(
                         $el, $label, $req, $icon,
-                        'success', self.positiveValidationIcon
+                        'success', self.positiveValidationIcon,
                     );
                     self.clearFieldTimeout($el);
                 });
@@ -484,14 +484,14 @@
                                                 error: errorItem.user_message,
                                                 suppressAttr: (
                                                     key === 'email' || key === 'username'
-                                                ) ? 'data-hj-suppress' : ''
+                                                ) ? 'data-hj-suppress' : '',
                                             });
                                         }
-                                    }
+                                    },
                                 );
                             }
-                        }
-                    )
+                        },
+                    ),
                 );
                 this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                 this.scrollToFormFeedback();
@@ -513,16 +513,16 @@
             renderAuthWarning: function() {
                 var msgPart1 = gettext('You\'ve successfully signed into %(currentProvider)s.'),
                     msgPart2 = gettext(
-                        'We just need a little more information before you start learning with %(platformName)s.'
+                        'We just need a little more information before you start learning with %(platformName)s.',
                     ),
                     fullMsg = _.sprintf(
                         msgPart1 + ' ' + msgPart2,
-                        {currentProvider: this.currentProvider, platformName: this.platformName}
+                        {currentProvider: this.currentProvider, platformName: this.platformName},
                     );
 
                 this.renderFormFeedback(this.formStatusTpl, {
                     jsHook: this.authWarningJsHook,
-                    message: fullMsg
+                    message: fullMsg,
                 });
                 $(this.formFields).removeClass('hidden');
             },
@@ -555,7 +555,7 @@
                 if ($confirmEmail.length) {
                     if (!$confirmEmail.val() || ($emailElement.val() !== $confirmEmail.val())) {
                         this.errors.push(StringUtils.interpolate('<li>{error}</li>', {
-                            error: $confirmEmail.data('errormsg-required')
+                            error: $confirmEmail.data('errormsg-required'),
                         }));
                     }
                     obj.confirm_email = $confirmEmail.val();
@@ -590,7 +590,7 @@
                     data[field] = $('#register-' + field).val();
                 }
                 FormView.prototype.liveValidate(
-                    $el, this.validationUrl, 'json', data, 'POST', this.model
+                    $el, this.validationUrl, 'json', data, 'POST', this.model,
                 );
             },
 
@@ -621,7 +621,7 @@
                     error = $el.data('errormsg-required');
                 decisions[name] = $el.val() ? '' : error;
                 this.renderLiveValidations($el, validationDecisions);
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

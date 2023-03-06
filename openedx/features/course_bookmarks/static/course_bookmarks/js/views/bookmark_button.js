@@ -10,7 +10,7 @@
                 bookmarkedText: gettext('Bookmarked'),
 
                 events: {
-                    click: 'toggleBookmark'
+                    click: 'toggleBookmark',
                 },
 
                 showBannerInterval: 5000,   // time in ms
@@ -59,7 +59,7 @@
                         complete: function() {
                             view.$el.prop('disabled', false);
                             view.$el.focus();
-                        }
+                        },
                     });
                 },
 
@@ -80,7 +80,7 @@
                         complete: function() {
                             view.$el.prop('disabled', false);
                             view.$el.focus();
-                        }
+                        },
                     });
                 },
 
@@ -102,7 +102,7 @@
                     if (!this.messageView) {
                         this.messageView = new MessageBannerView({
                             el: $('.message-banner'),
-                            type: 'error'
+                            type: 'error',
                         });
                     }
                     this.messageView.showMessage(errorMsg);
@@ -111,7 +111,7 @@
                     setTimeout(_.bind(function() {
                         this.messageView.hideMessage();
                     }, this), this.showBannerInterval);
-                }
+                },
             });
         });
 }).call(this, define || RequireJS.define);

@@ -1,6 +1,6 @@
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/discovery/collections/filters',
-    'js/discovery/views/filter_bar'
+    'js/discovery/views/filter_bar',
 ], function($, TemplateHelpers, Filters, FilterBar) {
     'use strict';
 
@@ -9,14 +9,14 @@ define([
             loadFixtures('js/fixtures/discovery.html');
             TemplateHelpers.installTemplates([
                 'templates/discovery/filter',
-                'templates/discovery/filter_bar'
+                'templates/discovery/filter_bar',
             ]);
             this.filters = new Filters();
             this.filterBar = new FilterBar({collection: this.filters});
             this.filters.add({
                 type: 'org',
                 query: 'edX',
-                name: 'edX'
+                name: 'edX',
             });
         });
 

@@ -14,7 +14,7 @@ function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
             model = new XBlockInfo(unitJSON, {parse: true});
             unitOutlineView = new UnitOutlineView({
                 model: model,
-                el: $('.wrapper-unit-overview')
+                el: $('.wrapper-unit-overview'),
             });
             if (!createOnly) {
                 unitOutlineView.render();
@@ -44,32 +44,32 @@ function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
                                 category: 'vertical',
                                 display_name: displayName,
                                 studio_url: '/container/mock-unit',
-                                visibility_state: 'unscheduled'
+                                visibility_state: 'unscheduled',
                             }, {
                                 id: 'mock-unit-2',
                                 category: 'vertical',
                                 display_name: 'Mock Unit 2',
                                 studio_url: '/container/mock-unit-2',
-                                visibility_state: 'unscheduled'
-                            }]
-                        }
+                                visibility_state: 'unscheduled',
+                            }],
+                        },
                     }, {
                         id: 'mock-section',
                         category: 'chapter',
                         display_name: 'Section',
                         studio_url: '/course/slashes:mock-course?show=mock-section',
-                        visibility_state: 'unscheduled'
+                        visibility_state: 'unscheduled',
                     }, {
                         id: 'mock-course',
                         category: 'course',
                         display_name: 'Mock Course',
                         studio_url: '/course/mock-course',
-                        visibility_state: 'unscheduled'
-                    }]
+                        visibility_state: 'unscheduled',
+                    }],
                 },
                 metadata: {
-                    display_name: 'Mock Unit'
-                }
+                    display_name: 'Mock Unit',
+                },
             };
         };
 
@@ -80,7 +80,7 @@ function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
                 url_name: 'course_name',
                 org: 'course_org',
                 num: 'course_num',
-                revision: 'course_rev'
+                revision: 'course_rev',
             });
             ViewHelpers.installMockAnalytics();
             ViewHelpers.installViewTemplates();
@@ -119,11 +119,11 @@ function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                 category: 'vertical',
                 display_name: 'Unit',
-                parent_locator: 'mock-subsection'
+                parent_locator: 'mock-subsection',
             });
             AjaxHelpers.respondWithJson(requests, {
                 locator: 'new-mock-unit',
-                courseKey: 'slashes:MockCourse'
+                courseKey: 'slashes:MockCourse',
             });
             expect(redirectSpy).toHaveBeenCalledWith('/container/new-mock-unit?action=new');
         });

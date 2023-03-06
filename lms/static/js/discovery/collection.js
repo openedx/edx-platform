@@ -1,7 +1,7 @@
 (function(define) {
     define([
         'backbone',
-        'js/discovery/models/course_card'
+        'js/discovery/models/course_card',
     ], function(Backbone, CourseCard) {
         'use strict';
 
@@ -32,7 +32,7 @@
                     },
                     error: function(self, xhr) {
                         self.trigger('error');
-                    }
+                    },
                 });
             },
 
@@ -51,7 +51,7 @@
                     },
                     add: true,
                     reset: false,
-                    remove: false
+                    remove: false,
                 });
             },
 
@@ -59,7 +59,7 @@
                 var data = {
                     search_string: this.searchTerm,
                     page_size: this.pageSize,
-                    page_index: pageNumber
+                    page_index: pageNumber,
                 };
                 if (this.selectedFacets.length > 0) {
                     this.selectedFacets.each(function(facet) {
@@ -96,7 +96,7 @@
 
             latestModels: function() {
                 return this.last(this.latestModelsCount);
-            }
+            },
 
         });
     });

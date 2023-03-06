@@ -91,7 +91,7 @@
         storeValue: function(value_el, new_value) {
             var json = JSON.stringify(new_value);
             $(value_el).val(json);
-        }
+        },
     };
 
     module.init();

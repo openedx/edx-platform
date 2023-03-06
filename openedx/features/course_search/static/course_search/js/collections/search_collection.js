@@ -4,7 +4,7 @@
     define([
         'underscore',
         'backbone',
-        'course_search/js/models/search_result'
+        'course_search/js/models/search_result',
     ], function(_, Backbone, SearchResult) {
         return Backbone.Collection.extend({
 
@@ -47,7 +47,7 @@
                     data: {
                         search_string: searchTerm,
                         page_size: this.pageSize,
-                        page_index: 0
+                        page_index: 0,
                     },
                     type: 'POST',
                     success: function(self) {
@@ -57,7 +57,7 @@
                     error: function(self, response) {
                         self.errorMessage = self.extractErrorMessage(response); // eslint-disable-line no-param-reassign
                         self.trigger('error');
-                    }
+                    },
                 });
             },
 
@@ -69,7 +69,7 @@
                     data: {
                         search_string: this.searchTerm,
                         page_size: this.pageSize,
-                        page_index: this.page + 1
+                        page_index: this.page + 1,
                     },
                     type: 'POST',
                     success: function(self) {
@@ -83,7 +83,7 @@
                     },
                     add: true,
                     reset: false,
-                    remove: false
+                    remove: false,
                 });
             },
 
@@ -119,7 +119,7 @@
 
             latestModels: function() {
                 return this.last(this.latestModelsCount);
-            }
+            },
 
         });
     });

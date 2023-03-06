@@ -40,70 +40,70 @@
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
             'URI': 'js/vendor/URI.min',
             'draggabilly': 'js/vendor/draggabilly',
-            'hls': 'common/js/vendor/hls'
+            'hls': 'common/js/vendor/hls',
         },
         shim: {
             'gettext': {
-                exports: 'gettext'
+                exports: 'gettext',
             },
             'jquery.ui': {
                 deps: ['jquery'],
-                exports: 'jQuery.ui'
+                exports: 'jQuery.ui',
             },
             'jquery.flot': {
                 deps: ['jquery'],
-                exports: 'jQuery.flot'
+                exports: 'jQuery.flot',
             },
             'jquery.form': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.ajaxForm'
+                exports: 'jQuery.fn.ajaxForm',
             },
             'jquery.markitup': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.markitup'
+                exports: 'jQuery.fn.markitup',
             },
             'jquery.leanModal': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.leanModal'
+                exports: 'jQuery.fn.leanModal',
             },
             'jquery.smoothScroll': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.smoothScroll'
+                exports: 'jQuery.fn.smoothScroll',
             },
             'jquery.ajaxQueue': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.ajaxQueue'
+                exports: 'jQuery.fn.ajaxQueue',
             },
             'jquery.scrollTo': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.scrollTo'
+                exports: 'jQuery.fn.scrollTo',
             },
             'jquery.cookie': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.cookie'
+                exports: 'jQuery.fn.cookie',
             },
             'jquery.qtip': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.qtip'
+                exports: 'jQuery.fn.qtip',
             },
             'jquery.fileupload': {
                 deps: ['jquery.iframe-transport'],
-                exports: 'jQuery.fn.fileupload'
+                exports: 'jQuery.fn.fileupload',
             },
             'jquery.inputnumber': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.inputNumber'
+                exports: 'jQuery.fn.inputNumber',
             },
             'jquery.simulate': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.simulate'
+                exports: 'jQuery.fn.simulate',
             },
             'jquery.url': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.url'
+                exports: 'jQuery.fn.url',
             },
             'datepair': {
-                deps: ['jquery.ui', 'jquery.timepicker']
+                deps: ['jquery.ui', 'jquery.timepicker'],
             },
             'underscore': {
                 deps: ['underscore.string'],
@@ -122,40 +122,40 @@
                      * view can perform the mixin on its own.
                      */
                     _.str = UnderscoreString;
-                }
+                },
             },
             'backbone': {
                 deps: ['underscore', 'jquery'],
-                exports: 'Backbone'
+                exports: 'Backbone',
             },
             'backbone.associations': {
                 deps: ['backbone'],
-                exports: 'Backbone.Associations'
+                exports: 'Backbone.Associations',
             },
             'backbone.paginator': {
                 deps: ['backbone'],
-                exports: 'Backbone.PageableCollection'
+                exports: 'Backbone.PageableCollection',
             },
             'backbone-super': {
-                deps: ['backbone']
+                deps: ['backbone'],
             },
             'URI': {
-                exports: 'URI'
+                exports: 'URI',
             },
             'jasmine-imagediff': {},
             'common/js/spec_helpers/jasmine-extensions': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'common/js/spec_helpers/jasmine-stealth': {
-                deps: ['underscore', 'underscore.string']
+                deps: ['underscore', 'underscore.string'],
             },
             'common/js/spec_helpers/jasmine-waituntil': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'sinon': {
-                exports: 'sinon'
-            }
-        }
+                exports: 'sinon',
+            },
+        },
     });
 
     testFiles = [
@@ -167,7 +167,7 @@
         'common/js/spec/components/paging_footer_spec.js',
         'common/js/spec/components/search_field_spec.js',
         'common/js/spec/components/view_utils_spec.js',
-        'common/js/spec/utils/edx.utils.validate_spec.js'
+        'common/js/spec/utils/edx.utils.validate_spec.js',
     ];
 
     for (i = 0; i < testFiles.length; i++) {
@@ -177,7 +177,7 @@
     specHelpers = [
         'common/js/spec_helpers/jasmine-extensions',
         'common/js/spec_helpers/jasmine-stealth',
-        'common/js/spec_helpers/jasmine-waituntil'
+        'common/js/spec_helpers/jasmine-waituntil',
     ];
 
     // Jasmine has a global stack for creating a tree of specs. We need to load

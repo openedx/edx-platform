@@ -7,7 +7,7 @@
 
             parse: function(response) {
                 return response.cohorts;
-            }
+            },
         });
         return CohortCollection;
     });

@@ -1,5 +1,5 @@
 define([
-    'jquery', 'js/collections/asset', 'js/views/assets', 'jquery.fileupload'
+    'jquery', 'js/collections/asset', 'js/views/assets', 'jquery.fileupload',
 ], function($, AssetCollection, AssetsView) {
     'use strict';
     return function(config) {
@@ -12,7 +12,7 @@ define([
             el: $('.wrapper-assets'),
             uploadChunkSizeInMBs: config.uploadChunkSizeInMBs,
             maxFileSizeInMBs: config.maxFileSizeInMBs,
-            maxFileSizeRedirectUrl: config.maxFileSizeRedirectUrl
+            maxFileSizeRedirectUrl: config.maxFileSizeRedirectUrl,
         });
         assetsView.render();
     };

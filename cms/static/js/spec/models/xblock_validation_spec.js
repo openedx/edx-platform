@@ -19,11 +19,11 @@ define(['js/models/xblock_validation'],
                 verifyModel(
                     new XBlockValidationModel(
                         {empty: true, messages: [{text: 'Bad JSON case'}], xblock_id: 'id'},
-                        {parse: true}
+                        {parse: true},
                     ),
                     true,
                     {},
-                    [{text: 'Bad JSON case'}], 'id'
+                    [{text: 'Bad JSON case'}], 'id',
                 );
             });
 
@@ -32,36 +32,36 @@ define(['js/models/xblock_validation'],
                 verifyModel(
                     new XBlockValidationModel({
                         empty: false,
-                        xblock_id: 'id'
+                        xblock_id: 'id',
                     }, {parse: true}),
                     false,
                     {text: 'This component has validation issues.', type: 'warning'},
                     [],
-                    'id'
+                    'id',
                 );
                 // Two messages that compute to a "warning" state in the summary.
                 verifyModel(
                     new XBlockValidationModel({
                         empty: false,
                         messages: [{text: 'one', type: 'not-configured'}, {text: 'two', type: 'warning'}],
-                        xblock_id: 'id'
+                        xblock_id: 'id',
                     }, {parse: true}),
                     false,
                     {text: 'This component has validation issues.', type: 'warning'},
                     [{text: 'one', type: 'not-configured'}, {text: 'two', type: 'warning'}],
-                    'id'
+                    'id',
                 );
                 // Two messages, with one of them "error", resulting in an "error" state in the summary.
                 verifyModel(
                     new XBlockValidationModel({
                         empty: false,
                         messages: [{text: 'one', type: 'warning'}, {text: 'two', type: 'error'}],
-                        xblock_id: 'id'
+                        xblock_id: 'id',
                     }, {parse: true}),
                     false,
                     {text: 'This component has validation issues.', type: 'error'},
                     [{text: 'one', type: 'warning'}, {text: 'two', type: 'error'}],
-                    'id'
+                    'id',
                 );
             });
 
@@ -71,24 +71,24 @@ define(['js/models/xblock_validation'],
                     new XBlockValidationModel({
                         empty: false,
                         xblock_id: 'id',
-                        summary: {text: 'my summary', type: 'custom type'}
+                        summary: {text: 'my summary', type: 'custom type'},
                     }, {parse: true}),
                     false,
                     {text: 'my summary', type: 'custom type'},
                     [],
-                    'id'
+                    'id',
                 );
                 // Summary text present, but not type (will get default value of warning).
                 verifyModel(
                     new XBlockValidationModel({
                         empty: false,
                         xblock_id: 'id',
-                        summary: {text: 'my summary'}
+                        summary: {text: 'my summary'},
                     }, {parse: true}),
                     false,
                     {text: 'my summary', type: 'warning'},
                     [],
-                    'id'
+                    'id',
                 );
                 // Summary type present, but not text.
                 verifyModel(
@@ -96,12 +96,12 @@ define(['js/models/xblock_validation'],
                         empty: false,
                         summary: {type: 'custom type'},
                         messages: [{text: 'one', type: 'not-configured'}, {text: 'two', type: 'warning'}],
-                        xblock_id: 'id'
+                        xblock_id: 'id',
                     }, {parse: true}),
                     false,
                     {text: 'This component has validation issues.', type: 'custom type'},
                     [{text: 'one', type: 'not-configured'}, {text: 'two', type: 'warning'}],
-                    'id'
+                    'id',
                 );
                 // Summary text present, type will be computed as error.
                 verifyModel(
@@ -109,12 +109,12 @@ define(['js/models/xblock_validation'],
                         empty: false,
                         summary: {text: 'my summary'},
                         messages: [{text: 'one', type: 'warning'}, {text: 'two', type: 'error'}],
-                        xblock_id: 'id'
+                        xblock_id: 'id',
                     }, {parse: true}),
                     false,
                     {text: 'my summary', type: 'error'},
                     [{text: 'one', type: 'warning'}, {text: 'two', type: 'error'}],
-                    'id'
+                    'id',
                 );
             });
 
@@ -125,12 +125,12 @@ define(['js/models/xblock_validation'],
                         xblock_id: 'id',
                         summary: {text: 'my summary'},
                         messages: [{text: 'one', type: 'warning'}, {text: 'two', type: 'error'}],
-                        showSummaryOnly: true
+                        showSummaryOnly: true,
                     }, {parse: true}),
                     false,
                     {text: 'my summary', type: 'error'},
                     [],
-                    'id'
+                    'id',
                 );
 
                 verifyModel(
@@ -139,14 +139,14 @@ define(['js/models/xblock_validation'],
                         xblock_id: 'id',
                         summary: {text: 'my summary'},
                         messages: [{text: 'one', type: 'warning'}, {text: 'two', type: 'error'}],
-                        showSummaryOnly: false
+                        showSummaryOnly: false,
                     }, {parse: true}),
                     false,
                     {text: 'my summary', type: 'error'},
                     [{text: 'one', type: 'warning'}, {text: 'two', type: 'error'}],
-                    'id'
+                    'id',
                 );
             });
         });
-    }
+    },
 );

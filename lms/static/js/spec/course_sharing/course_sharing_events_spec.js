@@ -21,7 +21,7 @@ define(
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.share_clicked', {
                     course_id: courseKey1,
                     social_media_site: 'facebook',
-                    location: 'dashboard'
+                    location: 'dashboard',
                 });
                 expect(Logger.log.calls.count()).toEqual(1);
 
@@ -30,7 +30,7 @@ define(
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.share_clicked', {
                     course_id: courseKey2,
                     social_media_site: 'facebook',
-                    location: 'dashboard'
+                    location: 'dashboard',
                 });
                 expect(Logger.log.calls.count()).toEqual(1);
             });
@@ -40,7 +40,7 @@ define(
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.share_clicked', {
                     course_id: courseKey1,
                     social_media_site: 'twitter',
-                    location: 'dashboard'
+                    location: 'dashboard',
                 });
                 expect(Logger.log.calls.count()).toEqual(1);
 
@@ -49,10 +49,10 @@ define(
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.share_clicked', {
                     course_id: courseKey2,
                     social_media_site: 'twitter',
-                    location: 'dashboard'
+                    location: 'dashboard',
                 });
                 expect(Logger.log.calls.count()).toEqual(1);
             });
         });
-    }
+    },
 );

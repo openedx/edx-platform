@@ -8,8 +8,8 @@
                         edx.HtmlUtils.joinHtml(
                             edx.HtmlUtils.HTML("<span class='error'>"),
                             response.error,
-                            edx.HtmlUtils.HTML('</span>')
-                        )
+                            edx.HtmlUtils.HTML('</span>'),
+                        ),
                     );
                 } else {
                     saved_div.html(edx.HtmlUtils.HTML(response.preview).toString());

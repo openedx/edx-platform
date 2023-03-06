@@ -19,6 +19,6 @@ define(['underscore'], function(_) {
     };
     return {
         urlRoot: urlRoot,
-        getUpdateUrl: getUpdateUrl
+        getUpdateUrl: getUpdateUrl,
     };
 });

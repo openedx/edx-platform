@@ -13,12 +13,12 @@
                 body: 'this is a response',
                 created_at: '2013-04-03T20:08:39Z',
                 abuse_flaggers: ['123'],
-                roles: ['Student']
+                roles: ['Student'],
             });
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.view = new ResponseCommentView({
                 model: this.comment,
-                el: $('#fixture-element')
+                el: $('#fixture-element'),
             });
             spyOn(ResponseCommentShowView.prototype, 'convertMath');
             spyOn(DiscussionUtil, 'makeWmdEditor');
@@ -29,8 +29,8 @@
             beforeEach(function() {
                 this.comment.updateInfo({
                     ability: {
-                        can_delete: true
-                    }
+                        can_delete: true,
+                    },
                 });
                 this.event = DiscussionSpecHelper.makeEventSpy();
                 this.event.target = $('body');
@@ -43,7 +43,7 @@
                     (isSuccess ? params.success : params.error)({});
                     return {
                         always: function() {
-                        }
+                        },
                     };
                 });
             };
@@ -82,8 +82,8 @@
             it('does not delete a comment if the permission is false', function() {
                 this.comment.updateInfo({
                     ability: {
-                        can_delete: false
-                    }
+                        can_delete: false,
+                    },
                 });
                 spyOn(window, 'confirm');
                 setAjaxResult(true);
@@ -158,12 +158,12 @@
                             params.success();
                         } else {
                             params.error({
-                                status: 500
+                                status: 500,
                             });
                         }
                         return {
                             always: function() {
-                            }
+                            },
                         };
                     });
 

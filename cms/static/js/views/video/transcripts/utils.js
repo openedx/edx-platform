@@ -52,7 +52,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
 
             if (collection && field_name) {
                 model = collection.findWhere({
-                    field_name: field_name
+                    field_name: field_name,
                 });
             }
 
@@ -130,7 +130,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                 if (match) {
                     cache[url] = {
                         video: match[1],
-                        type: match[2]
+                        type: match[2],
                     };
                 } else {
                 // Links like http://goo.gl/pxxZrg
@@ -140,7 +140,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                     if (match) {
                         cache[url] = {
                             video: match[1],
-                            type: 'other'
+                            type: 'other',
                         };
                     }
                 }
@@ -176,18 +176,18 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                     result = {
                         mode: 'youtube',
                         video: _youtubeParser(url),
-                        type: 'youtube'
+                        type: 'youtube',
                     };
                 } else {
                     result = {
-                        mode: 'incorrect'
+                        mode: 'incorrect',
                     };
                 }
             } else if (_videoLinkParser(url)) {
                 result = $.extend({mode: 'html5'}, _videoLinkParser(url));
             } else {
                 result = {
-                    mode: 'incorrect'
+                    mode: 'incorrect',
                 };
             }
 
@@ -252,7 +252,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
         var _syncCollections = function(fromCollection, toCollection) {
             fromCollection.each(function(m) {
                 var model = toCollection.findWhere({
-                    field_name: m.getFieldName()
+                    field_name: m.getFieldName(),
                 });
 
                 if (model) {
@@ -297,14 +297,14 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                 data = $.extend(
                     {locator: locator},
                     {videos: videoList},
-                    params
+                    params,
                 );
 
                 xhr = $.ajaxQueue({
                     url: '/transcripts/' + action,
                     data: {data: JSON.stringify(data)},
                     notifyOnError: false,
-                    type: 'get'
+                    type: 'get',
                 });
 
                 return xhr;
@@ -323,8 +323,8 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             Storage: {
                 set: Storage.set,
                 get: Storage.get,
-                remove: Storage.remove
-            }
+                remove: Storage.remove,
+            },
         };
     }());
 });

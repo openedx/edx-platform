@@ -27,7 +27,7 @@ var edx = edx || {};
         window.analytics.trackLink(
             $courseTitleLink,
             'edx.bi.dashboard.course_title.clicked',
-            trackProperty
+            trackProperty,
         );
     };
 
@@ -37,7 +37,7 @@ var edx = edx || {};
         window.analytics.trackLink(
             $courseImageLink,
             'edx.bi.dashboard.course_image.clicked',
-            trackProperty
+            trackProperty,
         );
     };
 
@@ -47,7 +47,7 @@ var edx = edx || {};
         window.analytics.trackLink(
             $enterCourseLink,
             'edx.bi.dashboard.enter_course.clicked',
-            trackProperty
+            trackProperty,
         );
     };
 
@@ -57,7 +57,7 @@ var edx = edx || {};
         window.analytics.trackLink(
             $optionsDropdown,
             'edx.bi.dashboard.course_options_dropdown.clicked',
-            trackProperty
+            trackProperty,
         );
     };
 
@@ -67,7 +67,7 @@ var edx = edx || {};
         window.analytics.trackLink(
             $courseLearnVerified,
             'edx.bi.dashboard.verified_info_link.clicked',
-            trackProperty
+            trackProperty,
         );
     };
 
@@ -77,7 +77,7 @@ var edx = edx || {};
         window.analytics.trackLink(
             $findCoursesBtn,
             'edx.bi.dashboard.find_courses_button.clicked',
-            trackProperty
+            trackProperty,
         );
     };
 
@@ -93,7 +93,7 @@ var edx = edx || {};
         edx.dashboard.trackFindCourseBtnClicked($('.btn-find-courses'));
         edx.dashboard.trackFindCourseBtnClicked(
             $('.discover-new-link'),
-            {category: 'dashboard', label: 'header'}
+            {category: 'dashboard', label: 'header'},
         );
     });
 }(jQuery));

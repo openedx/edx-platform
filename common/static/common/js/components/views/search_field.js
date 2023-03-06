@@ -11,7 +11,7 @@
         'jquery',
         'underscore',
         'edx-ui-toolkit/js/utils/html-utils',
-        'text!common/templates/components/search-field.underscore'
+        'text!common/templates/components/search-field.underscore',
     ],
     function(Backbone, $, _, HtmlUtils, searchFieldTemplate) {
         return Backbone.View.extend({
@@ -22,7 +22,7 @@
                 'keyup .search-field': 'refreshState',
                 'click .action-clear': 'clearSearch',
                 'mouseover .action-clear': 'setMouseOverState',
-                'mouseout .action-clear': 'setMouseOutState'
+                'mouseout .action-clear': 'setMouseOutState',
             },
 
             initialize: function(options) {
@@ -49,8 +49,8 @@
                     HtmlUtils.template(searchFieldTemplate)({
                         type: this.type,
                         searchString: this.collection.searchString,
-                        searchLabel: this.label
-                    })
+                        searchLabel: this.label,
+                    }),
                 );
                 this.refreshState();
                 return this;
@@ -86,7 +86,7 @@
                 this.collection.setSearchString('');
                 this.refreshState();
                 return this.collection.refresh();
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

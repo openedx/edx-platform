@@ -19,7 +19,7 @@ $(document).ready(function() {
         downArrow: 40,
         tab: 9,
         escape: 27,
-        space: 32
+        space: 32,
     };
 
 

@@ -6,11 +6,11 @@
             urls: {
                 learners: '/enterprise/api/v1/enterprise-learner/',
                 multipleEnterpriseUrl: '/enterprise/select/active/?success_url=',
-                enterpriseActivationUrl: '/enterprise/select/active'
+                enterpriseActivationUrl: '/enterprise/select/active',
             },
 
             headers: {
-                'X-CSRFToken': $.cookie('csrftoken')
+                'X-CSRFToken': $.cookie('csrftoken'),
             },
 
             /**
@@ -32,7 +32,7 @@
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
                     headers: this.headers,
-                    context: this
+                    context: this,
                 }).fail(function() {
                     view.redirect(next);
                 }).done(function(response) {
@@ -67,7 +67,7 @@
                     url: this.urls.enterpriseActivationUrl,
                     method: 'POST',
                     headers: {'X-CSRFToken': $.cookie('csrftoken')},
-                    data: {enterprise: enterprise}
+                    data: {enterprise: enterprise},
                 });
             },
 
@@ -84,7 +84,7 @@
                 return response.results.some(function(item) {
                     return item.enterprise_customer.uuid === enterprise;
                 });
-            }
+            },
         };
 
         return MultipleEnterpriseInterface;

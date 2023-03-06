@@ -12,9 +12,9 @@
             this.send_email.$emailEditor = {
                 save: function() {
                     return {
-                        data: testBody
+                        data: testBody,
                     };
-                }
+                },
             };
             this.ajax_params = {
                 type: 'POST',
@@ -24,10 +24,10 @@
                     action: 'send',
                     send_to: JSON.stringify([this.send_email.$send_to.first().val()]),
                     subject: testSubject,
-                    message: testBody
+                    message: testBody,
                 },
                 success: jasmine.any(Function),
-                error: jasmine.any(Function)
+                error: jasmine.any(Function),
             };
             return this.ajax_params;
         });
@@ -58,9 +58,9 @@
             this.send_email.$emailEditor = {
                 save: function() {
                     return {
-                        data: ''
+                        data: '',
                     };
-                }
+                },
             };
             this.send_email.$btn_send.click();
             expect(window.alert).toHaveBeenCalledWith('Your message cannot be blank.');

@@ -16,7 +16,7 @@ define([
     'js/certificates/collections/certificates',
     'js/certificates/models/certificate',
     'js/certificates/views/certificates_page',
-    'js/certificates/views/certificate_preview'
+    'js/certificates/views/certificate_preview',
 ],
 function($, CertificatesCollection, Certificate, CertificatesPage, CertificatePreview) {
     'use strict';
@@ -26,7 +26,7 @@ function($, CertificatesCollection, Certificate, CertificatesPage, CertificatePr
         var certificatesCollection = new CertificatesCollection(certificatesJson, {
             parse: true,
             canBeEmpty: true,
-            certificateUrl: certificateUrl
+            certificateUrl: certificateUrl,
         });
 
         // associating the certificate_preview globally.
@@ -36,14 +36,14 @@ function($, CertificatesCollection, Certificate, CertificatesPage, CertificatePr
                 course_modes: courseModes,
                 certificate_web_view_url: certificateWebViewUrl,
                 certificate_activation_handler_url: certificateActivationHandlerUrl,
-                is_active: isActive
+                is_active: isActive,
             });
         }
 
         // Execute the page object's rendering workflow
         new CertificatesPage({
             el: $('#content'),
-            certificatesCollection: certificatesCollection
+            certificatesCollection: certificatesCollection,
         }).render();
     };
 });

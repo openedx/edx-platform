@@ -120,7 +120,7 @@ describe('Tests for accessibility_tools.js', function() {
         it('supports setting an array of elements', function() {
             window.SR.readElts($('.status'));
             expect(getSRText()).toContain(
-                '<p>Yes!<span>Your answer is correct!</span></p>\n<p>No!<span>Your answer is wrong!</span></p>'
+                '<p>Yes!<span>Your answer is correct!</span></p>\n<p>No!<span>Your answer is wrong!</span></p>',
             );
         });
     });

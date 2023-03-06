@@ -29,7 +29,7 @@
                 this.state.el.on({
                     destroy: this.destroy,
                     play: this.hide,
-                    'ended pause': this.show
+                    'ended pause': this.show,
                 });
                 this.hide();
                 delete this.state.videoPlayPlaceholder;
@@ -61,7 +61,7 @@
                 this.state.el.on({
                     destroy: this.destroy,
                     play: this.hide,
-                    'ended pause': this.show
+                    'ended pause': this.show,
                 });
             },
 
@@ -79,7 +79,7 @@
                 this.el
                     .removeClass('is-hidden')
                     .attr({'aria-hidden': 'false', tabindex: 0});
-            }
+            },
         };
 
         return PlayPlaceholder;

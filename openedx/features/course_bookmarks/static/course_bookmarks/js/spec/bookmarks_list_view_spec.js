@@ -9,7 +9,7 @@ define([
     'js/views/message_banner',
     'course_bookmarks/js/spec_helpers/bookmark_helpers',
     'course_bookmarks/js/views/bookmarks_list',
-    'course_bookmarks/js/collections/bookmarks'
+    'course_bookmarks/js/collections/bookmarks',
 ],
 function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBannerView,
     BookmarkHelpers, BookmarksListView, BookmarksCollection) {
@@ -21,7 +21,7 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
         beforeEach(function() {
             loadFixtures('course_bookmarks/fixtures/bookmarks.html');
             TemplateHelpers.installTemplates([
-                'templates/fields/message_banner'
+                'templates/fields/message_banner',
             ]);
             spyOn(Logger, 'log').and.returnValue($.Deferred().resolve());
             jasmine.addMatchers({
@@ -29,11 +29,11 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                     return {
                         compare: function(actual, expectedUrl) {
                             return {
-                                pass: expectedUrl === actual.calls.mostRecent().args[0].currentTarget.pathname
+                                pass: expectedUrl === actual.calls.mostRecent().args[0].currentTarget.pathname,
                             };
-                        }
+                        },
                     };
-                }
+                },
             });
         });
 
@@ -42,14 +42,14 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                 [],
                 {
                     course_id: BookmarkHelpers.TEST_COURSE_ID,
-                    url: BookmarkHelpers.TEST_API_URL
-                }
+                    url: BookmarkHelpers.TEST_API_URL,
+                },
             );
             var bookmarksView = new BookmarksListView({
                 $el: $('.course-bookmarks'),
                 collection: bookmarksCollection,
                 loadingMessageView: new MessageBannerView({el: $('#loading-message')}),
-                errorMessageView: new MessageBannerView({el: $('#error-message')})
+                errorMessageView: new MessageBannerView({el: $('#error-message')}),
             });
             return bookmarksView;
         };
@@ -70,12 +70,12 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
             AjaxHelpers.respondWithJson(requests, expectedData);
 
             expect(bookmarksView.$('.bookmarks-empty-header').text().trim()).toBe(
-                'You have not bookmarked any courseware pages yet'
+                'You have not bookmarked any courseware pages yet',
             );
 
             expect(bookmarksView.$('.bookmarks-empty-detail-title').text().trim()).toBe(
                 'Use bookmarks to help you easily return to courseware pages. ' +
-                    'To bookmark a page, click "Bookmark this page" under the page title.'
+                    'To bookmark a page, click "Bookmark this page" under the page title.',
             );
 
             expect(bookmarksView.$('.paging-header').length).toBe(0);
@@ -94,8 +94,8 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                     course_id: BookmarkHelpers.TEST_COURSE_ID,
                     fields: 'display_name,path',
                     page: '1',
-                    page_size: '10'
-                }
+                    page_size: '10',
+                },
             );
             AjaxHelpers.respondWithJson(requests, expectedData);
 
@@ -110,8 +110,8 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
             var listView = new BookmarksListView({
                 collection: new BookmarksCollection([], {
                     course_id: 'abc',
-                    url: '/test-bookmarks/url/'
-                })
+                    url: '/test-bookmarks/url/',
+                }),
             });
             listView.collection.trigger('page_changed');
             expect(renderSpy).toHaveBeenCalled();
@@ -125,8 +125,8 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                     count: 12,
                     num_pages: 2,
                     current_page: 1,
-                    start: 0
-                }
+                    start: 0,
+                },
             );
             var bookmarksView = createBookmarksView();
             bookmarksView.showBookmarks();
@@ -142,8 +142,8 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                     count: 12,
                     num_pages: 2,
                     current_page: 2,
-                    start: 10
-                }
+                    start: 10,
+                },
             );
             AjaxHelpers.respondWithJson(requests, expectedData);
             BookmarkHelpers.verifyBookmarkedData(bookmarksView, expectedData);
@@ -161,8 +161,8 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                     count: 15,
                     num_pages: 2,
                     current_page: 1,
-                    start: 0
-                }
+                    start: 0,
+                },
             );
             bookmarksView.showBookmarks();
             BookmarkHelpers.verifyPaginationInfo(
@@ -170,7 +170,7 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                 bookmarksView,
                 expectedData,
                 '1',
-                'Showing 1-10 out of 15 total'
+                'Showing 1-10 out of 15 total',
             );
             verifyRequestParams(
                 requests,
@@ -178,8 +178,8 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                     course_id: BookmarkHelpers.TEST_COURSE_ID,
                     fields: 'display_name,path',
                     page: '1',
-                    page_size: '10'
-                }
+                    page_size: '10',
+                },
             );
 
             bookmarksView.$('.paging-footer .next-page-link').click();
@@ -189,15 +189,15 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                     count: 15,
                     num_pages: 2,
                     current_page: 2,
-                    start: 10
-                }
+                    start: 10,
+                },
             );
             BookmarkHelpers.verifyPaginationInfo(
                 requests,
                 bookmarksView,
                 expectedData,
                 '2',
-                'Showing 11-15 out of 15 total'
+                'Showing 11-15 out of 15 total',
             );
             verifyRequestParams(
                 requests,
@@ -205,8 +205,8 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                     course_id: BookmarkHelpers.TEST_COURSE_ID,
                     fields: 'display_name,path',
                     page: '2',
-                    page_size: '10'
-                }
+                    page_size: '10',
+                },
             );
 
             expectedData = BookmarkHelpers.createBookmarksData(
@@ -215,8 +215,8 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                     count: 15,
                     num_pages: 2,
                     current_page: 1,
-                    start: 0
-                }
+                    start: 0,
+                },
             );
             bookmarksView.$('.paging-footer .previous-page-link').click();
             BookmarkHelpers.verifyPaginationInfo(
@@ -224,7 +224,7 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                 bookmarksView,
                 expectedData,
                 '1',
-                'Showing 1-10 out of 15 total'
+                'Showing 1-10 out of 15 total',
             );
             verifyRequestParams(
                 requests,
@@ -232,8 +232,8 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
                     course_id: BookmarkHelpers.TEST_COURSE_ID,
                     fields: 'display_name,path',
                     page: '1',
-                    page_size: '10'
-                }
+                    page_size: '10',
+                },
             );
         });
 

@@ -3,7 +3,7 @@ define(['backbone', 'jquery', 'jquery.ui'], function(Backbone, $) {
     var CourseUpdate = Backbone.Model.extend({
         defaults: {
             date: $.datepicker.formatDate('MM d, yy', new Date()),
-            content: ''
+            content: '',
         },
         validate: function(attrs) {
             var date_exists = (attrs.date !== null && attrs.date !== '');
@@ -11,7 +11,7 @@ define(['backbone', 'jquery', 'jquery.ui'], function(Backbone, $) {
             if (!(date_exists && date_is_valid_string)) {
                 return {date_required: gettext('Action required: Enter a valid date.')};
             }
-        }
+        },
     });
     return CourseUpdate;
 }); // end define()

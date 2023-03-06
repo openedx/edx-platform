@@ -26,7 +26,7 @@ import '../helper.js'
             expect(Logger.log).toHaveBeenCalledWith('load_video', {
                 id: 'id',
                 code: this.code,
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -37,7 +37,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 currentTime: 10,
-                duration: this.duration
+                duration: this.duration,
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeFalsy();
         });
@@ -54,7 +54,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 currentTime: 10,
-                duration: this.duration
+                duration: this.duration,
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
@@ -65,7 +65,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 currentTime: 10,
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -77,7 +77,7 @@ import '../helper.js'
                 current_time: 10,
                 old_speed: '1.0',
                 new_speed: '2.0',
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -89,7 +89,7 @@ import '../helper.js'
                 old_time: 0,
                 new_time: 1,
                 type: 'any',
-                duration: this.duration
+                duration: this.duration,
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
@@ -106,7 +106,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 currentTime: 10,
-                duration: this.duration
+                duration: this.duration,
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
 
@@ -116,7 +116,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 currentTime: 10,
-                duration: this.duration
+                duration: this.duration,
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
@@ -127,7 +127,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 currentTime: 10,
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -137,7 +137,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 currentTime: 10,
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -146,7 +146,7 @@ import '../helper.js'
             expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.shown', {
                 id: 'id',
                 code: this.code,
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -156,7 +156,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 language: 'en',
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -166,7 +166,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 current_time: 10,
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -176,7 +176,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 current_time: 10,
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -186,7 +186,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 current_time: 10,
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -196,7 +196,7 @@ import '../helper.js'
                 id: 'id',
                 code: this.code,
                 current_time: 10,
-                duration: this.duration
+                duration: this.duration,
             });
         });
 
@@ -221,7 +221,7 @@ import '../helper.js'
                 'transcript:hide': plugin.onHideTranscript,
                 'captions:show': plugin.onShowCaptions,
                 'captions:hide': plugin.onHideCaptions,
-                destroy: plugin.destroy
+                destroy: plugin.destroy,
             });
         });
     });

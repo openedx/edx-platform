@@ -38,6 +38,6 @@ define(['jquery', 'underscore'],
 
         return {
             installTemplate: installTemplate,
-            installTemplates: installTemplates
+            installTemplates: installTemplates,
         };
     });

@@ -14,7 +14,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
                 errorWrapper: '.wrapper-error',
                 errorMessage: '#course_rerun_error',
                 error: '.error',
-                allowUnicode: '.allow-unicode-course-id'
+                allowUnicode: '.allow-unicode-course-id',
             },
             classes = {
                 shown: 'is-shown',
@@ -23,7 +23,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
                 hidden: 'is-hidden',
                 error: 'error',
                 disabled: 'is-disabled',
-                processing: 'is-processing'
+                processing: 'is-processing',
             },
             mockCreateCourseRerunHTML = readFixtures('mock/mock-create-course-rerun.underscore');
 
@@ -166,13 +166,13 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
                 org: 'DemoX',
                 number: 'DM101',
                 run: '2014',
-                display_name: 'Demo course'
+                display_name: 'Demo course',
             });
             expect($(selectors.save)).toHaveClass(classes.disabled);
             expect($(selectors.save)).toHaveClass(classes.processing);
             expect($(selectors.cancel)).toHaveClass(classes.hidden);
             AjaxHelpers.respondWithJson(requests, {
-                url: 'dummy_test_url'
+                url: 'dummy_test_url',
             });
             expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
         });
@@ -182,7 +182,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
             fillInFields('DemoX', 'DM101', '2014', 'Demo course');
             $(selectors.save).click();
             AjaxHelpers.respondWithJson(requests, {
-                ErrMsg: 'error message'
+                ErrMsg: 'error message',
             });
             expect($(selectors.errorWrapper)).not.toHaveClass(classes.hidden);
             expect($(selectors.errorWrapper)).toContainText('error message');

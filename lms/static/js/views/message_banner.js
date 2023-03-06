@@ -6,12 +6,12 @@
         'underscore',
         'backbone',
         'text!templates/fields/message_banner.underscore',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function(gettext, $, _, Backbone, messageBannerTemplate, HtmlUtils) {
         var MessageBannerView = Backbone.View.extend({
 
             events: {
-                'click .close-btn': 'closeBanner'
+                'click .close-btn': 'closeBanner',
             },
 
             closeBanner: function(event) {
@@ -28,7 +28,7 @@
                     type: '',
                     hideCloseBtn: true,
                     isRecoveryEmailMsg: false,
-                    isLearnerPortalEnabled: false
+                    isLearnerPortalEnabled: false,
                 });
             },
 
@@ -38,7 +38,7 @@
                 } else {
                     this.$el.html(_.template(messageBannerTemplate)(_.extend(this.options, {  // xss-lint: disable=javascript-jquery-html
                         message: this.message,
-                        HtmlUtils: HtmlUtils
+                        HtmlUtils: HtmlUtils,
                     })));
                 }
                 return this;
@@ -54,7 +54,7 @@
             hideMessage: function() {
                 this.message = null;
                 this.render();
-            }
+            },
         });
 
         return MessageBannerView;

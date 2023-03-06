@@ -37,7 +37,7 @@
                         cid: this.model.cid,
                         author_display: this.getAuthorDisplay(),
                         endorser_display: this.getEndorserDisplay(),
-                        readOnly: $('.discussion-module').data('read-only')
+                        readOnly: $('.discussion-module').data('read-only'),
                     }, this.model.attributes);
                 return template(context);
             };

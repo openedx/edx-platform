@@ -1,6 +1,6 @@
 define([
     'jquery',
-    'js/certificates/views/certificate_bulk_allowlist'
+    'js/certificates/views/certificate_bulk_allowlist',
 ],
 function($, CertificateBulkAllowlistView) {
     'use strict';
@@ -9,21 +9,21 @@ function($, CertificateBulkAllowlistView) {
         var SELECTORS = {
             upload_csv_button: '.upload-csv-button',
             bulk_allowlist_exception_form: 'form#bulk-allowlist-exception-form',
-            bulk_exception_results: '.bulk-exception-results'
+            bulk_exception_results: '.bulk-exception-results',
         };
         beforeEach(function() {
             setFixtures();
             var fixture = readFixtures(
-                'templates/instructor/instructor_dashboard_2/certificate-bulk-allowlist.underscore'
+                'templates/instructor/instructor_dashboard_2/certificate-bulk-allowlist.underscore',
             );
 
             setFixtures(
                 "<script type='text/template' id='certificate-bulk-allowlist-tpl'>" + fixture + '</script>' +
-                    "<div class='bulk-allowlist-exception'></div>"
+                    "<div class='bulk-allowlist-exception'></div>",
             );
 
             this.view = new CertificateBulkAllowlistView({
-                bulk_exception_url: certificate_bulk_exception_url
+                bulk_exception_url: certificate_bulk_exception_url,
             });
             this.view.render();
         });
@@ -34,10 +34,10 @@ function($, CertificateBulkAllowlistView) {
                 params.success({
                     row_errors: {},
                     general_errors: [],
-                    success: ['user test in row# 1']
+                    success: ['user test in row# 1'],
                 });
                 return {
-                    always: function() {}
+                    always: function() {},
                 };
             });
             submitCallback = jasmine.createSpy().and.returnValue();
@@ -53,10 +53,10 @@ function($, CertificateBulkAllowlistView) {
                 params.success({
                     row_errors: {},
                     general_errors: ['File is not attached.'],
-                    success: []
+                    success: [],
                 });
                 return {
-                    always: function() {}
+                    always: function() {},
                 };
             });
             submitCallback = jasmine.createSpy().and.returnValue();
@@ -75,12 +75,12 @@ function($, CertificateBulkAllowlistView) {
                         user_not_exist: ['user 2 in row# 2'],
                         user_already_allowlisted: ['user 3 in row# 3'],
                         user_not_enrolled: ['user 4 in row# 4'],
-                        user_on_certificate_invalidation_list: ['user 5 in row# 5']
+                        user_on_certificate_invalidation_list: ['user 5 in row# 5'],
                     },
-                    success: []
+                    success: [],
                 });
                 return {
-                    always: function() {}
+                    always: function() {},
                 };
             });
             submitCallback = jasmine.createSpy().and.returnValue();
@@ -108,12 +108,12 @@ function($, CertificateBulkAllowlistView) {
                         user_not_exist: ['user 2 in row# 2', 'user 2 in row# 2'],
                         user_already_allowlisted: ['user 3 in row# 3', 'user 3 in row# 3'],
                         user_not_enrolled: ['user 4 in row# 4', 'user 4 in row# 4'],
-                        user_on_certificate_invalidation_list: ['user 5 in row# 5', 'user 5 in row# 5']
+                        user_on_certificate_invalidation_list: ['user 5 in row# 5', 'user 5 in row# 5'],
                     },
-                    success: []
+                    success: [],
                 });
                 return {
-                    always: function() {}
+                    always: function() {},
                 };
             });
             submitCallback = jasmine.createSpy().and.returnValue();
@@ -137,10 +137,10 @@ function($, CertificateBulkAllowlistView) {
                 params.success({
                     row_errors: {},
                     general_errors: [],
-                    success: ['user test in row# 1']
+                    success: ['user test in row# 1'],
                 });
                 return {
-                    always: function() {}
+                    always: function() {},
                 };
             });
             submitCallback = jasmine.createSpy().and.returnValue();

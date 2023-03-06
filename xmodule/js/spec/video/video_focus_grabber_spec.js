@@ -99,7 +99,7 @@
 
             runs(function() {
                 expect(
-                    state.focusGrabber.enableFocusGrabber
+                    state.focusGrabber.enableFocusGrabber,
                 ).toHaveBeenCalled();
             });
         });

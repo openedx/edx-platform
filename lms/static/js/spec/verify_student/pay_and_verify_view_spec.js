@@ -12,38 +12,38 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 'make_payment_step',
                 'review_photos_step',
                 'webcam_photo',
-                'image_input'
+                'image_input',
             ];
 
             var INTRO_STEP = {
                 name: 'intro-step',
-                title: 'Intro'
+                title: 'Intro',
             };
 
             var DISPLAY_STEPS_FOR_PAYMENT = [
                 {
                     name: 'make-payment-step',
-                    title: 'Make Payment'
-                }
+                    title: 'Make Payment',
+                },
             ];
 
             var DISPLAY_STEPS_FOR_VERIFICATION = [
                 {
                     name: 'face-photo-step',
-                    title: 'Take Face Photo'
+                    title: 'Take Face Photo',
                 },
                 {
                     name: 'id-photo-step',
-                    title: 'ID Photo'
+                    title: 'ID Photo',
                 },
                 {
                     name: 'review-photos-step',
-                    title: 'Review Photos'
+                    title: 'Review Photos',
                 },
                 {
                     name: 'enrollment-confirmation-step',
-                    title: 'Enrollment Confirmation'
-                }
+                    title: 'Enrollment Confirmation',
+                },
             ];
 
 
@@ -51,7 +51,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 return new PayAndVerifyView({
                     displaySteps: displaySteps,
                     currentStep: currentStep,
-                    errorModel: new (Backbone.Model.extend({}))()
+                    errorModel: new (Backbone.Model.extend({}))(),
                 }).render();
             };
 
@@ -74,7 +74,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 // Create the view, starting on the first step
                 var view = createView(
                     DISPLAY_STEPS_FOR_PAYMENT.concat(DISPLAY_STEPS_FOR_VERIFICATION),
-                    'make-payment-step'
+                    'make-payment-step',
                 );
 
                 // Verify that the first step rendered
@@ -101,7 +101,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
             it('renders intro and verification steps', function() {
                 var view = createView(
                     [INTRO_STEP].concat(DISPLAY_STEPS_FOR_VERIFICATION),
-                    'intro-step'
+                    'intro-step',
                 );
 
                 // Verify that the first step rendered
@@ -125,7 +125,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 // Start on the review photos step
                 var view = createView(
                     DISPLAY_STEPS_FOR_VERIFICATION,
-                    'review-photos-step'
+                    'review-photos-step',
                 );
 
                 // Jump back to the face photo step
@@ -133,5 +133,5 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 expectStepRendered('face-photo-step');
             });
         });
-    }
+    },
 );

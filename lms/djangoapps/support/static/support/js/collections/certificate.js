@@ -24,7 +24,7 @@
                         url += '&course_id=' + this.courseFilter;
                     }
                     return url;
-                }
+                },
             });
         });
 }).call(this, define || RequireJS.define);

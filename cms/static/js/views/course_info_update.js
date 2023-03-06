@@ -18,7 +18,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
             'click .save-button': 'onSave',
             'click .cancel-button': 'onCancel',
             'click .post-actions > .edit-button': 'onEdit',
-            'click .post-actions > .delete-button': 'onDelete'
+            'click .post-actions > .delete-button': 'onDelete',
         },
 
         initialize: function() {
@@ -41,7 +41,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                             update, 'content', self.options.base_asset_url);
                         HtmlUtils.append(
                             updateList,
-                            HtmlUtils.HTML(self.template({updateModel: update}))
+                            HtmlUtils.HTML(self.template({updateModel: update})),
                         );
                         DateUtils.setupDatePicker('date', self, index);
                         update.isValid();
@@ -102,11 +102,11 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                 if (error.hasOwnProperty(field)) {
                     HtmlUtils.append(
                         $validationElement.find('#update-date-' + model.cid).parent(),
-                        self.errorTemplate({message: error[field]})
+                        self.errorTemplate({message: error[field]}),
                     );
                     HtmlUtils.append(
                         $validationElement.find('.date-display').parent(),
-                        self.errorTemplate({message: error[field]})
+                        self.errorTemplate({message: error[field]}),
                     );
                 }
             });
@@ -131,8 +131,8 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
 
             var $newForm = $(
                 this.template({
-                    updateModel: newModel
-                })
+                    updateModel: newModel,
+                }),
             );
 
             var updateEle = this.$el.find('#course-update-list');
@@ -142,7 +142,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
             this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
                 mode: 'text/html',
                 lineNumbers: true,
-                lineWrapping: true
+                lineWrapping: true,
             });
 
             $newForm.addClass('editing');
@@ -162,11 +162,11 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
             targetModel.set({
                 // translate short-form date (for input) into long form date (for display)
                 date: $.datepicker.formatDate('MM d, yy', new Date(this.dateEntry(event).val())),
-                content: this.$codeMirror.getValue()
+                content: this.$codeMirror.getValue(),
             });
             // push change to display, hide the editor, submit the change
             var saving = new NotificationView.Mini({
-                title: gettext('Saving')
+                title: gettext('Saving'),
             });
             saving.show();
             var ele = this.modelDom(event);
@@ -176,13 +176,13 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                 },
                 error: function() {
                     ele.remove();
-                }
+                },
             });
             this.closeEditor(false);
 
             analytics.track('Saved Course Update', {
                 course: course_location_analytics,
-                date: this.dateEntry(event).val()
+                date: this.dateEntry(event).val(),
             });
         },
 
@@ -220,7 +220,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
             this.$modalCover = ModalUtils.showModalCover(false,
                 function() {
                     self.closeEditor(false);
-                }
+                },
             );
 
             // Ensure validity is marked appropriately
@@ -241,11 +241,11 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                         click: function() {
                             analytics.track('Deleted Course Update', {
                                 course: course_location_analytics,
-                                date: self.dateEntry(event).val()
+                                date: self.dateEntry(event).val(),
                             });
                             self.modelDom(event).remove();
                             var deleting = new NotificationView.Mini({
-                                title: gettext('Deleting')
+                                title: gettext('Deleting'),
                             });
                             deleting.show();
                             targetModel.destroy({
@@ -255,20 +255,20 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                                             self.render();
                                             deleting.hide();
                                         },
-                                        reset: true
+                                        reset: true,
                                     });
-                                }
+                                },
                             });
                             confirm.hide();
-                        }
+                        },
                     },
                     secondary: {
                         text: gettext('Cancel'),
                         click: function() {
                             confirm.hide();
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
             confirm.show();
         },
@@ -288,7 +288,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                 this.$currentPost.find('.date').val(targetModel.get('date'));
 
                 content = HtmlUtils.HTML(CourseInfoHelper.changeContentToPreview(
-                    targetModel, 'content', this.options.base_asset_url
+                    targetModel, 'content', this.options.base_asset_url,
                 ));
                 try {
                     // just in case the content causes an error (embedded js errors)
@@ -327,7 +327,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
             if (li) {
                 return $(li).find('.date').first();
             }
-        }
+        },
     });
 
     return CourseInfoUpdateView;

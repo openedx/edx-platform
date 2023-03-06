@@ -12,7 +12,7 @@
 
                 url: function() {
                     return this.baseUrl + this.user;
-                }
+                },
             });
         });
 }).call(this, define || RequireJS.define);

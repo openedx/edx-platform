@@ -16,7 +16,7 @@ var edx = edx || {};
         defaultContext: function() {
             return {
                 platformName: '',
-                fullName: ''
+                fullName: '',
             };
         },
 
@@ -43,7 +43,7 @@ var edx = edx || {};
         retakePhotos: function() {
             // Track the user's intent to retake their photos
             window.analytics.track('edx.bi.user.images.retaken', {
-                category: 'verification'
+                category: 'verification',
             });
 
             this.goToStep('face-photo-step');
@@ -81,7 +81,7 @@ var edx = edx || {};
             this.errorModel.set({
                 errorTitle: gettext('Could not submit photos'),
                 errorMsg: errorMsg,
-                shown: true
+                shown: true,
             });
         },
 
@@ -102,6 +102,6 @@ var edx = edx || {};
                 .toggleClass('is-disabled', !isEnabled)
                 .prop('disabled', !isEnabled)
                 .attr('aria-disabled', !isEnabled);
-        }
+        },
     });
 }(jQuery, gettext));

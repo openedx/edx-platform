@@ -6,6 +6,6 @@
     var keyMap = CodeMirror.keyMap.accessible = {
         Tab: false,
         'Shift-Tab': false,
-        fallthrough: 'default'
+        fallthrough: 'default',
     };
 }());

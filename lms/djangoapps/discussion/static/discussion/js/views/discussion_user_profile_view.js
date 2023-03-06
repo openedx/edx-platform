@@ -14,13 +14,13 @@
         'common/js/discussion/utils',
         'common/js/discussion/views/discussion_thread_profile_view',
         'text!discussion/templates/user-profile.underscore',
-        'common/js/discussion/views/discussion_thread_list_view'
+        'common/js/discussion/views/discussion_thread_list_view',
     ],
     function(_, $, Backbone, gettext, URI, HtmlUtils, ViewUtils, Discussion, DiscussionUtil,
         DiscussionThreadProfileView, userProfileTemplate, DiscussionThreadListView) {
         var DiscussionUserProfileView = Backbone.View.extend({
             events: {
-                'click .all-posts-btn': 'navigateToAllThreads'
+                'click .all-posts-btn': 'navigateToAllThreads',
             },
 
             initialize: function(options) {
@@ -32,7 +32,7 @@
 
             render: function() {
                 HtmlUtils.setHtml(this.$el,
-                    HtmlUtils.template(userProfileTemplate)({})
+                    HtmlUtils.template(userProfileTemplate)({}),
                 );
 
                 this.discussionThreadListView = new DiscussionThreadListView({
@@ -42,7 +42,7 @@
                     mode: this.mode,
                     // @TODO: On the profile page, thread read state for the viewing user is not accessible via API.
                     // Fix this when the Discussions API can support this query. Until then, hide read state.
-                    hideReadState: true
+                    hideReadState: true,
                 }).render();
 
                 this.discussionThreadListView.on('thread:selected', _.bind(this.navigateToThread, this));
@@ -56,7 +56,7 @@
                     el: this.$('.forum-content'),
                     model: thread,
                     mode: 'inline',
-                    courseSettings: this.courseSettings
+                    courseSettings: this.courseSettings,
                 });
                 this.threadView.render();
                 this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllThreads);
@@ -78,7 +78,7 @@
 
                 // Set focus to thread list item that was saved as active
                 this.discussionThreadListView.$('.is-active').focus();
-            }
+            },
         });
 
         return DiscussionUserProfileView;

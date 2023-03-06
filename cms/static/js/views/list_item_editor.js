@@ -11,7 +11,7 @@
  */
 define([
     'js/views/baseview', 'common/js/components/utils/view_utils', 'underscore', 'gettext',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/html-utils',
 ], function(BaseView, ViewUtils, _, gettext, HtmlUtils) {
     'use strict';
 
@@ -23,8 +23,8 @@ define([
 
         render: function() {
             var template = this.template(_.extend({
-                error: this.model.validationError || this.getSaveableModel().validationError
-            }, this.getTemplateOptions())
+                error: this.model.validationError || this.getSaveableModel().validationError,
+            }, this.getTemplateOptions()),
             );
             this.$el.html(HtmlUtils.HTML(template).toString());
         },
@@ -48,7 +48,7 @@ define([
                             actionableModel.setOriginalAttributes();
                             this.close();
                             dfd.resolve();
-                        }.bind(this)
+                        }.bind(this),
                     });
 
                     return dfd;
@@ -73,7 +73,7 @@ define([
             }
 
             return this;
-        }
+        },
     });
 
     return ListItemEditorView;

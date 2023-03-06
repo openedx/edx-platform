@@ -7,7 +7,7 @@
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.user = DiscussionUtil.getUser();
             this.thread = new Thread({
-                thread_type: 'discussion'
+                thread_type: 'discussion',
             });
             this.commentData = {
                 id: 'dummy',
@@ -19,15 +19,15 @@
                 endorsement: {},
                 abuse_flaggers: [],
                 votes: {
-                    up_count: 42
+                    up_count: 42,
                 },
-                type: 'comment'
+                type: 'comment',
             };
             this.comment = new Comment(this.commentData);
             this.comment.set('thread', this.thread);
             this.view = new ThreadResponseShowView({
                 model: this.comment,
-                $el: $('#fixture-element')
+                $el: $('#fixture-element'),
             });
             spyOn(ThreadResponseShowView.prototype, 'convertMath');
             return this.view.render();
@@ -44,7 +44,7 @@
             });
             it('votes correctly via spacebar', function() {
                 return DiscussionViewSpecHelper.checkUpvote(this.view, this.comment, this.user, $.Event('keydown', {
-                    which: 32
+                    which: 32,
                 }));
             });
             it('unvotes correctly via click', function() {
@@ -52,7 +52,7 @@
             });
             it('unvotes correctly via spacebar', function() {
                 return DiscussionViewSpecHelper.checkUnvote(this.view, this.comment, this.user, $.Event('keydown', {
-                    which: 32
+                    which: 32,
                 }));
             });
         });
@@ -61,12 +61,12 @@
             endorsement = {
                 username: 'test_endorser',
                 user_id: 'test_id',
-                time: new Date().toISOString()
+                time: new Date().toISOString(),
             };
             this.thread.set('thread_type', 'question');
             this.comment.set({
                 endorsed: true,
-                endorsement: endorsement
+                endorsement: endorsement,
             });
             this.view.render();
             expect(this.view.$('.posted-details').text().replace(/\s+/g, ' '))
@@ -78,12 +78,12 @@
             var endorsement;
             endorsement = {
                 username: null,
-                time: new Date().toISOString()
+                time: new Date().toISOString(),
             };
             this.thread.set('thread_type', 'question');
             this.comment.set({
                 endorsed: true,
-                endorsement: endorsement
+                endorsement: endorsement,
             });
             this.view.render();
             expect(this.view.$('.posted-details').text()).toMatch('marked as answer less than a minute ago');
@@ -94,12 +94,12 @@
             endorsement = {
                 username: 'test_endorser',
                 user_id: 'test_id',
-                time: new Date().toISOString()
+                time: new Date().toISOString(),
             };
             this.thread.set('thread_type', 'discussion');
             this.comment.set({
                 endorsed: true,
-                endorsement: endorsement
+                endorsement: endorsement,
             });
             this.view.render();
             expect(this.view.$('.posted-details').text().replace(/\s+/g, ' '))
@@ -111,12 +111,12 @@
             var endorsement;
             endorsement = {
                 username: null,
-                time: new Date().toISOString()
+                time: new Date().toISOString(),
             };
             this.thread.set('thread_type', 'discussion');
             this.comment.set({
                 endorsed: true,
-                endorsement: endorsement
+                endorsement: endorsement,
             });
             this.view.render();
             expect(this.view.$('.posted-details').text()).toMatch('endorsed less than a minute ago');
@@ -125,7 +125,7 @@
         it('re-renders correctly when endorsement changes', function() {
             spyOn($, 'ajax').and.returnValue($.Deferred());
             DiscussionUtil.loadRoles({
-                Moderator: [parseInt(window.user.id)]
+                Moderator: [parseInt(window.user.id)],
             });
             this.thread.set('thread_type', 'question');
             this.view.render();
@@ -143,11 +143,11 @@
             var endorseButton;
             spyOn($, 'ajax').and.returnValue($.Deferred());
             DiscussionUtil.loadRoles({
-                Moderator: [parseInt(window.user.id)]
+                Moderator: [parseInt(window.user.id)],
             });
             this.thread.set({
                 thread_type: 'question',
-                user_id: (parseInt(window.user.id) + 1).toString()
+                user_id: (parseInt(window.user.id) + 1).toString(),
             });
             this.view.render();
             endorseButton = this.view.$('.action-answer');
@@ -161,7 +161,7 @@
             spyOn($, 'ajax').and.returnValue($.Deferred());
             this.thread.set({
                 thread_type: 'question',
-                user_id: window.user.id
+                user_id: window.user.id,
             });
             this.view.render();
             endorseButton = this.view.$('.action-answer');
@@ -174,7 +174,7 @@
             var endorseButton;
             this.thread.set({
                 thread_type: 'discussion',
-                user_id: window.user.id
+                user_id: window.user.id,
             });
             this.view.render();
             endorseButton = this.view.$('.action-endorse');
@@ -185,7 +185,7 @@
             var endorseButton;
             this.thread.set({
                 thread_type: 'question',
-                user_id: (parseInt(window.user.id) + 1).toString()
+                user_id: (parseInt(window.user.id) + 1).toString(),
             });
             this.view.render();
             endorseButton = this.view.$('.action-answer');
@@ -229,7 +229,7 @@
             beforeEach(function() {
                 this.comment.set('endorsement', {
                     username: 'test_endorser',
-                    time: new Date().toISOString()
+                    time: new Date().toISOString(),
                 });
                 return spyOn(DiscussionUtil, 'urlFor').and.returnValue('test_endorser_url');
             });

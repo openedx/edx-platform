@@ -5,21 +5,21 @@
         'underscore',
         'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
-        'js/edxnotes/models/tab'
+        'js/edxnotes/models/tab',
     ], function($, _, Backbone, HtmlUtils, TabModel) {
         var TabView = Backbone.View.extend({
             PanelConstructor: null,
 
             tabInfo: {
                 name: '',
-                class_name: ''
+                class_name: '',
             },
 
             initialize: function(options) {
                 _.bindAll(this, 'showLoadingIndicator', 'hideLoadingIndicator');
                 this.options = _.defaults(options || {}, {
                     createTabOnInitialization: true,
-                    createHeaderFooter: true
+                    createHeaderFooter: true,
                 });
 
                 if (this.options.createTabOnInitialization) {
@@ -45,7 +45,7 @@
                         this.destroySubView();
                         this.tabModel = null;
                         this.onClose();
-                    }
+                    },
                 });
             },
 
@@ -73,8 +73,8 @@
                     {
                         collection: collection,
                         scrollToTag: this.options.scrollToTag,
-                        createHeaderFooter: this.options.createHeaderFooter
-                    }
+                        createHeaderFooter: this.options.createHeaderFooter,
+                    },
                 );
             },
 
@@ -142,7 +142,7 @@
                     .find('.msg-content .copy').html('');
 
                 return this;
-            }
+            },
         });
 
         return TabView;

@@ -27,7 +27,7 @@
                         MockView = Backbone.View.extend({
                             testFunction: function() {
                                 return promise;
-                            }
+                            },
                         }),
                         testView = new MockView();
                     setFixtures("<a href='#' id='link'>ripe apples drop about my head</a>");

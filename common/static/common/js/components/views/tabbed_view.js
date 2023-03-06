@@ -9,7 +9,7 @@
         'text!common/templates/components/tabbed_view.underscore',
         'text!common/templates/components/tab.underscore',
         'text!common/templates/components/tabpanel.underscore',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function(
         Backbone,
         _,
@@ -18,7 +18,7 @@
         tabbedViewTemplate,
         tabTemplate,
         tabPanelTemplate,
-        HtmlUtils
+        HtmlUtils,
     ) {
         var getTabPanelId = function(id) {
             return 'tabpanel-' + id;
@@ -34,18 +34,18 @@
             render: function() {
                 var tabPanelHtml = this.template({
                     tabId: getTabPanelId(this.url),
-                    index: this.index
+                    index: this.index,
                 });
                 this.setElement($(tabPanelHtml));
                 this.$el.append(this.view.render().el);
                 return this;
-            }
+            },
         });
 
         var TabbedView = Backbone.View.extend({
             events: {
                 'click .tab': 'switchTab',
-                'keydown .tab': 'keydownHandler'
+                'keydown .tab': 'keydownHandler',
             },
 
             /**
@@ -67,14 +67,14 @@
                 this.router = options.router || null;
                 this.tabs = options.tabs;
                 this.template = HtmlUtils.template(tabbedViewTemplate)({
-                    viewLabel: this.viewLabel
+                    viewLabel: this.viewLabel,
                 });
                 // Convert each view into a TabPanelView
                 _.each(this.tabs, function(tabInfo, index) {
                     tabInfo.view = new TabPanelView({
                         url: tabInfo.url,
                         view: tabInfo.view,
-                        index: index
+                        index: index,
                     });
                 }, this);
                 this.urlMap = _.reduce(this.tabs, function(map, value) {
@@ -86,14 +86,14 @@
                 var self = this;
                 HtmlUtils.setHtml(
                     this.$el,
-                    this.template
+                    this.template,
                 );
                 _.each(this.tabs, function(tabInfo, index) {
                     var $tabEl = $(_.template(tabTemplate)({
                             index: index,
                             title: tabInfo.title,
                             url: tabInfo.url,
-                            tabPanelId: getTabPanelId(tabInfo.url)
+                            tabPanelId: getTabPanelId(tabInfo.url),
                         })),
                         tabContainerEl = this.$('.tabs');
                     self.$('.page-content-nav').append($tabEl);
@@ -124,13 +124,13 @@
                     .attr({
                         'aria-expanded': 'false',
                         'aria-selected': 'false',
-                        tabindex: '-1'
+                        tabindex: '-1',
                     });
 
                 this.$('.tabpanel[aria-hidden="false"]')
                     .addClass('is-hidden')
                     .attr({
-                        'aria-hidden': 'true'
+                        'aria-hidden': 'true',
                     });
 
                 // Show new tab/tabpanel
@@ -143,13 +143,13 @@
                     .attr({
                         'aria-expanded': 'true',
                         'aria-selected': 'true',
-                        tabindex: '0'
+                        tabindex: '0',
                     });
 
                 view.$el
                     .removeClass('is-hidden')
                     .attr({
-                        'aria-hidden': 'false'
+                        'aria-hidden': 'false',
                     });
             },
 
@@ -235,7 +235,7 @@
                     $element = this.$('button[data-index=' + tabNameOrIndex + ']');
                 }
                 return {tab: tab, element: $element};
-            }
+            },
         });
         return TabbedView;
     });

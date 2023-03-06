@@ -13,7 +13,7 @@ define(
             className: 'video-row',
 
             events: {
-                'click .remove-video-button.action-button': 'removeVideo'
+                'click .remove-video-button.action-button': 'removeVideo',
             },
 
             initialize: function(options) {
@@ -26,7 +26,7 @@ define(
                         model: this.model,
                         imageUploadURL: options.videoImageUploadURL,
                         defaultVideoImageURL: options.defaultVideoImageURL,
-                        videoImageSettings: options.videoImageSettings
+                        videoImageSettings: options.videoImageSettings,
                     });
                 }
                 this.videoTranscriptsView = new VideoTranscriptsView({
@@ -37,13 +37,13 @@ define(
                     errorDescription: this.model.get('error_description'),
                     transcriptAvailableLanguages: options.transcriptAvailableLanguages,
                     videoSupportedFileFormats: options.videoSupportedFileFormats,
-                    videoTranscriptSettings: options.videoTranscriptSettings
+                    videoTranscriptSettings: options.videoTranscriptSettings,
                 });
 
                 this.VideoStatusView = new VideoStatusView({
                     status: this.model.get('status'),
                     showError: !this.model.get('transcription_status'),
-                    errorDescription: this.model.get('error_description')
+                    errorDescription: this.model.get('error_description'),
                 });
             },
 
@@ -51,13 +51,13 @@ define(
                 var renderedAttributes = {
                     videoImageUploadEnabled: this.videoImageUploadEnabled,
                     created: DateUtils.renderDate(this.model.get('created')),
-                    status: this.model.get('status')
+                    status: this.model.get('status'),
                 };
                 HtmlUtils.setHtml(
                     this.$el,
                     this.template(
-                        _.extend({}, this.model.attributes, renderedAttributes)
-                    )
+                        _.extend({}, this.model.attributes, renderedAttributes),
+                    ),
                 );
 
                 if (this.videoImageUploadEnabled) {
@@ -82,17 +82,17 @@ define(
                             function() {
                                 return $.ajax({
                                     url: videoView.videoHandlerUrl + '/' + videoView.model.get('edx_video_id'),
-                                    type: 'DELETE'
+                                    type: 'DELETE',
                                 }).done(function() {
                                     videoView.remove();
                                 });
-                            }
+                            },
                         );
-                    }
+                    },
                 );
-            }
+            },
         });
 
         return PreviousVideoUploadView;
-    }
+    },
 );

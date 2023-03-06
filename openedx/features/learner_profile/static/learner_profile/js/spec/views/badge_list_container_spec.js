@@ -6,7 +6,7 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'edx-ui-toolkit/js/pagination/paging-collection',
     'learner_profile/js/spec_helpers/helpers',
-    'learner_profile/js/views/badge_list_container'
+    'learner_profile/js/views/badge_list_container',
 ],
 function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpers, BadgeListContainer) {
     'use strict';
@@ -17,8 +17,8 @@ function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpe
         var createView = function(requests, pageNum, badgeListObject) {
             var BadgeCollection = PagingCollection.extend({
                 queryParams: {
-                    currentPage: 'current_page'
-                }
+                    currentPage: 'current_page',
+                },
             });
             var badgeCollection = new BadgeCollection();
             var models = [];
@@ -36,7 +36,7 @@ function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpe
             expect(path).toBe('/api/badges/v1/assertions/user/staff/');
             AjaxHelpers.respondWithJson(requests, badgeListObject);
             badgeListContainer = new BadgeListContainer({
-                collection: badgeCollection
+                collection: badgeCollection,
 
             });
             badgeListContainer.render();
@@ -57,7 +57,7 @@ function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpe
                 next: null,
                 start: 20,
                 current_page: 1,
-                results: []
+                results: [],
             });
             badges = view.$el.find('div.badge-display');
             expect(badges.length).toBe(30);
@@ -73,7 +73,7 @@ function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpe
                 next: null,
                 start: 20,
                 current_page: 3,
-                results: []
+                results: [],
             });
             placeholder = view.$el.find('span.accomplishment-placeholder');
             expect(placeholder.length).toBe(1);
@@ -89,11 +89,11 @@ function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpe
                 next: null,
                 start: 0,
                 current_page: 1,
-                results: []
+                results: [],
             });
             placeholder = view.$el.find('span.accomplishment-placeholder');
             expect(placeholder.length).toBe(0);
         });
     });
-}
+},
 );

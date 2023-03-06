@@ -17,7 +17,7 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
             if (selectedDate && selectedTime) {
                 return new Date(Date.UTC(
                     selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(),
-                    selectedTime.getHours(), selectedTime.getMinutes()
+                    selectedTime.getHours(), selectedTime.getMinutes(),
                 ));
             } else if (selectedDate) {
                 return new Date(Date.UTC(
@@ -45,7 +45,7 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
             var dateObj = new Date(dateArg);
             return dateObj.toLocaleString(
                 [],
-                {timeZone: 'UTC', timeZoneName: 'short'}
+                {timeZone: 'UTC', timeZoneName: 'short'},
             );
         }
 
@@ -125,6 +125,6 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
             renderDate: renderDate,
             convertDateStringsToObjects: convertDateStringsToObjects,
             parseDateFromString: parseDateFromString,
-            setupDatePicker: setupDatePicker
+            setupDatePicker: setupDatePicker,
         };
     });

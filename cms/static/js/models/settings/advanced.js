@@ -11,7 +11,7 @@ define(['backbone'], function(Backbone) {
 
         validate: function(attrs) {
         // Keys can no longer be edited. We are currently not validating values.
-        }
+        },
     });
 
     return Advanced;

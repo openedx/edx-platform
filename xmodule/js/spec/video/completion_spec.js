@@ -12,7 +12,7 @@
             state = jasmine.initializePlayer({
                 recordedYoutubeIsAvailable: true,
                 completionEnabled: true,
-                publishCompletionUrl: 'https://example.com/publish_completion_url'
+                publishCompletionUrl: 'https://example.com/publish_completion_url',
             });
             state.completionHandler.completeAfterTime = 20;
 
@@ -23,7 +23,7 @@
                 dataType: 'json',
                 data: JSON.stringify({completion: 1.0}),
                 success: jasmine.any(Function),
-                error: jasmine.any(Function)
+                error: jasmine.any(Function),
             };
         });
 

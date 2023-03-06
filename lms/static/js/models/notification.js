@@ -37,8 +37,8 @@
             /**
              * An optional callback that will be invoked when the user clicks on the action button.
              */
-            actionCallback: null
-        }
+            actionCallback: null,
+        },
     });
 
     this.NotificationModel = NotificationModel;

@@ -116,11 +116,11 @@ var edx = edx || {},
                     .find('.chapter-menu')
                     .addClass('is-open')
                     .slideDown();
-            }
+            },
         };
 
         return {
-            init: navigation.init
+            init: navigation.init,
         };
     }());
 

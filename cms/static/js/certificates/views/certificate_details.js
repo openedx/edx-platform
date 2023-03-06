@@ -10,7 +10,7 @@ define([
     'js/certificates/views/signatory_details',
     'common/js/components/utils/view_utils',
     'jquery.smoothScroll',
-    'text!templates/certificate-details.underscore'
+    'text!templates/certificate-details.underscore',
 ],
 function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, ViewUtils, smoothScroll,
     certificateDetailsTemplate) {
@@ -18,7 +18,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
     var CertificateDetailsView = BaseView.extend({
         tagName: 'div',
         events: {
-            'click .edit': 'editCertificate'
+            'click .edit': 'editCertificate',
         },
 
         className: function() {
@@ -26,7 +26,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
             return [
                 'collection',
                 'certificates',
-                'certificate-details'
+                'certificate-details',
             ].join(' ');
         },
 
@@ -47,7 +47,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
                     gettext('Yes, allow edits to the active Certificate'),
                     function() {
                         return self.model.set('editing', true);
-                    }
+                    },
                 );
             } else {
                 this.model.set('editing', true);
@@ -59,7 +59,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
             // Expand to show all model data, if requested
             var attrs = $.extend({}, this.model.attributes, {
                 index: this.model.collection.indexOf(this.model),
-                showDetails: this.showDetails || showDetails || false
+                showDetails: this.showDetails || showDetails || false,
             });
             // xss-lint: disable=javascript-jquery-html
             this.$el.html(_.template(certificateDetailsTemplate)(attrs));
@@ -78,10 +78,10 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
             $.smoothScroll({
                 offset: 0,
                 easing: 'swing',
-                speed: 1000
+                speed: 1000,
             });
             return this;
-        }
+        },
     });
     return CertificateDetailsView;
 });

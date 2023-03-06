@@ -3,14 +3,14 @@
     define([
         'backbone',
         'edx-ui-toolkit/js/pagination/paging-collection',
-        'course_bookmarks/js/models/bookmark'
+        'course_bookmarks/js/models/bookmark',
     ], function(Backbone, PagingCollection, BookmarkModel) {
         return PagingCollection.extend({
             model: BookmarkModel,
 
             queryParams: {
                 course_id: function() { return this.options.course_id; },
-                fields: function() { return 'display_name,path'; }
+                fields: function() { return 'display_name,path'; },
             },
 
             url: function() {
@@ -21,7 +21,7 @@
                 this.options = options;
                 this.url = options.url;
                 PagingCollection.prototype.constructor.call(this, models, options);
-            }
+            },
         });
     });
 }(define || RequireJS.define));

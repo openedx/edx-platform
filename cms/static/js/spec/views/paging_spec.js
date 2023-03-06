@@ -4,7 +4,7 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'edx-ui-toolkit/js/pagination/paging-collection',
     'js/views/paging',
-    'js/views/paging_header'
+    'js/views/paging_header',
 ],
 function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
     'use strict';
@@ -14,7 +14,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
         return {
             id: id,
             display_name: id,
-            url: id
+            url: id,
         };
     };
 
@@ -22,23 +22,23 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
         results: [
             createPageableItem(1),
             createPageableItem(2),
-            createPageableItem(3)
+            createPageableItem(3),
         ],
         num_pages: 2,
         page_size: 3,
         count: 4,
         page: 0,
-        start: 0
+        start: 0,
     };
     var mockSecondPage = {
         results: [
-            createPageableItem(4)
+            createPageableItem(4),
         ],
         num_pages: 2,
         page_size: 3,
         page: 1,
         count: 4,
-        start: 3
+        start: 3,
     };
     var mockEmptyPage = {
         results: [],
@@ -46,7 +46,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
         page_size: 3,
         count: 0,
         page: 0,
-        start: 0
+        start: 0,
     };
 
     var respondWithMockItems = function(requests) {
@@ -64,7 +64,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
             this.registerSortableColumn('name-col', 'Name', 'name', 'asc');
             this.registerSortableColumn('date-col', 'Date', 'date', 'desc');
             this.setInitialSortColumn('date-col');
-        }
+        },
     });
 
     describe('Paging', function() {
@@ -73,8 +73,8 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 state: {
                     firstPage: 0,
                     currentPage: null,
-                    pageSize: 3
-                }
+                    pageSize: 3,
+                },
             });
 
         beforeEach(function() {

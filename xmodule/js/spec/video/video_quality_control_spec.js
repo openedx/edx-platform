@@ -27,19 +27,19 @@
             it('contains the quality control and is initially hidden',
                 function() {
                     expect(qualityControl.el).toHaveClass(
-                        'quality-control is-hidden'
+                        'quality-control is-hidden',
                     );
                 });
 
             it('add ARIA attributes to quality control', function() {
                 expect(qualityControl.el).toHaveAttrs({
-                    'aria-disabled': 'false'
+                    'aria-disabled': 'false',
                 });
             });
 
             it('bind the quality control', function() {
                 expect(qualityControl.el).toHandleWith('click',
-                    qualityControl.toggleQuality
+                    qualityControl.toggleQuality,
                 );
 
                 expect(state.el).toHandle('play');
@@ -72,7 +72,7 @@
             it('leaves quality control hidden on play if HD is not available',
                 function() {
                     player.getAvailableQualityLevels.and.returnValue(
-                        ['large', 'medium', 'small']
+                        ['large', 'medium', 'small'],
                     );
 
                     videoPlayer.onPlay();
@@ -95,7 +95,7 @@
             it('quality control is active if HD is available',
                 function() {
                     player.getAvailableQualityLevels.and.returnValue(
-                        ['highres', 'hd1080', 'hd720']
+                        ['highres', 'hd1080', 'hd720'],
                     );
 
                     qualityControl.quality = 'highres';

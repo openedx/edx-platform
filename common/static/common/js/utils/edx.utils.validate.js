@@ -4,7 +4,7 @@
         'jquery',
         'underscore',
         'underscore.string',
-        'gettext'
+        'gettext',
     ],
     function($, _, _s, gettext) {
         var utils;
@@ -27,7 +27,7 @@
                         email: gettext("The email address you've provided isn't formatted correctly."),
                         min: gettext('%(field)s must have at least %(count)d characters.'),
                         max: gettext('%(field)s can only contain up to %(count)d characters.'),
-                        required: gettext('Please enter your %(field)s.')
+                        required: gettext('Please enter your %(field)s.'),
                     },
 
                     field: function(el) {
@@ -62,7 +62,7 @@
                                 required: required,
                                 min: min,
                                 max: max,
-                                email: email
+                                email: email,
                             });
                         }
 
@@ -80,7 +80,7 @@
                             var max = $el.attr('maxlength') || false;
 
                             return (!!max) ? max >= $el.val().length : true;
-                        }
+                        },
                     },
 
                     isRequired: function($el) {
@@ -109,8 +109,8 @@
                                 '(^[-!#$%&\'*+/=?^_`{}|~0-9A-Z]+(\\.[-!#$%&\'*+/=?^_`{}|~0-9A-Z]+)*',
                                 '|^"([\\001-\\010\\013\\014\\016-\\037!#-\\[\\]-\\177]|\\\\[\\001-\\011\\013\\014\\016-\\177])*"', // eslint-disable-line max-len
                                 ')@((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\\.)+)(?:[A-Z0-9-]{2,63})',
-                                '|\\[(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}\\]$'
-                            ].join(''), 'i'
+                                '|\\[(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}\\]$',
+                            ].join(''), 'i',
                         ),
 
                         valid: function($el) {
@@ -119,7 +119,7 @@
 
                         format: function(str) {
                             return _fn.validate.email.regex.test(str);
-                        }
+                        },
                     },
 
                     getLabel: function(id) {
@@ -167,7 +167,7 @@
 
                                 txt.push(_fn.validate.template({
                                     content: content,
-                                    suppressAttr: suppressAttr
+                                    suppressAttr: suppressAttr,
                                 }));
                             }
                         });
@@ -180,12 +180,12 @@
                         if ($el.setCustomValidity) {
                             $el.setCustomValidity(' ');
                         }
-                    }
-                }
+                    },
+                },
             };
 
             return {
-                validate: _fn.validate.field
+                validate: _fn.validate.field,
             };
         }());
 

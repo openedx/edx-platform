@@ -7,8 +7,8 @@
             defaults: {
                 type: 'search_query',
                 query: '',
-                name: ''
-            }
+                name: '',
+            },
         });
     });
 }(define || RequireJS.define));

@@ -18,16 +18,16 @@
                 created_at: '2013-04-03T20:08:39Z',
                 abuse_flaggers: [],
                 votes: {
-                    up_count: 42
+                    up_count: 42,
                 },
                 thread_type: 'discussion',
                 closed: false,
                 pinned: false,
-                type: 'thread'
+                type: 'thread',
             };
             this.thread = new Thread(this.threadData);
             this.view = new DiscussionThreadShowView({
-                model: this.thread
+                model: this.thread,
             });
             this.view.setElement($('#fixture-element'));
             return spyOn(this.view, 'convertMath');
@@ -41,7 +41,7 @@
             });
             it('votes correctly via spacebar', function() {
                 return DiscussionViewSpecHelper.checkUpvote(this.view, this.thread, this.user, $.Event('keydown', {
-                    which: 32
+                    which: 32,
                 }));
             });
             it('unvotes correctly via click', function() {
@@ -49,7 +49,7 @@
             });
             it('unvotes correctly via spacebar', function() {
                 return DiscussionViewSpecHelper.checkUnvote(this.view, this.thread, this.user, $.Event('keydown', {
-                    which: 32
+                    which: 32,
                 }));
             });
         });
@@ -75,15 +75,15 @@
             it('exposes the pinning control only to authorized users', function() {
                 this.thread.updateInfo({
                     ability: {
-                        can_openclose: false
-                    }
+                        can_openclose: false,
+                    },
                 });
                 this.view.render();
                 expect(this.view.$el.find('.action-pin').closest('.is-hidden')).toExist();
                 this.thread.updateInfo({
                     ability: {
-                        can_openclose: true
-                    }
+                        can_openclose: true,
+                    },
                 });
                 this.view.render();
                 return expect(this.view.$el.find('.action-pin').closest('.is-hidden')).not.toExist();

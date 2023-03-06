@@ -5,14 +5,14 @@
         'gettext',
         'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
-        'text!common/templates/components/paging-footer.underscore'
+        'text!common/templates/components/paging-footer.underscore',
     ],
     function(_, gettext, Backbone, HtmlUtils, pagingFooterTemplate) {
         var PagingFooter = Backbone.View.extend({
             events: {
                 'click .next-page-link': 'nextPage',
                 'click .previous-page-link': 'previousPage',
-                'change .page-number-input': 'changePage'
+                'change .page-number-input': 'changePage',
             },
 
             initialize: function(options) {
@@ -40,8 +40,8 @@
                     HtmlUtils.template(pagingFooterTemplate)({
                         current_page: this.collection.getPageNumber(),
                         total_pages: this.collection.getTotalPages(),
-                        paginationLabel: this.paginationLabel
-                    })
+                        paginationLabel: this.paginationLabel,
+                    }),
                 );
                 this.$('.previous-page-link').toggleClass('is-disabled', onFirstPage).attr('aria-disabled', onFirstPage);
                 this.$('.next-page-link').toggleClass('is-disabled', onLastPage).attr('aria-disabled', onLastPage);
@@ -71,7 +71,7 @@
 
             previousPage: function() {
                 this.collection.previousPage();
-            }
+            },
         });
 
         return PagingFooter;

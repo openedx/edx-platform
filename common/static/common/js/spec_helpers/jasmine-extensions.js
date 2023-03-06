@@ -38,7 +38,7 @@
 
                         if ($.isEmptyObject(attrs)) {
                             return {
-                                pass: false
+                                pass: false,
                             };
                         }
 
@@ -47,25 +47,25 @@
                         });
 
                         return result;
-                    }
+                    },
                 };
             },
             toBeInRange: function() {
                 return {
                     compare: function(actual, min, max) {
                         return {
-                            pass: min <= actual && actual <= max
+                            pass: min <= actual && actual <= max,
                         };
-                    }
+                    },
                 };
             },
             toBeInArray: function() {
                 return {
                     compare: function(actual, array) {
                         return {
-                            pass: $.inArray(actual, array) > -1
+                            pass: $.inArray(actual, array) > -1,
                         };
-                    }
+                    },
                 };
             },
             toBeInstanceOf: function() {
@@ -73,29 +73,29 @@
                 return {
                     compare: function(actual, expected) {
                         return {
-                            pass: actual instanceof expected
+                            pass: actual instanceof expected,
                         };
-                    }
+                    },
                 };
             },
             toHaveIndex: function() {
                 return {
                     compare: function(actual, expected) {
                         return {
-                            pass: $(actual).index() === expected
+                            pass: $(actual).index() === expected,
                         };
-                    }
+                    },
                 };
             },
             toXMLEqual: function() {
                 return {
                     compare: function(actual, expected) {
                         return {
-                            pass: actual.replace(/\s+/g, '') === expected.replace(/\s+/g, '')
+                            pass: actual.replace(/\s+/g, '') === expected.replace(/\s+/g, ''),
                         };
-                    }
+                    },
                 };
-            }
+            },
         });
     });
 

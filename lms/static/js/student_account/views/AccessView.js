@@ -17,7 +17,7 @@
         'js/student_account/views/HintedLoginView',
         'edx-ui-toolkit/js/utils/html-utils',
         'js/student_account/multiple_enterprise',
-        'js/vendor/history'
+        'js/vendor/history',
     ],
     function($, utility, _, _s, Backbone, LoginModel, PasswordResetModel, RegisterModel, AccountRecoveryModel,
         LoginView, PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView, HtmlUtils,
@@ -25,7 +25,7 @@
         return Backbone.View.extend({
             tpl: '#access-tpl',
             events: {
-                'click .form-toggle': 'toggleForm'
+                'click .form-toggle': 'toggleForm',
             },
             subview: {
                 login: {},
@@ -33,7 +33,7 @@
                 passwordHelp: {},
                 accountRecoveryHelp: {},
                 institutionLogin: {},
-                hintedLogin: {}
+                hintedLogin: {},
             },
             nextUrl: '/dashboard',
             // The form currently loaded
@@ -51,7 +51,7 @@
 
                 this.thirdPartyAuth = options.third_party_auth || {
                     currentProvider: null,
-                    providers: []
+                    providers: [],
                 };
 
                 this.thirdPartyAuthHint = options.third_party_auth_hint || null;
@@ -70,7 +70,7 @@
                     register: options.registration_form_desc,
                     reset: options.password_reset_form_desc,
                     institution_login: null,
-                    hinted_login: null
+                    hinted_login: null,
                 };
                 this.platformName = options.platform_name;
                 this.supportURL = options.support_link;
@@ -88,12 +88,12 @@
                 // The login view listens for 'sync' events from the reset model
                 this.resetModel = new PasswordResetModel({}, {
                     method: 'GET',
-                    url: '#'
+                    url: '#',
                 });
 
                 this.accountRecoveryModel = new AccountRecoveryModel({}, {
                     method: 'GET',
-                    url: '#'
+                    url: '#',
                 });
 
                 this.render();
@@ -113,9 +113,9 @@
                     $(this.el),
                     HtmlUtils.HTML(
                         _.template(this.tpl)({
-                            mode: this.activeForm
-                        })
-                    )
+                            mode: this.activeForm,
+                        }),
+                    ),
                 )
                 this.postRender();
 
@@ -144,7 +144,7 @@
                 login: function(data) {
                     var model = new LoginModel({}, {
                         method: data.method,
-                        url: data.submit_url
+                        url: data.submit_url,
                     });
                     var isTpaSaml = this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl ?
                         this.thirdPartyAuth.finishAuthUrl.indexOf('tpa-saml') >= 0 : false;
@@ -166,7 +166,7 @@
                         enterpriseName: this.enterpriseName,
                         enterpriseSlugLoginURL: this.enterpriseSlugLoginURL,
                         isEnterpriseEnable: this.isEnterpriseEnable,
-                        is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled
+                        is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled,
                     });
 
                     // Listen for 'password-help' event to toggle sub-views
@@ -186,7 +186,7 @@
 
                     this.subview.passwordHelp = new PasswordResetView({
                         fields: data.fields,
-                        model: this.resetModel
+                        model: this.resetModel,
                     });
 
                     // Listen for 'password-email-sent' event to toggle sub-views
@@ -200,7 +200,7 @@
                     var model = new RegisterModel({}, {
                         method: data.method,
                         url: data.submit_url,
-                        nextUrl: this.nextUrl
+                        nextUrl: this.nextUrl,
                     });
 
                     this.subview.register = new RegisterView({
@@ -221,7 +221,7 @@
                     this.subview.institutionLogin = new InstitutionLoginView({
                         thirdPartyAuth: this.thirdPartyAuth,
                         platformName: this.platformName,
-                        mode: this.activeForm
+                        mode: this.activeForm,
                     });
 
                     this.subview.institutionLogin.render();
@@ -231,11 +231,11 @@
                     this.subview.hintedLogin = new HintedLoginView({
                         thirdPartyAuth: this.thirdPartyAuth,
                         hintedProvider: this.thirdPartyAuthHint,
-                        platformName: this.platformName
+                        platformName: this.platformName,
                     });
 
                     this.subview.hintedLogin.render();
-                }
+                },
             },
 
             passwordEmailSent: function() {
@@ -247,7 +247,7 @@
 
             resetPassword: function() {
                 window.analytics.track('edx.bi.password_reset_form.viewed', {
-                    category: 'user-engagement'
+                    category: 'user-engagement',
                 });
 
                 this.element.hide($(this.el).find('#login-form'));
@@ -266,7 +266,7 @@
                 e.preventDefault();
 
                 window.analytics.track('edx.bi.' + type + '_form.toggled', {
-                    category: 'user-engagement'
+                    category: 'user-engagement',
                 });
 
                 // Load the form. Institution login is always refreshed since it changes based on the previous form.
@@ -323,7 +323,7 @@
                 if (this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl) {
                     multipleEnterpriseInterface.check(
                         this.thirdPartyAuth.finishAuthUrl,
-                        this.edxUserInfoCookieName
+                        this.edxUserInfoCookieName,
                     );
                     // Note: the third party auth URL likely contains another redirect URL embedded inside
                 } else {
@@ -342,7 +342,7 @@
             form: {
                 isLoaded: function($form) {
                     return $form.html().length > 0;
-                }
+                },
             },
 
             /* Helper method to toggle display
@@ -356,14 +356,14 @@
                 scrollTop: function($el) {
                     // Scroll to top of selected element
                     $('html,body').animate({
-                        scrollTop: $el.offset().top
+                        scrollTop: $el.offset().top,
                     }, 'slow');
                 },
 
                 show: function($el) {
                     $el.removeClass('hidden');
-                }
-            }
+                },
+            },
         });
     });
 }).call(this, define || RequireJS.define);

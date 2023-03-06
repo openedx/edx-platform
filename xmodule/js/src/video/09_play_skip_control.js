@@ -29,7 +29,7 @@
                 gettext('Play'),
                 '">',
                 '<span class="icon fa fa-play" aria-hidden="true"></span>',
-                '</button>'
+                '</button>',
             ].join(''),
 
             destroy: function() {
@@ -58,7 +58,7 @@
                 this.el.on('click', this.onClick);
                 this.state.el.on({
                     play: this.play,
-                    destroy: this.destroy
+                    destroy: this.destroy,
                 });
             },
 
@@ -81,7 +81,7 @@
                     .addClass('fa-step-forward');
                 // Disable possibility to pause the video.
                 this.state.el.find('video').off('click');
-            }
+            },
         };
 
         return PlaySkipControl;

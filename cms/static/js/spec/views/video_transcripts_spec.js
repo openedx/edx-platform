@@ -16,20 +16,20 @@ define(
                 transcriptAvailableLanguages = [
                     {
                         language_code: 'en',
-                        language_text: 'English'
+                        language_text: 'English',
                     },
                     {
                         language_code: 'es',
-                        language_text: 'Spanish'
+                        language_text: 'Spanish',
                     },
                     {
                         language_code: 'ar',
-                        language_text: 'Chinese'
+                        language_text: 'Chinese',
                     },
                     {
                         language_code: 'ur',
-                        language_text: 'Urdu'
-                    }
+                        language_text: 'Urdu',
+                    },
                 ],
                 TRANSCRIPT_DOWNLOAD_FILE_FORMAT = 'srt',
                 TRANSCRIPT_DOWNLOAD_URL = 'abc.com/transcript_download/course_id',
@@ -40,7 +40,7 @@ define(
                     trancript_download_file_format: TRANSCRIPT_DOWNLOAD_FILE_FORMAT,
                     transcript_download_handler_url: TRANSCRIPT_DOWNLOAD_URL,
                     transcript_upload_handler_url: TRANSCRIPT_UPLOAD_URL,
-                    transcript_delete_handler_url: TRANSCRIPT_DELETE_URL
+                    transcript_delete_handler_url: TRANSCRIPT_DELETE_URL,
                 },
                 videoListView;
 
@@ -60,7 +60,7 @@ define(
                 expect(downloadTranscriptActionEl.html().trim(), 'Download');
                 expect(
                     downloadTranscriptActionEl.attr('href'),
-                    TRANSCRIPT_DOWNLOAD_URL + '?edx_video_id=' + edxVideoID + '&language_code=' + transcriptLanguage
+                    TRANSCRIPT_DOWNLOAD_URL + '?edx_video_id=' + edxVideoID + '&language_code=' + transcriptLanguage,
                 );
 
                 expect(uploadTranscriptActionEl.html().trim(), 'Replace');
@@ -73,10 +73,10 @@ define(
                 expect($transcriptStatusEl.hasClass(statusData.statusClass)).toEqual(true);
                 expect($transcriptStatusEl.find('span.fa').hasClass(statusData.iconClasses)).toEqual(true);
                 expect(
-                    $transcriptStatusEl.find('.more-details-action').hasClass('hidden')
+                    $transcriptStatusEl.find('.more-details-action').hasClass('hidden'),
                 ).toEqual(statusData.hiddenClass === 'hidden');
                 expect(
-                    $transcriptStatusEl.find('.transcript-detail-status').html().trim()
+                    $transcriptStatusEl.find('.transcript-detail-status').html().trim(),
                 ).toEqual(statusData.shortMessage);
             };
 
@@ -99,7 +99,7 @@ define(
                         client_video_id: clientVideoID,
                         edx_video_id: edxVideoID,
                         created: '2014-11-25T23:13:05',
-                        transcripts: availableTranscripts
+                        transcripts: availableTranscripts,
                     },
                     videoCollection = new Backbone.Collection([new Backbone.Model(videoData)]);
 
@@ -108,7 +108,7 @@ define(
                     videoImageSettings: {},
                     videoTranscriptSettings: videoTranscriptSettings,
                     transcriptAvailableLanguages: transcriptAvailableLanguages,
-                    videoSupportedFileFormats: videoSupportedFileFormats
+                    videoSupportedFileFormats: videoSupportedFileFormats,
                 });
                 videoListView.setElement($('.wrapper-assets'));
                 videoListView.render();
@@ -120,7 +120,7 @@ define(
                 setFixtures(
                     '<div id="page-prompt"></div>' +
                     '<div id="page-notification"></div>' +
-                    '<section class="wrapper-assets"></section>'
+                    '<section class="wrapper-assets"></section>',
                 );
                 TemplateHelpers.installTemplate('previous-video-upload-list');
                 renderView(transcripts);
@@ -139,33 +139,33 @@ define(
 
             it('does not show list of transcripts initially', function() {
                 expect(
-                    videoTranscriptsView.$el.find('.video-transcripts-wrapper').hasClass('hidden')
+                    videoTranscriptsView.$el.find('.video-transcripts-wrapper').hasClass('hidden'),
                 ).toEqual(true);
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Show transcripts (' + transcripts.length + ')'
+                    'Show transcripts (' + transcripts.length + ')',
                 );
             });
 
             it('shows list of transcripts when clicked on show transcript button', function() {
                 // Verify transcript container is hidden
                 expect(
-                    videoTranscriptsView.$el.find('.video-transcripts-wrapper').hasClass('hidden')
+                    videoTranscriptsView.$el.find('.video-transcripts-wrapper').hasClass('hidden'),
                 ).toEqual(true);
 
                 // Verify initial button text
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Show transcripts (' + transcripts.length + ')'
+                    'Show transcripts (' + transcripts.length + ')',
                 );
                 videoTranscriptsView.$el.find('.toggle-show-transcripts-button').click();
 
                 // Verify transcript container is not hidden
                 expect(
-                    videoTranscriptsView.$el.find('.video-transcripts-wrapper').hasClass('hidden')
+                    videoTranscriptsView.$el.find('.video-transcripts-wrapper').hasClass('hidden'),
                 ).toEqual(false);
 
                 // Verify button text is changed.
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Hide transcripts (' + transcripts.length + ')'
+                    'Hide transcripts (' + transcripts.length + ')',
                 );
             });
 
@@ -175,24 +175,24 @@ define(
 
                 // Verify button text.
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Hide transcripts (' + transcripts.length + ')'
+                    'Hide transcripts (' + transcripts.length + ')',
                 );
 
                 // Verify transcript container is not hidden
                 expect(
-                    videoTranscriptsView.$el.find('.video-transcripts-wrapper').hasClass('hidden')
+                    videoTranscriptsView.$el.find('.video-transcripts-wrapper').hasClass('hidden'),
                 ).toEqual(false);
 
                 videoTranscriptsView.$el.find('.toggle-show-transcripts-button').click();
 
                 // Verify button text is changed.
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Show transcripts (' + transcripts.length + ')'
+                    'Show transcripts (' + transcripts.length + ')',
                 );
 
                 // Verify transcript container is hidden
                 expect(
-                    videoTranscriptsView.$el.find('.video-transcripts-wrapper').hasClass('hidden')
+                    videoTranscriptsView.$el.find('.video-transcripts-wrapper').hasClass('hidden'),
                 ).toEqual(true);
             });
 
@@ -202,7 +202,7 @@ define(
 
                 // Verify appropriate text is shown
                 expect(
-                    videoTranscriptsView.$el.find('.transcripts-empty-text').html()
+                    videoTranscriptsView.$el.find('.transcripts-empty-text').html(),
                 ).toEqual('No transcript uploaded.');
             });
 
@@ -211,14 +211,14 @@ define(
                 // Show transcripts
                 videoTranscriptsView.$el.find('.toggle-show-transcripts-button').click();
                 expect(videoTranscriptsView.$el.find('.video-transcript-content').length).toEqual(
-                    transcripts.length
+                    transcripts.length,
                 );
 
                 _.each(transcripts, function(languageCode) {
                     $transcriptEl = videoTranscriptsView.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
                     // Verify correct transcript title is set.
                     expect($transcriptEl.find('.transcript-title').html()).toEqual(
-                        'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT
+                        'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT,
                     );
                     // Verify transcript is rendered with correct info.
                     verifyTranscriptStateInfo($transcriptEl, languageCode);
@@ -233,7 +233,7 @@ define(
 
                 // Verify correct transcript title is set.
                 expect($transcriptEl.find('.transcript-title').html()).toEqual(
-                    'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT
+                    'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT,
                 );
 
                 // Select a language
@@ -248,7 +248,7 @@ define(
                 AjaxHelpers.expectRequest(
                     requests,
                     'POST',
-                    TRANSCRIPT_UPLOAD_URL
+                    TRANSCRIPT_UPLOAD_URL,
                 );
 
                 // Send successful upload response
@@ -256,7 +256,7 @@ define(
 
                 // Verify correct transcript title is set.
                 expect($transcriptEl.find('.transcript-title').html()).toEqual(
-                    'Video client title n_' + newLanguageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT
+                    'Video client title n_' + newLanguageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT,
                 );
 
                 verifyMessage($transcriptEl, 'uploaded');
@@ -272,7 +272,7 @@ define(
 
                 // Verify correct transcript title is set.
                 expect($transcriptEl.find('.transcript-title').html()).toEqual(
-                    'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT
+                    'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT,
                 );
 
                 $transcriptEl.find('.delete-transcript-button').click();
@@ -284,7 +284,7 @@ define(
                 AjaxHelpers.expectRequest(
                     requests,
                     'DELETE',
-                    TRANSCRIPT_DELETE_URL + '/' + edxVideoID + '/' + languageCode
+                    TRANSCRIPT_DELETE_URL + '/' + edxVideoID + '/' + languageCode,
                 );
 
                 // Send successful delete response
@@ -292,12 +292,12 @@ define(
 
                 // Verify English transcript is not present.
                 expect(videoTranscriptsView.$el.find(
-                    '.video-transcript-content[data-language-code="' + languageCode + '"]'
+                    '.video-transcript-content[data-language-code="' + languageCode + '"]',
                 )).not.toExist();
 
                 // Verify transcripts view is rendered with transcript deleted for English.
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Show transcripts (2)'
+                    'Show transcripts (2)',
                 );
             });
 
@@ -308,7 +308,7 @@ define(
 
                 // Verify correct transcript title is set.
                 expect($transcriptEl.find('.transcript-title').html()).toEqual(
-                    'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT
+                    'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT,
                 );
 
                 $transcriptEl.find('.delete-transcript-button').click();
@@ -316,11 +316,11 @@ define(
                 // Verify prompt title and description.
 
                 expect($('#page-prompt #prompt-warning-title').html().trim()).toEqual(
-                    'Are you sure you want to remove this transcript?'
+                    'Are you sure you want to remove this transcript?',
                 );
 
                 expect($('#page-prompt #prompt-warning-description').html().trim()).toEqual(
-                    'If you remove this transcript, the transcript will not be available for any components that use this video.'   // eslint-disable-line max-len
+                    'If you remove this transcript, the transcript will not be available for any components that use this video.',   // eslint-disable-line max-len
                 );
 
                 // Click remove button on prompt.
@@ -330,24 +330,24 @@ define(
                 AjaxHelpers.expectRequest(
                     requests,
                     'DELETE',
-                    TRANSCRIPT_DELETE_URL + '/' + edxVideoID + '/' + languageCode
+                    TRANSCRIPT_DELETE_URL + '/' + edxVideoID + '/' + languageCode,
                 );
 
                 AjaxHelpers.respondWithError(requests, 500);
 
                 // Verify prompt message is shown.
                 expect($('#page-notification #notification-error-title').html()).toEqual(
-                    "Studio's having trouble saving your work"
+                    "Studio's having trouble saving your work",
                 );
 
                 // Verify English transcript container is not removed.
                 expect(videoTranscriptsView.$el.find(
-                    '.video-transcript-content[data-language-code="' + languageCode + '"]'
+                    '.video-transcript-content[data-language-code="' + languageCode + '"]',
                 )).toExist();
 
                 // Verify transcripts count is correct.
                 expect(videoTranscriptsView.$el.find('.toggle-show-transcripts-button-text').html().trim()).toEqual(
-                    'Show transcripts (3)'
+                    'Show transcripts (3)',
                 );
             });
 
@@ -371,7 +371,7 @@ define(
                 verifyDetailedErrorMessage(
                     $transcriptEl,
                     videoTranscriptsView.defaultFailureTitle,
-                    errorMessage
+                    errorMessage,
                 );
 
                 // Verify transcript is rendered with correct info.
@@ -396,7 +396,7 @@ define(
                 verifyDetailedErrorMessage(
                     $transcriptEl,
                     videoTranscriptsView.defaultFailureTitle,
-                    videoTranscriptsView.defaultFailureMessage
+                    videoTranscriptsView.defaultFailureMessage,
                 );
 
                 // Verify transcript is rendered with correct info.
@@ -413,7 +413,7 @@ define(
 
                 // Add transcript to upload queue and send POST request to upload transcript.
                 $transcriptEl.find('.upload-transcript-input').fileupload('add', {
-                    files: [createFakeTranscriptFile(transcriptFileName)]
+                    files: [createFakeTranscriptFile(transcriptFileName)],
                 });
 
                 verifyMessage($transcriptEl, 'validationFailed');
@@ -422,12 +422,12 @@ define(
                 verifyDetailedErrorMessage(
                     $transcriptEl,
                     videoTranscriptsView.defaultFailureTitle,
-                    errorMessage
+                    errorMessage,
                 );
 
                 // Verify transcript is rendered with correct info.
                 verifyTranscriptStateInfo($transcriptEl, languageCode);
             });
         });
-    }
+    },
 );

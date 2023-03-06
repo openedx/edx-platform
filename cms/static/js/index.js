@@ -12,13 +12,13 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         errorMessage: '#course_creation_error',
         tipError: '.create-course span.tip-error',
         error: '.create-course .error',
-        allowUnicode: '.allow-unicode-course-id'
+        allowUnicode: '.allow-unicode-course-id',
     }, {
         shown: 'is-shown',
         showing: 'is-showing',
         hiding: 'is-hiding',
         disabled: 'is-disabled',
-        error: 'error'
+        error: 'error',
     });
 
     var CreateLibraryUtils = new CreateLibraryUtilsFactory({
@@ -30,13 +30,13 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         errorMessage: '#library_creation_error',
         tipError: '.create-library  span.tip-error',
         error: '.create-library .error',
-        allowUnicode: '.allow-unicode-library-id'
+        allowUnicode: '.allow-unicode-library-id',
     }, {
         shown: 'is-shown',
         showing: 'is-showing',
         hiding: 'is-hiding',
         disabled: 'is-disabled',
-        error: 'error'
+        error: 'error',
     });
 
     var saveNewCourse = function(e) {
@@ -56,7 +56,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
             org: org,
             number: number,
             display_name: display_name,
-            run: run
+            run: run,
         };
 
         analytics.track('Created a Course', course_info);
@@ -70,7 +70,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
 
     var rtlTextDirection = function() {
         var Selectors = {
-            new_course_run: '#new-course-run'
+            new_course_run: '#new-course-run',
         };
 
         if ($('body').hasClass('rtl')) {
@@ -132,7 +132,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         var lib_info = {
             org: org,
             number: number,
-            display_name: display_name
+            display_name: display_name,
         };
 
         analytics.track('Created a Library', lib_info);
@@ -205,6 +205,6 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
     domReady(onReady);
 
     return {
-        onReady: onReady
+        onReady: onReady,
     };
 });

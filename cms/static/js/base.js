@@ -12,7 +12,7 @@ define([
     'jquery.ui',
     'jquery.leanModal',
     'jquery.form',
-    'jquery.smoothScroll'
+    'jquery.smoothScroll',
 ],
 function(
     domReady,
@@ -24,7 +24,7 @@ function(
     DateUtils,
     ModuleUtils,
     IframeUtils,
-    DropdownMenuView
+    DropdownMenuView,
 ) {
     'use strict';
     var $body;
@@ -37,7 +37,7 @@ function(
             easing: 'swing',
             speed: 1000,
             scrollElement: null,
-            scrollTarget: $(this).attr('href')
+            scrollTarget: $(this).attr('href'),
         });
     }
 
@@ -99,13 +99,13 @@ function(
             .attr('title', gettext('This link will open in a new browser window/tab'));
         $('a[rel="external"]').attr({
             rel: 'noopener external',
-            target: '_blank'
+            target: '_blank',
         });
 
         // general link management - lean modal window
         $('a[rel="modal"]').attr('title', gettext('This link will open in a modal window')).leanModal({
             overlay: 0.50,
-            closeButton: '.action-modal-close'
+            closeButton: '.action-modal-close',
         });
         $('.action-modal-close').click(function(e) {
             (e).preventDefault();
@@ -124,7 +124,7 @@ function(
         // Initiate the edx tool kit dropdown menu
         if ($('.js-header-user-menu').length) {
             dropdownMenuView = new DropdownMenuView({
-                el: '.js-header-user-menu'
+                el: '.js-header-user-menu',
             });
             dropdownMenuView.postRender();
         }

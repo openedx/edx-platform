@@ -2,7 +2,7 @@ define([
     'backbone',
     'jquery',
     'js/financial-assistance/models/financial_assistance_model',
-    'js/financial-assistance/views/financial_assistance_form_view'
+    'js/financial-assistance/views/financial_assistance_form_view',
 ], function(Backbone, $, FinancialAssistanceModel, FinancialAssistanceFormView) {
     'use strict';
     /* jslint maxlen: 500 */
@@ -20,12 +20,12 @@ define([
                         options: [
                             {name: 'Verified with Audit', value: 'course-v1:HCFA+VA101+2015'},
                             {name: 'Something Else', value: 'course-v1:SomethingX+SE101+215'},
-                            {name: 'Test Course', value: 'course-v1:TestX+T101+2015'}
+                            {name: 'Test Course', value: 'course-v1:TestX+T101+2015'},
                         ],
                         placeholder: '',
                         required: true,
                         requiredStr: '',
-                        type: 'select'
+                        type: 'select',
                     }, {
                         defaultValue: '',
                         instructions: 'Specify your annual income in USD.',
@@ -36,11 +36,11 @@ define([
                             {name: '$5,000 - $10,000', value: '$5,000 - $10,000'},
                             {name: '$10,000 - $15,000', value: '$10,000 - $15,000'},
                             {name: '$15,000 - $20,000', value: '$15,000 - $20,000'},
-                            {name: '$20,000 - $25,000', value: '$20,000 - $25,000'}
+                            {name: '$20,000 - $25,000', value: '$20,000 - $25,000'},
                         ],
                         placeholder: '',
                         required: true,
-                        type: 'select'
+                        type: 'select',
                     }, {
                         defaultValue: '',
                         instructions: 'Your response should contain approximately 250 - 500 words.',
@@ -50,9 +50,9 @@ define([
                         required: true,
                         restrictions: {
                             min_length: 800,
-                            max_length: 2500
+                            max_length: 2500,
                         },
-                        type: 'textarea'
+                        type: 'textarea',
                     }, {
                         defaultValue: '',
                         instructions: 'Use between 250 and 500 words or so in your response.',
@@ -62,9 +62,9 @@ define([
                         required: true,
                         restrictions: {
                             min_length: 800,
-                            max_length: 2500
+                            max_length: 2500,
                         },
-                        type: 'textarea'
+                        type: 'textarea',
                     }, {
                         defaultValue: '',
                         instructions: 'Use between 250 and 500 words or so in your response.',
@@ -74,9 +74,9 @@ define([
                         required: true,
                         restrictions: {
                             min_length: 800,
-                            max_length: 2500
+                            max_length: 2500,
                         },
-                        type: 'textarea'
+                        type: 'textarea',
                     }, {
                         defaultValue: '',
                         instructions: 'Annual income and personal information such as email address will not be shared.',
@@ -85,20 +85,20 @@ define([
                         placeholder: '',
                         required: false,
                         restrictions: {},
-                        type: 'checkbox'
-                    }
+                        type: 'checkbox',
+                    },
                 ],
                 user_details: {
                     country: 'UK',
                     email: 'xsy@edx.org',
                     name: 'xsy',
-                    username: 'xsy4ever'
+                    username: 'xsy4ever',
                 },
                 header_text: ['Line one.', 'Line two.'],
                 student_faq_url: '/faqs',
                 dashboard_url: '/dashboard',
                 platform_name: 'edx',
-                submit_url: '/api/financial/v1/assistance'
+                submit_url: '/api/financial/v1/assistance',
             },
             completeForm,
             validSubmission,
@@ -161,7 +161,7 @@ define([
 
             view = new FinancialAssistanceFormView({
                 el: '.financial-assistance-wrapper',
-                context: context
+                context: context,
             });
         });
 
@@ -223,7 +223,7 @@ define([
 
                 view = new FinancialAssistanceFormView({
                     el: '.financial-assistance-wrapper',
-                    context: context
+                    context: context,
                 });
             });
 
@@ -232,5 +232,5 @@ define([
             });
         });
     });
-}
+},
 );

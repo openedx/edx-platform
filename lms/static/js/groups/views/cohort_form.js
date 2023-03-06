@@ -5,7 +5,7 @@
     function($, _, Backbone, gettext, HtmlUtils) {
         var CohortFormView = Backbone.View.extend({
             events: {
-                'change .cohort-management-details-association-course input': 'onRadioButtonChange'
+                'change .cohort-management-details-association-course input': 'onRadioButtonChange',
             },
 
             initialize: function(options) {
@@ -18,7 +18,7 @@
                 var model = new NotificationModel(options);
                 this.removeNotification();
                 this.notification = new NotificationView({
-                    model: model
+                    model: model,
                 });
                 beforeElement.before(this.notification.$el);
                 this.notification.render();
@@ -36,7 +36,7 @@
                     isDefaultCohort: this.isDefault(this.model.get('name')),
                     contentGroups: this.contentGroups,
                     studioGroupConfigurationsUrl: this.context.studioGroupConfigurationsUrl,
-                    isCcxEnabled: this.context.isCcxEnabled
+                    isCcxEnabled: this.context.isCcxEnabled,
                 }));
                 return this;
             },
@@ -96,7 +96,7 @@
             showMessage: function(message, type, details) {
                 this.showNotification(
                     {type: type || 'confirmation', title: message, details: details},
-                    this.$('.form-fields')
+                    this.$('.form-fields'),
                 );
             },
 
@@ -133,19 +133,19 @@
                     name: this.getUpdatedCohortName(),
                     group_id: selectedContentGroup ? selectedContentGroup.id : null,
                     user_partition_id: selectedContentGroup ? selectedContentGroup.get('user_partition_id') : null,
-                    assignment_type: selectedAssignmentType
+                    assignment_type: selectedAssignmentType,
                 };
                 errorMessages = this.validate(fieldData);
 
                 if (errorMessages.length > 0) {
                     showErrorMessage(
                         isUpdate ? gettext('The cohort cannot be saved') : gettext('The cohort cannot be added'),
-                        errorMessages
+                        errorMessages,
                     );
                     saveOperation.reject();
                 } else {
                     cohort.save(
-                        fieldData, {patch: isUpdate, wait: true}
+                        fieldData, {patch: isUpdate, wait: true},
                     ).done(function(result) {
                         cohort.id = result.id;
                         self.render();    // re-render to remove any now invalid error messages
@@ -166,7 +166,7 @@
                     });
                 }
                 return saveOperation.promise();
-            }
+            },
         });
         return CohortFormView;
     });

@@ -28,7 +28,7 @@ describe('XBlockValidationFactory', () => {
             empty: false,
             summary: {text: 'my summary', type: 'not-configured'},
             messages: [],
-            xblock_id: 'id'
+            xblock_id: 'id',
         };
         // Root is false, will not add noContainerContent.
         XBlockValidationFactory(notConfiguredMessages, true, false, false, $messageDiv);
@@ -47,7 +47,7 @@ describe('XBlockValidationFactory', () => {
                 empty: false,
                 summary: {text: 'my summary'},
                 messages: [{text: 'one', type: 'warning'}, {text: 'two', type: 'error'}],
-                xblock_id: 'id'
+                xblock_id: 'id',
             };
         });
 

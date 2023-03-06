@@ -5,7 +5,7 @@ define(
         'common/js/spec_helpers/page_helpers',
         'common/js/spec_helpers/discussion_spec_helper',
         'discussion/js/discussion_board_factory',
-        'discussion/js/views/discussion_board_view'
+        'discussion/js/views/discussion_board_view',
     ],
     function($, Backbone, PageHelpers, DiscussionSpecHelper, DiscussionBoardFactory, DiscussionBoardView) {
         'use strict';
@@ -23,7 +23,7 @@ define(
                 discussionBoardView = new DiscussionBoardView({
                     el: $('.discussion-board'),
                     discussion: discussion,
-                    courseSettings: courseSettings
+                    courseSettings: courseSettings,
                 });
 
                 return discussionBoardView;
@@ -45,15 +45,15 @@ define(
                         allow_anonymous: false,
                         allow_anonymous_to_peers: false,
                         groups: [],
-                        category_map: {}
-                    }
+                        category_map: {},
+                    },
                 });
             };
 
             beforeEach(function() {
                 // Install the fixtures
                 setFixtures(
-                    '<div id="discussion-container" class="discussion-board"></div></div>'
+                    '<div id="discussion-container" class="discussion-board"></div></div>',
                 );
                 PageHelpers.preventBackboneChangingUrl();
                 DiscussionSpecHelper.setUnderscoreFixtures();
@@ -70,5 +70,5 @@ define(
                 expect(discussionView.$el.text()).toContain('Search all posts');
             });
         });
-    }
+    },
 );

@@ -13,7 +13,7 @@ function(BaseView, _, gettext, NotificationView, PromptView) {
             'click .edit': 'editTextbook',
             'click .delete': 'confirmDelete',
             'click .show-chapters': 'showChapters',
-            'click .hide-chapters': 'hideChapters'
+            'click .hide-chapters': 'hideChapters',
         },
         render: function() {
             var attrs = $.extend({}, this.model.attributes);
@@ -31,7 +31,7 @@ function(BaseView, _, gettext, NotificationView, PromptView) {
             var textbook = this.model;
             new PromptView.Warning({
                 title: _.template(gettext('Delete “<%- name %>”?'))(
-                    {name: textbook.get('name')}
+                    {name: textbook.get('name')},
                 ),
                 message: gettext("Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed."),
                 actions: {
@@ -40,22 +40,22 @@ function(BaseView, _, gettext, NotificationView, PromptView) {
                         click: function(view) {
                             view.hide();
                             var delmsg = new NotificationView.Mini({
-                                title: gettext('Deleting')
+                                title: gettext('Deleting'),
                             }).show();
                             textbook.destroy({
                                 complete: function() {
                                     delmsg.hide();
-                                }
+                                },
                             });
-                        }
+                        },
                     },
                     secondary: {
                         text: gettext('Cancel'),
                         click: function(view) {
                             view.hide();
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             }).show();
         },
         showChapters: function(e) {
@@ -65,7 +65,7 @@ function(BaseView, _, gettext, NotificationView, PromptView) {
         hideChapters: function(e) {
             if (e && e.preventDefault) { e.preventDefault(); }
             this.model.set('showChapters', false);
-        }
+        },
     });
     return ShowTextbook;
 });

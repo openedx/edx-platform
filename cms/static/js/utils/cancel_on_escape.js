@@ -9,7 +9,7 @@ define(['jquery'], function($) {
 
     var cancelOnEscape = function(cancelButton) {
         $body.bind('keyup', {
-            $cancelButton: cancelButton
+            $cancelButton: cancelButton,
         }, checkForCancel);
     };
 

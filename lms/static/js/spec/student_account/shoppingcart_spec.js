@@ -43,5 +43,5 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account
                 expect(ShoppingCartInterface.redirect).toHaveBeenCalledWith(FORWARD_URL);
             });
         });
-    }
+    },
 );

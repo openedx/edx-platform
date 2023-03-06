@@ -13,7 +13,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
             render: function() {
                 this.$el.html(this.template({ // xss-lint: disable=javascript-jquery-html
                     name: this.model.get('name'),
-                    error: this.model.validationError
+                    error: this.model.validationError,
                 }));
                 this.addAll();
                 return this;
@@ -22,7 +22,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                 'change input[name=textbook-name]': 'setName',
                 submit: 'setAndClose',
                 'click .action-cancel': 'cancel',
-                'click .action-add-chapter': 'createChapter'
+                'click .action-add-chapter': 'createChapter',
             },
             addOne: function(chapter) {
                 var view = new EditChapterView({model: chapter});
@@ -49,7 +49,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                     if (!chapter) { return; }
                     chapter.set({
                         name: $('.chapter-name', li).val(),
-                        asset_path: $('.chapter-asset-path', li).val()
+                        asset_path: $('.chapter-asset-path', li).val(),
                     });
                 });
                 return this;
@@ -59,7 +59,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                 this.setValues();
                 if (!this.model.isValid()) { return; }
                 var saving = new NotificationView.Mini({
-                    title: gettext('Saving')
+                    title: gettext('Saving'),
                 }).show();
                 var that = this;
                 this.model.save({}, {
@@ -69,7 +69,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                     },
                     complete: function() {
                         saving.hide();
-                    }
+                    },
                 });
             },
             cancel: function(e) {
@@ -87,7 +87,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                 // don't forget to tell the model that it's no longer being edited
                 this.model.set('editing', false);
                 return this;
-            }
+            },
         });
         return EditTextbook;
     });

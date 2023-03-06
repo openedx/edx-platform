@@ -7,7 +7,7 @@
         'common/js/components/views/tabbed_view',
         'edx-ui-toolkit/js/utils/html-utils',
         'js/student_account/views/account_section_view',
-        'text!templates/student_account/account_settings.underscore'
+        'text!templates/student_account/account_settings.underscore',
     ], function(gettext, $, _, TabbedView, HtmlUtils, AccountSectionView, accountSettingsTemplate) {
         var AccountSettingsView = TabbedView.extend({
 
@@ -16,7 +16,7 @@
             events: {
                 'click .account-nav-link': 'switchTab',
                 'keydown .account-nav-link': 'keydownHandler',
-                'click .btn-alert-primary': 'revertValue'
+                'click .btn-alert-primary': 'revertValue',
             },
 
             initialize: function(options) {
@@ -35,7 +35,7 @@
                         class: 'active',
                         tabindex: 0,
                         selected: true,
-                        expanded: true
+                        expanded: true,
                     },
                     {
                         name: 'accountsTabSections',
@@ -43,8 +43,8 @@
                         label: gettext('Linked Accounts'),
                         tabindex: -1,
                         selected: false,
-                        expanded: false
-                    }
+                        expanded: false,
+                    },
                 ];
                 if (!view.options.disableOrderHistoryTab) {
                     accountSettingsTabs.push({
@@ -53,7 +53,7 @@
                         label: gettext('Order History'),
                         tabindex: -1,
                         selected: false,
-                        expanded: false
+                        expanded: false,
                     });
                 }
 
@@ -61,14 +61,14 @@
                     betaLangMessage = HtmlUtils.interpolateHtml(
                         gettext('You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.'),  // eslint-disable-line max-len
                         {
-                            beta_language: view.options.betaLanguage.name
-                        }
+                            beta_language: view.options.betaLanguage.name,
+                        },
                     );
                     helpTranslateText = HtmlUtils.interpolateHtml(
                         gettext('Help Translate into {beta_language}'),
                         {
-                            beta_language: view.options.betaLanguage.name
-                        }
+                            beta_language: view.options.betaLanguage.name,
+                        },
                     );
                     betaLangCode = this.options.betaLanguage.code.split('-');
                     if (betaLangCode.length > 1) {
@@ -89,7 +89,7 @@
                     message: betaLangMessage,
                     helpTranslateText: helpTranslateText,
                     helpTranslateLink: helpTranslateLink,
-                    oldLangCode: oldLangCode
+                    oldLangCode: oldLangCode,
                 }));
                 _.each(accountSettingsTabs, function(tab) {
                     tabName = tab.name;
@@ -135,7 +135,7 @@
                     tabName: tabName,
                     tabLabel: tabLabel,
                     sections: tabSections,
-                    el: '#' + tabName + '-tabpanel'
+                    el: '#' + tabName + '-tabpanel',
                 });
 
                 accountSectionView.render();
@@ -147,7 +147,7 @@
 
             revertValue: function(event) {
                 this.options.userPreferencesModel.trigger('revertValue', event);
-            }
+            },
         });
 
         return AccountSettingsView;

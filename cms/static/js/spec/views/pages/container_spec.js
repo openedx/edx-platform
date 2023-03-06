@@ -42,8 +42,8 @@ function parameterized_suite(label, globalPageOptions) {
             EditHelpers.installMockXBlock({
                 data: '<p>Some HTML</p>',
                 metadata: {
-                    display_name: newDisplayName
-                }
+                    display_name: newDisplayName,
+                },
             });
 
             initialDisplayName = 'Test Container';
@@ -51,7 +51,7 @@ function parameterized_suite(label, globalPageOptions) {
             model = new XBlockInfo({
                 id: 'locator-container',
                 display_name: initialDisplayName,
-                category: 'vertical'
+                category: 'vertical',
             });
             window.course = new Course({
                 id: "5",
@@ -59,7 +59,7 @@ function parameterized_suite(label, globalPageOptions) {
                 url_name: "course_name",
                 org: "course_org",
                 num: "course_num",
-                revision: "course_rev"
+                revision: "course_rev",
             });
         });
 
@@ -74,7 +74,7 @@ function parameterized_suite(label, globalPageOptions) {
         respondWithHtml = function(html) {
             AjaxHelpers.respondWithJson(
                 requests,
-                {html: html, resources: []}
+                {html: html, resources: []},
             );
         };
 
@@ -83,7 +83,7 @@ function parameterized_suite(label, globalPageOptions) {
                 model: model,
                 templates: componentTemplates === undefined ?
                     EditHelpers.mockComponentTemplates : componentTemplates,
-                el: $('#content')
+                el: $('#content'),
             };
             return new PageClass(_.extend(options || {}, globalPageOptions, default_options));
         };
@@ -103,7 +103,7 @@ function parameterized_suite(label, globalPageOptions) {
                 '/xblock/locator-container/container_preview')).toBeTruthy();
             AjaxHelpers.respondWithJson(requests, {
                 html: mockUpdatedContainerXBlockHtml,
-                resources: []
+                resources: [],
             });
         };
 
@@ -146,7 +146,7 @@ function parameterized_suite(label, globalPageOptions) {
 
             it('inline edits the display name when performing a new action', function() {
                 renderContainerPage(this, mockContainerXBlockHtml, {
-                    action: 'new'
+                    action: 'new',
                 });
                 expect(containerPage.$('.xblock-header').length).toBe(9);
                 expect(containerPage.$('.wrapper-xblock .level-nesting')).not.toHaveClass('is-hidden');
@@ -180,7 +180,7 @@ function parameterized_suite(label, globalPageOptions) {
                 expect(str.startsWith(request.url, '/xblock/locator-container/studio_view')).toBeTruthy();
                 AjaxHelpers.respondWithJson(requests, {
                     html: mockContainerXBlockHtml,
-                    resources: []
+                    resources: [],
                 });
                 expect(EditHelpers.isShowingModal()).toBeTruthy();
 
@@ -234,7 +234,7 @@ function parameterized_suite(label, globalPageOptions) {
                 expect(str.startsWith(request.url, '/xblock/locator-component-A1/studio_view')).toBeTruthy();
                 AjaxHelpers.respondWithJson(requests, {
                     html: mockXBlockEditorHtml,
-                    resources: []
+                    resources: [],
                 });
                 expect(EditHelpers.isShowingModal()).toBeTruthy();
             });
@@ -246,7 +246,7 @@ function parameterized_suite(label, globalPageOptions) {
                 editButtons[0].click();
                 AjaxHelpers.respondWithJson(requests, {
                     html: mockXBlockEditorHtml,
-                    resources: []
+                    resources: [],
                 });
                 expect(EditHelpers.isShowingModal()).toBeTruthy();
             });
@@ -263,7 +263,7 @@ function parameterized_suite(label, globalPageOptions) {
                         .toBeTruthy();
                     AjaxHelpers.respondWithJson(requests, {
                         html: mockXBlockVisibilityEditorHtml,
-                        resources: []
+                        resources: [],
                     });
                     expect(EditHelpers.isShowingModal()).toBeTruthy();
                 } else {
@@ -293,8 +293,8 @@ function parameterized_suite(label, globalPageOptions) {
                 EditHelpers.installMockXModule({
                     data: '<p>Some HTML</p>',
                     metadata: {
-                        display_name: newDisplayName
-                    }
+                        display_name: newDisplayName,
+                    },
                 });
             });
 
@@ -313,7 +313,7 @@ function parameterized_suite(label, globalPageOptions) {
                 editButtons[0].click();
                 AjaxHelpers.respondWithJson(requests, {
                     html: mockXModuleEditor,
-                    resources: []
+                    resources: [],
                 });
 
                 $modal = $('.edit-xblock-modal');
@@ -326,7 +326,7 @@ function parameterized_suite(label, globalPageOptions) {
                 $modal.find('.action-save').click();
                 // Respond to the save
                 AjaxHelpers.respondWithJson(requests, {
-                    id: model.id
+                    id: model.id,
                 });
 
                 // Respond to the request to refresh
@@ -345,7 +345,7 @@ function parameterized_suite(label, globalPageOptions) {
                     _.range(NUM_COMPONENTS_PER_GROUP),
                     function(index) {
                         return 'locator-component-' + GROUP_TO_TEST + (index + 1);
-                    }
+                    },
                 );
 
             getGroupElement = function() {
@@ -399,7 +399,7 @@ function parameterized_suite(label, globalPageOptions) {
                     if (!globalPageOptions.requiresPageRefresh) {
                         expectComponents(
                             getGroupElement(),
-                            _.without(allComponentsInGroup, allComponentsInGroup[componentIndex])
+                            _.without(allComponentsInGroup, allComponentsInGroup[componentIndex]),
                         );
                     }
                 };
@@ -491,12 +491,12 @@ function parameterized_suite(label, globalPageOptions) {
                     // verify content of request
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                         duplicate_source_locator: 'locator-component-' + GROUP_TO_TEST + (componentIndex + 1),
-                        parent_locator: 'locator-group-' + GROUP_TO_TEST
+                        parent_locator: 'locator-group-' + GROUP_TO_TEST,
                     });
 
                     // send the response
                     AjaxHelpers.respondWithJson(requests, {
-                        locator: 'locator-duplicated-component'
+                        locator: 'locator-duplicated-component',
                     });
 
                     // expect parent container to be refreshed
@@ -523,7 +523,7 @@ function parameterized_suite(label, globalPageOptions) {
                     containerPage.$('.duplicate-button').first().click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                         duplicate_source_locator: 'locator-broken-javascript',
-                        parent_locator: 'locator-container'
+                        parent_locator: 'locator-container',
                     });
                 });
 
@@ -612,7 +612,7 @@ function parameterized_suite(label, globalPageOptions) {
                     EditHelpers.verifyXBlockRequest(requests, {
                         category: 'discussion',
                         type: 'discussion',
-                        parent_locator: 'locator-group-A'
+                        parent_locator: 'locator-group-A',
                     });
                 });
 
@@ -631,7 +631,7 @@ function parameterized_suite(label, globalPageOptions) {
                     EditHelpers.verifyXBlockRequest(requests, {
                         category: 'discussion',
                         type: 'discussion',
-                        parent_locator: 'locator-group-A'
+                        parent_locator: 'locator-group-A',
                     });
                 });
 
@@ -675,7 +675,7 @@ function parameterized_suite(label, globalPageOptions) {
                     it('can add an HTML component without a template', function() {
                         verifyCreateHtmlComponent(this, 0, {
                             category: 'html',
-                            parent_locator: 'locator-group-A'
+                            parent_locator: 'locator-group-A',
                         });
                     });
 
@@ -683,7 +683,7 @@ function parameterized_suite(label, globalPageOptions) {
                         verifyCreateHtmlComponent(this, 1, {
                             category: 'html',
                             boilerplate: 'announcement.yaml',
-                            parent_locator: 'locator-group-A'
+                            parent_locator: 'locator-group-A',
                         });
                     });
 
@@ -701,25 +701,25 @@ function parameterized_suite(label, globalPageOptions) {
                                         {
                                             category: 'html',
                                             boilerplate_name: null,
-                                            display_name: 'Text'
+                                            display_name: 'Text',
                                         }, {
                                             category: 'html',
                                             boilerplate_name: 'announcement.yaml',
-                                            display_name: 'Announcement'
+                                            display_name: 'Announcement',
                                         }, {
                                             category: 'html',
                                             boilerplate_name: 'raw.yaml',
-                                            display_name: 'Raw HTML'
+                                            display_name: 'Raw HTML',
                                         }],
                                     type: 'html',
                                     support_legend: {
                                         show_legend: true,
                                         documentation_label: 'Documentation Label:',
-                                        allow_unsupported_xblocks: false
-                                    }
+                                        allow_unsupported_xblocks: false,
+                                    },
                                 }],
                             {
-                                parse: true
+                                parse: true,
                             }),
                             supportDocumentation;
                         renderContainerPage(this, mockContainerXBlockHtml, {}, templates);
@@ -743,25 +743,25 @@ function parameterized_suite(label, globalPageOptions) {
                                         {
                                             category: 'html',
                                             boilerplate_name: null,
-                                            display_name: 'Text'
+                                            display_name: 'Text',
                                         }, {
                                             category: 'html',
                                             boilerplate_name: 'announcement.yaml',
-                                            display_name: 'Announcement'
+                                            display_name: 'Announcement',
                                         }, {
                                             category: 'html',
                                             boilerplate_name: 'raw.yaml',
-                                            display_name: 'Raw HTML'
+                                            display_name: 'Raw HTML',
                                         }],
                                     type: 'html',
                                     support_legend: {
                                         show_legend: true,
                                         documentation_label: 'Documentation Label:',
-                                        allow_unsupported_xblocks: true
-                                    }
+                                        allow_unsupported_xblocks: true,
+                                    },
                                 }],
                             {
-                                parse: true
+                                parse: true,
                             }),
                             supportDocumentation;
                         renderContainerPage(this, mockContainerXBlockHtml, {}, templates);
@@ -783,27 +783,27 @@ function parameterized_suite(label, globalPageOptions) {
                                             category: 'html',
                                             boilerplate_name: null,
                                             display_name: 'Text',
-                                            support_level: 'fs'
+                                            support_level: 'fs',
                                         }, {
                                             category: 'html',
                                             boilerplate_name: 'announcement.yaml',
                                             display_name: 'Announcement',
-                                            support_level: 'ps'
+                                            support_level: 'ps',
                                         }, {
                                             category: 'html',
                                             boilerplate_name: 'raw.yaml',
                                             display_name: 'Raw HTML',
-                                            support_level: 'us'
+                                            support_level: 'us',
                                         }],
                                     type: 'html',
                                     support_legend: {
                                         show_legend: true,
                                         documentation_label: 'Documentation Label:',
-                                        allow_unsupported_xblocks: true
-                                    }
+                                        allow_unsupported_xblocks: true,
+                                    },
                                 }],
                             {
-                                parse: true
+                                parse: true,
                             }),
                             supportLevelIndicators, getScreenReaderText;
                         renderContainerPage(this, mockContainerXBlockHtml, {}, templates);
@@ -836,8 +836,8 @@ parameterized_suite('Non paged',
         addResponse: 'templates/mock/mock-xblock.underscore',
         hasVisibilityEditor: true,
         pagedSpecificTests: false,
-        hasMoveModal: true
-    }
+        hasMoveModal: true,
+    },
 );
 
 // Create a suite for a paged container that does not include 'edit visibility' buttons
@@ -850,6 +850,6 @@ parameterized_suite('Paged',
         addResponse: 'templates/mock/mock-xblock-paged.underscore',
         hasVisibilityEditor: false,
         pagedSpecificTests: true,
-        hasMoveModal: false
-    }
+        hasMoveModal: false,
+    },
 );

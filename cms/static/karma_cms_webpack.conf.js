@@ -33,15 +33,15 @@ var options = {
 
     fixtureFiles: [
         {pattern: '../templates/js/**/*.underscore'},
-        {pattern: 'templates/**/*.underscore'}
+        {pattern: 'templates/**/*.underscore'},
     ],
 
     runFiles: [
         {pattern: 'cms/js/spec/main_webpack.js', webpack: true},
-        {pattern: 'jasmine.cms.conf.js', included: true}
+        {pattern: 'jasmine.cms.conf.js', included: true},
     ],
 
-    preprocessors: {}
+    preprocessors: {},
 };
 
 options.runFiles

@@ -29,6 +29,6 @@ define(['jquery', 'js/spec_helpers/modal_helpers', 'common/js/spec_helpers/templ
         return $.extend(ModalHelpers, {
             installValidationTemplates: installValidationTemplates,
             checkErrorContents: checkErrorContents,
-            undoChanges: undoChanges
+            undoChanges: undoChanges,
         });
     });

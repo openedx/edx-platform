@@ -4,7 +4,7 @@
         'underscore',
         'backbone',
         'gettext',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function($, _, Backbone, gettext, HtmlUtils) {
         'use strict';
 
@@ -26,10 +26,10 @@
                 this.className = data.type;
                 HtmlUtils.setHtml(
                     this.$el,
-                    this.tpl(data)
+                    this.tpl(data),
                 );
                 return this;
-            }
+            },
 
         });
     });

@@ -10,7 +10,7 @@ var setupFullScreenModal = function() {
             var data = {
                 smallHTML: $(this).html(),
                 largeALT: smallImageObject.attr('alt'),
-                largeSRC: largeImageSRC
+                largeSRC: largeImageSRC,
             };
             var html = _.template($('#image-modal-tpl').text())(data);
             // xss-lint: disable=javascript-jquery-insertion
@@ -92,7 +92,7 @@ var setupFullScreenModal = function() {
                     left: -imgContainerOffsetLeft,
                     top: -imgContainerOffsetTop,
                     width: imgContainerWidth,
-                    height: imgContainerHeight
+                    height: imgContainerHeight,
                 });
                 img.css({top: imgContainerOffsetTop / 2, left: imgContainerOffsetLeft / 2});
 

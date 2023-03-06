@@ -93,7 +93,7 @@
                     clear: clear,
                     getItem: getItem,
                     removeItem: removeItem,
-                    setItem: setItem
+                    setItem: setItem,
                 };
             };
 

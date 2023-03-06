@@ -6,13 +6,13 @@
             'underscore',
             'backbone',
             'common/js/discussion/utils',
-            'common/js/discussion/views/discussion_thread_view'
+            'common/js/discussion/views/discussion_thread_view',
         ],
         function(_, Backbone, DiscussionUtil, DiscussionThreadView) {
             var DiscussionRouter = Backbone.Router.extend({
                 routes: {
                     '': 'allThreads',
-                    ':forum_name/threads/:thread_id': 'showThread'
+                    ':forum_name/threads/:thread_id': 'showThread',
                 },
 
                 initialize: function(options) {
@@ -41,21 +41,21 @@
 
                     // Automatically navigate when the user selects threads
                     this.discussionBoardView.discussionThreadListView.on(
-                        'thread:selected', _.bind(this.navigateToThread, this)
+                        'thread:selected', _.bind(this.navigateToThread, this),
                     );
                     this.discussionBoardView.discussionThreadListView.on(
-                        'thread:removed', _.bind(this.navigateToAllThreads, this)
+                        'thread:removed', _.bind(this.navigateToAllThreads, this),
                     );
                     this.discussionBoardView.discussionThreadListView.on(
-                        'threads:rendered', _.bind(this.setActiveThread, this)
+                        'threads:rendered', _.bind(this.setActiveThread, this),
                     );
                     this.discussionBoardView.discussionThreadListView.on(
-                        'thread:created', _.bind(this.navigateToThread, this)
+                        'thread:created', _.bind(this.navigateToThread, this),
                     );
 
                     Backbone.history.start({
                         pushState: true,
-                        root: this.rootUrl
+                        root: this.rootUrl,
                     });
                 },
 
@@ -101,7 +101,7 @@
                         mode: 'tab',
                         startHeader: this.startHeader,
                         courseSettings: this.courseSettings,
-                        is_commentable_divided: this.discussion.is_commentable_divided
+                        is_commentable_divided: this.discussion.is_commentable_divided,
                     });
                     this.main.render();
                     return this.thread.on('thread:thread_type_updated', this.showMain);
@@ -110,13 +110,13 @@
                 navigateToThread: function(threadId) {
                     var thread = this.discussion.get(threadId);
                     return this.navigate('' + (thread.get('commentable_id')) + '/threads/' + threadId, {
-                        trigger: true
+                        trigger: true,
                     });
                 },
 
                 navigateToAllThreads: function() {
                     return this.navigate('', {
-                        trigger: true
+                        trigger: true,
                     });
                 },
 
@@ -126,7 +126,7 @@
                         duration: 200,
                         complete: function() {
                             return self.newPostView.$el.fadeIn(200).focus();
-                        }
+                        },
                     });
                 },
 
@@ -136,9 +136,9 @@
                         complete: function() {
                             return $('.forum-content').fadeIn(200).find('.thread-wrapper')
                                 .focus();
-                        }
+                        },
                     });
-                }
+                },
 
             });
 

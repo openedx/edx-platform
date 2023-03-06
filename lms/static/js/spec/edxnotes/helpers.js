@@ -14,7 +14,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         'irure dolor in reprehenderit in voluptate velit esse ',
         'cillum dolore eu fugiat nulla pariatur. Excepteur ',
         'sint occaecat cupidatat non proident, sunt in culpa ',
-        'qui officia deserunt mollit anim id est laborum.'
+        'qui officia deserunt mollit anim id est laborum.',
     ].join('');
     PRUNED_TEXT = [
         'Adipisicing elit, sed do eiusmod tempor incididunt ',
@@ -22,7 +22,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         'veniam, quis nostrud exercitation ullamco laboris ',
         'nisi ut aliquip ex ea commodo consequat. Duis aute ',
         'irure dolor in reprehenderit in voluptate velit esse ',
-        'cillum dolore eu fugiat nulla pariatur...'
+        'cillum dolore eu fugiat nulla pariatur...',
     ].join('');
     TRUNCATED_TEXT = [
         'Adipisicing elit, sed do eiusmod tempor incididunt ',
@@ -30,7 +30,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         'veniam, quis nostrud exercitation ullamco laboris ',
         'nisi ut aliquip ex ea commodo consequat. Duis aute ',
         'irure dolor in reprehenderit in voluptate velit esse ',
-        'cillum dolore eu fugiat nulla pariatur. Exce'
+        'cillum dolore eu fugiat nulla pariatur. Exce',
     ].join('');
     SHORT_TEXT = 'Adipisicing elit, sed do eiusmod tempor incididunt';
 
@@ -72,7 +72,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
             rawToken = {
                 sub: 'sub',
                 exp: now + 100,
-                iat: now
+                iat: now,
             };
 
         return 'header.' + base64Encode(JSON.stringify(rawToken)) + '.signature';
@@ -84,7 +84,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
             index: index,
             children: _.map(children, function(i) {
                 return 'i4x://section/' + i;
-            })
+            }),
         };
     };
 
@@ -94,7 +94,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
             location: 'i4x://section/' + location,
             children: _.map(children, function(i) {
                 return 'i4x://unit/' + i;
-            })
+            }),
         };
     };
 
@@ -102,7 +102,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         return {
             display_name: name,
             location: 'i4x://unit/' + location,
-            url: 'http://example.com'
+            url: 'http://example.com',
         };
     };
 
@@ -124,7 +124,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                     updated: 'December 11, 2014 at 11:12AM',
                     text: 'Third added model',
                     quote: 'Note 4',
-                    tags: ['Pumpkin', 'pumpkin', 'yummy']
+                    tags: ['Pumpkin', 'pumpkin', 'yummy'],
                 },
                 {
                     chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
@@ -133,7 +133,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                     created: 'December 11, 2014 at 11:11AM',
                     updated: 'December 11, 2014 at 11:11AM',
                     text: 'Third added model',
-                    quote: 'Note 5'
+                    quote: 'Note 5',
                 },
                 {
                     chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
@@ -143,7 +143,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                     updated: 'December 11, 2014 at 11:11AM',
                     text: 'Second added model',
                     quote: 'Note 3',
-                    tags: ['yummy']
+                    tags: ['yummy'],
                 },
                 {
                     chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
@@ -153,7 +153,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                     updated: 'December 11, 2014 at 11:10AM',
                     text: 'First added model',
                     quote: 'Note 2',
-                    tags: ['PUMPKIN', 'pie']
+                    tags: ['PUMPKIN', 'pie'],
                 },
                 {
                     chapter: getChapter('First Chapter', 1, 0, [2]),
@@ -163,9 +163,9 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                     updated: 'December 11, 2014 at 11:10AM',
                     text: 'First added model',
                     quote: 'Note 1',
-                    tags: ['pie', 'pumpkin']
-                }
-            ]
+                    tags: ['pie', 'pumpkin'],
+                },
+            ],
         };
     };
 
@@ -187,7 +187,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
             num_pages: options.num_pages || 1,
             current_page: options.current_page || 1,
             start: options.start || 0,
-            results: []
+            results: [],
         };
 
         for (var i = 0; i < options.numNotesToCreate; i++) {
@@ -199,7 +199,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                 updated: new Date().toISOString(),
                 text: 'text__' + i,
                 quote: 'Note__' + i,
-                tags: ['tag__' + i, 'tag__' + i + 1]
+                tags: ['tag__' + i, 'tag__' + i + 1],
             };
 
             data.results.push(notesInfo);
@@ -253,6 +253,6 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         createNotesData: createNotesData,
         respondToRequest: respondToRequest,
         verifyPaginationInfo: verifyPaginationInfo,
-        verifyPageData: verifyPageData
+        verifyPageData: verifyPageData,
     };
 });

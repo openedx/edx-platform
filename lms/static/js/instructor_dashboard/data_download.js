@@ -34,10 +34,10 @@
                     error: function() {
                         dataDownloadCert.clear_ui();
                         dataDownloadCert.$certificates_request_err.text(
-                            gettext('Error getting issued certificates list.')
+                            gettext('Error getting issued certificates list.'),
                         );
                         return $('.issued_certificates .issued-certificates-error.msg-error').css({
-                            display: 'block'
+                            display: 'block',
                         });
                     },
                     success: function(data) {
@@ -47,7 +47,7 @@
                             enableCellNavigation: true,
                             enableColumnReorder: false,
                             forceFitColumns: true,
-                            rowHeight: 35
+                            rowHeight: 35,
                         };
                         columns = (function() {
                             var i, len, ref, results;
@@ -58,18 +58,18 @@
                                 results.push({
                                     id: feature,
                                     field: feature,
-                                    name: data.feature_names[feature]
+                                    name: data.feature_names[feature],
                                 });
                             }
                             return results;
                         }());
                         gridData = data.certificates;
                         $tablePlaceholder = $('<div/>', {
-                            class: 'slickgrid'
+                            class: 'slickgrid',
                         });
                         dataDownloadCert.$certificate_display_table.append($tablePlaceholder);
                         return new window.Slick.Grid($tablePlaceholder, gridData, columns, options);
-                    }
+                    },
                 });
             });
             this.$list_issued_certificate_csv_btn.click(function() {
@@ -82,7 +82,7 @@
             this.$certificate_display_table.empty();
             this.$certificates_request_err.empty();
             return $('.issued-certificates-error.msg-error').css({
-                display: 'none'
+                display: 'none',
             });
         };
 
@@ -131,16 +131,16 @@
                         dataDownloadObj.clear_display();
                         dataDownloadObj.$reports_request_response_error.text(errorMessage);
                         return dataDownloadObj.$reports_request_response_error.css({
-                            display: 'block'
+                            display: 'block',
                         });
                     },
                     success: function(data) {
                         dataDownloadObj.clear_display();
                         dataDownloadObj.$reports_request_response.text(data.status);
                         return $('.msg-confirm').css({
-                            display: 'block'
+                            display: 'block',
                         });
-                    }
+                    },
                 });
             });
             this.$proctored_exam_csv_btn.click(function() {
@@ -157,16 +157,16 @@
                         dataDownloadObj.clear_display();
                         dataDownloadObj.$reports_request_response_error.text(errorMessage);
                         return dataDownloadObj.$reports_request_response_error.css({
-                            display: 'block'
+                            display: 'block',
                         });
                     },
                     success: function(data) {
                         dataDownloadObj.clear_display();
                         dataDownloadObj.$reports_request_response.text(data.status);
                         return $('.msg-confirm').css({
-                            display: 'block'
+                            display: 'block',
                         });
-                    }
+                    },
                 });
             });
             this.$survey_results_csv_btn.click(function() {
@@ -183,16 +183,16 @@
                         dataDownloadObj.clear_display();
                         dataDownloadObj.$reports_request_response_error.text(errorMessage);
                         return dataDownloadObj.$reports_request_response_error.css({
-                            display: 'block'
+                            display: 'block',
                         });
                     },
                     success: function(data) {
                         dataDownloadObj.clear_display();
                         dataDownloadObj.$reports_request_response.text(data.status);
                         return $('.msg-confirm').css({
-                            display: 'block'
+                            display: 'block',
                         });
-                    }
+                    },
                 });
             });
             this.$list_studs_csv_btn.click(function() {
@@ -209,15 +209,15 @@
                         }
                         dataDownloadObj.$reports_request_response_error.text(errorMessage);
                         return dataDownloadObj.$reports_request_response_error.css({
-                            display: 'block'
+                            display: 'block',
                         });
                     },
                     success: function(data) {
                         dataDownloadObj.$reports_request_response.text(data.status);
                         return $('.msg-confirm').css({
-                            display: 'block'
+                            display: 'block',
                         });
-                    }
+                    },
                 });
             });
             this.$list_studs_btn.click(function() {
@@ -231,10 +231,10 @@
                     error: function() {
                         dataDownloadObj.clear_display();
                         dataDownloadObj.$download_request_response_error.text(
-                            gettext('Error getting student list.')
+                            gettext('Error getting student list.'),
                         );
                         return dataDownloadObj.$download_request_response_error.css({
-                            display: 'block'
+                            display: 'block',
                         });
                     },
                     success: function(data) {
@@ -244,7 +244,7 @@
                             enableCellNavigation: true,
                             enableColumnReorder: false,
                             forceFitColumns: true,
-                            rowHeight: 35
+                            rowHeight: 35,
                         };
                         columns = (function() {
                             var i, len, ref, results;
@@ -255,18 +255,18 @@
                                 results.push({
                                     id: feature,
                                     field: feature,
-                                    name: data.feature_names[feature]
+                                    name: data.feature_names[feature],
                                 });
                             }
                             return results;
                         }());
                         gridData = data.students;
                         $tablePlaceholder = $('<div/>', {
-                            class: 'slickgrid'
+                            class: 'slickgrid',
                         });
                         dataDownloadObj.$download_display_table.append($tablePlaceholder);
                         return new window.Slick.Grid($tablePlaceholder, gridData, columns, options);
-                    }
+                    },
                 });
             });
             this.$list_problem_responses_csv_btn.click(function() {
@@ -277,22 +277,22 @@
                     dataType: 'json',
                     url: url,
                     data: {
-                        problem_location: dataDownloadObj.$list_problem_responses_csv_input.val()
+                        problem_location: dataDownloadObj.$list_problem_responses_csv_input.val(),
                     },
                     error: function(error) {
                         dataDownloadObj.$reports_request_response_error.text(
-                            JSON.parse(error.responseText)
+                            JSON.parse(error.responseText),
                         );
                         return dataDownloadObj.$reports_request_response_error.css({
-                            display: 'block'
+                            display: 'block',
                         });
                     },
                     success: function(data) {
                         dataDownloadObj.$reports_request_response.text(data.status);
                         return $('.msg-confirm').css({
-                            display: 'block'
+                            display: 'block',
                         });
-                    }
+                    },
                 });
             });
             this.$list_may_enroll_csv_btn.click(function() {
@@ -309,15 +309,15 @@
                         }
                         dataDownloadObj.$reports_request_response_error.text(errorMessage);
                         return dataDownloadObj.$reports_request_response_error.css({
-                            display: 'block'
+                            display: 'block',
                         });
                     },
                     success: function(data) {
                         dataDownloadObj.$reports_request_response.text(data.status);
                         return $('.msg-confirm').css({
-                            display: 'block'
+                            display: 'block',
                         });
-                    }
+                    },
                 });
             });
             this.$grade_config_btn.click(function() {
@@ -329,17 +329,17 @@
                     error: function() {
                         dataDownloadObj.clear_display();
                         dataDownloadObj.$download_request_response_error.text(
-                            gettext('Error retrieving grading configuration.')
+                            gettext('Error retrieving grading configuration.'),
                         );
                         return dataDownloadObj.$download_request_response_error.css({
-                            display: 'block'
+                            display: 'block',
                         });
                     },
                     success: function(data) {
                         dataDownloadObj.clear_display();
                         return edx.HtmlUtils.setHtml(
                             dataDownloadObj.$download_display_text, edx.HtmlUtils.HTML(data.grading_config_summary));
-                    }
+                    },
                 });
             });
             this.$async_report_btn.click(function(e) {
@@ -362,15 +362,15 @@
                         }
                         dataDownloadObj.$reports_request_response_error.text(errorMessage);
                         return dataDownloadObj.$reports_request_response_error.css({
-                            display: 'block'
+                            display: 'block',
                         });
                     },
                     success: function(data) {
                         dataDownloadObj.$reports_request_response.text(data.status);
                         return $('.msg-confirm').css({
-                            display: 'block'
+                            display: 'block',
                         });
-                    }
+                    },
                 });
             });
         }
@@ -393,10 +393,10 @@
             this.$reports_request_response.empty();
             this.$reports_request_response_error.empty();
             $('.msg-confirm').css({
-                display: 'none'
+                display: 'none',
             });
             return $('.msg-error').css({
-                display: 'none'
+                display: 'none',
             });
         };
 
@@ -404,14 +404,14 @@
     }());
 
     _.defaults(window, {
-        InstructorDashboard: {}
+        InstructorDashboard: {},
     });
 
     _.defaults(window.InstructorDashboard, {
-        sections: {}
+        sections: {},
     });
 
     _.defaults(window.InstructorDashboard.sections, {
-        DataDownload: DataDownload
+        DataDownload: DataDownload,
     });
 }).call(this);

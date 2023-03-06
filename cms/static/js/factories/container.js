@@ -14,7 +14,7 @@ export default function ContainerFactory(componentTemplates, XBlockInfoJson, act
         el: $('#content'),
         model: new XBlockContainerInfo(XBlockInfoJson, {parse: true}),
         action: action,
-        templates: new ComponentTemplates(componentTemplates, {parse: true})
+        templates: new ComponentTemplates(componentTemplates, {parse: true}),
     };
 
     xmoduleLoader.done(function() {

@@ -1,7 +1,7 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'gettext', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils'
+        'gettext', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils',
     ], function(gettext, _, Backbone, HtmlUtils) {
         var GroupView, ChapterView;
 
@@ -19,7 +19,7 @@
 
             render: function() {
                 HtmlUtils.prepend(this.$el, this.template({
-                    displayName: this.options.displayName
+                    displayName: this.options.displayName,
                 }));
 
                 return this;
@@ -27,7 +27,7 @@
 
             addChild: function(child) {
                 this.$el.append(HtmlUtils.HTML(child).toString());
-            }
+            },
         });
 
         ChapterView = Backbone.View.extend({
@@ -59,8 +59,8 @@
                     {
                         displayName: sectionInfo.display_name,
                         template: '<h4 class="course-subtitle"><%- displayName %></h4>',
-                        className: 'note-section'
-                    }
+                        className: 'note-section',
+                    },
                 );
                 this.children.push(section);
                 return section;
@@ -71,7 +71,7 @@
                 this.children = null;
                 Backbone.View.prototype.remove.call(this);
                 return this;
-            }
+            },
         });
 
         return {GroupView: GroupView, ChapterView: ChapterView};

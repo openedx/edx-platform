@@ -1,21 +1,21 @@
 define(
     [
-        'jquery', 'underscore', 'squire'
+        'jquery', 'underscore', 'squire',
     ],
     function($, _, Squire) {
         'use strict';
         // TODO: fix BLD-1100 Disabled due to intermittent failure on master and in PR builds
         xdescribe('VideoTranslations', function() {
             var TranslationsEntryTemplate = readFixtures(
-                    'video/metadata-translations-entry.underscore'
+                    'video/metadata-translations-entry.underscore',
                 ),
                 TranslationsItenTemplate = readFixtures(
-                    'video/metadata-translations-item.underscore'
+                    'video/metadata-translations-item.underscore',
                 ),
                 modelStub = {
                     default_value: {
                         en: 'en.srt',
-                        ru: 'ru.srt'
+                        ru: 'ru.srt',
                     },
                     display_name: 'Transcript Translation',
                     explicitly_set: false,
@@ -27,14 +27,14 @@ define(
                         {code: 'en', label: 'English'},
                         {code: 'fr', label: 'French'},
                         {code: 'ru', label: 'Russian'},
-                        {code: 'uk', label: 'Ukrainian'}
+                        {code: 'uk', label: 'Ukrainian'},
                     ],
                     value: {
                         en: 'en.srt',
                         ru: 'ru.srt',
                         uk: 'uk.srt',
-                        fr: 'fr.srt'
-                    }
+                        fr: 'fr.srt',
+                    },
                 },
                 self, injector;
 
@@ -64,9 +64,9 @@ define(
 
                                 return {
                                     pass: passed,
-                                    message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                    message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected,
                                 };
-                            }
+                            },
                         };
                     },
                     assertCanUpdateView: function() {
@@ -82,9 +82,9 @@ define(
 
                                 return {
                                     pass: passed,
-                                    message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                    message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected,
                                 };
-                            }
+                            },
                         };
                     },
                     assertClear: function() {
@@ -99,9 +99,9 @@ define(
                                 _.isEqual(view.getValueFromEditor(), modelValue);
 
                                 return {
-                                    pass: passed
+                                    pass: passed,
                                 };
-                            }
+                            },
                         };
                     },
                     assertUpdateModel: function() {
@@ -120,9 +120,9 @@ define(
                                 _.isEqual(model.getValue(), newValue);
 
                                 return {
-                                    pass: passed
+                                    pass: passed,
                                 };
-                            }
+                            },
                         };
                     },
                     verifyKeysUnique: function() {
@@ -144,9 +144,9 @@ define(
                                 passed = _.isEqual(value, expected);
 
                                 return {
-                                    pass: passed
+                                    pass: passed,
                                 };
-                            }
+                            },
                         };
                     },
                     verifyButtons: function() {
@@ -168,21 +168,21 @@ define(
                                 passed = upload && download && remove;
 
                                 return {
-                                    pass: passed
+                                    pass: passed,
                                 };
-                            }
+                            },
                         };
-                    }
+                    },
                 });
 
                 appendSetFixtures($('<script>', {
                     id: 'metadata-translations-entry',
-                    type: 'text/template'
+                    type: 'text/template',
                 }).text(TranslationsEntryTemplate));
 
                 appendSetFixtures($('<script>', {
                     id: 'metadata-translations-item',
-                    type: 'text/template'
+                    type: 'text/template',
                 }).text(TranslationsItenTemplate));
 
                 this.uploadSpies = createPromptSpy('UploadDialog');
@@ -193,7 +193,7 @@ define(
                 });
 
                 injector.require([
-                    'js/models/metadata', 'js/views/video/translations_editor'
+                    'js/models/metadata', 'js/views/video/translations_editor',
                 ],
                 function(MetadataModel, Translations) {
                     var model = new MetadataModel($.extend(true, {}, modelStub));
@@ -213,7 +213,7 @@ define(
                     en: 'en.srt',
                     ru: 'ru.srt',
                     uk: 'uk.srt',
-                    fr: 'fr.srt'
+                    fr: 'fr.srt',
                 });
 
                 expect(this.view).verifyButtons(true, true, true);
@@ -223,7 +223,7 @@ define(
                 expect(this.view).assertCanUpdateView({
                     ru: 'ru.srt',
                     uk: 'uk.srt',
-                    fr: 'fr.srt'
+                    fr: 'fr.srt',
                 });
             });
 
@@ -235,7 +235,7 @@ define(
                     ru: 'ru.srt',
                     uk: 'uk.srt',
                     fr: 'fr.srt',
-                    zh: ''
+                    zh: '',
                 });
 
                 expect(this.view).verifyButtons(true, false, true);
@@ -255,14 +255,14 @@ define(
                     ru: 'ru.srt',
                     uk: 'uk.srt',
                     fr: 'fr.srt',
-                    zh: 'zh.srt'
+                    zh: 'zh.srt',
                 });
             });
 
             it('has a clear method to revert to the model default', function() {
                 setValue(this.view, {
                     fr: 'en.srt',
-                    uk: 'ru.srt'
+                    uk: 'ru.srt',
                 });
 
                 this.view.$el.find('.create-setting').click();
@@ -271,7 +271,7 @@ define(
 
                 expect(this.view).assertClear({
                     en: 'en.srt',
-                    ru: 'ru.srt'
+                    ru: 'ru.srt',
                 });
 
                 expect(this.view.$el.find('.create-setting')).not.toHaveClass('is-disabled');
@@ -291,7 +291,7 @@ define(
                 setValue(this.view, {
                     en: 'en.srt',
                     ru: 'ru.srt',
-                    fr: ''
+                    fr: '',
                 });
                 expect(_.keys(this.view.model.get('value')).length).toEqual(3);
                 this.view.$el.find('.remove-setting').last().click();
@@ -307,15 +307,15 @@ define(
 
             it('only allows unique keys', function() {
                 expect(this.view).verifyKeysUnique(
-                    {ru: 'ru.srt'}, {ru: 'ru.srt'}, {key: 'ru', value: ''}
+                    {ru: 'ru.srt'}, {ru: 'ru.srt'}, {key: 'ru', value: ''},
                 );
 
                 expect(this.view).verifyKeysUnique(
-                    {ru: 'en.srt'}, {ru: 'ru.srt'}, {key: 'ru', value: 'ru.srt'}
+                    {ru: 'en.srt'}, {ru: 'ru.srt'}, {key: 'ru', value: 'ru.srt'},
                 );
 
                 expect(this.view).verifyKeysUnique(
-                    {ru: 'ru.srt'}, {ru: 'ru.srt'}, {key: '', value: ''}
+                    {ru: 'ru.srt'}, {ru: 'ru.srt'}, {key: '', value: ''},
                 );
             });
 

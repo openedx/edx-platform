@@ -3,7 +3,7 @@
     define(
         'video/08_video_auto_advance_control.js', [
             'edx-ui-toolkit/js/utils/html-utils',
-            'underscore'
+            'underscore',
         ], function(HtmlUtils, _) {
             /**
              * Auto advance control module.
@@ -36,19 +36,19 @@
                         '</span>',
                         '</button>'].join('')),
                     {
-                        autoAdvanceText: gettext('Auto-advance')
-                    }
+                        autoAdvanceText: gettext('Auto-advance'),
+                    },
                 ).toString(),
 
                 destroy: function() {
                     this.el.off({
-                        click: this.onClick
+                        click: this.onClick,
                     });
                     this.el.remove();
                     this.state.el.off({
                         ready: this.autoPlay,
                         ended: this.autoAdvance,
-                        destroy: this.destroy
+                        destroy: this.destroy,
                     });
                     delete this.state.videoAutoAdvanceControl;
                 },
@@ -80,12 +80,12 @@
                  */
                 bindHandlers: function() {
                     this.el.on({
-                        click: this.onClick
+                        click: this.onClick,
                     });
                     this.state.el.on({
                         ready: this.autoPlay,
                         ended: this.autoAdvance,
-                        destroy: this.destroy
+                        destroy: this.destroy,
                     });
                 },
 
@@ -121,7 +121,7 @@
                     if (this.state.auto_advance) {
                         $('.sequence-nav-button.button-next').first().click();
                     }
-                }
+                },
             };
 
             return AutoAdvanceControl;

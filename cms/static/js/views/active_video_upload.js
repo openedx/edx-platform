@@ -7,7 +7,7 @@ define(
         var STATUS_CLASSES = [
             {status: ActiveVideoUpload.STATUS_QUEUED, cls: 'queued'},
             {status: ActiveVideoUpload.STATUS_COMPLETED, cls: 'success'},
-            {status: ActiveVideoUpload.STATUS_FAILED, cls: 'error'}
+            {status: ActiveVideoUpload.STATUS_FAILED, cls: 'error'},
         ];
 
         var ActiveVideoUploadView = BaseView.extend({
@@ -15,7 +15,7 @@ define(
             className: 'active-video-upload',
 
             events: {
-                'click a.more-details-action': 'showUploadFailureMessage'
+                'click a.more-details-action': 'showUploadFailureMessage',
             },
 
             initialize: function() {
@@ -32,7 +32,7 @@ define(
                     STATUS_CLASSES,
                     function(statusClass) {
                         $el.toggleClass(statusClass.cls, status == statusClass.status);
-                    }
+                    },
                 );
                 return this;
             },
@@ -46,13 +46,13 @@ define(
                             text: gettext('Close'),
                             click: function(prompt) {
                                 return prompt.hide();
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 }).show();
-            }
+            },
         });
 
         return ActiveVideoUploadView;
-    }
+    },
 );

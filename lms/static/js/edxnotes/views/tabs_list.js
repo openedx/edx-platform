@@ -1,7 +1,7 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'underscore', 'backbone', 'js/edxnotes/views/tab_item'
+        'underscore', 'backbone', 'js/edxnotes/views/tab_item',
     ], function(_, Backbone, TabItemView) {
         var TabsListView = Backbone.View.extend({
             tagName: 'ul',
@@ -15,7 +15,7 @@
                         if (model.isActive() && collection.length) {
                             collection.at(0).activate();
                         }
-                    }
+                    },
                 });
             },
 
@@ -29,11 +29,11 @@
 
             createTab: function(model) {
                 var tab = new TabItemView({
-                    model: model
+                    model: model,
                 });
                 tab.render().$el.appendTo(this.$el);
                 return tab;
-            }
+            },
         });
 
         return TabsListView;

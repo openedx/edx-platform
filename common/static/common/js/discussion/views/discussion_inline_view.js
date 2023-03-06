@@ -17,7 +17,7 @@
             keydown: 'handleKeydown',
             'keydown .new-post-btn': function(event) {
                 return DiscussionUtil.activateOnSpace(event, this.toggleNewPost);
-            }
+            },
         },
 
         page_re: /\?discussion_page=(\d+)/,
@@ -65,7 +65,7 @@
                 success: function(response, textStatus) {
                     self.renderDiscussion(self.$el, response, textStatus, discussionId);
                 },
-                error: error
+                error: error,
             });
         },
 
@@ -85,13 +85,13 @@
 
             this.discussion = new Discussion(undefined, {pages: response.num_pages});
             this.discussion.reset(response.discussion_data, {
-                silent: false
+                silent: false,
             });
 
             discussionHtml = edx.HtmlUtils.template($('#inline-discussion-template').html())({
                 threads: response.discussion_data,
                 read_only: this.readOnly,
-                discussionId: discussionId
+                discussionId: discussionId,
             });
 
             if (this.$('section.discussion').length) {
@@ -104,7 +104,7 @@
             this.threadListView = new DiscussionThreadListView({
                 el: this.$('.inline-threads'),
                 collection: self.discussion,
-                courseSettings: self.courseSettings
+                courseSettings: self.courseSettings,
             });
 
             this.threadListView.render();
@@ -122,7 +122,7 @@
                 topicId: discussionId,
                 startHeader: this.startHeader,
                 is_commentable_divided: response.is_commentable_divided,
-                user_group_id: response.user_group_id
+                user_group_id: response.user_group_id,
             });
 
             this.newPostView.render();
@@ -150,7 +150,7 @@
                 mode: 'inline',
                 startHeader: this.startHeader,
                 courseSettings: this.courseSettings,
-                is_commentable_divided: this.is_commentable_divided
+                is_commentable_divided: this.is_commentable_divided,
             });
             this.threadView.render();
             this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllPosts);
@@ -199,7 +199,7 @@
                         if (request.status === 403 && request.responseText) {
                             DiscussionUtil.discussionAlert(
                                 gettext('Warning'),
-                                request.responseText
+                                request.responseText,
                             );
                             self.$el.text(request.responseText);
                             self.showed = true;
@@ -207,7 +207,7 @@
                             self.hideDiscussion();
                             DiscussionUtil.discussionAlert(
                                 gettext('Error'),
-                                gettext('This discussion could not be loaded. Refresh the page and try again.')
+                                gettext('This discussion could not be loaded. Refresh the page and try again.'),
                             );
                         }
                     });
@@ -251,6 +251,6 @@
             if (keyCode === this.escKey) {
                 this.$('section.discussion').find('.cancel').trigger('click');
             }
-        }
+        },
     });
 }).call(window);

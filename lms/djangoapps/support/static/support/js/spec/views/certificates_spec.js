@@ -1,7 +1,7 @@
 define([
     'jquery',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'support/js/views/certificates'
+    'support/js/views/certificates',
 ], function($, AjaxHelpers, CertificatesView) {
     'use strict';
 
@@ -17,7 +17,7 @@ define([
                     type: 'honor',
                     course_key: 'course-v1:edX+DemoX+Demo_Course',
                     modified: '2015-08-06T19:47:07+00:00',
-                    regenerate: true
+                    regenerate: true,
                 },
                 {
                     username: 'student',
@@ -27,8 +27,8 @@ define([
                     type: 'verified',
                     course_key: 'edx/test/2015',
                     modified: '2015-08-06T19:47:05+00:00',
-                    regenerate: true
-                }
+                    regenerate: true,
+                },
             ],
 
             GENERATE_SEARCH_RESULTS = [
@@ -40,8 +40,8 @@ define([
                     type: '',
                     course_key: 'edx/test1/2016',
                     modified: '',
-                    regenerate: false
-                }
+                    regenerate: false,
+                },
             ],
 
             getSearchResults = function() {
@@ -90,7 +90,7 @@ define([
             spyOn(window.history, 'pushState');
             setFixtures('<div class="certificates-content"></div>');
             view = new CertificatesView({
-                el: $('.certificates-content')
+                el: $('.certificates-content'),
             }).render();
         });
 
@@ -158,7 +158,7 @@ define([
             // Re-render the view, this time providing an initial filter.
             view = new CertificatesView({
                 el: $('.certificates-content'),
-                userFilter: 'student@example.com'
+                userFilter: 'student@example.com',
             }).render();
 
             // Simulate a response from the server
@@ -185,8 +185,8 @@ define([
                 '/certificates/regenerate',
                 $.param({
                     username: 'student',
-                    course_key: 'course-v1:edX+DemoX+Demo_Course'
-                })
+                    course_key: 'course-v1:edX+DemoX+Demo_Course',
+                }),
             );
 
             // Respond with success
@@ -208,8 +208,8 @@ define([
                 '/certificates/generate',
                 $.param({
                     username: 'student',
-                    course_key: 'edx/test1/2016'
-                })
+                    course_key: 'edx/test1/2016',
+                }),
             );
 
             // Respond with success

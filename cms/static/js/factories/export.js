@@ -1,5 +1,5 @@
 define([
-    'domReady', 'js/views/export', 'jquery', 'gettext'
+    'domReady', 'js/views/export', 'jquery', 'gettext',
 ], function(domReady, Export, $, gettext) {
     'use strict';
     return function(courselikeHomeUrl, library, statusUrl) {
@@ -35,7 +35,7 @@ define([
                             Export.showError(gettext('Your export has failed.'));
                         }
                     }
-                }
+                },
             });
         };
 

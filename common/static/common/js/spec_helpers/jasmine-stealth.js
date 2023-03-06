@@ -45,7 +45,7 @@
         }
 
         spies = {
-            constructor: jasmine.createSpy('' + classToFake + '\'s constructor')
+            constructor: jasmine.createSpy('' + classToFake + '\'s constructor'),
         };
 
         _.each(methodsToSpy, function(methodName) {
@@ -61,6 +61,6 @@
 
     jasmine.stealth = {
         spyOnConstructor: spyOnConstructor,
-        clearSpies: clearSpies
+        clearSpies: clearSpies,
     };
 }));

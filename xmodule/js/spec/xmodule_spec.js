@@ -11,7 +11,7 @@
         describe('implementation', function() {
             var $el,
                 videoModule = {
-                    module: 'video_module'
+                    module: 'video_module',
                 },
                 editCallback,
                 displayCallback,
@@ -115,7 +115,7 @@
                 expect(XBlockToXModuleShim(null, $el)).toBeUndefined();
 
                 expect(console.error).toHaveBeenCalledWith(
-                    'Unable to load UnknownModule: window[moduleType] is not a constructor'
+                    'Unable to load UnknownModule: window[moduleType] is not a constructor',
                 );
 
                 window.console = oldConsole;

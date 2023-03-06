@@ -2,7 +2,7 @@
     'use strict';
     define([
         'jquery',
-        'js/student_account/views/AccessView'
+        'js/student_account/views/AccessView',
     ],
     function($, AccessView) {
         return function(options) {
@@ -10,6 +10,6 @@
 
             new AccessView(_.extend(options, {el: $logistrationElement}));
         };
-    }
+    },
     );
 }).call(this, define || RequireJS.define);

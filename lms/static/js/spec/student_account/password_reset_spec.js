@@ -6,7 +6,7 @@
         'common/js/spec_helpers/template_helpers',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/student_account/models/PasswordResetModel',
-        'js/student_account/views/PasswordResetView'
+        'js/student_account/views/PasswordResetView',
     ],
     function($, _, TemplateHelpers, AjaxHelpers, PasswordResetModel, PasswordResetView) {
         describe('edx.student.account.PasswordResetView', function() {
@@ -25,21 +25,21 @@
                         required: true,
                         placeholder: 'place@holder.org',
                         instructions: 'Enter your email.',
-                        restrictions: {}
-                    }]
+                        restrictions: {},
+                    }],
                 };
 
             var createPasswordResetView = function(that) {
                 // Initialize the password reset model
                 model = new PasswordResetModel({}, {
                     url: FORM_DESCRIPTION.submit_url,
-                    method: FORM_DESCRIPTION.method
+                    method: FORM_DESCRIPTION.method,
                 });
 
                 // Initialize the password reset view
                 view = new PasswordResetView({
                     fields: FORM_DESCRIPTION.fields,
-                    model: model
+                    model: model,
                 });
 
                 // Spy on AJAX requests
@@ -59,7 +59,7 @@
                     // Force validation to return as expected
                     spyOn(view, 'validate').and.returnValue({
                         isValid: validationSuccess,
-                        message: 'Submission was validated.'
+                        message: 'Submission was validated.',
                     });
                 }
 
@@ -91,7 +91,7 @@
                 AjaxHelpers.expectRequest(
                     requests, 'POST',
                     FORM_DESCRIPTION.submit_url,
-                    $.param({email: EMAIL})
+                    $.param({email: EMAIL}),
                 );
 
                 // Respond with status code 200

@@ -26,13 +26,13 @@ define(['../dateutil_factory.js'], function(DateUtilIterator) {
                     en: 'Due Oct 14, 2016 08:00 UTC',
                     ru: 'Due 14 окт. 2016 г. 08:00 UTC',
                     ar: 'Due ١٤ أكتوبر ٢٠١٦ ٠٨:٠٠ UTC',
-                    fr: 'Due 14 oct. 2016 08:00 UTC'
+                    fr: 'Due 14 oct. 2016 08:00 UTC',
                 };
                 $form = $(
                     '<span class="subtitle-name localized-datetime" ' +
                     'data-timezone="UTC" ' +
                     'data-datetime="2016-10-14 08:00:00+00:00" ' +
-                    'data-string="Due {date}"></span>'
+                    'data-string="Due {date}"></span>',
                 );
                 Object.keys(testLangs).forEach(function(key) {
                     $form.attr('data-language', String(key));

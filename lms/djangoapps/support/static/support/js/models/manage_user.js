@@ -17,14 +17,14 @@
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({
-                        username_or_email: this.get('username')
+                        username_or_email: this.get('username'),
                     }),
                     success: _.bind(function(response) {
                         this.set('response', response.success_msg);
                         this.set('status', response.status);
-                    }, this)
+                    }, this),
                 });
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

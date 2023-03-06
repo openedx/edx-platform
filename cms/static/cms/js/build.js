@@ -30,7 +30,7 @@
             'js/factories/settings',
             'js/factories/settings_advanced',
             'js/factories/settings_graders',
-            'js/factories/videos_index'
+            'js/factories/videos_index',
         ]),
         /**
          * By default all the configuration for optimization happens from the command
@@ -71,7 +71,7 @@
 
             // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace
             'edx-ui-toolkit/js/utils/html-utils': 'empty:',
-            'edx-ui-toolkit/js/utils/string-utils': 'empty:'
+            'edx-ui-toolkit/js/utils/string-utils': 'empty:',
         },
 
         /**
@@ -97,9 +97,9 @@
                 deps: [
                     'jquery', 'underscore', 'codemirror', 'tinymce',
                     'jquery.tinymce', 'jquery.qtip', 'jquery.scrollTo', 'jquery.flot',
-                    'jquery.cookie', 'utility'
-                ]
-            }
+                    'jquery.cookie', 'utility',
+                ],
+            },
         },
         /**
          * Introduced in 2.1.2: If using "dir" for an output directory, normally the
@@ -158,6 +158,6 @@
          * SILENT: 4
          * Default is 0.
          */
-        logLevel: 1
+        logLevel: 1,
     };
 }());

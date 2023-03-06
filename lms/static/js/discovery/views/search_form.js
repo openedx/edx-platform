@@ -6,7 +6,7 @@
 
             el: '#discovery-form',
             events: {
-                'submit form': 'submitForm'
+                'submit form': 'submitForm',
             },
 
             initialize: function() {
@@ -46,7 +46,7 @@
                 var msg = ngettext(
                     'Viewing %s course',
                     'Viewing %s courses',
-                    count
+                    count,
                 );
                 this.$message.html(interpolate(msg, [count]));
             },
@@ -54,7 +54,7 @@
             showNotFoundMessage: function(term) {
                 var msg = interpolate(
                     gettext('We couldn\'t find any results for "%s".'),
-                    [_.escape(term)]
+                    [_.escape(term)],
                 );
                 this.$message.html(msg);
                 this.clearSearch();
@@ -62,7 +62,7 @@
 
             showErrorMessage: function(error) {
                 this.$message.text(gettext(error || 'There was an error, try searching again.'));
-            }
+            },
 
         });
     });

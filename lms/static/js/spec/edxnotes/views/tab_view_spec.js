@@ -5,7 +5,7 @@ define([
     'common/js/spec_helpers/template_helpers',
     'js/edxnotes/collections/tabs',
     'js/edxnotes/views/tabs_list',
-    'js/edxnotes/views/tab_view'
+    'js/edxnotes/views/tab_view',
 ], function($, Backbone, HtmlUtils, TemplateHelpers, TabsCollection, TabsListView, TabView) {
     'use strict';
     describe('EdxNotes TabView', function() {
@@ -16,14 +16,14 @@ define([
                 render: function() {
                     this.$el.html(this.content);
                     return this;
-                }
+                },
             }),
             TestView = TabView.extend({
                 PanelConstructor: TestSubView,
                 tabInfo: {
                     name: 'Test View Tab',
-                    is_closable: true
-                }
+                    is_closable: true,
+                },
             }),
             getView;
 
@@ -32,7 +32,7 @@ define([
             options = _.defaults(options || {}, {
                 el: $('.wrapper-student-notes'),
                 collection: [],
-                tabsCollection: tabsCollection
+                tabsCollection: tabsCollection,
             });
             view = new TestView(options);
 
@@ -46,7 +46,7 @@ define([
         beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
-                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
+                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item',
             ]);
             this.tabsCollection = new TabsCollection();
             this.tabsList = new TabsListView({collection: this.tabsCollection}).render();
@@ -62,7 +62,7 @@ define([
 
         it('cannot create a tab on initialization if flag is not set', function() {
             var view = getView(this.tabsCollection, {
-                createTabOnInitialization: false
+                createTabOnInitialization: false,
             });
             expect(this.tabsCollection).toHaveLength(0);
             expect(view.$('.tab')).not.toExist();

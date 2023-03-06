@@ -6,11 +6,11 @@
             tagName: 'form',
             events: {
                 submit: 'updateHandler',
-                'click .post-cancel': 'cancelHandler'
+                'click .post-cancel': 'cancelHandler',
             },
 
             attributes: {
-                class: 'discussion-post edit-post-form'
+                class: 'discussion-post edit-post-form',
             },
 
             initialize: function(options) {
@@ -42,7 +42,7 @@
                 if (this.isTabMode()) {
                     this.topicView = new DiscussionTopicMenuView({
                         topicId: this.topicId,
-                        course_settings: this.course_settings
+                        course_settings: this.course_settings,
                     });
                     this.addField(this.topicView.render());
                 }
@@ -66,7 +66,7 @@
                     postData = {
                         title: title,
                         thread_type: threadType,
-                        body: body
+                        body: body,
                     };
                 if (this.topicView) {
                     postData.commentable_id = this.topicView.getCurrentTopicId();
@@ -94,7 +94,7 @@
                             this.model.trigger('thread:thread_type_updated');
                             this.trigger('comment:endorse');
                         }
-                    }.bind(this)
+                    }.bind(this),
                 });
             },
 
@@ -111,7 +111,7 @@
                 this.trigger('thread:cancel_edit', event);
                 this.remove();
                 return this;
-            }
+            },
         });
     }
 }).call(window);

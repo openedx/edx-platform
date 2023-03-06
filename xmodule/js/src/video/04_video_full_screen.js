@@ -8,7 +8,7 @@
             gettext('Fill browser'),
             '">',
             '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
-            '</button>'
+            '</button>',
         ].join('');
 
         // The following properties and functions enable cross-browser use of the
@@ -29,7 +29,7 @@
                     requestFullscreen: 'requestFullscreen',
                     exitFullscreen: 'exitFullscreen',
                     fullscreenchange: 'fullscreenchange',
-                    fullscreenerror: 'fullscreenerror'
+                    fullscreenerror: 'fullscreenerror',
                 };
             }
             if ('webkitFullscreenEnabled' in document) {
@@ -39,7 +39,7 @@
                     requestFullscreen: 'webkitRequestFullscreen',
                     exitFullscreen: 'webkitExitFullscreen',
                     fullscreenchange: 'webkitfullscreenchange',
-                    fullscreenerror: 'webkitfullscreenerror'
+                    fullscreenerror: 'webkitfullscreenerror',
                 };
             }
             if ('mozFullScreenEnabled' in document) {
@@ -49,7 +49,7 @@
                     requestFullscreen: 'mozRequestFullScreen',
                     exitFullscreen: 'mozCancelFullScreen',
                     fullscreenchange: 'mozfullscreenchange',
-                    fullscreenerror: 'mozfullscreenerror'
+                    fullscreenerror: 'mozfullscreenerror',
                 };
             }
             if ('msFullscreenEnabled' in document) {
@@ -59,7 +59,7 @@
                     requestFullscreen: 'msRequestFullscreen',
                     exitFullscreen: 'msExitFullscreen',
                     fullscreenchange: 'MSFullscreenChange',
-                    fullscreenerror: 'MSFullscreenError'
+                    fullscreenerror: 'MSFullscreenError',
                 };
             }
             return {};
@@ -95,11 +95,11 @@
             $(document).off('keyup', this.videoFullScreen.exitHandler);
             this.videoFullScreen.fullScreenEl.remove();
             this.el.off({
-                destroy: this.videoFullScreen.destroy
+                destroy: this.videoFullScreen.destroy,
             });
             document.removeEventListener(
                 getVendorPrefixed('fullscreenchange'),
-                this.videoFullScreen.handleFullscreenChange
+                this.videoFullScreen.handleFullscreenChange,
             );
             if (this.isFullScreen) {
                 this.videoFullScreen.exit();
@@ -128,12 +128,12 @@
         function bindHandlers(state) {
             state.videoFullScreen.fullScreenEl.on('click', state.videoFullScreen.toggleHandler);
             state.el.on({
-                destroy: state.videoFullScreen.destroy
+                destroy: state.videoFullScreen.destroy,
             });
             $(document).on('keyup', state.videoFullScreen.exitHandler);
             document.addEventListener(
                 getVendorPrefixed('fullscreenchange'),
-                state.videoFullScreen.handleFullscreenChange
+                state.videoFullScreen.handleFullscreenChange,
             );
         }
 
@@ -267,7 +267,7 @@
                 handleFullscreenChange: handleFullscreenChange,
                 toggle: toggle,
                 toggleHandler: toggleHandler,
-                updateControlsHeight: updateControlsHeight
+                updateControlsHeight: updateControlsHeight,
             };
 
             state.bindTo(methodsDict, state.videoFullScreen, state);

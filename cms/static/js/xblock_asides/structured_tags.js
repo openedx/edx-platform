@@ -20,7 +20,7 @@
                 runtime.notify('save', {
                     state: 'start',
                     element: element,
-                    message: gettext('Updating Tags')
+                    message: gettext('Updating Tags'),
                 });
 
                 $.ajax({
@@ -28,11 +28,11 @@
                     url: studioRuntime.handlerUrl(element, 'save_tags'),
                     data: JSON.stringify(dataToPost),
                     dataType: 'json',
-                    contentType: 'application/json; charset=utf-8'
+                    contentType: 'application/json; charset=utf-8',
                 }).always(function() {
                     runtime.notify('save', {
                         state: 'end',
-                        element: element
+                        element: element,
                     });
                     saveTagsInProgress = false;
                 });

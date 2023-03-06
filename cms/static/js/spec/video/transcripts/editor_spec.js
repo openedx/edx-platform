@@ -3,7 +3,7 @@ define(
         'jquery', 'backbone', 'underscore',
         'js/views/video/transcripts/utils', 'js/views/video/transcripts/editor',
         'js/views/metadata', 'js/models/metadata', 'js/collections/metadata',
-        'underscore.string', 'xmodule', 'js/views/video/transcripts/metadata_videolist'
+        'underscore.string', 'xmodule', 'js/views/video/transcripts/metadata_videolist',
     ],
     function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCollection, _str) {
         describe('Transcripts.Editor', function() {
@@ -18,8 +18,8 @@ define(
                     value: [
                         'http://youtu.be/12345678901',
                         'video.mp4',
-                        'video.webm'
-                    ]
+                        'video.webm',
+                    ],
                 },
                 DisplayNameEntry = {
                     default_value: 'default value',
@@ -29,7 +29,7 @@ define(
                     help: 'Specifies the name for this component.',
                     options: [],
                     type: MetadataModel.GENERIC_TYPE,
-                    value: 'display value'
+                    value: 'display value',
                 },
                 VideoIDEntry = {
                     default_value: 'test default value',
@@ -39,17 +39,17 @@ define(
                     help: 'Specifies the video ID.',
                     options: [],
                     type: 'VideoID',
-                    value: 'basic tab video id'
+                    value: 'basic tab video id',
                 },
                 models = [DisplayNameEntry, VideoListEntry, VideoIDEntry],
                 testData = {
                     display_name: DisplayNameEntry,
                     video_url: VideoListEntry,
-                    edx_video_id: VideoIDEntry
+                    edx_video_id: VideoIDEntry,
                 },
                 metadataDict = {
                     object: testData,
-                    string: JSON.stringify(testData)
+                    string: JSON.stringify(testData),
                 },
                 component_locator = 'component_locator',
                 transcripts, $container, waitForEvent, editor;
@@ -64,7 +64,7 @@ define(
             beforeEach(function() {
                 var tpl = sandbox({
                     class: 'wrapper-comp-settings basic_metadata_edit',
-                    'data-metadata': JSON.stringify(metadataDict.object)
+                    'data-metadata': JSON.stringify(metadataDict.object),
                 });
 
                 appendSetFixtures(tpl);
@@ -88,30 +88,30 @@ define(
                     appendSetFixtures(
                         sandbox({  // eslint-disable-line no-undef
                             class: 'wrapper-comp-settings basic_metadata_edit',
-                            'data-metadata': JSON.stringify({video_url: VideoListEntry, edx_video_id: VideoIDEntry})
-                        })
+                            'data-metadata': JSON.stringify({video_url: VideoListEntry, edx_video_id: VideoIDEntry}),
+                        }),
                     );
 
                     appendSetFixtures(
                         $('<script>',
                             {
                                 id: 'metadata-videolist-entry',
-                                type: 'text/template'
-                            }
-                        ).text(readFixtures('video/transcripts/metadata-videolist-entry.underscore'))
+                                type: 'text/template',
+                            },
+                        ).text(readFixtures('video/transcripts/metadata-videolist-entry.underscore')),
                     );
 
                     appendSetFixtures(
                         $('<script>',
                             {
                                 id: 'metadata-string-entry',
-                                type: 'text/template'
-                            }
-                        ).text(readFixtures('metadata-string-entry.underscore'))
+                                type: 'text/template',
+                            },
+                        ).text(readFixtures('metadata-string-entry.underscore')),
                     );
 
                     editor = new Editor({
-                        el: $('.basic_metadata_edit')
+                        el: $('.basic_metadata_edit'),
                     });
 
                     // reset the already triggered events
@@ -148,8 +148,8 @@ define(
                                     {mode: 'youtube', video: '12345678901', type: 'youtube'},
                                     {mode: 'html5', video: 'video', type: 'mp4'},
                                     {mode: 'html5', video: 'video', type: 'webm'},
-                                    {mode: 'edx_video_id', type: 'edx_video_id', video: 'basic tab video id'}
-                                ]
+                                    {mode: 'edx_video_id', type: 'edx_video_id', video: 'basic tab video id'},
+                                ],
                             );
                         }).always(done);
                 });
@@ -171,7 +171,7 @@ define(
                     spyOn(Editor.prototype, 'handleFieldChanged');
 
                     transcripts = new Editor({
-                        el: $container
+                        el: $container,
                     });
                 });
 
@@ -189,7 +189,7 @@ define(
                 it('MetadataView.Editor is initialized', function() {
                     expect(MetadataView.Editor).toHaveBeenCalledWith({
                         el: $container,
-                        collection: transcripts.collection
+                        collection: transcripts.collection,
                     });
                 });
             });
@@ -203,7 +203,7 @@ define(
                         help: 'Specifies the name for this component.',
                         options: [],
                         type: MetadataModel.GENERIC_TYPE,
-                        value: 'default'
+                        value: 'default',
                     },
 
                     subEntry = {
@@ -214,7 +214,7 @@ define(
                         help: 'Specifies the name for this component.',
                         options: [],
                         type: 'Generic',
-                        value: 'default'
+                        value: 'default',
                     },
 
                     html5SourcesEntry = {
@@ -225,7 +225,7 @@ define(
                         help: 'A list of html5 sources.',
                         options: [],
                         type: MetadataModel.LIST_TYPE,
-                        value: ['default.mp4', 'default.webm']
+                        value: ['default.mp4', 'default.webm'],
                     },
 
                     youtubeEntry = {
@@ -236,7 +236,7 @@ define(
                         help: 'Specifies the name for this component.',
                         options: [],
                         type: MetadataModel.GENERIC_TYPE,
-                        value: 'OEoXaMPEzfM'
+                        value: 'OEoXaMPEzfM',
                     },
                     videoIDEntry = {
                         default_value: 'test default value',
@@ -246,7 +246,7 @@ define(
                         help: 'Specifies the video ID.',
                         options: [],
                         type: MetadataModel.GENERIC_TYPE,
-                        value: 'advanced tab video id'
+                        value: 'advanced tab video id',
                     },
                     metadataCollection,
                     metadataView;
@@ -257,7 +257,7 @@ define(
                     spyOn(Editor.prototype, 'handleFieldChanged');
 
                     transcripts = new Editor({
-                        el: $container
+                        el: $container,
                     });
 
                     metadataCollection = new MetadataCollection(
@@ -266,15 +266,15 @@ define(
                             subEntry,
                             html5SourcesEntry,
                             youtubeEntry,
-                            videoIDEntry
-                        ]
+                            videoIDEntry,
+                        ],
                     );
 
                     metadataView = jasmine.createSpyObj(
                         'MetadataView.Editor',
                         [
-                            'getModifiedMetadataValues'
-                        ]
+                            'getModifiedMetadataValues',
+                        ],
                     );
                 });
 
@@ -293,21 +293,21 @@ define(
                                 var displayNameValue, videoUrlValue, videoIDValue;
 
                                 displayNameValue = transcripts.collection.findWhere({
-                                    field_name: 'display_name'
+                                    field_name: 'display_name',
                                 }).getValue();
                                 expect(displayNameValue).toEqual('default');
 
                                 videoUrlValue = transcripts.collection.findWhere({
-                                    field_name: 'video_url'
+                                    field_name: 'video_url',
                                 }).getValue();
                                 expect(videoUrlValue).toEqual([
                                     'http://youtu.be/OEoXaMPEzfM',
                                     'default.mp4',
-                                    'default.webm'
+                                    'default.webm',
                                 ]);
 
                                 videoIDValue = transcripts.collection.findWhere({
-                                    field_name: 'edx_video_id'
+                                    field_name: 'edx_video_id',
                                 }).getValue();
                                 expect(videoIDValue).toEqual('advanced tab video id');
                             })
@@ -320,17 +320,17 @@ define(
                         transcripts.syncBasicTab(null);
 
                         videoUrlValue = transcripts.collection.findWhere({
-                            field_name: 'video_url'
+                            field_name: 'video_url',
                         }).getValue();
 
                         expect(videoUrlValue).toEqual([
                             'http://youtu.be/12345678901',
                             'video.mp4',
-                            'video.webm'
+                            'video.webm',
                         ]);
 
                         videoIDValue = transcripts.collection.findWhere({
-                            field_name: 'edx_video_id'
+                            field_name: 'edx_video_id',
                         }).getValue();
                         expect(videoIDValue).toEqual('basic tab video id');
                     });
@@ -339,25 +339,25 @@ define(
                         var model, videoUrlValue;
 
                         model = metadataCollection.findWhere({
-                            field_name: 'youtube_id_1_0'
+                            field_name: 'youtube_id_1_0',
                         });
 
                         model.setValue([
                             '12345678',
                             'default.mp4',
-                            'default.webm'
+                            'default.webm',
                         ]);
 
                         transcripts.syncBasicTab(metadataCollection, metadataView);
 
                         videoUrlValue = transcripts.collection.findWhere({
-                            field_name: 'video_url'
+                            field_name: 'video_url',
                         }).getValue();
 
                         expect(videoUrlValue).toEqual([
                             '',
                             'default.mp4',
-                            'default.webm'
+                            'default.webm',
                         ]);
                     });
                 });
@@ -372,30 +372,30 @@ define(
                                 var displayNameValue, subValue, html5SourcesValue, youtubeValue, videoIDValue;
 
                                 displayNameValue = metadataCollection.findWhere({
-                                    field_name: 'display_name'
+                                    field_name: 'display_name',
                                 }).getValue();
                                 expect(displayNameValue).toEqual('display value');
 
                                 subValue = metadataCollection.findWhere({
-                                    field_name: 'sub'
+                                    field_name: 'sub',
                                 }).getValue();
                                 expect(subValue).toEqual('default');
 
                                 html5SourcesValue = metadataCollection.findWhere({
-                                    field_name: 'html5_sources'
+                                    field_name: 'html5_sources',
                                 }).getValue();
                                 expect(html5SourcesValue).toEqual([
                                     'video.mp4',
-                                    'video.webm'
+                                    'video.webm',
                                 ]);
 
                                 youtubeValue = metadataCollection.findWhere({
-                                    field_name: 'youtube_id_1_0'
+                                    field_name: 'youtube_id_1_0',
                                 }).getValue();
                                 expect(youtubeValue).toEqual('12345678901');
 
                                 videoIDValue = metadataCollection.findWhere({
-                                    field_name: 'edx_video_id'
+                                    field_name: 'edx_video_id',
                                 }).getValue();
                                 expect(videoIDValue).toEqual('basic tab video id');
                             })
@@ -408,30 +408,30 @@ define(
                         transcripts.syncAdvancedTab(null);
 
                         displayNameValue = metadataCollection.findWhere({
-                            field_name: 'display_name'
+                            field_name: 'display_name',
                         }).getValue();
                         expect(displayNameValue).toEqual('default');
 
                         subValue = metadataCollection.findWhere({
-                            field_name: 'sub'
+                            field_name: 'sub',
                         }).getValue();
                         expect(subValue).toEqual('default');
 
                         html5SourcesValue = metadataCollection.findWhere({
-                            field_name: 'html5_sources'
+                            field_name: 'html5_sources',
                         }).getValue();
                         expect(html5SourcesValue).toEqual([
                             'default.mp4',
-                            'default.webm'
+                            'default.webm',
                         ]);
 
                         youtubeValue = metadataCollection.findWhere({
-                            field_name: 'youtube_id_1_0'
+                            field_name: 'youtube_id_1_0',
                         }).getValue();
                         expect(youtubeValue).toEqual('OEoXaMPEzfM');
 
                         videoIDValue = metadataCollection.findWhere({
-                            field_name: 'edx_video_id'
+                            field_name: 'edx_video_id',
                         }).getValue();
                         expect(videoIDValue).toEqual('advanced tab video id');
                     });
@@ -440,26 +440,26 @@ define(
                         var model, html5SourcesValue, youtubeValue;
 
                         model = transcripts.collection.findWhere({
-                            field_name: 'video_url'
+                            field_name: 'video_url',
                         });
 
                         model.setValue([
                             'video.mp4',
-                            'video.webm'
+                            'video.webm',
                         ]);
 
                         transcripts.syncAdvancedTab(metadataCollection);
 
                         html5SourcesValue = metadataCollection.findWhere({
-                            field_name: 'html5_sources'
+                            field_name: 'html5_sources',
                         }).getValue();
                         expect(html5SourcesValue).toEqual([
                             'video.mp4',
-                            'video.webm'
+                            'video.webm',
                         ]);
 
                         youtubeValue = metadataCollection.findWhere({
-                            field_name: 'youtube_id_1_0'
+                            field_name: 'youtube_id_1_0',
                         }).getValue();
                         expect(youtubeValue).toEqual('');
                     });

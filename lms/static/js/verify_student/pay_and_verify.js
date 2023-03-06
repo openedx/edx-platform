@@ -19,7 +19,7 @@ var edx = edx || {};
 
     // Initialize an error view for displaying top-level error messages.
     errorView = new edx.verify_student.ErrorView({
-        el: $('#error-container')
+        el: $('#error-container'),
     });
 
     // Initialize the base view, passing in information
@@ -42,7 +42,7 @@ var edx = edx || {};
                 hasPaid: $el.data('msg-key') === 'verify-now' || $el.data('msg-key') === 'verify-later',
                 isActive: $el.data('is-active'),
                 platformName: $el.data('platform-name'),
-                requirements: $el.data('requirements')
+                requirements: $el.data('requirements'),
             },
             'make-payment-step': {
                 isActive: $el.data('is-active'),
@@ -54,7 +54,7 @@ var edx = edx || {};
                 userTimezone: $el.data('user-timezone'),
                 hasVisibleReqs: _.some(
                     $el.data('requirements'),
-                    function(isVisible) { return isVisible; }
+                    function(isVisible) { return isVisible; },
                 ),
                 upgrade: $el.data('msg-key') === 'upgrade',
                 minPrice: $el.data('course-mode-min-price'),
@@ -62,7 +62,7 @@ var edx = edx || {};
                 contributionAmount: $el.data('contribution-amount'),
                 suggestedPrices: _.filter(
                     ($el.data('course-mode-suggested-prices').toString()).split(','),
-                    function(price) { return Boolean(price); }
+                    function(price) { return Boolean(price); },
                 ),
                 currency: $el.data('course-mode-currency'),
                 processors: $el.data('processors'),
@@ -70,25 +70,25 @@ var edx = edx || {};
                 courseModeSlug: $el.data('course-mode-slug'),
                 alreadyVerified: $el.data('already-verified'),
                 verificationGoodUntil: $el.data('verification-good-until'),
-                isABTesting: $el.data('is-ab-testing')
+                isABTesting: $el.data('is-ab-testing'),
             },
             'face-photo-step': {
                 platformName: $el.data('platform-name'),
-                captureSoundPath: $el.data('capture-sound')
+                captureSoundPath: $el.data('capture-sound'),
             },
             'id-photo-step': {
                 platformName: $el.data('platform-name'),
-                captureSoundPath: $el.data('capture-sound')
+                captureSoundPath: $el.data('capture-sound'),
             },
             'review-photos-step': {
                 fullName: $el.data('full-name'),
-                platformName: $el.data('platform-name')
+                platformName: $el.data('platform-name'),
             },
             'enrollment-confirmation-step': {
                 courseName: $el.data('course-name'),
                 coursewareUrl: $el.data('courseware-url'),
-                platformName: $el.data('platform-name')
-            }
-        }
+                platformName: $el.data('platform-name'),
+            },
+        },
     }).render();
 }(jQuery, _));

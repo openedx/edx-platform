@@ -1,7 +1,7 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'gettext', 'underscore', 'backbone'
+        'gettext', 'underscore', 'backbone',
     ], function(gettext, _, Backbone) {
         var UserAccountModel = Backbone.Model.extend({
             idAttribute: 'username',
@@ -26,7 +26,7 @@
                 accomplishments_shared: false,
                 default_public_account_fields: [],
                 extended_profile: [],
-                secondary_email: ''
+                secondary_email: '',
             },
 
             parse: function(response) {
@@ -67,7 +67,7 @@
                     return isBirthDefined && isOlderThanMinimum && !(this.get('requires_parental_consent'));
                 }
                 return isBirthDefined && !(this.get('requires_parental_consent'));
-            }
+            },
         });
         return UserAccountModel;
     });

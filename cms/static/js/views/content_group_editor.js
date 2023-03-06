@@ -3,7 +3,7 @@
  * It is expected to be backed by a Group model.
  */
 define([
-    'js/views/list_item_editor', 'underscore'
+    'js/views/list_item_editor', 'underscore',
 ],
 function(ListItemEditorView, _) {
     'use strict';
@@ -13,7 +13,7 @@ function(ListItemEditorView, _) {
         className: 'content-group-edit collection-edit',
         events: {
             submit: 'setAndClose',
-            'click .action-cancel': 'cancel'
+            'click .action-cancel': 'cancel',
         },
 
         initialize: function() {
@@ -28,7 +28,7 @@ function(ListItemEditorView, _) {
                 index: this.model.collection.indexOf(this.model),
                 isNew: this.model.isNew(),
                 usage: this.model.get('usage'),
-                uniqueId: _.uniqueId()
+                uniqueId: _.uniqueId(),
             };
         },
 
@@ -39,7 +39,7 @@ function(ListItemEditorView, _) {
 
         getSaveableModel: function() {
             return this.model.collection.parents[0];
-        }
+        },
     });
 
     return ContentGroupEditorView;

@@ -55,7 +55,7 @@ such that the value can be defined later than this assignment (file load order).
                 labels: ['field1', 'field2', 'field3'],
                 add_placeholder: 'Enter name',
                 add_btn_label: 'Add Member',
-                add_handler: function() {}
+                add_handler: function() {},
             });
             templateHtml = edx.HtmlUtils.template($('#membership-list-widget-tpl').text())(memberListParams);
             edx.HtmlUtils.setHtml(this.$container, templateHtml);
@@ -123,7 +123,7 @@ such that the value can be defined later than this assignment (file load order).
                 add_btn_label: $container.data('add-button-label'),
                 add_handler: function(input) {
                     return authListWidget.add_handler(input);
-                }
+                },
             });
             this.debug = true;
             this.list_endpoint = $container.data('list-endpoint');
@@ -172,9 +172,9 @@ such that the value can be defined later than this assignment (file load order).
                     labelTrans = gettext('Revoke access');
 
                     $revokeBtn = $(_.template('<div class="revoke"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <%- label %></div>')({  // eslint-disable-line max-len
-                        label: labelTrans
+                        label: labelTrans,
                     }), {
-                        class: 'revoke'
+                        class: 'revoke',
                     });
                     $revokeBtn.click(function() {
                         authListWidgetReloadList.modify_member_access(member.email, 'revoke', function(err) {
@@ -194,7 +194,7 @@ such that the value can be defined later than this assignment (file load order).
                             $selectedOption = $('select#member-lists-selector').children('option:selected');
                             if ($selectedOption[0].value === authListWidgetReloadList.rolename) {
                                 authListWidgetReloadList.show_errors(
-                                    gettext('This role requires a divided discussions scheme.')
+                                    gettext('This role requires a divided discussions scheme.'),
                                 );
                                 enableAddButton(false, authListWidgetReloadList);
                             }
@@ -202,7 +202,7 @@ such that the value can be defined later than this assignment (file load order).
                             authListWidgetReloadList.list_enabled = true;
                             enableAddButton(true, authListWidgetReloadList);
                             authListWidgetReloadList.add_row([member.username, member.email,
-                                member.group_name, $revokeBtn]
+                                member.group_name, $revokeBtn],
                             );
                         }
                     } else {
@@ -231,15 +231,15 @@ such that the value can be defined later than this assignment (file load order).
                 dataType: 'json',
                 url: this.list_endpoint,
                 data: {
-                    rolename: this.rolename
+                    rolename: this.rolename,
                 },
                 success: function(data) {
                     return typeof cb === 'function' ? cb(
                         null,
                         data[authlistwidgetgetmemberlist.rolename],
-                        data.division_scheme
+                        data.division_scheme,
                     ) : undefined;
-                }
+                },
             });
         };
 
@@ -252,14 +252,14 @@ such that the value can be defined later than this assignment (file load order).
                 data: {
                     unique_student_identifier: uniqueStudentIdentifier,
                     rolename: this.rolename,
-                    action: action
+                    action: action,
                 },
                 success: function(data) {
                     return authlistwidgetmemberaccess.member_response(data);
                 },
                 error: statusAjaxError(function() {
                     return typeof cb === 'function' ? cb(gettext("Error changing user's permissions.")) : undefined;
-                })
+                }),
             });
         };
 
@@ -270,16 +270,16 @@ such that the value can be defined later than this assignment (file load order).
             if (data.userDoesNotExist) {
                 msg = gettext("Could not find a user with username or email address '<%- identifier %>'.");
                 return this.show_errors(_.template(msg)({
-                    identifier: data.unique_student_identifier
+                    identifier: data.unique_student_identifier,
                 }));
             } else if (data.inactiveUser) {
                 msg = gettext("Error: User '<%- username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.");  // eslint-disable-line max-len
                 return this.show_errors(_.template(msg)({
-                    username: data.unique_student_identifier
+                    username: data.unique_student_identifier,
                 }));
             } else if (data.removingSelfAsInstructor) {
                 return this.show_errors(
-                    gettext('Error: You cannot remove yourself from the Instructor group!')
+                    gettext('Error: You cannot remove yourself from the Instructor group!'),
                 );
             } else {
                 return this.reload_list();
@@ -304,7 +304,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$browse_button.on('change', function(event) {
                 if (event.currentTarget.files.length === 1) {
                     return autoenrollviacsv.$browse_file.val(
-                        event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf('\\') + 1)
+                        event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf('\\') + 1),
                     );
                 }
                 return false;
@@ -328,7 +328,7 @@ such that the value can be defined later than this assignment (file load order).
                         success: function(responsedata) {
                             autoenrollviacsv.processing = false;
                             return autoenrollviacsv.display_response(responsedata);
-                        }
+                        },
                     });
                     return false;
                 });
@@ -384,22 +384,22 @@ such that the value can be defined later than this assignment (file load order).
                     }
                 }
                 return edx.HtmlUtils.append(displayResponse.$results,
-                    edx.HtmlUtils.HTML(displayResponse.render_notification_view(type, title, message, details))
+                    edx.HtmlUtils.HTML(displayResponse.render_notification_view(type, title, message, details)),
                 );
             };
             if (errors.length) {
                 renderResponse(gettext('Errors'),
-                    gettext('The following errors were generated:'), 'error', errors
+                    gettext('The following errors were generated:'), 'error', errors,
                 );
             }
             if (warnings.length) {
                 renderResponse(gettext('Warnings'),
-                    gettext('The following warnings were generated:'), 'warning', warnings
+                    gettext('The following warnings were generated:'), 'warning', warnings,
                 );
             }
             if (resultFromServerIsSuccess) {
                 return renderResponse(gettext('Success'),
-                    gettext('All accounts were created successfully.'), 'confirmation', []
+                    gettext('All accounts were created successfully.'), 'confirmation', [],
                 );
             }
             return renderResponse();
@@ -412,10 +412,10 @@ such that the value can be defined later than this assignment (file load order).
                 type: type,
                 title: title,
                 message: message,
-                details: details
+                details: details,
             });
             view = new NotificationView({
-                model: notificationModel
+                model: notificationModel,
             });
             view.render();
             return view.$el.html();
@@ -442,7 +442,7 @@ such that the value can be defined later than this assignment (file load order).
                     action: $(event.target).data('action'),
                     identifiers: betatest.$identifier_input.val(),
                     email_students: emailStudents,
-                    auto_enroll: autoEnroll
+                    auto_enroll: autoEnroll,
                 };
                 return $.ajax({
                     dataType: 'json',
@@ -454,7 +454,7 @@ such that the value can be defined later than this assignment (file load order).
                     },
                     error: statusAjaxError(function() {
                         return betatest.fail_with_error(gettext('Error adding/removing users as beta testers.'));
-                    })
+                    }),
                 });
             });
         }
@@ -495,17 +495,17 @@ such that the value can be defined later than this assignment (file load order).
             renderList = function(label, ids) {
                 var identifier, $idsList, $taskResSection, j, len1;
                 $taskResSection = $('<div/>', {
-                    class: 'request-res-section'
+                    class: 'request-res-section',
                 });
                 $taskResSection.append($('<h3/>', {
-                    text: label
+                    text: label,
                 }));
                 $idsList = $('<ul/>');
                 $taskResSection.append($idsList);
                 for (j = 0, len1 = ids.length; j < len1; j++) {
                     identifier = ids[j];
                     $idsList.append($('<li/>', {
-                        text: identifier
+                        text: identifier,
                     }));
                 }
                 return displayResponse.$task_response.append($taskResSection);
@@ -571,7 +571,7 @@ such that the value can be defined later than this assignment (file load order).
             }
             if (noUsers.length) {
                 noUsers.push($(
-                    gettext('Users must create and activate their account before they can be promoted to beta tester.'))
+                    gettext('Users must create and activate their account before they can be promoted to beta tester.')),
                 );
                 return renderList(gettext('Could not find users associated with the following identifiers:'), (function() { // eslint-disable-line max-len
                     var j, len1, results;
@@ -613,7 +613,7 @@ such that the value can be defined later than this assignment (file load order).
                     identifiers: batchEnroll.$identifier_input.val(),
                     auto_enroll: batchEnroll.$checkbox_autoenroll.is(':checked'),
                     email_students: emailStudents,
-                    reason: batchEnroll.$reason_field.val()
+                    reason: batchEnroll.$reason_field.val(),
                 };
                 return $.ajax({
                     dataType: 'json',
@@ -625,7 +625,7 @@ such that the value can be defined later than this assignment (file load order).
                     },
                     error: statusAjaxError(function() {
                         return batchEnroll.fail_with_error(gettext('Error enrolling/unenrolling users.'));
-                    })
+                    }),
                 });
             });
         }
@@ -687,17 +687,17 @@ such that the value can be defined later than this assignment (file load order).
             renderList = function(label, ids) {
                 var identifier, $idsList, $taskResSection, h, len3;
                 $taskResSection = $('<div/>', {
-                    class: 'request-res-section'
+                    class: 'request-res-section',
                 });
                 $taskResSection.append($('<h3/>', {
-                    text: label
+                    text: label,
                 }));
                 $idsList = $('<ul/>');
                 $taskResSection.append($idsList);
                 for (h = 0, len3 = ids.length; h < len3; h++) {
                     identifier = ids[h];
                     $idsList.append($('<li/>', {
-                        text: identifier
+                        text: identifier,
                     }));
                 }
                 return displayResponse.$task_response.append($taskResSection);
@@ -880,34 +880,34 @@ such that the value can be defined later than this assignment (file load order).
                 options = {
                     enableCellNavigation: true,
                     enableColumnReorder: false,
-                    forceFitColumns: true
+                    forceFitColumns: true,
                 };
                 WHICH_CELL_IS_REVOKE = 3;
                 columns = [
                     {
                         id: 'username',
                         field: 'username',
-                        name: 'Username'
+                        name: 'Username',
                     }, {
                         id: 'email',
                         field: 'email',
-                        name: 'Email'
+                        name: 'Email',
                     }, {
                         id: 'first_name',
                         field: 'first_name',
-                        name: 'First Name'
+                        name: 'First Name',
                     }, {
                         id: 'revoke',
                         field: 'revoke',
                         name: 'Revoke',
                         formatter: function() {
                             return "<span class='revoke-link'>Revoke Access</span>";
-                        }
-                    }
+                        },
+                    },
                 ];
                 tableData = data[ths.rolename];
                 $tablePlaceholder = $('<div/>', {
-                    class: 'slickgrid'
+                    class: 'slickgrid',
                 });
                 ths.$display_table.append($tablePlaceholder);
                 grid = new window.Slick.Grid($tablePlaceholder, tableData, columns, options);
@@ -927,12 +927,12 @@ such that the value can be defined later than this assignment (file load order).
                 type: 'POST',
                 url: this.$display_table.data('endpoint'),
                 data: {
-                    rolename: this.rolename
+                    rolename: this.rolename,
                 },
                 success: loadAuthList,
                 error: statusAjaxError(function() {
                     return ths.$request_response_error.text("Error fetching list for '" + ths.rolename + "'");
-                })
+                }),
             });
         };
 
@@ -950,14 +950,14 @@ such that the value can be defined later than this assignment (file load order).
                 data: {
                     email: email,
                     rolename: this.rolename,
-                    action: action
+                    action: action,
                 },
                 success: function(data) {
                     return typeof cb === 'function' ? cb(data) : undefined;
                 },
                 error: statusAjaxError(function() {
                     return ths.$request_response_error.text(gettext("Error changing user's permissions."));
-                })
+                }),
             });
         };
 
@@ -996,8 +996,8 @@ such that the value can be defined later than this assignment (file load order).
                     text: authList.$container.data('display-name'),
                     value: authList.rolename,
                     data: {
-                        auth_list: authList
-                    }
+                        auth_list: authList,
+                    },
                 }));
             }
             if (this.auth_lists.length === 0) {
@@ -1044,14 +1044,14 @@ such that the value can be defined later than this assignment (file load order).
     }());
 
     _.defaults(window, {
-        InstructorDashboard: {}
+        InstructorDashboard: {},
     });
 
     _.defaults(window.InstructorDashboard, {
-        sections: {}
+        sections: {},
     });
 
     _.defaults(window.InstructorDashboard.sections, {
-        Membership: Membership
+        Membership: Membership,
     });
 }).call(this);

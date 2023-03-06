@@ -175,7 +175,7 @@
                             }
                             console.warn(errmsg);
                             /* eslint-enable no-console */
-                        }
+                        },
                     });
                 } else {
                     /* eslint-disable no-console */
@@ -194,7 +194,7 @@
             /** How many seconds to wait after a POST fails to try again. */
             repostDelaySeconds: function() {
                 return 3.0;
-            }
+            },
         };
         return VideoCompletionHandler;
     });

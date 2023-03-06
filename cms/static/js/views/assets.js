@@ -14,7 +14,7 @@ define([
     'common/js/components/views/feedback_notification',
     'text!templates/asset-library.underscore',
     'jquery.fileupload-process',
-    'jquery.fileupload-validate'
+    'jquery.fileupload-validate',
 ],
 function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter,
     ModalUtils, ViewUtils, NotificationView, asset_library_template) {
@@ -27,7 +27,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
             'click .column-sort-link': 'onToggleColumn',
             'click .upload-button': 'showUploadModal',
             'click .filterable-column .nav-item': 'onFilterColumn',
-            'click .filterable-column .column-filter-link': 'toggleFilterColumn'
+            'click .filterable-column .column-filter-link': 'toggleFilterColumn',
         },
 
         typeData: ['Images', 'Documents'],
@@ -65,7 +65,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
                         function(asset) {
                             var view = new AssetView({model: asset});
                             tableBody.append(view.render().el);
-                        }
+                        },
                     );
                 }
                 self.$('.assets-library').toggle(hasAssets);
@@ -81,7 +81,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
                     // Create the table
                     HtmlUtils.setHtml(
                         this.$el,
-                        HtmlUtils.template(asset_library_template)({typeData: this.typeData})
+                        HtmlUtils.template(asset_library_template)({typeData: this.typeData}),
                     );
                     tableBody = this.$('#asset-table-body');
                     this.tableBody = tableBody;
@@ -99,13 +99,13 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
 
             onError: function() {
                 ViewUtils.hideLoadingIndicator();
-            }
+            },
         }),
 
         createPagingView: function() {
             var pagingView = new this.PagingAssetView({
                 el: this.$el,
-                collection: this.collection
+                collection: this.collection,
             });
             pagingView.registerSortableColumn('js-asset-name-col', gettext('Name'), 'display_name', 'asc');
             pagingView.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');
@@ -133,7 +133,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
             this.collection.fetch({reset: true}); // reload the collection to get a fresh page full of items
             analytics.track('Deleted Asset', {
                 course: course_location_analytics,
-                id: model.get('url')
+                id: model.get('url'),
             });
         },
 
@@ -146,7 +146,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
 
             analytics.track('Uploaded a File', {
                 course: course_location_analytics,
-                asset_url: model.get('url')
+                asset_url: model.get('url'),
             });
         },
 
@@ -208,17 +208,17 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
 
                     self.largeFileErrorMsg = new NotificationView.Error({
                         title: gettext('Your file could not be uploaded'),
-                        message: error
+                        message: error,
                     });
                     self.largeFileErrorMsg.show();
 
                     self.displayFailedUpload({
-                        msg: gettext('Max file size exceeded')
+                        msg: gettext('Max file size exceeded'),
                     });
                 },
                 processdone: function(event, data) {
                     self.largeFileErrorMsg = null;
-                }
+                },
             });
         },
 
@@ -352,7 +352,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
             $progressFill.text(resp.msg);
             $('.upload-modal .choose-file-button').text(gettext('Load Another File')).show();
             $progressFill.width('0%');
-        }
+        },
     });
 
     return AssetsView;

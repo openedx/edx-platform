@@ -10,13 +10,13 @@
         'text!templates/fields/field_link.underscore',
         'text!templates/fields/field_text.underscore',
         'text!templates/fields/field_textarea.underscore',
-        'backbone-super'
+        'backbone-super',
     ], function(gettext, $, _, Backbone, HtmlUtils, DateUtils,
         fieldReadOnlyTemplate,
         fieldDropDownTemplate,
         fieldLinkTemplate,
         fieldTextTemplate,
-        fieldTextAreaTemplate
+        fieldTextAreaTemplate,
     ) {
         var messageRevertDelay = 6000;
         var FieldViews = {};
@@ -35,33 +35,33 @@
                 canEdit: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Editable'),
-                    HtmlUtils.HTML('</span>')
+                    HtmlUtils.HTML('</span>'),
                 ),
                 error: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Error'),
-                    HtmlUtils.HTML('</span>')
+                    HtmlUtils.HTML('</span>'),
                 ),
                 validationError: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Validation Error'),
-                    HtmlUtils.HTML('</span>')
+                    HtmlUtils.HTML('</span>'),
                 ),
                 inProgress: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('In Progress'),
-                    HtmlUtils.HTML('</span>')
+                    HtmlUtils.HTML('</span>'),
                 ),
                 success: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Success'),
-                    HtmlUtils.HTML('</span>')
+                    HtmlUtils.HTML('</span>'),
                 ),
                 plus: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-plus placeholder" aria-hidden="true"></span><span class="sr">'),
                     gettext('Placeholder'),
-                    HtmlUtils.HTML('</span>')
-                )
+                    HtmlUtils.HTML('</span>'),
+                ),
             },
 
             messages: {
@@ -69,7 +69,7 @@
                 error: gettext('An error occurred. Please try again.'),
                 validationError: '',
                 inProgress: gettext('Saving'),
-                success: gettext('Your changes have been saved.')
+                success: gettext('Your changes have been saved.'),
             },
 
             constructor: function(options) {
@@ -85,7 +85,7 @@
 
                 _.bindAll(this, 'modelValue', 'modelValueIsSet', 'showNotificationMessage', 'getNotificationMessage',
                     'getMessage', 'title', 'showHelpMessage', 'showInProgressMessage', 'showSuccessMessage',
-                    'showErrorMessage'
+                    'showErrorMessage',
                 );
             },
 
@@ -184,7 +184,7 @@
                 } else {
                     this.showNotificationMessage(this.getMessage('error'));
                 }
-            }
+            },
         });
 
         FieldViews.EditableFieldView = FieldViews.FieldView.extend({
@@ -192,7 +192,7 @@
             initialize: function(options) {
                 this.persistChanges = _.isUndefined(options.persistChanges) ? false : options.persistChanges;
                 _.bindAll(this, 'saveAttributes', 'saveSucceeded', 'showDisplayMode', 'showEditMode',
-                    'startEditing', 'finishEditing'
+                    'startEditing', 'finishEditing',
                 );
                 this._super(options);
 
@@ -217,7 +217,7 @@
                     },
                     error: function(model, xhr) {
                         view.showErrorMessage(xhr);
-                    }
+                    },
                 };
                 if (this.persistChanges === true) {
                     this.showInProgressMessage();
@@ -286,7 +286,7 @@
 
             unhighlightField: function() {
                 this.$el.removeClass('error');
-            }
+            },
         });
 
         FieldViews.ReadonlyFieldView = FieldViews.FieldView.extend({
@@ -307,7 +307,7 @@
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     value: this.modelValue(),
-                    message: this.helpMessage
+                    message: this.helpMessage,
                 }));
                 this.delegateEvents();
                 return this;
@@ -319,7 +319,7 @@
 
             updateValueInField: function() {
                 this.$('.u-field-value ').text(this.modelValue());
-            }
+            },
         });
 
         FieldViews.DateFieldView = FieldViews.ReadonlyFieldView.extend({
@@ -332,7 +332,7 @@
                     datetime: new Date(this.modelValue()),
                     language: this.options.userLanguage,
                     timezone: this.options.userTimezone,
-                    format: this.options.dateFormat
+                    format: this.options.dateFormat,
                 };
                 return DateUtils.localize(context);
             },
@@ -343,7 +343,7 @@
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     value: this.timezoneFormattedDate(),
-                    message: this.helpMessage
+                    message: this.helpMessage,
                 }));
                 this.delegateEvents();
                 return this;
@@ -351,7 +351,7 @@
 
             updateValueInField: function() {
                 this.$('.u-field-value ').text(this.timezoneFormattedDate());
-            }
+            },
         });
 
         FieldViews.TextFieldView = FieldViews.EditableFieldView.extend({
@@ -361,7 +361,7 @@
             fieldTemplate: fieldTextTemplate,
 
             events: {
-                'change input': 'saveValue'
+                'change input': 'saveValue',
             },
 
             initialize: function(options) {
@@ -376,7 +376,7 @@
                     title: this.options.title,
                     value: this.modelValue(),
                     message: this.helpMessage,
-                    placeholder: this.options.placeholder || ''
+                    placeholder: this.options.placeholder || '',
                 }));
                 this.delegateEvents();
                 return this;
@@ -400,7 +400,7 @@
                 var attributes = {};
                 attributes[this.options.valueAttribute] = this.fieldValue();
                 this.saveAttributes(attributes);
-            }
+            },
         });
 
         FieldViews.DropdownFieldView = FieldViews.EditableFieldView.extend({
@@ -411,7 +411,7 @@
 
             events: {
                 click: 'startEditing',
-                'change select': 'finishEditing'
+                'change select': 'finishEditing',
             },
 
             initialize: function(options) {
@@ -433,7 +433,7 @@
                     iconName: this.options.iconName,
                     showBlankOption: (!this.options.required || !this.modelValueIsSet()),
                     groupOptions: this.createGroupOptions(),
-                    message: this.helpMessage
+                    message: this.helpMessage,
                 }));
                 this.delegateEvents();
                 this.updateValueInField();
@@ -554,9 +554,9 @@
                 return !(_.isUndefined(this.options.groupOptions)) ? this.options.groupOptions :
                     [{
                         groupTitle: null,
-                        selectOptions: this.options.options
+                        selectOptions: this.options.options,
                     }];
-            }
+            },
         });
 
         FieldViews.TextareaFieldView = FieldViews.EditableFieldView.extend({
@@ -574,7 +574,7 @@
                 'keyup textarea': 'manageTextareaContentChange',
                 'keydown textarea': 'onKeyDown',
                 'paste textarea': 'manageTextareaContentChange',
-                'cut textarea': 'manageTextareaContentChange'
+                'cut textarea': 'manageTextareaContentChange',
             },
 
             initialize: function(options) {
@@ -598,7 +598,7 @@
                     message: this.helpMessage,
                     messagePosition: this.options.messagePosition || 'footer',
                     placeholderValue: this.options.placeholderValue,
-                    maxCharacters: this.options.maxCharacters || ''
+                    maxCharacters: this.options.maxCharacters || '',
                 }));
                 this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ?
@@ -630,14 +630,14 @@
                     if (remainingCharCount < 20) {
                         $charCount.attr({
                             'aria-live': 'assertive',
-                            'aria-atomic': true
+                            'aria-atomic': true,
                         });
                     } else if (remainingCharCount < 60) {
                         $charCount.attr('aria-atomic', 'false');
                     } else if (remainingCharCount < 70) {
                         $charCount.attr({
                             'aria-live': 'polite',
-                            'aria-atomic': true
+                            'aria-atomic': true,
                         });
                     }
                     $charCount.text(curCharCount);
@@ -696,7 +696,7 @@
                     this.showDisplayMode(true);
                     this.$('a').focus();
                 }
-            }
+            },
         });
 
         FieldViews.LinkFieldView = FieldViews.FieldView.extend({
@@ -706,7 +706,7 @@
             fieldTemplate: fieldLinkTemplate,
 
             events: {
-                'click a': 'linkClicked'
+                'click a': 'linkClicked',
             },
 
             initialize: function(options) {
@@ -721,7 +721,7 @@
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     linkTitle: this.options.linkTitle,
                     linkHref: this.options.linkHref,
-                    message: this.helpMessage
+                    message: this.helpMessage,
                 }));
                 this.delegateEvents();
                 return this;
@@ -729,7 +729,7 @@
 
             linkClicked: function(event) {
                 event.preventDefault();
-            }
+            },
         });
 
         return FieldViews;

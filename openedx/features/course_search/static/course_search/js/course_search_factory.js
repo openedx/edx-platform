@@ -3,7 +3,7 @@
 
     define([
         'underscore', 'backbone', 'course_search/js/search_router', 'course_search/js/views/search_form',
-        'course_search/js/collections/search_collection', 'course_search/js/views/course_search_results_view'
+        'course_search/js/collections/search_collection', 'course_search/js/views/course_search_results_view',
     ],
     function(_, Backbone, SearchRouter, CourseSearchForm, SearchCollection, CourseSearchResultsView) {
         return function(options) {
@@ -13,7 +13,7 @@
             var router = new SearchRouter();
             var form = new CourseSearchForm({
                 el: options.searchHeader,
-                supportsActive: supportsActive
+                supportsActive: supportsActive,
             });
             var collection = new SearchCollection([], {courseId: courseId});
             var results = new CourseSearchResultsView({collection: collection});
@@ -56,6 +56,6 @@
                 router.trigger('search', requestedQuery);
             }
         };
-    }
+    },
     );
 }).call(this, define || RequireJS.define);

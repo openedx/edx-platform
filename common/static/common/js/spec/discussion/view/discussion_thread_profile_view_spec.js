@@ -13,16 +13,16 @@
                 abuse_flaggers: [],
                 commentable_id: 'dummy_discussion',
                 votes: {
-                    up_count: '42'
+                    up_count: '42',
                 },
-                created_at: '2014-09-09T20:11:08Z'
+                created_at: '2014-09-09T20:11:08Z',
             };
             this.imageTag = '<img src="https://www.google.com.pk/images/srpr/logo11w.png">';
         });
         makeView = function(thread) {
             var view;
             view = new DiscussionThreadProfileView({
-                model: thread
+                model: thread,
             });
             spyConvertMath(view);
             return view;
@@ -132,7 +132,7 @@
                         // eslint-disable no-loop-func
                         function() {
                             return checkPostWithImages(numImages, truncatedText, this.threadData, this.imageTag);
-                        }
+                        },
                         // eslint-enable no-loop-func
                     );
                 }

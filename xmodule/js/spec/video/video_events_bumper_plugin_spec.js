@@ -35,7 +35,7 @@
                 host_component_id: 'id',
                 bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
-                duration: 20
+                duration: 20,
             });
         });
 
@@ -46,7 +46,7 @@
                 bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20
+                duration: 20,
             });
         });
 
@@ -57,7 +57,7 @@
                 bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20
+                duration: 20,
             });
 
             Logger.log.calls.reset();
@@ -67,7 +67,7 @@
                 bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20
+                duration: 20,
             });
         });
 
@@ -78,7 +78,7 @@
                 bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20
+                duration: 20,
             });
         });
 
@@ -89,7 +89,7 @@
                 bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20
+                duration: 20,
             });
         });
 
@@ -99,7 +99,7 @@
                 host_component_id: 'id',
                 bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
-                duration: 20
+                duration: 20,
             });
         });
 
@@ -109,7 +109,7 @@
                 host_component_id: 'id',
                 bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
-                duration: 20
+                duration: 20,
             });
         });
 
@@ -120,7 +120,7 @@
                 bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20
+                duration: 20,
             });
         });
 
@@ -131,7 +131,7 @@
                 bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
-                duration: 20
+                duration: 20,
             });
         });
 
@@ -149,7 +149,7 @@
                 'language_menu:hide': plugin.onHideLanguageMenu,
                 'captions:show': plugin.onShowCaptions,
                 'captions:hide': plugin.onHideCaptions,
-                destroy: plugin.destroy
+                destroy: plugin.destroy,
             });
         });
     });

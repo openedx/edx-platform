@@ -7,7 +7,7 @@
             this.createTopicView = function(options) {
                 options = _.extend({
                     course_settings: this.course_settings,
-                    topicId: void 0
+                    topicId: void 0,
                 }, options);
                 this.view = new DiscussionTopicMenuView(options);
                 this.view.render().appendTo('#fixture-element');
@@ -25,58 +25,58 @@
                                 ['Numerical Input', 'entry'],
                                 ['Very long category name', 'entry'],
                                 ['Very very very very long category name', 'entry'],
-                                ['Name with <em>HTML</em>', 'entry']
+                                ['Name with <em>HTML</em>', 'entry'],
                             ],
                             entries: {
                                 'Selection From Options': {
                                     sort_key: null,
                                     is_divided: true,
-                                    id: 'cba3e4cd91d0466b9ac50926e495b76f'
+                                    id: 'cba3e4cd91d0466b9ac50926e495b76f',
                                 },
                                 'Numerical Input': {
                                     sort_key: null,
                                     is_divided: false,
-                                    id: 'c49f0dfb8fc94c9c8d9999cc95190c56'
+                                    id: 'c49f0dfb8fc94c9c8d9999cc95190c56',
                                 },
                                 'Very long category name': {
                                     sort_key: null,
                                     is_divided: false,
-                                    id: 'c49f0dfb8fc94c9c8d9999cc95190c59'
+                                    id: 'c49f0dfb8fc94c9c8d9999cc95190c59',
                                 },
                                 'Very very very very long category name': {
                                     sort_key: null,
                                     is_divided: false,
-                                    id: 'c49f0dfb8fc94c9c8d9999cc95190e32'
+                                    id: 'c49f0dfb8fc94c9c8d9999cc95190e32',
                                 },
                                 'Name with <em>HTML</em>': {
                                     sort_key: null,
                                     is_divided: false,
-                                    id: 'c49f0dfb8fc94c9c8d9999cc95190363'
-                                }
+                                    id: 'c49f0dfb8fc94c9c8d9999cc95190363',
+                                },
 
-                            }
+                            },
                         },
                         'Example Inline Discussion': {
                             subcategories: {},
                             children: [
-                                ['What Are Your Goals for Creating a MOOC?', 'entry']
+                                ['What Are Your Goals for Creating a MOOC?', 'entry'],
                             ],
                             entries: {
                                 'What Are Your Goals for Creating a MOOC?': {
                                     sort_key: null,
                                     is_divided: true,
-                                    id: 'cba3e4cd91d0466b9ac50926e495b931'
-                                }
-                            }
-                        }
+                                    id: 'cba3e4cd91d0466b9ac50926e495b931',
+                                },
+                            },
+                        },
                     },
                     children: [
                         ['Basic Question Types', 'subcategory'],
-                        ['Example Inline Discussion', 'subcategory']
+                        ['Example Inline Discussion', 'subcategory'],
                     ],
-                    entries: {}
+                    entries: {},
                 },
-                is_cohorted: true
+                is_cohorted: true,
             });
         });
 
@@ -93,7 +93,7 @@
 
         it('appropriate topic is selected if topicId is passed', function() {
             this.createTopicView({
-                topicId: 'c49f0dfb8fc94c9c8d9999cc95190c56'
+                topicId: 'c49f0dfb8fc94c9c8d9999cc95190c56',
             });
             this.view.render();
             expect(this.view.$el.find('option.topic-title:selected').text()).toEqual('Numerical Input');

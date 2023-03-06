@@ -5,14 +5,14 @@ function($, _, gettext, BaseModal, HtmlUtils) {
     var UploadDialog = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
             'change input[type=file]': 'selectFile',
-            'click .action-upload': 'upload'
+            'click .action-upload': 'upload',
         }),
 
         options: $.extend({}, BaseModal.prototype.options, {
             modalName: 'assetupload',
             modalSize: 'med',
             successMessageTimeout: 2000, // 2 seconds
-            viewSpecificClasses: 'confirm'
+            viewSpecificClasses: 'confirm',
         }),
 
         initialize: function(options) {
@@ -61,14 +61,14 @@ function($, _, gettext, BaseModal, HtmlUtils) {
                 uploadedBytes: this.model.get('uploadedBytes'),
                 totalBytes: this.model.get('totalBytes'),
                 finished: this.model.get('finished'),
-                error: this.model.validationError
+                error: this.model.validationError,
             });
         },
 
         selectFile: function(e) {
             var selectedFile = e.target.files[0] || null;
             this.model.set({
-                selectedFile: selectedFile
+                selectedFile: selectedFile,
             });
             // This change event triggering necessary for FireFox, because the browser don't
             // consider change of File object (file input field) as a change in model.
@@ -89,21 +89,21 @@ function($, _, gettext, BaseModal, HtmlUtils) {
                 success: _.bind(this.success, this),
                 error: _.bind(this.error, this),
                 uploadProgress: _.bind(this.progress, this),
-                data: uploadAjaxData
+                data: uploadAjaxData,
             });
         },
 
         progress: function(event, position, total) {
             this.model.set({
                 uploadedBytes: position,
-                totalBytes: total
+                totalBytes: total,
             });
         },
 
         success: function(response, statusText, xhr, form) {
             this.model.set({
                 uploading: false,
-                finished: true
+                finished: true,
             });
             if (this.options.onSuccess) {
                 this.options.onSuccess(response, statusText, xhr, form);
@@ -118,9 +118,9 @@ function($, _, gettext, BaseModal, HtmlUtils) {
             this.model.set({
                 uploading: false,
                 uploadedBytes: 0,
-                title: gettext("We're sorry, there was an error")
+                title: gettext("We're sorry, there was an error"),
             });
-        }
+        },
     });
     return UploadDialog;
 }); // end define()

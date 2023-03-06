@@ -20,7 +20,7 @@ define(
                         videoTranscriptSettings: options.videoTranscriptSettings,
                         model: model,
                         transcriptAvailableLanguages: options.transcriptAvailableLanguages,
-                        videoSupportedFileFormats: options.videoSupportedFileFormats
+                        videoSupportedFileFormats: options.videoSupportedFileFormats,
                     });
                 });
             },
@@ -33,8 +33,8 @@ define(
                     this.$el,
                     this.template({
                         encodingsDownloadUrl: this.encodingsDownloadUrl,
-                        videoImageUploadEnabled: this.videoImageUploadEnabled
-                    })
+                        videoImageUploadEnabled: this.videoImageUploadEnabled,
+                    }),
                 );
 
                 $tabBody = $el.find('.js-table-body');
@@ -42,9 +42,9 @@ define(
                     $tabBody.append(view.render().$el);
                 });
                 return this;
-            }
+            },
         });
 
         return PreviousVideoUploadListView;
-    }
+    },
 );

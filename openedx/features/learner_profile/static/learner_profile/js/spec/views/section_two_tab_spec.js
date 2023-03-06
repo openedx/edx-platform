@@ -5,7 +5,7 @@ define(
         'js/spec/student_account/helpers',
         'learner_profile/js/views/section_two_tab',
         'js/views/fields',
-        'js/student_account/models/user_account_model'
+        'js/student_account/models/user_account_model',
     ],
     function(Backbone, $, _, Helpers, SectionTwoTabView, FieldViews, UserAccountModel) {
         'use strict';
@@ -29,8 +29,8 @@ define(
                             "what your interests are, why you're taking courses on edX, or what you hope to learn.",
                         valueAttribute: 'bio',
                         helpMessage: '',
-                        messagePosition: 'header'
-                    })
+                        messagePosition: 'header',
+                    }),
                 ];
 
                 return new SectionTwoTabView({
@@ -38,7 +38,7 @@ define(
                     showFullProfile: function() {
                         return profileIsPublic;
                     },
-                    ownProfile: ownProfile
+                    ownProfile: ownProfile,
                 });
             };
 
@@ -109,5 +109,5 @@ define(
                 expect(bio.editable).toBe('toggle');
             });
         });
-    }
+    },
 );

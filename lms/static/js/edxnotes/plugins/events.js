@@ -1,7 +1,7 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'underscore', 'annotator_1.2.9'
+        'underscore', 'annotator_1.2.9',
     ], function(_, Annotator) {
     /**
      * Modifies Annotator.Plugin.Store.annotationCreated to make it trigger a new
@@ -16,7 +16,7 @@
                     }
                 }, this));
             },
-            Annotator.Plugin.Store.prototype.annotationCreated
+            Annotator.Plugin.Store.prototype.annotationCreated,
         );
 
         /**
@@ -41,7 +41,7 @@
             pluginInit: function() {
                 _.bindAll(this,
                     'annotationViewerShown', 'annotationFullyCreated', 'annotationEditorShown',
-                    'annotationEditorHidden', 'annotationUpdated', 'annotationDeleted'
+                    'annotationEditorHidden', 'annotationUpdated', 'annotationDeleted',
                 );
 
                 this.annotator
@@ -71,7 +71,7 @@
                 data = {
                     notes: _.map(annotations, function(annotation) {
                         return {note_id: annotation.id};
-                    })
+                    }),
                 };
                 if (data.notes.length) {
                     this.log('edx.course.student_notes.viewed', data);
@@ -100,7 +100,7 @@
                     data = _.extend(
                         defaultData,
                         this.getText('old_note_text', this.oldNoteText, defaultData.truncated),
-                        this.getTextArray('old_tags', this.oldTags, defaultData.truncated)
+                        this.getTextArray('old_tags', this.oldTags, defaultData.truncated),
                     );
                     this.log('edx.course.student_notes.edited', data);
                 }
@@ -122,11 +122,11 @@
                     {
                         note_id: annotation.id,
                         component_usage_id: annotation.usage_id,
-                        truncated: truncated
+                        truncated: truncated,
                     },
                     this.getText('note_text', annotation.text, truncated),
                     this.getText('highlighted_content', annotation.quote, truncated),
-                    this.getTextArray('tags', annotation.tags, truncated)
+                    this.getTextArray('tags', annotation.tags, truncated),
                 );
             },
 
@@ -179,7 +179,7 @@
 
             log: function(eventName, data) {
                 this.annotator.logger.emit(eventName, data);
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

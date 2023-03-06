@@ -3,7 +3,7 @@
  * It is expected to be backed by a GroupConfiguration collection.
  */
 define([
-    'js/views/list', 'js/views/group_configuration_item', 'gettext'
+    'js/views/list', 'js/views/group_configuration_item', 'gettext',
 ], function(ListView, GroupConfigurationItemView, gettext) {
     'use strict';
 
@@ -23,7 +23,7 @@ define([
 
         createItemView: function(options) {
             return new GroupConfigurationItemView(options);
-        }
+        },
     });
 
     return GroupConfigurationsListView;

@@ -95,7 +95,7 @@
                 initialize(html);
 
                 event = jQuery.Event('click', {
-                    target: $el.find('.full').get(0)
+                    target: $el.find('.full').get(0),
                 });
 
                 Collapsible.toggleFull(event, 'See full output', 'Hide output');
@@ -111,7 +111,7 @@
                 initialize(html_custom);
 
                 event = jQuery.Event('click', {
-                    target: $el.find('.full-custom').get(0)
+                    target: $el.find('.full-custom').get(0),
                 });
 
                 Collapsible.toggleFull(event, 'Show shortform-custom', 'Hide shortform-custom');

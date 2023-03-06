@@ -40,7 +40,7 @@
                 var context = _.extend({
                     cid: this.model.cid,
                     author_display: this.getAuthorDisplay(),
-                    readOnly: $('.discussion-module').data('read-only')
+                    readOnly: $('.discussion-module').data('read-only'),
                 }, this.model.attributes);
 
                 edx.HtmlUtils.setHtml(this.$el, template(context));
@@ -60,12 +60,12 @@
                         edx.HtmlUtils.HTML("<a href='#comment_{parent_id}'>@{name}</a>:  "),
                         {
                             parent_id: this.model.parent.id,
-                            name: name
-                        }
+                            name: name,
+                        },
                     );
                     return edx.HtmlUtils.prepend(
                         this.$('.response-body p:first'),
-                        html
+                        html,
                     );
                 }
             };

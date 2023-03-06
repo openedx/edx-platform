@@ -9,7 +9,7 @@ var edx = edx || {};
     edx.instructor_dashboard.ecommerce.ExpiryCouponView = Backbone.View.extend({
         el: 'li#add-coupon-modal-field-expiry',
         events: {
-            'click input[type="checkbox"]': 'clicked'
+            'click input[type="checkbox"]': 'clicked',
         },
         initialize: function() {
             $('li#add-coupon-modal-field-expiry input[name="expiration_date"]').hide();
@@ -28,7 +28,7 @@ var edx = edx || {};
         },
         hide: function($el) {
             $el.css('display', 'none');
-        }
+        },
     });
 
     $(function() {
@@ -38,7 +38,7 @@ var edx = edx || {};
             $registration_code_status_form_success = $('#regcode_status_form_success', $registration_code_status_form);
 
         $('#coupon_expiration_date').datepicker({
-            minDate: 0
+            minDate: 0,
         });
         var view = new edx.instructor_dashboard.ecommerce.ExpiryCouponView();
         $('input[name="user-enrollment-report"]').click(function() {
@@ -50,15 +50,15 @@ var edx = edx || {};
                 success: function(data) {
                     $('#enrollment-report-request-response').text(data.status);
                     return $('#enrollment-report-request-response').css({
-                        display: 'block'
+                        display: 'block',
                     });
                 },
                 error: function(std_ajax_err) {
                     $('#enrollment-report-request-response-error').text(gettext('There was a problem creating the report. Select "Create Executive Summary" to try again.'));
                     return $('#enrollment-report-request-response-error').css({
-                        display: 'block'
+                        display: 'block',
                     });
-                }
+                },
             });
         });
         $('input[name="exec-summary-report"]').click(function() {
@@ -70,15 +70,15 @@ var edx = edx || {};
                 success: function(data) {
                     $('#exec-summary-report-request-response').text(data.status);
                     return $('#exec-summary-report-request-response').css({
-                        display: 'block'
+                        display: 'block',
                     });
                 },
                 error: function(std_ajax_err) {
                     $('#exec-summary-report-request-response-error').text(gettext('There was a problem creating the report. Select "Create Executive Summary" to try again.'));
                     return $('#exec-summary-report-request-response-error').css({
-                        display: 'block'
+                        display: 'block',
                     });
-                }
+                },
             });
         });
         $lookup_button.click(function() {
@@ -95,7 +95,7 @@ var edx = edx || {};
             $.ajax({
                 type: 'GET',
                 data: {
-                    registration_code: lookup_registration_code
+                    registration_code: lookup_registration_code,
                 },
                 url: url,
                 success: function(data) {
@@ -117,8 +117,8 @@ var edx = edx || {};
                                     action_url: data.registration_code_detail_url,
                                     action_name: gettext('Cancel enrollment code'),
                                     registration_code: lookup_registration_code,
-                                    action_type: 'invalidate_registration_code'
-                                }
+                                    action_type: 'invalidate_registration_code',
+                                },
                             );
                         } else {
                             actions.push(
@@ -126,8 +126,8 @@ var edx = edx || {};
                                     action_url: data.registration_code_detail_url,
                                     action_name: gettext('Restore enrollment code'),
                                     registration_code: lookup_registration_code,
-                                    action_type: 'validate_registration_code'
-                                }
+                                    action_type: 'validate_registration_code',
+                                },
                             );
                         }
                         if (is_registration_code_redeemed == true) {
@@ -136,8 +136,8 @@ var edx = edx || {};
                                     action_url: data.registration_code_detail_url,
                                     action_name: gettext('Mark enrollment code as unused'),
                                     registration_code: lookup_registration_code,
-                                    action_type: 'unredeem_registration_code'
-                                }
+                                    action_type: 'unredeem_registration_code',
+                                },
                             );
                         }
                         is_registration_code_redeemed = is_registration_code_redeemed ? 'Yes' : 'No';
@@ -149,8 +149,8 @@ var edx = edx || {};
                                 lookup_registration_code: lookup_registration_code,
                                 is_registration_code_redeemed: is_registration_code_redeemed,
                                 is_registration_code_valid: is_registration_code_valid,
-                                actions: actions
-                            }
+                                actions: actions,
+                            },
                         );
 
                         // before insertAfter do this.
@@ -165,7 +165,7 @@ var edx = edx || {};
                     $lookup_button.removeAttr('disabled');
                     $registration_code_status_form_error.text(gettext(data.message));
                     $registration_code_status_form_error.show();
-                }
+                },
             });
         });
         $('section#invalidate_registration_code_modal').on('click', 'a.registration_code_action_link', function(event) {
@@ -179,7 +179,7 @@ var edx = edx || {};
                 type: 'POST',
                 data: {
                     registration_code: registration_code,
-                    action_type: action_type
+                    action_type: action_type,
                 },
                 url: url,
                 success: function(data) {
@@ -197,7 +197,7 @@ var edx = edx || {};
                     $lookup_button.removeAttr('disabled');
                     $registration_code_status_form_error.show();
                     $registration_code_status_form_error.text(gettext(data.message));
-                }
+                },
             });
         });
     });

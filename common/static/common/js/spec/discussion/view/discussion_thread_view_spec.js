@@ -33,7 +33,7 @@
                 params.success(createAjaxResponseJson(content, false), 'success');
                 return {
                     always: function() {
-                    }
+                    },
                 };
             });
             view.render();
@@ -50,7 +50,7 @@
                         _results.push(createTestResponseJson(index));
                     }
                     return _results;
-                }()) : []
+                }()) : [],
             }, options));
         };
         createTestResponseJson = function(index) {
@@ -58,7 +58,7 @@
                 user_id: window.user.id,
                 body: 'Response ' + index,
                 id: 'id_' + index,
-                created_at: '2015-01-01T22:20:28Z'
+                created_at: '2015-01-01T22:20:28Z',
             };
         };
         assertContentVisible = function(view, selector, visible) {
@@ -96,9 +96,9 @@
                         editable: can_act,
                         can_delete: can_act,
                         can_reply: can_act,
-                        can_vote: can_act
-                    }
-                }
+                        can_vote: can_act,
+                    },
+                },
             };
         };
         postResponse = function(view, index) {
@@ -112,7 +112,7 @@
                 params.success(createAjaxResponseJson(testResponseJson, true), 'success');
                 return {
                     always: function() {
-                    }
+                    },
                 };
             });
             return view.$('.discussion-submit-post').click();
@@ -122,14 +122,14 @@
             createDiscussionThreadView = function(originallyClosed) {
                 var discussion, thread, threadData, view;
                 threadData = DiscussionViewSpecHelper.makeThreadWithProps({
-                    closed: originallyClosed
+                    closed: originallyClosed,
                 });
                 thread = new Thread(threadData);
                 discussion = new Discussion(thread);
                 view = new DiscussionThreadView({
                     model: thread,
                     el: $('#fixture-element'),
-                    course_settings: DiscussionSpecHelper.createTestCourseSettings()
+                    course_settings: DiscussionSpecHelper.createTestCourseSettings(),
                 });
                 renderWithTestResponses(view, 1);
                 spyOn(DiscussionUtil, 'updateWithUndo').and.callFake(function(model, updates) {
@@ -158,21 +158,21 @@
             return function() {
                 it(
                     'Test that when a closed thread is opened the comment form is displayed',
-                    function() { return checkCommentForm(true); }
+                    function() { return checkCommentForm(true); },
                 );
                 it(
                     'Test that  when a open thread is closed the comment form is hidden',
-                    function() { return checkCommentForm(false); }
+                    function() { return checkCommentForm(false); },
                 );
                 it(
                     'Test that  when a closed thread is opened the vote button is displayed and ' +
                     'vote count is hidden',
-                    function() { return checkVoteDisplay(true); }
+                    function() { return checkVoteDisplay(true); },
                 );
                 it(
                     'Test that  when a open thread is closed the vote button is hidden and ' +
                     'vote count is displayed',
-                    function() { return checkVoteDisplay(false); }
+                    function() { return checkVoteDisplay(false); },
                 );
             };
         });
@@ -181,7 +181,7 @@
                 this.view = new DiscussionThreadView({
                     model: this.thread,
                     el: $('#fixture-element'),
-                    course_settings: DiscussionSpecHelper.createTestCourseSettings()
+                    course_settings: DiscussionSpecHelper.createTestCourseSettings(),
                 });
                 spyOn($.fn, 'focus');
             });
@@ -217,59 +217,59 @@
                 it('correctly render for a thread with one response', function() {
                     renderWithTestResponses(this.view, 1);
                     return assertResponseCountAndPaginationCorrect(
-                        this.view, '1 response', 'Showing all responses', null
+                        this.view, '1 response', 'Showing all responses', null,
                     );
                 });
                 it('correctly render for a thread with one additional page', function() {
                     renderWithTestResponses(this.view, 1, {
-                        resp_total: 2
+                        resp_total: 2,
                     });
                     return assertResponseCountAndPaginationCorrect(
-                        this.view, '2 responses', 'Showing first response', 'Load all responses'
+                        this.view, '2 responses', 'Showing first response', 'Load all responses',
                     );
                 });
                 it('correctly render for a thread with multiple additional pages', function() {
                     renderWithTestResponses(this.view, 2, {
-                        resp_total: 111
+                        resp_total: 111,
                     });
                     return assertResponseCountAndPaginationCorrect(
-                        this.view, '111 responses', 'Showing first 2 responses', 'Load next 100 responses'
+                        this.view, '111 responses', 'Showing first 2 responses', 'Load next 100 responses',
                     );
                 });
                 describe('on clicking the load more button', function() {
                     beforeEach(function() {
                         renderWithTestResponses(this.view, 1, {
-                            resp_total: 5
+                            resp_total: 5,
                         });
                         return assertResponseCountAndPaginationCorrect(
-                            this.view, '5 responses', 'Showing first response', 'Load all responses'
+                            this.view, '5 responses', 'Showing first response', 'Load all responses',
                         );
                     });
                     it('correctly re-render when all threads have loaded', function() {
                         renderWithTestResponses(this.view, 5, {
-                            resp_total: 5
+                            resp_total: 5,
                         });
                         this.view.$el.find('.load-response-button').click();
                         return assertResponseCountAndPaginationCorrect(
-                            this.view, '5 responses', 'Showing all responses', null
+                            this.view, '5 responses', 'Showing all responses', null,
                         );
                     });
                     it('correctly re-render when one page remains', function() {
                         renderWithTestResponses(this.view, 3, {
-                            resp_total: 42
+                            resp_total: 42,
                         });
                         this.view.$el.find('.load-response-button').click();
                         return assertResponseCountAndPaginationCorrect(
-                            this.view, '42 responses', 'Showing first 3 responses', 'Load all responses'
+                            this.view, '42 responses', 'Showing first 3 responses', 'Load all responses',
                         );
                     });
                     it('correctly re-render when multiple pages remain', function() {
                         renderWithTestResponses(this.view, 3, {
-                            resp_total: 111
+                            resp_total: 111,
                         });
                         this.view.$el.find('.load-response-button').click();
                         return assertResponseCountAndPaginationCorrect(
-                            this.view, '111 responses', 'Showing first 3 responses', 'Load next 100 responses'
+                            this.view, '111 responses', 'Showing first 3 responses', 'Load next 100 responses',
                         );
                     });
                 });
@@ -282,7 +282,7 @@
                 this.view = new DiscussionThreadView({
                     model: this.thread,
                     el: $('#fixture-element'),
-                    course_settings: DiscussionSpecHelper.createTestCourseSettings()
+                    course_settings: DiscussionSpecHelper.createTestCourseSettings(),
                 });
             });
             generateContent = function(idStart, idEnd) {
@@ -294,30 +294,30 @@
                 renderWithContent(view, {
                     endorsed_responses: generateContent(0, numEndorsed),
                     non_endorsed_responses: generateContent(numEndorsed, numEndorsed + numNonEndorsed),
-                    non_endorsed_resp_total: numNonEndorsed
+                    non_endorsed_resp_total: numNonEndorsed,
                 });
                 expect(view.$('.js-marked-answer-list .discussion-response').length).toEqual(numEndorsed);
                 expect(view.$('.js-response-list .discussion-response').length).toEqual(numNonEndorsed);
                 return assertResponseCountAndPaginationCorrect(
                     view, '' + numNonEndorsed + ' ' + (numEndorsed ? 'other ' : '') +
                     (numNonEndorsed === 1 ? 'response' : 'responses'),
-                    numNonEndorsed ? 'Showing all responses' : null, null
+                    numNonEndorsed ? 'Showing all responses' : null, null,
                 );
             };
             _.each({
                 no: 0,
                 one: 1,
-                many: 5
+                many: 5,
             }, function(numEndorsed, endorsedDesc) {
                 return _.each({
                     no: 0,
                     one: 1,
-                    many: 5
+                    many: 5,
                 }, function(numNonEndorsed, nonEndorsedDesc) {
                     it(
                         'renders correctly with ' + endorsedDesc + ' marked answer(s) and ' + nonEndorsedDesc +
                         ' response(s)',
-                        function() { return renderTestCase(this.view, numEndorsed, numNonEndorsed); }
+                        function() { return renderTestCase(this.view, numEndorsed, numNonEndorsed); },
                     );
                 });
             });
@@ -325,18 +325,18 @@
                 renderWithContent(this.view, {
                     endorsed_responses: generateContent(0, 2),
                     non_endorsed_responses: generateContent(3, 6),
-                    non_endorsed_resp_total: 42
+                    non_endorsed_resp_total: 42,
                 });
                 DiscussionViewSpecHelper.setNextResponseContent({
                     endorsed_responses: generateContent(0, 3),
                     non_endorsed_responses: generateContent(6, 9),
-                    non_endorsed_resp_total: 41
+                    non_endorsed_resp_total: 41,
                 });
                 this.view.$el.find('.load-response-button').click();
                 expect($('.js-marked-answer-list .discussion-response').length).toEqual(3);
                 expect($('.js-response-list .discussion-response').length).toEqual(6);
                 return assertResponseCountAndPaginationCorrect(
-                    this.view, '41 other responses', 'Showing first 6 responses', 'Load all responses'
+                    this.view, '41 other responses', 'Showing first 6 responses', 'Load all responses',
                 );
             });
         });
@@ -344,12 +344,12 @@
             beforeEach(function() {
                 this.thread.attributes.ability = _.extend(this.thread.attributes.ability, {
                     can_report: false,
-                    can_vote: false
+                    can_vote: false,
                 });
                 this.view = new DiscussionThreadView({
                     model: this.thread,
                     el: $('#fixture-element'),
-                    course_settings: DiscussionSpecHelper.createTestCourseSettings()
+                    course_settings: DiscussionSpecHelper.createTestCourseSettings(),
                 });
             });
             it("doesn't show report option if can_report ability is disabled", function() {

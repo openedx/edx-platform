@@ -5,12 +5,12 @@
         'backbone',
         'underscore',
         'gettext',
-        'text!support/templates/enrollment-modal.underscore'
+        'text!support/templates/enrollment-modal.underscore',
     ], function(Backbone, _, gettext, modalTemplate) {
         var EnrollmentModal = Backbone.View.extend({
             events: {
                 'click .enrollment-change-submit': 'submitEnrollmentChange',
-                'click .enrollment-change-cancel': 'cancel'
+                'click .enrollment-change-cancel': 'cancel',
             },
 
             initialize: function(options) {
@@ -25,7 +25,7 @@
                 this.$el.html(_.template(this.template)({
                     enrollment: this.enrollment,
                     modes: this.modes,
-                    reasons: this.reasons
+                    reasons: this.reasons,
                 }));
                 return this;
             },
@@ -59,9 +59,9 @@
                         // Error callback
                         _.bind(function() {
                             this.showErrors(gettext(
-                                'Something went wrong changing this enrollment. Please try again.'
+                                'Something went wrong changing this enrollment. Please try again.',
                             ));
-                        }, this)
+                        }, this),
                     );
                 }
             },
@@ -69,7 +69,7 @@
             cancel: function(event) {
                 event.preventDefault();
                 this.hide();
-            }
+            },
         });
         return EnrollmentModal;
     });

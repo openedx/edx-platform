@@ -9,28 +9,28 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
         defaults: {
             confirmation: gettext('Ok'),
             changeRoleError: gettext("There was an error changing the user's role"),
-            unknown: gettext('Unknown')
+            unknown: gettext('Unknown'),
         },
         errors: {
             addUser: gettext('Error adding user'),
-            deleteUser: gettext('Error removing user')
+            deleteUser: gettext('Error removing user'),
         },
         invalidEmail: {
             title: gettext('A valid email address is required'),
             message: gettext('You must enter a valid email address in order to add a new team member'),
-            primaryAction: gettext('Return and add email address')
+            primaryAction: gettext('Return and add email address'),
         },
         alreadyMember: {
             title: gettext('Already a member'),
             messageTpl: gettext('{email} is already on the {container} team. Recheck the email address if you want to add a new member.'),
-            primaryAction: gettext('Return to team listing')
+            primaryAction: gettext('Return to team listing'),
         },
         deleteUser: {
             title: gettext('Are you sure?'),
             messageTpl: gettext('Are you sure you want to restrict {email} access to “{container}”?'),
             primaryAction: gettext('Delete'),
-            secondaryAction: gettext('Cancel')
-        }
+            secondaryAction: gettext('Cancel'),
+        },
     };
 
     function makeInvalidEmailMessage(messages) {
@@ -43,9 +43,9 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                     click: function(view) {
                         view.hide();
                         $('#user-email-input').focus();
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
     }
 
@@ -55,7 +55,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
             message: _.template(
                 messages.alreadyMember.messageTpl,
                 {interpolate: /\{(.+?)}/g})(
-                {email: email, container: containerName}
+                {email: email, container: containerName},
             ),
             actions: {
                 primary: {
@@ -63,9 +63,9 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                     click: function(view) {
                         view.hide();
                         $('#user-email-input').focus();
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
     }
 
@@ -79,9 +79,9 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                     click: function(view) {
                         view.hide();
                         onErrorCallback();
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
     }
 
@@ -96,7 +96,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 'submit #create-user-form': 'createUserFormSubmit',
                 'click .action-cancel': 'cancelEditHandler',
                 keyup: 'keyUpHandler',
-                'click .remove-user': 'removeUserHandler'
+                'click .remove-user': 'removeUserHandler',
             };
             var roleEvents = {};
             var self = this;
@@ -142,7 +142,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 viewHelpers = {
                     format: function(template, data) {
                         return _.template(template, {interpolate: /\{(.+?)}/g})(data);
-                    }
+                    },
                 };
             for (var i = 0; i < this.users.length; i++) {
                 var user = this.users[i],
@@ -154,7 +154,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                     allow_delete: !(user.role === this.admin_role.key && adminRoleCount === 1),
                     allow_actions: this.allow_actions,
                     is_current_user: is_current_user,
-                    viewHelpers: viewHelpers
+                    viewHelpers: viewHelpers,
                 };
 
                 this.$userList.append(HtmlUtils.HTML(templateFn(template_data)).toString());
@@ -180,7 +180,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                     result.push({
                         to_role: other_role.key,
                         label: (i < currentRoleIdx) ? this.roles[currentRoleIdx].name : other_role.name,
-                        direction: (i < currentRoleIdx) ? 'remove' : 'add'
+                        direction: (i < currentRoleIdx) ? 'remove' : 'add',
                     });
                 }
             }
@@ -223,7 +223,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                     }
                     prompt = makeChangeRoleErrorMessage(self.messages, errMessage, message, onError);
                     prompt.show();
-                }
+                },
             });
         },
 
@@ -266,8 +266,8 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 this.initial_role.key,
                 {
                     errMessage: this.messages.errors.addUser,
-                    onError: function() { self.$userEmailInput.focus(); }
-                }
+                    onError: function() { self.$userEmailInput.focus(); },
+                },
             );
         },
 
@@ -286,7 +286,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 message: _.template(
                     self.messages.deleteUser.messageTpl,
                     {interpolate: /\{(.+?)}/g})(
-                    {email: email, container: self.containerName}
+                    {email: email, container: self.containerName},
                 ),
                 actions: {
                     primary: {
@@ -295,16 +295,16 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                             view.hide();
                             // Use the REST API to delete the user:
                             self.changeRole(email, null, {errMessage: self.messages.errors.deleteUser});
-                        }
+                        },
                     },
                     secondary: {
                         text: self.messages.deleteUser.secondaryAction,
-                        click: function(view) { view.hide(); }
-                    }
-                }
+                        click: function(view) { view.hide(); },
+                    },
+                },
             });
             msg.show();
-        }
+        },
     });
 
     return ManageUsersAndRoles;

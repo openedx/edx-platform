@@ -1,9 +1,9 @@
 define([
     'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
-    'js/edxnotes/models/note', 'js/edxnotes/views/note_item'
+    'js/edxnotes/models/note', 'js/edxnotes/views/note_item',
 ], function(
-    $, _, AjaxHelpers, TemplateHelpers, Helpers, Logger, NoteModel, NoteItemView
+    $, _, AjaxHelpers, TemplateHelpers, Helpers, Logger, NoteModel, NoteItemView,
 ) {
     'use strict';
     describe('EdxNotes NoteItemView', function() {
@@ -17,8 +17,8 @@ define([
                 text: formattedText || 'Third added model',
                 quote: Helpers.LONG_TEXT,
                 unit: {
-                    url: 'http://example.com/'
-                }
+                    url: 'http://example.com/',
+                },
             }));
 
             return new NoteItemView({model: model, scrollToTag: scrollToTag, view: 'Test View'}).render();
@@ -71,7 +71,7 @@ define([
 
         it('should highlight tags & text if they have elasticsearch formatter', function() {
             var view = getView({
-                tags: ['First', '{elasticsearch_highlight_start}Second{elasticsearch_highlight_end}']
+                tags: ['First', '{elasticsearch_highlight_start}Second{elasticsearch_highlight_end}'],
             }, {}, '{elasticsearch_highlight_start}Sample{elasticsearch_highlight_end}');
             expect(view.$('.reference-title').length).toBe(3);
             expect(view.$('.reference-title')[2]).toContainText('Tags:');
@@ -79,21 +79,21 @@ define([
             expect(view.$('span.reference-tags')[0]).toContainText('First');
             // highlighted tag & text
             expect($.trim($(view.$('span.reference-tags')[1]).html())).toBe(
-                '<span class="note-highlight">Second</span>'
+                '<span class="note-highlight">Second</span>',
             );
             expect($.trim(view.$('.note-comment-p').html())).toBe('<span class="note-highlight">Sample</span>');
         });
 
         it('should escape html for tags & comments', function() {
             var view = getView({
-                tags: ['First', '<b>Second</b>', 'ȗnicode']
+                tags: ['First', '<b>Second</b>', 'ȗnicode'],
             }, {}, '<b>Sample</b>');
             expect(view.$('.reference-title').length).toBe(3);
             expect(view.$('.reference-title')[2]).toContainText('Tags:');
             expect(view.$('span.reference-tags').length).toBe(3);
             expect(view.$('span.reference-tags')[0]).toContainText('First');
             expect($.trim($(view.$('span.reference-tags')[1]).html())).toBe(
-                '&lt;b&gt;Second&lt;/b&gt;'
+                '&lt;b&gt;Second&lt;/b&gt;',
             );
             expect($.trim($(view.$('span.reference-tags')[2]).html())).toBe('ȗnicode');
             expect($.trim(view.$('.note-comment-p').html())).toBe('&lt;b&gt;Sample&lt;/b&gt;');
@@ -101,7 +101,7 @@ define([
 
         xit('should handle a click event on the tag', function() {
             var scrollToTagSpy = {
-                scrollToTag: function(tagName) {}
+                scrollToTag: function(tagName) {},
             };
             spyOn(scrollToTagSpy, 'scrollToTag');
             var view = getView({tags: ['only']}, scrollToTagSpy.scrollToTag);
@@ -119,12 +119,12 @@ define([
                 {
                     note_id: 'id-123',
                     component_usage_id: 'usage_id-123',
-                    view: 'Test View'
+                    view: 'Test View',
                 },
                 null,
                 {
-                    timeout: 2000
-                }
+                    timeout: 2000,
+                },
             );
             expect(view.redirectTo).not.toHaveBeenCalled();
             AjaxHelpers.respondWithJson(requests, {});

@@ -7,12 +7,12 @@
         'gettext',
         'text!../../../templates/api_admin/catalog-results.underscore',
         'text!../../../templates/api_admin/catalog-error.underscore',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function(Backbone, _, gettext, catalogResultsTpl, catalogErrorTpl, HtmlUtils) {
         return Backbone.View.extend({
 
             events: {
-                'click .preview-query': 'previewQuery'
+                'click .preview-query': 'previewQuery',
             },
 
             initialize: function(options) {
@@ -46,9 +46,9 @@
                     error: _.bind(function() {
                         HtmlUtils.setHtml(
                             this.$('.preview-results'),
-                            HtmlUtils.template(catalogErrorTpl)({})
+                            HtmlUtils.template(catalogErrorTpl)({}),
                         );
-                    }, this)
+                    }, this),
                 });
             },
 
@@ -61,10 +61,10 @@
                     this.$('.preview-results'),
                     HtmlUtils.template(catalogResultsTpl)({
                         courses: data.results,
-                        catalogApiUrl: this.catalogApiUrl
-                    })
+                        catalogApiUrl: this.catalogApiUrl,
+                    }),
                 );
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

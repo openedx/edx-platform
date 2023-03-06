@@ -7,7 +7,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
                 'data-start="<%= start %>" ' +
                 'data-displayed="<%= displayed %>" ' +
                 'data-total="<%= total %>" ' +
-                'data-previews="<%= previews %>"></div>'
+                'data-previews="<%= previews %>"></div>',
     );
 
     function getResponseHtml(override_options) {
@@ -15,7 +15,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
             start: 0,
             displayed: PAGE_SIZE,
             total: PAGE_SIZE + 1,
-            previews: true
+            previews: true,
         };
         var options = _.extend(default_options, override_options);
         return '<div class="xblock" data-request-token="request_token">' +
@@ -28,7 +28,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
     var makePage = function(html_parameters) {
         return {
             resources: [],
-            html: getResponseHtml(html_parameters)
+            html: getResponseHtml(html_parameters),
         };
     };
 
@@ -37,19 +37,19 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
     var mockFirstPage = makePage({
         start: 0,
         displayed: PAGE_SIZE,
-        total: PAGE_SIZE + 1
+        total: PAGE_SIZE + 1,
     });
 
     var mockSecondPage = makePage({
         start: PAGE_SIZE,
         displayed: 1,
-        total: PAGE_SIZE + 1
+        total: PAGE_SIZE + 1,
     });
 
     var mockEmptyPage = makePage({
         start: 0,
         displayed: 0,
-        total: 0
+        total: 0,
     });
 
     var respondWithMockPage = function(requests, mockPage) {
@@ -66,7 +66,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
     var MockPagingView = PagedContainer.extend({
         view: 'container_preview',
         el: $("<div><div class='xblock' data-request-token='test_request_token'/></div>"),
-        model: new XBlockInfo({}, {parse: true})
+        model: new XBlockInfo({}, {parse: true}),
     });
 
     describe('Paging Container', function() {
@@ -75,7 +75,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
         beforeEach(function() {
             pagingContainer = new MockPagingView({
                 page_size: PAGE_SIZE,
-                page: jasmine.createSpyObj('page', ['updatePreviewButton', 'renderAddXBlockComponents'])
+                page: jasmine.createSpyObj('page', ['updatePreviewButton', 'renderAddXBlockComponents']),
             });
         });
 

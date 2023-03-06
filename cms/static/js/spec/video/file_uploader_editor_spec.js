@@ -1,15 +1,15 @@
 define(
     [
-        'jquery', 'underscore', 'squire'
+        'jquery', 'underscore', 'squire',
     ],
     function($, _, Squire) {
         'use strict';
         describe('FileUploader', function() {
             var FileUploaderTemplate = readFixtures(
-                    'metadata-file-uploader-entry.underscore'
+                    'metadata-file-uploader-entry.underscore',
                 ),
                 FileUploaderItemTemplate = readFixtures(
-                    'metadata-file-uploader-item.underscore'
+                    'metadata-file-uploader-item.underscore',
                 ),
                 locator = 'locator',
                 modelStub = {
@@ -19,7 +19,7 @@ define(
                     field_name: 'file_upload',
                     help: 'Specifies the name for this component.',
                     type: 'FileUploader',
-                    value: 'http://example.org/test_1'
+                    value: 'http://example.org/test_1',
                 },
                 self, injector;
 
@@ -49,9 +49,9 @@ define(
 
                                 return {
                                     pass: passed,
-                                    message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                    message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected,
                                 };
-                            }
+                            },
                         };
                     },
                     assertCanUpdateView: function() {
@@ -68,9 +68,9 @@ define(
 
                                 return {
                                     pass: passed,
-                                    message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                    message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected,
                                 };
-                            }
+                            },
                         };
                     },
                     assertClear: function() {
@@ -85,9 +85,9 @@ define(
                                 _.isEqual(view.getValueFromEditor(), modelValue);
 
                                 return {
-                                    pass: passed
+                                    pass: passed,
                                 };
-                            }
+                            },
                         };
                     },
                     assertUpdateModel: function() {
@@ -106,9 +106,9 @@ define(
                                 _.isEqual(model.getValue(), newValue);
 
                                 return {
-                                    pass: passed
+                                    pass: passed,
                                 };
-                            }
+                            },
                         };
                     },
                     verifyButtons: function() {
@@ -124,21 +124,21 @@ define(
                                 passed = upload && download;
 
                                 return {
-                                    pass: passed
+                                    pass: passed,
                                 };
-                            }
+                            },
                         };
-                    }
+                    },
                 });
 
                 appendSetFixtures($('<script>', {
                     id: 'metadata-file-uploader-entry',
-                    type: 'text/template'
+                    type: 'text/template',
                 }).text(FileUploaderTemplate));
 
                 appendSetFixtures($('<script>', {
                     id: 'metadata-file-uploader-item',
-                    type: 'text/template'
+                    type: 'text/template',
                 }).text(FileUploaderItemTemplate));
 
                 this.uploadSpies = createPromptSpy('UploadDialog');
@@ -151,13 +151,13 @@ define(
                 injector.mock('js/views/video/translations_editor');
 
                 injector.require([
-                    'js/models/metadata', 'js/views/metadata'
+                    'js/models/metadata', 'js/views/metadata',
                 ],
                 function(MetadataModel, MetadataView) {
                     var model = new MetadataModel($.extend(true, {}, modelStub));
                     self.view = new MetadataView.FileUploader({
                         model: model,
-                        locator: locator
+                        locator: locator,
                     });
 
                     done();
@@ -192,8 +192,8 @@ define(
                 options = this.uploadSpies.constructor.calls.mostRecent().args[0];
                 options.onSuccess({
                     asset: {
-                        url: 'http://example.org/test_3'
-                    }
+                        url: 'http://example.org/test_3',
+                    },
                 });
 
                 expect(this.view).verifyButtons(true, true);

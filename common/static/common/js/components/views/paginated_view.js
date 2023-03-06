@@ -23,14 +23,14 @@
         'common/js/components/views/paging_header',
         'common/js/components/views/paging_footer',
         'common/js/components/views/list',
-        'text!common/templates/components/paginated-view.underscore'
+        'text!common/templates/components/paginated-view.underscore',
     ], function(Backbone, _, HtmlUtils, PagingHeader, PagingFooter, ListView, paginatedViewTemplate) {
         var PaginatedView = Backbone.View.extend({
             initialize: function() {
                 var ItemListView = this.listViewClass.extend({
                     tagName: 'div',
                     className: this.type + '-container',
-                    itemViewClass: this.itemViewClass
+                    itemViewClass: this.itemViewClass,
                 });
                 this.listView = new ItemListView({collection: this.collection});
                 this.headerView = this.createHeaderView();
@@ -54,7 +54,7 @@
                 return new PagingFooter({
                     collection: this.collection,
                     hideWhenOnePage: true,
-                    paginationLabel: this.paginationLabel
+                    paginationLabel: this.paginationLabel,
                 });
             },
 
@@ -72,13 +72,13 @@
 
             renderError: function() {
                 this.$el.text(
-                    gettext('Your request could not be completed. Reload the page and try again. If the issue persists, click the Help tab to report the problem.')  // eslint-disable-line max-len
+                    gettext('Your request could not be completed. Reload the page and try again. If the issue persists, click the Help tab to report the problem.'),  // eslint-disable-line max-len
                 );
             },
 
             assign: function(view, selector) {
                 view.setElement(this.$(selector)).render();
-            }
+            },
         });
 
         return PaginatedView;

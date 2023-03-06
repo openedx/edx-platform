@@ -94,7 +94,7 @@ define(['js/views/baseview', 'underscore'], function(BaseView, _) {
                 console.error('Failed to load ' + name + ' template');
             }
             return _.template(templateText);
-        }
+        },
     });
 
     return AbstractEditor;

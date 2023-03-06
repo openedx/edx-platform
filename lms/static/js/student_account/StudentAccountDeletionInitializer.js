@@ -23,7 +23,7 @@ const wrapperRendered = setInterval(() => {
                 mktgRootLink: window.mktgRootLink,
                 platformName: window.platformName,
                 siteName: window.siteName,
-                mktgEmailOptIn: window.mktgEmailOptIn
+                mktgEmailOptIn: window.mktgEmailOptIn,
             },
         });
     }

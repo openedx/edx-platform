@@ -6,7 +6,7 @@ define([
     'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils',
     'js/views/utils/xblock_utils',
-    'text!templates/move-xblock-list.underscore'
+    'text!templates/move-xblock-list.underscore',
 ],
 function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBlockListViewTemplate) {
     'use strict';
@@ -26,7 +26,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
             course: 'section',
             section: 'subsection',
             subsection: 'unit',
-            unit: 'component'
+            unit: 'component',
         },
 
         categoriesText: {
@@ -34,11 +34,11 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
             subsection: gettext('Subsections'),
             unit: gettext('Units'),
             component: gettext('Components'),
-            group: gettext('Groups')
+            group: gettext('Groups'),
         },
 
         events: {
-            'click .button-forward': 'renderChildren'
+            'click .button-forward': 'renderChildren',
         },
 
         initialize: function(options) {
@@ -61,9 +61,9 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
                         categoryText: this.getCategoryText(),
                         parentDisplayname: this.parentInfo.parent.get('display_name'),
                         XBlocksCategory: this.childrenInfo.category,
-                        currentLocationIndex: this.getCurrentLocationIndex()
-                    }
-                )
+                        currentLocationIndex: this.getCurrentLocationIndex(),
+                    },
+                ),
             );
             Backbone.trigger('move:childrenRendered', this.breadcrumbInfo());
             Backbone.trigger('move:enableMoveOperation', this.parentInfo.parent);
@@ -78,7 +78,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
         renderChildren: function(event) {
             this.renderXBlockInfo(
                 'forward',
-                $(event.target).closest('.xblock-item').data('itemIndex')
+                $(event.target).closest('.xblock-item').data('itemIndex'),
             );
         },
 
@@ -179,8 +179,8 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
                 gettext('This {parentCategory} has no {childCategory}'),
                 {
                     parentCategory: this.parentInfo.category,
-                    childCategory: this.categoriesText[this.childrenInfo.category].toLowerCase()
-                }
+                    childCategory: this.categoriesText[this.childrenInfo.category].toLowerCase(),
+                },
             );
         },
 
@@ -194,9 +194,9 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
                 breadcrumbs: _.map(this.visitedAncestors, function(ancestor) {
                     return ancestor.get('category') === 'course' ?
                         gettext('Course Outline') : ancestor.get('display_name');
-                })
+                }),
             };
-        }
+        },
     });
 
     return XBlockListView;

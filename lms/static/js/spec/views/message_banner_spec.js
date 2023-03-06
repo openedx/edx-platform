@@ -1,5 +1,5 @@
 define(['backbone', 'jquery', 'underscore',
-    'common/js/spec_helpers/template_helpers', 'js/views/message_banner'
+    'common/js/spec_helpers/template_helpers', 'js/views/message_banner',
 ],
 function(Backbone, $, _, TemplateHelpers, MessageBannerView) {
     'use strict';
@@ -13,7 +13,7 @@ function(Backbone, $, _, TemplateHelpers, MessageBannerView) {
         it('renders message correctly', function() {
             var messageSelector = '.message-banner';
             var messageView = new MessageBannerView({
-                el: $(messageSelector)
+                el: $(messageSelector),
             });
 
             messageView.showMessage('I am message view');

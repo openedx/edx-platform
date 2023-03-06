@@ -7,8 +7,8 @@
                 divided_inline_discussions: [],
                 divided_course_wide_discussions: [],
                 always_divide_inline_discussions: false,
-                division_scheme: 'none'
-            }
+                division_scheme: 'none',
+            },
         });
         return CourseDiscussionsSettingsModel;
     });

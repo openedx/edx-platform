@@ -46,7 +46,7 @@
                     this.removeNotification();
 
                     discussionSettingsModel.save(
-                        fieldData, {patch: true, wait: true}
+                        fieldData, {patch: true, wait: true},
                     ).done(function() {
                         saveOperation.resolve();
                     }).fail(function(result) {
@@ -77,7 +77,7 @@
                     var model = new NotificationModel({type: type || 'confirmation', title: message});
                     this.removeNotification();
                     this.notification = new NotificationView({
-                        model: model
+                        model: model,
                     });
                     $element.before(this.notification.$el);
                     this.notification.render();
@@ -90,7 +90,7 @@
                     if (this.notification) {
                         this.notification.remove();
                     }
-                }
+                },
 
             });
             return DividedDiscussionConfigurationView;

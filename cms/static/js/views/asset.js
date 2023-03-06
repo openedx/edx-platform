@@ -10,7 +10,7 @@ function(BaseView, _, gettext, PromptView, NotificationView, HtmlUtils) {
         tagName: 'tr',
         events: {
             'click .remove-asset-button': 'confirmDelete',
-            'click .lock-checkbox': 'lockAsset'
+            'click .lock-checkbox': 'lockAsset',
         },
 
         render: function() {
@@ -24,7 +24,7 @@ function(BaseView, _, gettext, PromptView, NotificationView, HtmlUtils) {
                 portable_url: this.model.get('portable_url'),
                 static_full_url: this.model.get('static_full_url'),
                 asset_type: this.model.get_extension(),
-                uniqueId: uniqueId
+                uniqueId: uniqueId,
             };
             this.$el.html(HtmlUtils.HTML(this.template(attributes)).toString());
             this.updateLockState();
@@ -62,34 +62,34 @@ function(BaseView, _, gettext, PromptView, NotificationView, HtmlUtils) {
                                     new NotificationView.Confirmation({
                                         title: gettext('Your file has been deleted.'),
                                         closeIcon: false,
-                                        maxShown: 2000
+                                        maxShown: 2000,
                                     }).show();
-                                }
+                                },
                             });
-                        }
+                        },
                     },
                     secondary: {
                         text: gettext('Cancel'),
                         click: function(view) {
                             view.hide();
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             }).show();
         },
 
         lockAsset: function() {
             var asset = this.model;
             var saving = new NotificationView.Mini({
-                title: gettext('Saving')
+                title: gettext('Saving'),
             }).show();
             asset.save({locked: !asset.get('locked')}, {
                 wait: true, // This means we won't re-render until we get back the success state.
                 success: function() {
                     saving.hide();
-                }
+                },
             });
-        }
+        },
     });
 
     return AssetView;

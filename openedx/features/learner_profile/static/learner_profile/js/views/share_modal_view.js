@@ -5,12 +5,12 @@
         [
             'gettext', 'jquery', 'underscore', 'backbone', 'moment',
             'text!learner_profile/templates/share_modal.underscore',
-            'edx-ui-toolkit/js/utils/html-utils'
+            'edx-ui-toolkit/js/utils/html-utils',
         ],
         function(gettext, $, _, Backbone, Moment, badgeModalTemplate, HtmlUtils) {
             var ShareModalView = Backbone.View.extend({
                 attributes: {
-                    class: 'badges-overlay'
+                    class: 'badges-overlay',
                 },
                 template: _.template(badgeModalTemplate),
                 events: {
@@ -19,7 +19,7 @@
                     'click .badges-overlay': 'close',
                     keydown: 'keyAction',
                     'focus .focusguard-start': 'focusGuardStart',
-                    'focus .focusguard-end': 'focusGuardEnd'
+                    'focus .focusguard-end': 'focusGuardEnd',
                 },
                 initialize: function(options) {
                     this.options = _.extend({}, options);
@@ -48,7 +48,7 @@
                 render: function() {
                     this.$el.html(HtmlUtils.HTML(this.template(this.model.toJSON())).toString());
                     return this;
-                }
+                },
             });
 
             return ShareModalView;

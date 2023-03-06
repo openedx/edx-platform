@@ -16,7 +16,7 @@ var edx = edx || {};
 
     // Initialize an error view for displaying top-level error messages.
     errorView = new edx.verify_student.ErrorView({
-        el: $('#error-container')
+        el: $('#error-container'),
     });
 
     // Initialize the base view, passing in information
@@ -26,19 +26,19 @@ var edx = edx || {};
         stepInfo: {
             'face-photo-step': {
                 platformName: $el.data('platform-name'),
-                captureSoundPath: $el.data('capture-sound')
+                captureSoundPath: $el.data('capture-sound'),
             },
             'id-photo-step': {
                 platformName: $el.data('platform-name'),
-                captureSoundPath: $el.data('capture-sound')
+                captureSoundPath: $el.data('capture-sound'),
             },
             'review-photos-step': {
                 fullName: $el.data('full-name'),
-                platformName: $el.data('platform-name')
+                platformName: $el.data('platform-name'),
             },
             'reverify-success-step': {
-                platformName: $el.data('platform-name')
-            }
-        }
+                platformName: $el.data('platform-name'),
+            },
+        },
     }).render();
 }(jQuery, _));

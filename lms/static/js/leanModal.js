@@ -16,13 +16,13 @@
                 top: 100,
                 overlay: 0.5,
                 closeButton: null,
-                position: 'fixed'
+                position: 'fixed',
             };
             var overlay = '<div id="lean_overlay"></div>';
             if ($('#lean_overlay').length === 0) {
                 edx.HtmlUtils.append(
                     $('body'),
-                    $(overlay)
+                    $(overlay),
                 );
             }
 
@@ -56,7 +56,7 @@
                         modalClone.attr('id', 'modal_clone');
                         modalCloneHtml = edx.HtmlUtils.template(modalClone);
                         $(modalId).after(
-                            edx.HtmlUtils.ensureHtml(modalCloneHtml).toString()
+                            edx.HtmlUtils.ensureHtml(modalCloneHtml).toString(),
                         );
                         modalId = '#modal_clone';
                     }
@@ -92,7 +92,7 @@
                             opacity: 0,
                             'z-index': 11000,
                             left: 10 + '%',
-                            top: 10 + '%'
+                            top: 10 + '%',
                         });
                     } else {
                         $(modalId).css({
@@ -101,7 +101,7 @@
                             'z-index': 11000,
                             left: 50 + '%',
                             'margin-left': -($(modalId).outerWidth() / 2) + 'px',
-                            top: o.top + 'px'
+                            top: o.top + 'px',
                         });
                     }
 
@@ -118,13 +118,13 @@
                             top: 120,
                             overlay: 1,
                             closeButton: '.close-modal',
-                            position: 'absolute'
+                            position: 'absolute',
                         });
                     }
                     e.preventDefault();
                 });
             });
-        }
+        },
     });
 
     $(document).ready(function($) {  // eslint-disable-line no-shadow

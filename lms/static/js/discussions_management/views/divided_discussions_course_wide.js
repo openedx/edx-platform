@@ -6,7 +6,7 @@
         var CourseWideDiscussionsView = DividedDiscussionConfigurationView.extend({
             events: {
                 'change .check-discussion-subcategory-course-wide': 'discussionCategoryStateChanged',
-                'click .cohort-course-wide-discussions-form .action-save': 'saveCourseWideDiscussionsForm'
+                'click .cohort-course-wide-discussions-form .action-save': 'saveCourseWideDiscussionsForm',
             },
 
             initialize: function(options) {
@@ -17,8 +17,8 @@
             render: function() {
                 HtmlUtils.setHtml(this.$('.course-wide-discussions-nav'), this.template({
                     courseWideTopicsHtml: this.getCourseWideDiscussionsHtml(
-                        this.model.get('course_wide_discussions')
-                    )
+                        this.model.get('course_wide_discussions'),
+                    ),
                 }));
                 this.setDisabled(this.$('.cohort-course-wide-discussions-form .action-save'), true);
             },
@@ -42,7 +42,7 @@
                         name: name,
                         id: entry.id,
                         is_divided: entry.is_divided,
-                        type: 'course-wide'
+                        type: 'course-wide',
                     });
                 }));
             },
@@ -61,7 +61,7 @@
             saveCourseWideDiscussionsForm: function(event) {
                 var self = this,
                     courseWideDividedDiscussions = self.getDividedDiscussions(
-                        '.check-discussion-subcategory-course-wide:checked'
+                        '.check-discussion-subcategory-course-wide:checked',
                     ),
                     fieldData = {divided_course_wide_discussions: courseWideDividedDiscussions};
 
@@ -73,14 +73,14 @@
                             .done(function() {
                                 self.render();
                                 self.showMessage(gettext('Your changes have been saved.'),
-                                    self.$('.course-wide-discussion-topics')
+                                    self.$('.course-wide-discussion-topics'),
                                 );
                             }).fail(function() {
                                 var errorMessage = gettext("We've encountered an error. Refresh your browser and then try again."); // eslint-disable-line max-len
                                 self.showMessage(errorMessage, self.$('.course-wide-discussion-topics'), 'error');
                             });
                     });
-            }
+            },
 
         });
         return CourseWideDiscussionsView;

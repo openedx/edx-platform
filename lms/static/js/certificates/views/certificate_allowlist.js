@@ -9,7 +9,7 @@
         'underscore',
         'gettext',
         'backbone',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ],
 
     function($, _, gettext, Backbone, HtmlUtils) {
@@ -21,7 +21,7 @@
 
             events: {
                 'click #generate-exception-certificates': 'generateExceptionCertificates',
-                'click .delete-exception': 'removeException'
+                'click .delete-exception': 'removeException',
             },
 
             initialize: function(options) {
@@ -56,17 +56,17 @@
                         {
                             success: function() {
                                 self.escapeAndShowMessage(
-                                    gettext('Student Removed from certificate allowlist successfully.')
+                                    gettext('Student Removed from certificate allowlist successfully.'),
                                 );
                             },
                             error: this.showError(this),
                             wait: true,
-                            data: JSON.stringify(model.attributes)
-                        }
+                            data: JSON.stringify(model.attributes),
+                        },
                     );
                 } else {
                     this.escapeAndShowMessage(
-                        gettext('Could not find Certificate Exception in the allowlist. Please refresh the page and try again')  // eslint-disable-line max-len
+                        gettext('Could not find Certificate Exception in the allowlist. Please refresh the page and try again'),  // eslint-disable-line max-len
                     );
                 }
             },
@@ -74,7 +74,7 @@
             generateExceptionCertificates: function() {
                 this.collection.sync(
                     {success: this.showSuccess(this), error: this.showError(this)},
-                    $(this.generate_exception_certificates_radio).val()
+                    $(this.generate_exception_certificates_radio).val(),
                 );
             },
 
@@ -84,7 +84,7 @@
                 $(this.message_div).removeClass('hidden').append(HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<p>'),
                     _.escape(message),
-                    HtmlUtils.HTML('</p>')
+                    HtmlUtils.HTML('</p>'),
                 ))
                     .focus();
                 $(this.message_div).fadeOut(6000, 'linear');
@@ -103,12 +103,12 @@
                         caller_object.escapeAndShowMessage(response.message);
                     } catch (exception) {
                         caller_object.escapeAndShowMessage(
-                            gettext('Server Error, Please refresh the page and try again.')
+                            gettext('Server Error, Please refresh the page and try again.'),
                         );
                     }
                 };
-            }
+            },
         });
-    }
+    },
     );
 }).call(this, define || RequireJS.define);

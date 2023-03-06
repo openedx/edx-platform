@@ -1,12 +1,12 @@
 define([
     'jquery', 'underscore', 'js/views/pages/group_configurations',
     'js/models/group_configuration', 'js/collections/group_configuration',
-    'common/js/spec_helpers/template_helpers'
+    'common/js/spec_helpers/template_helpers',
 ], function($, _, GroupConfigurationsPage, GroupConfigurationModel, GroupConfigurationCollection, TemplateHelpers) {
     'use strict';
     describe('GroupConfigurationsPage', function() {
         var mockGroupConfigurationsPage = readFixtures(
-                'mock/mock-group-configuration-page.underscore'
+                'mock/mock-group-configuration-page.underscore',
             ),
             groupConfigItemClassName = '.group-configurations-list-item';
 
@@ -17,9 +17,9 @@ define([
                 experimentGroupConfigurations: new GroupConfigurationCollection({
                     id: 0,
                     name: 'Configuration 1',
-                    courseOutlineUrl: 'CourseOutlineUrl'
+                    courseOutlineUrl: 'CourseOutlineUrl',
                 }),
-                allGroupConfigurations: [new GroupConfigurationModel({groups: []})]
+                allGroupConfigurations: [new GroupConfigurationModel({groups: []})],
             });
             if (!disableSpy) {
                 spyOn(view, 'addWindowActions');
@@ -36,7 +36,7 @@ define([
             setFixtures(mockGroupConfigurationsPage);
             TemplateHelpers.installTemplates([
                 'group-configuration-editor', 'group-configuration-details', 'partition-group-details',
-                'content-group-editor', 'group-edit', 'list'
+                'content-group-editor', 'group-edit', 'list',
             ]);
 
             jasmine.addMatchers({
@@ -44,11 +44,11 @@ define([
                     return {
                         compare: function(actual) {
                             return {
-                                pass: Boolean($('a.group-toggle.hide-groups', $(actual)).length)
+                                pass: Boolean($('a.group-toggle.hide-groups', $(actual)).length),
                             };
-                        }
+                        },
                     };
-                }
+                },
             });
         });
 

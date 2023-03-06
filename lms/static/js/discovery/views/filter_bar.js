@@ -6,7 +6,7 @@
         'gettext',
         'js/discovery/models/filter',
         'js/discovery/views/filter_label',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function($, _, Backbone, gettext, Filter, FilterLabel, HtmlUtils) {
         'use strict';
 
@@ -17,7 +17,7 @@
 
             events: {
                 'click #clear-all-filters': 'clearAll',
-                'click li .discovery-button': 'clearFilter'
+                'click li .discovery-button': 'clearFilter',
             },
 
             initialize: function() {
@@ -31,7 +31,7 @@
             render: function() {
                 HtmlUtils.setHtml(
                     this.$el,
-                    this.tpl()
+                    this.tpl(),
                 );
                 this.$ul = this.$el.find('ul');
                 this.$el.addClass('is-animated');
@@ -72,7 +72,7 @@
             hide: function() {
                 this.$ul.empty();
                 this.$el.addClass('is-collapsed');
-            }
+            },
 
         });
     });

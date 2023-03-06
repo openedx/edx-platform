@@ -34,7 +34,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
             var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.PasswordFieldView, {
                 linkHref: '/password_reset',
                 emailAttribute: 'email',
-                valueAttribute: 'password'
+                valueAttribute: 'password',
             });
 
             var view = new AccountSettingsFieldViews.PasswordFieldView(fieldData).render();
@@ -46,7 +46,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
             FieldViewsSpecHelpers.expectMessageContains(
                 view,
                 "We've sent a message to legolas@woodland.middlearth. " +
-                    'Click the link in the message to reset your password.'
+                    'Click the link in the message to reset your password.',
             );
         });
 
@@ -60,15 +60,15 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
                 groupOptions: [{
                     groupTitle: gettext('All Time Zones'),
                     selectOptions: FieldViewsSpecHelpers.SELECT_OPTIONS,
-                    nullValueOptionLabel: 'Default (Local Time Zone)'
+                    nullValueOptionLabel: 'Default (Local Time Zone)',
                 }],
                 persistChanges: true,
-                required: true
+                required: true,
             });
             var countryData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
                 valueAttribute: 'country',
                 options: [['KY', 'Cayman Islands'], ['CA', 'Canada'], ['GY', 'Guyana']],
-                persistChanges: true
+                persistChanges: true,
             });
 
             var countryChange = {country: 'GY'};
@@ -95,11 +95,11 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
             AjaxHelpers.expectRequest(
                 requests,
                 'GET',
-                '/api/user/v1/preferences/time_zones/?country_code=GY'
+                '/api/user/v1/preferences/time_zones/?country_code=GY',
             );
             AjaxHelpers.respondWithJson(requests, [
                 {time_zone: 'America/Guyana', description: 'America/Guyana (ECT, UTC-0500)'},
-                {time_zone: 'Pacific/Kosrae', description: 'Pacific/Kosrae (KOST, UTC+1100)'}
+                {time_zone: 'Pacific/Kosrae', description: 'Pacific/Kosrae (KOST, UTC+1100)'},
             ]);
 
             // expect time zone dropdown to have two subheaders (country/all time zone sub-headers) with new values
@@ -127,7 +127,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
             var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
                 valueAttribute: 'language',
                 options: FieldViewsSpecHelpers.SELECT_OPTIONS,
-                persistChanges: true
+                persistChanges: true,
             });
 
             var view = new AccountSettingsFieldViews.LanguagePreferenceFieldView(fieldData).render();
@@ -144,8 +144,8 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
                 '/i18n/setlang/',
                 $.param({
                     language: data[fieldData.valueAttribute],
-                    next: window.location.href
-                })
+                    next: window.location.href,
+                }),
             );
             // Django will actually respond with a 302 redirect, but that would cause a page load during these
             // unittests.  204 should work fine for testing.
@@ -164,13 +164,13 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
                 '/i18n/setlang/',
                 $.param({
                     language: data[fieldData.valueAttribute],
-                    next: window.location.href
-                })
+                    next: window.location.href,
+                }),
             );
             AjaxHelpers.respondWithError(requests, 500);
             FieldViewsSpecHelpers.expectMessageContains(
                 view,
-                'You must sign out and sign back in before your language changes take effect.'
+                'You must sign out and sign back in before your language changes take effect.',
             );
         });
 
@@ -181,7 +181,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
             var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
                 valueAttribute: 'language_proficiencies',
                 options: FieldViewsSpecHelpers.SELECT_OPTIONS,
-                persistChanges: true
+                persistChanges: true,
             });
             fieldData.model.set({language_proficiencies: [{code: FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]}]});
 
@@ -206,7 +206,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
                 connected: true,
                 acceptsLogins: 'true',
                 connectUrl: 'yetanother.com/auth/connect',
-                disconnectUrl: 'yetanother.com/auth/disconnect'
+                disconnectUrl: 'yetanother.com/auth/disconnect',
             });
             var view = new AccountSettingsFieldViews.AuthFieldView(fieldData).render();
 

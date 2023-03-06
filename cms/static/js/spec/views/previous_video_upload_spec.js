@@ -11,7 +11,7 @@ define(
                         created: '2014-11-25T23:13:05',
                         edx_video_id: 'dummy_id',
                         status: 'uploading',
-                        transcripts: []
+                        transcripts: [],
                     },
                     view = new PreviousVideoUploadView({
                         model: new Backbone.Model($.extend({}, defaultData, modelData)),
@@ -19,7 +19,7 @@ define(
                         transcriptAvailableLanguages: [],
                         videoSupportedFileFormats: [],
                         videoTranscriptSettings: {},
-                        videoImageSettings: {}
+                        videoImageSettings: {},
                     });
                 return view.render().$el;
             };
@@ -43,7 +43,7 @@ define(
                         expect(options.timeZone).toEqual('UTC');
                         expect(options.timeZoneName).toEqual('short');
                         return fakeDate;
-                    }
+                    },
                 );
                 var $el = render({});
                 expect($el.find('.date-col').text()).toEqual(fakeDate);
@@ -74,9 +74,9 @@ define(
                 $el.find('a.remove-video-button').click();
                 expect($('.prompt.warning .title').text()).toEqual('Are you sure you want to remove this video from the list?');  // eslint-disable-line max-len
                 expect(
-                    $('.prompt.warning .message').text()
+                    $('.prompt.warning .message').text(),
                 ).toEqual(
-                    'Removing a video from this list does not affect course content. Any content that uses a previously uploaded video ID continues to display in the course.'  // eslint-disable-line max-len
+                    'Removing a video from this list does not affect course content. Any content that uses a previously uploaded video ID continues to display in the course.',  // eslint-disable-line max-len
                 );
                 expect($('.prompt.warning .action-primary').text()).toEqual('Remove');
                 expect($('.prompt.warning .action-secondary').text()).toEqual('Cancel');
@@ -90,5 +90,5 @@ define(
                 ViewHelpers.verifyNotificationShowing(notificationSpy, /Removing/);
             });
         });
-    }
+    },
 );

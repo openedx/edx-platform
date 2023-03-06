@@ -11,14 +11,14 @@
                         course_id: this.get('course_id'),
                         new_mode: new_mode,
                         old_mode: this.get('mode'),
-                        reason: reason
+                        reason: reason,
                     }),
                     success: _.bind(function(response) {
                         this.set('manual_enrollment', response);
                         this.set('mode', new_mode);
-                    }, this)
+                    }, this),
                 });
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

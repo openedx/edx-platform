@@ -6,7 +6,7 @@
     define([
         'backbone',
         'gettext',
-        'js/certificates/models/certificate_exception'
+        'js/certificates/models/certificate_exception',
     ],
 
     function(Backbone, gettext, CertificateExceptionModel) {
@@ -43,7 +43,7 @@
                 Backbone.sync(
                     'create',
                     new CertificateAllowlist(filtered, {url: url, generate_certificates_url: url}),
-                    options
+                    options,
                 );
             },
 
@@ -53,10 +53,10 @@
                             this.getModel({user_name: item.user_name, user_email: item.user_email});
                     certificate_exception_model.set(item);
                 }, this);
-            }
+            },
         });
 
         return CertificateAllowlist;
-    }
+    },
     );
 }).call(this, define || RequireJS.define);

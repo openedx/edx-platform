@@ -29,7 +29,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
             return false;
         },
 
-        render: function() {}
+        render: function() {},
     });
 
     var ContainerAccess = ContainerStateListenerView.extend({
@@ -48,12 +48,12 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                 HtmlUtils.HTML(
                     this.template({
                         hasPartitionGroupComponents: this.model.get('has_partition_group_components'),
-                        userPartitionInfo: this.model.get('user_partition_info')
-                    })
-                )
+                        userPartitionInfo: this.model.get('user_partition_info'),
+                    }),
+                ),
             );
             return this;
-        }
+        },
     });
 
     var MessageView = ContainerStateListenerView.extend({
@@ -70,11 +70,11 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
             HtmlUtils.setHtml(
                 this.$el,
                 HtmlUtils.HTML(
-                    this.template({currentlyVisibleToStudents: this.model.get('currently_visible_to_students')})
-                )
+                    this.template({currentlyVisibleToStudents: this.model.get('currently_visible_to_students')}),
+                ),
             );
             return this;
-        }
+        },
     });
 
     /**
@@ -92,7 +92,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
             } else {
                 viewLiveAction.addClass(disabledCss).attr('aria-disabled', true);
             }
-        }
+        },
     });
 
     /**
@@ -106,7 +106,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         events: {
             'click .action-publish': 'publish',
             'click .action-discard': 'discardChanges',
-            'click .action-staff-lock': 'toggleStaffLock'
+            'click .action-staff-lock': 'toggleStaffLock',
         },
 
         // takes XBlockInfo as a model
@@ -121,7 +121,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         onSync: function(model) {
             if (ViewUtils.hasChangedAttributes(model, [
                 'has_changes', 'published', 'edited_on', 'edited_by', 'visibility_state',
-                'has_explicit_staff_lock'
+                'has_explicit_staff_lock',
             ])) {
                 this.render();
             }
@@ -134,7 +134,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                     this.template({
                         visibilityState: this.model.get('visibility_state'),
                         visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(
-                            this.model.get('visibility_state')
+                            this.model.get('visibility_state'),
                         ),
                         hasChanges: this.model.get('has_changes'),
                         editedOn: this.model.get('edited_on'),
@@ -148,9 +148,9 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                         hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                         staffLockFrom: this.model.get('staff_lock_from'),
                         course: window.course,
-                        HtmlUtils: HtmlUtils
-                    })
-                )
+                        HtmlUtils: HtmlUtils,
+                    }),
+                ),
             );
 
             return this;
@@ -193,7 +193,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                     }).done(function() {
                         renderPage();
                     });
-                }
+                },
             );
         },
 
@@ -218,7 +218,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                 return xblockInfo.save({
                     publish: 'republish',
                     metadata: {visible_to_staff_only: enableStaffLock ? true : null}},
-                {patch: true}
+                {patch: true},
                 ).always(function() {
                     xblockInfo.set('publish', null);
                 }).done(function() {
@@ -249,7 +249,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                     function() {
                         // On cancel, revert the check in the check box
                         revertCheckBox();
-                    }
+                    },
                 );
             }
         },
@@ -257,7 +257,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         checkStaffLock: function(check) {
             this.$('.action-staff-lock i').removeClass('fa-check-square-o fa-square-o');
             this.$('.action-staff-lock i').addClass(check ? 'fa-check-square-o' : 'fa-square-o');
-        }
+        },
     });
 
     /**
@@ -285,13 +285,13 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                     this.template({
                         published: this.model.get('published'),
                         published_on: this.model.get('published_on'),
-                        published_by: this.model.get('published_by')
-                    })
-                )
+                        published_by: this.model.get('published_by'),
+                    }),
+                ),
             );
 
             return this;
-        }
+        },
     });
 
     return {
@@ -299,6 +299,6 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         ViewLiveButtonController: ViewLiveButtonController,
         Publisher: Publisher,
         PublishHistory: PublishHistory,
-        ContainerAccess: ContainerAccess
+        ContainerAccess: ContainerAccess,
     };
 }); // end define();

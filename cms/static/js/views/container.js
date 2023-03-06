@@ -1,7 +1,7 @@
 define([
     'jquery', 'underscore', 'js/views/xblock', 'js/utils/module',
     'gettext', 'edx-ui-toolkit/js/utils/string-utils',
-    'common/js/components/views/feedback_notification', 'jquery.ui'
+    'common/js/components/views/feedback_notification', 'jquery.ui',
 ], // The container view uses sortable, which is provided by jquery.ui.
 function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) {
     'use strict';
@@ -45,7 +45,7 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
                     }
 
                     saving = new NotificationView.Mini({
-                        title: gettext('Saving')
+                        title: gettext('Saving'),
                     });
                     saving.show();
 
@@ -91,7 +91,7 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
                 axis: 'y',
                 items: '> .is-draggable',
                 connectWith: reorderableClass,
-                tolerance: 'pointer'
+                tolerance: 'pointer',
 
             });
         },
@@ -111,7 +111,7 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
                 children,
                 function(child) {
                     return $(child).data('locator');
-                }
+                },
             );
             $.ajax({
                 url: ModuleUtils.getUpdateUrl(targetParent.data('locator')),
@@ -119,7 +119,7 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
                 dataType: 'json',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    children: childLocators
+                    children: childLocators,
                 }),
                 success: function() {
                     // change data-parent on the element moved.
@@ -128,7 +128,7 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
                     }
                     // Update publish and last modified information from the server.
                     xblockInfo.fetch();
-                }
+                },
             });
         },
 
@@ -148,10 +148,10 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
                     startTag: 'div.xblock[data-request-token="',
                     requestToken: this.requestToken,
                     endTag: '"] > ',
-                    selector: selector
-                }
+                    selector: selector,
+                },
             );
-        }
+        },
     });
 
     return ContainerView;

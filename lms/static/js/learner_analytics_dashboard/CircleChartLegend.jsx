@@ -48,7 +48,7 @@ class CircleChartLegend extends React.Component {
 
 
 CircleChartLegend.propTypes = {
-    data: PropTypes.array.isRequired
+    data: PropTypes.array.isRequired,
 }
 
 export default CircleChartLegend;

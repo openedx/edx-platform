@@ -3,7 +3,7 @@
 
     define([
         'underscore',
-        'support/js/views/manage_user'
+        'support/js/views/manage_user',
     ], function(_, ManageUserView) {
         return function(options) {
             var params = _.extend({el: '.manage-user-content'}, options);

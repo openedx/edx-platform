@@ -10,7 +10,7 @@
             'common/js/discussion/utils',
             'common/js/discussion/models/discussion_user',
             'common/js/discussion/models/discussion_course_settings',
-            'discussion/js/views/discussion_user_profile_view'
+            'discussion/js/views/discussion_user_profile_view',
         ],
         function($, Backbone, Content, Discussion, DiscussionUtil, DiscussionUser, DiscussionCourseSettings,
             DiscussionUserProfileView) {
@@ -30,7 +30,7 @@
                 DiscussionUtil.loadRoles({
                     Moderator: [],
                     Administrator: [],
-                    'Community TA': []
+                    'Community TA': [],
                 });
 
                 if (options.roles === undefined) {
@@ -52,7 +52,7 @@
                     discussion: discussion,
                     page: page,
                     numPages: numPages,
-                    courseSettings: courseSettings
+                    courseSettings: courseSettings,
                 });
                 discussionUserProfileView.render();
             };

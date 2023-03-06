@@ -1,6 +1,6 @@
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/discovery/models/filter',
-    'js/discovery/views/filter_label'
+    'js/discovery/views/filter_label',
 ], function($, TemplateHelpers, Filter, FilterLabel) {
     'use strict';
 
@@ -10,7 +10,7 @@ define([
             var filter = new Filter({
                 type: 'language',
                 query: 'en',
-                name: 'English'
+                name: 'English',
             });
             this.view = new FilterLabel({model: filter});
             this.view.render();

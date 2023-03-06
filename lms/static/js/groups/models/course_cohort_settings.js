@@ -4,8 +4,8 @@
         var CourseCohortSettingsModel = Backbone.Model.extend({
             idAttribute: 'id',
             defaults: {
-                is_cohorted: false
-            }
+                is_cohorted: false,
+            },
         });
         return CourseCohortSettingsModel;
     });

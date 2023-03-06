@@ -14,13 +14,13 @@
  * - restrictEditing (bool) : Boolean flag for hiding edit and remove options, defaults to false.
  */
 define([
-    'js/views/baseview'
+    'js/views/baseview',
 ], function(BaseView) {
     'use strict';
     var ListView = BaseView.extend({
         events: {
             'click .action-add': 'onAddItem',
-            'click .new-button': 'onAddItem'
+            'click .new-button': 'onAddItem',
         },
 
         listContainerCss: '.list-items',
@@ -45,13 +45,13 @@ define([
                 length: this.collection.length,
                 isEditing: model && model.get('editing'),
                 canCreateNewItem: this.canCreateItem(this.collection),
-                restrictEditing: this.restrictEditing
+                restrictEditing: this.restrictEditing,
             });
             edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.HTML(template));
 
             this.collection.each(function(model) {
                 this.$(this.listContainerCss).append(
-                    this.createItemView({model: model, restrictEditing: this.restrictEditing}).render().el
+                    this.createItemView({model: model, restrictEditing: this.restrictEditing}).render().el,
                 );
             }, this);
 
@@ -111,7 +111,7 @@ define([
             if (this.collection.length === 0) {
                 this.render();
             }
-        }
+        },
     });
 
     return ListView;

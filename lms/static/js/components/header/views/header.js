@@ -6,7 +6,7 @@
     define([
         'backbone',
         'text!templates/components/header/header.underscore',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ],
     function(Backbone, headerTemplate, HtmlUtils) {
         var HeaderView = Backbone.View.extend({
@@ -21,13 +21,13 @@
                 var json = this.model.attributes;
                 HtmlUtils.setHtml(
                     this.$el,
-                    this.template(json)
+                    this.template(json),
                 );
                 if (this.headerActionsView) {
                     this.headerActionsView.setElement(this.$('.page-header-secondary')).render();
                 }
                 return this;
-            }
+            },
         });
 
         return HeaderView;

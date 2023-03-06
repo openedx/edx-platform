@@ -1,6 +1,6 @@
 define([
     'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/edxnotes/utils/notes_collector', 'js/spec/edxnotes/helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/edxnotes/utils/notes_collector', 'js/spec/edxnotes/helpers',
 ], function($, _, Annotator, NotesFactory, AjaxHelpers, NotesCollector, Helpers) {
     'use strict';
     describe('EdxNotes NotesFactory', function() {
@@ -21,7 +21,7 @@ define([
                 options = {
                     user: 'a user',
                     usage_id: 'an usage',
-                    course_id: 'a course'
+                    course_id: 'a course',
                 };
 
             _.each($('.edx-notes-wrapper'), function(wrapper) {
@@ -31,7 +31,7 @@ define([
                     usageId: 'an usage',
                     courseId: 'a course',
                     token: token,
-                    tokenUrl: '/test_token_url'
+                    tokenUrl: '/test_token_url',
                 });
 
                 expect(annotator.options.auth.tokenUrl).toBe('/test_token_url');

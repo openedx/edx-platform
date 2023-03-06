@@ -116,7 +116,7 @@
                 threads: '/courses/' + $$course_id + '/discussion/forum',
                 enable_notifications: '/notification_prefs/enable/',
                 disable_notifications: '/notification_prefs/disable/',
-                notifications_status: '/notification_prefs/status/'
+                notifications_status: '/notification_prefs/status/',
             }[name];
         };
 
@@ -146,7 +146,7 @@
                 edx.HtmlUtils.HTML("<div class='loading-animation' tabindex='0'>"),
                 edx.HtmlUtils.HTML("<span class='icon fa fa-spinner' aria-hidden='true'></span><span class='sr'>"),
                 gettext('Loading content'),
-                edx.HtmlUtils.HTML('</span></div>')
+                edx.HtmlUtils.HTML('</span></div>'),
             );
             var $animElem = $(animElem.toString());
             element.after($animElem);
@@ -169,14 +169,14 @@
             var popupTemplate = $('#alert-popup').html() || '';
             if ($('#discussion-alert').length === 0) {
                 $alertDiv = $(
-                    edx.HtmlUtils.template(popupTemplate)({}).toString()
+                    edx.HtmlUtils.template(popupTemplate)({}).toString(),
                 );
                 this.makeFocusTrap($alertDiv.find('button'));
                 $alertTrigger = $("<a href='#discussion-alert' id='discussion-alert-trigger'/>").css('display', 'none');
                 $alertTrigger.leanModal({
                     closeButton: '#discussion-alert .dismiss',
                     overlay: 1,
-                    top: 200
+                    top: 200,
                 });
                 $('body').append($alertDiv).append($alertTrigger);
             }
@@ -196,13 +196,13 @@
                 return deferred.promise();
             }
             params.url = URI(params.url).addSearch({
-                ajax: 1
+                ajax: 1,
             });
             if (!params.error) {
                 params.error = function() {
                     self.discussionAlert(
                         gettext('Error'),
-                        gettext('Your request could not be processed. Refresh the page and try again.')
+                        gettext('Your request could not be processed. Refresh the page and try again.'),
                     );
                 };
             }
@@ -273,12 +273,12 @@
                     return edx.HtmlUtils.joinHtml(
                         edx.HtmlUtils.HTML('<li>'),
                         edx.HtmlUtils.template(
-                            $('#new-post-alert-template').html()
+                            $('#new-post-alert-template').html(),
                         )({
                             message: message,
-                            alertId: alertId
+                            alertId: alertId,
                         }),
-                        edx.HtmlUtils.HTML('</li>')
+                        edx.HtmlUtils.HTML('</li>'),
                     );
                 };
                 errorsField.empty().show();
@@ -423,7 +423,7 @@
             $div.find('code').each(function(index, code) {
                 edx.HtmlUtils.setHtml(
                     $(code),
-                    edx.HtmlUtils.HTML(processor(codeArchive[index], 'code'))
+                    edx.HtmlUtils.HTML(processor(codeArchive[index], 'code')),
                 );
             });
             return edx.HtmlUtils.HTML($div.html());
@@ -433,8 +433,8 @@
             return edx.HtmlUtils.HTML(
                 htmlSnippet.toString().replace(
                     /\&lt\;highlight\&gt\;/g,
-                    "<span class='search-highlight'>").replace(/\&lt\;\/highlight\&gt\;/g, '</span>'
-                )
+                    "<span class='search-highlight'>").replace(/\&lt\;\/highlight\&gt\;/g, '</span>',
+                ),
             );
         };
 
@@ -481,7 +481,7 @@
         DiscussionUtil.convertMath = function(element) {
             edx.HtmlUtils.setHtml(
                 element,
-                this.postMathJaxProcessor(this.markdownWithHighlight(element.text()))
+                this.postMathJaxProcessor(this.markdownWithHighlight(element.text())),
             );
 
         };
@@ -497,12 +497,12 @@
             truncated_text = edx.HtmlUtils.HTML(jQuery.truncate(htmlSnippet.toString(), {
                 length: maxLength,
                 noBreaks: true,
-                ellipsis: gettext('…')
+                ellipsis: gettext('…'),
             }));
             $result = $(edx.HtmlUtils.joinHtml(
                 edx.HtmlUtils.HTML('<div>'),
                 truncated_text,
-                edx.HtmlUtils.HTML('</div>')
+                edx.HtmlUtils.HTML('</div>'),
             ).toString());
             imagesToReplace = $result.find('img:not(:first)');
             if (imagesToReplace.length > 0) {
@@ -510,13 +510,13 @@
                     $result,
                     edx.HtmlUtils.interpolateHtml(
                         edx.HtmlUtils.HTML('<p><em>{text}</em></p>'),
-                        {text: gettext('Some images in this post have been omitted')}
-                    )
+                        {text: gettext('Some images in this post have been omitted')},
+                    ),
                 );
             }
             // See TNL-4983 for an explanation of why the linter requires ensureHtml()
             var afterMessage = edx.HtmlUtils.interpolateHtml(
-                edx.HtmlUtils.HTML('<em>{text}</em>'), {text: gettext('image omitted')}
+                edx.HtmlUtils.HTML('<em>{text}</em>'), {text: gettext('image omitted')},
             );
             imagesToReplace.after(edx.HtmlUtils.ensureHtml(afterMessage).toString()).remove();
             return $result.html();
@@ -530,7 +530,7 @@
             pageInfo = function(pageNum) {
                 return {
                     number: pageNum,
-                    url: pageUrlFunc(pageNum)
+                    url: pageUrlFunc(pageNum),
                 };
             };
             return {
@@ -542,7 +542,7 @@
                 leftdots: minPage > 2,
                 rightdots: maxPage < numPages - 1,
                 first: minPage > 1 ? pageInfo(1) : null,
-                last: maxPage < numPages ? pageInfo(numPages) : null
+                last: maxPage < numPages ? pageInfo(numPages) : null,
             };
         };
 

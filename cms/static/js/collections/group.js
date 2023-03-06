@@ -1,5 +1,5 @@
 define([
-    'underscore', 'underscore.string', 'backbone', 'gettext', 'js/models/group'
+    'underscore', 'underscore.string', 'backbone', 'gettext', 'js/models/group',
 ],
 function(_, str, Backbone, gettext, GroupModel) {
     'use strict';
@@ -70,7 +70,7 @@ function(_, str, Backbone, gettext, GroupModel) {
 
                 return {
                     quotient: numerator / denominator,
-                    remainder: numerator % denominator
+                    remainder: numerator % denominator,
                 };
             };
 
@@ -104,7 +104,7 @@ function(_, str, Backbone, gettext, GroupModel) {
 
                 return String(number);
             };
-        }())
+        }()),
     });
 
     return GroupCollection;

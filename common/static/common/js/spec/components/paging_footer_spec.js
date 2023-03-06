@@ -4,7 +4,7 @@ define([
     'underscore',
     'edx-ui-toolkit/js/pagination/paging-collection',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/components/views/paging_footer'
+    'common/js/components/views/paging_footer',
 ], function($, URI, _, PagingCollection, AjaxHelpers, PagingFooter) {
     'use strict';
     describe('PagingFooter', function() {
@@ -18,7 +18,7 @@ define([
                     page: currentPage,
                     num_pages: numPages,
                     // need to have non-empty collection to render
-                    results: _.map(_.range(collectionLength), function() { return {}; })
+                    results: _.map(_.range(collectionLength), function() { return {}; }),
                 };
             },
             nextPageCss = '.next-page-link',
@@ -34,7 +34,7 @@ define([
 
             pagingFooter = new PagingFooter({
                 el: $('.paging-footer'),
-                collection: collection
+                collection: collection,
             }).render();
         });
 

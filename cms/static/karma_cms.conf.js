@@ -15,33 +15,33 @@ var options = {
 
     libraryFilesToInclude: [
         {pattern: 'common/js/vendor/jquery.js', included: true},
-        {pattern: 'common/js/vendor/jquery-migrate.js', included: true}
+        {pattern: 'common/js/vendor/jquery-migrate.js', included: true},
     ],
 
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
         {pattern: 'cms/**/!(*spec|djangojs).js'},
-        {pattern: 'js/**/!(*spec|djangojs).js'}
+        {pattern: 'js/**/!(*spec|djangojs).js'},
     ],
 
     specFiles: [
         {pattern: 'cms/**/*spec.js'},
         {pattern: 'js/certificates/spec/**/*spec.js'},
-        {pattern: 'js/spec/**/*spec.js'}
+        {pattern: 'js/spec/**/*spec.js'},
     ],
 
     fixtureFiles: [
         {pattern: '../templates/js/**/*.underscore'},
-        {pattern: 'templates/**/*.underscore'}
+        {pattern: 'templates/**/*.underscore'},
     ],
 
     runFiles: [
         {pattern: 'cms/js/spec/main.js', included: true},
-        {pattern: 'jasmine.cms.conf.js', included: true}
+        {pattern: 'jasmine.cms.conf.js', included: true},
     ],
 
-    preprocessors: {}
+    preprocessors: {},
 };
 
 (options.sourceFiles.concat(options.specFiles))

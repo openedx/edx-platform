@@ -2,9 +2,9 @@ define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'logger', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/search_results',
-    'js/spec/edxnotes/helpers'
+    'js/spec/edxnotes/helpers',
 ], function(
-    $, _, TemplateHelpers, AjaxHelpers, Logger, TabsCollection, SearchResultsView, Helpers
+    $, _, TemplateHelpers, AjaxHelpers, Logger, TabsCollection, SearchResultsView, Helpers,
 ) {
     'use strict';
     describe('EdxNotes SearchResultsView', function() {
@@ -13,20 +13,20 @@ define([
                     created: 'December 11, 2014 at 11:12AM',
                     updated: 'December 11, 2014 at 11:12AM',
                     text: 'Third added model',
-                    quote: 'Should be listed first'
+                    quote: 'Should be listed first',
                 },
                 {
                     created: 'December 11, 2014 at 11:11AM',
                     updated: 'December 11, 2014 at 11:11AM',
                     text: 'Second added model',
-                    quote: 'Should be listed second'
+                    quote: 'Should be listed second',
                 },
                 {
                     created: 'December 11, 2014 at 11:10AM',
                     updated: 'December 11, 2014 at 11:10AM',
                     text: 'First added model',
-                    quote: 'Should be listed third'
-                }
+                    quote: 'Should be listed third',
+                },
             ],
             responseJson = {
                 count: 3,
@@ -35,7 +35,7 @@ define([
                 start: 0,
                 next: null,
                 previous: null,
-                results: notes
+                results: notes,
             },
             getView, submitForm, tabInfo, searchResultsTabId;
 
@@ -47,7 +47,7 @@ define([
                 courseId: 'course_id',
                 createTabOnInitialization: false,
                 createHeaderFooter: true,
-                perPage: perPage || 10
+                perPage: perPage || 10,
             });
             return new SearchResultsView(options);
         };
@@ -63,7 +63,7 @@ define([
             icon: 'fa fa-search',
             is_active: true,
             is_closable: true,
-            view: 'Search Results'
+            view: 'Search Results',
         };
 
         searchResultsTabId = '#search-results-panel';
@@ -71,7 +71,7 @@ define([
         beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
-                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
+                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item',
             ]);
 
             this.tabsCollection = new TabsCollection();
@@ -118,7 +118,7 @@ define([
             expect(view.$('#no-results-panel')).toBeFocused();
             expect(view.$('#no-results-panel')).toExist();
             expect(view.$('#no-results-panel')).toContainText(
-                'No results found for "some text".'
+                'No results found for "some text".',
             );
         });
 
@@ -185,7 +185,7 @@ define([
                     created: 'December 11, 2014 at 11:10AM',
                     updated: 'December 11, 2014 at 11:10AM',
                     text: 'New Note',
-                    quote: 'New Note'
+                    quote: 'New Note',
                 }];
 
             submitForm(view.searchBox, 'test_query');
@@ -201,7 +201,7 @@ define([
                 start: 0,
                 next: null,
                 previous: null,
-                results: newNotes
+                results: newNotes,
             }, true);
 
             expect(view.$('.note').length).toHaveLength(1);
@@ -220,7 +220,7 @@ define([
                     start: 0,
                     next: null,
                     previous: null,
-                    results: []
+                    results: [],
                 };
             submitForm(view.searchBox, 'awesome');
             Helpers.respondToRequest(requests, notes, true);
@@ -237,8 +237,8 @@ define([
                         count: 12,
                         num_pages: 2,
                         current_page: 1,
-                        start: 0
-                    }
+                        start: 0,
+                    },
                 );
 
             submitForm(view.searchBox, 'awesome');
@@ -250,7 +250,7 @@ define([
             view.$('input#page-number-input').trigger('change');
             Helpers.verifyRequestParams(
                 requests[requests.length - 1].url,
-                {page: '2', page_size: '10'}
+                {page: '2', page_size: '10'},
             );
 
             notes = Helpers.createNotesData(
@@ -259,8 +259,8 @@ define([
                     count: 12,
                     num_pages: 2,
                     current_page: 2,
-                    start: 10
-                }
+                    start: 10,
+                },
             );
             Helpers.respondToRequest(requests, notes, true);
             Helpers.verifyPaginationInfo(view, 'Showing 11-12 out of 12 total', false, 2, 2);
@@ -275,8 +275,8 @@ define([
                         count: 15,
                         num_pages: 2,
                         current_page: 1,
-                        start: 0
-                    }
+                        start: 0,
+                    },
                 ),
                 view = getView(this.tabsCollection);
 
@@ -288,7 +288,7 @@ define([
             view.$('.pagination .next-page-link').click();
             Helpers.verifyRequestParams(
                 requests[requests.length - 1].url,
-                {page: '2', page_size: '10'}
+                {page: '2', page_size: '10'},
             );
             var page2Notes = Helpers.createNotesData(
                 {
@@ -296,8 +296,8 @@ define([
                     count: 15,
                     num_pages: 2,
                     current_page: 2,
-                    start: 10
-                }
+                    start: 10,
+                },
             );
             Helpers.respondToRequest(requests, page2Notes, true);
             Helpers.verifyPaginationInfo(view, 'Showing 11-15 out of 15 total', false, 2, 2);
@@ -306,7 +306,7 @@ define([
             view.$('.pagination .previous-page-link').click();
             Helpers.verifyRequestParams(
                 requests[requests.length - 1].url,
-                {page: '1', page_size: '10'}
+                {page: '1', page_size: '10'},
             );
             Helpers.respondToRequest(requests, page1Notes);
 
@@ -321,7 +321,7 @@ define([
             submitForm(view.searchBox, 'awesome');
             Helpers.verifyRequestParams(
                 requests[requests.length - 1].url,
-                {page: '1', page_size: '5'}
+                {page: '1', page_size: '5'},
             );
         });
     });

@@ -2,7 +2,7 @@
     'use strict';
     define([
         'jquery',
-        'js/student_account/views/FormView'
+        'js/student_account/views/FormView',
     ],
     function($, FormView) {
         return FormView.extend({
@@ -12,7 +12,7 @@
 
             events: {
                 'click .js-reset': 'submitForm',
-                'click .reset-help': 'toggleResetHelp'
+                'click .reset-help': 'toggleResetHelp',
             },
 
             formType: 'password-reset',
@@ -41,7 +41,7 @@
                 // Destroy the view (but not el) and unbind events
                 this.$el.empty().off();
                 this.stopListening();
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

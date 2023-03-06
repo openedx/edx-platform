@@ -14,11 +14,11 @@ define(['jquery'], function($) {  // eslint-disable-line no-unused-vars
                         });
 
                         return {
-                            pass: passed
+                            pass: passed,
                         };
-                    }
+                    },
                 };
-            }
+            },
         });
     };
 });

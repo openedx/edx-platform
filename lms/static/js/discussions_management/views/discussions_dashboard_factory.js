@@ -18,8 +18,8 @@
                     el: $discussionsManagementElement,
                     discussionSettings: courseDiscussionSettings,
                     context: {
-                        courseDiscussionTopicDetailsModel: discussionTopicsSettings
-                    }
+                        courseDiscussionTopicDetailsModel: discussionTopicsSettings,
+                    },
                 });
 
                 courseDiscussionSettings.fetch().done(function() {

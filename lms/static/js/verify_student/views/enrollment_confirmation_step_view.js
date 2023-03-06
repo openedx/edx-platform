@@ -24,8 +24,8 @@ var edx = edx || {};
             return {
                 courseName: '',
                 coursewareUrl: '',
-                platformName: ''
+                platformName: '',
             };
-        }
+        },
     });
 }());

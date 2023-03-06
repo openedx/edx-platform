@@ -7,7 +7,7 @@ define(['backbone',
     'js/spec/student_account/helpers',
     'js/spec/student_account/account_settings_fields_helpers',
     'js/student_account/views/account_settings_factory',
-    'js/student_account/views/account_settings_view'
+    'js/student_account/views/account_settings_view',
 ],
 function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, Helpers,
     AccountSettingsFieldViewSpecHelpers, AccountSettingsPage) {
@@ -27,7 +27,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
                 Helpers.PLATFORM_NAME,
                 Helpers.CONTACT_EMAIL,
                 true,
-                Helpers.ENABLE_COPPA_COMPLIANCE
+                Helpers.ENABLE_COPPA_COMPLIANCE,
             );
             return context.accountSettingsView;
         };
@@ -125,7 +125,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
                     invalidValue1: '',
                     invalidValue2: '@',
                     validationError: 'Think again!',
-                    defaultValue: ''
+                    defaultValue: '',
                 }, requests);
             }
 
@@ -133,7 +133,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             var dropdownFields = [
                 sectionsData[1].fields[0],
                 sectionsData[1].fields[1],
-                sectionsData[1].fields[2]
+                sectionsData[1].fields[2],
             ];
             _.each(dropdownFields, function(field) {
                 var view = field.view;
@@ -145,7 +145,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
                     invalidValue1: Helpers.FIELD_OPTIONS[2][0],
                     invalidValue2: Helpers.FIELD_OPTIONS[3][0],
                     validationError: 'Nope, this will not do!',
-                    defaultValue: null
+                    defaultValue: null,
                 }, requests);
             });
         });
@@ -171,7 +171,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
                 Helpers.SYNC_LEARNER_PROFILE_DATA,
                 Helpers.ENTERPRISE_NAME,
                 Helpers.ENTERPRISE_READ_ONLY_ACCOUNT_FIELDS,
-                Helpers.EDX_SUPPORT_URL
+                Helpers.EDX_SUPPORT_URL,
             );
             return context.accountSettingsView;
         };
@@ -179,7 +179,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
         var requests;
         var accountInfoTab = {
             BASIC_ACCOUNT_INFORMATION: 0,
-            ADDITIONAL_INFORMATION: 1
+            ADDITIONAL_INFORMATION: 1,
         };
         var basicAccountInfoFields = {
             USERNAME: 0,
@@ -188,13 +188,13 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             PASSWORD: 3,
             LANGUAGE: 4,
             COUNTRY: 5,
-            TIMEZONE: 6
+            TIMEZONE: 6,
         };
         var additionalInfoFields = {
             EDUCATION: 0,
             GENDER: 1,
             YEAR_OF_BIRTH: 2,
-            PREFERRED_LANGUAGE: 3
+            PREFERRED_LANGUAGE: 3,
         };
 
         beforeEach(function() {
@@ -282,7 +282,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             textFields = [
                 sectionsData[accountInfoTab.BASIC_ACCOUNT_INFORMATION].fields[basicAccountInfoFields.USERNAME],
                 sectionsData[accountInfoTab.BASIC_ACCOUNT_INFORMATION].fields[basicAccountInfoFields.FULL_NAME],
-                sectionsData[accountInfoTab.BASIC_ACCOUNT_INFORMATION].fields[basicAccountInfoFields.EMAIL_ADDRESS]
+                sectionsData[accountInfoTab.BASIC_ACCOUNT_INFORMATION].fields[basicAccountInfoFields.EMAIL_ADDRESS],
             ];
             for (i = 0; i < textFields.length; i++) {
                 view = textFields[i].view;
@@ -292,7 +292,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
                     valueAttribute: view.options.valueAttribute,
                     helpMessage: view.options.helpMessage,
                     validValue: 'My Name',
-                    defaultValue: ''
+                    defaultValue: '',
                 }, requests);
             }
 
@@ -307,14 +307,14 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
                 helpMessage: '',
                 validValue: Helpers.FIELD_OPTIONS[1][0],
                 editable: 'never',
-                defaultValue: null
+                defaultValue: null,
             });
 
             expect(sectionsData[accountInfoTab.ADDITIONAL_INFORMATION].fields.length).toBe(4);
             dropdownFields = [
                 sectionsData[accountInfoTab.ADDITIONAL_INFORMATION].fields[additionalInfoFields.EDUCATION],
                 sectionsData[accountInfoTab.ADDITIONAL_INFORMATION].fields[additionalInfoFields.GENDER],
-                sectionsData[accountInfoTab.ADDITIONAL_INFORMATION].fields[additionalInfoFields.YEAR_OF_BIRTH]
+                sectionsData[accountInfoTab.ADDITIONAL_INFORMATION].fields[additionalInfoFields.YEAR_OF_BIRTH],
             ];
             _.each(dropdownFields, function(field) {
                 view = field.view;
@@ -326,7 +326,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
                     invalidValue1: Helpers.FIELD_OPTIONS[2][0], // dummy option for dropdown field
                     invalidValue2: Helpers.FIELD_OPTIONS[3][0], // dummy option for dropdown field
                     validationError: 'Nope, this will not do!',
-                    defaultValue: null
+                    defaultValue: null,
                 }, requests);
             });
         });

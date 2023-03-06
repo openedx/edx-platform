@@ -1,7 +1,7 @@
 define(
     [
         'underscore',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     ],
     function(_, AjaxHelpers) {
         'use strict';
@@ -14,7 +14,7 @@ define(
                     num_pages: options.num_pages || 1,
                     current_page: options.current_page || 1,
                     start: options.start || 0,
-                    results: []
+                    results: [],
                 },
                 i, bookmarkInfo;
 
@@ -28,8 +28,8 @@ define(
                     block_type: 'vertical',
                     path: [
                         {display_name: 'SECTION_DISPLAY_NAME', usage_id: 'SECTION_USAGE_ID'},
-                        {display_name: 'SUBSECTION_DISPLAY_NAME', usage_id: 'SUBSECTION_USAGE_ID'}
-                    ]
+                        {display_name: 'SUBSECTION_DISPLAY_NAME', usage_id: 'SUBSECTION_USAGE_ID'},
+                    ],
                 };
 
                 data.results.push(bookmarkInfo);
@@ -88,6 +88,6 @@ define(
             createBookmarksData: createBookmarksData,
             createBookmarkUrl: createBookmarkUrl,
             verifyBookmarkedData: verifyBookmarkedData,
-            verifyPaginationInfo: verifyPaginationInfo
+            verifyPaginationInfo: verifyPaginationInfo,
         };
     });

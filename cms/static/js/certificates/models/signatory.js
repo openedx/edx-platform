@@ -3,7 +3,7 @@
 define([
     'underscore',
     'backbone',
-    'backbone-relational'
+    'backbone-relational',
 ],
 function(_, Backbone) {
     'use strict';
@@ -14,7 +14,7 @@ function(_, Backbone) {
             name: '',
             title: '',
             organization: '',
-            signature_image_path: ''
+            signature_image_path: '',
         },
 
         initialize: function() {
@@ -36,7 +36,7 @@ function(_, Backbone) {
         reset: function() {
             // Revert the attributes of this model instance back to initial state
             this.set(this._originalAttributes, {parse: true, validate: true});
-        }
+        },
     });
     return Signatory;
 });

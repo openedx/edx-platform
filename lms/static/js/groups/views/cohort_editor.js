@@ -10,7 +10,7 @@
                 'click .wrapper-tabs .tab': 'selectTab',
                 'click .tab-content-settings .action-save': 'saveSettings',
                 'click .tab-content-settings .action-cancel': 'cancelSettings',
-                'submit .cohort-management-group-add-form': 'addStudents'
+                'submit .cohort-management-group-add-form': 'addStudents',
             },
 
             initialize: function(options) {
@@ -30,13 +30,13 @@
 
             render: function() {
                 HtmlUtils.setHtml(this.$el, this.template({
-                    cohort: this.model
+                    cohort: this.model,
                 }));
                 this.renderGroupHeader();
                 this.cohortFormView = new CohortFormView({
                     model: this.model,
                     contentGroups: this.contentGroups,
-                    context: this.context
+                    context: this.context,
                 });
                 this.cohortFormView.render();
                 this.$('.tab-content-settings').append(this.cohortFormView.$el);
@@ -45,7 +45,7 @@
 
             renderGroupHeader: function() {
                 HtmlUtils.setHtml(this.$('.cohort-management-group-header'), this.groupHeaderTemplate({
-                    cohort: this.model
+                    cohort: this.model,
                 }));
             },
 
@@ -59,8 +59,8 @@
                 edx.HtmlUtils.prepend(
                     $($tabElement.find('a')),
                     edx.HtmlUtils.interpolateHtml('<span class="sr"> {selectedTab} </span>',
-                        {selectedTab: gettext('Selected tab')}
-                    )
+                        {selectedTab: gettext('Selected tab')},
+                    ),
                 );
                 this.$('.tab-content').addClass('is-hidden');
                 this.$('.tab-content-' + tabName).removeClass('is-hidden').focus();
@@ -98,7 +98,7 @@
 
                 if (students.length > 0) {
                     $.post(
-                        add_url, {users: students}
+                        add_url, {users: students},
                     ).done(function(modifiedUsers) {
                         self.refreshCohorts().done(function() {
                             // Find the equivalent cohort in the new collection and select it
@@ -153,7 +153,7 @@
 
                 this.errorNotifications = new NotificationView({
                     el: this.$('.cohort-errors'),
-                    model: model
+                    model: model,
                 });
                 this.errorNotifications.render();
             },
@@ -173,7 +173,7 @@
                     title += interpolate_text(
                         ngettext('{numUsersAdded} learner has been added to this cohort. ',
                             '{numUsersAdded} learners have been added to this cohort. ', numUsersAdded),
-                        {numUsersAdded: numUsersAdded}
+                        {numUsersAdded: numUsersAdded},
                     );
 
                     var movedByCohort = {};
@@ -193,8 +193,8 @@
                             interpolate_text(
                                 ngettext('{numMoved} learner was moved from {prevCohort}',
                                     '{numMoved} learners were moved from {prevCohort}', numMoved),
-                                {numMoved: numMoved, prevCohort: prevCohort}
-                            )
+                                {numMoved: numMoved, prevCohort: prevCohort},
+                            ),
                         );
                     });
 
@@ -203,8 +203,8 @@
                             interpolate_text(
                                 ngettext('{numPresent} learner was already in the cohort',
                                     '{numPresent} learners were already in the cohort', numPresent),
-                                {numPresent: numPresent}
-                            )
+                                {numPresent: numPresent},
+                            ),
                         );
                     }
 
@@ -213,8 +213,8 @@
                         model: new NotificationModel({
                             type: 'confirmation',
                             title: title,
-                            details: details
-                        })
+                            details: details,
+                        }),
                     });
                     this.confirmationNotifications.render();
                 } else if (this.confirmationNotifications) {
@@ -240,7 +240,7 @@
                                     'These learners will automatically be added to the cohort when ' +
                                     'they enroll in the course.',
                             numPreassigned),
-                            {numPreassigned: numPreassigned}
+                            {numPreassigned: numPreassigned},
                         )
                     );
 
@@ -249,8 +249,8 @@
                         model: new NotificationModel({
                             type: 'warning',
                             title: title,
-                            details: details
-                        })
+                            details: details,
+                        }),
                     });
                     this.preassignedNotifications.render();
                 } else if (this.preassignedNotifications) {
@@ -289,7 +289,7 @@
                     title = interpolate_text(
                         ngettext('There was an error when trying to add learners:',
                             '{numErrors} learners could not be added to this cohort:', numErrors),
-                        {numErrors: numErrors}
+                        {numErrors: numErrors},
                     );
                     details = createErrorDetails(modifiedUsers.unknown, modifiedUsers.invalid, modifiedUsers.not_allowed, false);
 
@@ -304,7 +304,7 @@
                         details: details,
                         actionText: numErrors > errorLimit ? gettext('View all errors') : null,
                         actionCallback: errorActionCallback,
-                        actionClass: 'action-expand'
+                        actionClass: 'action-expand',
                     });
 
                     this.showErrorMessage(title, false, errorModel);
@@ -312,7 +312,7 @@
                     this.errorNotifications.$el.html('');
                     this.errorNotifications = null;
                 }
-            }
+            },
         });
         return CohortEditorView;
     });

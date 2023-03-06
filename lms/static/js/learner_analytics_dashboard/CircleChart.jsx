@@ -103,14 +103,14 @@ class CircleChart extends React.Component {
 CircleChart.defaultProps = {
     sliceBorder: {
         strokeColor: '#fff',
-        strokeWidth: 0
-    }
+        strokeWidth: 0,
+    },
 };
 
 CircleChart.propTypes = {
     slices: PropTypes.array.isRequired,
     centerHole: PropTypes.bool,
-    sliceBorder: PropTypes.object
+    sliceBorder: PropTypes.object,
 };
 
 export default CircleChart;

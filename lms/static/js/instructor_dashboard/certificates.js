@@ -58,7 +58,7 @@ var onCertificatesReady = null;
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     $certificate_generation_status.text(gettext('Error while generating certificates. Please try again.'));
-                }
+                },
             });
         });
 
@@ -96,7 +96,7 @@ var onCertificatesReady = null;
                             text(gettext('Error while regenerating certificates. Please try again.')).
                             addClass('message');
                     }
-                }
+                },
             });
         });
     };
@@ -121,14 +121,14 @@ var onCertificatesReady = null;
     }());
 
     _.defaults(window, {
-        InstructorDashboard: {}
+        InstructorDashboard: {},
     });
 
     _.defaults(window.InstructorDashboard, {
-        sections: {}
+        sections: {},
     });
 
     _.defaults(window.InstructorDashboard.sections, {
-        Certificates: Certificates
+        Certificates: Certificates,
     });
 }($, gettext, _));

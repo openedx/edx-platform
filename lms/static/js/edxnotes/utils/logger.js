@@ -144,7 +144,7 @@
                 loggers.push(logger);
                 return logger;
             },
-            destroyLogger: destroyLogger
+            destroyLogger: destroyLogger,
         };
     });
 }).call(this, define || RequireJS.define);

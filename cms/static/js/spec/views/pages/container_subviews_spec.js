@@ -28,7 +28,7 @@ describe('Container Subviews', function() {
             url_name: 'course_name',
             org: 'course_org',
             num: 'course_num',
-            revision: 'course_rev'
+            revision: 'course_rev',
         });
 
         TemplateHelpers.installTemplate('xblock-string-field-editor');
@@ -56,7 +56,7 @@ describe('Container Subviews', function() {
         visibility_state: VisibilityState.unscheduled,
         edited_on: 'Jul 02, 2014 at 14:20 UTC', edited_by: 'joe',
         published_on: 'Jul 01, 2014 at 12:45 UTC', published_by: 'amako',
-        currently_visible_to_students: false
+        currently_visible_to_students: false,
     };
 
     createXBlockInfo = function(options) {
@@ -69,7 +69,7 @@ describe('Container Subviews', function() {
             model: model,
             templates: EditHelpers.mockComponentTemplates,
             el: $('#content'),
-            isUnitPage: true
+            isUnitPage: true,
         });
     };
 
@@ -82,7 +82,7 @@ describe('Container Subviews', function() {
     respondWithHtml = function(html, options) {
         AjaxHelpers.respondWithJson(
             requests,
-            {html: html, resources: []}
+            {html: html, resources: []},
         );
         AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
         AjaxHelpers.respondWithJson(requests, createXBlockInfo(options));
@@ -150,7 +150,7 @@ describe('Container Subviews', function() {
             promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(promptSpies);
 
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container',
-                {publish: 'discard_changes'}
+                {publish: 'discard_changes'},
             );
         };
 
@@ -191,7 +191,7 @@ describe('Container Subviews', function() {
             renderContainerPage(this, mockContainerXBlockHtml);
             fetch({
                 published: true, has_changes: false, visibility_state: VisibilityState.ready,
-                release_date: 'Jul 02, 2030 at 14:20 UTC'
+                release_date: 'Jul 02, 2030 at 14:20 UTC',
             });
             expect(containerPage.$(headerCss).text()).toContain('Published (not yet released)');
             expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
@@ -201,7 +201,7 @@ describe('Container Subviews', function() {
 
             fetch({
                 published: true, has_changes: true, visibility_state: VisibilityState.needsAttention,
-                release_date: 'Jul 02, 2030 at 14:20 UTC'
+                release_date: 'Jul 02, 2030 at 14:20 UTC',
             });
             expect(containerPage.$(headerCss).text()).toContain('Draft (Unpublished changes)');
             expect(containerPage.$(publishButtonCss)).not.toHaveClass(disabledCss);
@@ -210,7 +210,7 @@ describe('Container Subviews', function() {
             expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
             fetch({published: true, has_changes: false, visibility_state: VisibilityState.live,
-                release_date: 'Jul 02, 1990 at 14:20 UTC'
+                release_date: 'Jul 02, 1990 at 14:20 UTC',
             });
             expect(containerPage.$(headerCss).text()).toContain('Published and Live');
             expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
@@ -219,7 +219,7 @@ describe('Container Subviews', function() {
             expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
             fetch({published: true, has_changes: false, visibility_state: VisibilityState.unscheduled,
-                release_date: null
+                release_date: null,
             });
             expect(containerPage.$(headerCss).text()).toContain('Published (not yet released)');
             expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
@@ -239,7 +239,7 @@ describe('Container Subviews', function() {
             EditHelpers.verifyNotificationShowing(notificationSpy, /Publishing/);
 
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container',
-                {publish: 'make_public'}
+                {publish: 'make_public'},
             );
 
             // Response to publish call
@@ -251,8 +251,8 @@ describe('Container Subviews', function() {
             AjaxHelpers.respondWithJson(
                 requests,
                 createXBlockInfo({
-                    published: true, has_changes: false, visibility_state: VisibilityState.ready
-                })
+                    published: true, has_changes: false, visibility_state: VisibilityState.ready,
+                }),
             );
 
             // Verify updates displayed
@@ -347,7 +347,7 @@ describe('Container Subviews', function() {
                 renderContainerPage(this, mockContainerXBlockHtml);
                 fetch({
                     visibility_state: VisibilityState.ready, released_to_students: false,
-                    release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"'
+                    release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"',
                 });
                 expect(containerPage.$(releaseDateTitleCss).text()).toContain('Scheduled:');
                 expect(containerPage.$(releaseDateDateCss).text()).toContain('Jul 02, 2014 at 14:20 UTC');
@@ -358,7 +358,7 @@ describe('Container Subviews', function() {
                 renderContainerPage(this, mockContainerXBlockHtml);
                 fetch({
                     visibility_state: VisibilityState.live, released_to_students: true,
-                    release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"'
+                    release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"',
                 });
                 expect(containerPage.$(releaseDateTitleCss).text()).toContain('Released:');
                 expect(containerPage.$(releaseDateDateCss).text()).toContain('Jul 02, 2014 at 14:20 UTC');
@@ -369,7 +369,7 @@ describe('Container Subviews', function() {
                 renderContainerPage(this, mockContainerXBlockHtml);
                 fetch({
                     visibility_state: VisibilityState.unscheduled, released_to_students: false,
-                    release_date: null, release_date_from: null
+                    release_date: null, release_date_from: null,
                 });
                 expect(containerPage.$(releaseDateTitleCss).text()).toContain('Release:');
                 expect(containerPage.$(releaseDateContentCss).text()).toContain('Unscheduled');
@@ -379,7 +379,7 @@ describe('Container Subviews', function() {
                 renderContainerPage(this, mockContainerXBlockHtml);
                 fetch({
                     visibility_state: VisibilityState.needsAttention, released_to_students: true,
-                    release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"'
+                    release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"',
                 });
                 containerPage.xblockPublisher.render();
                 expect(containerPage.$(releaseDateTitleCss).text()).toContain('Release:');
@@ -404,14 +404,14 @@ describe('Container Subviews', function() {
 
                 AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container', {
                     publish: 'republish',
-                    metadata: {visible_to_staff_only: isStaffOnly ? true : null}
+                    metadata: {visible_to_staff_only: isStaffOnly ? true : null},
                 });
                 AjaxHelpers.respondWithJson(requests, {
                     data: null,
                     id: 'locator-container',
                     metadata: {
-                        visible_to_staff_only: isStaffOnly ? true : null
-                    }
+                        visible_to_staff_only: isStaffOnly ? true : null,
+                    },
                 });
 
                 AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
@@ -424,7 +424,7 @@ describe('Container Subviews', function() {
                     published: containerPage.model.get('published'),
                     has_explicit_staff_lock: isStaffOnly,
                     visibility_state: newVisibilityState,
-                    release_date: 'Jul 02, 2000 at 14:20 UTC'
+                    release_date: 'Jul 02, 2000 at 14:20 UTC',
                 }));
             };
 
@@ -466,7 +466,7 @@ describe('Container Subviews', function() {
                 renderContainerPage(this, mockContainerXBlockHtml, {
                     released_to_students: true,
                     published: true,
-                    has_changes: false
+                    has_changes: false,
                 });
                 expect(containerPage.$(visibilityTitleCss).text()).toContain('Is Visible To');
             });
@@ -475,7 +475,7 @@ describe('Container Subviews', function() {
                 renderContainerPage(this, mockContainerXBlockHtml, {
                     released_to_students: false,
                     published: true,
-                    has_changes: true
+                    has_changes: true,
                 });
                 expect(containerPage.$(visibilityTitleCss).text()).toContain('Will Be Visible To');
             });
@@ -492,7 +492,7 @@ describe('Container Subviews', function() {
                 renderContainerPage(this, mockContainerXBlockHtml, {
                     visibility_state: VisibilityState.staffOnly,
                     ancestor_has_staff_lock: true,
-                    staff_lock_from: 'Section Foo'
+                    staff_lock_from: 'Section Foo',
                 });
                 verifyImplicitStaffOnly(true);
                 verifyExplicitStaffOnly(false);
@@ -503,7 +503,7 @@ describe('Container Subviews', function() {
                 renderContainerPage(this, mockContainerXBlockHtml, {
                     visibility_state: VisibilityState.staffOnly,
                     ancestor_has_staff_lock: true,
-                    staff_lock_from: 'Section Foo'
+                    staff_lock_from: 'Section Foo',
                 });
                 requestStaffOnly(true);
                 // explicit staff lock overrides the display of implicit staff lock
@@ -517,7 +517,7 @@ describe('Container Subviews', function() {
                 renderContainerPage(this, mockContainerXBlockHtml, {
                     visibility_state: VisibilityState.staffOnly,
                     has_explicit_staff_lock: true,
-                    ancestor_has_staff_lock: false
+                    ancestor_has_staff_lock: false,
                 });
                 requestStaffOnly(false);
                 verifyStaffOnly(false);
@@ -529,7 +529,7 @@ describe('Container Subviews', function() {
                     visibility_state: VisibilityState.staffOnly,
                     ancestor_has_staff_lock: true,
                     has_explicit_staff_lock: true,
-                    staff_lock_from: 'Section Foo'
+                    staff_lock_from: 'Section Foo',
                 });
                 requestStaffOnly(false);
                 verifyExplicitStaffOnly(false);
@@ -542,7 +542,7 @@ describe('Container Subviews', function() {
                 renderContainerPage(this, mockContainerXBlockHtml, {
                     visibility_state: VisibilityState.staffOnly,
                     has_explicit_staff_lock: true,
-                    ancestor_has_staff_lock: false
+                    ancestor_has_staff_lock: false,
                 });
                 containerPage.$('.action-staff-lock').click();
                 EditHelpers.confirmPrompt(promptSpy, true);    // Click 'No' to cancel
@@ -566,7 +566,7 @@ describe('Container Subviews', function() {
 
         it('renders never published when the block is unpublished', function() {
             renderContainerPage(this, mockContainerXBlockHtml, {
-                published: false, published_on: null, published_by: null
+                published: false, published_on: null, published_by: null,
             });
             expect(containerPage.$(lastPublishCss).text()).toContain('Never published');
         });
@@ -574,7 +574,7 @@ describe('Container Subviews', function() {
         it('renders the last published date and user when the block is published', function() {
             renderContainerPage(this, mockContainerXBlockHtml);
             fetch({
-                published: true, published_on: 'Jul 01, 2014 at 12:45 UTC', published_by: 'amako'
+                published: true, published_on: 'Jul 01, 2014 at 12:45 UTC', published_by: 'amako',
             });
             expect(containerPage.$(lastPublishCss).text()).
                 toContain('Last published Jul 01, 2014 at 12:45 UTC by amako');
@@ -583,7 +583,7 @@ describe('Container Subviews', function() {
         it('renders correctly when the block is published without publish info', function() {
             renderContainerPage(this, mockContainerXBlockHtml);
             fetch({
-                published: true, published_on: null, published_by: null
+                published: true, published_on: null, published_by: null,
             });
             expect(containerPage.$(lastPublishCss).text()).toContain('Previously published');
         });
@@ -596,21 +596,21 @@ describe('Container Subviews', function() {
 
         it('is empty for a unit that is not currently visible to students', function() {
             renderContainerPage(this, mockContainerXBlockHtml, {
-                currently_visible_to_students: false
+                currently_visible_to_students: false,
             });
             expect(containerPage.$(messageSelector).text().trim()).toBe('');
         });
 
         it('shows a message for a unit that is currently visible to students', function() {
             renderContainerPage(this, mockContainerXBlockHtml, {
-                currently_visible_to_students: true
+                currently_visible_to_students: true,
             });
             expect(containerPage.$(messageSelector).text().trim()).toBe(warningMessage);
         });
 
         it('hides the message when the unit is hidden from students', function() {
             renderContainerPage(this, mockContainerXBlockHtml, {
-                currently_visible_to_students: true
+                currently_visible_to_students: true,
             });
             fetch({currently_visible_to_students: false});
             expect(containerPage.$(messageSelector).text().trim()).toBe('');
@@ -618,7 +618,7 @@ describe('Container Subviews', function() {
 
         it('shows a message when a unit is made visible', function() {
             renderContainerPage(this, mockContainerXBlockHtml, {
-                currently_visible_to_students: false
+                currently_visible_to_students: false,
             });
             fetch({currently_visible_to_students: true});
             expect(containerPage.$(messageSelector).text().trim()).toBe(warningMessage);

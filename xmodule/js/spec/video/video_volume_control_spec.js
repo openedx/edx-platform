@@ -51,10 +51,10 @@
                     range: 'min',
                     min: 0,
                     max: 100,
-                    slide: jasmine.any(Function)
+                    slide: jasmine.any(Function),
                 }]);
                 expect($.fn.slider).toHaveBeenCalledWith(
-                    'value', volumeControl.volume
+                    'value', volumeControl.volume,
                 );
             });
 
@@ -62,7 +62,7 @@
                 var $liveRegion = $('.video-live-region');
 
                 expect($liveRegion).toHaveAttrs({
-                    'aria-live': 'polite'
+                    'aria-live': 'polite',
                 });
             });
 
@@ -70,7 +70,7 @@
                 var $button = $('.volume .control');
 
                 expect($button).toHaveAttrs({
-                    'aria-disabled': 'false'
+                    'aria-disabled': 'false',
                 });
             });
 
@@ -106,11 +106,11 @@
 
                                 actual.setVolume(volume, true, true);
                                 return {
-                                    pass: $region.text() === getExpectedText(expectation)
+                                    pass: $region.text() === getExpectedText(expectation),
                                 };
-                            }
+                            },
                         };
-                    }
+                    },
                 });
             });
 
@@ -287,21 +287,21 @@
             it('nothing happens if ALT+keyUp are pushed down', function() {
                 assertVolumeIsNotChanged({
                     keyCode: KEY.UP,
-                    altKey: true
+                    altKey: true,
                 });
             });
 
             it('nothing happens if SHIFT+keyUp are pushed down', function() {
                 assertVolumeIsNotChanged({
                     keyCode: KEY.UP,
-                    shiftKey: true
+                    shiftKey: true,
                 });
             });
 
             it('nothing happens if SHIFT+keyDown are pushed down', function() {
                 assertVolumeIsNotChanged({
                     keyCode: KEY.DOWN,
-                    shiftKey: true
+                    shiftKey: true,
                 });
             });
         });
@@ -316,7 +316,7 @@
                 var isMuted = volumeControl.getMuteStatus();
                 $('.volume .control').trigger(jQuery.Event('keydown', {
                     keyCode: KEY.ENTER,
-                    altKey: true
+                    altKey: true,
                 }));
                 expect(volumeControl.getMuteStatus()).toEqual(isMuted);
             });

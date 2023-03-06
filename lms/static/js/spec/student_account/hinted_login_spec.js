@@ -5,7 +5,7 @@
         'underscore',
         'common/js/spec_helpers/template_helpers',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'js/student_account/views/HintedLoginView'
+        'js/student_account/views/HintedLoginView',
     ],
     function($, _, TemplateHelpers, AjaxHelpers, HintedLoginView) {
         describe('edx.student.account.HintedLoginView', function() {
@@ -20,15 +20,15 @@
                             name: 'Google',
                             iconClass: 'fa-google-plus',
                             loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
-                            registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
+                            registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register',
                         },
                         {
                             id: 'oa2-facebook',
                             name: 'Facebook',
                             iconClass: 'fa-facebook',
                             loginUrl: '/auth/login/facebook/?auth_entry=account_login',
-                            registerUrl: '/auth/login/facebook/?auth_entry=account_register'
-                        }
+                            registerUrl: '/auth/login/facebook/?auth_entry=account_register',
+                        },
                     ],
                     secondaryProviders: [
                         {
@@ -36,9 +36,9 @@
                             name: 'Harvard',
                             iconClass: 'fa-university',
                             loginUrl: '/auth/login/tpa-saml/?auth_entry=account_login&idp=harvard',
-                            registerUrl: '/auth/login/tpa-saml/?auth_entry=account_register&idp=harvard'
-                        }
-                    ]
+                            registerUrl: '/auth/login/tpa-saml/?auth_entry=account_register&idp=harvard',
+                        },
+                    ],
                 };
 
             var createHintedLoginView = function(hintedProvider) {
@@ -46,7 +46,7 @@
                 view = new HintedLoginView({
                     thirdPartyAuth: THIRD_PARTY_AUTH,
                     hintedProvider: hintedProvider,
-                    platformName: PLATFORM_NAME
+                    platformName: PLATFORM_NAME,
                 });
 
                 // Mock the redirect call

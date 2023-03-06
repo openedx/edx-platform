@@ -24,7 +24,7 @@
                 pinned: false,
                 endorsed: false,
                 votes: {
-                    up_count: '0'
+                    up_count: '0',
                 },
                 read: false,
                 unread_comments_count: 0,
@@ -37,8 +37,8 @@
                     can_delete: false,
                     can_reply: true,
                     can_vote: false,
-                    editable: false
-                }
+                    editable: false,
+                },
             };
             return $.extend(thread, props);
         };
@@ -101,7 +101,7 @@
             expect((_ref = model.id, __indexOf.call(user.get('upvoted_ids'), _ref) >= 0)).toBe(true);
             initialVoteCount = model.get('votes').up_count;
             triggerVoteEvent(
-                view, event, DiscussionUtil.urlFor('undo_vote_for_' + (model.get('type')), model.id) + '?ajax=1'
+                view, event, DiscussionUtil.urlFor('undo_vote_for_' + (model.get('type')), model.id) + '?ajax=1',
             );
             expect(user.get('upvoted_ids')).toEqual([]);
             return expect(model.get('votes').up_count).toEqual(initialVoteCount - 1);
@@ -115,12 +115,12 @@
             expect(spy).toHaveBeenCalled();
             spy.calls.reset();
             button.trigger($.Event('keydown', {
-                which: 13
+                which: 13,
             }));
             expect(spy).not.toHaveBeenCalled();
             spy.calls.reset();
             button.trigger($.Event('keydown', {
-                which: 32
+                which: 32,
             }));
             return expect(spy).toHaveBeenCalled();
         };
@@ -132,11 +132,11 @@
         DiscussionViewSpecHelper.setNextResponseContent = function(content) {
             return $.ajax.and.callFake(function(params) {
                 params.success({
-                    content: content
+                    content: content,
                 });
                 return {
                     always: function() {
-                    }
+                    },
                 };
             });
         };

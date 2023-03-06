@@ -3,7 +3,7 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'support/js/spec_helpers/enrollment_helpers',
     'support/js/models/enrollment',
-    'support/js/views/enrollment_modal'
+    'support/js/views/enrollment_modal',
 ], function(_, AjaxHelpers, EnrollmentHelpers, EnrollmentModel, EnrollmentModal) {
     'use strict';
 
@@ -23,14 +23,14 @@ define([
                 reasons: _.reduce(
                     ['Financial Assistance', 'Stampeding Buffalo', 'Angry Customer'],
                     function(acc, x) { acc[x] = x; return acc; },
-                    {}
-                )
+                    {},
+                ),
             }).render();
         });
 
         it('can render itself', function() {
             expect($('.enrollment-modal h1').text()).toContain(
-                'Change enrollment for ' + EnrollmentHelpers.TEST_COURSE
+                'Change enrollment for ' + EnrollmentHelpers.TEST_COURSE,
             );
             expect($('.enrollment-change-field p').first().text()).toContain('Current enrollment mode: audit');
 
@@ -77,11 +77,11 @@ define([
                 course_id: EnrollmentHelpers.TEST_COURSE,
                 new_mode: 'verified',
                 old_mode: 'audit',
-                reason: 'Financial Assistance'
+                reason: 'Financial Assistance',
             });
             AjaxHelpers.respondWithJson(requests, {
                 enrolled_by: 'staff@edx.org',
-                reason: 'Financial Assistance'
+                reason: 'Financial Assistance',
             });
             expect($('.enrollment-change-errors').css('display')).toEqual('none');
         });

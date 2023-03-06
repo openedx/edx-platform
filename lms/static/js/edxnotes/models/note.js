@@ -16,23 +16,23 @@
                 unit: {
                     display_name: '',
                     url: '',
-                    location: ''
+                    location: '',
                 },
                 section: {
                     display_name: '',
                     location: '',
-                    children: []
+                    children: [],
                 },
                 chapter: {
                     display_name: '',
                     location: '',
                     index: 0,
-                    children: []
+                    children: [],
                 },
                 // Flag indicating current state of the note: expanded or collapsed.
                 is_expanded: false,
                 // Flag indicating whether `More` link should be shown.
-                show_link: false
+                show_link: false,
             },
 
             textSize: 300,
@@ -51,7 +51,7 @@
                 }
 
                 return message;
-            }
+            },
 
         });
 

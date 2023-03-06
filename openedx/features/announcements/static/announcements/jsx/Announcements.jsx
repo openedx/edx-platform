@@ -9,12 +9,12 @@ class AnnouncementSkipLink extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            count: 0
+            count: 0,
         };
         $.get('/announcements/page/1')
             .then(data => {
                 this.setState({
-                    count: data.count
+                    count: data.count,
                 });
             })
     }
@@ -67,7 +67,7 @@ class AnnouncementList extends React.Component {
                     count: data.count,
                     start_index: data.start_index,
                     end_index: data.end_index,
-                    page: page
+                    page: page,
                 });
             })
     }
@@ -86,7 +86,7 @@ class AnnouncementList extends React.Component {
 
     render() {
         var children = this.state.announcements.map(
-            (announcement, index) => <Announcement key={index} content={announcement.content} />
+            (announcement, index) => <Announcement key={index} content={announcement.content} />,
         );
         if (this.state.has_prev)
         {

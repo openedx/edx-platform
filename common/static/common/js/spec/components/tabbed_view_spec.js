@@ -5,7 +5,7 @@
         'underscore',
         'backbone',
         'common/js/components/views/tabbed_view',
-        'jquery.simulate'
+        'jquery.simulate',
     ],
     function($, _, Backbone, TabbedView) {
         var keys = $.simulate.keyCode;
@@ -19,7 +19,7 @@
                 render: function() {
                     this.$el.text(this.text);
                     return this;
-                }
+                },
             }),
             activeTab = function() {
                 return view.$('.page-content-nav');
@@ -34,13 +34,13 @@
                     tabs: [{
                         title: 'Test 1',
                         view: new TestSubview({text: 'this is test text'}),
-                        url: 'test-1'
+                        url: 'test-1',
                     }, {
                         title: 'Test 2',
                         view: new TestSubview({text: 'other text'}),
-                        url: 'test-2'
+                        url: 'test-2',
                     }],
-                    viewLabel: 'Tabs'
+                    viewLabel: 'Tabs',
                 }).render();
             });
 
@@ -68,23 +68,23 @@
                 expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
                     'aria-expanded': 'true',
                     'aria-selected': 'true',
-                    tabindex: '0'
+                    tabindex: '0',
                 });
                 expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
                     'aria-expanded': 'false',
                     'aria-selected': 'false',
-                    tabindex: '-1'
+                    tabindex: '-1',
                 });
                 view.$('.nav-item[data-index=1]').click();
                 expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
                     'aria-expanded': 'false',
                     'aria-selected': 'false',
-                    tabindex: '-1'
+                    tabindex: '-1',
                 });
                 expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
                     'aria-expanded': 'true',
                     'aria-selected': 'true',
-                    tabindex: '0'
+                    tabindex: '0',
                 });
             });
 
@@ -97,12 +97,12 @@
                 expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
                     'aria-expanded': 'false',
                     'aria-selected': 'false',
-                    tabindex: '-1'
+                    tabindex: '-1',
                 });
                 expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
                     'aria-expanded': 'true',
                     'aria-selected': 'true',
-                    tabindex: '0'
+                    tabindex: '0',
                 });
             });
 
@@ -115,12 +115,12 @@
                 expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
                     'aria-expanded': 'false',
                     'aria-selected': 'false',
-                    tabindex: '-1'
+                    tabindex: '-1',
                 });
                 expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
                     'aria-expanded': 'true',
                     'aria-selected': 'true',
-                    tabindex: '0'
+                    tabindex: '0',
                 });
             });
 
@@ -133,12 +133,12 @@
                 expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
                     'aria-expanded': 'false',
                     'aria-selected': 'false',
-                    tabindex: '-1'
+                    tabindex: '-1',
                 });
                 expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
                     'aria-expanded': 'true',
                     'aria-selected': 'true',
-                    tabindex: '0'
+                    tabindex: '0',
                 });
             });
 
@@ -151,12 +151,12 @@
                 expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
                     'aria-expanded': 'false',
                     'aria-selected': 'false',
-                    tabindex: '-1'
+                    tabindex: '-1',
                 });
                 expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
                     'aria-expanded': 'true',
                     'aria-selected': 'true',
-                    tabindex: '0'
+                    tabindex: '0',
                 });
             });
         });

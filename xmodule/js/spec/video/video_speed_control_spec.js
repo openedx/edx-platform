@@ -31,14 +31,14 @@
                     expect($secondaryControls.find('.value').text())
                         .toBe('1.50x');
                     expect(li.filter('.is-active')).toHaveData(
-                        'speed', state.videoSpeedControl.currentSpeed
+                        'speed', state.videoSpeedControl.currentSpeed,
                     );
                     expect(li.length).toBe(state.speeds.length);
 
                     $.each(li.toArray().reverse(), function(index, link) {
                         expect($(link).attr('data-speed')).toEqual(state.speeds[index]);
                         expect($(link).find('.speed-option').text()).toBe(
-                            state.speeds[index] + 'x'
+                            state.speeds[index] + 'x',
                         );
                     });
                 });

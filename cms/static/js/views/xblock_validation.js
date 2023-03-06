@@ -18,7 +18,7 @@ define(['jquery', 'underscore', 'js/views/baseview', 'gettext', 'edx-ui-toolkit/
                     validation: this.model,
                     additionalClasses: this.getAdditionalClasses(),
                     getIcon: this.getIcon.bind(this),
-                    getDisplayName: this.getDisplayName.bind(this)
+                    getDisplayName: this.getDisplayName.bind(this),
                 };
                 this.$el.html(HtmlUtils.HTML(this.template(attributes)).toString());
                 return this;
@@ -68,7 +68,7 @@ define(['jquery', 'underscore', 'js/views/baseview', 'gettext', 'edx-ui-toolkit/
                     return 'no-container-content';
                 }
                 return '';
-            }
+            },
         });
 
         return XBlockValidationView;

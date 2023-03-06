@@ -11,7 +11,7 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
         // takes XBlockInfo as a model
 
         events: {
-            'click .notification-action-button': 'fireNotificationActionEvent'
+            'click .notification-action-button': 'fireNotificationActionEvent',
         },
 
         initialize: function() {
@@ -31,7 +31,7 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
                 headers: {Accept: 'application/json'},
                 success: function(fragment) {
                     self.handleXBlockFragment(fragment, options);
-                }
+                },
             });
         },
 
@@ -247,7 +247,7 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
                 event.preventDefault();
                 this.notifyRuntime(eventName, this.model.get('id'));
             }
-        }
+        },
     });
 
     return XBlockView;

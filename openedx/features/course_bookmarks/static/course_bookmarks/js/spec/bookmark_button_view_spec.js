@@ -1,6 +1,6 @@
 define([
     'backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/template_helpers', 'course_bookmarks/js/views/bookmark_button'
+    'common/js/spec_helpers/template_helpers', 'course_bookmarks/js/views/bookmark_button',
 ],
 function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
     'use strict';
@@ -14,8 +14,8 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
             loadFixtures('course_bookmarks/fixtures/bookmark_button.html');
             TemplateHelpers.installTemplates(
                 [
-                    'templates/fields/message_banner'
-                ]
+                    'templates/fields/message_banner',
+                ],
             );
 
             jasmine.createSpy('timerCallback');
@@ -32,7 +32,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
                 bookmarked: isBookmarked,
                 bookmarkId: 'bilbo,usage_1',
                 usageId: 'usage_1',
-                apiUrl: API_URL
+                apiUrl: API_URL,
             });
         };
 
@@ -63,7 +63,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
                 event: 'bookmark:remove',
                 method: 'DELETE',
                 url: API_URL + 'bilbo,usage_1/',
-                body: null
+                body: null,
             };
             var removeBookmarkData = {
                 bookmarked: false,
@@ -71,7 +71,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
                 event: 'bookmark:add',
                 method: 'POST',
                 url: API_URL,
-                body: 'usage_id=usage_1'
+                body: 'usage_id=usage_1',
             };
             var requests = AjaxHelpers.requests(this);
 
@@ -93,7 +93,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
                 AjaxHelpers.expectRequest(
                     requests, firstActionData.method,
                     firstActionData.url,
-                    firstActionData.body
+                    firstActionData.body,
                 );
 
                 expect(bookmarkButtonView[firstActionData.handler]).toHaveBeenCalled();
@@ -114,7 +114,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
                     requests,
                     secondActionData.method,
                     secondActionData.url,
-                    secondActionData.body
+                    secondActionData.body,
                 );
 
                 expect(bookmarkButtonView[secondActionData.handler]).toHaveBeenCalled();

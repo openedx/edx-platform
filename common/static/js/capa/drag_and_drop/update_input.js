@@ -2,7 +2,7 @@
     define([], function() {
         return {
             check: check,
-            update: update
+            update: update,
         };
 
         function update(state) {
@@ -17,7 +17,7 @@
                             tempObj = {};
                             tempObj[state.draggables[c1].id] = [
                                 state.draggables[c1].x,
-                                state.draggables[c1].y
+                                state.draggables[c1].y,
                             ];
                             draggables.push(tempObj);
                             tempObj = null;
@@ -190,7 +190,7 @@
                     console.log(
                         'ERROR: In answer there exists a ' +
                     'draggable ID "' + draggableId + '". No ' +
-                    'draggable with this ID could be found.'
+                    'draggable with this ID could be found.',
                     );
                 }
 
@@ -202,7 +202,7 @@
                     console.log(
                         'ERROR: In answer there exists a target ' +
                     'ID "' + targetId + '". No target with this ' +
-                    'ID could be found.'
+                    'ID could be found.',
                     );
                 }
 
@@ -228,7 +228,7 @@
                             console.log(
                                 'ERROR: In answer there exists a ' +
                             'draggable ID "' + draggableId + '". No ' +
-                            'draggable with this ID could be found.'
+                            'draggable with this ID could be found.',
                             );
 
                             continue;
@@ -236,7 +236,7 @@
 
                         draggable.moveDraggableTo('XY', {
                             x: answer[c1][draggableId][0],
-                            y: answer[c1][draggableId][1]
+                            y: answer[c1][draggableId][1],
                         });
                     }
 

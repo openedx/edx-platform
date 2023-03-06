@@ -1,5 +1,5 @@
 define([
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/discovery/models/search_state'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/discovery/models/search_state',
 ], function(AjaxHelpers, SearchState) {
     'use strict';
 
@@ -10,7 +10,7 @@ define([
             {
                 data: {
                     modes: [
-                        'honor'
+                        'honor',
                     ],
                     course: 'edX/DemoX/Demo_Course',
                     enrollment_start: '2015-04-21T00:00:00+00:00',
@@ -18,15 +18,15 @@ define([
                     content: {
                         overview: ' About This Course Include your long course description here.',
                         display_name: 'edX Demonstration Course',
-                        number: 'DemoX'
+                        number: 'DemoX',
                     },
                     start: '1970-01-01T05:00:00+00:00',
                     image_url: '/c4x/edX/DemoX/asset/images_course_image.jpg',
                     org: 'edX',
-                    id: 'edX/DemoX/Demo_Course'
-                }
-            }
-        ]
+                    id: 'edX/DemoX/Demo_Course',
+                },
+            },
+        ],
     };
 
     describe('discovery.models.SearchState', function() {

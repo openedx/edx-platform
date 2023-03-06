@@ -12,7 +12,7 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Htm
             'click .new-component .new-component-type .single-template': 'createNewComponent',
             'click .new-component .cancel-button': 'closeNewComponent',
             'click .new-component-templates .new-component-template .button-component': 'createNewComponent',
-            'click .new-component-templates .cancel-button': 'closeNewComponent'
+            'click .new-component-templates .cancel-button': 'closeNewComponent',
         },
 
         initialize: function(options) {
@@ -34,7 +34,7 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Htm
 
                         menu = new AddXBlockMenu({model: componentModel});
                         that.$el.append(menu.render().el);
-                    }
+                    },
                 );
             }
         },
@@ -68,13 +68,13 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Htm
             this.closeNewComponent(event);
             ViewUtils.runOperationShowingMessage(
                 gettext('Adding'),
-                _.bind(this.options.createComponent, this, saveData, $element)
+                _.bind(this.options.createComponent, this, saveData, $element),
             ).always(function() {
                 // Restore the scroll position of the buttons so that the new
                 // component appears above them.
                 ViewUtils.setScrollOffset(self.$el, oldOffset);
             });
-        }
+        },
     });
 
     return AddXBlockComponent;

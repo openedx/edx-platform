@@ -8,7 +8,7 @@
             var Sjson = function(data) {
                 var sjson = {
                         start: data.start.concat(),
-                        text: data.text.concat()
+                        text: data.text.concat(),
                     },
                     module = {};
 
@@ -97,7 +97,7 @@
 
                     return {
                         start: filteredTimes,
-                        captions: filteredCaptions
+                        captions: filteredCaptions,
                     };
                 }
 
@@ -106,7 +106,7 @@
                     getStartTimes: getStartTimes,
                     getSize: size,
                     filter: filter,
-                    search: search
+                    search: search,
                 };
             };
 

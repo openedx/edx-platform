@@ -11,6 +11,6 @@ var edx = edx || {};
     edx.verify_student = edx.verify_student || {};
 
     edx.verify_student.ReverifySuccessStepView = edx.verify_student.StepView.extend({
-        templateName: 'reverify_success_step'
+        templateName: 'reverify_success_step',
     });
 }());

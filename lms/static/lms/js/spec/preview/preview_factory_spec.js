@@ -2,7 +2,7 @@ define(
     [
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/components/utils/view_utils',
-        'lms/js/preview/preview_factory'
+        'lms/js/preview/preview_factory',
     ],
     function(AjaxHelpers, ViewUtils, PreviewFactory) {
         'use strict';
@@ -30,7 +30,7 @@ define(
 
             it('can render preview for a staff user', function() {
                 showPreview({
-                    courseId: 'test_course'
+                    courseId: 'test_course',
                 });
                 expect(previewActionSelect().val()).toBe('staff');
             });
@@ -39,7 +39,7 @@ define(
                 var select;
                 showPreview({
                     courseId: 'test_course',
-                    disableStudentAccess: true
+                    disableStudentAccess: true,
                 });
                 select = previewActionSelect();
                 expect(select.attr('disabled')).toBe('disabled');
@@ -50,18 +50,18 @@ define(
                 var requests = AjaxHelpers.requests(this),
                     reloadSpy = spyOn(ViewUtils, 'reload');
                 showPreview({
-                    courseId: 'test_course'
+                    courseId: 'test_course',
                 });
                 previewActionSelect().find('option[value="student"]').prop('selected', 'selected').change();
                 AjaxHelpers.expectJsonRequest(
                     requests, 'POST', '/courses/test_course/masquerade',
                     {
                         role: 'student',
-                        user_name: null
-                    }
+                        user_name: null,
+                    },
                 );
                 AjaxHelpers.respondWithJson(requests, {
-                    success: true
+                    success: true,
                 });
                 expect(reloadSpy).toHaveBeenCalled();
             });
@@ -70,7 +70,7 @@ define(
                 var requests = AjaxHelpers.requests(this),
                     reloadSpy = spyOn(ViewUtils, 'reload');
                 showPreview({
-                    courseId: 'test_course'
+                    courseId: 'test_course',
                 });
                 previewActionSelect().find('option[value="group-b"]').prop('selected', 'selected').change();
                 AjaxHelpers.expectJsonRequest(
@@ -79,11 +79,11 @@ define(
                         role: 'student',
                         user_name: null,
                         user_partition_id: 'test_partition_b_id',
-                        group_id: 'group-b'
-                    }
+                        group_id: 'group-b',
+                    },
                 );
                 AjaxHelpers.respondWithJson(requests, {
-                    success: true
+                    success: true,
                 });
                 expect(reloadSpy).toHaveBeenCalled();
             });
@@ -92,7 +92,7 @@ define(
                 var requests = AjaxHelpers.requests(this),
                     reloadSpy = spyOn(ViewUtils, 'reload');
                 showPreview({
-                    courseId: 'test_course'
+                    courseId: 'test_course',
                 });
                 previewActionSelect().find('option[value="specific student"]').prop('selected', 'selected').change();
                 usernameInput().val('test_user').change();
@@ -100,11 +100,11 @@ define(
                     requests, 'POST', '/courses/test_course/masquerade',
                     {
                         role: 'student',
-                        user_name: 'test_user'
-                    }
+                        user_name: 'test_user',
+                    },
                 );
                 AjaxHelpers.respondWithJson(requests, {
-                    success: true
+                    success: true,
                 });
                 expect(reloadSpy).toHaveBeenCalled();
             });
@@ -112,10 +112,10 @@ define(
             it('shows the correct information when masquerading as a specific student', function() {
                 showPreview({
                     specificStudentSelected: true,
-                    masqueradeUsername: 'test_user'
+                    masqueradeUsername: 'test_user',
                 });
                 expect(usernameInput().val()).toBe('test_user');
             });
         });
-    }
+    },
 );

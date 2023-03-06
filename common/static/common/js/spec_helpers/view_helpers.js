@@ -145,7 +145,7 @@ function(_, $, NotificationView, Prompt, AjaxHelpers) {
         clickDeleteItem: clickDeleteItem,
         patchAndVerifyRequest: patchAndVerifyRequest,
         submitAndVerifyFormSuccess: submitAndVerifyFormSuccess,
-        submitAndVerifyFormError: submitAndVerifyFormError
+        submitAndVerifyFormError: submitAndVerifyFormError,
     };
-}
+},
 );

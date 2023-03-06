@@ -1,7 +1,7 @@
 define([
     'backbone', 'jquery', 'underscore',
     'learner_profile/js/spec_helpers/helpers',
-    'learner_profile/js/views/badge_view'
+    'learner_profile/js/views/badge_view',
 ],
 function(Backbone, $, _, LearnerProfileHelpers, BadgeView) {
     'use strict';
@@ -19,7 +19,7 @@ function(Backbone, $, _, LearnerProfileHelpers, BadgeView) {
             options = {
                 model: new Backbone.Model(badge),
                 ownProfile: ownProfile,
-                badgeMeta: {}
+                badgeMeta: {},
             };
             testView = new BadgeView(options);
             testView.render();
@@ -110,5 +110,5 @@ function(Backbone, $, _, LearnerProfileHelpers, BadgeView) {
             testBadgeIconIsDisplayed(false);
         });
     });
-}
+},
 );

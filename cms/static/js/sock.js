@@ -29,7 +29,7 @@ var toggleSock = function (e) {
         easing: 'swing',
         speed: 1000,
         scrollElement: null,
-        scrollTarget: $sock
+        scrollTarget: $sock,
     });
 };
 

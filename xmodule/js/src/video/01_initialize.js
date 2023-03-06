@@ -84,7 +84,7 @@
                     youtubeId: youtubeId,
                     loadHtmlPlayer: loadHtmlPlayer,
                     loadYoutubePlayer: loadYoutubePlayer,
-                    loadYouTubeIFrameAPI: loadYouTubeIFrameAPI
+                    loadYouTubeIFrameAPI: loadYouTubeIFrameAPI,
                 },
                 /* eslint-enable no-use-before-define */
 
@@ -247,7 +247,7 @@
                 }
 
                 console.log(
-                    '[Video info]: Youtube Video IDs are incorrect or absent.'
+                    '[Video info]: Youtube Video IDs are incorrect or absent.',
                 );
 
                 return false;
@@ -300,7 +300,7 @@
                     .find('.spinner')
                     .attr({
                         'aria-hidden': 'true',
-                        tabindex: -1
+                        tabindex: -1,
                     });
             }
 
@@ -342,7 +342,7 @@
                     // the final configuration.
                     compatKeys = {
                         start: 'startTime',
-                        end: 'endTime'
+                        end: 'endTime',
                     },
                     // Conversions used to pre-process some configuration data.
                     conversions = {
@@ -400,7 +400,7 @@
                             }
 
                             return value;
-                        }
+                        },
                     },
                     config = {};
 
@@ -408,7 +408,7 @@
                     startTime: 0,
                     endTime: null,
                     sub: '',
-                    streams: ''
+                    streams: '',
                 }, data);
 
                 $.each(data, function(option, value) {
@@ -465,7 +465,7 @@
                 if (this.htmlPlayerLoaded) { return; }
 
                 console.log(
-                    '[Video info]: Fetch metadata for YouTube video.'
+                    '[Video info]: Fetch metadata for YouTube video.',
                 );
 
                 this.fetchMetadata();
@@ -479,7 +479,7 @@
                 if (!_prepareHTML5Video(this)) {
                     console.log(
                         '[Video info]: Continue loading ' +
-                'YouTube video.'
+                'YouTube video.',
                     );
 
                     // Non-YouTube sources were not found either.
@@ -494,7 +494,7 @@
                     this.loadYoutubePlayer();
                 } else {
                     console.log(
-                        '[Video info]: Start HTML5 player.'
+                        '[Video info]: Start HTML5 player.',
                     );
 
                     // In-browser HTML5 player does not support quality
@@ -523,7 +523,7 @@
                     __dfd__: __dfd__,
                     container: container,
                     isFullScreen: false,
-                    isTouch: isTouch
+                    isTouch: isTouch,
                 });
 
                 console.log('[Video info]: Initializing video with id "%s".', id);
@@ -539,7 +539,7 @@
                     mode: $.cookie('edX_video_player_mode'),
                     // Available HD qualities will only be accessible once the video has
                     // been played once, via player.getAvailableQualityLevels.
-                    availableHDQualities: []
+                    availableHDQualities: [],
                 });
 
                 if (this.config.endTime < this.config.startTime) {
@@ -548,7 +548,7 @@
 
                 this.lang = this.config.transcriptLanguage;
                 this.speed = this.speedToString(
-                    this.config.speed || this.config.generalSpeed
+                    this.config.speed || this.config.generalSpeed,
                 );
                 this.auto_advance = this.config.autoAdvance;
                 this.htmlPlayerLoaded = false;
@@ -583,7 +583,7 @@
                     $(scriptTag).on('error', function() {
                         console.log(
                             '[Video info]: YouTube returned an error for ' +
-                    'video with id "' + self.id + '".'
+                    'video with id "' + self.id + '".',
                         );
                         // If the video is already loaded in `_waitForYoutubeApi` by the
                         // time we get here, then we shouldn't load it again.
@@ -677,7 +677,7 @@
                     '0.50': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
                     0.75: '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
                     1.25: '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
-                    2.0: '1.50'   // HTML5 or Youtube HTML5 -> Youtube Flash
+                    2.0: '1.50',   // HTML5 or Youtube HTML5 -> Youtube Flash
                 };
 
                 if (_.contains(this.speeds, newSpeed)) {
@@ -711,10 +711,10 @@
                     success: _.isFunction(callback) ? callback : null,
                     error: function() {
                         console.warn(
-                            'Unable to get youtube video metadata. Some video metadata may be unavailable.'
+                            'Unable to get youtube video metadata. Some video metadata may be unavailable.',
                         );
                     },
-                    notifyOnError: false
+                    notifyOnError: false,
                 });
             }
 

@@ -11,7 +11,7 @@
                 Logger.log('edx.course.share_clicked', {
                     course_id: courseId,
                     social_media_site: 'facebook',
-                    location: 'dashboard'
+                    location: 'dashboard',
                 });
             });
 
@@ -20,7 +20,7 @@
                 Logger.log('edx.course.share_clicked', {
                     course_id: courseId,
                     social_media_site: 'twitter',
-                    location: 'dashboard'
+                    location: 'dashboard',
                 });
             });
         };

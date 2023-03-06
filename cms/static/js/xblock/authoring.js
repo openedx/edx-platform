@@ -21,7 +21,7 @@
 
             // Otherwise get the checked groups within the selected partition.
             element.find(
-                '.partition-group-visibility-' + partitionId + ' input:checked'
+                '.partition-group-visibility-' + partitionId + ' input:checked',
             ).each(function(index, input) {
                 groupId = parseInt($(input).val(), 10);
 

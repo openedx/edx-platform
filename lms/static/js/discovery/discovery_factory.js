@@ -13,13 +13,13 @@
             var filterBar = new FilterBar({collection: filters});
             var refineSidebar = new RefineSidebar({
                 collection: search.discovery.facetOptions,
-                meanings: meanings
+                meanings: meanings,
             });
             var listing;
             var courseListingModel = search.discovery;
             courseListingModel.userPreferences = {
                 userLanguage: userLanguage,
-                userTimezone: userTimezone
+                userTimezone: userTimezone,
             };
             listing = new CoursesListing({model: courseListingModel});
 
@@ -59,7 +59,7 @@
                     if (query) {
                         filters.add(
                             {type: 'search_query', query: query, name: quote(query)},
-                            {merge: true}
+                            {merge: true},
                         );
                     }
                 } else {

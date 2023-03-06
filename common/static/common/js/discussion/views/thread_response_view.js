@@ -51,7 +51,7 @@
 
             ThreadResponseView.prototype.events = {
                 'click .discussion-submit-comment': 'submitComment',
-                'focus .wmd-input': 'showEditorChrome'
+                'focus .wmd-input': 'showEditorChrome',
             };
 
             ThreadResponseView.prototype.$ = function(selector) {
@@ -75,7 +75,7 @@
                 templateData = _.extend(this.model.toJSON(), {
                     wmdId: typeof(this.model.id) !== 'undefined' ? this.model.id : (new Date()).getTime(),
                     create_sub_comment: $container.data('user-create-subcomment'),
-                    readOnly: this.readOnly
+                    readOnly: this.readOnly,
                 });
                 return this.template(templateData);
             };
@@ -103,7 +103,7 @@
                 this.$('.wmd-preview-container').hide();
                 this.$('.wmd-input').css({
                     height: '35px',
-                    padding: '5px'
+                    padding: '5px',
                 });
                 return this.$('.comment-post-control').hide();
             };
@@ -114,7 +114,7 @@
                 this.$('.comment-post-control').show();
                 return this.$('.wmd-input').css({
                     height: '125px',
-                    padding: '10px'
+                    padding: '10px',
                 });
             };
 
@@ -157,7 +157,7 @@
                 comment.set('thread', this.model.get('thread'));
                 view = new ResponseCommentView({
                     model: comment,
-                    startHeader: this.startHeader
+                    startHeader: this.startHeader,
                 });
                 view.render();
                 if (this.readOnly) {
@@ -196,7 +196,7 @@
                     username: window.user.get('username'),
                     abuse_flaggers: [],
                     user_id: window.user.get('id'),
-                    id: 'unsaved'
+                    id: 'unsaved',
                 });
                 view = this.renderComment(comment);
                 this.hideEditorChrome();
@@ -207,13 +207,13 @@
                     type: 'POST',
                     dataType: 'json',
                     data: {
-                        body: body
+                        body: body,
                     },
                     success: function(response) {
                         comment.set(response.content);
                         comment.updateInfo(response.annotated_content_info);
                         return view.render();
-                    }
+                    },
                 });
             };
 
@@ -237,7 +237,7 @@
                 return DiscussionUtil.safeAjax({
                     $elem: $elem,
                     url: url,
-                    type: 'POST'
+                    type: 'POST',
                 });
             };
 
@@ -250,7 +250,7 @@
                 } else {
                     this.editView = new ThreadResponseEditView({
                         model: this.model,
-                        startHeader: this.startHeader
+                        startHeader: this.startHeader,
                     });
                     this.editView.bind('response:update', this.update);
                     return this.editView.bind('response:cancel_edit', this.cancelEdit);
@@ -291,7 +291,7 @@
                     this.showView.model = this.model;
                 } else {
                     this.showView = new ThreadResponseShowView({
-                        model: this.model
+                        model: this.model,
                     });
                     this.showView.bind('response:_delete', this._delete);
                     this.showView.bind('response:edit', this.edit);
@@ -332,20 +332,20 @@
                     type: 'POST',
                     dataType: 'json',
                     data: {
-                        body: newBody
+                        body: newBody,
                     },
                     error: DiscussionUtil.formErrorHandler(this.$('.edit-post-form-errors')),
                     success: function() {
                         self.editView.$('.edit-post-body textarea').val('').attr('prev-text', '');
                         self.editView.$('.wmd-preview p').html('');
                         self.model.set({
-                            body: newBody
+                            body: newBody,
                         });
                         self.createShowView();
                         self.renderShowView();
                         DiscussionUtil.typesetMathJax(self.$el.find('.response-body'));
                         return self.showCommentForm();
-                    }
+                    },
                 });
             };
 

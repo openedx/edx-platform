@@ -46,11 +46,11 @@
             settings = {
                 data: {
                     user: searchRequestsData[0].params.user,
-                    course_id: searchRequestsData[0].params.courseId
+                    course_id: searchRequestsData[0].params.courseId,
                 },
                 type: 'GET',
                 dataType: 'json',
-                headers: {'x-annotator-auth-token': searchRequestsData[0].params.token}
+                headers: {'x-annotator-auth-token': searchRequestsData[0].params.token},
             };
             searchEndpoint = searchRequestsData[0].params.endpoint + 'search/?';
             usageIds = _.map(searchRequestsData, function(item) {
@@ -100,14 +100,14 @@
             // Render the notes for each annotatable component using its associated AnnotatorJS instance
             _.each(searchRequestsData, function(item) {
                 item.annotator.plugins.Store._onLoadAnnotationsFromSearch( // eslint-disable-line no-underscore-dangle
-                    edxNotes[item.params.usageId]
+                    edxNotes[item.params.usageId],
                 );
             });
         };
 
         return {
             storeNotesRequestData: storeNotesRequestData,
-            cleanup: cleanup
+            cleanup: cleanup,
         };
     });
 }).call(this, define || RequireJS.define);

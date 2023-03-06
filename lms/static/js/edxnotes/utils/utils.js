@@ -18,7 +18,7 @@
         };
 
         return {
-            nl2br: nl2br
+            nl2br: nl2br,
         };
     });
 }).call(this, define || RequireJS.define);

@@ -13,5 +13,5 @@ define(['js/utils/module'],
                 expect(ModuleUtils.getUpdateUrl('locator')).toBe('/xblock/locator');
             });
         });
-    }
+    },
 );

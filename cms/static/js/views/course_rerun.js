@@ -12,13 +12,13 @@ function(domReady, $, _, CreateCourseUtilsFactory, ViewUtils, HtmlUtils) {
         errorMessage: '#course_rerun_error',
         tipError: 'span.tip-error',
         error: '.error',
-        allowUnicode: '.allow-unicode-course-id'
+        allowUnicode: '.allow-unicode-course-id',
     }, {
         shown: 'is-shown',
         showing: 'is-showing',
         hiding: 'is-hidden',
         disabled: 'is-disabled',
-        error: 'error'
+        error: 'error',
     });
 
     var saveRerunCourse = function(e) {
@@ -40,7 +40,7 @@ function(domReady, $, _, CreateCourseUtilsFactory, ViewUtils, HtmlUtils) {
             org: org,
             number: number,
             display_name: display_name,
-            run: run
+            run: run,
         };
 
         analytics.track('Reran a Course', courseInfo); // eslint-disable-line no-undef
@@ -87,6 +87,6 @@ function(domReady, $, _, CreateCourseUtilsFactory, ViewUtils, HtmlUtils) {
     return {
         saveRerunCourse: saveRerunCourse,
         cancelRerunCourse: cancelRerunCourse,
-        onReady: onReady
+        onReady: onReady,
     };
 });

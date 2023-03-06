@@ -26,7 +26,7 @@
                         name: name,
                         minlength: minlength,
                         maxlength: maxlength,
-                        value: value
+                        value: value,
                     });
                 };
 
@@ -163,7 +163,7 @@
                         '<option value="" data-isdefault="true">Please select a country</option>',
                         '<option value="BE">Belgium</option>',
                         '<option value="DE">Germany</option>',
-                        '</select>'
+                        '</select>',
                     ].join('');
 
                     setFixtures(select);

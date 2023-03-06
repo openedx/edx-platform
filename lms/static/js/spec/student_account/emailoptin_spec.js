@@ -16,12 +16,12 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account
 
                 // Expect that the correct request was made to the server
                 AjaxHelpers.expectRequest(
-                    requests, 'POST', EMAIL_OPT_IN_URL, 'course_id=edX%2FDemoX%2FFall&email_opt_in=True'
+                    requests, 'POST', EMAIL_OPT_IN_URL, 'course_id=edX%2FDemoX%2FFall&email_opt_in=True',
                 );
 
                 // Simulate a successful response from the server
                 AjaxHelpers.respondWithJson(requests, {});
             });
         });
-    }
+    },
 );

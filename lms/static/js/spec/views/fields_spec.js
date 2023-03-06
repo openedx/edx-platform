@@ -19,7 +19,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
             FieldViews.TextFieldView,
             FieldViews.DropdownFieldView,
             FieldViews.LinkFieldView,
-            FieldViews.TextareaFieldView
+            FieldViews.TextareaFieldView,
         ];
 
         beforeEach(function() {
@@ -37,7 +37,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 var fieldData = FieldViewsSpecHelpers.createFieldData(fieldViewClass, {
                     title: 'Username',
                     valueAttribute: 'username',
-                    helpMessage: 'The username that you use to sign in to edX.'
+                    helpMessage: 'The username that you use to sign in to edX.',
                 });
 
                 var view = new fieldViewClass(fieldData).render();
@@ -51,7 +51,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 var fieldData = FieldViewsSpecHelpers.createFieldData(fieldViewClass, {
                     title: 'Username',
                     valueAttribute: 'username',
-                    helpMessage: 'The username that you use to sign in to edX.'
+                    helpMessage: 'The username that you use to sign in to edX.',
                 });
 
                 var view = new fieldViewClass(fieldData).render();
@@ -67,13 +67,13 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 title: 'Preferred Language',
                 valueAttribute: 'language',
                 helpMessage: 'Your preferred language.',
-                persistChanges: true
+                persistChanges: true,
             });
 
             var view = new fieldViewClass(fieldData);
             view.saveAttributes(
                 {language: 'ur'},
-                {headers: {Priority: 'Urgent'}}
+                {headers: {Priority: 'Urgent'}},
             );
 
             var request = requests[0];
@@ -87,7 +87,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
             var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.ReadonlyFieldView, {
                 title: 'Username',
                 valueAttribute: 'username',
-                helpMessage: 'The username that you use to sign in to edX.'
+                helpMessage: 'The username that you use to sign in to edX.',
             });
             var view = new FieldViews.ReadonlyFieldView(fieldData).render();
 
@@ -105,7 +105,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 title: 'Full Name',
                 valueAttribute: 'name',
                 helpMessage: 'How are you?',
-                persistChanges: true
+                persistChanges: true,
             });
             var view = new FieldViews.TextFieldView(fieldData).render();
 
@@ -117,7 +117,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 invalidValue1: 'Your Name',
                 invalidValue2: 'Her Name',
                 validationError: 'Think again!',
-                defaultValue: ''
+                defaultValue: '',
             }, requests);
         });
 
@@ -129,7 +129,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 valueAttribute: 'name',
                 helpMessage: 'edX full name',
                 editable: 'never',
-                persistChanges: true
+                persistChanges: true,
 
             });
             var view = new FieldViews.DropdownFieldView(fieldData).render();
@@ -166,7 +166,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 title: 'Full Name',
                 valueAttribute: 'name',
                 helpMessage: 'edX full name',
-                persistChanges: true
+                persistChanges: true,
             });
             var view = new FieldViews.DropdownFieldView(fieldData).render();
 
@@ -178,7 +178,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 invalidValue1: FieldViewsSpecHelpers.SELECT_OPTIONS[1][0],
                 invalidValue2: FieldViewsSpecHelpers.SELECT_OPTIONS[2][0],
                 validationError: 'Nope, this will not do!',
-                defaultValue: null
+                defaultValue: null,
             }, requests);
         });
 
@@ -190,7 +190,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 valueAttribute: 'name',
                 helpMessage: 'edX full name',
                 editable: 'toggle',
-                persistChanges: true
+                persistChanges: true,
             });
             var view = new FieldViews.DropdownFieldView(fieldData).render();
 
@@ -203,7 +203,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 invalidValue1: FieldViewsSpecHelpers.SELECT_OPTIONS[1][0],
                 invalidValue2: FieldViewsSpecHelpers.SELECT_OPTIONS[2][0],
                 validationError: 'Nope, this will not do!',
-                defaultValue: null
+                defaultValue: null,
             }, requests);
         });
 
@@ -218,7 +218,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                     helpMessage: 'edX drop down',
                     editable: editable,
                     required: true,
-                    persistChanges: true
+                    persistChanges: true,
                 });
                 var view = new FieldViews.DropdownFieldView(fieldData).render();
 
@@ -250,7 +250,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                         'what your interests are, why you’re taking courses on edX, or what you hope to learn.',
                 editable: 'never',
                 persistChanges: true,
-                messagePosition: 'header'
+                messagePosition: 'header',
             });
 
             // set bio to empty to see the placeholder.
@@ -282,7 +282,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                         'what your interests are, why you’re taking courses on edX, or what you hope to learn.',
                 editable: 'toggle',
                 persistChanges: true,
-                messagePosition: 'header'
+                messagePosition: 'header',
             });
             fieldData.model.set({bio: ''});
 
@@ -300,7 +300,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
             expect(view.fieldValue()).toBe(BIO);
             expect(view.$(textareaLinkClass).length).toBe(0);
             AjaxHelpers.expectJsonRequest(
-                requests, 'PATCH', view.model.url, {bio: BIO}
+                requests, 'PATCH', view.model.url, {bio: BIO},
             );
             AjaxHelpers.respondWithNoContent(requests);
             expect(view.el).toHaveClass('mode-display');
@@ -318,7 +318,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 title: 'Title',
                 linkTitle: 'Link title',
                 helpMessage: 'Click the link.',
-                valueAttribute: 'password-reset'
+                valueAttribute: 'password-reset',
             });
             var view = new FieldViews.LinkFieldView(fieldData).render();
 
@@ -331,7 +331,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
             var fieldClasses = [
                 FieldViews.TextFieldView,
                 FieldViews.DropdownFieldView,
-                FieldViews.TextareaFieldView
+                FieldViews.TextareaFieldView,
             ];
             for (var i = 0; i < fieldClasses.length; i++) {
                 FieldViewsSpecHelpers.verifyPersistence(fieldClasses[i], requests);
@@ -345,7 +345,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                     dateFormat: 'MMM YYYY',
                     valueAttribute: 'date_joined',
                     userLanguage: 'en-US',
-                    userTimezone: 'America/New_York'
+                    userTimezone: 'America/New_York',
                 }),
                 joinDate = new Date(1990, 0, 15),
                 view;

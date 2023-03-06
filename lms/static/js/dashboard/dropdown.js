@@ -79,7 +79,7 @@ var edx = edx || {};
     edx.dashboard.dropdown.bindToggleButtons = function(selector) {
         $(selector).bind(
             'click',
-            edx.dashboard.dropdown.toggleCourseActionsDropdownMenu
+            edx.dashboard.dropdown.toggleCourseActionsDropdownMenu,
         );
     };
 

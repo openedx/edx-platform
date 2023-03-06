@@ -45,7 +45,7 @@
                     is_commentable_divided: this.is_commentable_divided,
                     author_display: this.getAuthorDisplay(),
                     cid: this.model.cid,
-                    readOnly: $('.discussion-module').data('read-only')
+                    readOnly: $('.discussion-module').data('read-only'),
                 }, this.model.attributes);
                 return edx.HtmlUtils.template($('#thread-show-template').html())(context);
             };
@@ -53,7 +53,7 @@
             DiscussionThreadShowView.prototype.render = function() {
                 edx.HtmlUtils.setHtml(
                     this.$el,
-                    this.renderTemplate()
+                    this.renderTemplate(),
                 );
                 this.delegateEvents();
                 this.renderAttrs();

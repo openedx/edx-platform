@@ -46,10 +46,10 @@
                     $('.video .toggle-captions').trigger('click');
 
                     expect($('.video .subtitles-menu')).toHaveAttrs({
-                        lang: 'en'
+                        lang: 'en',
                     });
                     expect($('.video .closed-captions')).toHaveAttrs({
-                        lang: 'en'
+                        lang: 'en',
                     });
                 });
 
@@ -64,12 +64,12 @@
                     $captionControl = $('.toggle-transcript');
                     expect($captionControl).toHaveAttrs({
                         'aria-disabled': 'false',
-                        'aria-label': 'Turn off transcripts'
+                        'aria-label': 'Turn off transcripts',
                     });
                     $captionControl.click();
                     expect($captionControl).toHaveAttrs({
                         'aria-disabled': 'false',
-                        'aria-label': 'Turn on transcripts'
+                        'aria-label': 'Turn on transcripts',
                     });
                 });
 
@@ -85,12 +85,12 @@
                     $toggleCaption = $('.toggle-captions');
                     expect($toggleCaption).toHaveAttrs({
                         'aria-disabled': 'false',
-                        'aria-label': 'Turn on closed captioning'
+                        'aria-label': 'Turn on closed captioning',
                     });
                     $toggleCaption.click();
                     expect($toggleCaption).toHaveAttrs({
                         'aria-disabled': 'false',
-                        'aria-label': 'Hide closed captions'
+                        'aria-label': 'Hide closed captions',
                     });
                 });
 
@@ -139,7 +139,7 @@
                             notifyOnError: false,
                             data: void(0),
                             success: jasmine.any(Function),
-                            error: jasmine.any(Function)
+                            error: jasmine.any(Function),
                         });
                         transcriptCall = $.ajaxWithPrefix.calls.all().find(function(call) {
                             return call.args[0].url === transcriptURL;
@@ -161,11 +161,11 @@
                             notifyOnError: false,
                             data: jasmine.any(Object),
                             success: jasmine.any(Function),
-                            error: jasmine.any(Function)
+                            error: jasmine.any(Function),
                         });
                         expect($.ajaxWithPrefix.calls.mostRecent().args[0].data)
                             .toEqual({
-                                videoId: 'cogebirgzzM'
+                                videoId: 'cogebirgzzM',
                             });
                     }).always(done);
                 });
@@ -181,11 +181,11 @@
                             notifyOnError: false,
                             data: jasmine.any(Object),
                             success: jasmine.any(Function),
-                            error: jasmine.any(Function)
+                            error: jasmine.any(Function),
                         });
                         expect($.ajaxWithPrefix.calls.mostRecent().args[0].data)
                             .toEqual({
-                                videoId: 'cogebirgzzM'
+                                videoId: 'cogebirgzzM',
                             });
                     }).always(done);
                 });
@@ -224,7 +224,7 @@
                     fullscreen: plugin.onResize,
                     pause: plugin.pause,
                     play: plugin.play,
-                    destroy: plugin.destroy
+                    destroy: plugin.destroy,
                 });
             });
 
@@ -321,10 +321,10 @@
                             .toHaveBeenCalledWith('language', 'de');
                         expect($('.langs-list li.is-active').length).toBe(1);
                         expect($('.subtitles .subtitles-menu')).toHaveAttrs({
-                            lang: 'de'
+                            lang: 'de',
                         });
                         expect($('.closed-captions')).toHaveAttrs({
-                            lang: 'de'
+                            lang: 'de',
                         });
                         expect($link).toHaveAttr('aria-pressed', 'true');
                     });
@@ -383,7 +383,7 @@
                 describe('is not rendered', function() {
                     it('if just 1 language', function() {
                         state = jasmine.initializePlayer(null, {
-                            transcriptLanguages: {en: 'English'}
+                            transcriptLanguages: {en: 'English'},
                         });
 
                         expect($('.langs-list')).not.toExist();
@@ -427,7 +427,7 @@
                 it('bind all the transcript link', function() {
                     var handlerList = ['captionMouseOverOut', 'captionClick',
                         'captionMouseDown', 'captionFocus', 'captionBlur',
-                        'captionKeyDown'
+                        'captionKeyDown',
                     ];
 
                     $.each(handlerList, function(index, handler) {
@@ -480,7 +480,7 @@
 
                 it('show explanation message', function() {
                     expect($('.subtitles .subtitles-menu li')).toHaveText(
-                        'Transcript will be displayed when you start playing the video.'
+                        'Transcript will be displayed when you start playing the video.',
                     );
                 });
 
@@ -513,7 +513,7 @@
                 beforeEach(function() {
                     state = jasmine.initializePlayer('video_all.html', {
                         sub: '',
-                        transcriptLanguages: {}
+                        transcriptLanguages: {},
                     });
                 });
 
@@ -801,7 +801,7 @@
 
                 state.config.transcriptLanguages = {
                     en: 'English',
-                    uk: 'Ukrainian'
+                    uk: 'Ukrainian',
                 };
 
                 spyOn(Caption, 'fetchAvailableTranslations');
@@ -831,7 +831,7 @@
                     url: '/transcript/available_translations',
                     notifyOnError: false,
                     success: jasmine.any(Function),
-                    error: jasmine.any(Function)
+                    error: jasmine.any(Function),
                 });
             });
 
@@ -840,18 +840,18 @@
                 state.config.transcriptLanguages = {
                     en: 'English',
                     uk: 'Ukrainian',
-                    de: 'German'
+                    de: 'German',
                 };
                 Caption.fetchAvailableTranslations();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
                 expect(state.config.transcriptLanguages).toEqual({
                     uk: 'Ukrainian',
-                    de: 'German'
+                    de: 'German',
                 });
                 expect(Caption.renderLanguageMenu).toHaveBeenCalledWith({
                     uk: 'Ukrainian',
-                    de: 'German'
+                    de: 'German',
                 });
             });
 
@@ -859,7 +859,7 @@
             it(msg, function() {
                 state.config.transcriptLanguages = {
                     en: 'English',
-                    ru: 'Russian'
+                    ru: 'Russian',
                 };
                 Caption.fetchAvailableTranslations();
 
@@ -1031,7 +1031,7 @@
             describe('set the height of transcript container', function() {
                 it('when transcript button is enabled', function() {
                     var realHeight = parseInt(
-                            $('.subtitles').css('maxHeight'), 10
+                            $('.subtitles').css('maxHeight'), 10,
                         ),
                         shouldBeHeight = $('.video-wrapper').height();
 
@@ -1048,7 +1048,7 @@
                     state.videoCaption.setSubtitlesHeight();
 
                     realHeight = parseInt(
-                        $('.subtitles').css('maxHeight'), 10
+                        $('.subtitles').css('maxHeight'), 10,
                     );
                     videoWrapperHeight = $('.video-wrapper').height();
                     progressSliderHeight = state.el.find('.slider').height();
@@ -1067,10 +1067,10 @@
                 var firstSpacing, lastSpacing;
 
                 firstSpacing = Math.abs(parseInt(
-                    $('.subtitles .spacing:first').css('height'), 10
+                    $('.subtitles .spacing:first').css('height'), 10,
                 ));
                 lastSpacing = Math.abs(parseInt(
-                    $('.subtitles .spacing:last').css('height'), 10
+                    $('.subtitles .spacing:last').css('height'), 10,
                 ));
 
                 expect(firstSpacing - state.videoCaption.topSpacingHeight())
@@ -1243,7 +1243,7 @@
                 beforeEach(function() {
                     state.videoCaption.isMouseFocus = false;
                     $('.subtitles li span[data-index=0]').trigger(
-                        jQuery.Event('focus')
+                        jQuery.Event('focus'),
                     );
                 });
 
@@ -1260,7 +1260,7 @@
             describe('when loosing focus through TAB key', function() {
                 beforeEach(function() {
                     $('.subtitles li span[data-index=0]').trigger(
-                        jQuery.Event('blur')
+                        jQuery.Event('blur'),
                     );
                 });
 

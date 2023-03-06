@@ -7,18 +7,18 @@
 
             $baseImageElContainer = $(HtmlUtils.joinHtml(
                 HtmlUtils.HTML('<div class="base_image_container" style=" position: relative; margin-bottom: 25px; '),
-                HtmlUtils.HTML('margin-left: auto; margin-right: auto; " ></div>')
+                HtmlUtils.HTML('margin-left: auto; margin-right: auto; " ></div>'),
             ).toString());
 
             state.baseImageEl = $('<img />', {
-                alt: gettext('Drop target image')
+                alt: gettext('Drop target image'),
             });
 
             state.baseImageEl.attr('src', state.config.baseImage);
             state.baseImageEl.load(function() {
                 $baseImageElContainer.css({
                     width: this.width,
-                    height: this.height
+                    height: this.height,
                 });
 
                 state.baseImageEl.appendTo($baseImageElContainer);
@@ -34,7 +34,7 @@
                 var errorMsg = HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span style="color: red;">'),
                     HtmlUtils.HTML('ERROR: Image "'), state.config.baseImage, HtmlUtils.HTML('" was not found!'),
-                    HtmlUtils.HTML('</span>')
+                    HtmlUtils.HTML('</span>'),
                 );
                 console.log('ERROR: Image "' + state.config.baseImage + '" was not found!');
                 HtmlUtils.setHtml($baseImageElContainer, errorMsg);

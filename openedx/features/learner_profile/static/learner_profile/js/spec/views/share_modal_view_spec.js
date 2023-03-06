@@ -4,7 +4,7 @@ define(
         'js/spec/student_account/helpers',
         'learner_profile/js/spec_helpers/helpers',
         'learner_profile/js/views/share_modal_view',
-        'jquery.simulate'
+        'jquery.simulate',
     ],
     function(Backbone, $, _, Moment, Helpers, LearnerProfileHelpers, ShareModalView) {
         'use strict';
@@ -19,11 +19,11 @@ define(
                 var context = _.extend(badge, {
                     created: new Moment(badge.created),
                     ownProfile: true,
-                    badgeMeta: {}
+                    badgeMeta: {},
                 });
                 return new ShareModalView({
                     model: new Backbone.Model(context),
-                    shareButton: $('<button/>')
+                    shareButton: $('<button/>'),
                 });
             };
 
@@ -59,5 +59,5 @@ define(
                 expect(view.close).toHaveBeenCalled();
             });
         });
-    }
+    },
 );

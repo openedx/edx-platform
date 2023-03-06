@@ -117,7 +117,7 @@ class EnterpriseLearnerPortalModal extends React.Component {
                                 gettext('You have access to the {enterpriseName} dashboard'),
                                 {
                                     enterpriseName: this.props.enterpriseCustomerName,
-                                }
+                                },
                             )}
                         </div>
                         <p>
@@ -125,7 +125,7 @@ class EnterpriseLearnerPortalModal extends React.Component {
                                 gettext('To access the courses available to you through {enterpriseName}, visit the {enterpriseName} dashboard.'),
                                 {
                                     enterpriseName: this.props.enterpriseCustomerName,
-                                }
+                                },
                             )}
                         </p>
                         <div className="mt-4 d-flex align-content-center justify-content-end">

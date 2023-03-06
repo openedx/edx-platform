@@ -18,7 +18,7 @@ window.ImageInput = (function($, undefined) {
 
     ImageInput.prototype = {
         constructor: ImageInputConstructor,
-        clickHandler: clickHandler
+        clickHandler: clickHandler,
     };
 
     return ImageInput;
@@ -48,7 +48,7 @@ window.ImageInput = (function($, undefined) {
         this.crossEl.css({
             left: posX - 15,
             top: posY - 15,
-            visibility: 'visible'
+            visibility: 'visible',
         });
 
         this.inputEl.val(result);

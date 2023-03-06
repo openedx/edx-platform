@@ -6,14 +6,14 @@ define([
     'backbone',
     'gettext',
     'js/utils/templates',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/html-utils',
 ],
 function($, _, Backbone, gettext, TemplateUtils, HtmlUtils) {
     'use strict';
     var LearningInfoView = Backbone.View.extend({
 
         events: {
-            'click .delete-course-learning-info': 'removeLearningInfo'
+            'click .delete-course-learning-info': 'removeLearningInfo',
         },
 
         initialize: function() {
@@ -37,7 +37,7 @@ function($, _, Backbone, gettext, TemplateUtils, HtmlUtils) {
                 var attributes = {
                     index: index,
                     info: info,
-                    info_count: learning_information.length
+                    info_count: learning_information.length,
                 };
                 $(self.el).append(HtmlUtils.HTML(self.template(attributes)).toString());
             });
@@ -52,7 +52,7 @@ function($, _, Backbone, gettext, TemplateUtils, HtmlUtils) {
                 existing_info = _.clone(this.model.get('learning_info'));
             existing_info.splice(index, 1);
             this.model.set('learning_info', existing_info);
-        }
+        },
 
     });
     return LearningInfoView;

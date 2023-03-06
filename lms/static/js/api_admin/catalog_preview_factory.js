@@ -6,7 +6,7 @@
             var view = new CatalogPreviewView({
                 el: '.catalog-body',
                 previewUrl: options.previewUrl,
-                catalogApiUrl: options.catalogApiUrl
+                catalogApiUrl: options.catalogApiUrl,
             });
             return view.render();
         };

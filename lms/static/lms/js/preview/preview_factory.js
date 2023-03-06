@@ -52,7 +52,7 @@
                         role: selectedOption.val() === 'staff' ? 'staff' : 'student',
                         user_partition_id: selectedOption.data('partition-id'),
                         group_id: selectedOption.data('group-id'),
-                        user_name: selectedOption.val() === 'specific student' ? $userNameElement.val() : null
+                        user_name: selectedOption.val() === 'specific student' ? $userNameElement.val() : null,
                     };
                     $.ajax({
                         url: '/courses/' + options.courseId + '/masquerade',
@@ -69,7 +69,7 @@
                         },
                         error: function() {
                             alert('Error: cannot connect to server');
-                        }
+                        },
                     });
                 }
             };

@@ -1,7 +1,7 @@
 define([
     'underscore',
     'edx-ui-toolkit/js/pagination/paging-collection',
-    'common/js/components/views/paging_header'
+    'common/js/components/views/paging_header',
 ], function(_, PagingCollection, PagingHeader) {
     'use strict';
     describe('PagingHeader', function() {
@@ -15,9 +15,9 @@ define([
                         num_pages: results.length / pageSize,
                         current_page: 1,
                         start: 0,
-                        results: _.first(results, perPage)
+                        results: _.first(results, perPage),
                     },
-                    {parse: true}
+                    {parse: true},
                 );
                 collection.start = 0;
                 collection.totalCount = results.length;
@@ -28,13 +28,13 @@ define([
                 collection.registerSortableField('foo', 'Display Name');
                 return new PagingHeader({
                     collection: collection,
-                    showSortControls: _.isUndefined(sortable) ? true : sortable
+                    showSortControls: _.isUndefined(sortable) ? true : sortable,
                 });
             };
 
         it('correctly displays which items are being viewed', function() {
             pagingHeader = new PagingHeader({
-                collection: newCollection(20, 5)
+                collection: newCollection(20, 5),
             }).render();
             expect(pagingHeader.$el.find('.search-count').text())
                 .toContain('Showing 1-5 out of 20 total');
@@ -42,7 +42,7 @@ define([
 
         it('reports that all items are on the current page', function() {
             pagingHeader = new PagingHeader({
-                collection: newCollection(5, 5)
+                collection: newCollection(5, 5),
             }).render();
             expect(pagingHeader.$el.find('.search-count').text())
                 .toContain('Showing 1-5 out of 5 total');
@@ -50,7 +50,7 @@ define([
 
         it('reports that the page contains a single item', function() {
             pagingHeader = new PagingHeader({
-                collection: newCollection(1, 1)
+                collection: newCollection(1, 1),
             }).render();
             expect(pagingHeader.$el.find('.search-count').text())
                 .toContain('Showing 1 out of 1 total');

@@ -3,7 +3,7 @@ define(['backbone', 'js/models/settings/course_grader'], function(Backbone, Cour
         model: CourseGrader,
         sumWeights: function() {
             return this.reduce(function(subtotal, grader) { return subtotal + grader.get('weight'); }, 0);
-        }
+        },
     });
 
     return CourseGraderCollection;

@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
+    'jquery', 'underscore', 'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory',
 ], function($, _, Annotator, Logger, NotesFactory) {
     'use strict';
     describe('EdxNotes CaretNavigation Plugin', function() {
@@ -7,8 +7,8 @@ define([
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             this.annotator = NotesFactory.factory(
                 $('div#edx-notes-wrapper-123').get(0), {
-                    endpoint: 'http://example.com/'
-                }
+                    endpoint: 'http://example.com/',
+                },
             );
             this.plugin = this.annotator.plugins.CaretNavigation;
             spyOn(Logger, 'log');
@@ -33,7 +33,7 @@ define([
                 expect(this.plugin.isShortcut($.Event('keyup', {
                     ctrlKey: true,
                     shiftKey: true,
-                    keyCode: 221
+                    keyCode: 221,
                 }))).toBeTruthy();
             });
 
@@ -41,13 +41,13 @@ define([
                 expect(this.plugin.isShortcut($.Event('keyup', {
                     ctrlKey: false,
                     shiftKey: true,
-                    keyCode: 221
+                    keyCode: 221,
                 }))).toBeFalsy();
 
                 expect(this.plugin.isShortcut($.Event('keyup', {
                     ctrlKey: true,
                     shiftKey: true,
-                    keyCode: $.ui.keyCode.TAB
+                    keyCode: $.ui.keyCode.TAB,
                 }))).toBeFalsy();
             });
         });
@@ -68,7 +68,7 @@ define([
                 var eventProps = $.extend({
                     ctrlKey: true,
                     shiftKey: true,
-                    keyCode: 221
+                    keyCode: 221,
                 }, props);
                 element.trigger($.Event('keyup', eventProps));
             };
@@ -78,7 +78,7 @@ define([
 
                 this.annotation = {
                     text: 'test',
-                    highlights: [this.element.get(0)]
+                    highlights: [this.element.get(0)],
                 };
 
                 this.mockOffset = {top: 0, left: 0};
@@ -105,7 +105,7 @@ define([
             it('should set up the annotation', function() {
                 triggerEvent(this.element);
                 expect(this.annotator.setupAnnotation).toHaveBeenCalledWith(
-                    this.annotation
+                    this.annotation,
                 );
             });
 
@@ -114,7 +114,7 @@ define([
                 triggerEvent(this.element);
                 expect($('annotator-hl-temporary').position.calls.count()).toBe(1);
                 expect(this.annotator.showEditor).toHaveBeenCalledWith(
-                    this.annotation, this.mockOffset
+                    this.annotation, this.mockOffset,
                 );
             });
 
@@ -123,7 +123,7 @@ define([
                 triggerEvent(this.element);
                 expect(this.annotator.adder.position.calls.count()).toBe(1);
                 expect(this.annotator.showEditor).toHaveBeenCalledWith(
-                    this.annotation, this.mockOffset
+                    this.annotation, this.mockOffset,
                 );
             });
 
@@ -158,7 +158,7 @@ define([
                 this.annotator.onEditorHide();
                 expect(this.mockSubscriber).not.toHaveBeenCalledWith('annotationCreated');
                 expect(this.annotator.deleteAnnotation).toHaveBeenCalledWith(
-                    this.annotation
+                    this.annotation,
                 );
             });
 

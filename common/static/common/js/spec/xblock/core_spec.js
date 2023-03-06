@@ -29,10 +29,10 @@
             beforeEach(function() {
                 window.TestRuntime = {};
                 this.runtimeA = {
-                    name: 'runtimeA'
+                    name: 'runtimeA',
                 };
                 this.runtimeZ = {
-                    name: 'runtimeZ'
+                    name: 'runtimeZ',
                 };
                 window.TestRuntime.vA = jasmine.createSpy().and.returnValue(this.runtimeA);
                 window.TestRuntime.vZ = jasmine.createSpy().and.returnValue(this.runtimeZ);

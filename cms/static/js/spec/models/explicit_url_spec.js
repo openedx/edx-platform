@@ -8,5 +8,5 @@ define(['js/models/explicit_url'],
                 expect(new Model().url()).toBe('');
             });
         });
-    }
+    },
 );

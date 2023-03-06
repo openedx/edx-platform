@@ -8,7 +8,7 @@ define([
     'js/utils/templates',
     'js/models/uploads',
     'js/views/uploads',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/html-utils',
 ],
 function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDialog, HtmlUtils) {
     'use strict';
@@ -16,7 +16,7 @@ function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDial
 
         events: {
             'click .remove-instructor-data': 'removeInstructor',
-            'click .action-upload-instructor-image': 'uploadInstructorImage'
+            'click .action-upload-instructor-image': 'uploadInstructorImage',
         },
 
         initialize: function() {
@@ -39,7 +39,7 @@ function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDial
             $.each(this.model.get('instructor_info').instructors, function(index, data) {
                 attributes = {
                     data: data,
-                    index: index
+                    index: index,
                 };
                 $(self.el).append(HtmlUtils.HTML(self.template(attributes)).toString());
             });
@@ -76,7 +76,7 @@ function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDial
             var upload = new FileUploadModel({
                 title: gettext('Upload instructor image.'),
                 message: gettext('Files must be in JPEG or PNG format.'),
-                mimeTypes: ['image/jpeg', 'image/png']
+                mimeTypes: ['image/jpeg', 'image/png'],
             });
             var self = this;
             var modal = new FileUploadDialog({
@@ -86,10 +86,10 @@ function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDial
                     self.model.set('instructor_info', {instructors: instructors});
                     self.model.trigger('change', self.model);
                     self.model.trigger('change:instructor_info', self.model);
-                }
+                },
             });
             modal.show();
-        }
+        },
     });
     return InstructorInfoView;
 });

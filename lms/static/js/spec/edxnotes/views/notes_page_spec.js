@@ -1,7 +1,7 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec/edxnotes/helpers',
-    'js/edxnotes/views/page_factory'
+    'js/edxnotes/views/page_factory',
 ], function($, _, TemplateHelpers, AjaxHelpers, Helpers, NotesFactory) {
     'use strict';
     describe('EdxNotes NotesPage', function() {
@@ -10,7 +10,7 @@ define([
         beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
-                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
+                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item',
             ]);
             this.view = new NotesFactory({notes: notes, pageSize: 10});
         });
@@ -39,7 +39,7 @@ define([
                 start: 0,
                 next: null,
                 previous: null,
-                results: []
+                results: [],
             });
             expect(this.view.$('#view-search-results')).toHaveClass('is-active');
             expect(this.view.$('#view-recent-activity')).toExist();

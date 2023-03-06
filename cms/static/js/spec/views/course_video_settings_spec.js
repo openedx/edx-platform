@@ -32,80 +32,80 @@ define(
                     three_play_turnaround: '',
                     video_source_language: 'en',
                     preferred_languages: ['fr', 'en'],
-                    modified: '2017-08-27T12:28:17.421260Z'
+                    modified: '2017-08-27T12:28:17.421260Z',
                 },
                 transcriptOrganizationCredentials = {
                     Cielo24: true,
-                    '3PlayMedia': true
+                    '3PlayMedia': true,
                 },
                 transcriptionPlans = {
                     '3PlayMedia': {
                         languages: {
                             fr: 'French',
                             en: 'English',
-                            ur: 'Urdu'
+                            ur: 'Urdu',
                         },
                         turnaround: {
                             default: '4-Day/Default',
                             same_day_service: 'Same Day',
                             rush_service: '24-hour/Rush',
                             extended_service: '10-Day/Extended',
-                            expedited_service: '2-Day/Expedited'
+                            expedited_service: '2-Day/Expedited',
                         },
                         translations: {
                             es: ['en'],
-                            en: ['en', 'ur']
+                            en: ['en', 'ur'],
                         },
-                        display_name: '3PlayMedia'
+                        display_name: '3PlayMedia',
                     },
                     Cielo24: {
                         turnaround: {
                             PRIORITY: 'Priority, 24h',
-                            STANDARD: 'Standard, 48h'
+                            STANDARD: 'Standard, 48h',
                         },
                         fidelity: {
                             PROFESSIONAL: {
                                 languages: {
                                     ru: 'Russian',
                                     fr: 'French',
-                                    en: 'English'
+                                    en: 'English',
                                 },
-                                display_name: 'Professional, 99% Accuracy'
+                                display_name: 'Professional, 99% Accuracy',
                             },
                             PREMIUM: {
                                 languages: {
-                                    en: 'English'
+                                    en: 'English',
                                 },
-                                display_name: 'Premium, 95% Accuracy'
+                                display_name: 'Premium, 95% Accuracy',
                             },
                             MECHANICAL: {
                                 languages: {
                                     fr: 'French',
                                     en: 'English',
-                                    nl: 'Dutch'
+                                    nl: 'Dutch',
                                 },
-                                display_name: 'Mechanical, 75% Accuracy'
-                            }
+                                display_name: 'Mechanical, 75% Accuracy',
+                            },
                         },
-                        display_name: 'Cielo24'
-                    }
+                        display_name: 'Cielo24',
+                    },
                 },
                 providers = {
                     none: {
                         key: 'none',
                         value: '',
-                        displayName: 'None'
+                        displayName: 'None',
                     },
                     Cielo24: {
                         key: 'Cielo24',
                         value: 'Cielo24',
-                        displayName: 'Cielo24'
+                        displayName: 'Cielo24',
                     },
                     '3PlayMedia': {
                         key: '3PlayMedia',
                         value: '3PlayMedia',
-                        displayName: '3Play Media'
-                    }
+                        displayName: '3Play Media',
+                    },
                 };
 
             renderCourseVideoSettingsView = function(activeTranscriptPreferencesData, transcriptionPlansData, transcriptOrganizationCredentialsData) {  // eslint-disable-line max-len
@@ -117,9 +117,9 @@ define(
                     videoTranscriptSettings: {
                         transcript_preferences_handler_url: transcriptPreferencesUrl,
                         transcript_credentials_handler_url: transcriptCredentialsHandlerUrl,
-                        transcription_plans: transcriptionPlansData || null
+                        transcription_plans: transcriptionPlansData || null,
                     },
-                    transcriptOrganizationCredentials: transcriptOrganizationCredentialsData || null
+                    transcriptOrganizationCredentials: transcriptOrganizationCredentialsData || null,
                 });
                 $courseVideoSettingsEl = courseVideoSettingsView.render().$el;
             };
@@ -153,7 +153,7 @@ define(
                     '<div class="course-video-settings-message">' +
                     '<span class="icon fa ' + icon + '" aria-hidden="true"></span>' +
                     '<span>' + message + '</span>' +
-                    '</div>'
+                    '</div>',
                 );
             };
 
@@ -168,13 +168,13 @@ define(
 
             verifyTranscriptPreferences = function() {
                 expect($courseVideoSettingsEl.find('#transcript-turnaround').val()).toEqual(
-                    activeTranscriptPreferences.cielo24_turnaround
+                    activeTranscriptPreferences.cielo24_turnaround,
                 );
                 expect($courseVideoSettingsEl.find('#transcript-fidelity').val()).toEqual(
-                    activeTranscriptPreferences.cielo24_fidelity
+                    activeTranscriptPreferences.cielo24_fidelity,
                 );
                 expect($courseVideoSettingsEl.find('.transcript-language-container').length).toEqual(
-                    activeTranscriptPreferences.preferred_languages.length
+                    activeTranscriptPreferences.preferred_languages.length,
                 );
                 // Now check values are assigned correctly.
                 expect(courseVideoSettingsView.selectedTurnaroundPlan, activeTranscriptPreferences.cielo24_turnaround);
@@ -185,12 +185,12 @@ define(
             verifyProviderSelectedView = function() {
                 // Verify provider
                 expect(
-                    $courseVideoSettingsEl.find('.selected-transcript-provider .title').html()
+                    $courseVideoSettingsEl.find('.selected-transcript-provider .title').html(),
                 ).toEqual(courseVideoSettingsView.selectedProvider);
 
                 expect($courseVideoSettingsEl.find('.selected-transcript-provider .action-change-provider')).toExist();
                 expect(
-                    $courseVideoSettingsEl.find('.selected-transcript-provider .action-change-provider .sr').html()
+                    $courseVideoSettingsEl.find('.selected-transcript-provider .action-change-provider .sr').html(),
                 ).toEqual('Press change to change selected transcript provider.');
             };
 
@@ -206,9 +206,9 @@ define(
                 // Verify correct number of input fields are shown.
                 expect(
                     $courseVideoSettingsEl.find(
-                        '.organization-credentials-wrapper .transcript-preferance-wrapper input'
-                    ).length
-                ).toEqual(_.keys(fields).length
+                        '.organization-credentials-wrapper .transcript-preferance-wrapper input',
+                    ).length,
+                ).toEqual(_.keys(fields).length,
                 );
 
                 // Verify individual field has correct label and key.
@@ -221,12 +221,12 @@ define(
                 var elementSelector = courseVideoSettingsView.selectedProvider + '-' + fieldName;
                 // Verify that correct label is shown.
                 expect(
-                    $courseVideoSettingsEl.find('.' + elementSelector + '-wrapper label .title').html()
+                    $courseVideoSettingsEl.find('.' + elementSelector + '-wrapper label .title').html(),
                 ).toEqual(label);
 
                 // Verify that credential field is shown.
                 expect(
-                    $courseVideoSettingsEl.find('.' + elementSelector + '-wrapper .' + elementSelector)
+                    $courseVideoSettingsEl.find('.' + elementSelector + '-wrapper .' + elementSelector),
                 ).toExist();
             };
 
@@ -234,12 +234,12 @@ define(
                 // Verify that success message is shown.
                 verifyMessage(
                     'success',
-                    transcriptionPlans[courseVideoSettingsView.selectedProvider].display_name + ' credentials saved'
+                    transcriptionPlans[courseVideoSettingsView.selectedProvider].display_name + ' credentials saved',
                 );
 
                 // Also verify that transcript credential state is updated.
                 expect(
-                    courseVideoSettingsView.transcriptOrganizationCredentials[courseVideoSettingsView.selectedProvider]
+                    courseVideoSettingsView.transcriptOrganizationCredentials[courseVideoSettingsView.selectedProvider],
                 ).toBeTruthy();
 
                 // Verify that selected provider view after credentials are saved.
@@ -264,7 +264,7 @@ define(
                 AjaxHelpers.expectRequest(
                     requests,
                     'DELETE',
-                    transcriptPreferencesUrl
+                    transcriptPreferencesUrl,
                 );
 
                 // Send successful empty content response.
@@ -291,9 +291,9 @@ define(
                         _.extend(
                             {provider: courseVideoSettingsView.selectedProvider},
                             fieldValues,
-                            {global: false}
-                        )
-                    )
+                            {global: false},
+                        ),
+                    ),
                 );
 
                 if (statusCode === 400) {
@@ -311,7 +311,7 @@ define(
             beforeEach(function() {
                 setFixtures(
                     '<div class="video-transcript-settings-wrapper"></div>' +
-                    '<button class="button course-video-settings-button"></button>'
+                    '<button class="button course-video-settings-button"></button>',
                 );
                 TemplateHelpers.installTemplate('course-video-settings');
                 renderCourseVideoSettingsView(activeTranscriptPreferences, transcriptionPlans);
@@ -367,7 +367,7 @@ define(
                 renderCourseVideoSettingsView(
                     activeTranscriptPreferences,
                     transcriptionPlans,
-                    transcriptOrganizationCredentials
+                    transcriptOrganizationCredentials,
                 );
 
                 // First check preferance are selected correctly in HTML.
@@ -382,11 +382,11 @@ define(
                 // Select turnaround.
                 selectPreference(
                     '.transcript-turnaround',
-                    transcriptionPlans[selectedProvider].turnaround.default
+                    transcriptionPlans[selectedProvider].turnaround.default,
                 );
                 expect(
                     courseVideoSettingsView.selectedTurnaroundPlan,
-                    transcriptionPlans[selectedProvider].turnaround.default
+                    transcriptionPlans[selectedProvider].turnaround.default,
                 );
 
                 // Now click cancel button and verify active preferences are shown.
@@ -409,7 +409,7 @@ define(
                 sourceLanguages = courseVideoSettingsView.getSourceLanguages();
                 expect($courseVideoSettingsEl.find('.video-source-language option')).toExist();
                 expect($courseVideoSettingsEl.find('.video-source-language option').length).toEqual(
-                    _.keys(sourceLanguages).length + 1
+                    _.keys(sourceLanguages).length + 1,
                 );
 
                 expect(_.keys(transcriptionPlans[selectedProvider].translations)).toEqual(_.keys(sourceLanguages));
@@ -439,13 +439,13 @@ define(
                 sourceLanguages = courseVideoSettingsView.getSourceLanguages();
                 expect($courseVideoSettingsEl.find('.video-source-language option')).toExist();
                 expect($courseVideoSettingsEl.find('.video-source-language option').length).toEqual(
-                    _.keys(sourceLanguages).length + 1
+                    _.keys(sourceLanguages).length + 1,
                 );
 
                 // Verify getSourceLangaues return a list of langauges.
                 expect(sourceLanguages).toBeDefined();
                 expect(transcriptionPlans[selectedProvider].fidelity[selectedFidelity].languages).toEqual(
-                    sourceLanguages
+                    sourceLanguages,
                 );
             });
 
@@ -476,7 +476,7 @@ define(
                 targetLanguages = courseVideoSettingsView.getTargetLanguages();
                 expect($courseVideoSettingsEl.find('.transcript-language-menu:visible option')).toExist();
                 expect($courseVideoSettingsEl.find('.transcript-language-menu:visible option').length).toEqual(
-                    _.keys(targetLanguages).length + 1
+                    _.keys(targetLanguages).length + 1,
                 );
             });
 
@@ -504,7 +504,7 @@ define(
                 targetLanguages = courseVideoSettingsView.getTargetLanguages();
                 expect($courseVideoSettingsEl.find('.transcript-language-menu:visible option')).toExist();
                 expect($courseVideoSettingsEl.find('.transcript-language-menu:visible option').length).toEqual(
-                    _.keys(targetLanguages).length + 1
+                    _.keys(targetLanguages).length + 1,
                 );
 
                 // Also verify that target language are same as selected source language.
@@ -527,13 +527,13 @@ define(
                         three_play_turnaround: activeTranscriptPreferences.three_play_turnaround,
                         preferred_languages: activeTranscriptPreferences.preferred_languages,
                         video_source_language: activeTranscriptPreferences.video_source_language,
-                        global: false
-                    })
+                        global: false,
+                    }),
                 );
 
                 // Send successful response.
                 AjaxHelpers.respondWithJson(requests, {
-                    transcript_preferences: activeTranscriptPreferences
+                    transcript_preferences: activeTranscriptPreferences,
                 });
 
                 // Verify that success message is shown.
@@ -564,13 +564,13 @@ define(
                         three_play_turnaround: activeTranscriptPreferences.three_play_turnaround,
                         preferred_languages: activeTranscriptPreferences.preferred_languages,
                         video_source_language: activeTranscriptPreferences.video_source_language,
-                        global: false
-                    })
+                        global: false,
+                    }),
                 );
 
                 // Send error response.
                 AjaxHelpers.respondWithError(requests, 400, {
-                    error: 'Error message'
+                    error: 'Error message',
                 });
 
                 // Verify that error message is shown.
@@ -684,7 +684,7 @@ define(
                 // Verify api key is present.
                 verifyCredentialFieldsPresent({
                     'api-key': 'API Key',
-                    username: 'Username'
+                    username: 'Username',
                 });
             });
 
@@ -695,7 +695,7 @@ define(
                 // Verify api key and api secret input fields are present.
                 verifyCredentialFieldsPresent({
                     'api-key': 'API Key',
-                    'api-secret': 'API Secret'
+                    'api-secret': 'API Secret',
                 });
             });
 
@@ -714,7 +714,7 @@ define(
                 // Verify message
                 expect($courseVideoSettingsEl.find('.transcription-account-details').html()).toEqual(
                     '<span>This action updates the ' + courseVideoSettingsView.selectedProvider +
-                    ' information for your entire organization.</span>'
+                    ' information for your entire organization.</span>',
                 );
             });
 
@@ -727,7 +727,7 @@ define(
                 expect($courseVideoSettingsEl.find('.transcription-account-details.warning')).not.toExist();
                 // Initial detail message is shown instead.
                 expect($courseVideoSettingsEl.find('.transcription-account-details').html()).toEqual(
-                    '<span>Enter the account information for your organization.</span>'
+                    '<span>Enter the account information for your organization.</span>',
                 );
             });
 
@@ -740,12 +740,12 @@ define(
 
                 verifyPreferanceErrorState(
                     $courseVideoSettingsEl.find('.' + courseVideoSettingsView.selectedProvider + '-api-key-wrapper'),
-                    true
+                    true,
                 );
 
                 verifyPreferanceErrorState(
                     $courseVideoSettingsEl.find('.' + courseVideoSettingsView.selectedProvider + '-api-secret-wrapper'),
-                    true
+                    true,
                 );
             });
 
@@ -753,7 +753,7 @@ define(
                 verifyProviderSelectedView();
                 submitOrganizationCredentials({
                     api_key: 'api-key',
-                    username: 'username'
+                    username: 'username',
                 });
 
                 verifyCredentialsSaved();
@@ -767,7 +767,7 @@ define(
 
                 submitOrganizationCredentials({
                     api_key: 'api-key',
-                    api_secret_key: 'api-secret'
+                    api_secret_key: 'api-secret',
                 });
 
                 verifyCredentialsSaved();
@@ -778,7 +778,7 @@ define(
 
                 submitOrganizationCredentials({
                     api_key: 'api-key',
-                    username: 'username'
+                    username: 'username',
                 }, 400, 'Error saving credentials.');
 
                 // Verify that bad request error message is shown.
@@ -790,7 +790,7 @@ define(
 
                 submitOrganizationCredentials({
                     api_key: 'api-key',
-                    username: 'username'
+                    username: 'username',
                 }, 500);
 
                 // Verify that server error message is shown.
@@ -800,5 +800,5 @@ define(
             // TODO: Add more tests like clicking on add language, remove and their scenarios and some other tests
             // for specific preferance selected tests etc. - See EDUCATOR-1478
         });
-    }
+    },
 );

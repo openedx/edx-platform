@@ -32,7 +32,7 @@
                     gettext('Do not show again'),
                     '">',
                     '<span class="icon fa fa-step-forward" aria-hidden="true"></span>',
-                    '</button>'
+                    '</button>',
                 ].join(''),
 
                 destroy: function() {
@@ -60,14 +60,14 @@
                     this.el.on('click', this.onClick);
                     this.state.el.on({
                         'play.skip': _.once(this.render),
-                        'destroy.skip': this.destroy
+                        'destroy.skip': this.destroy,
                     });
                 },
 
                 onClick: function(event) {
                     event.preventDefault();
                     this.state.videoCommands.execute('skip', true);
-                }
+                },
             };
 
             return SkipControl;

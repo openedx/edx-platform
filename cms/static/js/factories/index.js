@@ -27,7 +27,7 @@ define(['jquery.form', 'js/index'], function() {
 
         $('#request-coursecreator').ajaxForm({
             error: showError,
-            success: reloadPage
+            success: reloadPage,
         });
 
         $('#request-coursecreator-submit').click(function(event) {

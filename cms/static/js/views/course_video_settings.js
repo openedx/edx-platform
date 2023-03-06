@@ -12,7 +12,7 @@ define([
     'text!templates/course-video-transcript-provider-selected.underscore',
     'text!templates/transcript-organization-credentials.underscore',
     'text!templates/course-video-settings-update-settings-footer.underscore',
-    'text!templates/course-video-settings-update-org-credentials-footer.underscore'
+    'text!templates/course-video-settings-update-org-credentials-footer.underscore',
 ],
 function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, TranscriptSettingsTemplate,
     TranscriptPreferencesTemplate, TranscriptProviderEmptyStateTemplate, TranscriptProviderSelectedStateTemplate,
@@ -38,7 +38,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             'click .action-update-org-credentials': 'updateOrganizationCredentials',
             'click .action-update-course-video-settings': 'updateCourseVideoSettings',
             'click .action-cancel-course-video-settings': 'discardChanges',
-            'click .action-close-course-video-settings': 'closeCourseVideoSettings'
+            'click .action-close-course-video-settings': 'closeCourseVideoSettings',
         },
 
         initialize: function(options) {
@@ -126,7 +126,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     if (this.selectedFidelityPlan === 'MECHANICAL' && this.selectedVideoSourceLanguage) {
                         availableLanguages = _.pick(
                             availableLanguages,
-                            this.selectedVideoSourceLanguage
+                            this.selectedVideoSourceLanguage,
                         );
                     }
                 } else if (this.selectedProvider === THREE_PLAY_MEDIA) {
@@ -198,8 +198,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 HtmlUtils.setHtml(
                     this.$el.find('.course-video-settings-footer'),
                     this.updateSettingsFooterTemplate({
-                        dateModified: dateModified
-                    })
+                        dateModified: dateModified,
+                    }),
                 );
                 return;
             }
@@ -261,29 +261,29 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                                 key: 'none',
                                 value: '',
                                 name: gettext('None'),
-                                checked: this.selectedProvider === '' ? 'checked' : ''
+                                checked: this.selectedProvider === '' ? 'checked' : '',
                             },
                             {
                                 key: CIELO24,
                                 value: CIELO24,
                                 name: this.availableTranscriptionPlans[CIELO24].display_name,
-                                checked: this.selectedProvider === CIELO24 ? 'checked' : ''
+                                checked: this.selectedProvider === CIELO24 ? 'checked' : '',
                             },
                             {
                                 key: THREE_PLAY_MEDIA,
                                 value: THREE_PLAY_MEDIA,
                                 name: this.availableTranscriptionPlans[THREE_PLAY_MEDIA].display_name,
-                                checked: this.selectedProvider === THREE_PLAY_MEDIA ? 'checked' : ''
-                            }
-                        ]
-                    })
+                                checked: this.selectedProvider === THREE_PLAY_MEDIA ? 'checked' : '',
+                            },
+                        ],
+                    }),
                 );
             } else {
                 HtmlUtils.setHtml(
                     $transcriptProviderWrapperEl,
                     this.transcriptProviderSelectedStateTemplate({
-                        selectedProvider: this.availableTranscriptionPlans[this.selectedProvider].display_name
-                    })
+                        selectedProvider: this.availableTranscriptionPlans[this.selectedProvider].display_name,
+                    }),
                 );
                 this.renderTranscriptPreferences();
             }
@@ -301,7 +301,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             if (turnaroundPlan) {
                 HtmlUtils.setHtml(
                     $turnaround,
-                    HtmlUtils.HTML(new Option(gettext('Select turnaround'), ''))
+                    HtmlUtils.HTML(new Option(gettext('Select turnaround'), '')),
                 );
                 _.each(turnaroundPlan, function(value, key) {
                     var option = new Option(value, key);
@@ -329,7 +329,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             if (fidelityPlan) {
                 HtmlUtils.setHtml(
                     $fidelity,
-                    HtmlUtils.HTML(new Option(gettext('Select fidelity'), ''))
+                    HtmlUtils.HTML(new Option(gettext('Select fidelity'), '')),
                 );
                 _.each(fidelityPlan, function(fidelityObject, key) {
                     var option = new Option(fidelityObject.display_name, key);
@@ -394,7 +394,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
                 HtmlUtils.setHtml(
                     $languageMenuEl,
-                    HtmlUtils.HTML(selectOptionEl)
+                    HtmlUtils.HTML(selectOptionEl),
                 );
 
                 _.each(availableTranslations, function(translatableLanguage, key) {
@@ -404,7 +404,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     }
                     HtmlUtils.append(
                         $languageMenuEl,
-                        HtmlUtils.HTML(option)
+                        HtmlUtils.HTML(option),
                     );
                 });
             } else {
@@ -423,7 +423,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 // Pick out only those languages from plan laguages that also come from video source language.
                 availableLanguages = _.pick(
                     availableLanguages,
-                    availableTranslations[this.selectedVideoSourceLanguage]
+                    availableTranslations[this.selectedVideoSourceLanguage],
                 );
             }
 
@@ -438,13 +438,13 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
                 HtmlUtils.setHtml(
                     $languageMenuEl,
-                    HtmlUtils.HTML(selectOptionEl)
+                    HtmlUtils.HTML(selectOptionEl),
                 );
 
                 _.each(availableLanguages, function(value, key) {
                     HtmlUtils.append(
                         $languageMenuEl,
-                        HtmlUtils.HTML(new Option(value, key))
+                        HtmlUtils.HTML(new Option(value, key)),
                     );
                 });
             } else {
@@ -461,19 +461,19 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML('<span>{languageDisplayName}</span>'),
                         {
-                            languageDisplayName: this.getTargetLanguages()[language]
-                        }
+                            languageDisplayName: this.getTargetLanguages()[language],
+                        },
                     ),
                     HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML('<div class="remove-language-action"><button class="button-link action-remove-language" data-language-code="{languageCode}">{text}<span class="sr">{srText}</span></button></div>'), // eslint-disable-line max-len
                         {
                             languageCode: language,
                             text: gettext('Remove'),
-                            srText: gettext('Press Remove to remove language')
-                        }
+                            srText: gettext('Press Remove to remove language'),
+                        },
                     ),
-                    HtmlUtils.HTML('</div>')
-                )
+                    HtmlUtils.HTML('</div>'),
+                ),
             );
         },
 
@@ -489,9 +489,9 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                         HtmlUtils.HTML('{lastUpdateText} {dateModified}'),
                         {
                             lastUpdateText: gettext('Last updated'),
-                            dateModified: dateModified
-                        }
-                    )
+                            dateModified: dateModified,
+                        },
+                    ),
                 );
             }
 
@@ -527,9 +527,9 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     HtmlUtils.HTML('<div class="course-video-settings-message"><span class="icon fa {iconClass}" aria-hidden="true"></span><span>{text}</span></div>'), // eslint-disable-line max-len
                     {
                         text: responseText,
-                        iconClass: iconClass
-                    }
-                )
+                        iconClass: iconClass,
+                    },
+                ),
             );
         },
 
@@ -557,11 +557,11 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             $PreferenceContainer.addClass('error');
             HtmlUtils.setHtml(
                 $PreferenceContainer.find('.error-icon'),
-                infoIconHtml
+                infoIconHtml,
             );
             HtmlUtils.setHtml(
                 $PreferenceContainer.find('.error-info'),
-                requiredText
+                requiredText,
             );
         },
 
@@ -663,7 +663,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     three_play_turnaround: self.selectedProvider === THREE_PLAY_MEDIA ? self.selectedTurnaroundPlan : '',   // eslint-disable-line max-len
                     preferred_languages: self.selectedLanguages,
                     video_source_language: self.selectedVideoSourceLanguage,
-                    global: false   // Do not trigger global AJAX error handler
+                    global: false,   // Do not trigger global AJAX error handler
                 }, function(data) {
                     responseTranscriptPreferences = data ? data.transcript_preferences : null;
                     self.updateSuccessResponseStatus(responseTranscriptPreferences);
@@ -673,12 +673,12 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             } else {
                 $.ajax({
                     type: 'DELETE',
-                    url: self.transcriptHandlerUrl
+                    url: self.transcriptHandlerUrl,
                 }).done(function() {
                     responseTranscriptPreferences = null;
                     self.updateSuccessResponseStatus(
                         responseTranscriptPreferences,
-                        gettext('Automatic transcripts are disabled.')
+                        gettext('Automatic transcripts are disabled.'),
                     );
                 }).fail(function(jqXHR) {
                     self.updateFailResponseStatus(jqXHR.responseText);
@@ -706,7 +706,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 api_key: apiKey,
                 api_secret_key: apiSecret,
                 username: username,
-                global: false   // Do not trigger global AJAX error handler
+                global: false,   // Do not trigger global AJAX error handler
             }, function() {
                 self.$el.find('.organization-credentials-wrapper').hide();
 
@@ -717,8 +717,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     self.activeTranscriptionPlan,
                     gettext('{selectedProvider} credentials saved').replace(
                         '{selectedProvider}',
-                        self.availableTranscriptionPlans[self.selectedProvider].display_name
-                    )
+                        self.availableTranscriptionPlans[self.selectedProvider].display_name,
+                    ),
                 );
             }).fail(function(jqXHR) {
                 self.updateFailResponseStatus(jqXHR.responseText);
@@ -758,17 +758,17 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 this.organizationCredentialsTemplate({
                     selectedProvider: {
                         key: this.selectedProvider,
-                        name: this.availableTranscriptionPlans[this.selectedProvider].display_name
+                        name: this.availableTranscriptionPlans[this.selectedProvider].display_name,
                     },
                     organizationCredentialsExists: this.transcriptOrganizationCredentials[this.selectedProvider],
                     CIELO24: CIELO24,
-                    THREE_PLAY_MEDIA: THREE_PLAY_MEDIA
-                })
+                    THREE_PLAY_MEDIA: THREE_PLAY_MEDIA,
+                }),
             );
             // Render footer
             HtmlUtils.setHtml(
                 this.$el.find('.course-video-settings-footer'),
-                this.organizationCredentialsFooterTemplate({})
+                this.organizationCredentialsFooterTemplate({}),
             );
         },
 
@@ -781,8 +781,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 $courseVideoSettingsContentEl,
                 this.transcriptPreferencesTemplate({
                     selectedProvider: this.selectedProvider,
-                    THREE_PLAY_MEDIA: THREE_PLAY_MEDIA
-                })
+                    THREE_PLAY_MEDIA: THREE_PLAY_MEDIA,
+                }),
             );
 
             // Render transcript preferences.
@@ -795,8 +795,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             HtmlUtils.setHtml(
                 this.$el.find('.course-video-settings-footer'),
                 this.updateSettingsFooterTemplate({
-                    dateModified: dateModified
-                })
+                    dateModified: dateModified,
+                }),
             );
         },
 
@@ -810,8 +810,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             HtmlUtils.setHtml(
                 this.$el.find('.course-video-settings-footer'),
                 this.updateSettingsFooterTemplate({
-                    dateModified: dateModified
-                })
+                    dateModified: dateModified,
+                }),
             );
 
             this.renderProviders();
@@ -864,7 +864,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
             // Reset everything.
             this.resetPlanData();
-        }
+        },
     });
 
     return CourseVideoSettingsView;

@@ -29,13 +29,13 @@
                 '<img src="/static/images/play.png" alt="">',
                 '<span class="sr">', gettext('Play video'), '</span>',
                 '</button>',
-                '</div>'
+                '</div>',
             ].join('')),
 
             initialize: function() {
                 this.el = $(this.template({
                     url: this.options.poster.url,
-                    type: this.options.poster.type
+                    type: this.options.poster.type,
                 }));
                 this.element.addClass('is-pre-roll');
                 this.render();
@@ -61,7 +61,7 @@
             destroy: function() {
                 this.element.off('destroy', this.destroy).removeClass('is-pre-roll');
                 this.el.remove();
-            }
+            },
         };
 
         return VideoPoster;

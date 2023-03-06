@@ -12,7 +12,7 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
     'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop'],
 function(
     $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
-    XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
+    XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger,
 ) {
     var CourseOutlineView = XBlockOutlineView.extend({
         // takes XBlockOutlineInfo as a model
@@ -118,7 +118,7 @@ function(
             if (this.model.hasChildren()) {
                 sectionInfo = new XBlockOutlineInfo({
                     id: locator,
-                    category: 'chapter'
+                    category: 'chapter',
                 });
                 // Fetch the full xblock info for the section and then create a view for it
                 sectionInfo.fetch().done(function() {
@@ -152,7 +152,7 @@ function(
             return {
                 locator_to_show: locator,
                 edit_display_name: true,
-                scroll_offset: scrollOffset || 0
+                scroll_offset: scrollOffset || 0,
             };
         },
 
@@ -179,8 +179,8 @@ function(
                 enable_timed_exams: enableTimedExams,
                 unit_level_discussions: unitLevelDiscussions,
                 xblockType: XBlockViewUtils.getXBlockType(
-                    this.model.get('category'), this.parentView.model, true
-                )
+                    this.model.get('category'), this.parentView.model, true,
+                ),
             });
 
             if (modal) {
@@ -192,8 +192,8 @@ function(
             var modal = CourseOutlineModalsFactory.getModal('publish', this.model, {
                 onSave: this.refresh.bind(this),
                 xblockType: XBlockViewUtils.getXBlockType(
-                    this.model.get('category'), this.parentView.model, true
-                )
+                    this.model.get('category'), this.parentView.model, true,
+                ),
             });
 
             if (modal) {
@@ -205,8 +205,8 @@ function(
             var modal = CourseOutlineModalsFactory.getModal('highlights', this.model, {
                 onSave: this.refresh.bind(this),
                 xblockType: XBlockViewUtils.getXBlockType(
-                    this.model.get('category'), this.parentView.model, true
-                )
+                    this.model.get('category'), this.parentView.model, true,
+                ),
             });
 
             if (modal) {
@@ -241,7 +241,7 @@ function(
                     droppableClass: 'ol.list-sections',
                     parentLocationSelector: 'article.outline',
                     refresh: this.refreshWithCollapsedState.bind(this),
-                    ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
+                    ensureChildrenRendered: this.ensureChildrenRendered.bind(this),
                 });
             } else if ($(element).hasClass('outline-subsection')) {
                 ContentDragger.makeDraggable(element, {
@@ -250,7 +250,7 @@ function(
                     droppableClass: 'ol.list-subsections',
                     parentLocationSelector: 'li.outline-section',
                     refresh: this.refreshWithCollapsedState.bind(this),
-                    ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
+                    ensureChildrenRendered: this.ensureChildrenRendered.bind(this),
                 });
             } else if ($(element).hasClass('outline-unit')) {
                 ContentDragger.makeDraggable(element, {
@@ -259,10 +259,10 @@ function(
                     droppableClass: 'ol.list-units',
                     parentLocationSelector: 'li.outline-subsection',
                     refresh: this.refreshWithCollapsedState.bind(this),
-                    ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
+                    ensureChildrenRendered: this.ensureChildrenRendered.bind(this),
                 });
             }
-        }
+        },
     });
 
     return CourseOutlineView;

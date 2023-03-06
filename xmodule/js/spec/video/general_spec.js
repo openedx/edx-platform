@@ -38,7 +38,7 @@
                         expect(state.videos).toEqual({
                             '0.50': '7tqY6eQzVhE',
                             '1.0': 'cogebirgzzM',
-                            '1.50': 'abcdefghijkl'
+                            '1.50': 'abcdefghijkl',
                         });
                     });
 
@@ -134,28 +134,28 @@
                 {
                     itDescription: 'both times are proper',
                     data: {start: 12, end: 24},
-                    expectData: {start: 12, end: 24}
+                    expectData: {start: 12, end: 24},
                 },
                 {
                     itDescription: 'start time is invalid',
                     data: {start: '', end: 24},
-                    expectData: {start: 0, end: 24}
+                    expectData: {start: 0, end: 24},
                 },
                 {
                     itDescription: 'end time is invalid',
                     data: {start: 12, end: ''},
-                    expectData: {start: 12, end: null}
+                    expectData: {start: 12, end: null},
                 },
                 {
                     itDescription: 'start time is less than 0',
                     data: {start: -12, end: 24},
-                    expectData: {start: 0, end: 24}
+                    expectData: {start: 0, end: 24},
                 },
                 {
                     itDescription: 'start time is greater than end time',
                     data: {start: 42, end: 24},
-                    expectData: {start: 42, end: null}
-                }
+                    expectData: {start: 42, end: null},
+                },
             ];
 
             afterEach(function() {
@@ -173,7 +173,7 @@
                 it(itDescription, function() {
                     state = jasmine.initializePlayer('video.html', {
                         start: data.start,
-                        end: data.end
+                        end: data.end,
                     });
 
                     expect(state.config.startTime).toBe(expectData.start);

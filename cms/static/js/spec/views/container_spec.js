@@ -39,13 +39,13 @@ describe('Container View', () => {
             model = new XBlockInfo({
                 id: rootLocator,
                 display_name: 'Test AB Test',
-                category: 'split_test'
+                category: 'split_test',
             });
 
             containerView = new ContainerView({
                 model: model,
                 view: 'container_preview',
-                el: $('.wrapper-xblock')
+                el: $('.wrapper-xblock'),
             });
         });
 
@@ -60,7 +60,7 @@ describe('Container View', () => {
 
             AjaxHelpers.respondWithJson(requests, {
                 html: mockContainerHTML,
-                resources: []
+                resources: [],
             });
 
             $('body').append(containerView.$el);

@@ -6,7 +6,7 @@
         'backbone',
         'common/js/spec_helpers/template_helpers',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'js/student_account/logistration_factory'
+        'js/student_account/logistration_factory',
     ],
     function($, _, Backbone, TemplateHelpers, AjaxHelpers, LogistrationFactory) {
         describe('Logistration Factory', function() {
@@ -22,7 +22,7 @@
                         required: true,
                         placeholder: 'xsy@edx.org',
                         instructions: 'Enter your email here.',
-                        restrictions: {}
+                        restrictions: {},
                     },
                     {
                         name: 'username',
@@ -33,10 +33,10 @@
                         placeholder: 'Xsy',
                         instructions: 'Enter your username here.',
                         restrictions: {
-                            max_length: 200
-                        }
-                    }
-                ]
+                            max_length: 200,
+                        },
+                    },
+                ],
             };
 
             var initializeLogistrationFactory = function(that, mode, nextUrl, finishAuthUrl) {
@@ -46,13 +46,13 @@
                         currentProvider: null,
                         providers: [],
                         secondaryProviders: [{name: 'provider'}],
-                        finishAuthUrl: finishAuthUrl
+                        finishAuthUrl: finishAuthUrl,
                     },
                     login_redirect_url: nextUrl, // undefined for default
                     platform_name: 'edX',
                     login_form_desc: FORM_DESCRIPTION,
                     registration_form_desc: FORM_DESCRIPTION,
-                    password_reset_form_desc: FORM_DESCRIPTION
+                    password_reset_form_desc: FORM_DESCRIPTION,
                 };
 
                 // Initialize the logistration Factory
@@ -90,7 +90,7 @@
                  */
                 hiddenFormsList = [
                     '#register-form',
-                    '#password-reset-form'
+                    '#password-reset-form',
                 ];
                 assertForms('#login-form', hiddenFormsList);
             });
@@ -105,7 +105,7 @@
                  */
                 hiddenFormsList = [
                     '#login-form',
-                    '#password-reset-form'
+                    '#password-reset-form',
                 ];
                 assertForms('#register-form', hiddenFormsList);
             });
@@ -120,7 +120,7 @@
                  */
                 hiddenFormsList = [
                     '#login-form',
-                    '#register-form'
+                    '#register-form',
                 ];
                 assertForms('#password-reset-form', hiddenFormsList);
             });

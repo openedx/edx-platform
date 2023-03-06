@@ -3,7 +3,7 @@
         'underscore',
         'backbone',
         'js/discovery/models/course_card',
-        'js/discovery/models/facet_option'
+        'js/discovery/models/facet_option',
     ], function(_, Backbone, CourseCard, FacetOption) {
         'use strict';
 
@@ -13,7 +13,7 @@
 
             defaults: {
                 totalCount: 0,
-                latestCount: 0
+                latestCount: 0,
             },
 
             initialize: function() {
@@ -28,7 +28,7 @@
 
                 this.set({
                     totalCount: response.total,
-                    latestCount: courses.length
+                    latestCount: courses.length,
                 });
 
                 var options = this.facetOptions;
@@ -37,7 +37,7 @@
                         options.add({
                             facet: key,
                             term: term,
-                            count: count
+                            count: count,
                         }, {merge: true});
                     });
                 });
@@ -46,7 +46,7 @@
             reset: function() {
                 this.set({
                     totalCount: 0,
-                    latestCount: 0
+                    latestCount: 0,
                 });
                 this.courseCards.reset();
                 this.facetOptions.reset();
@@ -54,7 +54,7 @@
 
             latest: function() {
                 return this.courseCards.last(this.get('latestCount'));
-            }
+            },
 
         });
     });

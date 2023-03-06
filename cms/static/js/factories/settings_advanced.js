@@ -1,5 +1,5 @@
 define([
-    'jquery', 'gettext', 'js/models/settings/advanced', 'js/views/settings/advanced'
+    'jquery', 'gettext', 'js/models/settings/advanced', 'js/views/settings/advanced',
 ], function($, gettext, AdvancedSettingsModel, AdvancedSettingsView) {
     'use strict';
     return function(advancedDict, advancedSettingsUrl, publisherEnabled) {
@@ -27,7 +27,7 @@ define([
 
         editor = new AdvancedSettingsView({
             el: $('.settings-advanced'),
-            model: advancedModel
+            model: advancedModel,
         });
         editor.render();
 

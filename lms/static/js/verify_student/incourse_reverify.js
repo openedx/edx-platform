@@ -15,13 +15,13 @@ var edx = edx || {};
     edx.verify_student = edx.verify_student || {};
 
     errorView = new edx.verify_student.ErrorView({
-        el: $('#error-container')
+        el: $('#error-container'),
     });
 
     return new edx.verify_student.InCourseReverifyView({
         courseKey: $el.data('course-key'),
         platformName: $el.data('platform-name'),
         usageId: $el.data('usage-id'),
-        errorModel: errorView.model
+        errorModel: errorView.model,
     }).render();
 }(jQuery, _));

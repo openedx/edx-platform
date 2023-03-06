@@ -40,9 +40,9 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
 
                 notConfiguredModel = new XBlockValidationModel({
                     empty: false, summary: {text: 'Not configured', type: model.NOT_CONFIGURED},
-                    xblock_id: 'id'
+                    xblock_id: 'id',
                 },
-                {parse: true}
+                {parse: true},
                 );
                 nonRootView = new XBlockValidationView({model: notConfiguredModel});
                 nonRootView.render();
@@ -64,16 +64,16 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
                     empty: false,
                     summary: {
                         text: 'Summary message', type: 'error',
-                        action_label: 'Summary Action', action_class: 'edit-button'
+                        action_label: 'Summary Action', action_class: 'edit-button',
                     },
                     messages: [
                         {
                             text: 'First message', type: 'warning',
-                            action_label: 'First Message Action', action_runtime_event: 'fix-up'
+                            action_label: 'First Message Action', action_runtime_event: 'fix-up',
                         },
-                        {text: 'Second message', type: 'error'}
+                        {text: 'Second message', type: 'error'},
                     ],
-                    xblock_id: 'id'
+                    xblock_id: 'id',
                 });
                 view = new XBlockValidationView({model: model});
                 view.render();
@@ -114,7 +114,7 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
                 var summaryOnlyModel = new XBlockValidationModel({
                         empty: false,
                         summary: {text: 'Summary message', type: 'warning'},
-                        xblock_id: 'id'
+                        xblock_id: 'id',
                     }),
                     summaryOnlyView, details;
 
@@ -128,5 +128,5 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
                 expect(details.length).toBe(0);
             });
         });
-    }
+    },
 );

@@ -83,14 +83,14 @@
     }());
 
     _.defaults(window, {
-        InstructorDashboard: {}
+        InstructorDashboard: {},
     });
 
     _.defaults(window.InstructorDashboard, {
-        sections: {}
+        sections: {},
     });
 
     _.defaults(window.InstructorDashboard.sections, {
-        ECommerce: ECommerce
+        ECommerce: ECommerce,
     });
 }).call(this);

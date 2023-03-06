@@ -4,7 +4,7 @@ var disableFastPreview = true,
 if (typeof MathJax === 'undefined') {
     if (disableFastPreview) {
         window.MathJax = {
-            menuSettings: {CHTMLpreview: false}
+            menuSettings: {CHTMLpreview: false},
         };
     }
 
@@ -17,13 +17,13 @@ if (typeof MathJax === 'undefined') {
             tex2jax: {
                 inlineMath: [
                     ['\\(', '\\)'],
-                    ['[mathjaxinline]', '[/mathjaxinline]']
+                    ['[mathjaxinline]', '[/mathjaxinline]'],
                 ],
                 displayMath: [
                     ['\\[', '\\]'],
-                    ['[mathjax]', '[/mathjax]']
-                ]
-            }
+                    ['[mathjax]', '[/mathjax]'],
+                ],
+            },
         });
         if (disableFastPreview) {
             MathJax.Hub.processSectionDelay = 0;
@@ -47,8 +47,8 @@ if (typeof MathJax === 'undefined') {
         menuSettings: {
             collapsible: true,
             autocollapse: false,
-            explorer: true
-        }
+            explorer: true,
+        },
     };
     vendorScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML';
     document.body.appendChild(vendorScript);

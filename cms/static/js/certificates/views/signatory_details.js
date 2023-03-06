@@ -12,7 +12,7 @@ define([
     'js/certificates/views/signatory_editor',
     'text!templates/signatory-details.underscore',
     'text!templates/signatory-actions.underscore',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/html-utils',
 ],
 function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView,
     signatoryDetailsTemplate, signatoryActionsTemplate, HtmlUtils) {
@@ -22,7 +22,7 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
         events: {
             'click .edit-signatory': 'editSignatory',
             'click  .signatory-panel-save': 'saveSignatoryData',
-            'click  .signatory-panel-close': 'closeSignatoryEditView'
+            'click  .signatory-panel-close': 'closeSignatoryEditView',
 
         },
 
@@ -31,7 +31,7 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
             var index = this.model.collection.indexOf(this.model);
             return [
                 'signatory-details',
-                'signatory-details-view-' + index
+                'signatory-details-view-' + index,
             ].join(' ');
         },
 
@@ -41,7 +41,7 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
             this.edit_view = new SignatoryEditorView({
                 model: this.model,
                 isEditingAllCollections: false,
-                eventAgg: this.eventAgg
+                eventAgg: this.eventAgg,
             });
         },
 
@@ -77,7 +77,7 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
                             actionableModel.setOriginalAttributes();
                             dfd.resolve();
                             self.closeSignatoryEditView();
-                        }
+                        },
                     });
                     return dfd;
                 });
@@ -93,10 +93,10 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
         render: function() {
             // Assemble the detail view for this model
             var attributes = $.extend({}, this.model.attributes, {
-                signatory_number: this.model.collection.indexOf(this.model) + 1
+                signatory_number: this.model.collection.indexOf(this.model) + 1,
             });
             return HtmlUtils.setHtml(this.$el, HtmlUtils.template(signatoryDetailsTemplate)(attributes));
-        }
+        },
     });
     return SignatoryDetailsView;
 });

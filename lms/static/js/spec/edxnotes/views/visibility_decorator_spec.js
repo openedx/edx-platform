@@ -1,6 +1,6 @@
 define([
     'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator',
-    'js/spec/edxnotes/helpers'
+    'js/spec/edxnotes/helpers',
 ], function(Annotator, VisibilityDecorator, Helpers) {
     'use strict';
     describe('EdxNotes VisibilityDecorator', function() {
@@ -10,7 +10,7 @@ define([
             usageId: 'an usage',
             courseId: 'a course',
             token: Helpers.makeToken(),
-            tokenUrl: '/test_token_url'
+            tokenUrl: '/test_token_url',
         };
 
         beforeEach(function() {

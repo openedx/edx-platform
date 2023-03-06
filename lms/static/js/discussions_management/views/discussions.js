@@ -7,7 +7,7 @@
         'edx-ui-toolkit/js/utils/string-utils',
         'js/views/base_dashboard_view',
         'js/models/notification',
-        'js/views/notification'
+        'js/views/notification',
     ],
 
     function($, _, Backbone, gettext, InlineDiscussionsView,
@@ -25,7 +25,7 @@
         var DiscussionsView = BaseDashboardView.extend({
             events: {
                 'click .division-scheme': 'divisionSchemeChanged',
-                'change .cohorts-state': 'onCohortsEnabledChanged'
+                'change .cohorts-state': 'onCohortsEnabledChanged',
             },
 
             initialize: function(options) {
@@ -40,7 +40,7 @@
 
                 HtmlUtils.setHtml(this.$el, this.template({
                     availableSchemes: this.getDivisionSchemeData(this.discussionSettings.attributes.division_scheme), //  eslint-disable-line max-len
-                    layoutClass: numberAvailableSchemes === 2 ? THREE_COLUMN_CLASS : TWO_COLUMN_CLASS
+                    layoutClass: numberAvailableSchemes === 2 ? THREE_COLUMN_CLASS : TWO_COLUMN_CLASS,
                 }));
                 this.updateTopicVisibility(this.getSelectedScheme(), this.getTopicNav());
                 this.renderTopics();
@@ -59,22 +59,22 @@
                         displayName: gettext('Not divided'),
                         descriptiveText: gettext('Discussions are unified; all learners interact with posts from other learners, regardless of the group they are in.'), //  eslint-disable-line max-len
                         selected: selectedScheme === NONE,
-                        enabled: true // always leave none enabled
+                        enabled: true, // always leave none enabled
                     },
                     {
                         key: ENROLLMENT_TRACK,
                         displayName: gettext('Enrollment Tracks'),
                         descriptiveText: gettext('Use enrollment tracks as the basis for dividing discussions. All learners, regardless of their enrollment track, see the same discussion topics, but within divided topics, only learners who are in the same enrollment track see and respond to each others’ posts.'), //  eslint-disable-line max-len
                         selected: selectedScheme === ENROLLMENT_TRACK,
-                        enabled: this.isSchemeAvailable(ENROLLMENT_TRACK) || selectedScheme === ENROLLMENT_TRACK
+                        enabled: this.isSchemeAvailable(ENROLLMENT_TRACK) || selectedScheme === ENROLLMENT_TRACK,
                     },
                     {
                         key: COHORT,
                         displayName: gettext('Cohorts'),
                         descriptiveText: gettext('Use cohorts as the basis for dividing discussions. All learners, regardless of cohort, see the same discussion topics, but within divided topics, only members of the same cohort see and respond to each others’ posts. '), //  eslint-disable-line max-len
                         selected: selectedScheme === COHORT,
-                        enabled: this.isSchemeAvailable(COHORT) || selectedScheme === COHORT
-                    }
+                        enabled: this.isSchemeAvailable(COHORT) || selectedScheme === COHORT,
+                    },
 
                 ];
             },
@@ -87,7 +87,7 @@
                 var model = new NotificationModel({type: type || 'confirmation', title: message});
                 this.removeNotification();
                 this.notification = new NotificationView({
-                    model: model
+                    model: model,
                 });
                 this.$('.division-scheme-container').prepend(this.notification.$el);
                 this.notification.render();
@@ -155,7 +155,7 @@
                 var selectedScheme = this.getSelectedScheme(),
                     topicNav = this.getTopicNav(),
                     fieldData = {
-                        division_scheme: selectedScheme
+                        division_scheme: selectedScheme,
                     };
 
                 this.updateTopicVisibility(selectedScheme, topicNav);
@@ -174,7 +174,7 @@
                 };
 
                 discussionSettingsModel.save(
-                    fieldData, {patch: true, wait: true}
+                    fieldData, {patch: true, wait: true},
                 ).done(function() {
                     switch (selectedScheme) {
                     case NONE:
@@ -193,8 +193,8 @@
                         StringUtils.interpolate(
                             gettext('Your changes have been saved. {details}'),
                             {details: details},
-                            true
-                        )
+                            true,
+                        ),
                     );
                 }).fail(function(result) {
                     var errorMessage = null,
@@ -230,7 +230,7 @@
                     this.CourseWideDiscussionsView = new CourseWideDiscussionsView({
                         el: dividedDiscussionsElement,
                         model: this.context.courseDiscussionTopicDetailsModel,
-                        discussionSettings: this.discussionSettings
+                        discussionSettings: this.discussionSettings,
                     }).render();
                 }
 
@@ -238,10 +238,10 @@
                     this.InlineDiscussionsView = new InlineDiscussionsView({
                         el: dividedDiscussionsElement,
                         model: this.context.courseDiscussionTopicDetailsModel,
-                        discussionSettings: this.discussionSettings
+                        discussionSettings: this.discussionSettings,
                     }).render();
                 }
-            }
+            },
         });
         return DiscussionsView;
     });

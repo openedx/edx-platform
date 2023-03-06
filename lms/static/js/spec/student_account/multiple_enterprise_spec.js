@@ -1,7 +1,7 @@
 define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/student_account/multiple_enterprise',
-    'js/student_account/utils'
+    'js/student_account/utils',
 ],
 function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
     'use strict';
@@ -30,7 +30,7 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
                 requests,
                 'GET',
                 LEARNER_URL,
-                null
+                null,
             );
 
             // Simulate a successful response from the server
@@ -54,7 +54,7 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
                 requests,
                 'GET',
                 LEARNER_URL,
-                null
+                null,
             );
 
             // Simulate a successful response from the server
@@ -65,8 +65,8 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
                 'POST',
                 ENTERPRISE_ACTIVATION_URL,
                 $.param({
-                    enterprise: 'SomeEnterprise'
-                })
+                    enterprise: 'SomeEnterprise',
+                }),
             );
             AjaxHelpers.respondWithNoContent(requests);
 
@@ -88,7 +88,7 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
                 requests,
                 'GET',
                 LEARNER_URL,
-                null
+                null,
             );
 
             // Simulate a successful response from the server
@@ -99,8 +99,8 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
                 'POST',
                 ENTERPRISE_ACTIVATION_URL,
                 $.param({
-                    enterprise: 'SomeEnterprise'
-                })
+                    enterprise: 'SomeEnterprise',
+                }),
             );
             // Simulate an error response from the server
             AjaxHelpers.respondWithError(requests);
@@ -121,7 +121,7 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
                 requests,
                 'GET',
                 LEARNER_URL,
-                null
+                null,
             );
 
             // Simulate a successful response from the server
@@ -145,5 +145,5 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
             expect(MultipleEnterpriseInterface.redirect).toHaveBeenCalledWith(NEXT_URL);
         });
     });
-}
+},
 );

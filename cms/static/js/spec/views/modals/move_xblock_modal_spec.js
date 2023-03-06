@@ -15,16 +15,16 @@ function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, XBloc
                 sourceXBlockInfo: new XBlockInfo({
                     id: 'USAGE_ID',
                     display_name: DISPLAY_NAME,
-                    category: 'html'
+                    category: 'html',
                 }),
                 sourceParentXBlockInfo: new XBlockInfo({
                     id: 'PARENT_ID',
                     display_name: 'VERT 101',
-                    category: 'vertical'
+                    category: 'vertical',
                 }),
                 XBlockURLRoot: '/xblock',
                 outlineURL: OUTLINE_URL,
-                XBlockAncestorInfoURL: ANCESTORS_URL
+                XBlockAncestorInfoURL: ANCESTORS_URL,
 
             });
             modal.show();
@@ -35,7 +35,7 @@ function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, XBloc
             TemplateHelpers.installTemplates([
                 'basic-modal',
                 'modal-button',
-                'move-xblock-modal'
+                'move-xblock-modal',
             ]);
         });
 
@@ -46,10 +46,10 @@ function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, XBloc
         it('rendered as expected', function() {
             showModal();
             expect(
-                modal.$el.find('.modal-header .title').contents().get(0).nodeValue.trim()
+                modal.$el.find('.modal-header .title').contents().get(0).nodeValue.trim(),
             ).toEqual('Move: ' + DISPLAY_NAME);
             expect(
-                modal.$el.find('.modal-sr-title').text().trim()
+                modal.$el.find('.modal-sr-title').text().trim(),
             ).toEqual('Choose a location to move your component to');
             expect(modal.$el.find('.modal-actions .action-primary.action-move').text()).toEqual('Move');
         });

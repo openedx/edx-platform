@@ -4,7 +4,7 @@ define(['backbone', 'gettext', 'backbone.associations'], function(Backbone, gett
             return {
                 name: '',
                 asset_path: '',
-                order: this.collection ? this.collection.nextOrder() : 1
+                order: this.collection ? this.collection.nextOrder() : 1,
             };
         },
         isEmpty: function() {
@@ -24,7 +24,7 @@ define(['backbone', 'gettext', 'backbone.associations'], function(Backbone, gett
         toJSON: function() {
             return {
                 title: this.get('name'),
-                url: this.get('asset_path')
+                url: this.get('asset_path'),
             };
         },
         // NOTE: validation functions should return non-internationalized error
@@ -33,20 +33,20 @@ define(['backbone', 'gettext', 'backbone.associations'], function(Backbone, gett
             if (!attrs.name && !attrs.asset_path) {
                 return {
                     message: gettext('Chapter name and asset_path are both required'),
-                    attributes: {name: true, asset_path: true}
+                    attributes: {name: true, asset_path: true},
                 };
             } else if (!attrs.name) {
                 return {
                     message: gettext('Chapter name is required'),
-                    attributes: {name: true}
+                    attributes: {name: true},
                 };
             } else if (!attrs.asset_path) {
                 return {
                     message: gettext('asset_path is required'),
-                    attributes: {asset_path: true}
+                    attributes: {asset_path: true},
                 };
             }
-        }
+        },
     });
     return Chapter;
 });

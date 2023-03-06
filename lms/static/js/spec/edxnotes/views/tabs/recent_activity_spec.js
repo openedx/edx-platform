@@ -1,9 +1,9 @@
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/recent_activity',
-    'js/spec/edxnotes/helpers'
+    'js/spec/edxnotes/helpers',
 ], function(
-    $, TemplateHelpers, AjaxHelpers, NotesCollection, TabsCollection, RecentActivityView, Helpers
+    $, TemplateHelpers, AjaxHelpers, NotesCollection, TabsCollection, RecentActivityView, Helpers,
 ) {
     'use strict';
     describe('EdxNotes RecentActivityView', function() {
@@ -19,21 +19,21 @@ define([
                         created: 'December 11, 2014 at 11:12AM',
                         updated: 'December 11, 2014 at 11:12AM',
                         text: 'Third added model',
-                        quote: 'Should be listed first'
+                        quote: 'Should be listed first',
                     },
                     {
                         created: 'December 11, 2014 at 11:11AM',
                         updated: 'December 11, 2014 at 11:11AM',
                         text: 'Second added model',
-                        quote: 'Should be listed second'
+                        quote: 'Should be listed second',
                     },
                     {
                         created: 'December 11, 2014 at 11:10AM',
                         updated: 'December 11, 2014 at 11:10AM',
                         text: 'First added model',
-                        quote: 'Should be listed third'
-                    }
-                ]
+                        quote: 'Should be listed third',
+                    },
+                ],
             },
             getView, tabInfo, recentActivityTabId;
 
@@ -44,7 +44,7 @@ define([
                 el: $('.wrapper-student-notes'),
                 collection: collection,
                 tabsCollection: tabsCollection,
-                createHeaderFooter: true
+                createHeaderFooter: true,
             });
 
             view = new RecentActivityView(options);
@@ -59,7 +59,7 @@ define([
             icon: 'fa fa-clock-o',
             is_active: true,
             is_closable: false,
-            view: 'Recent Activity'
+            view: 'Recent Activity',
         };
 
         recentActivityTabId = '#recent-panel';
@@ -67,7 +67,7 @@ define([
         beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
-                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
+                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item',
             ]);
 
             this.collection = new NotesCollection(notes, {perPage: 10, parse: true});
@@ -89,7 +89,7 @@ define([
                 start: 0,
                 next: null,
                 previous: null,
-                results: []
+                results: [],
             };
             var collection = new NotesCollection(notes, {perPage: 10, parse: true});
             var view = getView(collection, this.tabsCollection);
@@ -105,8 +105,8 @@ define([
                     count: 12,
                     num_pages: 2,
                     current_page: 1,
-                    start: 0
-                }
+                    start: 0,
+                },
             );
 
             var collection = new NotesCollection(notes, {perPage: 10, parse: true});
@@ -120,7 +120,7 @@ define([
             view.$('input#page-number-input').trigger('change');
             Helpers.verifyRequestParams(
                 requests[requests.length - 1].url,
-                {page: '2', page_size: '10'}
+                {page: '2', page_size: '10'},
             );
 
             notes = Helpers.createNotesData(
@@ -129,8 +129,8 @@ define([
                     count: 12,
                     num_pages: 2,
                     current_page: 2,
-                    start: 10
-                }
+                    start: 10,
+                },
             );
             Helpers.respondToRequest(requests, notes, true);
             Helpers.verifyPaginationInfo(view, 'Showing 11-12 out of 12 total', false, 2, 2);
@@ -145,8 +145,8 @@ define([
                     count: 15,
                     num_pages: 2,
                     current_page: 1,
-                    start: 0
-                }
+                    start: 0,
+                },
             );
             var collection = new NotesCollection(page1Notes, {perPage: 10, parse: true});
             collection.url = '/test/notes/';
@@ -158,7 +158,7 @@ define([
             view.$('.pagination .next-page-link').click();
             Helpers.verifyRequestParams(
                 requests[requests.length - 1].url,
-                {page: '2', page_size: '10'}
+                {page: '2', page_size: '10'},
             );
             var page2Notes = Helpers.createNotesData(
                 {
@@ -166,8 +166,8 @@ define([
                     count: 15,
                     num_pages: 2,
                     current_page: 2,
-                    start: 10
-                }
+                    start: 10,
+                },
             );
             Helpers.respondToRequest(requests, page2Notes, true);
             Helpers.verifyPaginationInfo(view, 'Showing 11-15 out of 15 total', false, 2, 2);
@@ -176,7 +176,7 @@ define([
             view.$('.pagination .previous-page-link').click();
             Helpers.verifyRequestParams(
                 requests[requests.length - 1].url,
-                {page: '1', page_size: '10'}
+                {page: '1', page_size: '10'},
             );
             Helpers.respondToRequest(requests, page1Notes);
 
@@ -192,8 +192,8 @@ define([
                     count: 7,
                     num_pages: 2,
                     current_page: 1,
-                    start: 0
-                }
+                    start: 0,
+                },
             );
             var collection = new NotesCollection(notes, {perPage: 5, parse: true});
             collection.url = '/test/notes/';
@@ -202,7 +202,7 @@ define([
             view.$('.pagination .next-page-link').click();
             Helpers.verifyRequestParams(
                 requests[requests.length - 1].url,
-                {page: '2', page_size: '5'}
+                {page: '2', page_size: '5'},
             );
         });
     });

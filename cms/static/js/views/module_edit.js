@@ -35,7 +35,7 @@
 
                 ModuleEdit.prototype.events = {
                     'click .edit-button': 'clickEditButton',
-                    'click .delete-button': 'onDelete'
+                    'click .delete-button': 'onDelete',
                 };
 
                 ModuleEdit.prototype.initialize = function() {
@@ -59,7 +59,7 @@
                     payload.parent_locator = parent;
                     return $.postJSON(this.model.urlRoot + '/', payload, function(data) {
                         _this.model.set({
-                            id: data.locator
+                            id: data.locator,
                         });
                         _this.$el.data('locator', data.locator);
                         _this.$el.data('courseKey', data.courseKey);
@@ -75,11 +75,11 @@
                             type: 'GET',
                             cache: false,
                             headers: {
-                                Accept: 'application/json'
+                                Accept: 'application/json',
                             },
                             success: function(fragment) {
                                 return _this.renderXBlockFragment(fragment, target).done(callback);
-                            }
+                            },
                         });
                     }
                 };
@@ -97,7 +97,7 @@
                     event.preventDefault();
                     modal = new EditXBlockModal();
                     return modal.edit(this.$el, this.model, {
-                        refresh: _.bind(this.render, this)
+                        refresh: _.bind(this.render, this),
                     });
                 };
 

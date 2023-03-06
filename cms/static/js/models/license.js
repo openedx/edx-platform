@@ -3,7 +3,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
         defaults: {
             type: null,
             options: {},
-            custom: false // either `false`, or a string
+            custom: false, // either `false`, or a string
         },
 
         initialize: function(attributes) {
@@ -57,14 +57,14 @@ define(['backbone', 'underscore'], function(Backbone, _) {
                     return this.set({
                         type: string,
                         options: {},
-                        custom: false
+                        custom: false,
                     }, options);
                 } else {
                 // if there is a space, it's a custom license
                     return this.set({
                         type: null,
                         options: {},
-                        custom: string
+                        custom: string,
                     }, options);
                 }
             }
@@ -91,9 +91,9 @@ define(['backbone', 'underscore'], function(Backbone, _) {
             });
 
             return this.set({
-                type: type, options: optionsObj, custom: false
+                type: type, options: optionsObj, custom: false,
             }, options);
-        }
+        },
     });
 
     return LicenseModel;

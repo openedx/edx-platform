@@ -2,7 +2,7 @@ define(
     [
         'jquery', 'backbone', 'underscore',
         'js/views/video/transcripts/utils', 'js/views/video/transcripts/file_uploader',
-        'gettext'
+        'gettext',
     ],
     function($, Backbone, _, Utils, FileUploader, gettext) {
         var MessageManager = Backbone.View.extend({
@@ -14,7 +14,7 @@ define(
                 'click .setting-import': 'importHandler',
                 'click .setting-replace': 'replaceHandler',
                 'click .setting-choose': 'chooseHandler',
-                'click .setting-use-existing': 'useExistingHandler'
+                'click .setting-use-existing': 'useExistingHandler',
             },
 
             // Pre-defined dict with anchors to status templates.
@@ -25,12 +25,12 @@ define(
                 replace: '#transcripts-replace',
                 uploaded: '#transcripts-uploaded',
                 use_existing: '#transcripts-use-existing',
-                choose: '#transcripts-choose'
+                choose: '#transcripts-choose',
             },
 
             initialize: function(options) {
                 _.bindAll(this,
-                    'importHandler', 'replaceHandler', 'chooseHandler', 'useExistingHandler', 'showError', 'hideError'
+                    'importHandler', 'replaceHandler', 'chooseHandler', 'useExistingHandler', 'showError', 'hideError',
                 );
 
                 this.options = _.extend({}, options);
@@ -40,7 +40,7 @@ define(
                 this.fileUploader = new FileUploader({
                     el: this.$el,
                     messenger: this,
-                    component_locator: this.component_locator
+                    component_locator: this.component_locator,
                 });
             },
 
@@ -63,7 +63,7 @@ define(
                         videoList,
                         function(value) {
                             return value.video;
-                        }
+                        },
                     ),
                     html5List = (params) ? params.html5_local : [],
                     template;
@@ -81,7 +81,7 @@ define(
                         component_locator: encodeURIComponent(this.component_locator),
                         html5_list: html5List,
                         grouped_list: groupedList,
-                        subs_id: (params) ? params.subs : ''
+                        subs_id: (params) ? params.subs : '',
                     }));
 
                 this.fileUploader.render();
@@ -223,7 +223,7 @@ define(
                     });
 
                 return xhr;
-            }
+            },
 
         });
 

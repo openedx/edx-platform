@@ -1,7 +1,7 @@
 define([
     'underscore',
     'edx-ui-toolkit/js/pagination/paging-collection',
-    'js/models/asset'
+    'js/models/asset',
 ], function(_, PagingCollection, AssetModel) {
     'use strict';
 
@@ -16,7 +16,7 @@ define([
             order: null,
             currentPage: null,
             totalRecords: null,
-            totalCount: null
+            totalCount: null,
         },
 
         queryParams: {
@@ -26,9 +26,9 @@ define([
             order: 'direction',
             directions: {
                 asc: 'asc',
-                desc: 'desc'
+                desc: 'desc',
             },
-            asset_type: function() { return this.assetType; }
+            asset_type: function() { return this.assetType; },
         },
 
         parse: function(response, options) {
@@ -40,9 +40,9 @@ define([
         parseState: function(response) {
             return {
                 totalRecords: response[0].totalCount,
-                totalPages: Math.ceil(response[0].totalCount / response[0].pageSize)
+                totalPages: Math.ceil(response[0].totalCount / response[0].pageSize),
             };
-        }
+        },
     });
 
     return AssetCollection;

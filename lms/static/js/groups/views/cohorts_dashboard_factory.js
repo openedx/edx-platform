@@ -8,7 +8,7 @@
                 return new ContentGroupModel({
                     id: group.id,
                     name: group.name,
-                    user_partition_id: group.user_partition_id
+                    user_partition_id: group.user_partition_id,
                 });
             });
 
@@ -27,8 +27,8 @@
                 context: {
                     uploadCohortsCsvUrl: $cohortManagementElement.data('upload_cohorts_csv_url'),
                     studioGroupConfigurationsUrl: studioGroupConfigurationsUrl,
-                    isCcxEnabled: $cohortManagementElement.data('is_ccx_enabled')
-                }
+                    isCcxEnabled: $cohortManagementElement.data('is_ccx_enabled'),
+                },
             });
 
             cohorts.fetch().done(function() {

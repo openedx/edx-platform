@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory'
+    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory',
 ], function($, _, Annotator, NotesFactory) {
     'use strict';
     describe('EdxNotes Scroll Plugin', function() {
@@ -21,11 +21,11 @@ define([
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             annotators = [
                 NotesFactory.factory($('div#edx-notes-wrapper-123').get(0), {
-                    endpoint: 'http://example.com/'
+                    endpoint: 'http://example.com/',
                 }),
                 NotesFactory.factory($('div#edx-notes-wrapper-456').get(0), {
-                    endpoint: 'http://example.com/'
-                })
+                    endpoint: 'http://example.com/',
+                }),
             ];
 
             highlights = _.map(annotators, function(annotator) {
@@ -35,7 +35,7 @@ define([
                 return $('<span></span>', {
                     class: 'annotator-hl',
                     tabindex: -1,
-                    text: 'some content'
+                    text: 'some content',
                 }).appendTo(annotator.element);
             });
 
@@ -52,7 +52,7 @@ define([
         it('should scroll to a note, open it and freeze the annotator if its id is part of the url hash', function() {
             annotators[0].plugins.Scroller.onNotesLoaded([{
                 id: 'abc123',
-                highlights: [highlights[0]]
+                highlights: [highlights[0]],
             }]);
             annotators[0].onHighlightMouseover.calls.reset();
             expect(highlights[0]).toBeFocused();
@@ -64,7 +64,7 @@ define([
         it('should not do anything if the url hash contains a wrong id', function() {
             annotators[0].plugins.Scroller.onNotesLoaded([{
                 id: 'def456',
-                highlights: [highlights[0]]
+                highlights: [highlights[0]],
             }]);
             expect(highlights[0]).not.toBeFocused();
             highlights[0].mouseover();
@@ -75,7 +75,7 @@ define([
         it('should not do anything if the url hash contains an empty id', function() {
             annotators[0].plugins.Scroller.onNotesLoaded([{
                 id: '',
-                highlights: [highlights[0]]
+                highlights: [highlights[0]],
             }]);
             expect(highlights[0]).not.toBeFocused();
             highlights[0].mouseover();
@@ -87,7 +87,7 @@ define([
             annotators[0].plugins.Scroller.destroy();
             expect($.fn.unbind).toHaveBeenCalledWith(
                 'annotationsLoaded',
-                annotators[0].plugins.Scroller.onNotesLoaded
+                annotators[0].plugins.Scroller.onNotesLoaded,
             );
         });
     });

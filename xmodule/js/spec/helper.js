@@ -14,14 +14,14 @@
                     'loadVideoById', 'getAvailablePlaybackRates', 'playVideo',
                     'pauseVideo', 'seekTo', 'getDuration', 'setPlaybackRate',
                     'getAvailableQualityLevels', 'getPlaybackQuality',
-                    'setPlaybackQuality', 'destroy'
-                ]
+                    'setPlaybackQuality', 'destroy',
+                ],
             );
 
             Player.getDuration.and.returnValue(60);
             Player.getAvailablePlaybackRates.and.returnValue([0.50, 1.0, 1.50, 2.0]);
             Player.getAvailableQualityLevels.and.returnValue(
-                ['highres', 'hd1080', 'hd720', 'large', 'medium', 'small']
+                ['highres', 'hd1080', 'hd720', 'large', 'medium', 'small'],
             );
 
             return Player;
@@ -33,11 +33,11 @@
             PLAYING: 1,
             PAUSED: 2,
             BUFFERING: 3,
-            CUED: 5
+            CUED: 5,
         },
         ready: function(f) {
             return f();
-        }
+        },
     };
     jasmine.YT = stubbedYT;
     // Stub YouTube API.
@@ -51,10 +51,10 @@
 
     jasmine.stubbedCaption = {
         end: [
-            3120, 6270, 8490, 21620, 24920, 25750, 27900, 34380, 35550, 40250
+            3120, 6270, 8490, 21620, 24920, 25750, 27900, 34380, 35550, 40250,
         ],
         start: [
-            1180, 3120, 6270, 14910, 21620, 24920, 25750, 27900, 34380, 35550
+            1180, 3120, 6270, 14910, 21620, 24920, 25750, 27900, 34380, 35550,
         ],
         text: [
             'MICHAEL CIMA: So let\'s do the first one here.',
@@ -68,8 +68,8 @@
             'If I plot energy here and number, these atoms in the crystal ' +
                 'will have a',
             'distribution of energy.',
-            'And some will have quite a bit of energy, just for a moment.'
-        ]
+            'And some will have quite a bit of energy, just for a moment.',
+        ],
     };
 
     // Time waitsFor() should wait for before failing a test.
@@ -81,26 +81,26 @@
         '7tqY6eQzVhE': {
             contentDetails: {
                 id: '7tqY6eQzVhE',
-                duration: 'PT5M0S'
-            }
+                duration: 'PT5M0S',
+            },
         },
         cogebirgzzM: {
             contentDetails: {
                 id: 'cogebirgzzM',
-                duration: 'PT3M20S'
-            }
+                duration: 'PT3M20S',
+            },
         },
         abcdefghijkl: {
             contentDetails: {
                 id: 'abcdefghijkl',
-                duration: 'PT6M40S'
-            }
+                duration: 'PT6M40S',
+            },
         },
         bogus: {
             contentDetails: {
-                duration: 'PT1M40S'
-            }
-        }
+                duration: 'PT1M40S',
+            },
+        },
     };
 
     jasmine.fireEvent = function(el, eventName) {
@@ -145,11 +145,11 @@
                     return {
                         always: callCallback,
                         error: callCallback,
-                        done: callCallback
+                        done: callCallback,
                     };
                 } else if (settings.success) {
                     return settings.success({
-                        items: jasmine.stubbedMetadata[match[1]]
+                        items: jasmine.stubbedMetadata[match[1]],
                     });
                 } else {
                     return {
@@ -158,7 +158,7 @@
                         },
                         done: function(callback) {
                             return callback.call(window, {}, 'success');
-                        }
+                        },
                     };
                 }
             } else if (settings.url.match(/transcript\/translation\/.+$/)) {
@@ -167,7 +167,7 @@
                 return settings.success(['uk', 'de']);
             } else if (settings.url.match(/.+\/problem_get$/)) {
                 return settings.success({
-                    html: window.readFixtures('problem_content.html')
+                    html: window.readFixtures('problem_content.html'),
                 });
             } else if (
                 settings.url === '/calculate' ||
@@ -231,13 +231,13 @@
                     'alignByHeightOnly',
                     'setParams',
                     'setMode',
-                    'setElement'
+                    'setElement',
                 ],
                 obj = {},
                 delta = {
                     add: jasmine.createSpy().and.returnValue(obj),
                     substract: jasmine.createSpy().and.returnValue(obj),
-                    reset: jasmine.createSpy().and.returnValue(obj)
+                    reset: jasmine.createSpy().and.returnValue(obj),
                 };
 
             $.each(methods, function(index, method) {

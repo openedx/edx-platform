@@ -4,8 +4,8 @@
         var CourseDiscussionTopicDetailsModel = Backbone.Model.extend({
             defaults: {
                 course_wide_discussions: {},
-                inline_discussions: {}
-            }
+                inline_discussions: {},
+            },
         });
         return CourseDiscussionTopicDetailsModel;
     });

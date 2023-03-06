@@ -7,7 +7,7 @@ define(
         'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist',
         'js/views/video/translations_editor',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ],
     function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
         LicenseModel, LicenseView, TranscriptUtils, VideoList, VideoTranslations, HtmlUtils) {
@@ -35,12 +35,12 @@ define(
                                 el: self.$el.find('.metadata_entry')[counter++],
                                 courseKey: courseKey,
                                 locator: locator,
-                                model: model
+                                model: model,
                             },
                             conversions = {
                                 Select: 'Option',
                                 Float: 'Number',
-                                Integer: 'Number'
+                                Integer: 'Number',
                             },
                             type = model.getType();
 
@@ -67,7 +67,7 @@ define(
                         if (model.isModified()) {
                             modified_values[model.getFieldName()] = model.getValue();
                         }
-                    }
+                    },
                 );
                 return modified_values;
             },
@@ -86,10 +86,10 @@ define(
                             // It is possible that there is no display name value set. In that case, return empty string.
                             displayName = displayNameValue || '';
                         }
-                    }
+                    },
                 );
                 return displayName;
-            }
+            },
         });
 
         Metadata.VideoList = VideoList;
@@ -100,7 +100,7 @@ define(
             events: {
                 'change input': 'updateModel',
                 'keypress .setting-input': 'showClearButton',
-                'click .setting-clear': 'clear'
+                'click .setting-clear': 'clear',
             },
 
             templateName: 'metadata-string-entry',
@@ -124,7 +124,7 @@ define(
 
             setValueInEditor: function(value) {
                 this.$el.find('input').val(value);
-            }
+            },
         });
 
         Metadata.VideoID = Metadata.String.extend({
@@ -137,7 +137,7 @@ define(
                 this.$el.on(
                     'input',
                     'input',
-                    _.debounce(_.bind(this.inputChange, this), this.requestDelay)
+                    _.debounce(_.bind(this.inputChange, this), this.requestDelay),
                 );
             },
 
@@ -158,7 +158,7 @@ define(
             inputChange: function() {
                 TranscriptUtils.Storage.set('edx_video_id', this.getValueFromEditor());
                 Backbone.trigger('transcripts:basicTabFieldChanged');
-            }
+            },
         });
 
         Metadata.Number = AbstractEditor.extend({
@@ -167,7 +167,7 @@ define(
                 'change input': 'updateModel',
                 'keypress .setting-input': 'keyPressed',
                 'change .setting-input': 'changed',
-                'click .setting-clear': 'clear'
+                'click .setting-clear': 'clear',
             },
 
             render: function() {
@@ -259,7 +259,7 @@ define(
                 } else {
                     this.clear();
                 }
-            }
+            },
 
         });
 
@@ -267,7 +267,7 @@ define(
 
             events: {
                 'change select': 'updateModel',
-                'click .setting-clear': 'clear'
+                'click .setting-clear': 'clear',
             },
 
             templateName: 'metadata-option-entry',
@@ -296,7 +296,7 @@ define(
                 this.$el.find('#' + this.uniqueId + ' option').filter(function() {
                     return $(this).text() === value;
                 }).prop('selected', true);
-            }
+            },
         });
 
         Metadata.PublicAccess = Metadata.Option.extend({
@@ -317,7 +317,7 @@ define(
                 } else {
                     urlContainer.addClass('is-hidden');
                 }
-            }
+            },
         });
 
         Metadata.List = AbstractEditor.extend({
@@ -328,7 +328,7 @@ define(
                 'change input': 'updateModel',
                 'input input': 'enableAdd',
                 'click .create-setting': 'addEntry',
-                'click .remove-setting': 'removeEntry'
+                'click .remove-setting': 'removeEntry',
             },
 
             templateName: 'metadata-list-entry',
@@ -336,7 +336,7 @@ define(
             getValueFromEditor: function() {
                 return _.map(
                     this.$el.find('li input'),
-                    function(ele) { return ele.value.trim(); }
+                    function(ele) { return ele.value.trim(); },
                 ).filter(_.identity);
             },
 
@@ -352,8 +352,8 @@ define(
                             HtmlUtils.HTML('<a href="#" class="remove-action remove-setting" data-index="<%- index %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">'), // eslint-disable-line max-len
                             gettext('Remove'),
                             HtmlUtils.HTML('</span></a>'),
-                            HtmlUtils.HTML('</li>')
-                        ).toString()
+                            HtmlUtils.HTML('</li>'),
+                        ).toString(),
                     );
                     list.append(HtmlUtils.HTML($(template({ele: ele, index: index}))).toString());
                 });
@@ -385,7 +385,7 @@ define(
                 if (_.isNull(this.model.getValue())) {
                     this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
                 }
-            }
+            },
         });
 
         Metadata.RelativeTime = AbstractEditor.extend({
@@ -400,7 +400,7 @@ define(
                 'mouseup input': 'mouseUpHandler',
                 'change input': 'updateModel',
                 'keypress .setting-input': 'showClearButton',
-                'click .setting-clear': 'clear'
+                'click .setting-clear': 'clear',
             },
 
             templateName: 'metadata-string-entry',
@@ -452,7 +452,7 @@ define(
                 return [
                     pad(date.getUTCHours()),
                     pad(date.getUTCMinutes()),
-                    pad(date.getUTCSeconds())
+                    pad(date.getUTCSeconds()),
                 ].join(':');
             },
 
@@ -472,7 +472,7 @@ define(
             // Prevents default behavior to make works selection in WebKit
             // browsers
                 event.preventDefault();
-            }
+            },
         });
 
         Metadata.Dict = AbstractEditor.extend({
@@ -483,7 +483,7 @@ define(
                 'change input': 'updateModel',
                 'input input': 'enableAdd',
                 'click .create-setting': 'addEntry',
-                'click .remove-setting': 'removeEntry'
+                'click .remove-setting': 'removeEntry',
             },
 
             templateName: 'metadata-dict-entry',
@@ -521,8 +521,8 @@ define(
                             HtmlUtils.HTML('<input type="text" class="input input-key" value="<%- key %>">'),
                             HtmlUtils.HTML('<input type="text" class="input input-value" value="<%- value %>">'),
                             HtmlUtils.HTML('<a href="#" class="remove-action remove-setting" data-value="<%- value %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>'), // eslint-disable-line max-len
-                            HtmlUtils.HTML('</li>')
-                        ).toString()
+                            HtmlUtils.HTML('</li>'),
+                        ).toString(),
                     );
 
                     frag.appendChild($(template({key: key, value: value}))[0]);
@@ -559,7 +559,7 @@ define(
                 if (_.isNull(this.model.getValue())) {
                     this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
                 }
-            }
+            },
         });
 
 
@@ -572,7 +572,7 @@ define(
 
             events: {
                 'click .upload-setting': 'upload',
-                'click .setting-clear': 'clear'
+                'click .setting-clear': 'clear',
             },
 
             templateName: 'metadata-file-uploader-entry',
@@ -590,7 +590,7 @@ define(
             setValueInEditor: function(value) {
                 var html = this.buttonTemplate({
                     model: this.model,
-                    uniqueId: this.uniqueId
+                    uniqueId: this.uniqueId,
                 });
 
                 this.$('#' + this.uniqueId).val(value);
@@ -602,7 +602,7 @@ define(
                     $target = $(event.currentTarget),
                     url = '/assets/' + this.options.courseKey + '/',
                     model = new FileUpload({
-                        title: gettext('Upload File')
+                        title: gettext('Upload File'),
                     }),
                     view = new UploadDialog({
                         model: model,
@@ -612,11 +612,11 @@ define(
                             if (response.asset && response.asset.url) {
                                 self.model.setValue(response.asset.url);
                             }
-                        }
+                        },
                     }).show();
 
                 event.preventDefault();
-            }
+            },
         });
 
         Metadata.License = AbstractEditor.extend({
@@ -642,7 +642,7 @@ define(
             setLicense: function() {
                 this.model.setValue(this.licenseModel.toString());
                 this.render();
-            }
+            },
 
         });
 

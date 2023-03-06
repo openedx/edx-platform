@@ -14,7 +14,7 @@ define(
                 'click .toggle-show-transcripts-button': 'toggleShowTranscripts',
                 'click .upload-transcript-button': 'chooseFile',
                 'click .delete-transcript-button': 'deleteTranscript',
-                'click .more-details-action': 'showUploadFailureMessage'
+                'click .more-details-action': 'showUploadFailureMessage',
             },
 
             initialize: function(options) {
@@ -36,31 +36,31 @@ define(
                         statusClass: 'success',
                         iconClasses: 'fa-check',
                         shortMessage: 'Transcript uploaded.',
-                        hiddenClass: 'hidden'
+                        hiddenClass: 'hidden',
                     },
                     uploading: {
                         statusClass: '',
                         iconClasses: 'fa-spinner fa-pulse',
                         shortMessage: 'Uploading transcript.',
-                        hiddenClass: 'hidden'
+                        hiddenClass: 'hidden',
                     },
                     failed: {
                         statusClass: 'error',
                         iconClasses: 'fa-warning',
                         shortMessage: 'Upload failed.',
-                        hiddenClass: ''
+                        hiddenClass: '',
                     },
                     validationFailed: {
                         statusClass: 'error',
                         iconClasses: 'fa-warning',
                         shortMessage: 'Validation failed.',
-                        hiddenClass: ''
-                    }
+                        hiddenClass: '',
+                    },
                 };
                 // This is needed to attach transcript methods to this object while uploading.
                 _.bindAll(
                     this, 'render', 'chooseFile', 'transcriptSelected', 'transcriptUploadSucceeded',
-                    'transcriptUploadFailed'
+                    'transcriptUploadFailed',
                 );
             },
 
@@ -85,8 +85,8 @@ define(
                     {
                         transcriptDownloadHandlerUrl: transcriptDownloadHandlerUrl,
                         edxVideoID: edxVideoID,
-                        transcriptLanguageCode: transcriptLanguageCode
-                    }
+                        transcriptLanguageCode: transcriptLanguageCode,
+                    },
                 );
             },
 
@@ -99,8 +99,8 @@ define(
                     {
                         transcriptDeleteHandlerUrl: transcriptDeleteHandlerUrl,
                         edxVideoID: edxVideoID,
-                        transcriptLanguageCode: transcriptLanguageCode
-                    }
+                        transcriptLanguageCode: transcriptLanguageCode,
+                    },
                 );
             },
 
@@ -129,9 +129,9 @@ define(
                     StringUtils.interpolate(
                         gettext('Hide transcripts ({transcriptCount})'),
                         {
-                            transcriptCount: this.transcripts.length
-                        }
-                    )
+                            transcriptCount: this.transcripts.length,
+                        },
+                    ),
                 );
                 this.$el.find('.toggle-show-transcripts-icon')
                     .removeClass('fa-caret-right')
@@ -148,9 +148,9 @@ define(
                     StringUtils.interpolate(
                         gettext('Show transcripts ({transcriptCount})'),
                         {
-                            transcriptCount: this.transcripts.length
-                        }
-                    )
+                            transcriptCount: this.transcripts.length,
+                        },
+                    ),
                 );
                 this.$el.find('.toggle-show-transcripts-icon')
                     .removeClass('fa-caret-down')
@@ -164,7 +164,7 @@ define(
 
                 if (fileType !== this.videoTranscriptSettings.trancript_download_file_format) {
                     errorMessage = gettext(
-                        'This file type is not supported. Supported file type is {supportedFileFormat}.'
+                        'This file type is not supported. Supported file type is {supportedFileFormat}.',
                     )
                         .replace('{supportedFileFormat}', this.videoTranscriptSettings.trancript_download_file_format);
                 }
@@ -184,8 +184,8 @@ define(
                     formData: {
                         edx_video_id: this.edxVideoID,
                         language_code: $transcriptContainer.attr('data-language-code'),
-                        new_language_code: $transcriptContainer.find('.transcript-language-menu').val()
-                    }
+                        new_language_code: $transcriptContainer.find('.transcript-language-menu').val(),
+                    },
                 });
 
                 $transcriptUploadEl.click();
@@ -219,8 +219,8 @@ define(
                     this.getTranscriptDownloadLink(
                         this.edxVideoID,
                         newLanguageCode,
-                        this.videoTranscriptSettings.transcript_download_handler_url
-                    )
+                        this.videoTranscriptSettings.transcript_download_handler_url,
+                    ),
                 );
 
                 HtmlUtils.setHtml(
@@ -229,9 +229,9 @@ define(
                         {
                             transcriptClientTitle: this.getTranscriptClientTitle(),
                             transcriptLanguageCode: newLanguageCode,
-                            fileExtension: this.videoTranscriptSettings.trancript_download_file_format
-                        }
-                    )
+                            fileExtension: this.videoTranscriptSettings.trancript_download_file_format,
+                        },
+                    ),
                 );
 
                 this.renderMessage($transcriptContainer, 'uploaded');
@@ -261,7 +261,7 @@ define(
                     transcriptDeleteUrl = self.getTranscriptDeleteUrl(
                         self.edxVideoID,
                         languageCode,
-                        self.videoTranscriptSettings.transcript_delete_handler_url
+                        self.videoTranscriptSettings.transcript_delete_handler_url,
                     );
 
                 ViewUtils.confirmThenRunOperation(
@@ -274,16 +274,16 @@ define(
                             function() {
                                 return $.ajax({
                                     url: transcriptDeleteUrl,
-                                    type: 'DELETE'
+                                    type: 'DELETE',
                                 }).done(function() {
                                     // Update transcripts.
                                     self.transcripts = _.without(self.transcripts, languageCode);
                                     // re-render transcripts.
                                     self.render();
                                 });
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             },
 
@@ -308,8 +308,8 @@ define(
                         iconClasses: statusData.iconClasses,
                         shortMessage: gettext(statusData.shortMessage),
                         errorMessage: errorMessage || '',
-                        hiddenClass: statusData.hiddenClass
-                    })
+                        hiddenClass: statusData.hiddenClass,
+                    }),
                 );
 
                 $transcriptStatusEl.addClass(statusData.statusClass);
@@ -325,9 +325,9 @@ define(
                             text: gettext('Close'),
                             click: function(prompt) {
                                 return prompt.hide();
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 }).show();
             },
 
@@ -346,8 +346,8 @@ define(
                         transcriptClientTitle: this.getTranscriptClientTitle(),
                         transcriptFileFormat: this.videoTranscriptSettings.trancript_download_file_format,
                         getTranscriptDownloadLink: this.getTranscriptDownloadLink,
-                        transcriptDownloadHandlerUrl: this.videoTranscriptSettings.transcript_download_handler_url
-                    })
+                        transcriptDownloadHandlerUrl: this.videoTranscriptSettings.transcript_download_handler_url,
+                    }),
                 );
 
                 if (this.isCollapsed) {
@@ -356,9 +356,9 @@ define(
                     this.showTranscripts();
                 }
                 return this;
-            }
+            },
         });
 
         return VideoTranscriptsView;
-    }
+    },
 );

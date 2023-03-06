@@ -3,7 +3,7 @@
         'underscore',
         'backbone',
         'js/discovery/models/course_discovery',
-        'js/discovery/collections/filters'
+        'js/discovery/collections/filters',
     ], function(_, Backbone, CourseDiscovery, Filters) {
         'use strict';
 
@@ -54,7 +54,7 @@
                 this.jqhxr && this.jqhxr.abort();
                 this.jqhxr = this.discovery.fetch({
                     type: 'POST',
-                    data: data
+                    data: data,
                 });
                 return this.jqhxr;
             },
@@ -63,7 +63,7 @@
                 var data = {
                     search_string: this.searchTerm,
                     page_size: this.pageSize,
-                    page_index: pageIndex
+                    page_index: pageIndex,
                 };
                 _.extend(data, this.terms);
                 return data;
@@ -101,7 +101,7 @@
                             if (facet !== 'search_query') {
                                 var option = this.discovery.facetOptions.findWhere({
                                     facet: facet,
-                                    term: term
+                                    term: term,
                                 });
                                 if (option) {
                                     option.set('selected', true);
@@ -130,15 +130,15 @@
                         data: {
                             search_string: '',
                             page_size: this.pageSize,
-                            page_index: 0
+                            page_index: 0,
                         },
                         success: function(model, response, options) {
                             deferred.resolveWith(self, [model]);
-                        }
+                        },
                     });
                 }
                 return deferred.promise();
-            }
+            },
 
         });
     });

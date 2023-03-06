@@ -42,7 +42,7 @@
                 LEFT: 37,
                 UP: 38,
                 RIGHT: 39,
-                DOWN: 40
+                DOWN: 40,
             };
 
             this.updatedProblems = {};
@@ -238,7 +238,7 @@
                     }
                     if (this.savePosition) {
                         $.postWithPrefix(this.gotoPositionUrl, JSON.stringify({
-                            position: newPosition
+                            position: newPosition,
                         }));
                     }
                 }
@@ -317,7 +317,7 @@
                     target_tab: newPosition,
                     tab_count: this.num_contents,
                     id: this.id,
-                    widget_placement: widgetPlacement
+                    widget_placement: widgetPlacement,
                 });
 
                 // On Sequence change, destroy any existing polling thread
@@ -330,7 +330,7 @@
             } else {
                 alertTemplate = gettext('Sequence error! Cannot navigate to %(tab_name)s in the current SequenceModule. Please contact the course staff.');  // eslint-disable-line max-len
                 alertText = interpolate(alertTemplate, {
-                    tab_name: newPosition
+                    tab_name: newPosition,
                 }, true);
                 alert(alertText);  // eslint-disable-line no-alert
             }
@@ -373,7 +373,7 @@
                 id: this.id,
                 current_tab: this.position,
                 tab_count: this.num_contents,
-                widget_placement: widgetPlacement
+                widget_placement: widgetPlacement,
             }).always(function() {
                 if (targetUrl) {
                     // Wait to load the new page until we've attempted to log the event
@@ -390,7 +390,7 @@
 
                 offset = {
                     next: 1,
-                    previous: -1
+                    previous: -1,
                 };
 
                 newPosition = this.position + offset[direction];
@@ -418,7 +418,7 @@
             var completionIndicators = element.find('.check-circle');
             if (completionIndicators.length) {
                 $.postWithPrefix(this.getCompletionUrl, JSON.stringify({
-                    usage_key: usageKey
+                    usage_key: usageKey,
                 }), function(data) {
                     if (data.complete === true) {
                         completionIndicators.removeClass('is-hidden');

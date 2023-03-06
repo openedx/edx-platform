@@ -31,7 +31,7 @@
                         max: null,
                         slide: state.videoProgressSlider.onSlide,
                         stop: state.videoProgressSlider.onStop,
-                        step: 5
+                        step: 5,
                     });
                 });
 
@@ -46,7 +46,7 @@
                     expect($timeControl).toHaveAttrs({
                         role: 'slider',
                         'aria-label': 'Video position. Press space to toggle playback',
-                        'aria-disabled': 'false'
+                        'aria-disabled': 'false',
                     });
 
                     expect($timeControl).toHaveAttr('aria-valuetext');
@@ -121,19 +121,19 @@
                     state.videoProgressSlider.frozen = false;
                     state.videoProgressSlider.updatePlayTime({
                         time: 20,
-                        duration: 120
+                        duration: 120,
                     });
                 });
 
                 it('update the max value of the slider', function() {
                     expect($.fn.slider).toHaveBeenCalledWith(
-                        'option', 'max', 120
+                        'option', 'max', 120,
                     );
                 });
 
                 it('update current value of the slider', function() {
                     expect($.fn.slider).toHaveBeenCalledWith(
-                        'option', 'value', 20
+                        'option', 'value', 20,
                     );
                 });
 
@@ -155,7 +155,7 @@
             // Disabled 12/30/13 due to flakiness in master
             xit('freeze the slider', function() {
                 state.videoProgressSlider.onSlide(
-                    jQuery.Event('slide'), {value: 20}
+                    jQuery.Event('slide'), {value: 20},
                 );
 
                 expect(state.videoProgressSlider.frozen).toBeTruthy();
@@ -164,7 +164,7 @@
             // Disabled 12/30/13 due to flakiness in master
             xit('trigger seek event', function() {
                 state.videoProgressSlider.onSlide(
-                    jQuery.Event('slide'), {value: 20}
+                    jQuery.Event('slide'), {value: 20},
                 );
 
                 expect(state.videoPlayer.onSlideSeek).toHaveBeenCalled();
@@ -187,7 +187,7 @@
             // Disabled 12/30/13 due to flakiness in master
             xit('freeze the slider', function() {
                 state.videoProgressSlider.onStop(
-                    jQuery.Event('stop'), {value: 20}
+                    jQuery.Event('stop'), {value: 20},
                 );
 
                 expect(state.videoProgressSlider.frozen).toBeTruthy();
@@ -196,7 +196,7 @@
             // Disabled 12/30/13 due to flakiness in master
             xit('trigger seek event', function() {
                 state.videoProgressSlider.onStop(
-                    jQuery.Event('stop'), {value: 20}
+                    jQuery.Event('stop'), {value: 20},
                 );
 
                 expect(state.videoPlayer.onSlideSeek).toHaveBeenCalled();
@@ -205,7 +205,7 @@
             // Disabled 12/30/13 due to flakiness in master
             xit('set timeout to unfreeze the slider', function() {
                 state.videoProgressSlider.onStop(
-                    jQuery.Event('stop'), {value: 20}
+                    jQuery.Event('stop'), {value: 20},
                 );
 
                 jasmine.clock().tick(200);
@@ -219,18 +219,18 @@
                 {
                     startTime: 10,
                     endTime: 20,
-                    duration: 150
+                    duration: 150,
                 },
                 {
                     startTime: 90,
                     endTime: 100,
-                    duration: 100
+                    duration: 100,
                 },
                 {
                     startTime: 0,
                     endTime: 200,
-                    duration: 200
-                }
+                    duration: 200,
+                },
             ];
 
             state = jasmine.initializePlayer();
@@ -241,10 +241,10 @@
                     width = testCase.endTime * step - left,
                     expectedParams = {
                         left: left + '%',
-                        width: width + '%'
+                        width: width + '%',
                     },
                     params = state.videoProgressSlider.getRangeParams(
-                        testCase.startTime, testCase.endTime, testCase.duration
+                        testCase.startTime, testCase.endTime, testCase.duration,
                     );
 
                 expect(params).toEqual(expectedParams);
@@ -267,7 +267,7 @@
                     .toBe('Video ended');
 
                 expect('focus').toHaveBeenTriggeredOn(
-                    state.videoProgressSlider.handle
+                    state.videoProgressSlider.handle,
                 );
             });
 
@@ -278,7 +278,7 @@
                     .toBe('Video position');
 
                 expect('focus').not.toHaveBeenTriggeredOn(
-                    state.videoProgressSlider.handle
+                    state.videoProgressSlider.handle,
                 );
             });
 
@@ -302,7 +302,7 @@
                     121: '2 minutes 1 second',
 
                     3670: '1 hour 1 minute 10 seconds',
-                    21541: '5 hours 59 minutes 1 second'
+                    21541: '5 hours 59 minutes 1 second',
                 },
                 getTimeDescription;
 

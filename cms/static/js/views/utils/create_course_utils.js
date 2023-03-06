@@ -15,7 +15,7 @@ define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/
             this.setupOrgAutocomplete = function() {
                 $.getJSON('/organizations', function(data) {
                     $(selectors.org).autocomplete({
-                        source: data
+                        source: data,
                     });
                 });
             };
@@ -30,7 +30,7 @@ define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/
                         } else if (data.ErrMsg !== undefined) {
                             errorHandler(data.ErrMsg);
                         }
-                    }
+                    },
                 );
             };
         };

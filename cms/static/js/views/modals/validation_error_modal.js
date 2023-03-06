@@ -3,7 +3,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
         var ValidationErrorModal = BaseModal.extend({
             events: {
                 'click .action-cancel': 'cancel',
-                'click .action-undo': 'resetAction'
+                'click .action-undo': 'resetAction',
             },
 
             initialize: function() {
@@ -14,7 +14,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
             options: $.extend({}, BaseModal.prototype.options, {
                 modalName: 'Validation Error Modal',
                 title: gettext('Validation Error While Saving'),
-                modalSize: 'md'
+                modalSize: 'md',
             }),
 
             addActionButtons: function() {
@@ -37,7 +37,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
             getContentHtml: function() {
                 return this.template({
                     response: this.response,
-                    num_errors: this.response.length
+                    num_errors: this.response.length,
                 });
             },
 
@@ -55,9 +55,9 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
 
                 // hide the modal
                 BaseModal.prototype.hide.call(this);
-            }
+            },
         });
 
         return ValidationErrorModal;
-    }
+    },
 );

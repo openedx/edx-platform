@@ -23,7 +23,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             'blur :input': 'inputUnfocus',
             'click .action-upload-image': 'uploadImage',
             'click .add-course-learning-info': 'addLearningFields',
-            'click .add-course-instructor-info': 'addInstructorFields'
+            'click .add-course-instructor-info': 'addInstructorFields',
         },
 
         initialize: function(options) {
@@ -53,7 +53,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.licenseView = new LicenseView({
                 model: this.licenseModel,
                 el: this.$('#course-license-selector').get(),
-                showPreview: true
+                showPreview: true,
             });
             this.listenTo(this.licenseModel, 'change', this.handleLicenseChange);
 
@@ -61,18 +61,18 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 new NotificationView.Warning({
                     title: gettext('Course Credit Requirements'),
                     message: gettext('The minimum grade for course credit is not set.'),
-                    closeIcon: true
+                    closeIcon: true,
                 }).show();
             }
 
             this.learning_info_view = new LearningInfoView({
                 el: $('.course-settings-learning-fields'),
-                model: this.model
+                model: this.model,
             });
 
             this.instructor_info_view = new InstructorInfoView({
                 el: $('.course-instructor-details-fields'),
-                model: this.model
+                model: this.model,
             });
         },
 
@@ -102,7 +102,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
 
             this.$el.find('#' + this.fieldToSelectorMap.short_description).val(this.model.get('short_description'));
             this.$el.find('#' + this.fieldToSelectorMap.about_sidebar_html).val(
-                this.model.get('about_sidebar_html')
+                this.model.get('about_sidebar_html'),
             );
             this.codeMirrorize(null, $('#course-about-sidebar-html')[0]);
 
@@ -188,7 +188,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             course_settings_learning_fields: 'course-settings-learning-fields',
             add_course_learning_info: 'add-course-learning-info',
             add_course_instructor_info: 'add-course-instructor-info',
-            course_learning_info: 'course-learning-info'
+            course_learning_info: 'course-learning-info',
         },
 
         addLearningFields: function() {
@@ -210,7 +210,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 title: '',
                 organization: '',
                 image: '',
-                bio: ''
+                bio: '',
             });
             this.model.set('instructor_info', {instructors: instructors});
         },
@@ -223,8 +223,8 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                     gettext('{hours}:{minutes} (current UTC time)'),
                     {
                         hours: hours,
-                        minutes: minutes
-                    }
+                        minutes: minutes,
+                    },
                 );
 
             $(e.currentTarget).attr('title', currentTimeText);
@@ -475,7 +475,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             var upload = new FileUploadModel({
                 title: title,
                 message: gettext('Files must be in JPEG or PNG format.'),
-                mimeTypes: ['image/jpeg', 'image/png']
+                mimeTypes: ['image/jpeg', 'image/png'],
             });
             var self = this;
             var modal = new FileUploadDialog({
@@ -487,7 +487,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                     self.model.set(options);
                     self.render();
                     $(selector).attr('src', self.model.get(image_path_key));
-                }
+                },
             });
             modal.show();
         },
@@ -495,7 +495,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
         handleLicenseChange: function() {
             this.showNotificationBar();
             this.model.set('license', this.licenseModel.toString());
-        }
+        },
     });
 
     return DetailsView;

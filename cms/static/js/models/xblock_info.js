@@ -167,7 +167,7 @@ define(
                 highlights_enabled: false,
                 highlights_enabled_for_messaging: false,
                 highlights_preview_only: true,
-                highlights_doc_url: ''
+                highlights_doc_url: '',
             },
 
             initialize: function() {
@@ -264,7 +264,7 @@ define(
         */
             isEditableOnCourseOutline: function() {
                 return this.isSequential() || this.isChapter() || this.isVertical();
-            }
+            },
         });
         return XBlockInfo;
     });

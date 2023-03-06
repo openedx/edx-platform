@@ -32,10 +32,10 @@
 
                     beforeEach(function() {
                         data = {
-                            item_2: 'value_2'
+                            item_2: 'value_2',
                         };
                         data[id] = {
-                            item_1: 'value_1'
+                            item_1: 'value_1',
                         };
 
                         window[namespace] = data;

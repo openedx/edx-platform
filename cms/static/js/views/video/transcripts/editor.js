@@ -3,7 +3,7 @@ define(
         'jquery', 'backbone', 'underscore',
         'js/views/video/transcripts/utils',
         'js/views/metadata', 'js/collections/metadata',
-        'js/views/video/transcripts/metadata_videolist'
+        'js/views/video/transcripts/metadata_videolist',
     ],
     function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
         var Editor = Backbone.View.extend({
@@ -20,7 +20,7 @@ define(
                 // initialize MetadataView.Editor
                 this.settingsView = new MetadataView.Editor({
                     el: this.$el,
-                    collection: this.collection
+                    collection: this.collection,
                 });
 
                 // Listen to edx_video_id update
@@ -185,7 +185,7 @@ define(
                     videoUrlValue,
                     function(value) {
                         return Utils.parseLink(value).mode;
-                    }
+                    },
                 );
 
                 if (html5Sources) {
@@ -240,7 +240,7 @@ define(
                 this.stopListening();
                 this.undelegateEvents();
                 this.$el.empty();
-            }
+            },
         });
 
         return Editor;

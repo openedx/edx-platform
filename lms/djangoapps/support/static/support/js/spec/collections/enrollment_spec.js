@@ -1,7 +1,7 @@
 define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'support/js/spec_helpers/enrollment_helpers',
-    'support/js/collections/enrollment'
+    'support/js/collections/enrollment',
 ], function(AjaxHelpers, EnrollmentHelpers, EnrollmentCollection) {
     'use strict';
 
@@ -11,7 +11,7 @@ define([
         beforeEach(function() {
             enrollmentCollection = new EnrollmentCollection([EnrollmentHelpers.mockEnrollmentData], {
                 user: 'test-user',
-                baseUrl: '/support/enrollment/'
+                baseUrl: '/support/enrollment/',
             });
         });
 

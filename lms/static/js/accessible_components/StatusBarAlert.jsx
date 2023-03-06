@@ -26,7 +26,7 @@ export class StatusAlertRenderer {
                     dismissable={true}
                     onClose={() => this.shiftFocus(afterselector)}
                 />,
-                document.querySelector(selector)
+                document.querySelector(selector),
             );
         }
     }

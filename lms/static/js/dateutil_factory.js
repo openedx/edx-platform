@@ -20,7 +20,7 @@
     define([
         'jquery',
         'edx-ui-toolkit/js/utils/date-utils',
-        'edx-ui-toolkit/js/utils/string-utils'
+        'edx-ui-toolkit/js/utils/string-utils',
     ], function($, DateUtils, StringUtils) {
         var DateUtilFactory;
         var localizedTime;
@@ -35,7 +35,7 @@
             '%Y-%d-%m': 'YYYY, D MMM HH[:]mm z', // example: 2018, 01 Jan 15:30 UTC
             '%m-%d-%Y': 'MMM D, YYYY HH[:]mm z', // example: Jan 01, 2018 15:30 UTC
             '%d-%m-%Y': 'D MMM YYYY HH[:]mm z', // example: 01 Jan, 2018 15:30 UTC
-            '%Y-%m-%d': 'YYYY, MMM D HH[:]mm z' // example: 2018, Jan 01 15:30 UTC
+            '%Y-%m-%d': 'YYYY, MMM D HH[:]mm z', // example: 2018, Jan 01 15:30 UTC
         });
 
         transform = function(iterationKey) {
@@ -50,17 +50,17 @@
                         datetime: $(this).data('datetime'),
                         timezone: $(this).data('timezone'),
                         language: $(this).data('language'),
-                        format: dateFormat
+                        format: dateFormat,
                     };
                     displayDatetime = stringHandler(
                         localizedTime(context),
                         $(this).data('string'),
-                        $(this).data('datetoken')
+                        $(this).data('datetoken'),
                     );
                     $(this).text(displayDatetime);
                 } else {
                     displayDatetime = stringHandler(
-                        $(this).data('string')
+                        $(this).data('string'),
                     );
                     $(this).text(displayDatetime);
                 }
@@ -85,7 +85,7 @@
             if (isValid(containerString)) {
                 returnString = StringUtils.interpolate(
                     containerString,
-                    interpolateDict
+                    interpolateDict,
                 );
             } else {
                 returnString = localTimeString;
@@ -101,7 +101,7 @@
         };
         DateUtilFactory = {
             transform: transform,
-            stringHandler: stringHandler
+            stringHandler: stringHandler,
         };
         return DateUtilFactory;
     });

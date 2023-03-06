@@ -4,7 +4,7 @@
     define(['jquery',
         'underscore',
         'backbone',
-        'js/components/card/views/card'
+        'js/components/card/views/card',
     ],
     function($, _, Backbone, CardView) {
         describe('card component view', function() {
@@ -60,7 +60,7 @@
                     description: 'A test description',
                     actionClass: 'test-action',
                     actionUrl: 'www.example.com',
-                    actionContent: 'A test action'
+                    actionContent: 'A test action',
                 }))();
                 verifyContent(view);
             });
@@ -73,7 +73,7 @@
                     description: function() { return 'A test description'; },
                     actionClass: function() { return 'test-action'; },
                     actionUrl: function() { return 'www.example.com'; },
-                    actionContent: function() { return 'A test action'; }
+                    actionContent: function() { return 'A test action'; },
                 }));
                 verifyContent(view);
             });

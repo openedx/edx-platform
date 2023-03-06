@@ -2,7 +2,7 @@
     'use strict';
     define([
         'gettext', 'underscore', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
-        'js/edxnotes/views/tab_view', 'edx-ui-toolkit/js/utils/html-utils'
+        'js/edxnotes/views/tab_view', 'edx-ui-toolkit/js/utils/html-utils',
     ], function(gettext, _, NoteGroupView, TabPanelView, TabView, HtmlUtils) {
         var view = 'Location in Course';
         var CourseStructureView = TabView.extend({
@@ -38,19 +38,19 @@
                 getChapterGroupView: function(chapter, section) {
                     var group = new NoteGroupView.ChapterView({
                         chapter: chapter,
-                        section: section
+                        section: section,
                     });
                     this.children.push(group);
                     return group;
-                }
+                },
             }),
 
             tabInfo: {
                 name: gettext('Location in Course'),
                 identifier: 'view-course-structure',
                 icon: 'fa fa-list-ul',
-                view: view
-            }
+                view: view,
+            },
         });
 
         return CourseStructureView;

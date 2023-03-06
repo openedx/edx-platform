@@ -18,7 +18,7 @@ var edx = edx || {};
         submitButtonId: '#submit',
 
         events: {
-            'click #submit': 'submitPhoto'
+            'click #submit': 'submitPhoto',
         },
 
         initialize: function(obj) {
@@ -32,7 +32,7 @@ var edx = edx || {};
 
             this.model = new edx.verify_student.VerificationModel({
                 courseKey: this.courseKey,
-                checkpoint: this.usageId
+                checkpoint: this.usageId,
             });
 
             this.listenTo(this.model, 'sync', _.bind(this.handleSubmitPhotoSuccess, this));
@@ -45,9 +45,9 @@ var edx = edx || {};
                 HtmlUtils.template($(this.templateId).html())(
                     {
                         courseKey: this.courseKey,
-                        platformName: this.platformName
-                    }
-                )
+                        platformName: this.platformName,
+                    },
+                ),
             );
 
             // Render the webcam view *after* the parent view
@@ -64,7 +64,7 @@ var edx = edx || {};
                 model: this.model,
                 modelAttribute: 'faceImage',
                 submitButton: this.submitButtonId,
-                errorModel: this.errorModel
+                errorModel: this.errorModel,
             }).render();
         },
 
@@ -92,7 +92,7 @@ var edx = edx || {};
             this.errorModel.set({
                 errorTitle: gettext('Could not submit photos'),
                 errorMsg: errorMsg,
-                shown: true
+                shown: true,
             });
         },
         setSubmitButtonEnabled: function(isEnabled) {
@@ -100,6 +100,6 @@ var edx = edx || {};
                 .toggleClass('is-disabled', !isEnabled)
                 .prop('disabled', !isEnabled)
                 .attr('aria-disabled', !isEnabled);
-        }
+        },
     });
 }(jQuery, _, _.str, Backbone, gettext, edx.HtmlUtils));

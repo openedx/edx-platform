@@ -57,24 +57,24 @@
                     is_discussion_division_enabled: this.course_settings.get('is_discussion_division_enabled'),
                     mode: this.mode,
                     startHeader: this.startHeader,
-                    form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
+                    form_id: this.mode + (this.topicId ? '-' + this.topicId : ''),
                 });
                 edx.HtmlUtils.setHtml(
                     this.$el,
-                    edx.HtmlUtils.template($('#new-post-template').html())(context)
+                    edx.HtmlUtils.template($('#new-post-template').html())(context),
                 );
                 threadTypeTemplate = edx.HtmlUtils.template($('#thread-type-template').html());
                 if ($('.js-group-select').prop('disabled')) {
                     $('.group-selector-wrapper').addClass('disabled');
                 }
                 this.addField(threadTypeTemplate({
-                    form_id: _.uniqueId('form-')
+                    form_id: _.uniqueId('form-'),
                 }));
                 if (this.isTabMode()) {
                     this.topicView = new DiscussionTopicMenuView({
                         topicId: this.topicId,
                         course_settings: this.course_settings,
-                        group_name: this.getGroupName()
+                        group_name: this.getGroupName(),
                     });
                     this.topicView.on('thread:topic_change', this.toggleGroupDropdown);
                     if (this.course_settings.get('is_discussion_division_enabled')) {
@@ -91,7 +91,7 @@
             NewPostView.prototype.addField = function(fieldView) {
                 return edx.HtmlUtils.append(
                     this.$('.forum-new-post-form-wrapper'),
-                    fieldView
+                    fieldView,
                 );
             };
 
@@ -107,7 +107,7 @@
                         return {
                             value: group.id,
                             text: group.name,
-                            selected: group.id === userGroupId
+                            selected: group.id === userGroupId,
                         };
                     });
                 } else {
@@ -147,7 +147,7 @@
                 'reset .forum-new-post-form': 'updateStyles',
                 'keydown .wmd-button': function(event) {
                     return DiscussionUtil.handleKeypressInToolbar(event);
-                }
+                },
             };
 
             NewPostView.prototype.toggleGroupDropdown = function($target) {
@@ -209,7 +209,7 @@
                         anonymous: anonymous,
                         anonymous_to_peers: anonymousToPeers,
                         auto_subscribe: follow,
-                        group_id: group
+                        group_id: group,
                     },
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function(response) {
@@ -228,7 +228,7 @@
                         self.resetForm();
                         self.trigger('newPost:createPost');
                         return self.collection.add(thread);
-                    }
+                    },
                 });
             };
 

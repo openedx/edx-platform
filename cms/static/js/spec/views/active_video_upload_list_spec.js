@@ -8,7 +8,7 @@ define(
         'common/js/spec_helpers/template_helpers',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'accessibility',
-        'mock-ajax'
+        'mock-ajax',
     ],
     function($, ActiveVideoUpload, ActiveVideoUploadListView, StringUtils, TemplateHelpers, AjaxHelpers) {
         'use strict';
@@ -18,7 +18,7 @@ define(
             UPLOAD_STATUS = {
                 s3Fail: 's3_upload_failed',
                 fail: 'upload_failed',
-                success: 'upload_completed'
+                success: 'upload_completed',
             },
             videoUploadMaxFileSizeInGB = 5,
             videoSupportedFileFormats = ['.mp4', '.mov'],
@@ -43,9 +43,9 @@ define(
                 activeTranscriptPreferences: {},
                 videoTranscriptSettings: {
                     transcript_preferences_handler_url: '',
-                    transcription_plans: null
+                    transcription_plans: null,
                 },
-                isVideoTranscriptEnabled: isVideoTranscriptEnabled
+                isVideoTranscriptEnabled: isVideoTranscriptEnabled,
             });
         };
 
@@ -56,7 +56,7 @@ define(
                     '<div id="page-notification"></div>' +
                     '<div id="reader-feedback"></div>' +
                     '<div class="video-transcript-settings-wrapper"></div>' +
-                    '<button class="button course-video-settings-button"></button>'
+                    '<button class="button course-video-settings-button"></button>',
                 );
                 TemplateHelpers.installTemplate('active-video-upload');
                 TemplateHelpers.installTemplate('active-video-upload-list');
@@ -81,7 +81,7 @@ define(
                         '.video-uploads-header': this.view.uploadHeader,
                         '.video-upload-text': this.view.uploadText.toString(),
                         '.video-max-file-size-text': this.view.maxSizeText,
-                        '.video-allowed-extensions-text': this.view.supportedVideosText
+                        '.video-allowed-extensions-text': this.view.supportedVideosText,
                     },
                     self = this;
 
@@ -138,7 +138,7 @@ define(
                 var sentRequests = getSentRequests();
                 return sentRequests.filter(function(request) {
                     return request.method === 'POST' && _.has(
-                        JSON.parse(request.params)[0], 'status'
+                        JSON.parse(request.params)[0], 'status',
                     );
                 })[0];
             };
@@ -148,7 +148,7 @@ define(
                     expectedData = JSON.stringify({
                         edxVideoId: videoId,
                         status: status,
-                        message: message
+                        message: message,
                     });
                 expect(request.method).toEqual('POST');
                 expect(request.url).toEqual(POST_URL);
@@ -183,11 +183,11 @@ define(
                                 return {
                                     edx_video_id: VIDEO_ID,
                                     file_name: fileName,
-                                    upload_url: url || makeUploadUrl(fileName)
+                                    upload_url: url || makeUploadUrl(fileName),
                                 };
-                            }
-                        )
-                    })
+                            },
+                        ),
+                    }),
                 });
             };
 
@@ -197,19 +197,19 @@ define(
                         {
                             edxVideoId: '101',
                             status: 'upload_completed',
-                            message: 'Uploaded completed'
-                        }
+                            message: 'Uploaded completed',
+                        },
                     ]);
                     getStatusUpdateRequest().respondWith(
                         {
                             status: 500,
                             responseText: JSON.stringify({
-                                error: '500 server errror'
-                            })
-                        }
+                                error: '500 server errror',
+                            }),
+                        },
                     );
                     expect($('#notification-error-title').text().trim()).toEqual(
-                        "Studio's having trouble saving your work"
+                        "Studio's having trouble saving your work",
                     );
                     expect($('#notification-error-description').text().trim()).toEqual('500 server errror');
                 });
@@ -218,8 +218,8 @@ define(
                     var fileInfo = {name: 'video.mp4', size: 10000},
                         videos = {
                             files: [
-                                fileInfo
-                            ]
+                                fileInfo,
+                            ],
                         },
                         S3Url = 'http://s3.aws.com/upload/videos/' + fileInfo.name,
                         requests;
@@ -236,9 +236,9 @@ define(
                             files: [{
                                 edx_video_id: VIDEO_ID,
                                 file_name: fileInfo.name,
-                                upload_url: S3Url
-                            }]
-                        }
+                                upload_url: S3Url,
+                            }],
+                        },
                     });
                     expect(requests.length).toEqual(2);
                     AjaxHelpers.respond(
@@ -246,22 +246,22 @@ define(
                         {
                             statusCode: 403,
                             contentType: 'application/xml',
-                            body: '<Error><Message>Invalid access key.</Message></Error>'
-                        }
+                            body: '<Error><Message>Invalid access key.</Message></Error>',
+                        },
                     );
                     verifyUploadViewInfo(
                         this.view.itemViews[0],
                         'Your file could not be uploaded',
-                        'Invalid access key.'
+                        'Invalid access key.',
                     );
                     verifyStatusUpdateRequest(
                         VIDEO_ID,
                         UPLOAD_STATUS.s3Fail,
                         'Invalid access key.',
-                        AjaxHelpers.currentRequest(requests)
+                        AjaxHelpers.currentRequest(requests),
                     );
                     verifyA11YMessage(
-                        StringUtils.interpolate('Upload failed for video {fileName}', {fileName: fileInfo.name})
+                        StringUtils.interpolate('Upload failed for video {fileName}', {fileName: fileInfo.name}),
                     );
 
                     // this is required otherwise mock-ajax will throw an exception when it tries to uninstall Ajax in
@@ -275,8 +275,8 @@ define(
                     var fileInfo = {name: 'video.mp4'},
                         videos = {
                             files: [
-                                fileInfo
-                            ]
+                                fileInfo,
+                            ],
                         },
                         sentRequests,
                         uploadCancelledRequest;
@@ -302,9 +302,9 @@ define(
                             [{
                                 edxVideoId: VIDEO_ID,
                                 status: 'upload_cancelled',
-                                message: 'User cancelled video upload'
-                            }]
-                        )
+                                message: 'User cancelled video upload',
+                            }],
+                        ),
                     );
                 });
             });
@@ -314,8 +314,8 @@ define(
                     var supportedFiles = {
                             files: [
                                 {name: 'test-1.mp4'},
-                                {name: 'test-1.mov'}
-                            ]
+                                {name: 'test-1.mov'},
+                            ],
                         },
                         requestParams = _.map(supportedFiles.files, function(file) {
                             return JSON.stringify({files: [{file_name: file.name}]});
@@ -326,10 +326,10 @@ define(
                 it('should fail upload for unspported file formats', function() {
                     var files = [
                             {name: 'test-3.txt', size: 0},
-                            {name: 'test-4.png', size: 0}
+                            {name: 'test-4.png', size: 0},
                         ],
                         unSupportedFiles = {
-                            files: files
+                            files: files,
                         },
                         self = this;
 
@@ -340,8 +340,8 @@ define(
                             'Your file could not be uploaded',
                             StringUtils.interpolate(
                                 '{fileName} is not in a supported file format. Supported file formats are {supportedFormats}.',  // eslint-disable-line max-len
-                                {fileName: files[index].name, supportedFormats: videoSupportedFileFormats.join(' and ')}  // eslint-disable-line max-len
-                            )
+                                {fileName: files[index].name, supportedFormats: videoSupportedFileFormats.join(' and ')},  // eslint-disable-line max-len
+                            ),
                         );
                     });
                 });
@@ -352,7 +352,7 @@ define(
                     [
                         {desc: 'larger than', additionalBytes: 1},
                         {desc: 'equal to', additionalBytes: 0},
-                        {desc: 'smaller than', additionalBytes: - 1}
+                        {desc: 'smaller than', additionalBytes: - 1},
                     ],
                     function(caseInfo) {
                         it(caseInfo.desc + 'max file size', function() {
@@ -360,8 +360,8 @@ define(
                                 fileSize = maxFileSizeInBytes + caseInfo.additionalBytes,
                                 fileToUpload = {
                                     files: [
-                                        {name: 'file.mp4', size: fileSize}
-                                    ]
+                                        {name: 'file.mp4', size: fileSize},
+                                    ],
                                 },
                                 requestParams = _.map(fileToUpload.files, function(file) {
                                     return JSON.stringify({files: [{file_name: file.name}]});
@@ -373,35 +373,35 @@ define(
                                 verifyUploadViewInfo(
                                     uploadView,
                                     'Your file could not be uploaded',
-                                    'file.mp4 exceeds maximum size of ' + videoUploadMaxFileSizeInGB + ' GB.'
+                                    'file.mp4 exceeds maximum size of ' + videoUploadMaxFileSizeInGB + ' GB.',
                                 );
                                 verifyA11YMessage(
                                     StringUtils.interpolate(
-                                        'Upload failed for video {fileName}', {fileName: 'file.mp4'}
-                                    )
+                                        'Upload failed for video {fileName}', {fileName: 'file.mp4'},
+                                    ),
                                 );
                             } else {
                                 verifyUploadPostRequest(requestParams);
                                 sendUploadPostResponse(
                                     getSentRequests()[0],
-                                    [fileToUpload.files[0].name]
+                                    [fileToUpload.files[0].name],
                                 );
                                 getSentRequests()[1].respondWith(
-                                    {status: 200}
+                                    {status: 200},
                                 );
                                 verifyStatusUpdateRequest(
                                     VIDEO_ID,
                                     UPLOAD_STATUS.success,
-                                    'Uploaded completed'
+                                    'Uploaded completed',
                                 );
                                 verifyA11YMessage(
                                     StringUtils.interpolate(
-                                        'Upload completed for video {fileName}', {fileName: fileToUpload.files[0].name}
-                                    )
+                                        'Upload completed for video {fileName}', {fileName: fileToUpload.files[0].name},
+                                    ),
                                 );
                             }
                         });
-                    }
+                    },
                 );
             });
 
@@ -409,12 +409,12 @@ define(
                 [
                     {desc: 'a single file', numFiles: 1},
                     {desc: 'multiple files', numFiles: concurrentUploadLimit},
-                    {desc: 'more files than upload limit', numFiles: concurrentUploadLimit + 1}
+                    {desc: 'more files than upload limit', numFiles: concurrentUploadLimit + 1},
                 ],
                 function(caseInfo) {
                     var fileNames = _.map(
                         _.range(caseInfo.numFiles),
-                        function(i) { return 'test' + i + '.mp4'; }
+                        function(i) { return 'test' + i + '.mp4'; },
                     );
 
                     describe('on selection of ' + caseInfo.desc, function() {
@@ -427,7 +427,7 @@ define(
                                 if (arguments.length === 2 && propName === 'files') {
                                     return _.map(
                                         fileNames,
-                                        function(fileName) { return {name: fileName}; }
+                                        function(fileName) { return {name: fileName}; },
                                     );
                                 } else {
                                     realProp.apply(this, arguments);
@@ -448,7 +448,7 @@ define(
                                 expect(request.requestHeaders['Content-Type']).toEqual('application/json');
                                 expect(request.requestHeaders.Accept).toContain('application/json');
                                 expect(JSON.parse(request.params)).toEqual({
-                                    files: [{file_name: fileNames[index]}]
+                                    files: [{file_name: fileNames[index]}],
                                 });
                             });
                         });
@@ -464,16 +464,16 @@ define(
                                 var spec = this;
                                 var sentRequests = getSentRequests();
                                 expect(sentRequests.length).toEqual(
-                                    _.min([concurrentUploadLimit, caseInfo.numFiles])
+                                    _.min([concurrentUploadLimit, caseInfo.numFiles]),
                                 );
                                 _.each(
                                     sentRequests,
                                     function(uploadRequest, i) {
                                         expect(uploadRequest.url).toEqual(
-                                            makeUploadUrl(fileNames[i])
+                                            makeUploadUrl(fileNames[i]),
                                         );
                                         expect(uploadRequest.method).toEqual('PUT');
-                                    }
+                                    },
                                 );
                             });
 
@@ -483,12 +483,12 @@ define(
                                     var $uploadElem = $(uploadElem);
                                     var queued = i >= concurrentUploadLimit;
                                     expect($.trim($uploadElem.find('.video-detail-name').text())).toEqual(
-                                        fileNames[i]
+                                        fileNames[i],
                                     );
                                     expect($.trim($uploadElem.find('.video-detail-status').text())).toEqual(
                                         queued ?
                                             ActiveVideoUpload.STATUS_QUEUED :
-                                            ActiveVideoUpload.STATUS_UPLOADING
+                                            ActiveVideoUpload.STATUS_UPLOADING,
                                     );
                                     expect($uploadElem.find('.video-detail-progress').val()).toEqual(0);
                                     expect($uploadElem).not.toHaveClass('success');
@@ -517,7 +517,7 @@ define(
                                             progressValue: 1,
                                             presentClass: 'success',
                                             absentClass: 'error',
-                                            isViewRefresh: isViewRefresh
+                                            isViewRefresh: isViewRefresh,
                                         },
                                         {
                                             desc: 'failure' + refreshDescription,
@@ -526,8 +526,8 @@ define(
                                             progressValue: 0,
                                             presentClass: 'error',
                                             absentClass: 'success',
-                                            isViewRefresh: isViewRefresh
-                                        }
+                                            isViewRefresh: isViewRefresh,
+                                        },
                                     ];
 
                                     _.each(subCases,
@@ -539,13 +539,13 @@ define(
                                                     refreshSpy = subCaseInfo.isViewRefresh ? jasmine.createSpy() : null;
                                                     this.view.onFileUploadDone = refreshSpy;
                                                     getSentRequests()[0].respondWith(
-                                                        {status: subCaseInfo.responseStatus}
+                                                        {status: subCaseInfo.responseStatus},
                                                     );
                                                     // after successful upload, status update request is sent to server
                                                     // we re-render views after success response is received from server
                                                     if (subCaseInfo.statusText === ActiveVideoUpload.STATUS_COMPLETED) {
                                                         getStatusUpdateRequest().respondWith(
-                                                            {status: 200}
+                                                            {status: 200},
                                                         );
                                                     }
                                                 });
@@ -557,20 +557,20 @@ define(
                                                         expect(refreshSpy).toHaveBeenCalled();
                                                         if ($uploadElem.length > 0) {
                                                             expect(
-                                                                $.trim($uploadElem.find('.video-detail-status').text())
+                                                                $.trim($uploadElem.find('.video-detail-status').text()),
                                                             ).not.toEqual(ActiveVideoUpload.STATUS_COMPLETED);
                                                             expect(
-                                                                $uploadElem.find('.video-detail-progress').val()
+                                                                $uploadElem.find('.video-detail-progress').val(),
                                                             ).not.toEqual(1);
                                                             expect($uploadElem).not.toHaveClass('success');
                                                         }
                                                     } else {
                                                         expect($uploadElem.length).toEqual(1);
                                                         expect(
-                                                            $.trim($uploadElem.find('.video-detail-status').text())
+                                                            $.trim($uploadElem.find('.video-detail-status').text()),
                                                         ).toEqual(subCaseInfo.statusText);
                                                         expect(
-                                                            $uploadElem.find('.video-detail-progress').val()
+                                                            $uploadElem.find('.video-detail-progress').val(),
                                                         ).toEqual(subCaseInfo.progressValue);
                                                         expect($uploadElem).toHaveClass(subCaseInfo.presentClass);
                                                         expect($uploadElem).not.toHaveClass(subCaseInfo.absentClass);
@@ -587,10 +587,10 @@ define(
                                                         // uploading, 4th request will be sent to server to update
                                                         // status for completed upload
                                                         expect(getSentRequests().length).toEqual(
-                                                            concurrentUploadLimit + 1 + 1
+                                                            concurrentUploadLimit + 1 + 1,
                                                         );
                                                         expect(
-                                                            $.trim($uploadElem.find('.video-detail-status').text())
+                                                            $.trim($uploadElem.find('.video-detail-status').text()),
                                                         ).toEqual(ActiveVideoUpload.STATUS_UPLOADING);
                                                         expect($uploadElem).not.toHaveClass('queued');
                                                     });
@@ -611,14 +611,14 @@ define(
                                                         });
                                                 }
                                             });
-                                        }
+                                        },
                                     );
-                                }
+                                },
                             );
                         });
                     });
-                }
+                },
             );
         });
-    }
+    },
 );

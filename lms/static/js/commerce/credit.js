@@ -14,13 +14,13 @@ var edx = edx || {};
             url: '/api/credit/v1/providers/' + providerId + '/request/',
             type: 'POST',
             headers: {
-                'X-CSRFToken': $.cookie('csrftoken')
+                'X-CSRFToken': $.cookie('csrftoken'),
             },
             dataType: 'json',
             contentType: 'application/json',
             data: JSON.stringify({
                 course_key: courseKey,
-                username: username
+                username: username,
             }),
             context: this,
             success: function(requestData) {
@@ -28,18 +28,18 @@ var edx = edx || {};
                     class: 'hidden',
                     action: requestData.url,
                     method: 'POST',
-                    'accept-method': 'UTF-8'
+                    'accept-method': 'UTF-8',
                 });
 
                 _.each(requestData.parameters, function(value, key) {
                     $('<textarea>').attr({
                         name: key,
-                        value: value
+                        value: value,
                     }).appendTo($form);
                 });
 
                 $form.appendTo('body').submit();
-            }
+            },
         });
     };
 }(jQuery, _));

@@ -4,7 +4,7 @@
  */
 define([
     'js/views/list_item_editor', 'underscore', 'jquery', 'gettext',
-    'js/views/experiment_group_edit'
+    'js/views/experiment_group_edit',
 ],
 function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
     'use strict';
@@ -17,7 +17,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             'focus .input-text': 'onFocus',
             'blur .input-text': 'onBlur',
             submit: 'setAndClose',
-            'click .action-cancel': 'cancel'
+            'click .action-cancel': 'cancel',
         },
 
         className: function() {
@@ -26,7 +26,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             return [
                 'collection-edit',
                 'group-configuration-edit',
-                'group-configuration-edit-' + index
+                'group-configuration-edit-' + index,
             ].join(' ');
         },
 
@@ -54,7 +54,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
                 name: this.model.get('name'),
                 description: this.model.get('description'),
                 usage: this.model.get('usage'),
-                isNew: this.model.isNew()
+                isNew: this.model.isNew(),
             };
         },
 
@@ -78,7 +78,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             var collection = this.model.get('groups');
             collection.add([{
                 name: collection.getNextDefaultGroupName(),
-                order: collection.nextOrder()
+                order: collection.nextOrder(),
             }]);
         },
 
@@ -86,7 +86,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'name', this.$('.collection-name-input').val(),
-                {silent: true}
+                {silent: true},
             );
         },
 
@@ -95,7 +95,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             this.model.set(
                 'description',
                 this.$('.group-configuration-description-input').val(),
-                {silent: true}
+                {silent: true},
             );
         },
 
@@ -108,13 +108,13 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
 
                 if (group) {
                     group.set({
-                        name: $('.group-name', li).val()
+                        name: $('.group-name', li).val(),
                     });
                 }
             }, this);
 
             return this;
-        }
+        },
     });
 
     return GroupConfigurationEditorView;

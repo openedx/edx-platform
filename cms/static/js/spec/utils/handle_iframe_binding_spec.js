@@ -1,7 +1,7 @@
 define(
     [
         'jquery', 'underscore',
-        'js/utils/handle_iframe_binding'
+        'js/utils/handle_iframe_binding',
     ],
     function($, _, IframeBinding) {
         describe('IframeBinding', function() {

@@ -40,7 +40,7 @@ define(['jquery', 'logger', 'js/courseware/toggle_element_visibility', 'moment']
                 $update.siblings('.toggle-visibility-button').trigger('click');
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.home.course_update.toggled', {
                     action: 'hide',
-                    publish_date: moment('December 1, 2015', 'MMM DD, YYYY').format()
+                    publish_date: moment('December 1, 2015', 'MMM DD, YYYY').format(),
                 });
             });
         });

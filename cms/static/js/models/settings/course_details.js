@@ -1,5 +1,5 @@
 define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js/utils/date_utils',
-    'edx-ui-toolkit/js/utils/string-utils'
+    'edx-ui-toolkit/js/utils/string-utils',
 ],
 function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
     'use strict';
@@ -36,7 +36,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             entrance_exam_minimum_score_pct: '50',
             learning_info: [],
             instructor_info: {},
-            self_paced: null
+            self_paced: null,
         },
 
         validate: function(newattrs) {
@@ -46,12 +46,12 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             const CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS = {
                 END: "end",
                 END_WITH_DATE: "end_with_date",
-                EARLY_NO_INFO: "early_no_info"
+                EARLY_NO_INFO: "early_no_info",
             };
 
             newattrs = DateUtils.convertDateStringsToObjects(
                 newattrs,
-                ['start_date', 'end_date', 'certificate_available_date', 'enrollment_start', 'enrollment_end']
+                ['start_date', 'end_date', 'certificate_available_date', 'enrollment_start', 'enrollment_end'],
             );
 
             if (newattrs.start_date === null) {
@@ -64,13 +64,13 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             if (newattrs.start_date && newattrs.enrollment_start &&
                   newattrs.start_date < newattrs.enrollment_start) {
                 errors.enrollment_start = gettext(
-                    'The course start date must be later than the enrollment start date.'
+                    'The course start date must be later than the enrollment start date.',
                 );
             }
             if (newattrs.enrollment_start && newattrs.enrollment_end &&
                   newattrs.enrollment_start >= newattrs.enrollment_end) {
                 errors.enrollment_end = gettext(
-                    'The enrollment start date cannot be after the enrollment end date.'
+                    'The enrollment start date cannot be after the enrollment end date.',
                 );
             }
             if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
@@ -79,7 +79,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             if (this.showCertificateAvailableDate && newattrs.end_date && newattrs.certificate_available_date &&
                     newattrs.certificate_available_date < newattrs.end_date) {
                 errors.certificate_available_date = gettext(
-                    'The certificate available date must be later than the course end date.'
+                    'The certificate available date must be later than the course end date.',
                 );
             }
 
@@ -91,11 +91,11 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
 
                     errors.certificates_display_behavior = StringUtils.interpolate(
                         gettext(
-                            "The certificate display behavior must be one of: {behavior_options}"
+                            "The certificate display behavior must be one of: {behavior_options}",
                         ),
                         {
-                            behavior_options: Object.values(CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS).join(', ')
-                        }
+                            behavior_options: Object.values(CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS).join(', '),
+                        },
                     );
                 }
 
@@ -106,11 +106,11 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
                 ){
                     errors.certificates_display_behavior = StringUtils.interpolate(
                         gettext(
-                            "The certificates display behavior must be {valid_option} if certificate available date is set."
+                            "The certificates display behavior must be {valid_option} if certificate available date is set.",
                         ),
                         {
-                            valid_option: CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE
-                        }
+                            valid_option: CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE,
+                        },
                     );
                 }
             }
@@ -124,11 +124,11 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             if (_.has(newattrs, 'entrance_exam_minimum_score_pct')) {
                 var range = {
                     min: 1,
-                    max: 100
+                    max: 100,
                 };
                 if (!ValidationHelpers.validateIntegerRange(newattrs.entrance_exam_minimum_score_pct, range)) {
                     errors.entrance_exam_minimum_score_pct = StringUtils.interpolate(gettext(
-                        'Please enter an integer between %(min)s and %(max)s.'
+                        'Please enter an integer between %(min)s and %(max)s.',
                     ), range, true);
                 }
             }
@@ -160,7 +160,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
         // has already started, returns false; otherwise, returns true.
         canTogglePace: function() {
             return new Date() <= new Date(this.get('start_date'));
-        }
+        },
     });
 
     return CourseDetails;

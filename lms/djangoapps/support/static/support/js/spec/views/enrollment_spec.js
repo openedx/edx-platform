@@ -2,7 +2,7 @@ define([
     'underscore',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'support/js/spec_helpers/enrollment_helpers',
-    'support/js/views/enrollment'
+    'support/js/views/enrollment',
 ], function(_, AjaxHelpers, EnrollmentHelpers, EnrollmentView) {
     'use strict';
 
@@ -15,7 +15,7 @@ define([
                 el: '.enrollment-content',
                 user: 'test-user',
                 enrollmentsUrl: '/support/enrollment/',
-                enrollmentSupportUrl: '/support/enrollment/'
+                enrollmentSupportUrl: '/support/enrollment/',
             }, options));
         };
 
@@ -39,7 +39,7 @@ define([
             expect($('.enrollment-results').length).toBe(1);
             expect($('.enrollment-results td button').first().data()).toEqual({
                 course_id: EnrollmentHelpers.TEST_COURSE,
-                modes: 'audit,verified'
+                modes: 'audit,verified',
             });
         });
 

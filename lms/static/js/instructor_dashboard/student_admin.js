@@ -41,10 +41,10 @@
             this.$btn_delete_state_single = this.$section.find("input[name='delete-state-single']");
             this.$btn_rescore_problem_single = this.$section.find("input[name='rescore-problem-single']");
             this.$btn_rescore_problem_if_higher_single = this.$section.find(
-                "input[name='rescore-problem-if-higher-single']"
+                "input[name='rescore-problem-if-higher-single']",
             );
             this.$btn_override_problem_score_single = this.$section.find(
-                "input[name='override-problem-score-single']"
+                "input[name='override-problem-score-single']",
             );
             this.$field_select_score_single = findAndAssert(this.$section, "input[name='score-select-single']");
             this.$btn_task_history_single = this.$section.find("input[name='task-history-single']");
@@ -54,7 +54,7 @@
             this.$btn_delete_entrance_exam_state = this.$section.find("input[name='delete-entrance-exam-state']");
             this.$btn_rescore_entrance_exam = this.$section.find("input[name='rescore-entrance-exam']");
             this.$btn_rescore_entrance_exam_if_higher = this.$section.find(
-                "input[name='rescore-entrance-exam-if-higher']"
+                "input[name='rescore-entrance-exam-if-higher']",
             );
             this.$btn_skip_entrance_exam = this.$section.find("input[name='skip-entrance-exam']");
             this.$btn_entrance_exam_task_history = this.$section.find("input[name='entrance-exam-task-history']");
@@ -80,12 +80,12 @@
                 if (!uniqStudentIdentifier) {
                     studentadmin.$enrollment_status.text('');
                     return studentadmin.$request_err_enrollment_status.text(
-                        gettext('Please enter a student email address or username.')
+                        gettext('Please enter a student email address or username.'),
                     );
                 }
                 errorMessage = gettext("Error getting enrollment status for '<%- student_id %>'. Make sure that the student identifier is spelled correctly.");  // eslint-disable-line max-len
                 fullErrorMessage = _.template(errorMessage)({
-                    student_id: uniqStudentIdentifier
+                    student_id: uniqStudentIdentifier,
                 });
                 studentadmin.$enrollment_status.text(gettext("Retrieving enrollment status..."));
                 return $.ajax({
@@ -94,7 +94,7 @@
                     url: studentadmin.$enrollment_status_link.data('endpoint'),
                     data: {
                         course_id: studentadmin.$enrollment_status_link.data('course-id'),
-                        unique_student_identifier: uniqStudentIdentifier
+                        unique_student_identifier: uniqStudentIdentifier,
                     },
                     success: studentadmin.clear_errors_then(function(data) {
                         return studentadmin.$enrollment_status.text(data.enrollment_status);
@@ -102,7 +102,7 @@
                     error: statusAjaxError(function() {
                         studentadmin.$enrollment_status.text('');
                         return studentadmin.$request_err_enrollment_status.text(fullErrorMessage);
-                    })
+                    }),
                 });
             });
             this.$progress_link.click(function(e) {
@@ -111,19 +111,19 @@
                 uniqStudentIdentifier = studentadmin.$field_student_select_progress.val();
                 if (!uniqStudentIdentifier) {
                     return studentadmin.$request_err_progress.text(
-                        gettext('Please enter a student email address or username.')
+                        gettext('Please enter a student email address or username.'),
                     );
                 }
                 errorMessage = gettext("Error getting student progress url for '<%- student_id %>'. Make sure that the student identifier is spelled correctly.");  // eslint-disable-line max-len
                 fullErrorMessage = _.template(errorMessage)({
-                    student_id: uniqStudentIdentifier
+                    student_id: uniqStudentIdentifier,
                 });
                 return $.ajax({
                     type: 'POST',
                     dataType: 'json',
                     url: studentadmin.$progress_link.data('endpoint'),
                     data: {
-                        unique_student_identifier: uniqStudentIdentifier
+                        unique_student_identifier: uniqStudentIdentifier,
                     },
                     success: studentadmin.clear_errors_then(function(data) {
                         window.location = data.progress_url;
@@ -131,7 +131,7 @@
                     }),
                     error: statusAjaxError(function() {
                         return studentadmin.$request_err_progress.text(fullErrorMessage);
-                    })
+                    }),
                 });
             });
             this.$btn_reset_attempts_single.click(function() {
@@ -141,7 +141,7 @@
                 problemToReset = studentadmin.$field_problem_select_single.val();
                 if (!uniqStudentIdentifier) {
                     return studentadmin.$request_err_grade.text(
-                        gettext('Please enter a student email address or username.')
+                        gettext('Please enter a student email address or username.'),
                     );
                 }
                 if (!problemToReset) {
@@ -150,17 +150,17 @@
                 sendData = {
                     unique_student_identifier: uniqStudentIdentifier,
                     problem_to_reset: problemToReset,
-                    delete_module: false
+                    delete_module: false,
                 };
                 successMessage = gettext("Success! Problem attempts reset for problem '<%- problem_id %>' and student '<%- student_id %>'.");  // eslint-disable-line max-len
                 errorMessage = gettext("Error resetting problem attempts for problem '<%- problem_id %>' and student '<%- student_id %>'. Make sure that the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
                 fullSuccessMessage = _.template(successMessage)({
                     problem_id: problemToReset,
-                    student_id: uniqStudentIdentifier
+                    student_id: uniqStudentIdentifier,
                 });
                 fullErrorMessage = _.template(errorMessage)({
                     problem_id: problemToReset,
-                    student_id: uniqStudentIdentifier
+                    student_id: uniqStudentIdentifier,
                 });
                 return $.ajax({
                     type: 'POST',
@@ -172,7 +172,7 @@
                     }),
                     error: statusAjaxError(function() {
                         return studentadmin.$request_err_grade.text(fullErrorMessage);
-                    })
+                    }),
                 });
             });
             this.$btn_delete_state_single.click(function() {
@@ -182,29 +182,29 @@
                 problemToReset = studentadmin.$field_problem_select_single.val();
                 if (!uniqStudentIdentifier) {
                     return studentadmin.$request_err_grade.text(
-                        gettext('Please enter a student email address or username.')
+                        gettext('Please enter a student email address or username.'),
                     );
                 }
                 if (!problemToReset) {
                     return studentadmin.$request_err_grade.text(
-                        gettext('Please enter a problem location.')
+                        gettext('Please enter a problem location.'),
                     );
                 }
                 confirmMessage = gettext("Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?");
                 fullConfirmMessage = _.template(confirmMessage)({
                     student_id: uniqStudentIdentifier,
-                    problem_id: problemToReset
+                    problem_id: problemToReset,
                 });
                 if (window.confirm(fullConfirmMessage)) {  // eslint-disable-line no-alert
                     sendData = {
                         unique_student_identifier: uniqStudentIdentifier,
                         problem_to_reset: problemToReset,
-                        delete_module: true
+                        delete_module: true,
                     };
                     errorMessage = gettext("Error deleting student '<%- student_id %>'s state on problem '<%- problem_id %>'. Make sure that the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
                     fullErrorMessage = _.template(errorMessage)({
                         student_id: uniqStudentIdentifier,
-                        problem_id: problemToReset
+                        problem_id: problemToReset,
                     });
                     return $.ajax({
                         type: 'POST',
@@ -216,7 +216,7 @@
                         }),
                         error: statusAjaxError(function() {
                             return studentadmin.$request_err_grade.text(fullErrorMessage);
-                        })
+                        }),
                     });
                 } else {
                     return studentadmin.clear_errors();
@@ -234,22 +234,22 @@
                 problemToReset = studentadmin.$field_problem_select_single.val();
                 if (!uniqStudentIdentifier) {
                     return studentadmin.$request_err_grade.text(
-                        gettext('Please enter a student email address or username.')
+                        gettext('Please enter a student email address or username.'),
                     );
                 }
                 if (!problemToReset) {
                     return studentadmin.$request_err_grade.text(
-                        gettext('Please enter a problem location.')
+                        gettext('Please enter a problem location.'),
                     );
                 }
                 sendData = {
                     unique_student_identifier: uniqStudentIdentifier,
-                    problem_location_str: problemToReset
+                    problem_location_str: problemToReset,
                 };
                 errorMessage = gettext("Error getting task history for problem '<%- problem_id %>' and student '<%- student_id %>'. Make sure that the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
                 fullErrorMessage = _.template(errorMessage)({
                     student_id: uniqStudentIdentifier,
-                    problem_id: problemToReset
+                    problem_id: problemToReset,
                 });
                 return $.ajax({
                     type: 'POST',
@@ -261,7 +261,7 @@
                     }),
                     error: statusAjaxError(function() {
                         return studentadmin.$request_err_grade.text(fullErrorMessage);
-                    })
+                    }),
                 });
             });
             this.$btn_reset_entrance_exam_attempts.click(function() {
@@ -269,12 +269,12 @@
                 uniqStudentIdentifier = studentadmin.$field_exam_grade.val();
                 if (!uniqStudentIdentifier) {
                     return studentadmin.$request_err_ee.text(gettext(
-                        'Please enter a student email address or username.')
+                        'Please enter a student email address or username.'),
                     );
                 }
                 sendData = {
                     unique_student_identifier: uniqStudentIdentifier,
-                    delete_module: false
+                    delete_module: false,
                 };
                 return $.ajax({
                     type: 'POST',
@@ -285,7 +285,7 @@
                         var fullSuccessMessage, successMessage;
                         successMessage = gettext("Entrance exam attempts is being reset for student '{student_id}'.");
                         fullSuccessMessage = interpolate_text(successMessage, {
-                            student_id: uniqStudentIdentifier
+                            student_id: uniqStudentIdentifier,
                         });
                         return alert(fullSuccessMessage);  // eslint-disable-line no-alert
                     }),
@@ -293,10 +293,10 @@
                         var errorMessage, fullErrorMessage;
                         errorMessage = gettext("Error resetting entrance exam attempts for student '{student_id}'. Make sure student identifier is correct.");  // eslint-disable-line max-len
                         fullErrorMessage = interpolate_text(errorMessage, {
-                            student_id: uniqStudentIdentifier
+                            student_id: uniqStudentIdentifier,
                         });
                         return studentadmin.$request_err_ee.text(fullErrorMessage);
-                    })
+                    }),
                 });
             });
             this.$btn_rescore_entrance_exam.click(function() {
@@ -313,11 +313,11 @@
                 }
                 confirmMessage = gettext("Do you want to allow this student ('{student_id}') to skip the entrance exam?");  // eslint-disable-line max-len
                 fullConfirmMessage = interpolate_text(confirmMessage, {
-                    student_id: uniqStudentIdentifier
+                    student_id: uniqStudentIdentifier,
                 });
                 if (window.confirm(fullConfirmMessage)) {  // eslint-disable-line no-alert
                     sendData = {
-                        unique_student_identifier: uniqStudentIdentifier
+                        unique_student_identifier: uniqStudentIdentifier,
                     };
                     return $.ajax({
                         dataType: 'json',
@@ -331,7 +331,7 @@
                             var errorMessage;
                             errorMessage = gettext("An error occurred. Make sure that the student's username or email address is correct and try again.");  // eslint-disable-line max-len
                             return studentadmin.$request_err_ee.text(errorMessage);
-                        })
+                        }),
                     });
                 }
                 return false;
@@ -341,12 +341,12 @@
                 uniqStudentIdentifier = studentadmin.$field_exam_grade.val();
                 if (!uniqStudentIdentifier) {
                     return studentadmin.$request_err_ee.text(
-                        gettext('Please enter a student email address or username.')
+                        gettext('Please enter a student email address or username.'),
                     );
                 }
                 sendData = {
                     unique_student_identifier: uniqStudentIdentifier,
-                    delete_module: true
+                    delete_module: true,
                 };
                 return $.ajax({
                     type: 'POST',
@@ -357,7 +357,7 @@
                         var fullSuccessMessage, successMessage;
                         successMessage = gettext("Entrance exam state is being deleted for student '{student_id}'.");
                         fullSuccessMessage = interpolate_text(successMessage, {
-                            student_id: uniqStudentIdentifier
+                            student_id: uniqStudentIdentifier,
                         });
                         return alert(fullSuccessMessage);  // eslint-disable-line no-alert
                     }),
@@ -365,10 +365,10 @@
                         var errorMessage, fullErrorMessage;
                         errorMessage = gettext("Error deleting entrance exam state for student '{student_id}'. Make sure student identifier is correct.");  // eslint-disable-line max-len
                         fullErrorMessage = interpolate_text(errorMessage, {
-                            student_id: uniqStudentIdentifier
+                            student_id: uniqStudentIdentifier,
                         });
                         return studentadmin.$request_err_ee.text(fullErrorMessage);
-                    })
+                    }),
                 });
             });
             this.$btn_entrance_exam_task_history.click(function() {
@@ -376,11 +376,11 @@
                 uniqStudentIdentifier = studentadmin.$field_exam_grade.val();
                 if (!uniqStudentIdentifier) {
                     return studentadmin.$request_err_ee.text(
-                        gettext("Enter a student's username or email address.")
+                        gettext("Enter a student's username or email address."),
                     );
                 }
                 sendData = {
-                    unique_student_identifier: uniqStudentIdentifier
+                    unique_student_identifier: uniqStudentIdentifier,
                 };
                 return $.ajax({
                     type: 'POST',
@@ -394,10 +394,10 @@
                         var errorMessage, fullErrorMessage;
                         errorMessage = gettext("Error getting entrance exam task history for student '{student_id}'. Make sure student identifier is correct.");  // eslint-disable-line max-len
                         fullErrorMessage = interpolate_text(errorMessage, {
-                            student_id: uniqStudentIdentifier
+                            student_id: uniqStudentIdentifier,
                         });
                         return studentadmin.$request_err_ee.text(fullErrorMessage);
-                    })
+                    }),
                 });
             });
             this.$btn_reset_attempts_all.click(function() {
@@ -406,25 +406,25 @@
                 problemToReset = studentadmin.$field_problem_select_all.val();
                 if (!problemToReset) {
                     return studentadmin.$request_response_error_all.text(
-                        gettext('Please enter a problem location.')
+                        gettext('Please enter a problem location.'),
                     );
                 }
                 confirmMessage = gettext("Reset attempts for all students on problem '<%- problem_id %>'?");
                 fullConfirmMessage = _.template(confirmMessage)({
-                    problem_id: problemToReset
+                    problem_id: problemToReset,
                 });
                 if (window.confirm(fullConfirmMessage)) { // eslint-disable-line no-alert
                     sendData = {
                         all_students: true,
-                        problem_to_reset: problemToReset
+                        problem_to_reset: problemToReset,
                     };
                     successMessage = gettext("Successfully started task to reset attempts for problem '<%- problem_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
                     fullSuccessMessage = _.template(successMessage)({
-                        problem_id: problemToReset
+                        problem_id: problemToReset,
                     });
                     errorMessage = gettext("Error starting a task to reset attempts for all students on problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct.");  // eslint-disable-line max-len
                     fullErrorMessage = _.template(errorMessage)({
-                        problem_id: problemToReset
+                        problem_id: problemToReset,
                     });
                     return $.ajax({
                         type: 'POST',
@@ -436,7 +436,7 @@
                         }),
                         error: statusAjaxError(function() {
                             return studentadmin.$request_response_error_all.text(fullErrorMessage);
-                        })
+                        }),
                     });
                 } else {
                     return studentadmin.clear_errors();
@@ -454,11 +454,11 @@
             this.$btn_task_history_all.click(function() {
                 var sendData;
                 sendData = {
-                    problem_location_str: studentadmin.$field_problem_select_all.val()
+                    problem_location_str: studentadmin.$field_problem_select_all.val(),
                 };
                 if (!sendData.problem_location_str) {
                     return studentadmin.$request_response_error_all.text(
-                        gettext('Please enter a problem location.')
+                        gettext('Please enter a problem location.'),
                     );
                 }
                 return $.ajax({
@@ -471,9 +471,9 @@
                     }),
                     error: statusAjaxError(function() {
                         return studentadmin.$request_response_error_all.text(
-                            gettext('Error listing task history for this student and problem.')
+                            gettext('Error listing task history for this student and problem.'),
                         );
-                    })
+                    }),
                 });
             });
         }
@@ -486,28 +486,28 @@
             problemToReset = this.$field_problem_select_single.val();
             if (!uniqStudentIdentifier) {
                 return this.$request_err_grade.text(
-                    gettext('Please enter a student email address or username.')
+                    gettext('Please enter a student email address or username.'),
                 );
             }
             if (!problemToReset) {
                 return this.$request_err_grade.text(
-                    gettext('Please enter a problem location.')
+                    gettext('Please enter a problem location.'),
                 );
             }
             sendData = {
                 unique_student_identifier: uniqStudentIdentifier,
                 problem_to_reset: problemToReset,
-                only_if_higher: onlyIfHigher
+                only_if_higher: onlyIfHigher,
             };
             successMessage = gettext("Started rescore problem task for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
             fullSuccessMessage = _.template(successMessage)({
                 student_id: uniqStudentIdentifier,
-                problem_id: problemToReset
+                problem_id: problemToReset,
             });
             defaultErrorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
             fullDefaultErrorMessage = _.template(defaultErrorMessage)({
                 student_id: uniqStudentIdentifier,
-                problem_id: problemToReset
+                problem_id: problemToReset,
             });
             return $.ajax({
                 type: 'POST',
@@ -522,7 +522,7 @@
                         return that.$request_err_grade.text(response.responseText);
                     }
                     return that.$request_err_grade.text(fullDefaultErrorMessage);
-                })
+                }),
             });
         };
 
@@ -535,33 +535,33 @@
             score = this.$field_select_score_single.val();
             if (!uniqStudentIdentifier) {
                 return this.$request_err_grade.text(
-                    gettext('Please enter a student email address or username.')
+                    gettext('Please enter a student email address or username.'),
                 );
             }
             if (!problemToReset) {
                 return this.$request_err_grade.text(
-                    gettext('Please enter a problem location.')
+                    gettext('Please enter a problem location.'),
                 );
             }
             if (!score) {
                 return this.$request_err_grade.text(
-                    gettext('Please enter a score.')
+                    gettext('Please enter a score.'),
                 );
             }
             sendData = {
                 unique_student_identifier: uniqStudentIdentifier,
                 problem_to_reset: problemToReset,
-                score: score
+                score: score,
             };
             successMessage = gettext("Started task to override the score for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
             fullSuccessMessage = _.template(successMessage)({
                 student_id: uniqStudentIdentifier,
-                problem_id: problemToReset
+                problem_id: problemToReset,
             });
             defaultErrorMessage = gettext("Error starting a task to override score for problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the score and the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
             fullDefaultErrorMessage = _.template(defaultErrorMessage)({
                 student_id: uniqStudentIdentifier,
-                problem_id: problemToReset
+                problem_id: problemToReset,
             });
             return $.ajax({
                 type: 'POST',
@@ -576,7 +576,7 @@
                         return that.$request_err_grade.text(response.responseText);
                     }
                     return that.$request_err_grade.text(fullDefaultErrorMessage);
-                })
+                }),
             });
         };
 
@@ -586,12 +586,12 @@
             uniqStudentIdentifier = this.$field_exam_grade.val();
             if (!uniqStudentIdentifier) {
                 return this.$request_err_ee.text(gettext(
-                    'Please enter a student email address or username.')
+                    'Please enter a student email address or username.'),
                 );
             }
             sendData = {
                 unique_student_identifier: uniqStudentIdentifier,
-                only_if_higher: onlyIfHigher
+                only_if_higher: onlyIfHigher,
             };
             return $.ajax({
                 type: 'POST',
@@ -602,7 +602,7 @@
                     var fullSuccessMessage, successMessage;
                     successMessage = gettext("Started entrance exam rescore task for student '{student_id}'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
                     fullSuccessMessage = interpolate_text(successMessage, {
-                        student_id: uniqStudentIdentifier
+                        student_id: uniqStudentIdentifier,
                     });
                     return alert(fullSuccessMessage);  // eslint-disable-line no-alert
                 }),
@@ -610,10 +610,10 @@
                     var errorMessage, fullErrorMessage;
                     errorMessage = gettext("Error starting a task to rescore entrance exam for student '{student_id}'. Make sure that entrance exam has problems in it and student identifier is correct.");  // eslint-disable-line max-len
                     fullErrorMessage = interpolate_text(errorMessage, {
-                        student_id: uniqStudentIdentifier
+                        student_id: uniqStudentIdentifier,
                     });
                     return that.$request_err_ee.text(fullErrorMessage);
-                })
+                }),
             });
         };
 
@@ -625,26 +625,26 @@
             problemToReset = this.$field_problem_select_all.val();
             if (!problemToReset) {
                 return this.$request_response_error_all.text(
-                    gettext('Please enter a problem location.')
+                    gettext('Please enter a problem location.'),
                 );
             }
             confirmMessage = gettext("Rescore problem '<%- problem_id %>' for all students?");
             fullConfirmMessage = _.template(confirmMessage)({
-                problem_id: problemToReset
+                problem_id: problemToReset,
             });
             if (window.confirm(fullConfirmMessage)) {  // eslint-disable-line no-alert
                 sendData = {
                     all_students: true,
                     problem_to_reset: problemToReset,
-                    only_if_higher: onlyIfHigher
+                    only_if_higher: onlyIfHigher,
                 };
                 successMessage = gettext("Successfully started task to rescore problem '<%- problem_id %>' for all students. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
                 fullSuccessMessage = _.template(successMessage)({
-                    problem_id: problemToReset
+                    problem_id: problemToReset,
                 });
                 defaultErrorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct.");  // eslint-disable-line max-len
                 fullDefaultErrorMessage = _.template(defaultErrorMessage)({
-                    problem_id: problemToReset
+                    problem_id: problemToReset,
                 });
                 return $.ajax({
                     type: 'POST',
@@ -659,7 +659,7 @@
                             return that.$request_response_error_all.text(response.responseText);
                         }
                         return that.$request_response_error_all.text(fullDefaultErrorMessage);
-                    })
+                    }),
                 });
             } else {
                 return this.clear_errors();
@@ -697,14 +697,14 @@
     }());
 
     _.defaults(window, {
-        InstructorDashboard: {}
+        InstructorDashboard: {},
     });
 
     _.defaults(window.InstructorDashboard, {
-        sections: {}
+        sections: {},
     });
 
     _.defaults(window.InstructorDashboard.sections, {
-        StudentAdmin: this.StudentAdmin
+        StudentAdmin: this.StudentAdmin,
     });
 }).call(this);

@@ -1,6 +1,6 @@
 define([
     'jquery', 'backbone', 'js/views/active_video_upload_list',
-    'js/views/previous_video_upload_list', 'js/views/active_video_upload'
+    'js/views/previous_video_upload_list', 'js/views/active_video_upload',
 ], function($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView, ActiveVideoUpload) {
     'use strict';
     var VideosIndexFactory = function(
@@ -19,7 +19,7 @@ define([
         videoTranscriptSettings,
         isVideoTranscriptEnabled,
         videoImageSettings,
-        transcriptAvailableLanguages
+        transcriptAvailableLanguages,
     ) {
         var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
@@ -37,7 +37,7 @@ define([
                         url: videoHandlerUrl,
                         contentType: 'application/json',
                         dataType: 'json',
-                        type: 'GET'
+                        type: 'GET',
                     }).done(function(responseData) {
                         var updatedCollection = new Backbone.Collection(responseData.videos).filter(function(video) {
                                 // Include videos that are not in the active video upload list,
@@ -55,11 +55,11 @@ define([
                                 videoImageSettings: videoImageSettings,
                                 videoTranscriptSettings: videoTranscriptSettings,
                                 transcriptAvailableLanguages: transcriptAvailableLanguages,
-                                videoSupportedFileFormats: videoSupportedFileFormats
+                                videoSupportedFileFormats: videoSupportedFileFormats,
                             });
                         $contentWrapper.find('.wrapper-assets').replaceWith(updatedView.render().$el);
                     });
-                }
+                },
             }),
             previousView = new PreviousVideoUploadListView({
                 videoImageUploadURL: videoImageUploadURL,
@@ -70,7 +70,7 @@ define([
                 videoImageSettings: videoImageSettings,
                 videoTranscriptSettings: videoTranscriptSettings,
                 transcriptAvailableLanguages: transcriptAvailableLanguages,
-                videoSupportedFileFormats: videoSupportedFileFormats
+                videoSupportedFileFormats: videoSupportedFileFormats,
             });
         $contentWrapper.append(activeView.render().$el);
         $contentWrapper.append(previousView.render().$el);

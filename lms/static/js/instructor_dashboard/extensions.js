@@ -31,7 +31,7 @@
                     student: ext.$student_input.val(),
                     url: ext.$url_input.val(),
                     due_datetime: ext.$due_datetime_input.val(),
-                    reason: ext.$reason_input.val()
+                    reason: ext.$reason_input.val(),
                 };
                 return $.ajax({
                     type: 'POST',
@@ -43,7 +43,7 @@
                     },
                     error: function(xhr) {
                         return ext.fail_with_error('set-extension', 'Error changing due date', xhr);
-                    }
+                    },
                 });
             });
             this.$reset_due_date.click(function() {
@@ -56,7 +56,7 @@
                 sendData = {
                     student: ext.$student_input.val(),
                     url: ext.$url_input.val(),
-                    reason: ext.$reason_input.val()
+                    reason: ext.$reason_input.val(),
                 };
                 return $.ajax({
                     type: 'POST',
@@ -68,7 +68,7 @@
                     },
                     error: function(xhr) {
                         return ext.fail_with_error('reset-extension', 'Error reseting due date', xhr);
-                    }
+                    },
                 });
             });
             this.$show_unit_ext.click(function() {
@@ -78,7 +78,7 @@
                 ext.$url_input = ext.$section.find("#view-granted-extensions select[name='url']");
                 url = ext.$show_unit_ext.data('endpoint');
                 sendData = {
-                    url: ext.$url_input.val()
+                    url: ext.$url_input.val(),
                 };
                 return $.ajax({
                     type: 'POST',
@@ -90,7 +90,7 @@
                     },
                     success: function(data) {
                         return ext.display_grid(data);
-                    }
+                    },
                 });
             });
             this.$show_student_ext.click(function() {
@@ -100,7 +100,7 @@
                 url = ext.$show_student_ext.data('endpoint');
                 ext.$student_input = ext.$section.find("#view-granted-extensions input[name='student']");
                 sendData = {
-                    student: ext.$student_input.val()
+                    student: ext.$student_input.val(),
                 };
                 return $.ajax({
                     type: 'POST',
@@ -112,7 +112,7 @@
                     },
                     success: function(data) {
                         return ext.display_grid(data);
-                    }
+                    },
                 });
             });
         }
@@ -149,7 +149,7 @@
             options = {
                 enableCellNavigation: true,
                 enableColumnReorder: false,
-                forceFitColumns: true
+                forceFitColumns: true,
             };
             columns = (function() {
                 var i, len, ref, results;
@@ -160,7 +160,7 @@
                     results.push({
                         id: col,
                         field: col,
-                        name: col
+                        name: col,
                     });
                 }
                 return results;
@@ -168,7 +168,7 @@
             gridData = data.data;
             $tablePlaceholder = $('<div/>', {
                 class: 'slickgrid',
-                style: 'min-height: 400px'
+                style: 'min-height: 400px',
             });
             this.$grid_table.append($tablePlaceholder);
             return new window.Slick.Grid($tablePlaceholder, gridData, columns, options);
@@ -185,14 +185,14 @@
     }());
 
     _.defaults(window, {
-        InstructorDashboard: {}
+        InstructorDashboard: {},
     });
 
     _.defaults(window.InstructorDashboard, {
-        sections: {}
+        sections: {},
     });
 
     _.defaults(window.InstructorDashboard.sections, {
-        Extensions: Extensions
+        Extensions: Extensions,
     });
 }).call(this);

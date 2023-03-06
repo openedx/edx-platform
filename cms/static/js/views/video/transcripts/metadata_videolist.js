@@ -2,7 +2,7 @@ define(
     [
         'jquery', 'backbone', 'underscore', 'js/views/abstract_editor',
         'js/views/video/transcripts/utils',
-        'js/views/video/transcripts/message_manager'
+        'js/views/video/transcripts/message_manager',
     ],
     function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
         'use strict';
@@ -13,7 +13,7 @@ define(
             events: {
                 'click .setting-clear': 'clear',
                 'keypress .setting-input': 'showClearButton',
-                'click .collapse-setting': 'toggleExtraVideosBar'
+                'click .collapse-setting': 'toggleExtraVideosBar',
             },
 
             templateName: 'metadata-videolist-entry',
@@ -22,7 +22,7 @@ define(
             placeholders: {
                 webm: '.webm',
                 mp4: 'http://somesite.com/video.mp4',
-                youtube: 'http://youtube.com/'
+                youtube: 'http://youtube.com/',
             },
 
             initialize: function(options) {
@@ -33,7 +33,7 @@ define(
 
                 this.messenger = new Messenger({
                     el: this.$el,
-                    parent: this
+                    parent: this,
                 });
 
                 // Call it after MessageManager. This is because
@@ -44,7 +44,7 @@ define(
 
                 this.$el.on(
                     'input', '.videolist-settings-item input',
-                    _.debounce(_.bind(this.inputHandler, this), this.inputDelay)
+                    _.debounce(_.bind(this.inputHandler, this), this.inputDelay),
                 );
 
                 this.component_locator = this.$el.closest('[data-locator]')
@@ -93,7 +93,7 @@ define(
                     .render('not_found')
                     .showError(
                         errorMessage,
-                        true // hide buttons
+                        true, // hide buttons
                     );
             },
 
@@ -106,7 +106,7 @@ define(
                     this.$el.find('.input'),
                     function(ele) {
                         return ele.value.trim();
-                    }
+                    },
                 ).filter(_.identity);
             },
 
@@ -185,7 +185,7 @@ define(
                         }
 
                         return label;
-                    }
+                    },
                 );
             },
 
@@ -354,7 +354,7 @@ define(
          */
             checkIsUniqVideoTypes: function(list) {
                 return this.checkIsValid(
-                    this.isUniqVideoTypes, list, gettext('Link types should be unique.')
+                    this.isUniqVideoTypes, list, gettext('Link types should be unique.'),
                 );
             },
 
@@ -367,7 +367,7 @@ define(
          */
             checkIsUniqOtherVideos: function(list) {
                 return this.checkIsValid(
-                    this.isUniqOtherVideos, list, gettext('Links should be unique.')
+                    this.isUniqOtherVideos, list, gettext('Links should be unique.'),
                 );
             },
 
@@ -395,7 +395,7 @@ define(
                 }
 
                 return true;
-            }
+            },
         });
 
         return VideoList;

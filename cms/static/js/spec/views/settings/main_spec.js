@@ -1,6 +1,6 @@
 define([
     'jquery', 'js/models/settings/course_details', 'js/views/settings/main',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
 ], function($, CourseDetailsModel, MainView, AjaxHelpers, TemplateHelpers) {
     'use strict';
 
@@ -11,7 +11,7 @@ define([
         add_course_learning_info: '.add-course-learning-info',
         delete_course_learning_info: '.delete-course-learning-info',
         add_course_instructor_info: '.add-course-instructor-info',
-        remove_instructor_data: '.remove-instructor-data'
+        remove_instructor_data: '.remove-instructor-data',
     };
 
     describe('Settings/Main', function() {
@@ -48,9 +48,9 @@ define([
                 language: '',
                 learning_info: [''],
                 instructor_info: {
-                    instructors: [{name: '', title: '', organization: '', image: '', bio: ''}]
+                    instructors: [{name: '', title: '', organization: '', image: '', bio: ''}],
                 },
-                self_paced: false
+                self_paced: false,
             },
 
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore'),
@@ -61,21 +61,21 @@ define([
             TemplateHelpers.installTemplates(['course-settings-learning-fields', 'course-instructor-details'], true);
             appendSetFixtures(mockSettingsPage);
             appendSetFixtures(
-                $('<script>', {id: 'basic-learning-info-tpl', type: 'text/template'}).text(learningInfoTpl)
+                $('<script>', {id: 'basic-learning-info-tpl', type: 'text/template'}).text(learningInfoTpl),
             );
             appendSetFixtures(
-                $('<script>', {id: 'basic-instructor-info-tpl', type: 'text/template'}).text(instructorInfoTpl)
+                $('<script>', {id: 'basic-instructor-info-tpl', type: 'text/template'}).text(instructorInfoTpl),
             );
 
 
             this.model = new CourseDetailsModel($.extend(true, {}, modelData, {
                 instructor_info: {
-                    instructors: [{name: '', title: '', organization: '', image: '', bio: ''}]
+                    instructors: [{name: '', title: '', organization: '', image: '', bio: ''}],
                 }}), {parse: true});
             this.model.urlRoot = urlRoot;
             this.view = new MainView({
                 el: $('.settings-details'),
-                model: this.model
+                model: this.model,
             }).render();
         });
 
@@ -90,7 +90,7 @@ define([
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
                     // Expect to see changes just in `start_date` field.
-                    start_date: '2014-10-05T22:00:00.000Z'
+                    start_date: '2014-10-05T22:00:00.000Z',
                 });
             this.view.$el.find('#course-start-time')
                 .val('22:00')
@@ -100,7 +100,7 @@ define([
             // It sends `POST` request, because the model doesn't have `id`. In
             // this case, it is considered to be new according to Backbone documentation.
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
+                requests, 'POST', urlRoot, expectedJson,
             );
         });
 
@@ -108,7 +108,7 @@ define([
             var pre_requisite_courses = ['test/CSS101/2012_T1'];
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
-                    pre_requisite_courses: pre_requisite_courses
+                    pre_requisite_courses: pre_requisite_courses,
                 });
             this.view.$el.find('#pre-requisite-course')
                 .val(pre_requisite_courses[0])
@@ -116,7 +116,7 @@ define([
 
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
+                requests, 'POST', urlRoot, expectedJson,
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
@@ -167,7 +167,7 @@ define([
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
                     entrance_exam_enabled: entrance_exam_enabled,
-                    entrance_exam_minimum_score_pct: entrance_exam_minimum_score_pct
+                    entrance_exam_minimum_score_pct: entrance_exam_minimum_score_pct,
                 });
 
             // select the entrance-exam-enabled checkbox.
@@ -180,7 +180,7 @@ define([
 
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
+                requests, 'POST', urlRoot, expectedJson,
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
@@ -188,13 +188,13 @@ define([
         it('should save language as part of course details', function() {
             var requests = AjaxHelpers.requests(this);
             var expectedJson = $.extend(true, {}, modelData, {
-                language: 'en'
+                language: 'en',
             });
             $('#course-language').val('en').trigger('change');
             expect(this.model.get('language')).toEqual('en');
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
+                requests, 'POST', urlRoot, expectedJson,
             );
         });
 
@@ -210,7 +210,7 @@ define([
         it('should save title', function() {
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
-                    title: 'course title'
+                    title: 'course title',
                 });
 
             // Input some value.
@@ -218,7 +218,7 @@ define([
             this.view.$('#course-title').trigger('change');
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
+                requests, 'POST', urlRoot, expectedJson,
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
@@ -226,7 +226,7 @@ define([
         it('should save subtitle', function() {
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
-                    subtitle: 'course subtitle'
+                    subtitle: 'course subtitle',
                 });
 
             // Input some value.
@@ -234,7 +234,7 @@ define([
             this.view.$('#course-subtitle').trigger('change');
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
+                requests, 'POST', urlRoot, expectedJson,
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
@@ -242,7 +242,7 @@ define([
         it('should save duration', function() {
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
-                    duration: '8 weeks'
+                    duration: '8 weeks',
                 });
 
             // Input some value.
@@ -250,7 +250,7 @@ define([
             this.view.$('#course-duration').trigger('change');
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
+                requests, 'POST', urlRoot, expectedJson,
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
@@ -258,7 +258,7 @@ define([
         it('should save description', function() {
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
-                    description: 'course description'
+                    description: 'course description',
                 });
 
             // Input some value.
@@ -266,7 +266,7 @@ define([
             this.view.$('#course-description').trigger('change');
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
+                requests, 'POST', urlRoot, expectedJson,
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
@@ -293,7 +293,7 @@ define([
             expect(this.model.get('learning_info').length).toEqual(1);
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
-                    learning_info: ['testing info']
+                    learning_info: ['testing info'],
                 });
 
             // Input some value.
@@ -302,7 +302,7 @@ define([
 
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
+                requests, 'POST', urlRoot, expectedJson,
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
@@ -332,9 +332,9 @@ define([
                             title: 'test_title',
                             organization: 'test_org',
                             image: 'test_image',
-                            bio: 'test_bio'
-                        }]
-                    }
+                            bio: 'test_bio',
+                        }],
+                    },
                 });
 
             // Input some value.
@@ -346,7 +346,7 @@ define([
 
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
+                requests, 'POST', urlRoot, expectedJson,
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });

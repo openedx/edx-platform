@@ -37,7 +37,7 @@
                 return Problem.prototype.enableSubmitButton.apply(that, arguments);
             };
             this.disableAllButtonsWhileRunning = function(
-                operationCallback, isFromCheckOperation // eslint-disable-line no-unused-vars
+                operationCallback, isFromCheckOperation, // eslint-disable-line no-unused-vars
             ) {
                 return Problem.prototype.disableAllButtonsWhileRunning.apply(that, arguments);
             };
@@ -110,7 +110,7 @@
             this.setupInputTypes = function() {
                 return Problem.prototype.setupInputTypes.apply(that, arguments);
             };
-            this.poll = function(prevTimeout, focusCallback // eslint-disable-line no-unused-vars
+            this.poll = function(prevTimeout, focusCallback, // eslint-disable-line no-unused-vars
             ) {
                 return Problem.prototype.poll.apply(that, arguments);
             };
@@ -233,14 +233,14 @@
                         // Translators: {num_points} is the number of points possible (examples: 1, 3, 10).;
                         '{num_points} point possible (graded, results hidden)',
                         '{num_points} points possible (graded, results hidden)',
-                        totalScore
+                        totalScore,
                     );
                 } else {
                     progressTemplate = ngettext(
                         // Translators: {num_points} is the number of points possible (examples: 1, 3, 10).;
                         '{num_points} point possible (ungraded, results hidden)',
                         '{num_points} points possible (ungraded, results hidden)',
-                        totalScore
+                        totalScore,
                     );
                 }
             } else if ((attemptsUsed === 0 || totalScore === 0) && curScore === 0) {
@@ -250,13 +250,13 @@
                     progressTemplate = ngettext(
                         // Translators: {num_points} is the number of points possible (examples: 1, 3, 10).;
                         '{num_points} point possible (graded)', '{num_points} points possible (graded)',
-                        totalScore
+                        totalScore,
                     );
                 } else {
                     progressTemplate = ngettext(
                         // Translators: {num_points} is the number of points possible (examples: 1, 3, 10).;
                         '{num_points} point possible (ungraded)', '{num_points} points possible (ungraded)',
-                        totalScore
+                        totalScore,
                     );
                 }
             } else {
@@ -266,14 +266,14 @@
                         // This comment needs to be on one line to be properly scraped for the translators.
                         // Translators: {earned} is the number of points earned. {possible} is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points);
                         '{earned}/{possible} point (graded)', '{earned}/{possible} points (graded)',
-                        totalScore
+                        totalScore,
                     );
                 } else {
                     progressTemplate = ngettext(
                         // This comment needs to be on one line to be properly scraped for the translators.
                         // Translators: {earned} is the number of points earned. {possible} is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points);
                         '{earned}/{possible} point (ungraded)', '{earned}/{possible} points (ungraded)',
-                        totalScore
+                        totalScore,
                     );
                 }
             }
@@ -281,8 +281,8 @@
                 progressTemplate, {
                     earned: curScore,
                     num_points: totalScore,
-                    possible: totalScore
-                }
+                    possible: totalScore,
+                },
             );
             return this.$('.problem-progress').text(progress);
         };
@@ -344,7 +344,7 @@
                     if (newTimeout >= 60000) {
                         delete window.queuePollerID;
                         that.gentle_alert(
-                            gettext('The grading process is still running. Refresh the page to see updates.')
+                            gettext('The grading process is still running. Refresh the page to see updates.'),
                         );
                     } else {
                         window.queuePollerID = window.setTimeout(function() {
@@ -451,7 +451,7 @@
                             alert(e.message); // eslint-disable-line no-alert
                         } else {
                             alert( // eslint-disable-line no-alert
-                                gettext('Could not grade your answer. The submission was aborted.')
+                                gettext('Could not grade your answer. The submission was aborted.'),
                             );
                         }
                         throw e;
@@ -470,7 +470,7 @@
             questionTitle = this.$('.problem-header');
             if (questionTitle.length > 0) {
                 $('html, body').animate({
-                    scrollTop: questionTitle.offset().top
+                    scrollTop: questionTitle.offset().top,
                 }, 500);
                 questionTitle.focus();
             }
@@ -543,8 +543,8 @@
                             errors.push(edx.StringUtils.interpolate(
                                 gettext('You submitted {filename}; only {allowedFiles} are allowed.'), {
                                     filename: file.name,
-                                    allowedFiles: allowedFiles
-                                }
+                                    allowedFiles: allowedFiles,
+                                },
                             ));
                         }
                         if (indexOfHelper.call(requiredFiles, file.name) >= 0) {
@@ -556,8 +556,8 @@
                             errors.push(edx.StringUtils.interpolate(
                                 gettext('Your file {filename} is too large (max size: {maxSize}MB).'), {
                                     filename: file.name,
-                                    maxSize: maxSize
-                                }
+                                    maxSize: maxSize,
+                                },
                             ));
                         }
                         fd.append(element.id, file);  // xss-lint: disable=javascript-jquery-append
@@ -571,8 +571,8 @@
                         requiredFilesNotSubmitted = true;
                         errors.push(edx.StringUtils.interpolate(
                             gettext('You did not submit the required files: {requiredFiles}.'), {
-                                requiredFiles: requiredFiles
-                            }
+                                requiredFiles: requiredFiles,
+                            },
                         ));
                     }
                 } else {
@@ -587,7 +587,7 @@
                 error = errors[i];
                 errorHtml = edx.HtmlUtils.joinHtml(
                     errorHtml,
-                    edx.HtmlUtils.interpolateHtml(edx.HtmlUtils.HTML('<li>{error}</li>'), {error: error})
+                    edx.HtmlUtils.interpolateHtml(edx.HtmlUtils.HTML('<li>{error}</li>'), {error: error}),
                 );
             }
             errorHtml = edx.HtmlUtils.interpolateHtml(edx.HtmlUtils.HTML('<ul>{errors}</ul>'), {errors: errorHtml});
@@ -618,7 +618,7 @@
                     },
                     error: function(response) {
                         that.gentle_alert(response.responseJSON.success);
-                    }
+                    },
                 };
                 $.ajaxWithPrefix('' + this.url + '/problem_check', settings);
             }
@@ -678,8 +678,8 @@
                         labeledStatus.push(edx.StringUtils.interpolate(
                             template, {
                                 label: ariaLabel,
-                                status: $(element).text()
-                            }
+                                status: $(element).text(),
+                            },
                         ));
                         addedStatus = true;
                     }
@@ -699,7 +699,7 @@
             var that = this;
             Logger.log('problem_reset', this.answers);
             return $.postWithPrefix('' + this.url + '/problem_reset', {
-                id: this.id
+                id: this.id,
             }, function(response) {
                 if (response.success) {
                     that.el.trigger('contentChanged', [that.id, response.html, response]);
@@ -718,7 +718,7 @@
         Problem.prototype.show = function() {
             var that = this;
             Logger.log('problem_show', {
-                problem: this.id
+                problem: this.id,
             });
             return $.postWithPrefix('' + this.url + '/problem_show', function(response) {
                 var answers;
@@ -787,7 +787,7 @@
         Problem.prototype.gentle_alert = function(msg) {
             edx.HtmlUtils.setHtml(
                 this.el.find('.notification-gentle-alert .notification-message'),
-                edx.HtmlUtils.HTML(msg)
+                edx.HtmlUtils.HTML(msg),
             );
             this.clear_all_notifications();
             this.gentleAlertNotification.show();
@@ -810,7 +810,7 @@
                     that.el.trigger('contentChanged', [that.id, response.html, response]);
                     edx.HtmlUtils.setHtml(
                         that.el.find('.notification-save .notification-message'),
-                        edx.HtmlUtils.HTML(saveMessage)
+                        edx.HtmlUtils.HTML(saveMessage),
                     );
                     that.clear_all_notifications();
                     that.el.find('.wrapper-problem-response .message').hide();
@@ -994,7 +994,7 @@
                         $('<span>', {
                             class: 'status unanswered',
                             style: 'display: inline-block;',
-                            id: 'status_' + id
+                            id: 'status_' + id,
                         });
                     }
                     $element.find('label').find('span.status.correct').remove();
@@ -1018,7 +1018,7 @@
                     $p.removeClass('correct incorrect submitted');
                     return $p.parent().removeClass('correct incorrect').addClass('unsubmitted');
                 });
-            }
+            },
         };
 
         Problem.prototype.inputtypeSetupMethods = {
@@ -1062,15 +1062,15 @@
                         Tab: function(cm) {
                             cm.replaceSelection(spaces, 'end');
                             return false;
-                        }
-                    }
+                        },
+                    },
                 });
                 id = element.attr('id').replace(/^input_/, '');
                 CodeMirrorTextArea = CodeMirrorEditor.getInputField();
                 CodeMirrorTextArea.setAttribute('id', 'cm-textarea-' + id);
                 CodeMirrorTextArea.setAttribute('aria-describedby', 'cm-editor-exit-message-' + id + ' status_' + id);
                 return CodeMirrorEditor;
-            }
+            },
         };
 
         Problem.prototype.inputtypeShowAnswerMethods = {
@@ -1175,7 +1175,7 @@
                             ctx.stroke();
                             return ctx.fill();
                         });
-                    }
+                    },
                 };
                 $element = $(element);
                 id = $element.attr('id').replace(/inputtype_/, '');
@@ -1201,7 +1201,7 @@
                 } else {
                     console.log('Answer is absent for image input with id=' + id); // eslint-disable-line no-console
                 }
-            }
+            },
         };
 
         /**
@@ -1316,7 +1316,7 @@
             }
             return $.postWithPrefix('' + this.url + '/hint_button', {
                 hint_index: nextIndex,
-                input_id: this.id
+                input_id: this.id,
             }, function(response) {
                 var hintMsgContainer;
                 if (response.success) {

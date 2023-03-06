@@ -6,8 +6,8 @@ define(['backbone', 'js/utils/module'], function(Backbone, ModuleUtils) {
             id: null,
             data: null,
             metadata: null,
-            children: null
-        }
+            children: null,
+        },
     });
     return ModuleInfo;
 });

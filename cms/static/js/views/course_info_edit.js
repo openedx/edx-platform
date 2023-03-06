@@ -15,16 +15,16 @@ define(['js/views/baseview', 'js/views/course_info_update', 'js/views/course_inf
                 new CourseInfoUpdateView({
                     el: $('body.updates'),
                     collection: this.model.get('updates'),
-                    base_asset_url: this.model.get('base_asset_url')
+                    base_asset_url: this.model.get('base_asset_url'),
                 });
 
                 new CourseInfoHandoutView({
                     el: this.$('#course-handouts-view'),
                     model: this.model.get('handouts'),
-                    base_asset_url: this.model.get('base_asset_url')
+                    base_asset_url: this.model.get('base_asset_url'),
                 });
                 return this;
-            }
+            },
         });
         return CourseInfoEdit;
     }); // end define()

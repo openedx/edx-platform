@@ -7,7 +7,7 @@
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/student_account/models/RegisterModel',
         'js/student_account/views/RegisterView',
-        'js/student_account/tos_modal'
+        'js/student_account/tos_modal',
     ],
     function($, _, TemplateHelpers, AjaxHelpers, RegisterModel, RegisterView) {
         describe('edx.student.account.RegisterView', function() {
@@ -28,7 +28,7 @@
                     mailing_address: '141 Portland',
                     goals: 'To boldly learn what no letter of the alphabet has learned before',
                     confirm_email: 'xsy@edx.org',
-                    honor_code: true
+                    honor_code: true,
                 },
                 $email = null,
                 $name = null,
@@ -49,32 +49,32 @@
                             name: 'Google',
                             iconClass: 'fa-google-plus',
                             loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
-                            registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
+                            registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register',
                         },
                         {
                             id: 'oa2-facebook',
                             name: 'Facebook',
                             iconClass: 'fa-facebook',
                             loginUrl: '/auth/login/facebook/?auth_entry=account_login',
-                            registerUrl: '/auth/login/facebook/?auth_entry=account_register'
-                        }
-                    ]
+                            registerUrl: '/auth/login/facebook/?auth_entry=account_register',
+                        },
+                    ],
                 },
                 VALIDATION_DECISIONS_POSITIVE = {
                     validation_decisions: {
                         email: '',
                         username: '',
                         password: '',
-                        confirm_email: ''
-                    }
+                        confirm_email: '',
+                    },
                 },
                 VALIDATION_DECISIONS_NEGATIVE = {
                     validation_decisions: {
                         email: 'Error.',
                         username: 'Error.',
                         password: 'Error.',
-                        confirm_email: 'Error'
-                    }
+                        confirm_email: 'Error',
+                    },
                 },
                 FORM_DESCRIPTION = {
                     method: 'post',
@@ -90,7 +90,7 @@
                             required: true,
                             exposed: true,
                             instructions: 'Enter your email.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: '',
@@ -101,7 +101,7 @@
                             required: true,
                             exposed: true,
                             instructions: 'Enter your email.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: 'Jane Doe',
@@ -112,7 +112,7 @@
                             required: true,
                             exposed: true,
                             instructions: 'Enter your username.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: 'JaneDoe',
@@ -123,7 +123,7 @@
                             required: true,
                             exposed: true,
                             instructions: 'Enter your username.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: '',
@@ -134,7 +134,7 @@
                             required: true,
                             exposed: true,
                             instructions: 'Enter your password.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: '',
@@ -146,12 +146,12 @@
                                 {value: '', name: '--'},
                                 {value: 'p', name: 'Doctorate'},
                                 {value: 'm', name: "Master's or professional degree"},
-                                {value: 'b', name: "Bachelor's degree"}
+                                {value: 'b', name: "Bachelor's degree"},
                             ],
                             required: false,
                             exposed: false,
                             instructions: 'Select your education level.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: '',
@@ -163,12 +163,12 @@
                                 {value: '', name: '--'},
                                 {value: 'm', name: 'Male'},
                                 {value: 'f', name: 'Female'},
-                                {value: 'o', name: 'Other'}
+                                {value: 'o', name: 'Other'},
                             ],
                             required: false,
                             exposed: false,
                             instructions: 'Select your gender.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: '',
@@ -180,12 +180,12 @@
                                 {value: '', name: '--'},
                                 {value: 1900, name: '1900'},
                                 {value: 1950, name: '1950'},
-                                {value: 2014, name: '2014'}
+                                {value: 2014, name: '2014'},
                             ],
                             required: false,
                             exposed: false,
                             instructions: 'Select your year of birth.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: '',
@@ -196,7 +196,7 @@
                             required: false,
                             exposed: false,
                             instructions: 'Enter your mailing address.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: '',
@@ -207,7 +207,7 @@
                             required: false,
                             exposed: false,
                             instructions: "If you'd like, tell us why you're interested in edX.",
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: '',
@@ -220,9 +220,9 @@
                             instructions: '',
                             restrictions: {},
                             supplementalLink: '/honor',
-                            supplementalText: 'Review the Terms of Service and Honor Code'
+                            supplementalText: 'Review the Terms of Service and Honor Code',
                         },
-                    ]
+                    ],
                 };
             var createRegisterView = function(that, formFields) {
                 var fields = formFields;
@@ -233,7 +233,7 @@
                 // Initialize the register model
                 model = new RegisterModel({}, {
                     url: FORM_DESCRIPTION.submit_url,
-                    method: FORM_DESCRIPTION.method
+                    method: FORM_DESCRIPTION.method,
                 });
 
                 // Initialize the register view
@@ -241,7 +241,7 @@
                     fields: fields,
                     model: model,
                     thirdPartyAuth: THIRD_PARTY_AUTH,
-                    platformName: PLATFORM_NAME
+                    platformName: PLATFORM_NAME,
                 });
 
                 // Spy on AJAX requests
@@ -306,7 +306,7 @@
                     // Force validation to return as expected
                     spyOn(view, 'validate').and.returnValue({
                         isValid: validationSuccess,
-                        message: 'Submission was validated.'
+                        message: 'Submission was validated.',
                     });
                     // Successful validation means there's no need to use AJAX calls from liveValidate,
                     if (validationSuccess) {
@@ -334,7 +334,7 @@
                 AjaxHelpers.expectRequest(
                     requests, 'POST',
                     FORM_DESCRIPTION.submit_url,
-                    $.param(USER_DATA)
+                    $.param(USER_DATA),
                 );
 
                 // Respond with status code 200
@@ -371,7 +371,7 @@
                 AjaxHelpers.expectRequest(
                     requests, 'POST',
                     FORM_DESCRIPTION.submit_url,
-                    $.param(expectedData)
+                    $.param(expectedData),
                 );
             });
 
@@ -389,7 +389,7 @@
                     model: model,
                     thirdPartyAuth: THIRD_PARTY_AUTH,
                     platformName: PLATFORM_NAME,
-                    is_require_third_party_auth_enabled: true
+                    is_require_third_party_auth_enabled: true,
                 });
 
                 expect(thirdPartyAuthView).not.toContain(view.$submitButton);
@@ -524,7 +524,7 @@
                     required: false,
                     exposed: true,
                     instructions: 'Check this field if you would like to.',
-                    restrictions: {}
+                    restrictions: {},
                 })
 
                 createRegisterView(this, formFields);
@@ -573,7 +573,7 @@
                 expect($content.length).toEqual(1);
                 expect($content.find('.modal-close-button').text()).toEqual('Close');
                 expect($content.find('#modal-header-text').text()).toEqual(
-                    'Terms of Service and Honor Code'
+                    'Terms of Service and Honor Code',
                 );
 
                 // The content area has an iframe displaying the TOS link
@@ -606,8 +606,8 @@
                         type: 'hidden',
                         required: false,
                         instructions: 'Used for testing hidden input fields that are optional.',
-                        restrictions: {}
-                    }
+                        restrictions: {},
+                    },
                 ]);
                 expect(view.$('.checkbox-optional_fields_toggle')).toHaveClass('hidden');
             });

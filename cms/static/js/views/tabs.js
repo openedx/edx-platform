@@ -53,12 +53,12 @@
                 this.$('.component').each(function(idx, element) {
                     var model;
                     model = new ModuleModel({
-                        id: $(element).data('locator')
+                        id: $(element).data('locator'),
                     });
                     return new ModuleEditView({
                         el: element,
                         onDelete: self.deleteTab,
-                        model: model
+                        model: model,
                     });
                 });
                 this.options = _.extend({}, options);
@@ -73,7 +73,7 @@
                     placeholder: 'component-placeholder',
                     forcePlaceholderSize: true,
                     axis: 'y',
-                    items: '> .is-movable'
+                    items: '> .is-movable',
                 });
             };
 
@@ -82,7 +82,7 @@
                 checkbox_element = event.target;
                 tab_element = $(checkbox_element).parents('.course-tab')[0];
                 saving = new NotificationView.Mini({
-                    title: gettext('Saving')
+                    title: gettext('Saving'),
                 });
                 saving.show();
                 return $.ajax({
@@ -91,11 +91,11 @@
                     data: JSON.stringify({
                         tab_id_locator: {
                             tab_id: $(tab_element).data('tab-id'),
-                            tab_locator: $(tab_element).data('locator')
+                            tab_locator: $(tab_element).data('locator'),
                         },
-                        is_hidden: $(checkbox_element).is(':checked')
+                        is_hidden: $(checkbox_element).is(':checked'),
                     }),
-                    contentType: 'application/json'
+                    contentType: 'application/json',
                 }).success(function() {
                     return saving.hide();
                 });
@@ -107,23 +107,23 @@
                 this.$('.course-tab').each(function(idx, element) {
                     return tabs.push({
                         tab_id: $(element).data('tab-id'),
-                        tab_locator: $(element).data('locator')
+                        tab_locator: $(element).data('locator'),
                     });
                 });
                 analytics.track('Reordered Pages', {
-                    course: course_location_analytics
+                    course: course_location_analytics,
                 });
                 saving = new NotificationView.Mini({
-                    title: gettext('Saving')
+                    title: gettext('Saving'),
                 });
                 saving.show();
                 return $.ajax({
                     type: 'POST',
                     url: this.model.url(),
                     data: JSON.stringify({
-                        tabs: tabs
+                        tabs: tabs,
                     }),
-                    contentType: 'application/json'
+                    contentType: 'application/json',
                 }).success(function() {
                     return saving.hide();
                 });
@@ -134,7 +134,7 @@
                 event.preventDefault();
                 editor = new ModuleEditView({
                     onDelete: this.deleteTab,
-                    model: new ModuleModel()
+                    model: new ModuleModel(),
                 });
                 $('.new-component-item').before(editor.$el);
                 editor.$el.addClass('course-tab is-movable');
@@ -143,13 +143,13 @@
                     return editor.$el.removeClass('new');
                 }, 1000);
                 $('html, body').animate({
-                    scrollTop: $('.new-component-item').offset().top
+                    scrollTop: $('.new-component-item').offset().top,
                 }, 500);
                 editor.createItem(this.model.get('id'), {
-                    category: 'static_tab'
+                    category: 'static_tab',
                 });
                 return analytics.track('Added Page', {
-                    course: course_location_analytics
+                    course: course_location_analytics,
                 });
             };
 
@@ -167,30 +167,30 @@
                                 $component = $(event.currentTarget).parents('.component');
                                 analytics.track('Deleted Page', {
                                     course: course_location_analytics,
-                                    id: $component.data('locator')
+                                    id: $component.data('locator'),
                                 });
                                 deleting = new NotificationView.Mini({
-                                    title: gettext('Deleting')
+                                    title: gettext('Deleting'),
                                 });
                                 deleting.show();
                                 return $.ajax({
                                     type: 'DELETE',
-                                    url: ModuleUtils.getUpdateUrl($component.data('locator'))
+                                    url: ModuleUtils.getUpdateUrl($component.data('locator')),
                                 }).success(function() {
                                     $component.remove();
                                     return deleting.hide();
                                 });
-                            }
+                            },
                         },
                         secondary: [
                             {
                                 text: gettext('Cancel'),
                                 click: function(view) {
                                     return view.hide();
-                                }
-                            }
-                        ]
-                    }
+                                },
+                            },
+                        ],
+                    },
                 });
                 return confirm.show();
             };

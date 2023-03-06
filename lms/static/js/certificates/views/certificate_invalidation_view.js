@@ -12,7 +12,7 @@
                 messages: 'div.message',
                 events: {
                     'click #invalidate-certificate': 'invalidateCertificate',
-                    'click .re-validate-certificate': 'reValidateCertificate'
+                    'click .re-validate-certificate': 'reValidateCertificate',
                 },
 
                 initialize: function() {
@@ -38,11 +38,11 @@
                     var certificate_invalidation = new CertificateInvalidationModel(
                         {
                             user: user,
-                            notes: notes
+                            notes: notes,
                         },
                         {
-                            url: this.collection.url
-                        }
+                            url: this.collection.url,
+                        },
                     );
 
                     if (this.collection.findWhere({user: user})) {
@@ -65,10 +65,10 @@
                                     self.escapeAndShowMessage(response_data.message);
                                 } catch (exception) {
                                     self.escapeAndShowMessage(
-                                        gettext('Server Error, Please refresh the page and try again.')
+                                        gettext('Server Error, Please refresh the page and try again.'),
                                     );
                                 }
-                            }
+                            },
                         });
                     } else {
                         this.escapeAndShowMessage(certificate_invalidation.validationError);
@@ -84,7 +84,7 @@
                         model.destroy({
                             success: function() {
                                 self.escapeAndShowMessage(
-                                    gettext('The certificate for this learner has been re-validated and the system is re-running the grade for this learner.')  // eslint-disable-line max-len
+                                    gettext('The certificate for this learner has been re-validated and the system is re-running the grade for this learner.'),  // eslint-disable-line max-len
                                 );
                             },
                             error: function(model, response) {
@@ -93,16 +93,16 @@
                                     self.escapeAndShowMessage(response_data.message);
                                 } catch (exception) {
                                     self.escapeAndShowMessage(
-                                        gettext('Server Error, Please refresh the page and try again.')
+                                        gettext('Server Error, Please refresh the page and try again.'),
                                     );
                                 }
                             },
                             wait: true,
-                            data: JSON.stringify(model.attributes)
+                            data: JSON.stringify(model.attributes),
                         });
                     } else {
                         self.escapeAndShowMessage(
-                            gettext('Could not find Certificate Invalidation in the list. Please refresh the page and try again')  // eslint-disable-line max-len
+                            gettext('Could not find Certificate Invalidation in the list. Please refresh the page and try again'),  // eslint-disable-line max-len
                         );
                     }
                 },
@@ -115,9 +115,9 @@
                 escapeAndShowMessage: function(message) {
                     $(this.messages + '>p').remove();
                     this.$(this.messages).removeClass('hidden').append('<p>' + _.escape(message) + '</p>');
-                }
+                },
 
             });
-        }
+        },
     );
 }).call(this, define || RequireJS.define);

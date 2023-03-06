@@ -53,7 +53,7 @@ define(['jquery', 'underscore', 'js/views/baseview', 'js/utils/handle_iframe_bin
 
                     render: function() {
                         this.$el.html(this.viewHtml);
-                    }
+                    },
                 });
 
                 it('hides a collapsible node when clicking on the toggle link', function() {

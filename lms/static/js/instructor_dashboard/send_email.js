@@ -108,7 +108,7 @@
                             action: 'send',
                             send_to: JSON.stringify(targets),
                             subject: subject,
-                            message: body
+                            message: body,
                         };
                         return $.ajax({
                             type: 'POST',
@@ -120,7 +120,7 @@
                             },
                             error: statusAjaxError(function() {
                                 return sendemail.fail_with_error(gettext('Error sending email.'));
-                            })
+                            }),
                         });
                     } else {
                         sendemail.task_response.empty();
@@ -139,18 +139,18 @@
                             return createTaskListTable(sendemail.$table_task_history_email, data.tasks);
                         } else {
                             sendemail.$history_request_response_error.text(
-                                gettext('There is no email history for this course.')
+                                gettext('There is no email history for this course.'),
                             );
                             return sendemail.$history_request_response_error.css({
-                                display: 'block'
+                                display: 'block',
                             });
                         }
                     },
                     error: statusAjaxError(function() {
                         return sendemail.$history_request_response_error.text(
-                            gettext('There was an error obtaining email task history for this course.')
+                            gettext('There was an error obtaining email task history for this course.'),
                         );
-                    })
+                    }),
                 });
             });
             this.$btn_task_history_email_content.click(function() {
@@ -162,23 +162,23 @@
                     success: function(data) {
                         if (data.emails.length) {
                             createEmailContentTable(sendemail.$table_email_content_history,
-                                sendemail.$email_content_table_inner, data.emails
+                                sendemail.$email_content_table_inner, data.emails,
                             );
                             return createEmailMessageViews(sendemail.$email_messages_wrapper, data.emails);
                         } else {
                             sendemail.$content_request_response_error.text(
-                                gettext('There is no email history for this course.')
+                                gettext('There is no email history for this course.'),
                             );
                             return sendemail.$content_request_response_error.css({
-                                display: 'block'
+                                display: 'block',
                             });
                         }
                     },
                     error: statusAjaxError(function() {
                         return sendemail.$content_request_response_error.text(
-                            gettext('There was an error obtaining email content history for this course.')
+                            gettext('There was an error obtaining email content history for this course.'),
                         );
-                    })
+                    }),
                 });
             });
             this.$send_to.change(function() {
@@ -212,7 +212,7 @@
             this.$request_response_error.empty();
             this.$request_response_error.text(msg);
             return $('.msg-confirm').css({
-                display: 'none'
+                display: 'none',
             });
         };
 
@@ -221,7 +221,7 @@
             this.$request_response_error.empty();
             this.$task_response.text(dataFromServer);
             return $('.msg-confirm').css({
-                display: 'block'
+                display: 'block',
             });
         };
 
@@ -251,14 +251,14 @@
     }());
 
     _.defaults(window, {
-        InstructorDashboard: {}
+        InstructorDashboard: {},
     });
 
     _.defaults(window.InstructorDashboard, {
-        sections: {}
+        sections: {},
     });
 
     _.defaults(window.InstructorDashboard.sections, {
-        Email: this.Email
+        Email: this.Email,
     });
 }).call(this);

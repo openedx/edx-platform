@@ -1,13 +1,13 @@
 (function(define) {
     'use strict';
     define([
-        'underscore', 'edx-ui-toolkit/js/pagination/paging-collection', 'js/edxnotes/models/note'
+        'underscore', 'edx-ui-toolkit/js/pagination/paging-collection', 'js/edxnotes/models/note',
     ], function(_, PagingCollection, NoteModel) {
         return PagingCollection.extend({
             model: NoteModel,
 
             state: {
-                pageSize: 10
+                pageSize: 10,
             },
 
             queryParams: {},
@@ -48,12 +48,12 @@
                     courseStructure = {
                         chapters: _.sortBy(_.toArray(chapters), function(c) { return c.index; }),
                         sections: sections,
-                        units: units
+                        units: units,
                     };
 
                     return courseStructure;
                 };
-            }())
+            }()),
         });
     });
 }).call(this, define || RequireJS.define);

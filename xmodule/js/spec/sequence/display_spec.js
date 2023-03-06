@@ -8,7 +8,7 @@
             keys = {
                 ENTER: 13,
                 LEFT: 37,
-                RIGHT: 39
+                RIGHT: 39,
             };
 
         beforeEach(function() {
@@ -38,12 +38,12 @@
                 expect(this.sequence.$('.nav-item[data-index=1]')).toHaveAttr({
                     'aria-expanded': 'false',
                     'aria-selected': 'false',
-                    tabindex: '-1'
+                    tabindex: '-1',
                 });
                 expect(this.sequence.$('.nav-item[data-index=0]')).toHaveAttr({
                     'aria-expanded': 'true',
                     'aria-selected': 'true',
-                    tabindex: '0'
+                    tabindex: '0',
                 });
             });
 
@@ -55,12 +55,12 @@
                 expect(this.sequence.$('.nav-item[data-index=0]')).toHaveAttr({
                     'aria-expanded': 'false',
                     'aria-selected': 'false',
-                    tabindex: '-1'
+                    tabindex: '-1',
                 });
                 expect(this.sequence.$('.nav-item[data-index=1]')).toHaveAttr({
                     'aria-expanded': 'true',
                     'aria-selected': 'true',
-                    tabindex: '0'
+                    tabindex: '0',
                 });
             });
 
@@ -68,7 +68,7 @@
                 this.sequence.$('.nav-item[data-index=0]').children('.check-circle').remove();
                 spyOn($, 'postWithPrefix').and.callFake(function(url, data, callback) {
                     callback({
-                        complete: true
+                        complete: true,
                     });
                 });
                 this.sequence.update_completion(1);
@@ -79,11 +79,11 @@
                 beforeEach(function() {
                     expect(
                         this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
-                            .hasClass('is-hidden')
+                            .hasClass('is-hidden'),
                     ).toBe(true);
                     expect(
                         this.sequence.$('.nav-item[data-index=1]').children('.check-circle').first()
-                            .hasClass('is-hidden')
+                            .hasClass('is-hidden'),
                     ).toBe(true);
                 });
 
@@ -91,33 +91,33 @@
                     expect($.postWithPrefix).toHaveBeenCalled();
                     expect(
                         this.sequence.$('.nav-item[data-index=1]').children('.check-circle').first()
-                            .hasClass('is-hidden')
+                            .hasClass('is-hidden'),
                     ).toBe(true);
                 });
 
                 it('API check returned true', function() {
                     spyOn($, 'postWithPrefix').and.callFake(function(url, data, callback) {
                         callback({
-                            complete: true
+                            complete: true,
                         });
                     });
                     this.sequence.update_completion(1);
                     expect(
                         this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
-                            .hasClass('is-hidden')
+                            .hasClass('is-hidden'),
                     ).toBe(false);
                 });
 
                 it('API check returned false', function() {
                     spyOn($, 'postWithPrefix').and.callFake(function(url, data, callback) {
                         callback({
-                            complete: false
+                            complete: false,
                         });
                     });
                     this.sequence.update_completion(1);
                     expect(
                         this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
-                            .hasClass('is-hidden')
+                            .hasClass('is-hidden'),
                     ).toBe(true);
                 });
             });

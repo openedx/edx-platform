@@ -6,7 +6,7 @@
             'jquery',
             'js/views/message_banner',
             'course_bookmarks/js/collections/bookmarks',
-            'course_bookmarks/js/views/bookmarks_list'
+            'course_bookmarks/js/views/bookmarks_list',
         ],
         function($, MessageBannerView, BookmarksCollection, BookmarksListView) {
             return function(options) {
@@ -15,21 +15,21 @@
                     bookmarksCollection = new BookmarksCollection([],
                         {
                             course_id: courseId,
-                            url: bookmarksApiUrl
-                        }
+                            url: bookmarksApiUrl,
+                        },
                     );
                 var bookmarksView = new BookmarksListView(
                     {
                         $el: options.$el,
                         collection: bookmarksCollection,
                         loadingMessageView: new MessageBannerView({el: $('#loading-message')}),
-                        errorMessageView: new MessageBannerView({el: $('#error-message')})
-                    }
+                        errorMessageView: new MessageBannerView({el: $('#error-message')}),
+                    },
                 );
                 bookmarksView.render();
                 bookmarksView.showBookmarks();
                 return bookmarksView;
             };
-        }
+        },
     );
 }).call(this, define || RequireJS.define);

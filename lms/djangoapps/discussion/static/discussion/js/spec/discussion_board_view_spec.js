@@ -8,7 +8,7 @@
             'edx-ui-toolkit/js/utils/constants',
             'common/js/discussion/discussion',
             'common/js/spec_helpers/discussion_spec_helper',
-            'discussion/js/views/discussion_board_view'
+            'discussion/js/views/discussion_board_view',
         ],
         function(_, $, constants, Discussion, DiscussionSpecHelper, DiscussionBoardView) {
             describe('DiscussionBoardView', function() {
@@ -24,11 +24,11 @@
                     discussionBoardView = new DiscussionBoardView({
                         el: $('.discussion-board'),
                         discussion: discussion,
-                        courseSettings: courseSettings
+                        courseSettings: courseSettings,
                     });
                     window.ENABLE_FORUM_DAILY_DIGEST = true;
                     window.user = new DiscussionUser({
-                        id: 99
+                        id: 99,
                     });
 
                     return discussionBoardView;
@@ -69,7 +69,7 @@
                         threadListView = discussionBoardView.discussionThreadListView;
                         spyOn(threadListView, 'performSearch');
                         discussionBoardView.$('.search-input').trigger($.Event('keydown', {
-                            which: constants.keyCodes.enter
+                            which: constants.keyCodes.enter,
                         }));
                         expect(threadListView.performSearch).toHaveBeenCalled();
                     });

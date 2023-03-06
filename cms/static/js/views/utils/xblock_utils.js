@@ -35,7 +35,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         unscheduled: 'unscheduled',
         needsAttention: 'needs_attention',
         staffOnly: 'staff_only',
-        gated: 'gated'
+        gated: 'gated',
     };
 
     /**
@@ -53,13 +53,13 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
                 var addOperation = $.Deferred();
                 analytics.track('Created a ' + category, {
                     course: course_location_analytics,
-                    display_name: displayName
+                    display_name: displayName,
                 });
                 $.postJSON(ModuleUtils.getUpdateUrl(),
                     {
                         parent_locator: parentLocator,
                         category: category,
-                        display_name: displayName
+                        display_name: displayName,
                     }, function(data) {
                         var locator = data.locator;
                         addOperation.resolve(locator);
@@ -81,7 +81,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
                 var duplicationOperation = $.Deferred();
                 $.postJSON(ModuleUtils.getUpdateUrl(), {
                     duplicate_source_locator: xblockElement.data('locator'),
-                    parent_locator: parentElement.data('locator')
+                    parent_locator: parentElement.data('locator'),
                 }, function(data) {
                     duplicationOperation.resolve(data);
                 })
@@ -109,7 +109,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
                 $.patchJSON(ModuleUtils.getUpdateUrl(), {
                     move_source_locator: sourceLocator,
                     parent_locator: targetParentLocator,
-                    target_index: targetIndex
+                    target_index: targetIndex,
                 }, function(response) {
                     moveOperation.resolve(response);
                 })
@@ -134,11 +134,11 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
                     function() {
                         return $.ajax({
                             type: 'DELETE',
-                            url: url
+                            url: url,
                         }).success(function() {
                             deletion.resolve();
                         });
-                    }
+                    },
                 );
             },
             messageBody;
@@ -146,7 +146,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         messageBody = StringUtils.interpolate(
             gettext('Deleting this {xblock_type} is permanent and cannot be undone.'),
             {xblock_type: xblockType},
-            true
+            true,
         );
 
         if (xblockInfo.get('is_prereq')) {
@@ -155,30 +155,30 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
                 StringUtils.interpolate(
                     gettext('Delete this {xblock_type} (and prerequisite)?'),
                     {xblock_type: xblockType},
-                    true
+                    true,
                 ),
                 messageBody,
                 StringUtils.interpolate(
                     gettext('Yes, delete this {xblock_type}'),
                     {xblock_type: xblockType},
-                    true
+                    true,
                 ),
-                operation
+                operation,
             );
         } else {
             ViewUtils.confirmThenRunOperation(
                 StringUtils.interpolate(
                     gettext('Delete this {xblock_type}?'),
                     {xblock_type: xblockType},
-                    true
+                    true,
                 ),
                 messageBody,
                 StringUtils.interpolate(
                     gettext('Yes, delete this {xblock_type}'),
                     {xblock_type: xblockType},
-                    true
+                    true,
                 ),
-                operation
+                operation,
             );
         }
         return deletion.promise();
@@ -188,7 +188,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         var metadata = {};
         metadata[fieldName] = newValue;
         return {
-            metadata: metadata
+            metadata: metadata,
         };
     };
 
@@ -219,7 +219,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         return ViewUtils.runOperationShowingMessage(gettext('Saving'),
             function() {
                 return xblockInfo.save(xblockData, options);
-            }
+            },
         );
     };
 
@@ -277,7 +277,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         if (xblockWrapperElement.length > 0) {
             xblockElement = xblockWrapperElement.find('.xblock');
             displayName = xblockWrapperElement.find(
-                '.xblock-header .header-details .xblock-display-name'
+                '.xblock-header .header-details .xblock-display-name',
             ).text().trim();
             // If not found, try looking for the old unit page style rendering.
             // Only used now by static pages.
@@ -290,7 +290,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
                 courseKey: xblockWrapperElement.data('course-key'),
                 category: xblockElement.data('block-type'),
                 display_name: displayName,
-                has_children: hasChildren
+                has_children: hasChildren,
             });
         }
         return xblockInfo;
@@ -307,6 +307,6 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         getXBlockListTypeClass: getXBlockListTypeClass,
         updateXBlockFields: updateXBlockFields,
         getXBlockType: getXBlockType,
-        findXBlockInfo: findXBlockInfo
+        findXBlockInfo: findXBlockInfo,
     };
 });

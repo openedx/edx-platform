@@ -7,7 +7,7 @@
         var FinancialAssistance = Backbone.Model.extend({
             initialize: function(options) {
                 this.url = options.url;
-            }
+            },
         });
         return FinancialAssistance;
     });

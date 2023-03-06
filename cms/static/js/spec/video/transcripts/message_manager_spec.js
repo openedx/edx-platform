@@ -3,22 +3,22 @@ define(
         'jquery', 'underscore', 'backbone',
         'js/views/video/transcripts/utils', 'js/views/video/transcripts/message_manager',
         'js/views/video/transcripts/file_uploader', 'sinon',
-        'xmodule'
+        'xmodule',
     ],
     function($, _, Backbone, Utils, MessageManager, FileUploader, sinon) {
         'use strict';
 
         describe('Transcripts.MessageManager', function() {
             var videoListEntryTemplate = readFixtures(
-                    'video/transcripts/metadata-videolist-entry.underscore'
+                    'video/transcripts/metadata-videolist-entry.underscore',
                 ),
                 foundTemplate = readFixtures(
-                    'video/transcripts/messages/transcripts-found.underscore'
+                    'video/transcripts/messages/transcripts-found.underscore',
                 ),
                 handlers = {
                     importHandler: ['replace', 'Error: Import failed.'],
                     replaceHandler: ['replace', 'Error: Replacing failed.'],
-                    chooseHandler: ['choose', 'Error: Choosing failed.', 'video_id']
+                    chooseHandler: ['choose', 'Error: Choosing failed.', 'video_id'],
                 },
                 view, fileUploader, sinonXhr;
 
@@ -29,20 +29,20 @@ define(
 
                 setFixtures(
                     $('<div>', {id: 'metadata-videolist-entry'})
-                        .html(videoListEntryTemplate)
+                        .html(videoListEntryTemplate),
                 );
                 appendSetFixtures(
                     $('<script>',
                         {
                             id: 'transcripts-found',
-                            type: 'text/template'
-                        }
-                    ).text(foundTemplate)
+                            type: 'text/template',
+                        },
+                    ).text(foundTemplate),
                 );
 
                 videoList = jasmine.createSpyObj(
                     'MetadataView.VideoList',
-                    ['getVideoObjectsList']
+                    ['getVideoObjectsList'],
                 );
                 $container = $('#metadata-videolist-entry');
 
@@ -53,7 +53,7 @@ define(
                 view = new MessageManager({
                     el: $container,
                     parent: videoList,
-                    component_locator: 'component_locator'
+                    component_locator: 'component_locator',
                 });
             });
 
@@ -61,7 +61,7 @@ define(
                 expect(fileUploader.initialize).toHaveBeenCalledWith({
                     el: view.$el,
                     messenger: view,
-                    component_locator: view.component_locator
+                    component_locator: view.component_locator,
                 });
             });
 
@@ -175,7 +175,7 @@ define(
                     var defaults = {
                         action: 'replace',
                         errorMessage: 'errorMessage',
-                        extraParamas: void(0)
+                        extraParamas: void(0),
                     };
                     var args = $.extend({}, defaults, config);
 
@@ -191,8 +191,8 @@ define(
                         {'Content-Type': 'application/json'},
                         JSON.stringify({
                             status: 'Success',
-                            edx_video_id: 'video_id'
-                        })
+                            edx_video_id: 'video_id',
+                        }),
                     ]);
 
                     assertCommand({})
@@ -201,7 +201,7 @@ define(
                                 action,
                                 view.component_locator,
                                 videoList,
-                                void(0)
+                                void(0),
                             );
                             expect(view.showError).not.toHaveBeenCalled();
                             expect(view.render.calls.mostRecent().args[0]).toEqual('found');
@@ -219,8 +219,8 @@ define(
                         {'Content-Type': 'application/json'},
                         JSON.stringify({
                             status: 'Success',
-                            edx_video_id: 'video_id'
-                        })
+                            edx_video_id: 'video_id',
+                        }),
                     ]);
 
                     view.processCommand(action, errorMessage, extraParamas);
@@ -232,8 +232,8 @@ define(
                                 view.component_locator,
                                 videoList,
                                 {
-                                    html5_id: extraParamas
-                                }
+                                    html5_id: extraParamas,
+                                },
                             );
                             expect(view.showError).not.toHaveBeenCalled();
                             expect(view.render.calls.mostRecent().args[0]).toEqual('found');
@@ -251,7 +251,7 @@ define(
                                 action,
                                 view.component_locator,
                                 videoList,
-                                void(0)
+                                void(0),
                             );
                             expect(view.showError).toHaveBeenCalled();
                             expect(view.render).not.toHaveBeenCalled();

@@ -9,7 +9,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
 
                 var scheduleFixture = readFixtures('templates/ccx/schedule.underscore');
                 appendSetFixtures(
-                    '<script id="schedule_template" type="text/template" >' + scheduleFixture + '</script>'
+                    '<script id="schedule_template" type="text/template" >' + scheduleFixture + '</script>',
                 );
                 schedule_template = _.template($('#schedule_template').html());
                 save_url = 'save_ccx';
@@ -40,11 +40,11 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                                     due: null,
                                     start: null,
                                     location: 'i4x://edX/DemoX/vertical/vertical_0270f6de40fc',
-                                    hidden: true
-                                }
-                            ]
-                        }
-                    ]
+                                    hidden: true,
+                                },
+                            ],
+                        },
+                    ],
                 }];
                 view = new edx.ccx.schedule.ScheduleView({el: $('#new-ccx-schedule')});
                 view.schedule_collection.set(data);
@@ -209,7 +209,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 AjaxHelpers.expectJsonRequest(requests, 'POST', 'save_ccx', view.schedule);
                 expect($('#dirty-schedule #save-changes').text()).toEqual('Saving');
                 AjaxHelpers.respondWithJson(requests, {
-                    data: view.schedule
+                    data: view.schedule,
                 });
                 expect($('#dirty-schedule #save-changes').text()).toEqual('Save changes');
                 expect($('#ajax-error')).toHaveCss({display: 'none'});
@@ -222,5 +222,5 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 expect($('#ajax-error')).toHaveCss({display: 'block'});
             });
         });
-    }
+    },
 );

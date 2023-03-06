@@ -30,7 +30,7 @@ var edx = edx || {};
                 $('<input>').attr({
                     type: 'hidden',
                     name: key,
-                    value: value
+                    value: value,
                 }).appendTo(form); // xss-lint: disable=javascript-jquery-insert-into-target
             });
         };
@@ -46,8 +46,8 @@ var edx = edx || {};
                 'edx.bi.user.payment_processor.visited',
                 {
                     category: 'donations',
-                    label: course
-                }
+                    label: course,
+                },
             );
         };
 
@@ -66,8 +66,8 @@ var edx = edx || {};
                 type: 'POST',
                 data: {
                     amount: amount,
-                    course_id: course
-                }
+                    course_id: course,
+                },
             });
         };
 
@@ -86,7 +86,7 @@ var edx = edx || {};
                 _.bindAll(view,
                     'render', 'donate', 'startPayment',
                     'validate', 'startPayment',
-                    'displayServerError', 'submitPaymentForm'
+                    'displayServerError', 'submitPaymentForm',
                 );
                 return this;
             },
@@ -148,7 +148,7 @@ var edx = edx || {};
                     this.$paymentForm,
                     'post',
                     data.payment_url,
-                    data.payment_params
+                    data.payment_params,
                 );
                 firePaymentAnalyticsEvent(this.course);
                 this.submitPaymentForm(this.$paymentForm);
@@ -169,7 +169,7 @@ var edx = edx || {};
                 } else {
                     this.$amount.addClass('validation-error');
                     this.$errorMsg.text(
-                        gettext('Please enter a valid donation amount.')
+                        gettext('Please enter a valid donation amount.'),
                     );
                 }
 
@@ -215,7 +215,7 @@ var edx = edx || {};
             */
             submitPaymentForm: function(form) {
                 form.submit();
-            }
+            },
         };
 
         view.initialize(params);
@@ -233,7 +233,7 @@ var edx = edx || {};
             var course = $container.data('course');
             var view = new edx.dashboard.donation.DonationView({
                 el: $container,
-                course: course
+                course: course,
             }).render();
         });
     });

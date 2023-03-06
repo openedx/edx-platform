@@ -64,6 +64,6 @@ define(['jquery'], function($) {
 
     return {
         iframeBinding: iframeBinding,
-        iframeBindingHtml: iframeBindingHtml
+        iframeBindingHtml: iframeBindingHtml,
     };
 });

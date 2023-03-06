@@ -4,12 +4,12 @@ define([
     'js/collections/group_configuration', 'js/collections/group', 'js/views/group_configuration_details',
     'js/views/group_configurations_list', 'js/views/group_configuration_editor', 'js/views/group_configuration_item',
     'js/views/experiment_group_edit', 'js/views/partition_group_list', 'js/views/partition_group_details',
-    'js/views/content_group_editor', 'js/views/partition_group_item'
+    'js/views/content_group_editor', 'js/views/partition_group_item',
 ], function(
     _, AjaxHelpers, TemplateHelpers, ViewHelpers, Course, GroupConfigurationModel, GroupModel,
     GroupConfigurationCollection, GroupCollection, GroupConfigurationDetailsView, GroupConfigurationsListView,
     GroupConfigurationEditorView, GroupConfigurationItemView, ExperimentGroupEditView, GroupList,
-    PartitionGroupDetailsView, ContentGroupEditorView, PartitionGroupItemView
+    PartitionGroupDetailsView, ContentGroupEditorView, PartitionGroupItemView,
 ) {
     'use strict';
     var SELECTORS = {
@@ -37,7 +37,7 @@ define([
         usageUnitErrorIcon: '.group-configuration-usage-unit .fa-exclamation-circle',
         warningMessage: '.group-configuration-validation-text',
         warningIcon: '.wrapper-group-configuration-validation > .fa-warning',
-        note: '.wrapper-delete-button'
+        note: '.wrapper-delete-button',
     };
 
     var assertTheDetailsView = function(view, text) {
@@ -60,7 +60,7 @@ define([
         var usageUnitAnchors = view.$(SELECTORS.usageUnitAnchor);
 
         expect(view.$(SELECTORS.note)).toHaveAttr(
-            'data-tooltip', toolTipText
+            'data-tooltip', toolTipText,
         );
         expect(view.$('.delete')).toHaveClass('is-disabled');
         expect(view.$(SELECTORS.usageCount)).not.toExist();
@@ -81,7 +81,7 @@ define([
     var setUsageInfo = function(model) {
         model.set('usage', [
             {label: 'label1', url: 'url1'},
-            {label: 'label2', url: 'url2'}
+            {label: 'label2', url: 'url2'},
         ]);
     };
     var assertHideValidationContent = function(view) {
@@ -128,7 +128,7 @@ define([
         setUsageInfo(that.model);
         that.view.render();
         expect(that.view.$(SELECTORS.note)).toHaveAttr(
-            'data-tooltip', toolTipText
+            'data-tooltip', toolTipText,
         );
         expect(that.view.$(SELECTORS.warningMessage)).toContainText(warningText);
         expect(that.view.$(SELECTORS.warningIcon)).toExist();
@@ -149,7 +149,7 @@ define([
             url_name: 'course_name',
             org: 'course_org',
             num: 'course_num',
-            revision: 'course_rev'
+            revision: 'course_rev',
         });
 
         jasmine.addMatchers({
@@ -166,9 +166,9 @@ define([
                         }
 
                         return {
-                            pass: passed
+                            pass: passed,
                         };
-                    }
+                    },
                 };
             },
             toBeCorrectValuesInInputs: function() {
@@ -177,15 +177,15 @@ define([
                         var expected = {
                             name: actual.$(SELECTORS.inputName).val(),
                             description: actual
-                                .$(SELECTORS.inputDescription).val()
+                                .$(SELECTORS.inputDescription).val(),
                         };
 
                         var passed = _.isEqual(values, expected);
 
                         return {
-                            pass: passed
+                            pass: passed,
                         };
-                    }
+                    },
                 };
             },
             toBeCorrectValuesInModel: function() {
@@ -196,9 +196,9 @@ define([
                         });
 
                         return {
-                            pass: passed
+                            pass: passed,
                         };
-                    }
+                    },
                 };
             },
             toHaveDefaultNames: function() {
@@ -211,11 +211,11 @@ define([
                         var passed = _.isEqual(actualValues, values);
 
                         return {
-                            pass: passed
+                            pass: passed,
                         };
-                    }
+                    },
                 };
-            }
+            },
         });
     });
 
@@ -230,13 +230,13 @@ define([
             this.model = new GroupConfigurationModel({
                 name: 'Configuration',
                 description: 'Configuration Description',
-                id: 0
+                id: 0,
             });
 
             this.collection = new GroupConfigurationCollection([this.model]);
             this.collection.outlineUrl = '/outline';
             this.view = new GroupConfigurationDetailsView({
-                model: this.model
+                model: this.model,
             });
             appendSetFixtures(this.view.render().el);
         });
@@ -278,7 +278,7 @@ define([
             assertShowEmptyUsages(
                 this.view,
                 'This Group Configuration is not in use. ' +
-                'Start by adding a content experiment to any Unit via the'
+                'Start by adding a content experiment to any Unit via the',
             );
         });
 
@@ -296,7 +296,7 @@ define([
             assertShowNonEmptyUsages(
                 this.view,
                 'This Group Configuration is used in:',
-                'Cannot delete when in use by an experiment'
+                'Cannot delete when in use by an experiment',
             );
         });
 
@@ -306,7 +306,7 @@ define([
             this.view.$('.hide-groups').click();
 
             expect(this.view.$(SELECTORS.note)).toHaveAttr(
-                'data-tooltip', 'Cannot delete when in use by an experiment'
+                'data-tooltip', 'Cannot delete when in use by an experiment',
             );
             assertHideNonEmptyUsages(this.view);
         });
@@ -318,9 +318,9 @@ define([
                     url: 'url1',
                     validation: {
                         text: 'Warning message',
-                        type: 'warning'
-                    }
-                }
+                        type: 'warning',
+                    },
+                },
             ]);
             this.model.set('showGroups', false);
             this.view.$('.show-groups').click();
@@ -336,9 +336,9 @@ define([
                     url: 'url1',
                     validation: {
                         text: 'Error message',
-                        type: 'error'
-                    }
-                }
+                        type: 'error',
+                    },
+                },
             ]);
             this.model.set('showGroups', false);
             this.view.$('.show-groups').click();
@@ -368,19 +368,19 @@ define([
         beforeEach(function() {
             ViewHelpers.installViewTemplates();
             TemplateHelpers.installTemplates([
-                'group-configuration-editor', 'group-edit'
+                'group-configuration-editor', 'group-edit',
             ]);
 
             this.model = new GroupConfigurationModel({
                 name: 'Configuration',
                 description: 'Configuration Description',
                 id: 0,
-                editing: true
+                editing: true,
             });
             this.collection = new GroupConfigurationCollection([this.model]);
             this.collection.url = '/group_configurations';
             this.view = new GroupConfigurationEditorView({
-                model: this.model
+                model: this.model,
             });
             appendSetFixtures(this.view.render().el);
         });
@@ -388,7 +388,7 @@ define([
         it('should render properly', function() {
             expect(this.view).toBeCorrectValuesInInputs({
                 name: 'Configuration',
-                description: 'Configuration Description'
+                description: 'Configuration Description',
             });
             expect(this.view.$('.delete')).toExist();
         });
@@ -407,14 +407,14 @@ define([
             this.view.$('.action-add-group').click();
             setValuesToInputs(this.view, {
                 inputName: 'New Configuration',
-                inputDescription: 'New Description'
+                inputDescription: 'New Description',
             });
 
             ViewHelpers.submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
 
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'New Configuration',
-                description: 'New Description'
+                description: 'New Description',
             });
 
             groups = this.model.get('groups');
@@ -435,7 +435,7 @@ define([
             this.view.$('.action-add-group').click();
             setValuesToInputs(this.view, {
                 inputName: 'New Configuration',
-                inputDescription: 'New Description'
+                inputDescription: 'New Description',
             });
 
             expect(this.model.get('groups').length).toBe(3);
@@ -443,7 +443,7 @@ define([
             this.view.$('.action-cancel').click();
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'Configuration',
-                description: 'Configuration Description'
+                description: 'Configuration Description',
             });
             // Model is still exist in the collection
             expect(this.collection.indexOf(this.model)).toBeGreaterThan(-1);
@@ -455,7 +455,7 @@ define([
             spyOn(this.model, 'isNew').and.returnValue(true);
             setValuesToInputs(this.view, {
                 inputName: 'New Configuration',
-                inputDescription: 'New Description'
+                inputDescription: 'New Description',
             });
             this.view.$('.action-cancel').click();
             // Model is removed from the collection
@@ -471,7 +471,7 @@ define([
             this.view.$('form').submit();
             // See error message
             expect(this.view.$(SELECTORS.errorMessage)).toContainText(
-                'Group Configuration name is required'
+                'Group Configuration name is required',
             );
             // No request
             AjaxHelpers.expectNoRequests(requests);
@@ -482,7 +482,7 @@ define([
             AjaxHelpers.respondWithJson(requests, {});
             // Model is updated
             expect(this.model).toBeCorrectValuesInModel({
-                name: 'New Configuration'
+                name: 'New Configuration',
             });
             // Error message disappear
             expect(this.view.$(SELECTORS.errorMessage)).not.toBeInDOM();
@@ -524,21 +524,21 @@ define([
             this.view.$('.action-add-group').click(); // Add Group E
 
             expect(this.view.$(SELECTORS.inputGroupName)).toHaveDefaultNames([
-                'Group A', 'Group B', 'Group C', 'Group D', 'Group E'
+                'Group A', 'Group B', 'Group C', 'Group D', 'Group E',
             ]);
 
             // Remove Group B
             this.view.$('.group-1 .action-close').click();
 
             expect(this.view.$(SELECTORS.inputGroupName)).toHaveDefaultNames([
-                'Group A', 'Group C', 'Group D', 'Group E'
+                'Group A', 'Group C', 'Group D', 'Group E',
             ]);
 
             this.view.$('.action-add-group').click(); // Add Group F
             this.view.$('.action-add-group').click(); // Add Group G
 
             expect(this.view.$(SELECTORS.inputGroupName)).toHaveDefaultNames([
-                'Group A', 'Group C', 'Group D', 'Group E', 'Group F', 'Group G'
+                'Group A', 'Group C', 'Group D', 'Group E', 'Group F', 'Group G',
             ]);
         });
 
@@ -548,7 +548,7 @@ define([
                 'Cannot delete when in use by an experiment',
                 'This configuration is currently used in content ' +
                 'experiments. If you make changes to the groups, you may ' +
-                'need to edit those experiments.'
+                'need to edit those experiments.',
             );
         });
 
@@ -562,13 +562,13 @@ define([
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(
-                ['group-configuration-editor', 'group-edit', 'list']
+                ['group-configuration-editor', 'group-edit', 'list'],
             );
 
             this.model = new GroupConfigurationModel({id: 0});
             this.collection = new GroupConfigurationCollection();
             this.view = new GroupConfigurationsListView({
-                collection: this.collection
+                collection: this.collection,
             });
             appendSetFixtures(this.view.render().el);
         });
@@ -606,13 +606,13 @@ define([
     describe('Experiment group configurations controller view', function() {
         beforeEach(function() {
             TemplateHelpers.installTemplates([
-                'group-configuration-editor', 'group-configuration-details'
+                'group-configuration-editor', 'group-configuration-details',
             ], true);
             this.model = new GroupConfigurationModel({id: 0});
             this.collection = new GroupConfigurationCollection([this.model]);
             this.collection.url = '/group_configurations';
             this.view = new GroupConfigurationItemView({
-                model: this.model
+                model: this.model,
             });
             appendSetFixtures(this.view.render().el);
         });
@@ -630,7 +630,7 @@ define([
                 this,
                 '/group_configurations/0',
                 SELECTORS.itemView,
-                'Delete this group configuration?'
+                'Delete this group configuration?',
             );
         });
     });
@@ -640,13 +640,13 @@ define([
             TemplateHelpers.installTemplate('group-edit', true);
 
             this.model = new GroupModel({
-                name: 'Group A'
+                name: 'Group A',
             });
 
             this.collection = new GroupCollection([this.model]);
 
             this.view = new ExperimentGroupEditView({
-                model: this.model
+                model: this.model,
             });
         });
 
@@ -690,7 +690,7 @@ define([
                 groupConfiguration = new GroupConfigurationModel({
                     id: 0,
                     name: 'Content Group Configuration',
-                    groups: groups
+                    groups: groups,
                 }, {canBeEmpty: true});
             groupConfiguration.urlRoot = '/mock_url';
             groupConfiguration.outlineUrl = '/mock_url';
@@ -760,7 +760,7 @@ define([
                 name: 'Content Group Configuration',
                 groups: view.collection.map(function(groupModel, index) {
                     return _.extend(groupModel.toJSON(), {id: index});
-                })
+                }),
             });
         };
 
@@ -781,7 +781,7 @@ define([
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(
-                ['content-group-editor', 'partition-group-details', 'list']
+                ['content-group-editor', 'partition-group-details', 'list'],
             );
         });
 
@@ -881,7 +881,7 @@ define([
                 name: 'Content Group Configuration',
                 id: 0,
                 scheme: 'cohort',
-                groups: new GroupCollection([this.model])
+                groups: new GroupCollection([this.model]),
             }, {canBeEmpty: true});
 
             saveableModel.urlRoot = '/mock_url';
@@ -890,7 +890,7 @@ define([
             this.collection.outlineUrl = '/outline';
 
             this.view = new PartitionGroupDetailsView({
-                model: this.model
+                model: this.model,
             });
             appendSetFixtures(this.view.render().el);
         });
@@ -916,7 +916,7 @@ define([
             assertShowNonEmptyUsages(
                 this.view,
                 'This group controls access to:',
-                'Cannot delete when in use by a unit'
+                'Cannot delete when in use by a unit',
             );
         });
 
@@ -925,7 +925,7 @@ define([
             this.view.$('.hide-groups').click();
 
             expect(this.view.$('li.action-delete')).toHaveAttr(
-                'data-tooltip', 'Cannot delete when in use by a unit'
+                'data-tooltip', 'Cannot delete when in use by a unit',
             );
             assertHideNonEmptyUsages(this.view);
         });
@@ -949,7 +949,7 @@ define([
                 id: 0,
                 scheme: 'cohort',
                 groups: new GroupCollection([this.model]),
-                editing: true
+                editing: true,
             });
 
             this.collection = new GroupConfigurationCollection([this.saveableModel]);
@@ -957,7 +957,7 @@ define([
             this.collection.url = '/group_configurations';
 
             this.view = new ContentGroupEditorView({
-                model: this.model
+                model: this.model,
             });
             appendSetFixtures(this.view.render().el);
         });
@@ -972,7 +972,7 @@ define([
             ViewHelpers.submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
 
             expect(this.model).toBeCorrectValuesInModel({
-                name: 'New Content Group'
+                name: 'New Content Group',
             });
             expect(this.view.$el).not.toBeInDOM();
         });
@@ -992,7 +992,7 @@ define([
 
             this.view.$('.action-cancel').click();
             expect(this.model).toBeCorrectValuesInModel({
-                name: 'Content Group'
+                name: 'Content Group',
             });
             // Model is still exist in the collection
             expect(this.collection.indexOf(this.saveableModel)).toBeGreaterThan(-1);
@@ -1003,7 +1003,7 @@ define([
             assertCannotDeleteUsed(
                 this,
                 'Cannot delete when in use by a unit',
-                'This content group is used in one or more units.'
+                'This content group is used in one or more units.',
             );
         });
 
@@ -1015,7 +1015,7 @@ define([
     describe('Content group controller view', function() {
         beforeEach(function() {
             TemplateHelpers.installTemplates([
-                'content-group-editor', 'partition-group-details'
+                'content-group-editor', 'partition-group-details',
             ], true);
 
             this.model = new GroupModel({name: 'Content Group', id: 0, courseOutlineUrl: 'CourseOutlineUrl'});
@@ -1024,13 +1024,13 @@ define([
                 name: 'Content Group Configuration',
                 id: 0,
                 scheme: 'cohort',
-                groups: new GroupCollection([this.model])
+                groups: new GroupCollection([this.model]),
             });
             this.saveableModel.urlRoot = '/group_configurations';
             this.collection = new GroupConfigurationCollection([this.saveableModel]);
             this.collection.url = '/group_configurations';
             this.view = new PartitionGroupItemView({
-                model: this.model
+                model: this.model,
             });
             appendSetFixtures(this.view.render().el);
         });
@@ -1048,7 +1048,7 @@ define([
                 this,
                 '/group_configurations/0/0',
                 '.partition-groups-list-item',
-                'Delete this content group'
+                'Delete this content group',
             );
         });
     });

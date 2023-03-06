@@ -4,13 +4,13 @@ define([
     'gettext',
     'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils',
-    'text!templates/paging-header.underscore'
+    'text!templates/paging-header.underscore',
 ], function(_, Backbone, gettext, HtmlUtils, StringUtils, pagingHeaderTemplate) {
     'use strict';
     var PagingHeader = Backbone.View.extend({
         events: {
             'click .next-page-link': 'nextPage',
-            'click .previous-page-link': 'previousPage'
+            'click .previous-page-link': 'previousPage',
         },
 
         initialize: function(options) {
@@ -72,7 +72,7 @@ define([
                 currentItemRange: this.currentItemRangeLabel(),
                 totalItemsCount: this.totalItemsCountLabel(),
                 assetType: assetType,
-                sortName: this.sortNameLabel()
+                sortName: this.sortNameLabel(),
             });
         },
 
@@ -86,7 +86,7 @@ define([
 
             return HtmlUtils.interpolateHtml(htmlMessage, {
                 start: Math.min(start + 1, end),
-                end: end
+                end: end,
             });
         },
 
@@ -96,11 +96,11 @@ define([
 
             // Translators: turns into "25 total" to be used in other sentences, e.g. "Showing 0-9 out of 25 total".
             totalItemsLabel = StringUtils.interpolate(gettext('{totalItems} total'), {
-                totalItems: this.view.collection.getTotalRecords()
+                totalItems: this.view.collection.getTotalRecords(),
             });
 
             return HtmlUtils.interpolateHtml(htmlMessage, {
-                totalItemsLabel: totalItemsLabel
+                totalItemsLabel: totalItemsLabel,
             });
         },
 
@@ -108,7 +108,7 @@ define([
             var htmlMessage = HtmlUtils.HTML('<span class="sort-order">{sortName}</span>');
 
             return HtmlUtils.interpolateHtml(htmlMessage, {
-                sortName: this.view.sortDisplayName()
+                sortName: this.view.sortDisplayName(),
             });
         },
 
@@ -116,7 +116,7 @@ define([
             var htmlMessage = HtmlUtils.HTML('<span class="filter-column">{filterName}</span>');
 
             return HtmlUtils.interpolateHtml(htmlMessage, {
-                filterName: this.view.filterDisplayName()
+                filterName: this.view.filterDisplayName(),
             });
         },
 
@@ -126,7 +126,7 @@ define([
 
         previousPage: function() {
             this.view.previousPage();
-        }
+        },
     });
 
     return PagingHeader;

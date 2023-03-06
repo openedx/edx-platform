@@ -47,7 +47,7 @@
                 surveyResultReport: gettext('Error generating survey results. Please try again.'),
                 proctoredExamResults: gettext('Error generating proctored exam results. Please try again.'),
                 learnerWhoCanEnroll: gettext('Error generating list of students who may enroll. Please try again.'),
-                viewCertificates: gettext('Error getting issued certificates list.')
+                viewCertificates: gettext('Error getting issued certificates list.'),
             };
 
             /**
@@ -61,10 +61,10 @@
                 this.$reports_request_response_error.empty();
                 this.$data_display_table.empty();
                 $('.msg-confirm').css({
-                    display: 'none'
+                    display: 'none',
                 });
                 return $('.msg-error').css({
-                    display: 'none'
+                    display: 'none',
                 });
             };
 
@@ -142,7 +142,7 @@
                     },
                     success: function(data) {
                         dataDownloadObj.buildDataTable(data);
-                    }
+                    },
                 });
             };
 
@@ -180,7 +180,7 @@
                             dataDownloadObj.$reports_request_response.text(data.status);
                             $('.msg-confirm').css({display: 'block'});
                         }
-                    }
+                    },
                 });
             };
 
@@ -192,7 +192,7 @@
                 }
                 dataDownloadObj.$download_request_response_error.text(errorMessage);
                 return dataDownloadObj.$download_request_response_error.css({
-                    display: 'block'
+                    display: 'block',
                 });
             };
             /**
@@ -205,7 +205,7 @@
                     enableCellNavigation: true,
                     enableColumnReorder: false,
                     forceFitColumns: true,
-                    rowHeight: 35
+                    rowHeight: 35,
                 };
                 columns = (function() {
                     var i, len, ref, results;
@@ -216,14 +216,14 @@
                         results.push({
                             id: feature,
                             field: feature,
-                            name: data.feature_names[feature]
+                            name: data.feature_names[feature],
                         });
                     }
                     return results;
                 }());
                 gridData = data.hasOwnProperty('students') ? data.students : data.certificates;
                 $tablePlaceholder = $('<div/>', {
-                    class: 'slickgrid'
+                    class: 'slickgrid',
                 });
                 dataDownloadObj.$download_display_table.append($tablePlaceholder);
                 return new window.Slick.Grid($tablePlaceholder, gridData, columns, options);
@@ -244,14 +244,14 @@
     }());
 
     _.defaults(window, {
-        InstructorDashboard: {}
+        InstructorDashboard: {},
     });
 
     _.defaults(window.InstructorDashboard, {
-        sections: {}
+        sections: {},
     });
 
     _.defaults(window.InstructorDashboard.sections, {
-        DataDownloadV2: DataDownloadV2
+        DataDownloadV2: DataDownloadV2,
     });
 }).call(this);

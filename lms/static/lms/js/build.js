@@ -42,7 +42,7 @@
             'support/js/enrollment_factory',
             'support/js/manage_user_factory',
             'teams/js/teams_tab_factory',
-            'js/dateutil_factory'
+            'js/dateutil_factory',
         ]),
 
         /**
@@ -86,7 +86,7 @@
 
             // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace
             'edx-ui-toolkit/js/utils/html-utils': 'empty:',
-            'edx-ui-toolkit/js/utils/string-utils': 'empty:'
+            'edx-ui-toolkit/js/utils/string-utils': 'empty:',
         },
 
         /**
@@ -165,6 +165,6 @@
          * SILENT: 4
          * Default is 0.
          */
-        logLevel: 1
+        logLevel: 1,
     };
 }());

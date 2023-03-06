@@ -2,37 +2,37 @@ define(
     [
         'jquery', 'underscore', 'backbone',
         'js/views/video/transcripts/utils', 'js/views/video/transcripts/file_uploader',
-        'xmodule', 'jquery.form'
+        'xmodule', 'jquery.form',
     ],
     function($, _, Backbone, TranscriptUtils, FileUploader) {
         'use strict';
 
         describe('Transcripts.FileUploader', function() {
             var videoListEntryTemplate = readFixtures(
-                    'video/transcripts/metadata-videolist-entry.underscore'
+                    'video/transcripts/metadata-videolist-entry.underscore',
                 ),
                 fileUploadTemplate = readFixtures(
-                    'video/transcripts/file-upload.underscore'
+                    'video/transcripts/file-upload.underscore',
                 ),
                 view;
 
             beforeEach(function() {
                 setFixtures(
                     $('<div>', {id: 'metadata-videolist-entry'})
-                        .html(videoListEntryTemplate)
+                        .html(videoListEntryTemplate),
                 );
                 appendSetFixtures(
                     $('<script>',
                         {
                             id: 'file-upload',
-                            type: 'text/template'
-                        }
-                    ).text(fileUploadTemplate)
+                            type: 'text/template',
+                        },
+                    ).text(fileUploadTemplate),
                 );
 
                 var messenger = jasmine.createSpyObj(
                         'MessageManager',
-                        ['render', 'showError', 'hideError']
+                        ['render', 'showError', 'hideError'],
                     ),
                     $container = $('.transcripts-status');
 
@@ -45,7 +45,7 @@ define(
                 view = new FileUploader({
                     el: $container,
                     messenger: messenger,
-                    component_locator: 'component_locator'
+                    component_locator: 'component_locator',
                 });
             });
 
@@ -74,7 +74,7 @@ define(
 
                         expect(view.render).not.toThrow();
                         expect(_.template).not.toHaveBeenCalled();
-                    }
+                    },
                 );
 
                 it('All works okay if all data is okay', function() {
@@ -116,7 +116,7 @@ define(
 
                     expect(view.$form.ajaxSubmit).toHaveBeenCalled();
                     expect(view.$form.ajaxSubmit).toHaveBeenCalledWith(jasmine.objectContaining({
-                        data: {edx_video_id: videoId}
+                        data: {edx_video_id: videoId},
                     }));
                 });
             });
@@ -160,12 +160,12 @@ define(
                 var data = {
                     Correct: {
                         name: 'file_name.srt',
-                        isValid: true
+                        isValid: true,
                     },
                     Incorrect: {
                         name: 'file_name.mp4',
-                        isValid: false
-                    }
+                        isValid: false,
+                    },
                 };
 
                 $.each(data, function(fileType, fileInfo) {
@@ -200,8 +200,8 @@ define(
                         status: 200,
                         responseText: JSON.stringify({
                             status: 'Success',
-                            edx_video_id: 'test_video_id'
-                        })
+                            edx_video_id: 'test_video_id',
+                        }),
                     };
                     spyOn(Backbone, 'trigger');
                     view.xhrCompleteHandler(xhr);
@@ -224,7 +224,7 @@ define(
                 it('Ajax transport Error', function() {
                     var xhr = {
                         status: 400,
-                        responseText: JSON.stringify({})
+                        responseText: JSON.stringify({}),
                     };
 
                     assertAjaxError(xhr);

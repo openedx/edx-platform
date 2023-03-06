@@ -10,7 +10,7 @@ define(['js/models/license'], function(LicenseModel) {
         it('accepts normal arguments', function() {
             var model = new LicenseModel({
                 type: 'creative-commons',
-                options: {'fake-boolean': true, version: 'your momma'}
+                options: {'fake-boolean': true, version: 'your momma'},
             });
             expect(model.get('type')).toEqual('creative-commons');
             expect(model.get('options')).toEqual({'fake-boolean': true, version: 'your momma'});
@@ -55,7 +55,7 @@ define(['js/models/license'], function(LicenseModel) {
         it('can stringify a license with options', function() {
             this.model.set({
                 type: 'abc',
-                options: {ping: 'pong', bing: true, buzz: true, beep: false}}
+                options: {ping: 'pong', bing: true, buzz: true, beep: false}},
             );
             expect(this.model.toString()).toEqual('abc: ping=pong bing buzz');
         });
@@ -64,7 +64,7 @@ define(['js/models/license'], function(LicenseModel) {
             this.model.set({
                 type: "doesn't matter",
                 options: {ignore: 'me'},
-                custom: 'this is my super cool license'
+                custom: 'this is my super cool license',
             });
             expect(this.model.toString()).toEqual('this is my super cool license');
         });

@@ -14,7 +14,7 @@ define(
                 'mouseover .thumbnail-wrapper': 'showHoverState',
                 'mouseout .thumbnail-wrapper': 'hideHoverState',
                 'focus .thumbnail-wrapper': 'showHoverState',
-                'blur .thumbnail-wrapper': 'hideHoverState'
+                'blur .thumbnail-wrapper': 'hideHoverState',
             },
 
             initialize: function(options) {
@@ -28,7 +28,7 @@ define(
                     upload: {
                         name: 'upload',
                         icon: '',
-                        text: gettext('Add Thumbnail')
+                        text: gettext('Add Thumbnail'),
                     },
                     edit: {
                         name: 'edit',
@@ -42,19 +42,19 @@ define(
                                 videoImageSupportedFileFormats: this.getVideoImageSupportedFileFormats().humanize,
                                 lineBreak: HtmlUtils.HTML('<br>'),
                                 InstructionsSpanStart: HtmlUtils.HTML('<span class="requirements-instructions">'),
-                                spanEnd: HtmlUtils.HTML('</span>')
-                            }
-                        ).toString()
+                                spanEnd: HtmlUtils.HTML('</span>'),
+                            },
+                        ).toString(),
                     },
                     error: {
                         name: 'error',
                         icon: '',
-                        text: gettext('Image upload failed')
+                        text: gettext('Image upload failed'),
                     },
                     progress: {
                         name: 'progress-action',
                         icon: '<span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>',
-                        text: gettext('Uploading')
+                        text: gettext('Uploading'),
                     },
                     requirements: {
                         name: 'requirements',
@@ -68,15 +68,15 @@ define(
                                 lineBreak: HtmlUtils.HTML('<br>'),
                                 ReqTextSpanStart: HtmlUtils.HTML('<span class="requirements-text">'),
                                 InstructionsSpanStart: HtmlUtils.HTML('<span class="requirements-instructions">'),
-                                spanEnd: HtmlUtils.HTML('</span>')
-                            }
-                        ).toString()
-                    }
+                                spanEnd: HtmlUtils.HTML('</span>'),
+                            },
+                        ).toString(),
+                    },
                 };
 
                 _.bindAll(
                     this, 'render', 'chooseFile', 'imageSelected', 'imageUploadSucceeded', 'imageUploadFailed',
-                    'showHoverState', 'hideHoverState'
+                    'showHoverState', 'hideHoverState',
                 );
             },
 
@@ -92,8 +92,8 @@ define(
                         duration: this.getDuration(this.model.get('duration')),
                         videoImageSupportedFileFormats: this.getVideoImageSupportedFileFormats(),
                         videoImageMaxSize: this.getVideoImageMaxSize(),
-                        videoImageResolution: this.getVideoImageResolution()
-                    })
+                        videoImageResolution: this.getVideoImageResolution(),
+                    }),
                 );
                 this.hideHoverState();
                 return this;
@@ -106,21 +106,21 @@ define(
                 }).sort();
                 return {
                     humanize: supportedFormats.slice(0, -1).join(', ') + ' or ' + supportedFormats.slice(-1),
-                    machine: _.values(this.videoImageSettings.supported_file_formats)
+                    machine: _.values(this.videoImageSettings.supported_file_formats),
                 };
             },
 
             getVideoImageMaxSize: function() {
                 return {
                     humanize: this.videoImageSettings.max_size / (1024 * 1024) + ' MB',
-                    machine: this.videoImageSettings.max_size
+                    machine: this.videoImageSettings.max_size,
                 };
             },
 
             getVideoImageMinSize: function() {
                 return {
                     humanize: this.videoImageSettings.min_size / 1024 + ' KB',
-                    machine: this.videoImageSettings.min_size
+                    machine: this.videoImageSettings.min_size,
                 };
             },
 
@@ -128,7 +128,7 @@ define(
                 return StringUtils.interpolate(
                     // Translators: message will be like 1280x720 pixels
                     gettext('{maxWidth}x{maxHeight} pixels'),
-                    {maxWidth: this.videoImageSettings.max_width, maxHeight: this.videoImageSettings.max_height}
+                    {maxWidth: this.videoImageSettings.max_width, maxHeight: this.videoImageSettings.max_height},
                 );
             },
 
@@ -136,7 +136,7 @@ define(
                 return StringUtils.interpolate(
                     // Translators: message will be like Thumbnail for Arrow.mp4
                     gettext('Thumbnail for {videoName}'),
-                    {videoName: this.model.get('client_video_id')}
+                    {videoName: this.model.get('client_video_id')},
                 );
             },
 
@@ -144,7 +144,7 @@ define(
                 return StringUtils.interpolate(
                     // Translators: message will be like Add Thumbnail - Arrow.mp4
                     gettext('Add Thumbnail - {videoName}'),
-                    {videoName: this.model.get('client_video_id')}
+                    {videoName: this.model.get('client_video_id')},
                 );
             },
 
@@ -155,7 +155,7 @@ define(
 
                 return {
                     humanize: this.getDurationTextHuman(durationSeconds),
-                    machine: this.getDurationTextMachine(durationSeconds)
+                    machine: this.getDurationTextMachine(durationSeconds),
                 };
             },
 
@@ -171,8 +171,8 @@ define(
                     // Translators: humanizeDuration will be like 10 minutes, an hour and 20 minutes etc
                     gettext('Video duration is {humanizeDuration}'),
                     {
-                        humanizeDuration: humanize
-                    }
+                        humanizeDuration: humanize,
+                    },
                 );
             },
 
@@ -190,7 +190,7 @@ define(
                     minutesText = StringUtils.interpolate(
                         // Translators: message will be like 15 minutes, 1 minute
                         gettext('{minutes} {unit}'),
-                        {minutes: minutes, unit: minutesText}
+                        {minutes: minutes, unit: minutesText},
                     );
                 }
 
@@ -199,7 +199,7 @@ define(
                     secondsText = StringUtils.interpolate(
                         // Translators: message will be like 20 seconds, 1 second
                         gettext('{seconds} {unit}'),
-                        {seconds: seconds, unit: secondsText}
+                        {seconds: seconds, unit: secondsText},
                     );
                 }
 
@@ -218,7 +218,7 @@ define(
                     url: this.imageUploadURL + '/' + encodeURIComponent(this.model.get('edx_video_id')),
                     add: this.imageSelected,
                     done: this.imageUploadSucceeded,
-                    fail: this.imageUploadFailed
+                    fail: this.imageUploadFailed,
                 });
             },
 
@@ -279,11 +279,11 @@ define(
                 this.$('.thumbnail-action').toggle(showText);
                 HtmlUtils.setHtml(
                     this.$('.thumbnail-action .action-icon'),
-                    HtmlUtils.HTML(this.actionsInfo[action].icon)
+                    HtmlUtils.HTML(this.actionsInfo[action].icon),
                 );
                 HtmlUtils.setHtml(
                     this.$('.thumbnail-action .action-text'),
-                    HtmlUtils.HTML(this.actionsInfo[action].text)
+                    HtmlUtils.HTML(this.actionsInfo[action].text),
                 );
                 this.$('.thumbnail-action .action-text-sr').text(additionalSRText || '');
                 this.$('.thumbnail-wrapper').attr('class', 'thumbnail-wrapper {action}'.replace('{action}', action));
@@ -302,11 +302,11 @@ define(
                     this.$('.thumbnail-action .edit-container').toggle(true);
                     HtmlUtils.setHtml(
                         this.$('.thumbnail-action .edit-container .action-icon'),
-                        HtmlUtils.HTML(this.actionsInfo[action].icon)
+                        HtmlUtils.HTML(this.actionsInfo[action].icon),
                     );
                     HtmlUtils.setHtml(
                         this.$('.thumbnail-action .edit-container .edit-action-text'),
-                        HtmlUtils.HTML(this.actionsInfo[action].actionText)
+                        HtmlUtils.HTML(this.actionsInfo[action].actionText),
                     );
                 }
             },
@@ -318,27 +318,27 @@ define(
                     errorMessage = StringUtils.interpolate(
                         // Translators: supportedFileFormats will be like .bmp, gif, .jpg or .png.
                         gettext(
-                            'This image file type is not supported. Supported file types are {supportedFileFormats}.'
+                            'This image file type is not supported. Supported file types are {supportedFileFormats}.',
                         ),
                         {
-                            supportedFileFormats: this.getVideoImageSupportedFileFormats().humanize
-                        }
+                            supportedFileFormats: this.getVideoImageSupportedFileFormats().humanize,
+                        },
                     );
                 } else if (imageFile.size > this.getVideoImageMaxSize().machine) {
                     errorMessage = StringUtils.interpolate(
                         // Translators: maxFileSizeInMB will be like 2 MB.
                         gettext('The selected image must be smaller than {maxFileSizeInMB}.'),
                         {
-                            maxFileSizeInMB: this.getVideoImageMaxSize().humanize
-                        }
+                            maxFileSizeInMB: this.getVideoImageMaxSize().humanize,
+                        },
                     );
                 } else if (imageFile.size < this.getVideoImageMinSize().machine) {
                     errorMessage = StringUtils.interpolate(
                         // Translators: minFileSizeInKB will be like 2 KB.
                         gettext('The selected image must be larger than {minFileSizeInKB}.'),
                         {
-                            minFileSizeInKB: this.getVideoImageMinSize().humanize
-                        }
+                            minFileSizeInKB: this.getVideoImageMinSize().humanize,
+                        },
                     );
                 }
 
@@ -369,8 +369,8 @@ define(
                 // Add error wrapper html to current video element row.
                 $parentRowEl.before(    // xss-lint: disable=javascript-jquery-insertion
                     HtmlUtils.ensureHtml(
-                        this.thumbnailErrorTemplate({videoId: videoId, errorText: errorText})
-                    ).toString()
+                        this.thumbnailErrorTemplate({videoId: videoId, errorText: errorText}),
+                    ).toString(),
                 );
                 this.$el.find('.thumbnail-wrapper').addClass('error');
             },
@@ -379,9 +379,9 @@ define(
                 if ($(window).prop('SR') !== undefined) {
                     $(window).prop('SR').readTexts(messages);
                 }
-            }
+            },
         });
 
         return VideoThumbnailView;
-    }
+    },
 );

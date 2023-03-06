@@ -19,7 +19,7 @@ var edx = edx || {};
                 isActive: false,
                 hasPaid: false,
                 platformName: '',
-                requirements: {}
+                requirements: {},
             };
         },
 
@@ -32,7 +32,7 @@ var edx = edx || {};
         postRender: function() {
             // Track a virtual pageview, for easy funnel reconstruction.
             window.analytics.page('verification', this.templateName);
-        }
+        },
 
     });
 }(jQuery));

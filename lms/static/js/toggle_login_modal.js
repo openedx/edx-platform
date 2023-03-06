@@ -15,7 +15,7 @@
                 top: 100,
                 overlay: 0.5,
                 closeButton: null,
-                position: 'fixed'
+                position: 'fixed',
             };
 
             if ($('#lean_overlay').length == 0) {
@@ -71,7 +71,7 @@
                             opacity: 0,
                             'z-index': 11000,
                             left: 10 + '%',
-                            top: 10 + '%'
+                            top: 10 + '%',
                         });
                     } else {
                         $(modal_id).css({
@@ -80,7 +80,7 @@
                             'z-index': 11000,
                             left: 50 + '%',
                             'margin-left': -(modal_width / 2) + 'px',
-                            top: o.top + 'px'
+                            top: o.top + 'px',
                         });
                     }
 
@@ -100,7 +100,7 @@
                 }
                 e.preventDefault();
             }
-        }
+        },
     });
 
     $(document).ready(function($) {

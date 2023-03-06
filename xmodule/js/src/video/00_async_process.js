@@ -50,7 +50,7 @@
                     setTimeout(handler, 25);
 
                     return dfd.promise();
-                }
+                },
             };
 
             return AsyncProcess;

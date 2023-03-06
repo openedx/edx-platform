@@ -44,7 +44,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                         return {
                             ele: $container,
                             attachMethod: 'prepend',
-                            parentList: parentList
+                            parentList: parentList,
                         };
                     }
                 }
@@ -60,7 +60,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                             Math.abs(eleY - containerY) < 50) {
                         return {
                             ele: $container,
-                            attachMethod: 'prepend'
+                            attachMethod: 'prepend',
                         };
                     }
                     // Otherwise the list is populated, and we should attach before/after a sibling
@@ -83,21 +83,21 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                                 if (eleY + fudge >= siblingY && eleYEnd - fudge <= siblingYEnd) {
                                     return {
                                         ele: $sibling,
-                                        attachMethod: yChange > 0 ? 'after' : 'before'
+                                        attachMethod: yChange > 0 ? 'after' : 'before',
                                     };
                                 }
                                 // Element being dragged is before the drop target.
                                 else if (Math.abs(eleYEnd - siblingY) <= fudge) {
                                     return {
                                         ele: $sibling,
-                                        attachMethod: 'before'
+                                        attachMethod: 'before',
                                     };
                                 }
                                 // Element being dragged is after the drop target.
                                 else if (Math.abs(eleY - siblingYEnd) <= fudge) {
                                     return {
                                         ele: $sibling,
-                                        attachMethod: 'after'
+                                        attachMethod: 'after',
                                     };
                                 }
                             } else {
@@ -106,14 +106,14 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                                         Math.abs(eleY - siblingYEnd) <= fudge) {
                                     return {
                                         ele: $sibling,
-                                        attachMethod: 'after'
+                                        attachMethod: 'after',
                                     };
                                 }
                                 // Dragging up or down into beginning of list.
                                 else if (j === 0 && Math.abs(eleY - siblingY) <= fudge) {
                                     return {
                                         ele: $sibling,
-                                        attachMethod: 'before'
+                                        attachMethod: 'before',
                                     };
                                 }
                                 // Dragging down into end of list. Special handling required because
@@ -123,12 +123,12 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                                         Math.abs(eleYEnd - siblingYEnd) <= fudge) {
                                     return {
                                         ele: $sibling,
-                                        attachMethod: 'after'
+                                        attachMethod: 'after',
                                     };
                                 } else if (eleY >= siblingY && eleY <= siblingYEnd) {
                                     return {
                                         ele: $sibling,
-                                        attachMethod: eleY - siblingY <= siblingHeight / 2 ? 'before' : 'after'
+                                        attachMethod: eleY - siblingY <= siblingHeight / 2 ? 'before' : 'after',
                                     };
                                 }
                             }
@@ -139,7 +139,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
             // Failed drag
             return {
                 ele: null,
-                attachMethod: ''
+                attachMethod: '',
             };
         },
 
@@ -158,7 +158,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                 // The y location of the last dragMove event (to determine direction).
                 lastY: 0,
                 // The direction the drag is moving in (negative means up, positive down).
-                dragDirection: 0
+                dragDirection: 0,
             };
             if (!$ele.hasClass(this.collapsedClass)) {
                 $ele.addClass(this.collapsedClass);
@@ -250,7 +250,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
             // Everything in its right place
             $ele.css({
                 top: 'auto',
-                left: 'auto'
+                left: 'auto',
             });
 
             this.dragState = {};
@@ -289,7 +289,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                 if (_.isFunction(refresh)) { refresh(collapsed); }
             };
             saving = new NotificationView.Mini({
-                title: gettext('Saving')
+                title: gettext('Saving'),
             });
             saving.show();
             element.addClass('was-dropped');
@@ -325,7 +325,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                 ele.find(childrenSelector),
                 function(child) {
                     return $(child).data('locator');
-                }
+                },
             );
             $.ajax({
                 url: ModuleUtils.getUpdateUrl(ele.data('locator')),
@@ -333,9 +333,9 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                 dataType: 'json',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    children: children
+                    children: children,
                 }),
-                success: success
+                success: success,
             });
         },
 
@@ -359,7 +359,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                 droppableClass: undefined,
                 parentLocationSelector: undefined,
                 refresh: undefined,
-                ensureChildrenRendered: undefined
+                ensureChildrenRendered: undefined,
             }, options);
 
             if ($(element).data('droppable-class') !== options.droppableClass) {
@@ -368,18 +368,18 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                     'parent-location-selector': options.parentLocationSelector,
                     'child-selector': options.type,
                     refresh: options.refresh,
-                    ensureChildrenRendered: options.ensureChildrenRendered
+                    ensureChildrenRendered: options.ensureChildrenRendered,
                 });
 
                 draggable = new Draggabilly(element, {
                     handle: options.handleClass,
-                    containment: '.wrapper-dnd'
+                    containment: '.wrapper-dnd',
                 });
                 draggable.on('dragStart', _.bind(contentDragger.onDragStart, contentDragger, draggable));
                 draggable.on('dragMove', _.bind(contentDragger.onDragMove, contentDragger, draggable));
                 draggable.on('dragEnd', _.bind(contentDragger.onDragEnd, contentDragger, draggable));
             }
-        }
+        },
     };
 
     return contentDragger;

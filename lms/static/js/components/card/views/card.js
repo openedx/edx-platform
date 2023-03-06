@@ -21,14 +21,14 @@
         'underscore',
         'backbone',
         'text!templates/components/card/card.underscore',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ],
     function($, _, Backbone, cardTemplate, HtmlUtils) {
         var CardView = Backbone.View.extend({
             tagName: 'li',
 
             events: {
-                'click .action': 'action'
+                'click .action': 'action',
             },
 
             /**
@@ -89,8 +89,8 @@
                         action_url: this.callIfFunction(this.actionUrl),
                         action_content: this.callIfFunction(this.actionContent),
                         configuration: this.callIfFunction(this.configuration),
-                        srInfo: this.srInfo
-                    })
+                        srInfo: this.srInfo,
+                    }),
                 );
                 var detailsEl = this.$el.find('.card-meta');
                 _.each(this.callIfFunction(this.details), function(detail) {
@@ -110,7 +110,7 @@
             details: [],
             actionClass: '',
             actionUrl: '',
-            actionContent: ''
+            actionContent: '',
         });
 
         return CardView;

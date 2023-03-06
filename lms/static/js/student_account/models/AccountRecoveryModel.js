@@ -4,7 +4,7 @@
         function($, Backbone) {
             return Backbone.Model.extend({
                 defaults: {
-                    email: ''
+                    email: '',
                 },
                 ajaxType: '',
                 urlRoot: '',
@@ -16,7 +16,7 @@
 
                 sync: function(method, model) {
                     var headers = {
-                        'X-CSRFToken': $.cookie('csrftoken')
+                        'X-CSRFToken': $.cookie('csrftoken'),
                     };
 
                     // Only expects an email address.
@@ -30,9 +30,9 @@
                         },
                         error: function(error) {
                             model.trigger('error', error);
-                        }
+                        },
                     });
-                }
+                },
             });
         });
 }).call(this, define || RequireJS.define);

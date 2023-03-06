@@ -35,12 +35,12 @@
             moment: 'xmodule_js/common_static/common/js/vendor/moment-with-locales',
             draggabilly: 'xmodule_js/common_static/js/vendor/draggabilly',
             'edx-ui-toolkit': 'edx-ui-toolkit',
-            hls: 'common/js/vendor/hls'
+            hls: 'common/js/vendor/hls',
         },
         shim: {
             moment: {
-                exports: 'moment'
-            }
-        }
+                exports: 'moment',
+            },
+        },
     });
 }).call(this, RequireJS.requirejs, RequireJS.define);

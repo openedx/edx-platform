@@ -1,10 +1,10 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'backbone', 'js/edxnotes/models/tab'
+        'backbone', 'js/edxnotes/models/tab',
     ], function(Backbone, TabModel) {
         var TabsCollection = Backbone.Collection.extend({
-            model: TabModel
+            model: TabModel,
         });
 
         return TabsCollection;

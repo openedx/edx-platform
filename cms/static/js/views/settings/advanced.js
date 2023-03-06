@@ -14,12 +14,12 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
         // Model class is CMS.Models.Settings.Advanced
         events: {
             'focus :input': 'focusInput',
-            'blur :input': 'blurInput'
+            'blur :input': 'blurInput',
         // TODO enable/disable save based on validation (currently enabled whenever there are changes)
         },
         initialize: function() {
             this.template = HtmlUtils.template(
-                $('#advanced_entry-tpl').text()
+                $('#advanced_entry-tpl').text(),
             );
             this.listenTo(this.model, 'invalid', this.handleValidationError);
             this.render();
@@ -122,7 +122,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                     jsonValidationErrors.push({
                         key: key,
                         message: 'Incorrectly formatted JSON',
-                        model: {display_name: displayName}
+                        model: {display_name: displayName},
                     });
                 }
             });
@@ -142,7 +142,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                     self.render();
                     self.showSavedBar(title, message);
                     analytics.track('Saved Advanced Settings', {
-                        course: course_location_analytics
+                        course: course_location_analytics,
                     });
                 },
                 silent: true,
@@ -154,7 +154,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                         jsonResponse = $.parseJSON(response.responseText);
                         self.showErrorModal(jsonResponse);
                     }
-                }
+                },
             });
         },
         showErrorModal: function(content) {
@@ -170,7 +170,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
             var self = this;
             this.model.fetch({
                 success: function() { self.render(); },
-                reset: true
+                reset: true,
             });
         },
         renderTemplate: function(key, model) {
@@ -188,7 +188,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
         },
         blurInput: function(event) {
             $(event.target).prev().removeClass('is-focused');
-        }
+        },
     });
 
     return AdvancedView;

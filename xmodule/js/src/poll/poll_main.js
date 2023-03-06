@@ -26,7 +26,7 @@
                     // eslint-disable-next-line max-len
                     _this.answersObj[index].numberEl.html(HtmlUtils.HTML('' + value + ' (' + percentValue.toFixed(1) + '%)').toString());
                     _this.answersObj[index].percentEl.css({
-                        width: '' + percentValue.toFixed(1) + '%'
+                        width: '' + percentValue.toFixed(1) + '%',
                     });
                 });
             },
@@ -67,7 +67,7 @@
                                 new window.Conditional(value, _this.runtime, _this.id.replace(/^poll_/, ''));
                             });
                         }
-                    }
+                    },
                 );
             }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
@@ -108,7 +108,7 @@
                                 new window.Conditional(value, _this.runtime, _this.id.replace(/^poll_/, ''));
                             });
                         }
-                    }
+                    },
                 );
             }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
@@ -125,8 +125,8 @@
                     HtmlUtils.append(this.questionEl, HtmlUtils.joinHtml(
                         HtmlUtils.HTML('<h3>Error!</h3>'),
                         HtmlUtils.HTML(
-                            '<p>XML data format changed. List of answers was modified, but poll data was not updated.</p>'
-                        )
+                            '<p>XML data format changed. List of answers was modified, but poll data was not updated.</p>',
+                        ),
                     ));
 
                     return;
@@ -231,7 +231,7 @@
                 if (this.questionAnswered === true) {
                     this.showAnswerGraph(this.jsonConfig.poll_answers, this.jsonConfig.total);
                 }
-            } // End-of: 'postInit': function () {
+            }, // End-of: 'postInit': function () {
         }; // End-of: PollMain.prototype = {
 
         return PollMain;
@@ -252,7 +252,7 @@
             // attached to the same DOM elements. We don't want this to happen.
             if (this.questionEl.attr('poll_main_processed') === 'true') {
                 console.log(
-                    'ERROR: PolMain JS constructor was called on a DOM element that has already been processed once.'
+                    'ERROR: PolMain JS constructor was called on a DOM element that has already been processed once.',
                 );
 
                 return;
@@ -307,14 +307,14 @@
                         _this.questionEl.children('.poll_question_div').html(JSON.stringify(_this.jsonConfig));
 
                         _this.postInit();
-                    }
+                    },
                 );
 
                 return;
             } catch (err) {
                 console.log(
                     'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
-                    'Error messsage: "' + err.message + '".'
+                    'Error messsage: "' + err.message + '".',
                 );
 
                 return;

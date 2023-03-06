@@ -24,7 +24,7 @@
                 '  <button class="discussion-show btn btn-brand" data-discussion-id="test-discussion-id">' +
                 '     <span class="button-text">Show Discussion</span>' +
                 '  </button>' +
-                '</div>'
+                '</div>',
             );
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.ajaxSpy = spyOn($, 'ajax');
@@ -40,12 +40,12 @@
                 groups: [
                     {
                         id: 1,
-                        name: 'Cohort1'
+                        name: 'Cohort1',
                     }, {
                         id: 2,
-                        name: 'Cohort2'
-                    }
-                ]
+                        name: 'Cohort2',
+                    },
+                ],
             });
             setNextAjaxResult(test, {
                 user_info: DiscussionSpecHelper.getTestUserInfo(),
@@ -53,18 +53,18 @@
                 course_settings: courseSettings.attributes,
                 discussion_data: DiscussionViewSpecHelper.makeThreadWithProps({
                     commentable_id: 'test-topic',
-                    title: TEST_THREAD_TITLE
+                    title: TEST_THREAD_TITLE,
                 }),
                 page: 1,
                 num_pages: 1,
                 content: {
                     endorsed_responses: [],
                     non_endorsed_responses: [],
-                    children: []
-                }
+                    children: [],
+                },
             });
             testView = new DiscussionInlineView({
-                el: $('.discussion-module')
+                el: $('.discussion-module'),
             });
             testView.render();
             return testView;
@@ -75,12 +75,12 @@
                 groups: [
                     {
                         id: 1,
-                        name: 'Cohort1'
+                        name: 'Cohort1',
                     }, {
                         id: 2,
-                        name: 'Cohort2'
-                    }
-                ]
+                        name: 'Cohort2',
+                    },
+                ],
             });
             setNextAjaxResult(test, {
                 user_info: DiscussionSpecHelper.getTestUserInfo(),
@@ -88,15 +88,15 @@
                 course_settings: courseSettings.attributes,
                 discussion_data: DiscussionViewSpecHelper.makeThreadWithProps({
                     commentable_id: 'test-topic',
-                    title: TEST_THREAD_TITLE
+                    title: TEST_THREAD_TITLE,
                 }),
                 page: 1,
                 num_pages: 1,
                 content: {
                     endorsed_responses: [],
                     non_endorsed_responses: [],
-                    children: []
-                }
+                    children: [],
+                },
             });
             testView.$('.discussion-show').click();
         };
@@ -190,7 +190,7 @@
                 testView.$('.js-post-title').text('Test title');
                 testView.$('.wmd-input').text('Test body');
                 setNextAjaxResult(this, {
-                    hello: 'world'
+                    hello: 'world',
                 });
                 testView.$('.forum-new-post-form .submit').click();
 

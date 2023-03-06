@@ -51,10 +51,10 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
                 org: 'DemoX',
                 number: 'DM101',
                 run: '2014',
-                display_name: 'Demo course'
+                display_name: 'Demo course',
             });
             AjaxHelpers.respondWithJson(requests, {
-                url: 'dummy_test_url'
+                url: 'dummy_test_url',
             });
             expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
             $('.new-course-org').autocomplete('destroy');
@@ -78,7 +78,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
             fillInFields('DemoX', 'DM101', '2014', 'Demo course');
             $('.new-course-save').click();
             AjaxHelpers.respondWithJson(requests, {
-                ErrMsg: 'error message'
+                ErrMsg: 'error message',
             });
             expect($('.create-course .wrap-error')).toHaveClass('is-shown');
             expect($('#course_creation_error')).toContainText('error message');
@@ -96,10 +96,10 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/library/', {
                 org: 'DemoX',
                 number: 'DM101',
-                display_name: 'Demo library'
+                display_name: 'Demo library',
             });
             AjaxHelpers.respondWithJson(requests, {
-                url: 'dummy_test_url'
+                url: 'dummy_test_url',
             });
             expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
         });
@@ -137,7 +137,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
             fillInLibraryFields('DemoX', 'DM101', 'Demo library');
             $('.new-library-save').click();
             AjaxHelpers.respondWithError(requests, 400, {
-                ErrMsg: 'error message'
+                ErrMsg: 'error message',
             });
             expect($('.create-library .wrap-error')).toHaveClass('is-shown');
             expect($('#library_creation_error')).toContainText('error message');

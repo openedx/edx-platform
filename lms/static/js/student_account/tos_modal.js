@@ -8,7 +8,7 @@
     var focusableElementsSelector = [
         'a[href], area[href], input:not([disabled]), select:not([disabled]),',
         'textarea:not([disabled]), button:not([disabled]), iframe, object, embed,',
-        '*[tabindex], *[contenteditable]'
+        '*[tabindex], *[contenteditable]',
     ].join(' ');
 
     var disableTabIndexingOn = function(containerSelector) {
@@ -49,23 +49,23 @@
             titleId = 'modal-header-text',
             $modal = $('<div>', {
                 class: modalClass,
-                'aria-hidden': 'true'
+                'aria-hidden': 'true',
             }),
             $content = $('<div>', {
                 class: contentClass,
                 role: 'dialog',
                 'aria-modal': 'true',
-                'aria-labelledby': titleId
+                'aria-labelledby': titleId,
             }),
             $header = $('<div>', {
-                class: 'header'
+                class: 'header',
             }),
             $closeButton = $('<button>', {
                 'aria-label': closeLabel,
-                class: closeButtonClass
+                class: closeButtonClass,
             }),
             $title = $('<h1>', {
-                id: titleId
+                id: titleId,
             });
         $closeButton.text(closeLabel);
         $title.text(modalTitle);
@@ -108,13 +108,13 @@
                         '/* edx-themes */',
                         '.page-heading, .footer-main {',
                         '    display: none;',
-                        '}'
+                        '}',
                     ].join('\n');
                 $style.text(styleContent);
                 $iframeHead.append($style);
                 // Set the iframe's height to fill the available space
                 $(this).css({
-                    height: $(contentSelector).height()
+                    height: $(contentSelector).height(),
                 });
                 // Hide the modal when ESC is pressed and the iframe is focused
                 $iframeBody.keydown(function(event) {
@@ -123,7 +123,7 @@
                         hideModal(modalSelector, tosLinkSelector);
                     }
                 });
-            }
+            },
         });
     };
 

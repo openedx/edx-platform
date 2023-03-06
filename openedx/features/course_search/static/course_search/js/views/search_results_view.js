@@ -9,7 +9,7 @@
         'edx-ui-toolkit/js/utils/string-utils',
         'course_search/js/views/search_item_view',
         'text!course_search/templates/search_loading.underscore',
-        'text!course_search/templates/search_error.underscore'
+        'text!course_search/templates/search_error.underscore',
     ], function($, _, Backbone, HtmlUtils, StringUtils, SearchItemView, searchLoadingTemplate, searchErrorTemplate) {
         return Backbone.View.extend({
 
@@ -33,7 +33,7 @@
                     totalCountMsg: this.totalCountMsg(),
                     pageSize: this.collection.pageSize,
                     hasMoreResults: this.collection.hasNextPage(),
-                    searchTerm: this.collection.searchTerm
+                    searchTerm: this.collection.searchTerm,
                 }));
                 this.renderItems();
                 this.$el.find(this.spinner).hide();
@@ -56,7 +56,7 @@
                 var items = latest.map(function(result) {
                     var item = new SearchItemView({
                         model: result,
-                        template: this.itemTemplate
+                        template: this.itemTemplate,
                     });
                     return item.render().el;
                 }, this);
@@ -68,11 +68,11 @@
                 var fmt = ngettext(
                     '{total_results} result found for "{search_term}"',
                     '{total_results} results found for "{search_term}"',
-                    this.collection.totalCount
+                    this.collection.totalCount,
                 );
                 return StringUtils.interpolate(fmt, {
                     total_results: this.collection.totalCount,
-                    search_term: this.collection.searchTerm
+                    search_term: this.collection.searchTerm,
                 });
             },
 
@@ -102,7 +102,7 @@
                 HtmlUtils.setHtml(
                     this.$el,
                     HtmlUtils.template(this.errorTemplate)({
-                        errorMessage: this.collection.errorMessage
+                        errorMessage: this.collection.errorMessage,
                     }));
                 this.showResults();
             },
@@ -114,7 +114,7 @@
                 this.$el.find(this.spinner).show();
                 this.trigger('next');
                 return false;
-            }
+            },
 
         });
     });

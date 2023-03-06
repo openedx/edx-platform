@@ -6,7 +6,7 @@ define([
     'js/certificates/models/certificate_exception',
     'js/certificates/views/certificate_allowlist',
     'js/certificates/views/certificate_allowlist_editor',
-    'js/certificates/collections/certificate_allowlist'
+    'js/certificates/collections/certificate_allowlist',
 ],
 function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistView, CertificateAllowlistEditorView,
     CertificateAllowlistCollection) {
@@ -28,13 +28,13 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
 
         var EXPECTED_ERRORS = {
             user_name_or_email_required: 'Student username/email field is required and can not be empty. ' +
-                'Kindly fill in username/email and then press "Add to Exception List" button.'
+                'Kindly fill in username/email and then press "Add to Exception List" button.',
         };
 
         beforeEach(function() {
             certificateException = new CertificateExceptionModel({user_name: 'test_user'}, {url: 'test/url/'});
             certificateException.set({
-                notes: 'Test notes'
+                notes: 'Test notes',
             });
         });
 
@@ -63,7 +63,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 user_email: 'test1@test.com',
                 course_id: 'edX/test/course',
                 created: 'Thursday, October 29, 2015',
-                notes: 'test notes for test certificate exception'
+                notes: 'test notes for test certificate exception',
             },
             {
                 id: 2,
@@ -72,8 +72,8 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 user_email: 'test2@test.com',
                 course_id: 'edX/test/course',
                 created: 'Thursday, October 29, 2015',
-                notes: 'test notes for test certificate exception'
-            }
+                notes: 'test notes for test certificate exception',
+            },
         ];
 
         beforeEach(function() {
@@ -81,7 +81,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 parse: true,
                 canBeEmpty: true,
                 url: certificateExceptionUrl,
-                generate_certificates_url: certificateExceptionUrl
+                generate_certificates_url: certificateExceptionUrl,
             });
         });
 
@@ -105,8 +105,8 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                     course_id: 'edX/test/course',
                     created: 'Thursday, October 29, 2015',
                     notes: 'test notes for test certificate exception',
-                    certificate_generated: ''
-                }
+                    certificate_generated: '',
+                },
             );
 
             expect(certificateAllowlist.getModel({user_email: 'test2@test.com'}).attributes).toEqual(
@@ -118,8 +118,8 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                     course_id: 'edX/test/course',
                     created: 'Thursday, October 29, 2015',
                     notes: 'test notes for test certificate exception',
-                    certificate_generated: ''
-                }
+                    certificate_generated: '',
+                },
             );
         });
 
@@ -130,7 +130,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 addStudents = 'all';
             var expected = {
                 url: certificateExceptionUrl + addStudents,
-                postData: []
+                postData: [],
             };
 
             certificateAllowlist.sync({success: successCallback, error: errorCallback}, addStudents);
@@ -156,8 +156,8 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                         created: '',
                         notes: 'test3 notes',
                         certificate_generated: '',
-                        new: true}
-                ]
+                        new: true},
+                ],
             };
             AjaxHelpers.expectJsonRequest(requests, 'POST', expected.url, expected.postData);
         });
@@ -175,7 +175,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 user_email: 'test1@test.com',
                 course_id: 'edX/test/course',
                 created: 'Thursday, October 29, 2015',
-                notes: 'test notes for test certificate exception'
+                notes: 'test notes for test certificate exception',
             },
             {
                 id: 2,
@@ -184,8 +184,8 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 user_email: 'test2@test.com',
                 course_id: 'edX/test/course',
                 created: 'Thursday, October 29, 2015',
-                notes: 'test notes for test certificate exception'
-            }
+                notes: 'test notes for test certificate exception',
+            },
         ];
 
         beforeEach(function() {
@@ -199,13 +199,13 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 parse: true,
                 canBeEmpty: true,
                 url: certificateExceptionUrl,
-                generate_certificates_url: certificateExceptionUrl
+                generate_certificates_url: certificateExceptionUrl,
 
             });
 
             view = new CertificateAllowlistView({
                 collection: this.certificate_allowlist,
-                active_certificate: true
+                active_certificate: true,
             });
             view.render();
         });
@@ -222,7 +222,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
             // Render the view with active_certificate set to false.
             view = new CertificateAllowlistView({
                 collection: this.certificate_allowlist,
-                active_certificate: false
+                active_certificate: false,
             });
             view.render();
 
@@ -242,7 +242,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
 
             // Update a model in collection and verify it is rendered
             view.collection.update([
-                {user_name: user, notes: notes, user_email: email}
+                {user_name: user, notes: notes, user_email: email},
             ]);
 
             expect(view.$el.find('table tbody tr td:contains("' + user + '")').parent().html())
@@ -302,7 +302,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 course_id: 'edX/test/course',
                 created: 'Thursday, October 29, 2015',
                 notes: 'test notes for test certificate exception',
-                new: true
+                new: true,
             },
             {
                 url: certificateExceptionUrl,
@@ -312,8 +312,8 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 user_email: 'test2@test.com',
                 course_id: 'edX/test/course',
                 created: 'Thursday, October 29, 2015',
-                notes: 'test notes for test certificate exception'
-            }
+                notes: 'test notes for test certificate exception',
+            },
         ];
 
         beforeEach(function() {
@@ -321,36 +321,36 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
             setFixtures();
 
             fixture = readFixtures(
-                'templates/instructor/instructor_dashboard_2/certificate-allowlist-editor.underscore'
+                'templates/instructor/instructor_dashboard_2/certificate-allowlist-editor.underscore',
             );
 
             fixture2 = readFixtures(
-                'templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore'
+                'templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore',
             );
 
             setFixtures(
                 "<script type='text/template' id='certificate-allowlist-editor-tpl'>" + fixture + '</script>' +
                     "<script type='text/template' id='certificate-allowlist-tpl'>" + fixture2 + '</script>' +
                     "<div id='certificate-allowlist-editor'></div>" +
-                    "<div class='allowlisted-students' id='allowlisted-students'></div>"
+                    "<div class='allowlisted-students' id='allowlisted-students'></div>",
             );
 
             certificateAllowlist = new CertificateAllowlistCollection(certificatesExceptionsJson, {
                 parse: true,
                 canBeEmpty: true,
                 url: certificateExceptionUrl,
-                generate_certificates_url: certificateExceptionUrl
+                generate_certificates_url: certificateExceptionUrl,
             });
 
             view = new CertificateAllowlistEditorView({
                 collection: certificateAllowlist,
-                url: certificateExceptionUrl
+                url: certificateExceptionUrl,
             });
             view.render();
 
             listView = new CertificateAllowlistView({
                 collection: certificateAllowlist,
-                certificateAllowlistEditorView: view
+                certificateAllowlistEditorView: view,
             });
             listView.render();
         });
@@ -372,7 +372,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
             var errorMessages = {
                 empty_user_name_email: 'Student username/email field is required and can not be empty. ' +
                     'Kindly fill in username/email and then press "Add to Exception List" button.',
-                duplicate_user: '<p>' + (duplicateUser) + ' already in exception list.</p>'
+                duplicate_user: '<p>' + (duplicateUser) + ' already in exception list.</p>',
             };
 
             // click 'Add Exception' button with empty username/email field
@@ -396,8 +396,8 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                     user_email: 'test2@test.com',
                     course_id: 'edX/test/course',
                     created: 'Thursday, October 29, 2015',
-                    notes: 'test user notes'
-                }
+                    notes: 'test user notes',
+                },
             );
 
             // Verify success message
@@ -426,5 +426,5 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
             expect($(certificateExceptionSelector).length).toBe(0);
         });
     });
-}
+},
 );

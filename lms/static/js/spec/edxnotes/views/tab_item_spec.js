@@ -1,6 +1,6 @@
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs_list'
+    'js/edxnotes/views/tabs_list',
 ], function($, TemplateHelpers, TabsCollection, TabsListView) {
     'use strict';
     describe('EdxNotes TabItemView', function() {
@@ -11,11 +11,11 @@ define([
                 {
                     identifier: 'second-item',
                     is_closable: true,
-                    icon: 'icon-class'
-                }
+                    icon: 'icon-class',
+                },
             ]);
             this.tabsList = new TabsListView({
-                collection: this.collection
+                collection: this.collection,
             }).render();
         });
 

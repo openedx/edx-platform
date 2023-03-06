@@ -14,23 +14,23 @@ function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
             'face_photo_step',
             'id_photo_step',
             'review_photos_step',
-            'reverify_success_step'
+            'reverify_success_step',
         ];
 
         var STEP_INFO = {
             'face-photo-step': {
-                platformName: 'edX'
+                platformName: 'edX',
             },
             'id-photo-step': {
-                platformName: 'edX'
+                platformName: 'edX',
             },
             'review-photos-step': {
                 fullName: 'John Doe',
-                platformName: 'edX'
+                platformName: 'edX',
             },
             'reverify-success-step': {
-                platformName: 'edX'
-            }
+                platformName: 'edX',
+            },
         };
 
         var createView = function() {
@@ -70,5 +70,5 @@ function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
             expectStepRendered('reverify-success-step');
         });
     });
-}
+},
 );

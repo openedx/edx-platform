@@ -6,7 +6,7 @@ define(['jquery', 'js/student_account/utils'],
                 edxUserInfoCookieName = 'edx-user-info', 
                 userInfo = {
                     version: 1,
-                    username: 'local-test-user'
+                    username: 'local-test-user',
                 };
 
             beforeEach(function() {
@@ -33,5 +33,5 @@ define(['jquery', 'js/student_account/utils'],
                 expect(user).toEqual({});
             });
         });
-    }
+    },
 );

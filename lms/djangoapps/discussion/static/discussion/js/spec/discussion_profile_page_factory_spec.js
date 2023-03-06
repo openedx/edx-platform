@@ -6,7 +6,7 @@ define(
         'jquery',
         'backbone',
         'common/js/spec_helpers/discussion_spec_helper',
-        'discussion/js/discussion_profile_page_factory'
+        'discussion/js/discussion_profile_page_factory',
     ],
     function(_, $, Backbone, DiscussionSpecHelper, DiscussionProfilePageFactory) {
         'use strict';
@@ -25,9 +25,9 @@ define(
                             sortPreference: null,
                             threads: [],
                             page: 1,
-                            numPages: 5
+                            numPages: 5,
                         },
-                        options
+                        options,
                     ));
                 };
 
@@ -46,5 +46,5 @@ define(
                 expect($('.discussion-user-threads').text()).toContain('Show');
             });
         });
-    }
+    },
 );

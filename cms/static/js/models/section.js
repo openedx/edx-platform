@@ -2,7 +2,7 @@ define(['backbone', 'gettext', 'common/js/components/views/feedback_notification
     function(Backbone, gettext, NotificationView, ModuleUtils) {
         var Section = Backbone.Model.extend({
             defaults: {
-                name: ''
+                name: '',
             },
             validate: function(attrs, options) {
                 if (!attrs.name) {
@@ -13,8 +13,8 @@ define(['backbone', 'gettext', 'common/js/components/views/feedback_notification
             toJSON: function() {
                 return {
                     metadata: {
-                        display_name: this.get('name')
-                    }
+                        display_name: this.get('name'),
+                    },
                 };
             },
             initialize: function() {
@@ -24,7 +24,7 @@ define(['backbone', 'gettext', 'common/js/components/views/feedback_notification
             showNotification: function() {
                 if (!this.msg) {
                     this.msg = new NotificationView.Mini({
-                        title: gettext('Saving')
+                        title: gettext('Saving'),
                     });
                 }
                 this.msg.show();
@@ -32,7 +32,7 @@ define(['backbone', 'gettext', 'common/js/components/views/feedback_notification
             hideNotification: function() {
                 if (!this.msg) { return; }
                 this.msg.hide();
-            }
+            },
         });
         return Section;
     });

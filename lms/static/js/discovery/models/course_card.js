@@ -11,13 +11,13 @@
                 content: {
                     overview: '',
                     display_name: '',
-                    number: ''
+                    number: '',
                 },
                 start: '',
                 image_url: '',
                 org: '',
-                id: ''
-            }
+                id: '',
+            },
         });
     });
 }(define || RequireJS.define));

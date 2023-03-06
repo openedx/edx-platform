@@ -1,7 +1,7 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'jquery', 'underscore', 'js/edxnotes/views/notes_factory'
+        'jquery', 'underscore', 'js/edxnotes/views/notes_factory',
     ], function($, _, NotesFactory) {
         var parameters = {},
             visibility = null,
@@ -69,7 +69,7 @@
 
             _setVisibility: function(state) {
                 visibility = state;
-            }
+            },
         };
     });
 }).call(this, define || RequireJS.define);

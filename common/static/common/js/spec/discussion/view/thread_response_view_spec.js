@@ -6,15 +6,15 @@
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.thread = new Thread({
-                thread_type: 'discussion'
+                thread_type: 'discussion',
             });
             this.response = new Comment({
                 children: [{}, {}],
-                thread: this.thread
+                thread: this.thread,
             });
             this.view = new ThreadResponseView({
                 model: this.response,
-                el: $('#fixture-element')
+                el: $('#fixture-element'),
             });
             spyOn(ThreadResponseShowView.prototype, 'render');
             return spyOn(ResponseCommentView.prototype, 'render');
@@ -25,7 +25,7 @@
                 var comment, commentData, thread, view;
                 thread = new Thread({
                     thread_type: 'discussion',
-                    closed: closed
+                    closed: closed,
                 });
                 commentData = {
                     id: 'dummy',
@@ -36,12 +36,12 @@
                     abuse_flaggers: [],
                     type: 'comment',
                     children: [],
-                    thread: thread
+                    thread: thread,
                 };
                 comment = new Comment(commentData);
                 view = new ThreadResponseView({
                     model: comment,
-                    el: $('#fixture-element')
+                    el: $('#fixture-element'),
                 });
                 view.render();
                 return expect(view.$('.comment-form').closest('li').is(':visible')).toBe(!closed);
@@ -69,12 +69,12 @@
             it('hides "show comments" link if collapseComments is set but response has no comments', function() {
                 this.response = new Comment({
                     children: [],
-                    thread: this.thread
+                    thread: this.thread,
                 });
                 this.view = new ThreadResponseView({
                     model: this.response,
                     el: $('#fixture-element'),
-                    collapseComments: true
+                    collapseComments: true,
                 });
                 this.view.render();
                 expect(this.view.$('.comments')).toBeVisible();
@@ -86,7 +86,7 @@
                     this.view = new ThreadResponseView({
                         model: this.response,
                         el: $('#fixture-element'),
-                        collapseComments: true
+                        collapseComments: true,
                     });
                     this.view.render();
                     expect(this.view.$('.comments')).not.toBeVisible();
@@ -94,25 +94,25 @@
                     this.view.$('.action-show-comments').click();
                     expect(this.view.$('.comments')).toBeVisible();
                     return expect(this.view.$('.action-show-comments')).not.toBeVisible();
-                }
+                },
             );
             it('calls renderTemplate with a temporary id if the model lacks one', function() {
                 this.view = new ThreadResponseView({
                     model: this.response,
                     el: $('#fixture-element'),
-                    collapseComments: true
+                    collapseComments: true,
                 });
                 spyOn(_, 'extend').and.callThrough();
                 spyOn(window, 'Date').and.callFake(function() {
                     return {
                         getTime: function() {
                             return 1;
-                        }
+                        },
                     };
                 });
                 this.view.render();
                 expect(_.extend).toHaveBeenCalledWith(jasmine.any(Object), jasmine.objectContaining({
-                    wmdId: 1
+                    wmdId: 1,
                 }));
             });
             it('populates commentViews and binds events', function() {

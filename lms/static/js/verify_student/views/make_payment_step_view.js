@@ -40,7 +40,7 @@ var edx = edx || {};
                 courseModeSlug: 'audit',
                 verificationGoodUntil: '',
                 isABTesting: false,
-                userEmail: ''
+                userEmail: '',
             };
         },
 
@@ -74,7 +74,7 @@ var edx = edx || {};
         _getPaymentButtonHtml: function(processorName) {
             var self = this;
             return _.template(
-                '<button class="next <%- btnClass %> payment-button" id="<%- name %>" ><%- text %></button> '
+                '<button class="next <%- btnClass %> payment-button" id="<%- name %>" ><%- text %></button> ',
             )({name: processorName, text: self._getPaymentButtonText(processorName), btnClass: this.btnClass});
         },
 
@@ -82,7 +82,7 @@ var edx = edx || {};
             var templateContext = this.templateContext(),
                 hasVisibleReqs = _.some(
                     templateContext.requirements,
-                    function(isVisible) { return isVisible; }
+                    function(isVisible) { return isVisible; },
                 ),
                 // This a hack to appease /lms/static/js/spec/verify_student/pay_and_verify_view_spec.js,
                 // which does not load an actual template context.
@@ -115,7 +115,7 @@ var edx = edx || {};
 
             // render the name of the product being paid for
             $('div.payment-buttons span.product-name').append( // xss-lint: disable=javascript-jquery-append
-                self._getProductText(templateContext.courseModeSlug, templateContext.upgrade)
+                self._getProductText(templateContext.courseModeSlug, templateContext.upgrade),
             );
 
             if (processors.length === 0) {
@@ -123,7 +123,7 @@ var edx = edx || {};
                 this.errorModel.set({
                     errorTitle: gettext('All payment options are currently unavailable.'),
                     errorMsg: gettext('Try the transaction again in a few minutes.'),
-                    shown: true
+                    shown: true,
                 });
             } else {
                 // create a button for each payment processor
@@ -157,7 +157,7 @@ var edx = edx || {};
                     processor: event.target.id,
                     contribution: paymentAmount,
                     course_id: this.stepData.courseKey,
-                    sku: this.templateContext().sku
+                    sku: this.templateContext().sku,
                 };
 
             // Disable the payment button to prevent multiple submissions
@@ -170,12 +170,12 @@ var edx = edx || {};
                 url: '/verify_student/create_order/',
                 type: 'POST',
                 headers: {
-                    'X-CSRFToken': $.cookie('csrftoken')
+                    'X-CSRFToken': $.cookie('csrftoken'),
                 },
                 data: postData,
                 context: this,
                 success: this.handleCreateOrderResponse,
-                error: this.handleCreateOrderError
+                error: this.handleCreateOrderError,
             });
         },
 
@@ -197,7 +197,7 @@ var edx = edx || {};
                 $('<input>').attr({
                     type: 'hidden',
                     name: key,
-                    value: value
+                    value: value,
                 }).appendTo($form); // xss-lint: disable=javascript-jquery-insert-into-target
             });
 
@@ -219,7 +219,7 @@ var edx = edx || {};
             this.errorModel.set({
                 errorTitle: gettext('Could not submit order'),
                 errorMsg: errorMsg,
-                shown: true
+                shown: true,
             });
 
             // Re-enable the button so the user can re-try
@@ -257,7 +257,7 @@ var edx = edx || {};
                 this.stepData.suggestedPrices,
                 function(price) {
                     return parseFloat(price) === amountFloat;
-                }
+                },
             );
 
             // If we've found an option for the price, select it.
@@ -279,7 +279,7 @@ var edx = edx || {};
         // Stubbed out in tests
         submitForm: function(form) {
             form.submit();
-        }
+        },
 
     });
 }(jQuery, _, gettext, interpolate_text));

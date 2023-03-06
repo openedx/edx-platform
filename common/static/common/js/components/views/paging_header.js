@@ -6,7 +6,7 @@
         'gettext',
         'edx-ui-toolkit/js/utils/html-utils',
         'edx-ui-toolkit/js/utils/string-utils',
-        'text!common/templates/components/paging-header.underscore'
+        'text!common/templates/components/paging-header.underscore',
     ], function(Backbone, _, gettext, HtmlUtils, StringUtils, headerTemplate) {
         var PagingHeader = Backbone.View.extend({
             initialize: function(options) {
@@ -18,7 +18,7 @@
             },
 
             events: {
-                'change #paging-header-select': 'sortCollection'
+                'change #paging-header-select': 'sortCollection',
             },
 
             render: function() {
@@ -29,18 +29,18 @@
                     context = {
                         firstIndex: Math.min(start + 1, end),
                         lastIndex: end,
-                        numItems: numItems
+                        numItems: numItems,
                     };
 
                 if (end <= 1) {
                     message = StringUtils.interpolate(
                         gettext('Showing {firstIndex} out of {numItems} total'),
-                        context
+                        context,
                     );
                 } else {
                     message = StringUtils.interpolate(
                         gettext('Showing {firstIndex}-{lastIndex} out of {numItems} total'),
-                        context
+                        context,
                     );
                 }
 
@@ -51,8 +51,8 @@
                         srInfo: this.srInfo,
                         sortableFields: this.collection.sortableFields,
                         sortOrder: this.sortOrder,
-                        showSortControls: this.showSortControls
-                    })
+                        showSortControls: this.showSortControls,
+                    }),
                 );
                 return this;
             },
@@ -67,7 +67,7 @@
                 this.sortOrder = selected.attr('value');
                 this.collection.setSortField(this.sortOrder);
                 return this.collection.refresh();
-            }
+            },
         });
         return PagingHeader;
     });

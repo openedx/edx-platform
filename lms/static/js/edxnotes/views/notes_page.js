@@ -3,10 +3,10 @@
     define([
         'backbone', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs_list',
         'js/edxnotes/views/tabs/recent_activity', 'js/edxnotes/views/tabs/course_structure',
-        'js/edxnotes/views/tabs/search_results', 'js/edxnotes/views/tabs/tags'
+        'js/edxnotes/views/tabs/search_results', 'js/edxnotes/views/tabs/tags',
     ], function(
         Backbone, TabsCollection, TabsListView, RecentActivityView, CourseStructureView,
-        SearchResultsView, TagsView
+        SearchResultsView, TagsView,
     ) {
         var NotesPageView = Backbone.View.extend({
             initialize: function(options) {
@@ -20,7 +20,7 @@
                     this.tagsView = new TagsView({
                         el: this.el,
                         collection: this.collection,
-                        tabsCollection: this.tabsCollection
+                        tabsCollection: this.tabsCollection,
                     });
 
                     scrollToTag = this.tagsView.scrollToTag;
@@ -33,7 +33,7 @@
                     el: this.el,
                     collection: this.collection,
                     tabsCollection: this.tabsCollection,
-                    scrollToTag: scrollToTag
+                    scrollToTag: scrollToTag,
                 });
 
                 if (!_.contains(this.options.disabledTabs, 'course_structure')) {
@@ -41,7 +41,7 @@
                         el: this.el,
                         collection: this.collection,
                         tabsCollection: this.tabsCollection,
-                        scrollToTag: scrollToTag
+                        scrollToTag: scrollToTag,
                     });
                 }
 
@@ -56,14 +56,14 @@
                     debug: this.options.debug,
                     perPage: this.options.perPage,
                     createTabOnInitialization: false,
-                    scrollToTag: scrollToTag
+                    scrollToTag: scrollToTag,
                 });
 
                 this.tabsView = new TabsListView({collection: this.tabsCollection});
                 this.$('.tab-list')
                     .append(this.tabsView.render().$el)
                     .removeClass('is-hidden');
-            }
+            },
         });
 
         return NotesPageView;

@@ -8,13 +8,13 @@
         'support/js/collections/certificate',
         'text!support/templates/certificates.underscore',
         'text!support/templates/certificates_results.underscore',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function(Backbone, _, gettext, CertCollection, certificatesTpl, resultsTpl, HtmlUtils) {
         return Backbone.View.extend({
             events: {
                 'submit .certificates-form': 'search',
                 'click .btn-cert-regenerate': 'regenerateCertificate',
-                'click .btn-cert-generate': 'generateCertificate'
+                'click .btn-cert-generate': 'generateCertificate',
             },
 
             initialize: function(options) {
@@ -42,7 +42,7 @@
 
             renderResults: function() {
                 var context = {
-                    certificates: this.certificates
+                    certificates: this.certificates,
                 };
 
                 this.setResults(HtmlUtils.template(resultsTpl)(context));
@@ -76,7 +76,7 @@
                 this.certificates.setCourseFilter(this.getCourseFilter());
                 this.certificates.fetch({
                     success: this.updateCertificates,
-                    error: this.handleSearchError
+                    error: this.handleSearchError,
                 });
             },
 
@@ -93,16 +93,16 @@
                     type: 'POST',
                     data: {
                         username: $button.data('username'),
-                        course_key: $button.data('course-key')
+                        course_key: $button.data('course-key'),
                     },
                     context: this,
                     success: function() {
                         this.certificates.fetch({
                             success: this.updateCertificates,
-                            error: this.handleSearchError
+                            error: this.handleSearchError,
                         });
                     },
-                    error: this.handleGenerationsError
+                    error: this.handleGenerationsError,
                 });
             },
 
@@ -118,16 +118,16 @@
                     type: 'POST',
                     data: {
                         username: $button.data('username'),
-                        course_key: $button.data('course-key')
+                        course_key: $button.data('course-key'),
                     },
                     context: this,
                     success: function() {
                         this.certificates.fetch({
                             success: this.updateCertificates,
-                            error: this.handleSearchError
+                            error: this.handleSearchError,
                         });
                     },
-                    error: this.handleGenerationsError
+                    error: this.handleGenerationsError,
                 });
             },
 
@@ -173,7 +173,7 @@
             setResults: function(html) {
                 HtmlUtils.setHtml(
                     $('.certificates-results', this.$el),
-                    html
+                    html,
                 );
             },
 
@@ -187,7 +187,7 @@
                 $('.btn-disable-on-submit')
                     .removeClass('is-disabled')
                     .attr('disabled', false);
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

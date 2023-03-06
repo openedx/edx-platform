@@ -10,7 +10,7 @@ define(
         'learner_profile/js/views/learner_profile_view',
         'learner_profile/js/views/learner_profile_fields',
         'learner_profile/js/learner_profile_factory',
-        'js/views/message_banner'
+        'js/views/message_banner',
     ],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
         UserAccountModel, UserPreferencesModel, LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {
@@ -45,7 +45,7 @@ define(
                     platform_name: 'edX',
                     find_courses_url: '/courses/',
                     account_settings_data: Helpers.createAccountSettingsData(options),
-                    preferences_data: Helpers.createUserPreferencesData()
+                    preferences_data: Helpers.createUserPreferencesData(),
                 });
             };
 
@@ -214,7 +214,7 @@ define(
             it('renders the limited profile for under 13 users', function() {
                 var context = createProfilePage(
                     true,
-                    {year_of_birth: new Date().getFullYear() - 10, requires_parental_consent: true}
+                    {year_of_birth: new Date().getFullYear() - 10, requires_parental_consent: true},
                 );
                 var learnerProfileView = context.learnerProfileView;
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);

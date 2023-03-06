@@ -33,15 +33,15 @@ var edx = edx || {};
                     if ($link.hasClass('external')) {
                         window.analytics.track('edx.bi.footer.link', {
                             category: 'outbound_link',
-                            label: $link.attr('href')
+                            label: $link.attr('href'),
                         });
                     }
-                }
-            }
+                },
+            },
         };
 
         return {
-            analytics: _fn.analytics.init
+            analytics: _fn.analytics.init,
         };
     }());
 

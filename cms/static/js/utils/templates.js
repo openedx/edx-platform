@@ -14,6 +14,6 @@ define(['jquery', 'underscore'], function($, _) {
     };
 
     return {
-        loadTemplate: loadTemplate
+        loadTemplate: loadTemplate,
     };
 });

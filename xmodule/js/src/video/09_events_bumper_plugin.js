@@ -43,7 +43,7 @@
                     'language_menu:hide': this.onHideLanguageMenu,
                     'captions:show': this.onShowCaptions,
                     'captions:hide': this.onHideCaptions,
-                    destroy: this.destroy
+                    destroy: this.destroy,
                 };
                 this.bindHandlers();
             },
@@ -101,10 +101,10 @@
                     host_component_id: this.state.id,
                     bumper_id: this.state.config.sources[0] || '',
                     duration: this.getDuration(),
-                    code: 'html5'
+                    code: 'html5',
                 }, data, this.options.data);
                 Logger.log(eventName, logInfo);
-            }
+            },
         };
 
         return EventsBumperPlugin;

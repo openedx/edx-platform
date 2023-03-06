@@ -12,7 +12,7 @@ define(['backbone'], function(Backbone) {
             default_value: null,
             options: null,
             type: null,
-            custom: false  // Used only for non-metadata fields
+            custom: false,  // Used only for non-metadata fields
         },
 
         initialize: function() {
@@ -68,7 +68,7 @@ define(['backbone'], function(Backbone) {
         setValue: function(value) {
             this.set({
                 explicitly_set: true,
-                value: value
+                value: value,
             });
         },
 
@@ -103,9 +103,9 @@ define(['backbone'], function(Backbone) {
         clear: function() {
             this.set({
                 explicitly_set: false,
-                value: this.get('default_value')
+                value: this.get('default_value'),
             });
-        }
+        },
     });
 
     Metadata.SELECT_TYPE = 'Select';

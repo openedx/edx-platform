@@ -9,10 +9,10 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
             model = new XBlockInfo({
                 id: 'testCourse/branch/draft/block/verticalFFF',
                 display_name: 'Test Unit',
-                category: 'vertical'
+                category: 'vertical',
             });
             xblockView = new XBlockView({
-                model: model
+                model: model,
             });
         });
 
@@ -23,7 +23,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
             xblockView.render();
             AjaxHelpers.respondWithJson(requests, {
                 html: mockXBlockHtml,
-                resources: []
+                resources: [],
             });
 
             expect(xblockView.$el.select('.xblock-header')).toBeTruthy();
@@ -39,13 +39,13 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
                     type: 'GET',
                     success: function(fragment) {
                         promise = xblockView.renderXBlockFragment(fragment, this.$el);
-                    }
+                    },
                 });
                 // Note: this mock response will call the AJAX success function synchronously
                 // so the promise variable defined above will be available.
                 AjaxHelpers.respondWithJson(requests, {
                     html: mockXBlockHtml,
-                    resources: resources
+                    resources: resources,
                 });
                 expect(xblockView.$el.select('.xblock-header')).toBeTruthy();
                 return promise;
@@ -63,7 +63,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
                     headHtml;
                 postXBlockRequest(requests, [
                     ['xblock_spec_hash1', {mimetype: 'text/css', kind: 'text', data: mockCssText}],
-                    ['xblock_spec_hash2', {mimetype: 'text/css', kind: 'url', data: mockCssUrl}]
+                    ['xblock_spec_hash2', {mimetype: 'text/css', kind: 'url', data: mockCssUrl}],
                 ]);
                 headHtml = $('head').html();
                 expect(headHtml).toContain(mockCssText);
@@ -74,8 +74,8 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
                 var requests = AjaxHelpers.requests(this);
                 postXBlockRequest(requests, [
                     ['xblock_spec_hash3', {
-                        mimetype: 'application/javascript', kind: 'text', data: 'window.test = 100;'
-                    }]
+                        mimetype: 'application/javascript', kind: 'text', data: 'window.test = 100;',
+                    }],
                 ]);
                 expect(window.test).toBe(100);
             });
@@ -84,7 +84,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
                 var requests = AjaxHelpers.requests(this),
                     mockHeadTag = '<title>Test Title</title>';
                 postXBlockRequest(requests, [
-                    ['xblock_spec_hash4', {mimetype: 'text/html', placement: 'head', data: mockHeadTag}]
+                    ['xblock_spec_hash4', {mimetype: 'text/html', placement: 'head', data: mockHeadTag}],
                 ]);
                 expect($('head').html()).toContain(mockHeadTag);
             });
@@ -96,8 +96,8 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
                 spyOn(ViewUtils, 'loadJavaScript').and.returnValue($.Deferred().reject().promise());
                 promise = postXBlockRequest(requests, [
                     ['xblock_spec_hash5', {
-                        mimetype: 'application/javascript', kind: 'url', data: missingJavaScriptUrl
-                    }]
+                        mimetype: 'application/javascript', kind: 'url', data: missingJavaScriptUrl,
+                    }],
                 ]);
                 expect(promise.state()).toBe('rejected');
             });

@@ -8,12 +8,12 @@
                         container: window,
                         element: null,
                         containerRatio: null,
-                        elementRatio: null
+                        elementRatio: null,
                     },
                     callbacksList = [],
                     delta = {
                         height: 0,
-                        width: 0
+                        width: 0,
                     },
                     module = {},
                     mode = null,
@@ -28,7 +28,7 @@
 
                     if (!config.element) {
                         console.log(
-                            'Required parameter `element` is not passed.'
+                            'Required parameter `element` is not passed.',
                         );
                     }
 
@@ -57,7 +57,7 @@
                         containerHeight: containerHeight,
                         containerRatio: containerRatio,
                         element: $element,
-                        elementRatio: elementRatio
+                        elementRatio: elementRatio,
                     };
                 };
 
@@ -95,7 +95,7 @@
                         height: height,
                         width: data.containerWidth,
                         top: 0.5 * (data.containerHeight - height),
-                        left: 0
+                        left: 0,
                     });
 
                     return module;
@@ -109,7 +109,7 @@
                         height: data.containerHeight,
                         width: data.containerHeight * data.elementRatio,
                         top: 0,
-                        left: 0.5 * (data.containerWidth - width)
+                        left: 0.5 * (data.containerWidth - width),
                     });
 
                     return module;
@@ -200,7 +200,7 @@
                 var destroy = function() {
                     var data = getData();
                     data.element.css({
-                        height: '', width: '', top: '', left: ''
+                        height: '', width: '', top: '', left: '',
                     });
                     removeCallbacks();
                     resetDelta();
@@ -221,13 +221,13 @@
                         add: addCallback,
                         once: addOnceCallback,
                         remove: removeCallback,
-                        removeAll: removeCallbacks
+                        removeAll: removeCallbacks,
                     },
                     delta: {
                         add: addDelta,
                         substract: substractDelta,
-                        reset: resetDelta
-                    }
+                        reset: resetDelta,
+                    },
                 });
             };
 

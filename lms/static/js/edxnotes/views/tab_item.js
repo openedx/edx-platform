@@ -11,7 +11,7 @@
             events: {
                 click: 'selectHandler',
                 'click a': function(event) { event.preventDefault(); },
-                'click .action-close': 'closeHandler'
+                'click .action-close': 'closeHandler',
             },
 
             initialize: function(options) {
@@ -23,13 +23,13 @@
                         if (value) {
                             this.$('.tab-label').prepend($('<span />', {
                                 class: 'tab-aria-label sr',
-                                text: gettext('Current tab')
+                                text: gettext('Current tab'),
                             }));
                         } else {
                             this.$('.tab-aria-label').remove();
                         }
                     },
-                    destroy: this.remove
+                    destroy: this.remove,
                 });
             },
 
@@ -50,7 +50,7 @@
                 event.preventDefault();
                 event.stopPropagation();
                 this.model.destroy();
-            }
+            },
         });
 
         return TabItemView;

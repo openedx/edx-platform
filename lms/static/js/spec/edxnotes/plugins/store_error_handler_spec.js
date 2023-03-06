@@ -3,7 +3,7 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/spec/edxnotes/helpers',
     'js/edxnotes/views/notes_factory',
-    'js/edxnotes/utils/notes_collector'
+    'js/edxnotes/utils/notes_collector',
 ], function($, _, Annotator, AjaxHelpers, Helpers, NotesFactory, NotesCollector) {
     'use strict';
     describe('Store Error Handler Custom Message', function() {
@@ -29,7 +29,7 @@ define([
                     usageId: 'an usage',
                     courseId: 'a course',
                     token: token,
-                    tokenUrl: '/test_token_url'
+                    tokenUrl: '/test_token_url',
                 });
             });
 

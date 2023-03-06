@@ -12,17 +12,17 @@ define(
                         created: '2014-11-25T23:13:05',
                         edx_video_id: 'dummy_id',
                         status: 'uploading',
-                        transcripts: []
+                        transcripts: [],
                     };
                     var collection = new Backbone.Collection(
                         _.map(
                             _.range(numModels),
                             function(num, index) {
                                 return new Backbone.Model(
-                                    _.extend({}, modelData, {edx_video_id: 'dummy_id_' + index})
+                                    _.extend({}, modelData, {edx_video_id: 'dummy_id_' + index}),
                                 );
-                            }
-                        )
+                            },
+                        ),
                     );
                     var view = new PreviousVideoUploadListView({
                         collection: collection,
@@ -30,7 +30,7 @@ define(
                         transcriptAvailableLanguages: [],
                         videoSupportedFileFormats: [],
                         videoTranscriptSettings: {},
-                        videoImageSettings: {}
+                        videoImageSettings: {},
                     });
                     return view.render().$el;
                 },
@@ -105,5 +105,5 @@ define(
                 verifyVideosInfo(this, false);
             });
         });
-    }
+    },
 );

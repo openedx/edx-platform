@@ -21,7 +21,7 @@ describe('EditXBlockModal', function() {
         model = new XBlockInfo({
             id: 'testCourse/branch/draft/block/verticalFFF',
             display_name: 'Test Unit',
-            category: 'vertical'
+            category: 'vertical',
         });
     });
 

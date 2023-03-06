@@ -1,8 +1,8 @@
 define([
     'js/api_admin/views/catalog_preview',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
 ], function(
-    CatalogPreviewView, AjaxHelpers
+    CatalogPreviewView, AjaxHelpers,
 ) {
     'use strict';
 
@@ -16,12 +16,12 @@ define([
                 '<div class="catalog-body">' +
                 '<textarea id="id_query"></textarea>' +
                 '<div class="preview-results"></div>' +
-                '</div>'
+                '</div>',
             );
             view = new CatalogPreviewView({
                 el: '.catalog-body',
                 previewUrl: previewUrl,
-                catalogApiUrl: catalogApiUrl
+                catalogApiUrl: catalogApiUrl,
             });
             view.render();
         });
@@ -39,7 +39,7 @@ define([
                 results: [{key: 'TestX', title: 'Test Course'}],
                 count: 1,
                 next: null,
-                prev: null
+                prev: null,
             });
             expect(view.$('.preview-results').text()).toContain('Test Course');
             expect(view.$('.preview-results-list li a').attr('href')).toEqual(catalogApiUrl + 'TestX');
@@ -51,7 +51,7 @@ define([
             view.$('.preview-query').click();
             AjaxHelpers.respondWithError(requests, 500);
             expect(view.$('.preview-results').text()).toContain(
-                'There was an error retrieving preview results for this catalog.'
+                'There was an error retrieving preview results for this catalog.',
             );
         });
     });

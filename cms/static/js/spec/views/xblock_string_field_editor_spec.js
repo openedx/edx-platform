@@ -12,9 +12,9 @@ describe('XBlockStringFieldEditorView', function() {
         return new XBlockInfo(
             {
                 display_name: displayName,
-                id: 'my_xblock'
+                id: 'my_xblock',
             },
-            {parse: true}
+            {parse: true},
         );
     };
 
@@ -24,7 +24,7 @@ describe('XBlockStringFieldEditorView', function() {
         }
         return new XBlockStringFieldEditor({
             model: xblockInfo,
-            el: $('.wrapper-xblock-field')
+            el: $('.wrapper-xblock-field'),
         });
     };
 
@@ -38,7 +38,7 @@ describe('XBlockStringFieldEditorView', function() {
                 '<h1 class="page-header-title xblock-field-value incontext-editor-value">' +
                 '<span class="title-value">' + initialDisplayName + '</span>' +
                 '</h1>' +
-                '</div>'
+                '</div>',
         );
     });
 
@@ -48,8 +48,8 @@ describe('XBlockStringFieldEditorView', function() {
         expectPostedNewDisplayName = function(requests, displayName) {
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/my_xblock', {
                 metadata: {
-                    display_name: displayName
-                }
+                    display_name: displayName,
+                },
             });
         };
 

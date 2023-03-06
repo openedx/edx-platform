@@ -100,7 +100,7 @@
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                         }).then(function() {
                             expect([STATUS.BUFFERING, STATUS.PLAYING]).toContain(
-                                state.videoPlayer.player.getPlayerState()
+                                state.videoPlayer.player.getPlayerState(),
                             );
                         }).always(done);
                     });
@@ -325,7 +325,7 @@
                 it('has url in player config', function() {
                     expect(state.videoPlayer.player.config.poster).toEqual(POSTER_URL);
                     expect(state.videoPlayer.player.videoEl).toHaveAttrs({
-                        poster: POSTER_URL
+                        poster: POSTER_URL,
                     });
                 });
             });
@@ -351,8 +351,8 @@
             state = jasmine.initializePlayer(
                 'video_html5.html',
                 {
-                    poster: null
-                }
+                    poster: null,
+                },
             );
             expect(state.videoPlayer.player.config.poster).toEqual(null);
             expect(state.videoPlayer.player.videoEl).not.toHaveAttr('poster');
@@ -362,8 +362,8 @@
             state = jasmine.initializePlayer(
                 'video_hls.html',
                 {
-                    poster: null
-                }
+                    poster: null,
+                },
             );
             expect(state.videoPlayer.player.config.poster).toEqual(null);
             expect(state.videoPlayer.player.videoEl).not.toHaveAttr('poster');

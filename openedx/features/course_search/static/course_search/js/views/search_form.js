@@ -7,7 +7,7 @@
             el: '',
             events: {
                 'submit .search-form': 'submitForm',
-                'click .cancel-button': 'clearSearch'
+                'click .cancel-button': 'clearSearch',
             },
 
             initialize: function(options) {
@@ -62,7 +62,7 @@
                     this.$searchButton.show();
                     this.$cancelButton.hide();
                 }
-            }
+            },
         });
     });
 }(define || RequireJS.define));

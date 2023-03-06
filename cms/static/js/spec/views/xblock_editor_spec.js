@@ -12,8 +12,8 @@ describe('XBlockEditorView', function() {
     mockSaveResponse = {
         data: '<p>Some HTML</p>',
         metadata: {
-            display_name: testDisplayName
-        }
+            display_name: testDisplayName,
+        },
     };
 
     beforeEach(function() {
@@ -21,10 +21,10 @@ describe('XBlockEditorView', function() {
         model = new XBlockInfo({
             id: 'testCourse/branch/draft/block/verticalFFF',
             display_name: 'Test Unit',
-            category: 'vertical'
+            category: 'vertical',
         });
         editor = new XBlockEditorView({
-            model: model
+            model: model,
         });
     });
 
@@ -46,7 +46,7 @@ describe('XBlockEditorView', function() {
             editor.render();
             AjaxHelpers.respondWithJson(requests, {
                 html: mockXBlockEditorHtml,
-                resources: []
+                resources: [],
             });
 
             expect(editor.$el.select('.xblock-header')).toBeTruthy();
@@ -72,7 +72,7 @@ describe('XBlockEditorView', function() {
             editor.render();
             AjaxHelpers.respondWithJson(requests, {
                 html: mockXModuleEditorHtml,
-                resources: []
+                resources: [],
             });
 
             expect(editor.$el.select('.xblock-header')).toBeTruthy();
@@ -85,7 +85,7 @@ describe('XBlockEditorView', function() {
             editor.render();
             AjaxHelpers.respondWithJson(requests, {
                 html: mockXModuleEditorHtml,
-                resources: []
+                resources: [],
             });
             // Give the mock xblock a save method...
             editor.xblock.save = window.MockDescriptor.save;
@@ -104,7 +104,7 @@ describe('XBlockEditorView', function() {
             editor.render();
             AjaxHelpers.respondWithJson(requests, {
                 html: mockXModuleEditorHtml,
-                resources: []
+                resources: [],
             });
 
             expect(editor.$el.select('.xblock-header')).toBeTruthy();

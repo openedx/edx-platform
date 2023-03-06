@@ -6,17 +6,17 @@ define(['Markdown.Editor'], function(MarkdownEditor) {
         describe('util.isValidUrl', function() {
             it('should return true for http://example.com', function() {
                 expect(
-                    editor.util.isValidUrl('http://example.com')
+                    editor.util.isValidUrl('http://example.com'),
                 ).toBeTruthy();
             });
             it('should return true for https://example.com', function() {
                 expect(
-                    editor.util.isValidUrl('https://example.com')
+                    editor.util.isValidUrl('https://example.com'),
                 ).toBeTruthy();
             });
             it('should return true for ftp://example.com', function() {
                 expect(
-                    editor.util.isValidUrl('ftp://example.com')
+                    editor.util.isValidUrl('ftp://example.com'),
                 ).toBeTruthy();
             });
             it('should return false for http://', function() {
@@ -30,22 +30,22 @@ define(['Markdown.Editor'], function(MarkdownEditor) {
             });
             it('should return false for fake://example.com', function() {
                 expect(
-                    editor.util.isValidUrl('fakeprotocol://example.com')
+                    editor.util.isValidUrl('fakeprotocol://example.com'),
                 ).toBeFalsy();
             });
             it('should return false for fake://', function() {
                 expect(
-                    editor.util.isValidUrl('fakeprotocol://')
+                    editor.util.isValidUrl('fakeprotocol://'),
                 ).toBeFalsy();
             });
             it('should return false for www.noprotocol.com', function() {
                 expect(
-                    editor.util.isValidUrl('www.noprotocol.com')
+                    editor.util.isValidUrl('www.noprotocol.com'),
                 ).toBeFalsy();
             });
             it('should return false for an empty string', function() {
                 expect(
-                    editor.util.isValidUrl('')
+                    editor.util.isValidUrl(''),
                 ).toBeFalsy();
             });
         });

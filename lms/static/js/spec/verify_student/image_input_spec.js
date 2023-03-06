@@ -4,7 +4,7 @@ define([
     'common/js/spec_helpers/template_helpers',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/verify_student/views/image_input_view',
-    'js/verify_student/models/verification_model'
+    'js/verify_student/models/verification_model',
 ], function($, Backbone, TemplateHelpers, AjaxHelpers, ImageInputView, VerificationModel) {
     'use strict';
 
@@ -17,7 +17,7 @@ define([
                 model: new VerificationModel({}),
                 modelAttribute: 'faceImage',
                 errorModel: new (Backbone.Model.extend({}))(),
-                submitButton: $('#submit_button')
+                submitButton: $('#submit_button'),
             }).render();
         };
 
@@ -36,7 +36,7 @@ define([
             if (fileType !== null) {
                 fakeFile = new Blob(
                     [IMAGE_DATA],
-                    {type: 'image/' + fileType}
+                    {type: 'image/' + fileType},
                 );
                 fakeEvent.target.files = [fakeFile];
             }
@@ -91,7 +91,7 @@ define([
         beforeEach(function() {
             setFixtures(
                 '<div id="current-step-container"></div>' +
-                '<input type="button" id="submit_button"></input>'
+                '<input type="button" id="submit_button"></input>',
             );
             TemplateHelpers.installTemplate('templates/verify_student/image_input');
         });

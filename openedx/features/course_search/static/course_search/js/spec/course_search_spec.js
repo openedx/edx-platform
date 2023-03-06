@@ -14,7 +14,7 @@ define([
     'course_search/js/views/dashboard_search_results_view',
     'course_search/js/course_search_factory',
     'course_search/js/dashboard_search_factory',
-    'text!course_search/templates/course_search_item.underscore'
+    'text!course_search/templates/course_search_item.underscore',
 ], function(
     $,
     Backbone,
@@ -31,7 +31,7 @@ define([
     DashSearchResultsView,
     CourseSearchFactory,
     DashboardSearchFactory,
-    courseSearchItemTemplate
+    courseSearchItemTemplate,
 ) {
     'use strict';
 
@@ -92,9 +92,9 @@ define([
                             location: ['section', 'subsection', 'unit'],
                             url: '/some/url/to/content',
                             content_type: 'text',
-                            excerpt: 'this is a short excerpt'
-                        }
-                    }]
+                            excerpt: 'this is a short excerpt',
+                        },
+                    }],
                 };
                 this.collection.performSearch('search string');
                 AjaxHelpers.respondWithJson(requests, response);
@@ -225,7 +225,7 @@ define([
                     content_type: 'Video',
                     course_name: 'Course Name',
                     excerpt: 'A short excerpt.',
-                    url: 'path/to/content'
+                    url: 'path/to/content',
                 });
 
                 this.seqModel = new SearchResult({
@@ -233,17 +233,17 @@ define([
                     content_type: 'Sequence',
                     course_name: 'Course Name',
                     excerpt: 'A short excerpt.',
-                    url: 'path/to/content'
+                    url: 'path/to/content',
                 });
 
                 this.item = new SearchItemView({
                     model: this.model,
-                    template: courseSearchItemTemplate
+                    template: courseSearchItemTemplate,
                 });
                 this.item.render();
                 this.seqItem = new SearchItemView({
                     model: this.seqModel,
-                    template: courseSearchItemTemplate
+                    template: courseSearchItemTemplate,
                 });
                 this.seqItem.render();
             });
@@ -332,7 +332,7 @@ define([
                 beforeEach(function() {
                     loadFixtures('course_search/fixtures/course_content_page.html');
                     this.form = new SearchForm({
-                        el: '.search-bar'
+                        el: '.search-bar',
                     });
                     this.onClear = jasmine.createSpy('onClear');
                     this.onSearch = jasmine.createSpy('onSearch');
@@ -380,7 +380,7 @@ define([
                     url: '/some/url/to/content',
                     content_type: 'text',
                     course_name: '',
-                    excerpt: 'this is a short excerpt'
+                    excerpt: 'this is a short excerpt',
                 }];
                 this.collection.set(searchResults);
                 this.collection.latestModelsCount = 1;
@@ -392,7 +392,7 @@ define([
                 expect(this.resultsView.$el).toContainHtml(
                     this.collection.totalCount +
                     ' result found for "' +
-                    this.collection.searchTerm + '"'
+                    this.collection.searchTerm + '"',
                 );
                 expect(this.resultsView.$el).toContainHtml('this is a short excerpt');
 
@@ -432,7 +432,7 @@ define([
                 this.resultsView.loadNext();
                 // toBeVisible does not work with inline
                 expect(this.resultsView.$el.find('a.search-load-next .icon')).toHaveCss({
-                    display: 'inline'
+                    display: 'inline',
                 });
                 this.resultsView.renderNext();
                 expect(this.resultsView.$el.find('a.search-load-next .icon')).toBeHidden();
@@ -445,7 +445,7 @@ define([
                     pageSize: 20,
                     latestModels: function() {
                         return SearchCollection.prototype.latestModels.apply(this, arguments);
-                    }
+                    },
                 });
 
                 this.collection = new MockCollection();
@@ -508,9 +508,9 @@ define([
                             url: '/some/url/to/content',
                             content_type: 'text',
                             excerpt: 'this is a short excerpt',
-                            course_name: ''
-                        }
-                    }]
+                            course_name: '',
+                        },
+                    }],
                 });
                 expect($('.search-info')).toExist();
                 expect($('.search-result-list')).toBeVisible();
@@ -561,9 +561,9 @@ define([
                             url: '/some/url/to/content',
                             content_type: 'text',
                             excerpt: 'this is a short excerpt',
-                            course_name: ''
-                        }
-                    }]
+                            course_name: '',
+                        },
+                    }],
                 };
                 var body;
                 $('.search-field').val('query');
@@ -592,7 +592,7 @@ define([
                     loadFixtures('course_search/fixtures/course_content_page.html');
                     CourseSearchFactory({
                         courseId: courseId,
-                        searchHeader: $('.search-bar')
+                        searchHeader: $('.search-bar'),
                     });
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = $('#course-content');
@@ -649,9 +649,9 @@ define([
                                 url: '/some/url/to/content',
                                 content_type: 'text',
                                 excerpt: 'this is a short excerpt',
-                                course_name: ''
-                            }
-                        }]
+                                course_name: '',
+                            },
+                        }],
                     });
                     $('.search-form .cancel-button').trigger('click');
                     expect(this.$searchResults).toBeHidden();
@@ -665,7 +665,7 @@ define([
                     loadFixtures('course_search/fixtures/course_search_results_page.html');
                     CourseSearchFactory({
                         courseId: courseId,
-                        searchHeader: $('.page-header-search')
+                        searchHeader: $('.page-header-search'),
                     });
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = null;  // The search results page does not show over a content element

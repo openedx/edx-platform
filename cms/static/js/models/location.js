@@ -5,7 +5,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
             org: '',
             course: '',
             category: '',
-            name: ''
+            name: '',
         },
         toUrl: function(overrides) {
             return;
@@ -25,7 +25,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
                     org: payload[1],
                     course: payload[2],
                     category: payload[3],
-                    name: payload[4]
+                    name: payload[4],
                 };
             } else if (_.isString(payload)) {
                 this._tagPattern.lastIndex = 0; // odd regex behavior requires this to be reset sometimes
@@ -37,7 +37,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
                         org: this.getNextField(payload),
                         course: this.getNextField(payload),
                         category: this.getNextField(payload),
-                        name: this.getNextField(payload)
+                        name: this.getNextField(payload),
                     };
                 } else return null;
             } else {
@@ -50,7 +50,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
             } catch (err) {
                 return '';
             }
-        }
+        },
     });
     return Location;
 });

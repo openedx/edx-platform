@@ -31,19 +31,19 @@
                 this.convertMath();
                 this.abbreviateBody();
                 params = $.extend(this.model.toJSON(), {
-                    permalink: this.model.urlFor('retrieve')
+                    permalink: this.model.urlFor('retrieve'),
                 });
                 if (!this.model.get('anonymous')) {
                     params = $.extend(params, {
                         user: {
                             username: this.model.username,
-                            user_url: this.model.user_url
-                        }
+                            user_url: this.model.user_url,
+                        },
                     });
                 }
                 edx.HtmlUtils.setHtml(
                     this.$el,
-                    edx.HtmlUtils.template($('#profile-thread-template').html())(params)
+                    edx.HtmlUtils.template($('#profile-thread-template').html())(params),
                 );
                 this.$('span.timeago').timeago();
                 DiscussionUtil.typesetMathJax(this.$('.post-body'));

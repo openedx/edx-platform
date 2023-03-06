@@ -8,7 +8,7 @@ define([
     'backbone',
     'gettext',
     '../../common/js/components/views/feedback_notification',
-    'jquery.cookie'
+    'jquery.cookie',
 ], function(domReady, $, _, str, Backbone, gettext, NotificationView) {
     'use strict';
 
@@ -26,12 +26,12 @@ define([
         Backbone.emulateHTTP = true;
         $.ajaxSetup({
             headers: {
-                'X-CSRFToken': $.cookie('csrftoken')
+                'X-CSRFToken': $.cookie('csrftoken'),
             },
             dataType: 'json',
             content: {
-                script: false
-            }
+                script: false,
+            },
         });
         $(document).ajaxError(function(event, jqXHR, ajaxSettings) {
             var msg, contentType,
@@ -45,12 +45,12 @@ define([
             }
             msg = new NotificationView.Error({
                 title: gettext("Studio's having trouble saving your work"),
-                message: message
+                message: message,
             });
             console.log('Studio AJAX Error', { // eslint-disable-line no-console
                 url: event.currentTarget.URL,
                 response: jqXHR.responseText,
-                status: jqXHR.status
+                status: jqXHR.status,
             });
             return msg.show();
         });
@@ -66,7 +66,7 @@ define([
                 dataType: 'json',
                 data: JSON.stringify(data),
                 success: callback,
-                global: data ? data.global : true    // Trigger global AJAX error handler or not
+                global: data ? data.global : true,    // Trigger global AJAX error handler or not
             });
         };
         $.postJSON = function(url, data, callback) {  // eslint-disable-line no-param-reassign

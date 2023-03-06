@@ -4,7 +4,7 @@
 
         function Container(state) {
             state.containerEl = $(
-                '<div style=" clear: both; width: 665px; margin-left: auto; margin-right: auto; " ></div>'
+                '<div style=" clear: both; width: 665px; margin-left: auto; margin-right: auto; " ></div>',
             );
 
             $('#inputtype_' + state.problemId).before(HtmlUtils.HTML(state.containerEl).toString());

@@ -25,7 +25,7 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                 ViewUtils.checkTotalKeyLengthViolations(
                     self.selectors, self.classes,
                     self.keyFieldSelectors,
-                    self.keyLengthViolationMessage
+                    self.keyLengthViolationMessage,
                 );
             };
 
@@ -59,7 +59,7 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                         self.setFieldInErr($element.parent(), error);
                         return error ? true : acc;
                     },
-                    false
+                    false,
                 );
             };
 
@@ -71,7 +71,7 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                         var $element = $(element);
                         return $element.val().length !== 0 ? acc : false;
                     },
-                    true
+                    true,
                 );
             };
 
@@ -95,7 +95,7 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                                 self.toggleSaveButton(false);
                             }
                         });
-                    }
+                    },
                 );
 
                 var $name = $(self.selectors.name);
@@ -115,8 +115,8 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                 hasInvalidRequiredFields: self.hasInvalidRequiredFields,
                 create: self.create,
                 validateFilledFields: self.validateFilledFields,
-                configureHandlers: self.configureHandlers
+                configureHandlers: self.configureHandlers,
             };
         };
-    }
+    },
 );

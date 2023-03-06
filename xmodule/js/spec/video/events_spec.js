@@ -63,7 +63,7 @@
             it('seek', function() {
                 state.videoPlayer.onCaptionSeek({
                     time: 1,
-                    type: 'any'
+                    type: 'any',
                 });
 
                 expect('seek').not.toHaveBeenTriggeredOn('.video');

@@ -25,7 +25,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                 expect(view.fieldValue()).toBe(view.modelValue());
             } else if ('optionForValue' in view) {
                 expect($($element.find('.u-field-value .u-field-value-readonly')[0]).text()).toBe(
-                    view.displayValue(view.modelValue())
+                    view.displayValue(view.modelValue()),
                 );
             } else {
                 expect($($element.find('.u-field-value .u-field-value-readonly')[0]).text()).toBe(view.modelValue());
@@ -59,7 +59,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         _.each(_.rest(sectionOneFieldElements, 3), function(sectionFieldElement, fieldIndex) {
             expectProfileElementContainsField(
                 sectionFieldElement,
-                learnerProfileView.options.sectionOneFieldViews[fieldIndex]
+                learnerProfileView.options.sectionOneFieldViews[fieldIndex],
             );
         });
     };
@@ -73,7 +73,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         _.each($sectionTwoFieldElements, function(sectionFieldElement, fieldIndex) {
             expectProfileElementContainsField(
                 sectionFieldElement,
-                learnerProfileView.options.sectionTwoFieldViews[fieldIndex]
+                learnerProfileView.options.sectionTwoFieldViews[fieldIndex],
             );
         });
     };
@@ -92,11 +92,11 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expect(sectionOneFieldElements.length).toBe(2);
         expectProfileElementContainsField(
             sectionOneFieldElements[0],
-            learnerProfileView.options.profileImageFieldView
+            learnerProfileView.options.profileImageFieldView,
         );
         expectProfileElementContainsField(
             sectionOneFieldElements[1],
-            learnerProfileView.options.usernameFieldView
+            learnerProfileView.options.usernameFieldView,
         );
 
         if (othersProfile) {
@@ -162,7 +162,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         var errorMessage = $('.badge-set-display').text();
         expect(errorMessage).toBe(
             'Your request could not be completed. Reload the page and try again. If the issue persists, click the ' +
-            'Help tab to report the problem.'
+            'Help tab to report the problem.',
         );
     };
 
@@ -180,7 +180,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         num_pages: 3,
         start: 0,
         current_page: 1,
-        results: []
+        results: [],
     };
 
     var secondPageBadges = {
@@ -190,7 +190,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         num_pages: 3,
         start: 10,
         current_page: 2,
-        results: []
+        results: [],
     };
 
     var thirdPageBadges = {
@@ -200,14 +200,14 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         next: null,
         start: 20,
         current_page: 3,
-        results: []
+        results: [],
     };
 
     var emptyBadges = {
         count: 0,
         previous: null,
         num_pages: 1,
-        results: []
+        results: [],
     };
 
     function makeBadge(num) {
@@ -219,11 +219,11 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                 course_id: null,
                 description: "Yay! It's a test badge.",
                 criteria: 'https://example.com/syllabus',
-                image_url: 'http://localhost:8000/media/badge_classes/test_lMB9bRw.png'
+                image_url: 'http://localhost:8000/media/badge_classes/test_lMB9bRw.png',
             },
             image_url: 'http://example.com/image.png',
             assertion_url: 'http://example.com/example.json',
-            created_at: '2015-12-03T16:25:57.676113Z'
+            created_at: '2015-12-03T16:25:57.676113Z',
         };
     }
 
@@ -254,6 +254,6 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         thirdPageBadges: thirdPageBadges,
         emptyBadges: emptyBadges,
         expectPage: expectPage,
-        makeBadge: makeBadge
+        makeBadge: makeBadge,
     };
 });

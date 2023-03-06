@@ -9,7 +9,7 @@ define([
     'js/certificates/models/signatory',
     'js/certificates/views/signatory_editor',
     'text!templates/certificate-editor.underscore',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/html-utils',
 ],
 function($, _, Backbone, gettext,
     ListItemEditorView, SignatoryModel, SignatoryEditorView, certificateEditorTemplate, HtmlUtils) {
@@ -28,7 +28,7 @@ function($, _, Backbone, gettext,
             'blur .input-text': 'onBlur',
             submit: 'setAndClose',
             'click .action-cancel': 'cancel',
-            'click .action-add-signatory': 'addSignatory'
+            'click .action-add-signatory': 'addSignatory',
         },
 
         className: function() {
@@ -39,7 +39,7 @@ function($, _, Backbone, gettext,
                 'collection-edit',
                 'certificates',
                 'certificate-edit',
-                'certificate-edit-' + index
+                'certificate-edit-' + index,
             ].join(' ');
         },
 
@@ -74,7 +74,7 @@ function($, _, Backbone, gettext,
                 var signatory_view = new SignatoryEditorView({
                     model: modelSignatory,
                     isEditingAllCollections: true,
-                    eventAgg: self.eventAgg
+                    eventAgg: self.eventAgg,
                 });
                 self.$('div.signatory-edit-list').append(HtmlUtils.HTML((signatory_view.render())).toString());
             });
@@ -105,7 +105,7 @@ function($, _, Backbone, gettext,
                 course_title: this.model.get('course_title'),
                 org_logo_path: this.model.get('org_logo_path'),
                 is_active: this.model.get('is_active'),
-                isNew: this.model.isNew()
+                isNew: this.model.isNew(),
             };
         },
 
@@ -119,7 +119,7 @@ function($, _, Backbone, gettext,
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'name', this.$('.collection-name-input').val(),
-                {silent: true}
+                {silent: true},
             );
         },
 
@@ -129,7 +129,7 @@ function($, _, Backbone, gettext,
             this.model.set(
                 'description',
                 this.$('.certificate-description-input').val(),
-                {silent: true}
+                {silent: true},
             );
         },
 
@@ -139,7 +139,7 @@ function($, _, Backbone, gettext,
             this.model.set(
                 'course_title',
                 this.$('.certificate-course-title-input').val(),
-                {silent: true}
+                {silent: true},
             );
         },
 
@@ -149,7 +149,7 @@ function($, _, Backbone, gettext,
             this.setDescription();
             this.setCourseTitle();
             return this;
-        }
+        },
     });
     return CertificateEditorView;
 });

@@ -45,7 +45,7 @@
                 inputTip: get_option_with_default('inputTip', ''),
                 extensions: get_option_with_default('extensions', ''),
                 submitButtonText: get_option_with_default('submitButtonText', gettext('Upload File')),
-                url: get_option_with_default('url', '')
+                url: get_option_with_default('url', ''),
             }));
 
             submitButton = this.$el.find('.submit-file-button');
@@ -67,7 +67,7 @@
                         data.submit();
                     });
                     resultNotification.html('');
-                }
+                },
             });
 
             return this;
@@ -81,12 +81,12 @@
             } else {
                 notificationModel = new NotificationModel({
                     type: 'confirmation',
-                    title: interpolate_text(gettext("Your upload of '{file}' succeeded."), {file: file})
+                    title: interpolate_text(gettext("Your upload of '{file}' succeeded."), {file: file}),
                 });
             }
             var notification = new NotificationView({
                 el: this.$('.result'),
-                model: notificationModel
+                model: notificationModel,
             });
             notification.render();
         },
@@ -110,15 +110,15 @@
                 }
                 notificationModel = new NotificationModel({
                     type: 'error',
-                    title: message
+                    title: message,
                 });
             }
             var notification = new NotificationView({
                 el: this.$('.result'),
-                model: notificationModel
+                model: notificationModel,
             });
             notification.render();
-        }
+        },
     });
 
     this.FileUploaderView = FileUploaderView;

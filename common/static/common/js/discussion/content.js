@@ -51,7 +51,7 @@
                 can_delete: '.admin-delete',
                 can_openclose: '.admin-openclose',
                 can_report: '.admin-report',
-                can_vote: '.admin-vote'
+                can_vote: '.admin-vote',
             };
 
             Content.prototype.urlMappers = {};
@@ -86,7 +86,7 @@
                 }
                 this.get('children').push(comment);
                 model = new Comment($.extend({}, comment, {
-                    thread: this.get('thread')
+                    thread: this.get('thread'),
                 }));
                 this.get('comments').add(model);
                 this.trigger('comment:add');
@@ -110,7 +110,7 @@
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                     comment = _ref[_i];
                     _results.push(this.addComment(comment, {
-                        silent: true
+                        silent: true,
                     }));
                 }
                 return _results;
@@ -271,7 +271,7 @@
                 },
                 unPinThread: function() {
                     return DiscussionUtil.urlFor('un_pin_thread', this.id);
-                }
+                },
             };
 
             Thread.prototype.initialize = function() {
@@ -316,7 +316,7 @@
                 json_attributes = _.clone(this.attributes);
                 return _.extend(json_attributes, {
                     title: this.display_title(),
-                    body: this.display_body()
+                    body: this.display_body(),
                 });
             };
 
@@ -372,7 +372,7 @@
                 },
                 unFlagAbuse: function() {
                     return DiscussionUtil.urlFor('unFlagAbuse_' + (this.get('type')), this.id);
-                }
+                },
             };
 
             Comment.prototype.getCommentsCount = function() {
@@ -417,7 +417,7 @@
 
             Comments.prototype.find = function(id) {
                 return _.first(this.where({
-                    id: id
+                    id: id,
                 }));
             };
 

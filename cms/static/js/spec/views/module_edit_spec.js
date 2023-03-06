@@ -9,7 +9,7 @@ import 'xmodule/js/src/xmodule';
 describe('ModuleEdit', function() {
     beforeEach(function() {
         this.stubModule = new ModuleModel({
-            id: 'stub-id'
+            id: 'stub-id',
         });
         setFixtures('<ul>\n' +
                     '<li class="component" id="stub-id" data-locator="stub-id">\n' +
@@ -37,7 +37,7 @@ describe('ModuleEdit', function() {
         this.moduleEdit = new ModuleEdit({
             el: $('.component'),
             model: this.stubModule,
-            onDelete: jasmine.createSpy()
+            onDelete: jasmine.createSpy(),
         });
         return this.moduleEdit;
     });
@@ -56,7 +56,7 @@ describe('ModuleEdit', function() {
                 this.moduleEdit = new ModuleEdit({
                     el: $('.component'),
                     model: this.stubModule,
-                    onDelete: jasmine.createSpy()
+                    onDelete: jasmine.createSpy(),
                 });
                 return this.moduleEdit;
             });
@@ -83,40 +83,40 @@ describe('ModuleEdit', function() {
                             'hash1', {
                                 kind: 'text',
                                 mimetype: 'text/css',
-                                data: 'inline-css'
-                            }
+                                data: 'inline-css',
+                            },
                         ], [
                             'hash2', {
                                 kind: 'url',
                                 mimetype: 'text/css',
-                                data: 'css-url'
-                            }
+                                data: 'css-url',
+                            },
                         ], [
                             'hash3', {
                                 kind: 'text',
                                 mimetype: 'application/javascript',
-                                data: 'inline-js'
-                            }
+                                data: 'inline-js',
+                            },
                         ], [
                             'hash4', {
                                 kind: 'url',
                                 mimetype: 'application/javascript',
-                                data: 'js-url'
-                            }
+                                data: 'js-url',
+                            },
                         ], [
                             'hash5', {
                                 placement: 'head',
                                 mimetype: 'text/html',
-                                data: 'head-html'
-                            }
+                                data: 'head-html',
+                            },
                         ], [
                             'hash6', {
                                 placement: 'not-head',
                                 mimetype: 'text/html',
-                                data: 'not-head-html'
-                            }
-                        ]
-                    ]
+                                data: 'not-head-html',
+                            },
+                        ],
+                    ],
                 });
             });
             afterEach(function() {
@@ -129,17 +129,17 @@ describe('ModuleEdit', function() {
                     type: 'GET',
                     cache: false,
                     headers: {
-                        Accept: 'application/json'
+                        Accept: 'application/json',
                     },
-                    success: jasmine.any(Function)
+                    success: jasmine.any(Function),
                 });
                 expect($.ajax).not.toHaveBeenCalledWith({
                     url: '/xblock/' + this.moduleEdit.model.id + '/studio_view',
                     type: 'GET',
                     headers: {
-                        Accept: 'application/json'
+                        Accept: 'application/json',
                     },
-                    success: jasmine.any(Function)
+                    success: jasmine.any(Function),
                 });
                 expect(this.moduleEdit.loadDisplay).toHaveBeenCalled();
                 return expect(this.moduleEdit.delegateEvents).toHaveBeenCalled();
@@ -151,12 +151,12 @@ describe('ModuleEdit', function() {
                     type: 'GET',
                     cache: false,
                     headers: {
-                        Accept: 'application/json'
+                        Accept: 'application/json',
                     },
-                    success: jasmine.any(Function)
+                    success: jasmine.any(Function),
                 });
                 this.moduleEdit.clickEditButton({
-                    preventDefault: jasmine.createSpy('event.preventDefault')
+                    preventDefault: jasmine.createSpy('event.preventDefault'),
                 });
                 mockXBlockEditorHtml = readFixtures('templates/mock/mock-xblock-editor.underscore');
                 $.ajax.calls.mostRecent().args[0].success({
@@ -166,49 +166,49 @@ describe('ModuleEdit', function() {
                             'hash1', {
                                 kind: 'text',
                                 mimetype: 'text/css',
-                                data: 'inline-css'
-                            }
+                                data: 'inline-css',
+                            },
                         ], [
                             'hash2', {
                                 kind: 'url',
                                 mimetype: 'text/css',
-                                data: 'css-url'
-                            }
+                                data: 'css-url',
+                            },
                         ], [
                             'hash3', {
                                 kind: 'text',
                                 mimetype: 'application/javascript',
-                                data: 'inline-js'
-                            }
+                                data: 'inline-js',
+                            },
                         ], [
                             'hash4', {
                                 kind: 'url',
                                 mimetype: 'application/javascript',
-                                data: 'js-url'
-                            }
+                                data: 'js-url',
+                            },
                         ], [
                             'hash5', {
                                 placement: 'head',
                                 mimetype: 'text/html',
-                                data: 'head-html'
-                            }
+                                data: 'head-html',
+                            },
                         ], [
                             'hash6', {
                                 placement: 'not-head',
                                 mimetype: 'text/html',
-                                data: 'not-head-html'
-                            }
-                        ]
-                    ]
+                                data: 'not-head-html',
+                            },
+                        ],
+                    ],
                 });
                 expect($.ajax).toHaveBeenCalledWith({
                     url: '/xblock/' + this.moduleEdit.model.id + '/studio_view',
                     type: 'GET',
                     cache: false,
                     headers: {
-                        Accept: 'application/json'
+                        Accept: 'application/json',
                     },
-                    success: jasmine.any(Function)
+                    success: jasmine.any(Function),
                 });
                 return expect(this.moduleEdit.delegateEvents).toHaveBeenCalled();
             });
@@ -242,10 +242,10 @@ describe('ModuleEdit', function() {
                             'hash1', {
                                 kind: 'text',
                                 mimetype: 'text/css',
-                                data: 'inline-css'
-                            }
-                        ]
-                    ]
+                                data: 'inline-css',
+                            },
+                        ],
+                    ],
                 });
                 return expect($('head').append.calls.count()).toBe(count);
             });

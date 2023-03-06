@@ -32,7 +32,7 @@
         'gettext',
         'js/student_account/emailoptin',
         'js/student_account/enrollment',
-        'js/student_account/shoppingcart'
+        'js/student_account/shoppingcart',
     ], function($, _, Backbone, gettext, emailOptInInterface, enrollmentInterface, shoppingCartInterface) {
         var FinishAuthView = Backbone.View.extend({
             el: '#finish-auth-status',
@@ -41,7 +41,7 @@
                 finishAuth: '/account/finish_auth',
                 defaultNextUrl: '/dashboard',
                 payment: '/verify_student/start-flow/',
-                trackSelection: '/course_modes/choose/'
+                trackSelection: '/course_modes/choose/',
             },
 
             initialize: function(obj) {
@@ -51,7 +51,7 @@
                     courseId: $.url('?course_id'),
                     courseMode: $.url('?course_mode'),
                     emailOptIn: $.url('?email_opt_in'),
-                    purchaseWorkflow: $.url('?purchase_workflow')
+                    purchaseWorkflow: $.url('?purchase_workflow'),
                 };
                 for (var key in queryParams) {
                     if (queryParams[key]) {
@@ -169,7 +169,7 @@
             redirect: function(url) {
                 this.updateTaskDescription(gettext('Loading your courses'));
                 window.location.replace(url);
-            }
+            },
         });
         return FinishAuthView;
     });

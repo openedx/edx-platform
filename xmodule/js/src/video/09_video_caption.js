@@ -8,7 +8,7 @@
         'edx-ui-toolkit/js/utils/html-utils',
         'draggabilly',
         'time.js',
-        'underscore'
+        'underscore',
     ], function(Sjson, AsyncProcess, HtmlUtils, Draggabilly, Time, _) {
         /**
          * @desc VideoCaption module exports a function.
@@ -36,7 +36,7 @@
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
                 'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
-                'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie'
+                'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie',
             );
 
             this.state = state;
@@ -61,7 +61,7 @@
                         fullscreen: this.onResize,
                         pause: this.pause,
                         play: this.play,
-                        destroy: this.destroy
+                        destroy: this.destroy,
                     })
                     .removeClass('is-captions-rendered');
                 if (this.fetchXHR && this.fetchXHR.abort) {
@@ -99,12 +99,12 @@
                             '<span class="icon fa fa-caret-left" aria-hidden="true"></span>',
                             '</button>',
                             '</div>',
-                            '</div>'
+                            '</div>',
                         ].join('')),
                     {
                         langTitle: gettext('Open language menu'),
-                        courseId: this.state.id
-                    }
+                        courseId: this.state.id,
+                    },
                 );
 
                 var subtitlesHtml = HtmlUtils.interpolateHtml(
@@ -113,12 +113,12 @@
                             '<div class="subtitles" role="region" id="transcript-{courseId}">',
                             '<h3 id="transcript-label-{courseId}" class="transcript-title sr"></h3>',
                             '<ol id="transcript-captions-{courseId}" class="subtitles-menu" lang="{courseLang}"></ol>',
-                            '</div>'
+                            '</div>',
                         ].join('')),
                     {
                         courseId: this.state.id,
-                        courseLang: this.state.lang
-                    }
+                        courseLang: this.state.lang,
+                    },
                 );
 
                 this.loaded = false;
@@ -146,37 +146,37 @@
                 var state = this.state,
                     events = [
                         'mouseover', 'mouseout', 'mousedown', 'click', 'focus', 'blur',
-                        'keydown'
+                        'keydown',
                     ].join(' ');
 
                 this.captionControlEl.on({
                     click: this.toggleClosedCaptions,
-                    keydown: this.handleCaptionToggle
+                    keydown: this.handleCaptionToggle,
                 });
                 this.transcriptControlEl.on({
                     click: this.toggleTranscript,
-                    keydown: this.handleTranscriptToggle
+                    keydown: this.handleTranscriptToggle,
                 });
                 this.subtitlesMenuEl.on({
                     mouseenter: this.onMouseEnter,
                     mouseleave: this.onMouseLeave,
                     mousemove: this.onMovement,
                     mousewheel: this.onMovement,
-                    DOMMouseScroll: this.onMovement
+                    DOMMouseScroll: this.onMovement,
                 })
                     .on(events, 'span[data-index]', this.onCaptionHandler);
                 this.container.on({
                     mouseenter: this.onContainerMouseEnter,
-                    mouseleave: this.onContainerMouseLeave
+                    mouseleave: this.onContainerMouseLeave,
                 });
 
                 if (this.showLanguageMenu) {
                     this.languageChooserEl.on({
-                        keydown: this.handleKeypress
+                        keydown: this.handleKeypress,
                     }, '.language-menu');
 
                     this.languageChooserEl.on({
-                        keydown: this.handleKeypressLink
+                        keydown: this.handleKeypressLink,
                     }, '.control-lang');
                 }
 
@@ -189,7 +189,7 @@
                         fullscreen: this.onResize,
                         pause: this.pause,
                         play: this.play,
-                        destroy: this.destroy
+                        destroy: this.destroy,
                     });
 
                 if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
@@ -424,7 +424,7 @@
 
                 this.frozen = setTimeout(
                     this.onMouseLeave,
-                    this.state.config.captionsFreezeTime
+                    this.state.config.captionsFreezeTime,
                 );
             },
 
@@ -486,7 +486,7 @@
 
                 return {
                     start: start,
-                    captions: captions
+                    captions: captions,
                 };
             },
 
@@ -557,8 +557,8 @@
                                     HtmlUtils.joinHtml(
                                         HtmlUtils.HTML('<li>'),
                                         gettext('Transcript will be displayed when you start playing the video.'),
-                                        HtmlUtils.HTML('</li>')
-                                    )
+                                        HtmlUtils.HTML('</li>'),
+                                    ),
                                 );
                             } else {
                                 self.renderCaption(start, captions);
@@ -566,11 +566,11 @@
                             self.hideCaptions(self.hideCaptionsOnLoad);
                             HtmlUtils.append(
                                 self.state.el.find('.video-wrapper').parent(),
-                                HtmlUtils.HTML(self.subtitlesEl)
+                                HtmlUtils.HTML(self.subtitlesEl),
                             );
                             HtmlUtils.append(
                                 self.state.el.find('.secondary-controls'),
-                                HtmlUtils.HTML(self.container)
+                                HtmlUtils.HTML(self.container),
                             );
                             self.bindHandlers();
                         }
@@ -582,7 +582,7 @@
                         console.log('[Video info]: ERROR while fetching captions.');
                         console.log(
                             '[Video info]: STATUS:', textStatus +
-                            ', MESSAGE:', '' + errorThrown
+                            ', MESSAGE:', '' + errorThrown,
                         );
                         // If initial list of languages has more than 1 item, check
                         // for availability other transcripts.
@@ -605,7 +605,7 @@
                             self.languageChooserEl.hide();
                             self.hideClosedCaptions();
                         }
-                    }
+                    },
                 });
 
                 return true;
@@ -640,7 +640,7 @@
                     error: function() {
                         self.hideCaptions(true);
                         self.languageChooserEl.hide();
-                    }
+                    },
                 });
 
                 return this.availableTranslationsXHR;
@@ -691,7 +691,7 @@
                     linkHtml = HtmlUtils.joinHtml(
                         HtmlUtils.HTML('<button class="control control-lang">'),
                         label,
-                        HtmlUtils.HTML('</button>')
+                        HtmlUtils.HTML('</button>'),
                     );
                     $link = $(linkHtml.toString());
 
@@ -706,7 +706,7 @@
 
                 HtmlUtils.append(
                     this.languageChooserEl,
-                    HtmlUtils.HTML($menu)
+                    HtmlUtils.HTML($menu),
                 );
 
                 $menu.on('click', '.control-lang', function(e) {
@@ -754,7 +754,7 @@
                         role: 'link',
                         'data-index': index,
                         'data-start': start[index],
-                        tabindex: 0
+                        tabindex: 0,
                     });
 
                     HtmlUtils.setHtml($($spanEl), HtmlUtils.HTML(text.toString()));
@@ -765,7 +765,7 @@
                 return AsyncProcess.array(captions, process).done(function(list) {
                     HtmlUtils.append(
                         container,
-                        HtmlUtils.HTML(list)
+                        HtmlUtils.HTML(list),
                     );
                 });
             },
@@ -837,34 +837,34 @@
                     HtmlUtils.HTML([
                         '<li class="spacing" style="height: {height}px">',
                                 '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>',  // eslint-disable-line max-len, indent
-                        '</li>'
+                        '</li>',
                     ].join('')),
                     {
                         id: this.state.id,
-                        height: this.topSpacingHeight()
-                    }
+                        height: this.topSpacingHeight(),
+                    },
                 );
 
                 var bottomSpacer = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML([
                         '<li class="spacing" style="height: {height}px">',
                                 '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>',  // eslint-disable-line max-len, indent
-                        '</li>'
+                        '</li>',
                     ].join('')),
                     {
                         id: this.state.id,
-                        height: this.bottomSpacingHeight()
-                    }
+                        height: this.bottomSpacingHeight(),
+                    },
                 );
 
                 HtmlUtils.prepend(
                     this.subtitlesMenuEl,
-                    topSpacer
+                    topSpacer,
                 );
 
                 HtmlUtils.append(
                     this.subtitlesMenuEl,
-                    bottomSpacer
+                    bottomSpacer,
                 );
             },
 
@@ -1001,8 +1001,8 @@
                     this.subtitlesEl.scrollTo(
                         el,
                         {
-                            offset: -1 * this.calculateOffset(el)
-                        }
+                            offset: -1 * this.calculateOffset(el),
+                        },
                     );
                 }
             },
@@ -1098,8 +1098,8 @@
                     'videoPlayer.onCaptionSeek',
                     {
                         type: 'onCaptionSeek',
-                        time: time / 1000
-                    }
+                        time: time / 1000,
+                    },
                 );
 
                 event.preventDefault();
@@ -1124,7 +1124,7 @@
             */
             topSpacingHeight: function() {
                 return this.calculateOffset(
-                    this.subtitlesEl.find('li:not(.spacing)').first()
+                    this.subtitlesEl.find('li:not(.spacing)').first(),
                 );
             },
 
@@ -1136,7 +1136,7 @@
             */
             bottomSpacingHeight: function() {
                 return this.calculateOffset(
-                    this.subtitlesEl.find('li:not(.spacing)').last()
+                    this.subtitlesEl.find('li:not(.spacing)').last(),
                 );
             },
 
@@ -1148,7 +1148,7 @@
                     // keep it going until turned off
                     $.cookie('show_closed_captions', 'true', {
                         expires: 3650,
-                        path: '/'
+                        path: '/',
                     });
                 } else {
                     this.hideClosedCaptions();
@@ -1214,11 +1214,11 @@
                 if (method) {
                     $.cookie('show_closed_captions', 'true', {
                         expires: 3650,
-                        path: '/'
+                        path: '/',
                     });
                 } else {
                     $.cookie('show_closed_captions', null, {
-                        path: '/'
+                        path: '/',
                     });
                 }
             },
@@ -1268,11 +1268,11 @@
                 if (showTranscript) {
                     $.cookie('show_transcript', 'true', {
                         expires: 3650,
-                        path: '/'
+                        path: '/',
                     });
                 } else {
                     $.cookie('show_transcript', 'false', {
-                        path: '/'
+                        path: '/',
                     });
                 }
             },
@@ -1372,9 +1372,9 @@
                 }
 
                 this.subtitlesEl.css({
-                    maxHeight: this.captionHeight() - height
+                    maxHeight: this.captionHeight() - height,
                 });
-            }
+            },
         };
 
         return VideoCaption;

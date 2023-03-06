@@ -53,7 +53,7 @@
                     update: update,
                     figureOutStartEndTime: figureOutStartEndTime,
                     figureOutStartingTime: figureOutStartingTime,
-                    updatePlayTime: updatePlayTime
+                    updatePlayTime: updatePlayTime,
                 };
             /* eslint-enable no-use-before-define */
 
@@ -78,7 +78,7 @@
                             return onSeek.call(this, params);
                         }
                     }.bind(state),
-                    300
+                    300,
                 );
 
                 state.bindTo(methodsDict, state.videoPlayer, state);
@@ -141,7 +141,7 @@
                     showinfo: 0,
                     enablejsapi: 1,
                     modestbranding: 1,
-                    cc_load_policy: 0
+                    cc_load_policy: 0,
                 };
 
                 if (!state.isFlashMode()) {
@@ -170,8 +170,8 @@
                     events: {
                         onReady: state.videoPlayer.onReady,
                         onStateChange: state.videoPlayer.onStateChange,
-                        onError: state.videoPlayer.onError
-                    }
+                        onError: state.videoPlayer.onError,
+                    },
                 };
 
                 if (state.videoType === 'html5') {
@@ -183,8 +183,8 @@
                                 onReadyHLS: function() { dfd.resolve(); },
                                 videoSources: state.HLSVideoSources,
                                 canPlayHLS: state.canPlayHLS,
-                                HLSOnlySources: state.HLSOnlySources
-                            })
+                                HLSOnlySources: state.HLSOnlySources,
+                            }),
                         );
                         // `loadedmetadata` event triggered too early on Safari due
                         // to which correct video dimensions were not calculated
@@ -205,8 +205,8 @@
                             onReady: state.videoPlayer.onReady,
                             onStateChange: state.videoPlayer.onStateChange,
                             onPlaybackQualityChange: state.videoPlayer.onPlaybackQualityChange,
-                            onError: state.videoPlayer.onError
-                        }
+                            onError: state.videoPlayer.onError,
+                        },
                     });
 
                     state.el.on('initialize', function() {
@@ -238,23 +238,23 @@
                         'videoControl.updateVcrVidTime',
                         {
                             time: time,
-                            duration: duration
-                        }
+                            duration: duration,
+                        },
                     );
 
                     // Update the time slider.
                     state.trigger(
                         'videoProgressSlider.updateStartEndTimeRegion',
                         {
-                            duration: duration
-                        }
+                            duration: duration,
+                        },
                     );
                     state.trigger(
                         'videoProgressSlider.updatePlayTime',
                         {
                             time: time,
-                            duration: duration
-                        }
+                            duration: duration,
+                        },
                     );
                 };
 
@@ -279,7 +279,7 @@
                 state.resizer = new Resizer({
                     element: state.videoEl,
                     elementRatio: videoWidth / videoHeight,
-                    container: state.container
+                    container: state.container,
                 })
                     .callbacks.once(function() {
                         state.el.trigger('caption:resize');
@@ -325,8 +325,8 @@
                         onReady: state.videoPlayer.onReady,
                         onStateChange: state.videoPlayer.onStateChange,
                         onPlaybackQualityChange: state.videoPlayer.onPlaybackQualityChange,
-                        onError: state.videoPlayer.onError
-                    }
+                        onError: state.videoPlayer.onError,
+                    },
                 });
 
                 _updateVcrAndRegion(state, true);
@@ -345,7 +345,7 @@
                 var player = this.videoPlayer.player;
                 this.el.removeClass([
                     'is-unstarted', 'is-playing', 'is-paused', 'is-buffered',
-                    'is-ended', 'is-cued'
+                    'is-ended', 'is-cued',
                 ].join(' '));
                 $(window).off('.video');
                 this.el.trigger('destroy');
@@ -403,7 +403,7 @@
                         this.videoPlayer.pause();
 
                         this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
-                            end: true
+                            end: true,
                         });
 
                         this.el.trigger('stop');
@@ -423,7 +423,7 @@
                     this.videoPlayer.currentTime = Time.convert(
                         time,
                         parseFloat(this.speed),
-                        newSpeed
+                        newSpeed,
                     );
                 }
 
@@ -497,7 +497,7 @@
             function runTimer() {
                 if (!this.videoPlayer.updateInterval) {
                     this.videoPlayer.updateInterval = window.setInterval(
-                        this.videoPlayer.update, 200
+                        this.videoPlayer.update, 200,
                     );
 
                     this.videoPlayer.update();
@@ -514,7 +514,7 @@
 
 
                 this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
-                    end: true
+                    end: true,
                 });
 
                 if (this.videoPlayer.skipOnEndedStartEndReset) {
@@ -540,7 +540,7 @@
             function onPlay() {
                 this.videoPlayer.runTimer();
                 this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
-                    end: false
+                    end: false,
                 });
                 this.videoPlayer.ready();
                 this.el.trigger('play', arguments);
@@ -595,7 +595,7 @@
                     function(item) {
                         var speed = Number(item);
                         return speed > 0.25 && speed <= 5;
-                    }
+                    },
                 );
 
                 // Because of a recent change in the YouTube API (not documented), sometimes
@@ -682,7 +682,7 @@
             function onStateChange(event) {
                 this.el.removeClass([
                     'is-unstarted', 'is-playing', 'is-paused', 'is-buffered',
-                    'is-ended', 'is-cued'
+                    'is-ended', 'is-cued',
                 ].join(' '));
 
                 switch (event.data) {
@@ -797,16 +797,16 @@
                     'videoProgressSlider.updatePlayTime',
                     {
                         time: time,
-                        duration: endTime
-                    }
+                        duration: endTime,
+                    },
                 );
 
                 this.trigger(
                     'videoControl.updateVcrVidTime',
                     {
                         time: time,
-                        duration: endTime
-                    }
+                        duration: endTime,
+                    },
                 );
 
                 this.el.trigger('caption:update', [time]);

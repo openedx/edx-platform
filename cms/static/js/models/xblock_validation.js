@@ -7,7 +7,7 @@ define(['backbone', 'gettext', 'underscore'], function(Backbone, gettext, _) {
             summary: {},
             messages: [],
             empty: true,
-            xblock_id: null
+            xblock_id: null,
         },
 
         WARNING: 'warning',
@@ -44,7 +44,7 @@ define(['backbone', 'gettext', 'underscore'], function(Backbone, gettext, _) {
             }
 
             return response;
-        }
+        },
     });
     return XBlockValidationModel;
 });

@@ -22,14 +22,14 @@ var options = {
 
     fixtureFiles: [
         {pattern: 'fixtures/*.*'},
-        {pattern: 'fixtures/hls/**/*.*'}
+        {pattern: 'fixtures/hls/**/*.*'},
     ],
 
     runFiles: [
-        {pattern: 'karma_runner_webpack.js', webpack: true}
+        {pattern: 'karma_runner_webpack.js', webpack: true},
     ],
 
-    preprocessors: {}
+    preprocessors: {},
 };
 
 options.runFiles

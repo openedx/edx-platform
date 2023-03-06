@@ -4,7 +4,7 @@
  */
 define([
     'js/views/baseview', 'underscore', 'gettext', 'underscore.string',
-    'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils',
 ], function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
     'use strict';
 
@@ -13,7 +13,7 @@ define([
         events: {
             'click .edit': 'editGroup',
             'click .show-groups': 'showContentGroupUsages',
-            'click .hide-groups': 'hideContentGroupUsages'
+            'click .hide-groups': 'hideContentGroupUsages',
         },
 
         className: function() {
@@ -22,7 +22,7 @@ define([
             return [
                 'collection',
                 'partition-group-details',
-                'partition-group-details-' + index
+                'partition-group-details-' + index,
             ].join(' ');
         },
 
@@ -43,7 +43,7 @@ define([
                 index: this.model.collection.indexOf(this.model),
                 showContentGroupUsages: showContentGroupUsages || false,
                 HtmlUtils: HtmlUtils,
-                restrictEditing: this.restrictEditing
+                restrictEditing: this.restrictEditing,
             });
             HtmlUtils.setHtml(this.$el, HtmlUtils.HTML(this.template(attrs)));
             return this;
@@ -72,12 +72,12 @@ define([
                         configuration is used in.
                     */
                     'Used in {count} location', 'Used in {count} locations',
-                    count
+                    count,
                 ),
-                {count: count}
+                {count: count},
                 );
             }
-        }
+        },
     });
 
     return PartitionGroupDetailsView;

@@ -5,7 +5,7 @@
         function($, _, CertificatesView) {
             return function(options) {
                 options = _.extend(options, {
-                    el: $('.certificates-content')
+                    el: $('.certificates-content'),
                 });
                 return new CertificatesView(options).render();
             };

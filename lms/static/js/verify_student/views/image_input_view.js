@@ -27,7 +27,7 @@ var edx = edx || {};
             var renderedHtml = edx.HtmlUtils.template($(this.template).html())({});
             edx.HtmlUtils.setHtml(
                 $(this.el),
-                renderedHtml
+                renderedHtml,
             );
             // Set the submit button to disabled by default
             this.setSubmitButtonEnabled(false);
@@ -92,11 +92,11 @@ var edx = edx || {};
                     this.errorModel.set({
                         errorTitle: gettext('Image Upload Error'),
                         errorMsg: gettext('Please verify that you have uploaded a valid image (PNG and JPEG).'),
-                        shown: true
+                        shown: true,
                     });
                 } else {
                     this.errorModel.set({
-                        shown: false
+                        shown: false,
                     });
                 }
             }
@@ -108,6 +108,6 @@ var edx = edx || {};
                 .toggleClass('is-disabled', !isEnabled)
                 .prop('disabled', !isEnabled)
                 .attr('aria-disabled', !isEnabled);
-        }
+        },
     });
 }(jQuery, _, Backbone, gettext));

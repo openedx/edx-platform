@@ -34,7 +34,7 @@
                     show: show,
                     showControls: showControls,
                     focusFirst: focusFirst,
-                    updateVcrVidTime: updateVcrVidTime
+                    updateVcrVidTime: updateVcrVidTime,
                 };
 
                 state.bindTo(methodsDict, state.videoControl, state);
@@ -45,7 +45,7 @@
                     mousemove: this.videoControl.showControls,
                     keydown: this.videoControl.showControls,
                     destroy: this.videoControl.destroy,
-                    initialize: this.videoControl.focusFirst
+                    initialize: this.videoControl.focusFirst,
                 });
 
                 this.el.off('controls:show');
@@ -79,7 +79,7 @@
                 if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
                     state.el.on({
                         mousemove: state.videoControl.showControls,
-                        keydown: state.videoControl.showControls
+                        keydown: state.videoControl.showControls,
                     });
                 }
 
@@ -156,6 +156,6 @@
                 endTime = Math.min(endTime, params.duration);
                 this.videoControl.vidTimeEl.text(Time.format(params.time) + ' / ' + Time.format(endTime));
             }
-        }
+        },
     );
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

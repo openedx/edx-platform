@@ -39,7 +39,7 @@ var edx = edx || {};
 
                     // Allow subclasses to install custom event handlers
                     this.postRender();
-                }
+                },
             ).fail(_.bind(this.handleError, this));
 
             return this;
@@ -49,13 +49,13 @@ var edx = edx || {};
             this.errorModel.set({
                 errorTitle: errorTitle || gettext('Error'),
                 errorMsg: errorMsg || gettext('An error has occurred. Please try reloading the page.'),
-                shown: true
+                shown: true,
             });
         },
 
         templateContext: function() {
             var context = {
-                nextStepTitle: this.nextStepTitle
+                nextStepTitle: this.nextStepTitle,
             };
             return _.extend(context, this.defaultContext(), this.stepData);
         },
@@ -84,7 +84,7 @@ var edx = edx || {};
             return $.Deferred(
                 function(defer) {
                     defer.resolveWith(view, [templateContext]);
-                }
+                },
             ).promise();
         },
 
@@ -99,7 +99,7 @@ var edx = edx || {};
 
         goToStep: function(stepName) {
             this.trigger('go-to-step', stepName);
-        }
+        },
 
     });
 }(jQuery, _, Backbone, gettext));

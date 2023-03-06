@@ -4,7 +4,7 @@ define([
     'common/js/spec_helpers/template_helpers',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/verify_student/views/webcam_photo_view',
-    'js/verify_student/models/verification_model'
+    'js/verify_student/models/verification_model',
 ],
 function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, VerificationModel) {
     'use strict';
@@ -39,7 +39,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
                 isSupported: function() { return isSupported; },
                 snapshot: function() { return snapshotSuccess; },
                 getImageData: function() { return IMAGE_DATA; },
-                reset: function() {}
+                reset: function() {},
             };
         };
 
@@ -50,7 +50,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
                 modelAttribute: 'faceImage',
                 errorModel: new (Backbone.Model.extend({}))(),
                 submitButton: $('#submit_button'),
-                backend: backendStub
+                backend: backendStub,
             }).render();
         };
 
@@ -83,7 +83,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
 
             setFixtures(
                 '<div id="current-step-container"></div>' +
-                    '<input type="button" id="submit_button"></input>'
+                    '<input type="button" id="submit_button"></input>',
             );
             TemplateHelpers.installTemplate('templates/verify_student/webcam_photo');
         });
@@ -97,7 +97,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             // Initially, only the snapshot button is shown
             expectButtonShown({
                 snapshot: true,
-                reset: false
+                reset: false,
             });
 
             expectSubmitEnabled(false);
@@ -111,7 +111,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             // Expect that buttons were updated
             expectButtonShown({
                 snapshot: false,
-                reset: true
+                reset: true,
             });
             expectSubmitEnabled(true);
 
@@ -135,7 +135,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             // Expect that we're back to the initial button shown state
             expectButtonShown({
                 snapshot: true,
-                reset: false
+                reset: false,
             });
             expectSubmitEnabled(false);
 
@@ -156,7 +156,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             // so the user can retry.
             expectButtonShown({
                 snapshot: true,
-                reset: false
+                reset: false,
             });
 
             // Expect that submit is NOT enabled, since the user didn't
@@ -180,10 +180,10 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             // Expect that buttons are hidden
             expectButtonShown({
                 snapshot: false,
-                reset: false
+                reset: false,
             });
             expectSubmitEnabled(false);
         });
     });
-}
+},
 );

@@ -3,7 +3,7 @@
     define(
         'video/08_video_speed_control.js', [
             'video/00_iterator.js',
-            'edx-ui-toolkit/js/utils/html-utils'
+            'edx-ui-toolkit/js/utils/html-utils',
         ], function(Iterator, HtmlUtils) {
             /**
      * Video speed control module.
@@ -19,7 +19,7 @@
 
                 _.bindAll(this, 'onSetSpeed', 'onRenderSpeed', 'clickLinkHandler',
                     'keyDownLinkHandler', 'mouseEnterHandler', 'mouseLeaveHandler',
-                    'clickMenuHandler', 'keyDownMenuHandler', 'destroy'
+                    'clickMenuHandler', 'keyDownMenuHandler', 'destroy',
                 );
                 this.state = state;
                 this.state.videoSpeedControl = this;
@@ -47,7 +47,7 @@
                     '<span class="value"></span>',
                     '</button>',
                     '<ol class="video-speeds menu"></ol>',
-                    '</div>'
+                    '</div>',
                 ].join(''),
 
                 destroy: function() {
@@ -55,12 +55,12 @@
                         mouseenter: this.mouseEnterHandler,
                         mouseleave: this.mouseLeaveHandler,
                         click: this.clickMenuHandler,
-                        keydown: this.keyDownMenuHandler
+                        keydown: this.keyDownMenuHandler,
                     });
 
                     this.state.el.off({
                         'speed:set': this.onSetSpeed,
-                        'speed:render': this.onRenderSpeed
+                        'speed:render': this.onRenderSpeed,
                     });
                     this.closeMenu(true);
                     this.speedsContainer.remove();
@@ -74,7 +74,7 @@
 
                     if (!this.isPlaybackRatesSupported(state)) {
                         console.log(
-                            '[Video info]: playbackRate is not supported.'
+                            '[Video info]: playbackRate is not supported.',
                         );
 
                         return false;
@@ -107,23 +107,23 @@
                                         '<button class="control speed-option" tabindex="-1" aria-pressed="false">',
                                         '{speed}x',
                                         '</button>',
-                                        '</li>'
-                                    ].join('')
+                                        '</li>',
+                                    ].join(''),
                                 ),
                                 {
-                                    speed: speed
-                                }
+                                    speed: speed,
+                                },
                             ).toString();
                         });
 
                     HtmlUtils.setHtml(
                         speedsContainer,
-                        HtmlUtils.HTML(speedsList)
+                        HtmlUtils.HTML(speedsList),
                     );
                     this.speedLinks = new Iterator(speedsContainer.find('.speed-option'));
                     HtmlUtils.prepend(
                         this.state.el.find('.secondary-controls'),
-                        HtmlUtils.HTML(this.el)
+                        HtmlUtils.HTML(this.el),
                     );
                     this.setActiveSpeed(currentSpeed);
 
@@ -142,19 +142,19 @@
                         mouseenter: this.mouseEnterHandler,
                         mouseleave: this.mouseLeaveHandler,
                         click: this.openMenu,
-                        keydown: this.keyDownMenuHandler
+                        keydown: this.keyDownMenuHandler,
                     });
 
                     // Attach click and keydown event handlers to the individual speed
                     // entries.
                     this.speedsContainer.on({
                         click: this.clickLinkHandler,
-                        keydown: this.keyDownLinkHandler
+                        keydown: this.keyDownLinkHandler,
                     }, '.speed-option');
 
                     this.state.el.on({
                         'speed:set': this.onSetSpeed,
-                        'speed:render': this.onRenderSpeed
+                        'speed:render': this.onRenderSpeed,
                     });
                     this.state.el.on('destroy', this.destroy);
                 },
@@ -410,7 +410,7 @@
                     }
 
                     return true;
-                }
+                },
             };
 
             return SpeedControl;

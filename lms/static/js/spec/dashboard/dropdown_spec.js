@@ -77,5 +77,5 @@ define(['js/dashboard/dropdown', 'jquery.simulate'],
                 });
             });
         });
-    }
+    },
 );

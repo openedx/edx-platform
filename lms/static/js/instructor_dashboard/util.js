@@ -50,7 +50,7 @@
             enableColumnReorder: false,
             autoHeight: true,
             rowHeight: 100,
-            forceFitColumns: true
+            forceFitColumns: true,
         };
         columns = [
             {
@@ -61,7 +61,7 @@
         */
 
                 name: gettext('Task Type'),
-                minWidth: 102
+                minWidth: 102,
             }, {
                 id: 'task_input',
                 field: 'task_input',
@@ -70,7 +70,7 @@
         */
 
                 name: gettext('Task inputs'),
-                minWidth: 150
+                minWidth: 150,
             }, {
                 id: 'task_id',
                 field: 'task_id',
@@ -79,7 +79,7 @@
         */
 
                 name: gettext('Task ID'),
-                minWidth: 150
+                minWidth: 150,
             }, {
                 id: 'requester',
                 field: 'requester',
@@ -88,7 +88,7 @@
         */
 
                 name: gettext('Requester'),
-                minWidth: 80
+                minWidth: 80,
             }, {
                 id: 'created',
                 field: 'created',
@@ -97,7 +97,7 @@
         */
 
                 name: gettext('Submitted'),
-                minWidth: 120
+                minWidth: 120,
             }, {
                 id: 'duration_sec',
                 field: 'duration_sec',
@@ -106,7 +106,7 @@
         */
 
                 name: gettext('Duration (sec)'),
-                minWidth: 80
+                minWidth: 80,
             }, {
                 id: 'task_state',
                 field: 'task_state',
@@ -115,7 +115,7 @@
         */
 
                 name: gettext('State'),
-                minWidth: 80
+                minWidth: 80,
             }, {
                 id: 'status',
                 field: 'status',
@@ -124,7 +124,7 @@
         */
 
                 name: gettext('Task Status'),
-                minWidth: 80
+                minWidth: 80,
             }, {
                 id: 'task_message',
                 field: 'task_message',
@@ -133,12 +133,12 @@
         */
 
                 name: gettext('Task Progress'),
-                minWidth: 120
-            }
+                minWidth: 120,
+            },
         ];
         tableData = tasksData;
         $tablePlaceholder = $('<div/>', {
-            class: 'slickgrid'
+            class: 'slickgrid',
         });
         $tableTasks.append($tablePlaceholder);
         return new Slick.Grid($tablePlaceholder, tableData, columns, options);
@@ -153,7 +153,7 @@
         return edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML(
             '<p><a href="#email_message_'), value.id, edx.HtmlUtils.HTML(
             '" id="email_message_'), value.id, edx.HtmlUtils.HTML('_trig">'),
-        subjectText, edx.HtmlUtils.HTML('</a></p>')
+        subjectText, edx.HtmlUtils.HTML('</a></p>'),
         );
     };
 
@@ -190,7 +190,7 @@
             enableColumnReorder: false,
             autoHeight: true,
             rowHeight: 50,
-            forceFitColumns: true
+            forceFitColumns: true,
         };
         columns = [
             {
@@ -199,7 +199,7 @@
                 name: gettext('Subject'),
                 minWidth: 80,
                 cssClass: 'email-content-cell',
-                formatter: subjectFormatter
+                formatter: subjectFormatter,
             }, {
                 id: 'requester',
                 field: 'requester',
@@ -207,7 +207,7 @@
                 minWidth: 80,
                 maxWidth: 100,
                 cssClass: 'email-content-cell',
-                formatter: unknownIfNullFormatter
+                formatter: unknownIfNullFormatter,
             }, {
                 id: 'sent_to',
                 field: 'sent_to',
@@ -215,14 +215,14 @@
                 minWidth: 80,
                 maxWidth: 100,
                 cssClass: 'email-content-cell',
-                formatter: sentToFormatter
+                formatter: sentToFormatter,
             }, {
                 id: 'created',
                 field: 'created',
                 name: gettext('Time Sent'),
                 minWidth: 80,
                 cssClass: 'email-content-cell',
-                formatter: unknownIfNullFormatter
+                formatter: unknownIfNullFormatter,
             }, {
                 id: 'number_sent',
                 field: 'number_sent',
@@ -230,12 +230,12 @@
                 minwidth: 100,
                 maxWidth: 150,
                 cssClass: 'email-content-cell',
-                formatter: unknownIfNullFormatter
-            }
+                formatter: unknownIfNullFormatter,
+            },
         ];
         tableData = emailData;
         $tablePlaceholder = $('<div/>', {
-            class: 'slickgrid'
+            class: 'slickgrid',
         });
         $tableEmailsInner.append($tablePlaceholder);
         Slick.Grid($tablePlaceholder, tableData, columns, options);
@@ -256,31 +256,31 @@
             $messageContent = $('<section>', {
                 'aria-hidden': 'true',
                 class: 'modal email-modal',
-                id: 'email_message_' + emailId
+                id: 'email_message_' + emailId,
             });
             $emailWrapper = $('<div>', {
-                class: 'inner-wrapper email-content-wrapper'
+                class: 'inner-wrapper email-content-wrapper',
             });
             $emailHeader = $('<div>', {
-                class: 'email-content-header'
+                class: 'email-content-header',
             });
             $emailHeader.append($('<input>', {
                 type: 'button',
                 name: 'copy-email-body-text',
                 value: gettext('Copy Email To Editor'),
-                id: 'copy_email_' + emailId
+                id: 'copy_email_' + emailId,
             }));
             $closeButton = $('<a>', {
                 href: '#',
-                class: 'close-modal'
+                class: 'close-modal',
             });
             $closeButton.append($('<i>', {
-                class: 'icon fa fa-times'
+                class: 'icon fa fa-times',
             }));
             $emailHeader.append($closeButton);
             interpolateHeader = function(title, value) {
                 return edx.HtmlUtils.setHtml($('<h2>', {
-                    class: 'message-bold'
+                    class: 'message-bold',
                 }), edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML('<em>'), title, edx.HtmlUtils.HTML('</em>'), value));
             };
             $subject = interpolateHeader(gettext('Subject:'), emailInfo.email.subject);
@@ -294,10 +294,10 @@
             $emailWrapper.append($emailHeader);
             $emailWrapper.append($('<hr>'));
             $emailContent = $('<div>', {
-                class: 'email-content-message'
+                class: 'email-content-message',
             });
             $emailContentHeader = edx.HtmlUtils.setHtml($('<h2>', {
-                class: 'message-bold'
+                class: 'message-bold',
             }), edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML('<em>'), gettext('Message:'), edx.HtmlUtils.HTML('</em>')));
             $emailContent.append($emailContentHeader);
             $message = edx.HtmlUtils.setHtml($('<div>'), edx.HtmlUtils.HTML(emailInfo.email.html_message));
@@ -307,7 +307,7 @@
             $messagesWrapper.append($messageContent);
             $('#email_message_' + emailInfo.email.id + '_trig').leanModal({
                 closeButton: '.close-modal',
-                copyEmailButton: '#copy_email_' + emailId
+                copyEmailButton: '#copy_email_' + emailId,
             });
             setupCopyEmailButton(emailId, emailInfo.email.html_message, emailInfo.email.subject);
         }
@@ -364,7 +364,7 @@
             this.$section = $section;
             this.reload_running_tasks_list = function() {
                 return PendingInstructorTasks.prototype.reload_running_tasks_list.apply(
-                    ths, arguments
+                    ths, arguments,
                 );
             };
             this.$running_tasks_section = findAndAssert(this.$section, '.running-tasks-section');
@@ -401,7 +401,7 @@
                 },
                 error: function() {
                     ths.task_poller.backOff();
-                }
+                },
             });
         };
 
@@ -414,7 +414,7 @@
         keywordValidator.keyword_regex = /%%+[^%]+%%/g;
 
         keywordValidator.keywords = [
-            '%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%'
+            '%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%',
         ];
 
         keywordValidator.validate_string = function(string) {
@@ -441,7 +441,7 @@
             }
             return {
                 isValid: isValid,
-                invalidKeywords: invalidKeywords
+                invalidKeywords: invalidKeywords,
             };
         };
 
@@ -480,7 +480,7 @@
                 },
                 error: function() {
                     ths.downloads_poller.backOff();
-                }
+                },
             });
         };
 
@@ -491,7 +491,7 @@
                 enableCellNavigation: true,
                 enableColumnReorder: false,
                 rowHeight: 30,
-                forceFitColumns: true
+                forceFitColumns: true,
             };
             columns = [
                 {
@@ -507,11 +507,11 @@
                             '<a rel="noopener" target="_blank" href="'), dataContext.url,
                         edx.HtmlUtils.HTML('">'), dataContext.name,
                         edx.HtmlUtils.HTML('</a>'));
-                    }
-                }
+                    },
+                },
             ];
             $tablePlaceholder = $('<div/>', {
-                class: 'slickgrid'
+                class: 'slickgrid',
             });
             this.$report_downloads_table.append($tablePlaceholder);
             grid = new Slick.Grid($tablePlaceholder, reportDownloadsData, columns, options);
@@ -520,11 +520,11 @@
                 reportUrl = event.target.href;
                 if (reportUrl) {
                     return Logger.log('edx.instructor.report.downloaded', {
-                        report_url: reportUrl
+                        report_url: reportUrl,
                     });
                 }
                 return Logger.log('edx.instructor.report.downloaded', {
-                    report_url: reportUrl
+                    report_url: reportUrl,
                 });
             });
             return grid.autosizeColumns();
@@ -535,7 +535,7 @@
 
     if (typeof _ !== 'undefined' && _ !== null) {
         _.defaults(window, {
-            InstructorDashboard: {}
+            InstructorDashboard: {},
         });
         window.InstructorDashboard.util = {
             plantTimeout: plantTimeout,
@@ -547,7 +547,7 @@
             createEmailMessageViews: createEmailMessageViews,
             PendingInstructorTasks: PendingInstructorTasks,
             KeywordValidator: KeywordValidator,
-            ReportDownloads: this.ReportDownloads
+            ReportDownloads: this.ReportDownloads,
         };
     }
 }).call(this);

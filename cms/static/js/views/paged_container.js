@@ -69,7 +69,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
 
                 getPageSize: function() {
                     return self.page_size;
-                }
+                },
             };
         },
 
@@ -111,7 +111,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                         }
                     }
                     self.handleXBlockFragment(fragment, options);
-                }
+                },
             });
         },
 
@@ -121,7 +121,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                 page_size: this.page_size,
                 enable_paging: true,
                 page_number: page_number,
-                force_render: force_render
+                force_render: force_render,
             };
         },
 
@@ -182,11 +182,11 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
 
             this.pagingHeader = new PagingHeader({
                 view: this,
-                el: this.$el.find('.container-paging-header')
+                el: this.$el.find('.container-paging-header'),
             });
             this.pagingFooter = new PagingFooter({
                 collection: this.collection,
-                el: this.$el.find('.container-paging-footer')
+                el: this.$el.find('.container-paging-footer'),
             });
 
             this.pagingHeader.render();
@@ -225,7 +225,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                 }
                 this.setPage(
                     target_page,
-                    {force_render: force_render}
+                    {force_render: force_render},
                 );
             } else {
                 this.pagingHeader.render();
@@ -268,10 +268,10 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                 url: '/preview' + decodeURIComponent(xblockUrl) + '/handler/trigger_previews',
                 type: 'POST',
                 data: JSON.stringify({showChildrenPreviews: !this.collection.showChildrenPreviews}),
-                dataType: 'json'
+                dataType: 'json',
             })
                 .then(self.render).promise();
-        }
+        },
     });
 
     return PagedContainerView;

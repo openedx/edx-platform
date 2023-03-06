@@ -22,9 +22,9 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
             username: USERNAME,
             name: FULLNAME,
             email: EMAIL,
-            language: SELECT_OPTIONS[0][0]
+            language: SELECT_OPTIONS[0][0],
         },
-        url: API_URL
+        url: API_URL,
     });
 
     var createFieldData = function(fieldType, fieldData) {
@@ -33,7 +33,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
             title: fieldData.title || 'Field Title',
             valueAttribute: fieldData.valueAttribute,
             helpMessage: fieldData.helpMessage || 'I am a field message',
-            placeholderValue: fieldData.placeholderValue || 'I am a placeholder message'
+            placeholderValue: fieldData.placeholderValue || 'I am a placeholder message',
         };
 
         switch (fieldType) {
@@ -57,10 +57,10 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
     var createErrorMessage = function(attribute, user_message) {
         var field_errors = {};
         field_errors[attribute] = {
-            user_message: user_message
+            user_message: user_message,
         };
         return {
-            field_errors: field_errors
+            field_errors: field_errors,
         };
     };
 
@@ -83,7 +83,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
 
     var expectAjaxRequestWithData = function(requests, data) {
         AjaxHelpers.expectJsonRequest(
-            requests, 'PATCH', API_URL, data
+            requests, 'PATCH', API_URL, data,
         );
     };
 
@@ -108,7 +108,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
 
         view.showErrorMessage({
             responseText: JSON.stringify(createErrorMessage(data.valueAttribute, 'Ops, try again!.')),
-            status: 400
+            status: 400,
         });
         expectMessageContains(view, view.indicators.validationError);
 
@@ -141,7 +141,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
             helpMessage: 'The username that you use to sign in to edX.',
             validValue: 'My Name',
             persistChanges: false,
-            messagePosition: 'header'
+            messagePosition: 'header',
         });
         var view = new fieldClass(fieldData).render();
         var valueInputSelector;
@@ -191,7 +191,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         expectMessageContains(view, view.messages.inProgress);
         request_data[data.valueAttribute] = data.validValue;
         AjaxHelpers.expectJsonRequest(
-            requests, 'PATCH', url, request_data
+            requests, 'PATCH', url, request_data,
         );
 
         AjaxHelpers.respondWithNoContent(requests);
@@ -207,7 +207,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         view.$(data.valueInputSelector).focusout();
         request_data[data.valueAttribute] = data.invalidValue1;
         AjaxHelpers.expectJsonRequest(
-            requests, 'PATCH', url, request_data
+            requests, 'PATCH', url, request_data,
         );
         AjaxHelpers.respondWithError(requests, 500);
         // When server returns a 500 error
@@ -219,7 +219,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         view.$(data.valueInputSelector).focusout();
         request_data[data.valueAttribute] = data.invalidValue2;
         AjaxHelpers.expectJsonRequest(
-            requests, 'PATCH', url, request_data
+            requests, 'PATCH', url, request_data,
         );
         AjaxHelpers.respondWithError(requests, 400, createErrorMessage(data.valueAttribute, data.validationError));
         // When server returns a validation error
@@ -233,7 +233,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         expect(view.fieldValue()).toBe(data.defaultValue);
         request_data[data.valueAttribute] = data.defaultValue;
         AjaxHelpers.expectJsonRequest(
-            requests, 'PATCH', url, request_data
+            requests, 'PATCH', url, request_data,
         );
         AjaxHelpers.respondWithNoContent(requests);
         // When server returns success.
@@ -269,28 +269,28 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
     var verifyTextField = function(view, data, requests) {
         verifyEditableField(view, _.extend({
             valueSelector: '.u-field-value',
-            valueInputSelector: '.u-field-value > input'
+            valueInputSelector: '.u-field-value > input',
         }, data),
         requests);
     };
 
     var verifyReadonlyTextField = function(view, data) {
         verifyReadonlyField(view, _.extend({
-            valueSelector: '.u-field-value'
+            valueSelector: '.u-field-value',
         }, data));
     };
 
     var verifyDropDownField = function(view, data, requests) {
         verifyEditableField(view, _.extend({
             valueSelector: '.u-field-value',
-            valueInputSelector: '.u-field-value > select'
-        }, data
+            valueInputSelector: '.u-field-value > select',
+        }, data,
         ), requests);
     };
 
     var verifyReadonlyDropDownField = function(view, data) {
         verifyUneditableDropdownField(view, _.extend({
-            valueSelector: '.editable-never'
+            valueSelector: '.editable-never',
         }, data));
     };
 
@@ -311,6 +311,6 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         verifyReadonlyTextField: verifyReadonlyTextField,
         verifyDropDownField: verifyDropDownField,
         verifyReadonlyDropDownField: verifyReadonlyDropDownField,
-        verifyPersistence: verifyPersistence
+        verifyPersistence: verifyPersistence,
     };
 });

@@ -18,7 +18,7 @@ var options = {
     libraryFiles: [
         {pattern: 'js/libs/**/*.js'},
         {pattern: 'js/test/**/*.js'},
-        {pattern: 'js/vendor/**/*.js'}
+        {pattern: 'js/vendor/**/*.js'},
     ],
 
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
@@ -26,16 +26,16 @@ var options = {
     sourceFiles: [],
 
     specFiles: [
-        {pattern: 'common/js/spec/**/*spec.js'}
+        {pattern: 'common/js/spec/**/*spec.js'},
     ],
 
     fixtureFiles: [
-        {pattern: 'common/templates/**/*.*'}
+        {pattern: 'common/templates/**/*.*'},
     ],
 
     runFiles: [
-        {pattern: 'common/js/spec/main_requirejs.js', included: true}
-    ]
+        {pattern: 'common/js/spec/main_requirejs.js', included: true},
+    ],
 };
 
 module.exports = function(config) {

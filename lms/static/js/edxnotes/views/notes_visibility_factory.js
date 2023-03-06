@@ -2,11 +2,11 @@
     'use strict';
     define([
         'jquery', 'underscore', 'backbone', 'gettext',
-        'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator', 'js/utils/animation'
+        'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator', 'js/utils/animation',
     ], function($, _, Backbone, gettext, Annotator, VisibilityDecorator) {
         var ToggleVisibilityView = Backbone.View.extend({
             events: {
-                'click .action-toggle-notes': 'toggleHandler'
+                'click .action-toggle-notes': 'toggleHandler',
             },
 
             errorMessage: gettext('An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.'),
@@ -96,7 +96,7 @@
                     dataType: 'json',
                     data: JSON.stringify({visibility: this.visibility}),
                     success: this.onSuccess,
-                    error: this.onError
+                    error: this.onError,
                 });
             },
 
@@ -106,7 +106,7 @@
 
             onError: function() {
                 this.showErrorMessage(this.errorMessage);
-            }
+            },
         });
 
         return {
@@ -115,10 +115,10 @@
                     el: $('.edx-notes-visibility').get(0),
                     visibility: visibility,
                     visibilityUrl: visibilityUrl,
-                    hideUI: hideUI
+                    hideUI: hideUI,
                 });
             },
-            VisibilityDecorator: VisibilityDecorator
+            VisibilityDecorator: VisibilityDecorator,
         };
     });
 }).call(this, define || RequireJS.define);

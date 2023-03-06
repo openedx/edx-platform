@@ -1,6 +1,6 @@
 define([
     'backbone', 'underscore', 'gettext', 'js/models/group', 'js/collections/group',
-    'backbone.associations', 'cms/js/main'
+    'backbone.associations', 'cms/js/main',
 ],
 function(Backbone, _, gettext, GroupModel, GroupCollection) {
     'use strict';
@@ -14,17 +14,17 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
                 groups: new GroupCollection([
                     {
                         name: gettext('Group A'),
-                        order: 0
+                        order: 0,
                     },
                     {
                         name: gettext('Group B'),
-                        order: 1
-                    }
+                        order: 1,
+                    },
                 ]),
                 showGroups: false,
                 editing: false,
                 usage: [],
-                read_only: false
+                read_only: false,
             };
         },
 
@@ -32,7 +32,7 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
             type: Backbone.Many,
             key: 'groups',
             relatedModel: GroupModel,
-            collectionType: GroupCollection
+            collectionType: GroupCollection,
         }],
 
         initialize: function(attributes, options) {
@@ -54,7 +54,7 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
 
         isDirty: function() {
             return !_.isEqual(
-                this._originalAttributes, this.parse(this.toJSON())
+                this._originalAttributes, this.parse(this.toJSON()),
             );
         },
 
@@ -80,7 +80,7 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
                 description: this.get('description'),
                 version: this.get('version'),
                 groups: this.get('groups').toJSON(),
-                read_only: this.get('read_only')
+                read_only: this.get('read_only'),
             };
         },
 
@@ -88,14 +88,14 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
             if (!attrs.name.trim()) {
                 return {
                     message: gettext('Group Configuration name is required.'),
-                    attributes: {name: true}
+                    attributes: {name: true},
                 };
             }
 
             if (!this.canBeEmpty && attrs.groups.length < 1) {
                 return {
                     message: gettext('There must be at least one group.'),
-                    attributes: {groups: true}
+                    attributes: {groups: true},
                 };
             } else {
                 // validate all groups
@@ -112,7 +112,7 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
                 if (!invalidGroups.isEmpty()) {
                     return {
                         message: gettext('All groups must have a name.'),
-                        attributes: {groups: invalidGroups.toJSON()}
+                        attributes: {groups: invalidGroups.toJSON()},
                     };
                 }
 
@@ -120,7 +120,7 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
                 if (groupNames.length !== _.uniq(groupNames).length) {
                     return {
                         message: gettext('All groups must have a unique name.'),
-                        attributes: {groups: validGroups.toJSON()}
+                        attributes: {groups: validGroups.toJSON()},
                     };
                 }
             }
@@ -128,7 +128,7 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
 
         groupRemoved: function() {
             this.setOriginalAttributes();
-        }
+        },
     });
 
     return GroupConfiguration;

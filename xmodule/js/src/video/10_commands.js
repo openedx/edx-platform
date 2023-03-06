@@ -53,7 +53,7 @@
                     commandsList = [
                         playCommand, pauseCommand, togglePlaybackCommand,
                         toggleMuteCommand, toggleFullScreenCommand, setSpeedCommand,
-                        skipCommand
+                        skipCommand,
                     ];
 
                 _.each(commandsList, function(command) {
@@ -61,7 +61,7 @@
                 }, this);
 
                 return commands;
-            }
+            },
         };
 
         Command = function(name, execute) {

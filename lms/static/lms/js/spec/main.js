@@ -97,141 +97,141 @@
             // Common edx utils
             'common/js/utils/edx.utils.validate': 'common/js/utils/edx.utils.validate',
             'slick.core': 'xmodule_js/common_static/js/vendor/slick.core',
-            'slick.grid': 'xmodule_js/common_static/js/vendor/slick.grid'
+            'slick.grid': 'xmodule_js/common_static/js/vendor/slick.grid',
         },
         shim: {
             'gettext': {
-                exports: 'gettext'
+                exports: 'gettext',
             },
             'string_utils': {
                 deps: ['underscore'],
-                exports: 'interpolate_text'
+                exports: 'interpolate_text',
             },
             'date': {
-                exports: 'Date'
+                exports: 'Date',
             },
             'jquery-migrate': ['jquery'],
             'jquery.ui': {
                 deps: ['jquery'],
-                exports: 'jQuery.ui'
+                exports: 'jQuery.ui',
             },
             'jquery.flot': {
                 deps: ['jquery'],
-                exports: 'jQuery.flot'
+                exports: 'jQuery.flot',
             },
             'jquery.form': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.ajaxForm'
+                exports: 'jQuery.fn.ajaxForm',
             },
             'jquery.markitup': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.markitup'
+                exports: 'jQuery.fn.markitup',
             },
             'jquery.leanModal': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.leanModal'
+                exports: 'jQuery.fn.leanModal',
             },
             'jquery.smoothScroll': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.smoothScroll'
+                exports: 'jQuery.fn.smoothScroll',
             },
             'jquery.ajaxQueue': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.ajaxQueue'
+                exports: 'jQuery.fn.ajaxQueue',
             },
             'jquery.scrollTo': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.scrollTo'
+                exports: 'jQuery.fn.scrollTo',
             },
             'jquery.cookie': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.cookie'
+                exports: 'jQuery.fn.cookie',
             },
             'jquery.qtip': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.qtip'
+                exports: 'jQuery.fn.qtip',
             },
             'jquery.fileupload': {
                 deps: ['jquery.iframe-transport'],
-                exports: 'jQuery.fn.fileupload'
+                exports: 'jQuery.fn.fileupload',
             },
             'jquery.inputnumber': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.inputNumber'
+                exports: 'jQuery.fn.inputNumber',
             },
             'jquery.simulate': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.simulate'
+                exports: 'jQuery.fn.simulate',
             },
             'jquery.timeago': {
                 deps: ['jquery'],
-                exports: 'jQuery.timeago'
+                exports: 'jQuery.timeago',
             },
             'jquery.tinymce': {
                 deps: ['jquery', 'tinymce'],
-                exports: 'jQuery.fn.tinymce'
+                exports: 'jQuery.fn.tinymce',
             },
             'jquery.url': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.url'
+                exports: 'jQuery.fn.url',
             },
             'datepair': {
-                deps: ['jquery.ui', 'jquery.timepicker']
+                deps: ['jquery.ui', 'jquery.timepicker'],
             },
             'underscore': {
                 deps: ['underscore.string'],
-                exports: '_'
+                exports: '_',
             },
             'backbone': {
                 deps: ['underscore', 'jquery'],
-                exports: 'Backbone'
+                exports: 'Backbone',
             },
             'bootstrap': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'backbone.associations': {
                 deps: ['backbone'],
-                exports: 'Backbone.Associations'
+                exports: 'Backbone.Associations',
             },
             'backbone.paginator': {
                 deps: ['backbone'],
-                exports: 'Backbone.PageableCollection'
+                exports: 'Backbone.PageableCollection',
             },
             'backbone-super': {
-                deps: ['backbone']
+                deps: ['backbone'],
             },
             'paging-collection': {
-                deps: ['jquery', 'underscore', 'backbone.paginator']
+                deps: ['jquery', 'underscore', 'backbone.paginator'],
             },
             'youtube': {
-                exports: 'YT'
+                exports: 'YT',
             },
             'Markdown.Converter': {
                 deps: ['mathjax'],
-                exports: 'Markdown.Converter'
+                exports: 'Markdown.Converter',
             },
             'Markdown.Editor': {
                 deps: ['Markdown.Converter', 'gettext', 'underscore'],
-                exports: 'Markdown.Editor'
+                exports: 'Markdown.Editor',
             },
             'Markdown.Sanitizer': {
                 deps: ['Markdown.Converter'],
-                exports: 'Markdown.Sanitizer'
+                exports: 'Markdown.Sanitizer',
             },
             '_split': {
-                exports: '_split'
+                exports: '_split',
             },
             'MathJaxProcessor': {
                 deps: [
-                    'Markdown.Converter', 'Markdown.Sanitizer', 'Markdown.Editor', '_split', 'mathjax_delay_renderer'
+                    'Markdown.Converter', 'Markdown.Sanitizer', 'Markdown.Editor', '_split', 'mathjax_delay_renderer',
                 ],
-                exports: 'MathJaxProcessor'
+                exports: 'MathJaxProcessor',
             },
             'codemirror': {
-                exports: 'CodeMirror'
+                exports: 'CodeMirror',
             },
             'tinymce': {
-                exports: 'tinymce'
+                exports: 'tinymce',
             },
             'mathjax': {
                 exports: 'MathJax',
@@ -239,49 +239,49 @@
                     MathJax.Hub.Config({
                         tex2jax: {
                             inlineMath: [['\\(', '\\)'], ['[mathjaxinline]', '[/mathjaxinline]']],
-                            displayMath: [['\\[', '\\]'], ['[mathjax]', '[/mathjax]']]
-                        }
+                            displayMath: [['\\[', '\\]'], ['[mathjax]', '[/mathjax]']],
+                        },
                     });
                     return MathJax.Hub.Configured();
-                }
+                },
             },
             'URI': {
-                exports: 'URI'
+                exports: 'URI',
             },
             'xmodule': {
-                exports: 'XModule'
+                exports: 'XModule',
             },
             'logger': {
-                exports: 'Logger'
+                exports: 'Logger',
             },
             'sinon': {
-                exports: 'sinon'
+                exports: 'sinon',
             },
             'jasmine-imagediff': {},
             'common/js/spec_helpers/jasmine-extensions': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'common/js/spec_helpers/jasmine-stealth': {
-                deps: ['underscore', 'underscore.string']
+                deps: ['underscore', 'underscore.string'],
             },
             'common/js/spec_helpers/jasmine-waituntil': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'xblock/core': {
                 exports: 'XBlock',
-                deps: ['jquery', 'jquery.immediateDescendents']
+                deps: ['jquery', 'jquery.immediateDescendents'],
             },
             'xblock/runtime.v1': {
                 exports: 'XBlock.Runtime.v1',
-                deps: ['xblock/core']
+                deps: ['xblock/core'],
             },
             'xblock/lms.runtime.v1': {
                 exports: 'LmsRuntime.v1',
-                deps: ['xblock/runtime.v1']
+                deps: ['xblock/runtime.v1'],
             },
             'xmodule_js/common_static/js/test/add_ajax_prefix': {
                 exports: 'AjaxPrefix',
-                deps: ['js/src/ajax_prefix']
+                deps: ['js/src/ajax_prefix'],
             },
             'js/instructor_dashboard/util': {
                 exports: 'js/instructor_dashboard/util',
@@ -290,21 +290,21 @@
                     // Set global variables that the util code is expecting to be defined
                     require([  // eslint-disable-line global-require
                         'edx-ui-toolkit/js/utils/html-utils',
-                        'edx-ui-toolkit/js/utils/string-utils'
+                        'edx-ui-toolkit/js/utils/string-utils',
                     ], function(HtmlUtils, StringUtils) {
                         window.edx = window.edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
                     });
-                }
+                },
             },
             'js/instructor_dashboard/student_admin': {
                 exports: 'js/instructor_dashboard/student_admin',
-                deps: ['jquery', 'underscore', 'js/instructor_dashboard/util', 'string_utils']
+                deps: ['jquery', 'underscore', 'js/instructor_dashboard/util', 'string_utils'],
             },
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
-                deps: ['jquery', 'gettext', 'underscore']
+                deps: ['jquery', 'gettext', 'underscore'],
             },
             'js/instructor_dashboard/membership': {
                 exports: 'js/instructor_dashboard/membership',
@@ -313,68 +313,68 @@
                     // Set global variables that the util code is expecting to be defined
                     require([  // eslint-disable-line global-require
                         'edx-ui-toolkit/js/utils/html-utils',
-                        'edx-ui-toolkit/js/utils/string-utils'
+                        'edx-ui-toolkit/js/utils/string-utils',
                     ], function(HtmlUtils, StringUtils) {
                         window.edx = window.edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
                     });
-                }
+                },
             },
             // LMS class loaded explicitly until they are converted to use RequireJS
             'js/student_account/account': {
                 exports: 'js/student_account/account',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
+                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie'],
             },
             'js/staff_debug_actions': {
                 exports: 'js/staff_debug_actions',
-                deps: ['gettext']
+                deps: ['gettext'],
             },
             'js/dashboard/donation.js': {
                 exports: 'js/dashboard/donation',
-                deps: ['jquery', 'underscore', 'gettext']
+                deps: ['jquery', 'underscore', 'gettext'],
             },
             'js/dashboard/dropdown.js': {
                 exports: 'js/dashboard/dropdown',
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'js/shoppingcart/shoppingcart.js': {
                 exports: 'js/shoppingcart/shoppingcart',
-                deps: ['jquery', 'underscore', 'gettext']
+                deps: ['jquery', 'underscore', 'gettext'],
             },
             'js/ccx/schedule': {
                 exports: 'js/ccx/schedule',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'moment']
+                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'moment'],
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/instructor_dashboard/ecommerce': {
                 exports: 'edx.instructor_dashboard.ecommerce.ExpiryCouponView',
-                deps: ['backbone', 'jquery', 'underscore']
+                deps: ['backbone', 'jquery', 'underscore'],
             },
 
             'js/models/notification': {
                 exports: 'NotificationModel',
-                deps: ['backbone']
+                deps: ['backbone'],
             },
             'js/views/notification': {
                 exports: 'NotificationView',
-                deps: ['backbone', 'jquery', 'underscore']
+                deps: ['backbone', 'jquery', 'underscore'],
             },
             'js/views/file_uploader': {
                 exports: 'FileUploaderView',
                 deps: [
                     'backbone', 'jquery', 'underscore', 'gettext', 'string_utils', 'js/views/notification',
-                    'js/models/notification', 'jquery.fileupload'
-                ]
+                    'js/models/notification', 'jquery.fileupload',
+                ],
             },
             'js/verify_student/models/verification_model': {
                 exports: 'edx.verify_student.VerificationModel',
-                deps: ['jquery', 'underscore', 'backbone', 'jquery.cookie']
+                deps: ['jquery', 'underscore', 'backbone', 'jquery.cookie'],
             },
             'js/verify_student/views/error_view': {
                 exports: 'edx.verify_student.ErrorView',
-                deps: ['jquery', 'underscore', 'backbone']
+                deps: ['jquery', 'underscore', 'backbone'],
             },
             'js/verify_student/views/webcam_photo_view': {
                 exports: 'edx.verify_student.WebcamPhotoView',
@@ -383,12 +383,12 @@
                     'underscore',
                     'backbone',
                     'gettext',
-                    'js/verify_student/views/image_input_view'
-                ]
+                    'js/verify_student/views/image_input_view',
+                ],
             },
             'js/verify_student/views/image_input_view': {
                 exports: 'edx.verify_student.ImageInputView',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext']
+                deps: ['jquery', 'underscore', 'backbone', 'gettext'],
             },
             'js/verify_student/views/step_view': {
                 exports: 'edx.verify_student.StepView',
@@ -399,7 +399,7 @@
                         'underscore',
                         'underscore.string',
                         'edx-ui-toolkit/js/utils/html-utils',
-                        'edx-ui-toolkit/js/utils/string-utils'
+                        'edx-ui-toolkit/js/utils/string-utils',
                     ], function(_, str, HtmlUtils, StringUtils) {
                         window._ = _;
                         window._.str = str;
@@ -407,14 +407,14 @@
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
                     });
-                }
+                },
             },
             'js/verify_student/views/intro_step_view': {
                 exports: 'edx.verify_student.IntroStepView',
                 deps: [
                     'jquery',
-                    'js/verify_student/views/step_view'
-                ]
+                    'js/verify_student/views/step_view',
+                ],
             },
             'js/verify_student/views/make_payment_step_view': {
                 exports: 'edx.verify_student.MakePaymentStepView',
@@ -425,8 +425,8 @@
                     'jquery.cookie',
                     'jquery.url',
                     'string_utils',
-                    'js/verify_student/views/step_view'
-                ]
+                    'js/verify_student/views/step_view',
+                ],
             },
             'js/verify_student/views/face_photo_step_view': {
                 exports: 'edx.verify_student.FacePhotoStepView',
@@ -435,8 +435,8 @@
                     'underscore',
                     'gettext',
                     'js/verify_student/views/step_view',
-                    'js/verify_student/views/webcam_photo_view'
-                ]
+                    'js/verify_student/views/webcam_photo_view',
+                ],
             },
             'js/verify_student/views/id_photo_step_view': {
                 exports: 'edx.verify_student.IDPhotoStepView',
@@ -445,8 +445,8 @@
                     'underscore',
                     'gettext',
                     'js/verify_student/views/step_view',
-                    'js/verify_student/views/webcam_photo_view'
-                ]
+                    'js/verify_student/views/webcam_photo_view',
+                ],
             },
             'js/verify_student/views/review_photos_step_view': {
                 exports: 'edx.verify_student.ReviewPhotosStepView',
@@ -455,22 +455,22 @@
                     'underscore',
                     'gettext',
                     'js/verify_student/views/step_view',
-                    'js/verify_student/views/webcam_photo_view'
-                ]
+                    'js/verify_student/views/webcam_photo_view',
+                ],
             },
             'js/verify_student/views/enrollment_confirmation_step_view': {
                 exports: 'edx.verify_student.EnrollmentConfirmationStepView',
                 deps: [
                     'jquery',
-                    'js/verify_student/views/step_view'
-                ]
+                    'js/verify_student/views/step_view',
+                ],
             },
             'js/verify_student/views/reverify_success_step_view': {
                 exports: 'edx.verify_student.ReverifySuccessStepView',
                 deps: [
                     'jquery',
-                    'js/verify_student/views/step_view'
-                ]
+                    'js/verify_student/views/step_view',
+                ],
             },
             'js/verify_student/views/pay_and_verify_view': {
                 exports: 'edx.verify_student.PayAndVerifyView',
@@ -485,8 +485,8 @@
                     'js/verify_student/views/face_photo_step_view',
                     'js/verify_student/views/id_photo_step_view',
                     'js/verify_student/views/review_photos_step_view',
-                    'js/verify_student/views/enrollment_confirmation_step_view'
-                ]
+                    'js/verify_student/views/enrollment_confirmation_step_view',
+                ],
             },
             'js/verify_student/views/reverify_view': {
                 exports: 'edx.verify_student.ReverifyView',
@@ -499,21 +499,21 @@
                     'js/verify_student/views/face_photo_step_view',
                     'js/verify_student/views/id_photo_step_view',
                     'js/verify_student/views/enrollment_confirmation_step_view',
-                    'js/verify_student/views/reverify_success_step_view'
-                ]
+                    'js/verify_student/views/reverify_success_step_view',
+                ],
             },
             // Student Notes
             'annotator_1.2.9': {
                 exports: 'Annotator',
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'slick.core': {
                 deps: ['jquery'],
-                exports: 'Slick'
+                exports: 'Slick',
             },
             'slick.grid': {
                 deps: ['jquery', 'jquery.eventDrag', 'slick.core'],
-                exports: 'Slick'
+                exports: 'Slick',
             },
             // Discussions
             'common/js/discussion/utils': {
@@ -524,7 +524,7 @@
                     'backbone',
                     'gettext',
                     'MathJaxProcessor',
-                    'URI'
+                    'URI',
                 ],
                 exports: 'DiscussionUtil',
                 init: function() {
@@ -534,7 +534,7 @@
                             'backbone',
                             'URI',
                             'edx-ui-toolkit/js/utils/html-utils',
-                            'edx-ui-toolkit/js/utils/string-utils'
+                            'edx-ui-toolkit/js/utils/string-utils',
                         ],
                         function(Backbone, URI, HtmlUtils, StringUtils) {
                             window.Backbone = Backbone;
@@ -542,102 +542,102 @@
                             window.edx = window.edx || {};
                             window.edx.HtmlUtils = HtmlUtils;
                             window.edx.StringUtils = StringUtils;
-                        }
+                        },
                     );
-                }
+                },
             },
             'common/js/discussion/content': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'Content'
+                exports: 'Content',
             },
             'common/js/discussion/discussion': {
                 deps: [
                     'common/js/discussion/utils',
-                    'common/js/discussion/content'
+                    'common/js/discussion/content',
                 ],
-                exports: 'Discussion'
+                exports: 'Discussion',
             },
             'common/js/discussion/models/discussion_course_settings': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'DiscussionCourseSettings'
+                exports: 'DiscussionCourseSettings',
             },
             'common/js/discussion/models/discussion_user': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'DiscussionUser'
+                exports: 'DiscussionUser',
             },
             'common/js/discussion/views/discussion_content_view': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'DiscussionContentView'
+                exports: 'DiscussionContentView',
             },
             'common/js/discussion/views/discussion_thread_edit_view': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'DiscussionThreadEditView'
+                exports: 'DiscussionThreadEditView',
             },
             'common/js/discussion/views/discussion_thread_list_view': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'DiscussionThreadListView'
+                exports: 'DiscussionThreadListView',
             },
             'common/js/discussion/views/discussion_thread_profile_view': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'DiscussionThreadProfileView'
+                exports: 'DiscussionThreadProfileView',
             },
             'xmodule_js/common_static/common/js/discussion/views/discussion_thread_show_view': {
                 deps: [
                     'common/js/discussion/utils',
-                    'common/js/discussion/views/discussion_content_view'
+                    'common/js/discussion/views/discussion_content_view',
                 ],
-                exports: 'DiscussionThreadShowView'
+                exports: 'DiscussionThreadShowView',
             },
             'common/js/discussion/views/discussion_thread_view': {
                 deps: [
                     'common/js/discussion/utils',
-                    'common/js/discussion/views/discussion_content_view'
+                    'common/js/discussion/views/discussion_content_view',
                 ],
-                exports: 'DiscussionThreadView'
+                exports: 'DiscussionThreadView',
             },
             'common/js/discussion/views/discussion_topic_menu_view': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'DiscussionTopicMenuView'
+                exports: 'DiscussionTopicMenuView',
             },
             'common/js/discussion/views/new_post_view': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'NewPostView'
+                exports: 'NewPostView',
             },
             'common/js/discussion/views/thread_response_edit_view': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'ThreadResponseEditView'
+                exports: 'ThreadResponseEditView',
             },
             'common/js/discussion/views/thread_response_show_view': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'ThreadResponseShowView'
+                exports: 'ThreadResponseShowView',
             },
             'common/js/discussion/views/thread_response_view': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'ThreadResponseView'
+                exports: 'ThreadResponseView',
             },
             'common/js/discussion/views/discussion_inline_view': {
                 deps: [
@@ -661,17 +661,17 @@
                     'common/js/discussion/views/new_post_view',
                     'common/js/discussion/views/thread_response_edit_view',
                     'common/js/discussion/views/thread_response_show_view',
-                    'common/js/discussion/views/thread_response_view'
+                    'common/js/discussion/views/thread_response_view',
                 ],
-                exports: 'DiscussionInlineView'
+                exports: 'DiscussionInlineView',
             },
             'common/js/spec_helpers/discussion_spec_helper': {
                 deps: [
-                    'common/js/discussion/utils'
+                    'common/js/discussion/utils',
                 ],
-                exports: 'DiscussionSpecHelper'
-            }
-        }
+                exports: 'DiscussionSpecHelper',
+            },
+        },
     });
 
     testFiles = [
@@ -815,7 +815,7 @@
         'teams/js/spec/views/teams_tab_spec.js',
         'teams/js/spec/views/topic_card_spec.js',
         'teams/js/spec/views/topic_teams_spec.js',
-        'teams/js/spec/views/topics_spec.js'
+        'teams/js/spec/views/topics_spec.js',
     ];
 
     for (i = 0; i < testFiles.length; i++) {
@@ -825,7 +825,7 @@
     specHelpers = [
         'common/js/spec_helpers/jasmine-extensions',
         'common/js/spec_helpers/jasmine-stealth',
-        'common/js/spec_helpers/jasmine-waituntil'
+        'common/js/spec_helpers/jasmine-waituntil',
     ];
 
     // Jasmine has a global stack for creating a tree of specs. We need to load

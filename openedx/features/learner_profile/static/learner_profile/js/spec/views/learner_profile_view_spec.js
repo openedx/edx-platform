@@ -17,7 +17,7 @@ define(
         'learner_profile/js/views/learner_profile_view',
         'learner_profile/js/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
-        'js/views/message_banner'
+        'js/views/message_banner',
     ],
     function(gettext, Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
         FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
@@ -47,14 +47,14 @@ define(
                     valueAttribute: 'account_privacy',
                     options: [
                         ['all_users', 'Full Profile'],
-                        ['private', 'Limited Profile']
+                        ['private', 'Limited Profile'],
                     ],
                     helpMessage: '',
-                    accountSettingsPageUrl: '/account/settings/'
+                    accountSettingsPageUrl: '/account/settings/',
                 });
 
                 var messageView = new MessageBannerView({
-                    el: $('.message-banner')
+                    el: $('.message-banner'),
                 });
 
                 var profileImageFieldView = new LearnerProfileFields.ProfileImageFieldView({
@@ -65,26 +65,26 @@ define(
                     imageMaxBytes: Helpers.IMAGE_MAX_BYTES,
                     imageMinBytes: Helpers.IMAGE_MIN_BYTES,
                     imageUploadUrl: Helpers.IMAGE_UPLOAD_API_URL,
-                    imageRemoveUrl: Helpers.IMAGE_REMOVE_API_URL
+                    imageRemoveUrl: Helpers.IMAGE_REMOVE_API_URL,
                 });
 
                 var usernameFieldView = new FieldViews.ReadonlyFieldView({
                     model: accountSettingsModel,
                     valueAttribute: 'username',
-                    helpMessage: ''
+                    helpMessage: '',
                 });
 
                 var nameFieldView = new FieldViews.ReadonlyFieldView({
                     model: accountSettingsModel,
                     valueAttribute: 'name',
-                    helpMessage: ''
+                    helpMessage: '',
                 });
 
                 var sectionOneFieldViews = [
                     new LearnerProfileFields.SocialLinkIconsView({
                         model: accountSettingsModel,
                         socialPlatforms: Helpers.SOCIAL_PLATFORMS,
-                        ownProfile: true
+                        ownProfile: true,
                     }),
 
                     new FieldViews.DropdownFieldView({
@@ -96,7 +96,7 @@ define(
                         placeholderValue: '',
                         valueAttribute: 'country',
                         options: Helpers.FIELD_OPTIONS,
-                        helpMessage: ''
+                        helpMessage: '',
                     }),
 
                     new AccountSettingsFieldViews.LanguageProficienciesFieldView({
@@ -108,14 +108,14 @@ define(
                         placeholderValue: 'Add language',
                         valueAttribute: 'language_proficiencies',
                         options: Helpers.FIELD_OPTIONS,
-                        helpMessage: ''
+                        helpMessage: '',
                     }),
 
                     new FieldViews.DateFieldView({
                         model: accountSettingsModel,
                         valueAttribute: 'date_joined',
-                        helpMessage: ''
-                    })
+                        helpMessage: '',
+                    }),
                 ];
 
                 var sectionTwoFieldViews = [
@@ -128,8 +128,8 @@ define(
                             "what your interests are, why you're taking courses on edX, or what you hope to learn.",
                         valueAttribute: 'bio',
                         helpMessage: '',
-                        messagePosition: 'header'
-                    })
+                        messagePosition: 'header',
+                    }),
                 ];
 
                 var badgeCollection = new PagingCollection();
@@ -138,7 +138,7 @@ define(
                 var badgeListContainer = new BadgeListContainer({
                     attributes: {class: 'badge-set-display'},
                     collection: badgeCollection,
-                    find_courses_url: Helpers.FIND_COURSES_URL
+                    find_courses_url: Helpers.FIND_COURSES_URL,
                 });
 
                 return new LearnerProfileView(
@@ -154,7 +154,7 @@ define(
                         profileImageFieldView: profileImageFieldView,
                         sectionOneFieldViews: sectionOneFieldViews,
                         sectionTwoFieldViews: sectionTwoFieldViews,
-                        badgeListContainer: badgeListContainer
+                        badgeListContainer: badgeListContainer,
                     });
             };
 

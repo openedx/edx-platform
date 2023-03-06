@@ -16,7 +16,7 @@
                         attrs: {},
                         items: [],
                         callback: $.noop,
-                        initialize: $.noop
+                        initialize: $.noop,
                     }, options);
 
                     this.id = _.uniqueId();
@@ -124,7 +124,7 @@
                     return _.map(events.split(/\s+/), function(event) {
                         return event + '.' + this.id;
                     }, this).join(' ');
-                }
+                },
             });
 
             AbstractMenu = AbstractItem.extend({
@@ -175,7 +175,7 @@
 
                 keyDownHandler: function() { },
                 mouseOverHandler: function() { },
-                mouseLeaveHandler: function() { }
+                mouseLeaveHandler: function() { },
             });
 
             Menu = AbstractMenu.extend({
@@ -191,7 +191,7 @@
                     return $('<ol />', {
                         class: ['contextmenu', this.options.prefix + 'contextmenu'].join(' '),
                         role: 'menu',
-                        tabindex: -1
+                        tabindex: -1,
                     });
                 },
 
@@ -267,7 +267,7 @@
                         my: 'left top',
                         of: event,
                         collision: 'flipfit flipfit',
-                        within: this.contextmenuElement
+                        within: this.contextmenuElement,
                     });
 
                     return this;
@@ -279,7 +279,7 @@
                             x0: containerOffset.left,
                             y0: containerOffset.top,
                             x1: containerOffset.left + this.contextmenuElement.outerWidth(),
-                            y1: containerOffset.top + this.contextmenuElement.outerHeight()
+                            y1: containerOffset.top + this.contextmenuElement.outerHeight(),
                         };
                     return containerBox.x0 <= x && x <= containerBox.x1 && containerBox.y0 <= y && y <= containerBox.y1;
                 },
@@ -295,7 +295,7 @@
                             } else {
                                 this.close();
                             }
-                        }.bind(this)
+                        }.bind(this),
                     );
                 },
 
@@ -327,14 +327,14 @@
                     }
 
                     return false;
-                }
+                },
             });
 
             Overlay = Component.extend({
                 ns: '.overlay',
                 initialize: function(clickHandler, contextmenuHandler) {
                     this.element = $('<div />', {
-                        class: 'overlay'
+                        class: 'overlay',
                     });
                     this.clickHandler = clickHandler;
                     this.contextmenuHandler = contextmenuHandler;
@@ -382,7 +382,7 @@
                 undelegateEvents: function() {
                     $(document).off(this.ns);
                     return this;
-                }
+                },
             });
 
             Submenu = AbstractMenu.extend({
@@ -400,18 +400,18 @@
                             'aria-haspopup': 'true',
                             'aria-labelledby': 'submenu-item-label-' + this.id,
                             role: 'menuitem',
-                            tabindex: -1
+                            tabindex: -1,
                         });
 
                     $spanElem = $('<span />', {
                         id: 'submenu-item-label-' + this.id,
-                        text: this.options.label
+                        text: this.options.label,
                     });
                     this.label = $spanElem.appendTo($element);
 
                     $listElem = $('<ol />', {
                         class: ['submenu', this.options.prefix + 'submenu'].join(' '),
-                        role: 'menu'
+                        role: 'menu',
                     });
 
                     this.list = $listElem.appendTo($element);
@@ -477,7 +477,7 @@
                         at: 'right top',
                         of: this.getElement(),
                         collision: 'flipfit flipfit',
-                        within: this.contextmenuElement
+                        within: this.contextmenuElement,
                     });
                     return this;
                 },
@@ -492,14 +492,14 @@
                     clearTimeout(this.timer);
                     this.timer = setTimeout(this.close.bind(this), 200);
                     this.focus();
-                }
+                },
             });
 
             MenuItem = AbstractItem.extend({
                 createElement: function() {
                     var classNames = [
                         'menu-item', this.options.prefix + 'menu-item',
-                        this.options.isSelected ? 'is-selected' : ''
+                        this.options.isSelected ? 'is-selected' : '',
                     ].join(' ');
 
                     return $('<li />', {
@@ -507,7 +507,7 @@
                         'aria-selected': this.options.isSelected ? 'true' : 'false',
                         role: 'menuitem',
                         tabindex: -1,
-                        text: this.options.label
+                        text: this.options.label,
                     });
                 },
 
@@ -576,7 +576,7 @@
                     }
 
                     return false;
-                }
+                },
             });
 
             // VideoContextMenu() function - what this module 'exports'.
@@ -598,9 +598,9 @@
                                     },
                                     pause: function() {
                                         menuitem.setLabel(i18n.Play);
-                                    }
+                                    },
                                 });
-                            }
+                            },
                         }, {
                             label: state.videoVolumeControl.getMuteStatus() ? i18n.Unmute : i18n.Mute,
                             callback: function() {
@@ -614,9 +614,9 @@
                                         } else {
                                             menuitem.setLabel(i18n.Mute);
                                         }
-                                    }
+                                    },
                                 });
-                            }
+                            },
                         }, {
                             label: i18n['Fill browser'],
                             callback: function() {
@@ -630,9 +630,9 @@
                                         } else {
                                             menuitem.setLabel(i18n['Fill browser']);
                                         }
-                                    }
+                                    },
                                 });
-                            }
+                            },
                         }, {
                             label: i18n.Speed,
                             items: _.map(state.speeds, function(speed) {
@@ -648,11 +648,11 @@
                                         if (item) {
                                             item.select();
                                         }
-                                    }
+                                    },
                                 });
-                            }
-                        }
-                        ]
+                            },
+                        },
+                        ],
                     };
 
                 $.fn.contextmenu = function(container, options) {

@@ -13,8 +13,8 @@
 
                 initialize: function(models, options) {
                     this.url = options.url;
-                }
+                },
             });
-        }
+        },
     );
 }).call(this, define || RequireJS.define);

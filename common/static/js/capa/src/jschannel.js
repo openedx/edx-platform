@@ -494,7 +494,7 @@ var Channel = (function() {
                     },
                     completed: function() {
                         return completed;
-                    }
+                    },
                 };
             };
 
@@ -771,7 +771,7 @@ var Channel = (function() {
                     pendingQueue = [];
                     debug('channel destroyed');
                     chanId = '';
-                }
+                },
             };
 
             obj.bind('__ready', onReady);
@@ -780,6 +780,6 @@ var Channel = (function() {
             }, 0);
 
             return obj;
-        }
+        },
     };
 }());

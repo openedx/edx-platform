@@ -1,8 +1,8 @@
 define([
     'jquery', 'underscore', 'annotator_1.2.9', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'js/edxnotes/views/notes_visibility_factory', 'js/edxnotes/utils/notes_collector', 'js/spec/edxnotes/helpers'
+    'js/edxnotes/views/notes_visibility_factory', 'js/edxnotes/utils/notes_collector', 'js/spec/edxnotes/helpers',
 ], function(
-    $, _, Annotator, AjaxHelpers, NotesVisibilityFactory, NotesCollector, Helpers
+    $, _, Annotator, AjaxHelpers, NotesVisibilityFactory, NotesCollector, Helpers,
 ) {
     'use strict';
     describe('EdxNotes ToggleNotesFactory', function() {
@@ -12,19 +12,19 @@ define([
             usageId: 'usageid777',
             courseId: 'courseid000',
             token: Helpers.makeToken(),
-            tokenUrl: '/test_token_url'
+            tokenUrl: '/test_token_url',
         };
 
         beforeEach(function() {
             loadFixtures(
                 'js/fixtures/edxnotes/edxnotes_wrapper.html',
-                'js/fixtures/edxnotes/toggle_notes.html'
+                'js/fixtures/edxnotes/toggle_notes.html',
             );
             NotesVisibilityFactory.VisibilityDecorator.factory(
-                document.getElementById('edx-notes-wrapper-123'), params, true
+                document.getElementById('edx-notes-wrapper-123'), params, true,
             );
             NotesVisibilityFactory.VisibilityDecorator.factory(
-                document.getElementById('edx-notes-wrapper-456'), params, true
+                document.getElementById('edx-notes-wrapper-456'), params, true,
             );
             this.toggleNotes = NotesVisibilityFactory.ToggleVisibilityView(true, '/test_url');
             this.toggleVisibilityButton = $('.action-toggle-notes');
@@ -61,7 +61,7 @@ define([
             expect(Annotator._instances).toHaveLength(0);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
-                visibility: false
+                visibility: false,
             });
             AjaxHelpers.respondWithJson(requests, {});
 
@@ -73,12 +73,12 @@ define([
             expect(Annotator._instances).toHaveLength(2);
 
             AjaxHelpers.expectJsonRequest(requests, 'GET',
-                '/test_endpoint/search/?usage_id=usageid777&usage_id=usageid777&user=user12345&course_id=courseid000'
+                '/test_endpoint/search/?usage_id=usageid777&usage_id=usageid777&user=user12345&course_id=courseid000',
             );
             AjaxHelpers.respondWithJson(requests, []);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
-                visibility: true
+                visibility: true,
             });
             AjaxHelpers.respondWithJson(requests, {});
         });
@@ -91,7 +91,7 @@ define([
             AjaxHelpers.respondWithError(requests);
             expect($errorContainer).toContainText(
                 'An error has occurred. Make sure that you are connected to the Internet, ' +
-                'and then try refreshing the page.'
+                'and then try refreshing the page.',
             );
             expect($errorContainer).toBeVisible();
             expect($errorContainer).toHaveClass('annotator-notice-show');
@@ -100,12 +100,12 @@ define([
             this.toggleVisibilityButton.click();
 
             AjaxHelpers.expectJsonRequest(requests, 'GET',
-                '/test_endpoint/search/?usage_id=usageid777&usage_id=usageid777&user=user12345&course_id=courseid000'
+                '/test_endpoint/search/?usage_id=usageid777&usage_id=usageid777&user=user12345&course_id=courseid000',
             );
             AjaxHelpers.respondWithJson(requests, []);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
-                visibility: true
+                visibility: true,
             });
             AjaxHelpers.respondWithJson(requests, {});
 

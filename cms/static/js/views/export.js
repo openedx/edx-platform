@@ -3,7 +3,7 @@
  */
 define([
     'jquery', 'underscore', 'gettext', 'moment', 'common/js/components/views/feedback_prompt',
-    'edx-ui-toolkit/js/utils/html-utils', 'jquery.cookie'
+    'edx-ui-toolkit/js/utils/html-utils', 'jquery.cookie',
 ], function($, _, gettext, moment, PromptView, HtmlUtils) {
     'use strict';
 
@@ -15,14 +15,14 @@ define([
         PREPARING: 0,
         EXPORTING: 1,
         COMPRESSING: 2,
-        SUCCESS: 3
+        SUCCESS: 3,
     };
 
     var STATE = {
         READY: 1,
         IN_PROGRESS: 2,
         SUCCESS: 3,
-        ERROR: 4
+        ERROR: 4,
     };
 
     var courselikeHomeUrl;
@@ -36,7 +36,7 @@ define([
         downloadLink: $('#download-exported-button'),
         stages: $('ol.status-progress').children(),
         successStage: $('.item-progresspoint-success'),
-        wrapper: $('div.wrapper-status')
+        wrapper: $('div.wrapper-status'),
     };
 
     /** ******** Private functions *****************************************/
@@ -73,7 +73,7 @@ define([
                 stageMsg = HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<p class="copy error">'),
                     stageMsg,
-                    HtmlUtils.HTML('</p>')
+                    HtmlUtils.HTML('</p>'),
                 );
                 $(stage)
                     .removeClass('is-started')
@@ -177,7 +177,7 @@ define([
         $.cookie(COOKIE_NAME, JSON.stringify({
             statusUrl: statusUrl,
             date: moment().valueOf(),
-            completed: completed || false
+            completed: completed || false,
         }), {path: window.location.pathname});
     };
 
@@ -321,15 +321,15 @@ define([
                             click: function(view) {
                                 view.hide();
                                 document.location = editUnitUrl;
-                            }
+                            },
                         },
                         secondary: {
                             text: gettext('Return to Export'),
                             click: function(view) {
                                 view.hide();
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 });
             } else {
                 if (isLibrary) {
@@ -354,15 +354,15 @@ define([
                             click: function(view) {
                                 view.hide();
                                 document.location = courselikeHomeUrl;
-                            }
+                            },
                         },
                         secondary: {
                             text: gettext('Cancel'),
                             click: function(view) {
                                 view.hide();
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 });
             }
 
@@ -393,7 +393,7 @@ define([
             updateFeedbackList();
 
             return deferred.promise();
-        }
+        },
     };
 
     return CourseExport;

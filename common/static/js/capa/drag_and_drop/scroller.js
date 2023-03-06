@@ -6,7 +6,7 @@
             var $parentEl, $moveLeftEl, $showEl, $moveRightEl, showElLeftMargin;
 
             $parentEl = $(HtmlUtils.HTML(
-                '<div style=" width: 665px; height: 102px; margin-left: auto; margin-right: auto; " ></div>'
+                '<div style=" width: 665px; height: 102px; margin-left: auto; margin-right: auto; " ></div>',
             ).toString());
 
             $moveLeftEl = $(HtmlUtils.joinHtml(
@@ -26,7 +26,7 @@
                 HtmlUtils.HTML('background-position: center center; '),
                 HtmlUtils.HTML('background-repeat: no-repeat; " >'),
                 HtmlUtils.HTML('</div>'),
-                HtmlUtils.HTML('</div>')
+                HtmlUtils.HTML('</div>'),
             ).toString());
             $moveLeftEl.appendTo($parentEl);
 
@@ -52,14 +52,14 @@
 
                 // We scroll by changing the 'margin-left' CSS property smoothly.
                 state.sliderEl.animate({
-                    'margin-left': showElLeftMargin + 'px'
+                    'margin-left': showElLeftMargin + 'px',
                 }, 100, function() {
                     updateArrowOpacity();
                 });
             });
 
             $showEl = $(HtmlUtils.HTML(
-                '<div style=" width: 585px; height: 102px; overflow: hidden; display: inline; float: left; " ></div>'
+                '<div style=" width: 585px; height: 102px; overflow: hidden; display: inline; float: left; " ></div>',
             ).toString());
             $showEl.appendTo($parentEl);
 
@@ -72,7 +72,7 @@
             // eslint-disable-next-line no-param-reassign
             state.sliderEl = $(HtmlUtils.joinHtml(
                 HtmlUtils.HTML('<div style=" width: 20000px; height: 100px; border-top: 1px solid #CCC; '),
-                HtmlUtils.HTML('border-bottom: 1px solid #CCC; " ></div>')
+                HtmlUtils.HTML('border-bottom: 1px solid #CCC; " ></div>'),
             ).toString());
             state.sliderEl.appendTo($showEl);
 
@@ -97,7 +97,7 @@
                 HtmlUtils.HTML('background-position: center center; '),
                 HtmlUtils.HTML('background-repeat: no-repeat; " >'),
                 HtmlUtils.HTML('</div>'),
-                HtmlUtils.HTML('</div>')
+                HtmlUtils.HTML('</div>'),
             ).toString());
             $moveRightEl.appendTo($parentEl);
 
@@ -123,7 +123,7 @@
 
                 // We scroll by changing the 'margin-left' CSS property smoothly.
                 state.sliderEl.animate({
-                    'margin-left': showElLeftMargin + 'px'
+                    'margin-left': showElLeftMargin + 'px',
                 }, 100, function() {
                     updateArrowOpacity();
                 });

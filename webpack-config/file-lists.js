@@ -13,7 +13,7 @@ module.exports = {
         /descriptors\/js/,
         /modules\/js/,
         /xmodule\/js\/src\//,
-        path.resolve(__dirname, '../openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js')
+        path.resolve(__dirname, '../openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js'),
     ],
 
     // These files are used by RequireJS as well, so we can't remove
@@ -94,11 +94,11 @@ module.exports = {
         path.resolve(__dirname, '../openedx/features/course_search/static/course_search/js/spec/course_search_spec.js'),
         path.resolve(
             __dirname,
-            '../openedx/features/course_search/static/course_search/js/views/course_search_results_view.js'
+            '../openedx/features/course_search/static/course_search/js/views/course_search_results_view.js',
         ),
         path.resolve(
             __dirname,
-            '../openedx/features/course_search/static/course_search/js/views/dashboard_search_results_view.js'
+            '../openedx/features/course_search/static/course_search/js/views/dashboard_search_results_view.js',
         ),
         path.resolve(__dirname, '../openedx/features/course_search/static/course_search/js/views/search_results_view.js'),
         path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js'),
@@ -106,11 +106,11 @@ module.exports = {
         path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/badge_view.js'),
         path.resolve(
             __dirname,
-            '../openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js'
+            '../openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js',
         ),
         path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/section_two_tab.js'),
         path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/share_modal_view.js'),
         path.resolve(__dirname, '../node_modules/edx-ui-toolkit/src/js/dropdown-menu/dropdown-menu-view.js'),
-        path.resolve(__dirname, '../node_modules/edx-ui-toolkit/src/js/breadcrumbs/breadcrumbs-view.js')
-    ]
+        path.resolve(__dirname, '../node_modules/edx-ui-toolkit/src/js/breadcrumbs/breadcrumbs-view.js'),
+    ],
 };

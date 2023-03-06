@@ -9,7 +9,7 @@ export class DemographicsCollectionBanner extends React.Component {
         super(props);
         this.state = {
             modalOpen: false,
-            hideBanner: false
+            hideBanner: false,
         }
 
         this.dismissBanner = this.dismissBanner.bind(this);
@@ -39,7 +39,7 @@ export class DemographicsCollectionBanner extends React.Component {
             },
             body: JSON.stringify({
                 show_call_to_action: false,
-            })
+            }),
         };
 
         await fetch(`${this.props.lmsRootUrl}/api/demographics/v1/demographics/status/`, requestOptions);

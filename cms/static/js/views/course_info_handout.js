@@ -4,7 +4,7 @@ define([
     'common/js/components/views/feedback_notification',
     'js/views/course_info_helper',
     'js/utils/modal',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/html-utils',
 ],
 function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, HtmlUtils) {
     'use strict';
@@ -14,7 +14,7 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
         events: {
             'click .save-button': 'onSave',
             'click .cancel-button': 'onCancel',
-            'click .edit-button': 'onEdit'
+            'click .edit-button': 'onEdit',
         },
 
         initialize: function() {
@@ -24,7 +24,7 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
                 complete: function() {
                     self.render();
                 },
-                reset: true
+                reset: true,
             });
         },
 
@@ -54,7 +54,7 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
 
         onSave: function(event) {
             var saving = new NotificationView.Mini({
-                title: gettext('Saving')
+                title: gettext('Saving'),
             });
             var handoutsContent = this.$codeMirror.getValue();
             $('#handout_error').removeClass('is-shown');
@@ -68,14 +68,14 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
                 this.model.save({}, {
                     success: function() {
                         saving.hide();
-                    }
+                    },
                 });
                 this.render();
                 this.$form.hide();
                 this.closeEditor();
 
                 analytics.track('Saved Course Handouts', { // eslint-disable-line no-undef
-                    course: course_location_analytics // eslint-disable-line no-undef
+                    course: course_location_analytics, // eslint-disable-line no-undef
                 });
             } else {
                 $('#handout_error').addClass('is-shown');
@@ -98,7 +98,7 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
             ModalUtils.hideModalCover();
             this.$form.find('.CodeMirror').remove();
             this.$codeMirror = null;
-        }
+        },
     });
 
     return CourseInfoHandoutsView;

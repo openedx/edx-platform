@@ -48,7 +48,7 @@
 
             Discussion.prototype.find = function(id) {
                 return _.first(this.where({
-                    id: id
+                    id: id,
                 }));
             };
 
@@ -89,7 +89,7 @@
                     sort_options = {};
                 }
                 data = {
-                    page: this.current_page + 1
+                    page: this.current_page + 1,
                 };
                 if (_.contains(['unread', 'unanswered', 'flagged'], options.filter)) {
                     data[options.filter] = true;
@@ -136,7 +136,7 @@
                                     _results.push(new Thread(data));
                                 }
                                 return _results;
-                            }())
+                            }()),
                         ][0];
                         new_collection = _.union(models, new_threads);
                         Content.loadContentInfos(response.annotated_content_info);
@@ -145,7 +145,7 @@
                         self.is_commentable_divided = response.is_commentable_divided;
                         return self.reset(new_collection);
                     },
-                    error: error
+                    error: error,
                 });
             };
 
@@ -182,7 +182,7 @@
             };
 
             Discussion.prototype.pinnedThreadsSortComparatorWithCount = function(
-                thread1, thread2, thread1_count, thread2_count
+                thread1, thread2, thread1_count, thread2_count,
             ) {
                 if (thread1.get('pinned') && !thread2.get('pinned')) {
                     return -1;

@@ -69,7 +69,7 @@
                         this.editView = null;
                     }
                     this.showView = new ResponseCommentShowView({
-                        model: this.model
+                        model: this.model,
                     });
                     this.showView.bind('comment:_delete', this._delete);
                     this.showView.bind('comment:edit', this.edit);
@@ -86,7 +86,7 @@
                     }
                     this.editView = new ResponseCommentEditView({
                         model: this.model,
-                        startHeader: this.startHeader
+                        startHeader: this.startHeader,
                     });
                     this.editView.bind('comment:update', this.update);
                     this.editView.bind('comment:cancel_edit', this.cancelEdit);
@@ -117,9 +117,9 @@
                     error: function() {
                         return DiscussionUtil.discussionAlert(
                             gettext('Error'),
-                            gettext('This comment could not be deleted. Refresh the page and try again.')
+                            gettext('This comment could not be deleted. Refresh the page and try again.'),
                         );
-                    }
+                    },
                 });
             };
 
@@ -145,13 +145,13 @@
                     type: 'POST',
                     dataType: 'json',
                     data: {
-                        body: newBody
+                        body: newBody,
                     },
                     error: DiscussionUtil.formErrorHandler(this.$('.edit-comment-form-errors')),
                     success: function() {
                         self.model.set('body', newBody);
                         return self.cancelEdit();
-                    }
+                    },
                 });
             };
 

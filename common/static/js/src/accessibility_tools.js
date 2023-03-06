@@ -131,7 +131,7 @@ var trapFocusForAccessibleModal = function(
         focusableElementsFilterString,
         closeButtonId,
         modalId,
-        mainPageId
+        mainPageId,
     );
     $last = trapTabFocus(focusableItems, closeButtonId);
     trapShiftTabFocus($last, closeButtonId);
@@ -160,7 +160,7 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
             focusableElementsString,
             closeButtonId,
             modalId,
-            mainPageId
+            mainPageId,
         );
 
         // In IE, focus shifts to iframes when they load.
@@ -213,8 +213,8 @@ $(function() {
                     $('body'),
                     edx.HtmlUtils.interpolateHtml(
                         edx.HtmlUtils.HTML('<div id="{readerFeedbackID}" class="sr" aria-live="polite"></div>'),
-                        {readerFeedbackID: readerFeedbackID}
-                    )
+                        {readerFeedbackID: readerFeedbackID},
+                    ),
                 );
             }
             this.el = $('#' + readerFeedbackID);
@@ -242,7 +242,7 @@ $(function() {
                 htmlFeedback = edx.HtmlUtils.interpolateHtml(
                     edx.HtmlUtils.HTML('{previous_feedback}<p>{value}</p>\n'),
                     // "value" may be HTML, if an element is being passed
-                    {previous_feedback: htmlFeedback, value: edx.HtmlUtils.HTML(value)}
+                    {previous_feedback: htmlFeedback, value: edx.HtmlUtils.HTML(value)},
                 );
             });
             edx.HtmlUtils.setHtml(this.el, htmlFeedback);

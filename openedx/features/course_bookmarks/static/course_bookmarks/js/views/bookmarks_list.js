@@ -4,7 +4,7 @@
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment', 'edx-ui-toolkit/js/utils/html-utils',
         'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
-        'text!course_bookmarks/templates/bookmarks-list.underscore'
+        'text!course_bookmarks/templates/bookmarks-list.underscore',
     ],
     function(gettext, $, _, Backbone, Logger, _moment, HtmlUtils,
         PagingHeaderView, PagingFooterView, bookmarksListTemplate) {
@@ -25,7 +25,7 @@
             defaultPage: 1,
 
             events: {
-                'click .bookmarks-results-list-item': 'visitBookmark'
+                'click .bookmarks-results-list-item': 'visitBookmark',
             },
 
             initialize: function(options) {
@@ -42,7 +42,7 @@
             render: function() {
                 var data = {
                     bookmarksCollection: this.collection,
-                    humanFriendlyDate: this.humanFriendlyDate
+                    humanFriendlyDate: this.humanFriendlyDate,
                 };
 
                 HtmlUtils.setHtml(this.$el, this.template(data));
@@ -76,8 +76,8 @@
                     {
                         bookmark_id: bookmarkId,
                         component_type: componentType,
-                        component_usage_id: componentUsageId
-                    }
+                        component_usage_id: componentUsageId,
+                    },
                 ).always(function() {
                     window.location.href = event.currentTarget.pathname;
                 });
@@ -120,7 +120,7 @@
 
             focusBookmarksElement: function() {
                 this.$('#my-bookmarks').focus();
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

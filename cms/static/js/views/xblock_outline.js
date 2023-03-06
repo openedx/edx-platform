@@ -22,7 +22,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
         // takes XBlockInfo as a model
 
         options: {
-            collapsedClass: 'is-collapsed'
+            collapsedClass: 'is-collapsed',
         },
 
         templateName: 'xblock-outline',
@@ -71,7 +71,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
             } else {
                 HtmlUtils.setHtml(
                     this.$el,
-                    HtmlUtils.HTML(html)
+                    HtmlUtils.HTML(html),
                 );
             }
         },
@@ -88,7 +88,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 isCollapsed = this.shouldRenderChildren() && !this.shouldExpandChildren();
             if (childInfo) {
                 addChildName = StringUtils.interpolate(gettext('New {component_type}'), {
-                    component_type: childInfo.display_name
+                    component_type: childInfo.display_name,
                 }, true);
                 defaultNewChildName = childInfo.display_name;
             }
@@ -109,7 +109,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 includesChildren: this.shouldRenderChildren(),
                 hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                 staffOnlyMessage: this.model.get('staff_only_message'),
-                course: course
+                course: course,
             };
         },
 
@@ -149,11 +149,11 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 XBlockOutlineFieldEditor = XBlockStringFieldEditor.extend({
                     refresh: function() {
                         self.refresh();
-                    }
+                    },
                 });
                 nameEditor = new XBlockOutlineFieldEditor({
                     el: xblockField,
-                    model: this.model
+                    model: this.model,
                 });
                 nameEditor.render();
             }
@@ -217,14 +217,14 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 parentView: this,
                 initialState: this.initialState,
                 expandedLocators: this.expandedLocators,
-                template: this.template
+                template: this.template,
             }, options));
         },
 
         onSync: function(event) {
             var hasChangedAttributes = ViewUtils.hasChangedAttributes(
                 this.model,
-                ['visibility_state', 'child_info', 'display_name', 'highlights']
+                ['visibility_state', 'child_info', 'display_name', 'highlights'],
             );
             if (hasChangedAttributes) {
                 this.onXBlockChange();
@@ -313,7 +313,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
             var xblockMap = {
                     unit: 'subsection',
                     subsection: 'section',
-                    section: 'course'
+                    section: 'course',
                 },
                 parentXblockType = xblockMap[xblockType];
             return xblockElement.closest('.outline-' + parentXblockType);
@@ -335,7 +335,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                         self.parentView.onChildDuplicated(
                             data.locator,
                             xblockType,
-                            xblockElement
+                            xblockElement,
                         );
                     }
                 });
@@ -349,7 +349,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
             XBlockViewUtils.addXBlock($target).done(function(locator) {
                 self.onChildAdded(locator, category, event);
             });
-        }
+        },
     });
 
     return XBlockOutlineView;

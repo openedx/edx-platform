@@ -14,7 +14,7 @@ var edx = edx || {};
 
         defaultContext: function() {
             return {
-                platformName: ''
+                platformName: '',
             };
         },
 
@@ -25,7 +25,7 @@ var edx = edx || {};
                 modelAttribute: 'faceImage',
                 submitButton: '#next_step_button',
                 errorModel: this.errorModel,
-                captureSoundPath: this.stepData.captureSoundPath
+                captureSoundPath: this.stepData.captureSoundPath,
             }).render();
 
             // Track a virtual pageview, for easy funnel reconstruction.
@@ -34,11 +34,11 @@ var edx = edx || {};
             this.listenTo(webcam, 'imageCaptured', function() {
                 // Track the user's successful image capture
                 window.analytics.track('edx.bi.user.face_image.captured', {
-                    category: 'verification'
+                    category: 'verification',
                 });
             });
 
             $('#next_step_button').on('click', _.bind(this.nextStep, this));
-        }
+        },
     });
 }(jQuery));

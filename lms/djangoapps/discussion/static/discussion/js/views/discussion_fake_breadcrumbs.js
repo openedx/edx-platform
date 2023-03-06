@@ -13,7 +13,7 @@
         'backbone',
         'gettext',
         'edx-ui-toolkit/js/utils/html-utils',
-        'text!discussion/templates/fake-breadcrumbs.underscore'
+        'text!discussion/templates/fake-breadcrumbs.underscore',
     ],
     function(Backbone, gettext, HtmlUtils, breadcrumbsTemplate) {
         var DiscussionFakeBreadcrumbs = Backbone.View.extend({
@@ -26,7 +26,7 @@
                 var json = this.model.attributes;
                 HtmlUtils.setHtml(this.$el, this.template(json));
                 return this;
-            }
+            },
         });
 
         return DiscussionFakeBreadcrumbs;

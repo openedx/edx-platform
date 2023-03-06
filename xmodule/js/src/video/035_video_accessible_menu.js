@@ -59,9 +59,9 @@
                         },
                         complete: function() {
                             document.location.href = downloadUrl;
-                        }
+                        },
                     });
-                }
+                },
             };
 
             return VideoTranscriptDownloadHandler;

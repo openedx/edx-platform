@@ -7,13 +7,13 @@ define(
         'js/views/video/transcripts/metadata_videolist', 'js/models/metadata',
         'js/views/abstract_editor',
         'js/views/video/transcripts/message_manager',
-        'xmodule'
+        'xmodule',
     ],
     function($, _, Backbone, AjaxHelpers, Utils, Editor, VideoList, MetadataModel, AbstractEditor, MessageManager) {
         'use strict';
         describe('CMS.Views.Metadata.VideoList', function() {
             var videoListEntryTemplate = readFixtures(
-                    'video/transcripts/metadata-videolist-entry.underscore'
+                    'video/transcripts/metadata-videolist-entry.underscore',
                 ),
                 abstractEditor = AbstractEditor.prototype,
                 component_locator = 'component_locator',
@@ -21,18 +21,18 @@ define(
                     {
                         mode: 'youtube',
                         type: 'youtube',
-                        video: '12345678901'
+                        video: '12345678901',
                     },
                     {
                         mode: 'html5',
                         type: 'mp4',
-                        video: 'video'
+                        video: 'video',
                     },
                     {
                         mode: 'html5',
                         type: 'webm',
-                        video: 'video'
-                    }
+                        video: 'video',
+                    },
                 ],
                 modelStub = {
                     default_value: ['a thing', 'another thing'],
@@ -45,8 +45,8 @@ define(
                     value: [
                         'http://youtu.be/12345678901',
                         'video.mp4',
-                        'video.webm'
-                    ]
+                        'video.webm',
+                    ],
                 },
                 videoIDStub = {
                     default_value: 'test default value',
@@ -56,12 +56,12 @@ define(
                     help: 'Specifies the video ID.',
                     options: [],
                     type: 'VideoID',
-                    value: 'advanced tab video id'
+                    value: 'advanced tab video id',
                 },
                 response = JSON.stringify({
                     command: 'found',
                     status: 'Success',
-                    subs: 'video_id'
+                    subs: 'video_id',
                 }),
                 waitForEvent,
                 createVideoListView;
@@ -72,8 +72,8 @@ define(
                     [
                         200,
                         {'Content-Type': 'application/json'},
-                        response
-                    ]
+                        response,
+                    ],
                 );
                 mockServer.autoRespond = true;
                 return mockServer;
@@ -82,7 +82,7 @@ define(
             beforeEach(function() {
                 var tpl = sandbox({  // eslint-disable-line no-undef
                     class: 'component',
-                    'data-locator': component_locator
+                    'data-locator': component_locator,
                 });
 
                 setFixtures(tpl);
@@ -91,9 +91,9 @@ define(
                     $('<script>',
                         {
                             id: 'metadata-videolist-entry',
-                            type: 'text/template'
-                        }
-                    ).text(videoListEntryTemplate)
+                            type: 'text/template',
+                        },
+                    ).text(videoListEntryTemplate),
                 );
 
                 // create mock server
@@ -119,9 +119,9 @@ define(
                                     passed = _.isEqual(actualValue, expected);
 
                                 return {
-                                    pass: passed
+                                    pass: passed,
                                 };
-                            }
+                            },
                         };
                     },
                     assertCanUpdateView: function() {
@@ -135,9 +135,9 @@ define(
                                 passed = _.isEqual(actualValue, expected);
 
                                 return {
-                                    pass: passed
+                                    pass: passed,
                                 };
-                            }
+                            },
                         };
                     },
                     assertIsCorrectVideoList: function() {
@@ -147,11 +147,11 @@ define(
                                     passed = _.isEqual(actualValue, expected);
 
                                 return {
-                                    pass: passed
+                                    pass: passed,
                                 };
-                            }
+                            },
                         };
-                    }
+                    },
                 });
             });
 
@@ -175,13 +175,13 @@ define(
                 appendSetFixtures(
                     sandbox({  // eslint-disable-line no-undef
                         class: 'wrapper-comp-settings basic_metadata_edit',
-                        'data-metadata': JSON.stringify({video_url: modelStub, edx_video_id: videoIDStub})
-                    })
+                        'data-metadata': JSON.stringify({video_url: modelStub, edx_video_id: videoIDStub}),
+                    }),
                 );
 
                 $container = $('.basic_metadata_edit');
                 editor = new Editor({
-                    el: $container
+                    el: $container,
                 });
 
                 spyOn(editor, 'getLocator').and.returnValue(component_locator);
@@ -194,7 +194,7 @@ define(
                 videoListView = new VideoList({
                     el: $('.component'),
                     model: model,
-                    MessageManager: MessageManager
+                    MessageManager: MessageManager,
                 });
 
                 waitForEvent()
@@ -270,20 +270,20 @@ define(
                             {
                                 mode: 'youtube',
                                 type: 'youtube',
-                                video: '12345678901'
+                                video: '12345678901',
                             },
                             {
                                 mode: 'html5',
                                 type: 'mp4',
-                                video: 'video'
-                            }
+                                video: 'video',
+                            },
                         ],
                         videoListHtml5mode = [
                             {
                                 mode: 'html5',
                                 type: 'mp4',
-                                video: 'video'
-                            }
+                                video: 'video',
+                            },
                         ];
 
                     spyOn(VideoList.prototype, 'getVideoObjectsList').and.returnValue(videoListLength);
@@ -318,8 +318,8 @@ define(
                             {
                                 mode: 'youtube',
                                 type: 'youtube',
-                                video: '12345678901'
-                            }
+                                video: '12345678901',
+                            },
                         ];
 
                     spyOn(VideoList.prototype, 'getVideoObjectsList').and.returnValue(videoList);
@@ -343,7 +343,7 @@ define(
                         data = videoList.concat([{
                             mode: 'html5',
                             type: 'other',
-                            video: 'pxxZrg'
+                            video: 'pxxZrg',
                         }]);
 
                     waitsForResponse(this.mockServer)
@@ -360,28 +360,28 @@ define(
                             {
                                 mode: 'html5',
                                 type: 'mp4',
-                                video: 'video'
+                                video: 'video',
                             },
                             {
                                 mode: 'html5',
                                 type: 'mp4',
-                                video: 'video'
+                                video: 'video',
                             },
                             {
                                 mode: 'html5',
                                 type: 'other',
-                                video: 'pxxZrg'
+                                video: 'pxxZrg',
                             },
                             {
                                 mode: 'html5',
                                 type: 'other',
-                                video: 'pxxZrg'
+                                video: 'pxxZrg',
                             },
                             {
                                 mode: 'youtube',
                                 type: 'youtube',
-                                video: '12345678901'
-                            }
+                                video: '12345678901',
+                            },
                         ];
 
                     waitsForResponse(this.mockServer)
@@ -412,23 +412,23 @@ define(
                             {
                                 mode: 'html5',
                                 type: 'mp4',
-                                video: 'video'
+                                video: 'video',
                             },
                             {
                                 mode: 'html5',
                                 type: 'mp4',
-                                video: 'video'
+                                video: 'video',
                             },
                             {
                                 mode: 'html5',
                                 type: 'other',
-                                video: 'pxxZrg'
+                                video: 'pxxZrg',
                             },
                             {
                                 mode: 'youtube',
                                 type: 'youtube',
-                                video: '12345678901'
-                            }
+                                video: '12345678901',
+                            },
                         ];
 
                     waitsForResponse(this.mockServer)
@@ -447,23 +447,23 @@ define(
                             {
                                 mode: 'html5',
                                 type: 'mp4',
-                                video: 'video'
+                                video: 'video',
                             },
                             {
                                 mode: 'html5',
                                 type: 'mp4',
-                                video: 'video'
+                                video: 'video',
                             },
                             {
                                 mode: 'html5',
                                 type: 'other',
-                                video: 'pxxZrg'
+                                video: 'pxxZrg',
                             },
                             {
                                 mode: 'youtube',
                                 type: 'youtube',
-                                video: '12345678901'
-                            }
+                                video: '12345678901',
+                            },
                         ];
 
                     waitsForResponse(this.mockServer)
@@ -601,18 +601,18 @@ define(
                     {
                         mode: 'youtube',
                         type: 'youtube',
-                        video: '12345678901'
+                        video: '12345678901',
                     },
                     {
                         mode: 'html5',
                         type: 'mp4',
-                        video: 'video'
+                        video: 'video',
                     },
                     {
                         mode: 'html5',
                         type: 'other',
-                        video: 'pxxZrg'
-                    }
+                        video: 'pxxZrg',
+                    },
                 ];
 
                 waitsForResponse(this.mockServer)
@@ -621,7 +621,7 @@ define(
                             'http://youtu.be/12345678901',
                             'video.mp4',
                             'http://goo.gl/pxxZrg',
-                            'video'
+                            'video',
                         ]);
                         expect(view).assertIsCorrectVideoList(value);
                     })
@@ -654,25 +654,25 @@ define(
                             expectedResult: [
                                 defaultPlaceholders.youtube,
                                 defaultPlaceholders.mp4,
-                                defaultPlaceholders.webm
-                            ]
+                                defaultPlaceholders.webm,
+                            ],
                         },
                         mp4: {
                             value: [modelStub.value[1]],
                             expectedResult: [
                                 defaultPlaceholders.mp4,
                                 defaultPlaceholders.youtube,
-                                defaultPlaceholders.webm
-                            ]
+                                defaultPlaceholders.webm,
+                            ],
                         },
                         webm: {
                             value: [modelStub.value[2]],
                             expectedResult: [
                                 defaultPlaceholders.webm,
                                 defaultPlaceholders.youtube,
-                                defaultPlaceholders.mp4
-                            ]
-                        }
+                                defaultPlaceholders.mp4,
+                            ],
+                        },
                     };
 
                     defaultPlaceholders = view.placeholders;
@@ -685,7 +685,7 @@ define(
                             });
                         })
                         .always(done);
-                }
+                },
                 );
             });
 
@@ -717,7 +717,7 @@ define(
                     return new VideoList({
                         el: $('.component'),
                         model: new MetadataModel(modelStub),
-                        MessageManager: MessageManager
+                        MessageManager: MessageManager,
                     });
                 };
 

@@ -9,7 +9,7 @@
                     terms[filter.id] = filter.get('query');
                     return terms;
                 }, {});
-            }
+            },
         });
     });
 }(define || RequireJS.define));

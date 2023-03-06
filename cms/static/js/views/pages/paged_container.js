@@ -7,7 +7,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views
         var PagedXBlockContainerPage = XBlockContainerPage.extend({
 
             events: _.extend({}, XBlockContainerPage.prototype.events, {
-                'click .toggle-preview-button': 'toggleChildrenPreviews'
+                'click .toggle-preview-button': 'toggleChildrenPreviews',
             }),
 
             defaultViewClass: PagedContainerView,
@@ -22,7 +22,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views
             getViewParameters: function() {
                 return _.extend(XBlockContainerPage.prototype.getViewParameters.call(this), {
                     page_size: this.page_size,
-                    page: this
+                    page: this,
                 });
             },
 
@@ -47,7 +47,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views
 
                 this.$('.preview-text', $button).text(text);
                 this.$('.toggle-preview-button').removeClass('is-hidden');
-            }
+            },
         });
         return PagedXBlockContainerPage;
     });

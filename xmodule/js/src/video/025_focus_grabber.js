@@ -51,7 +51,7 @@
                 var methodsDict = {
                     disableFocusGrabber: disableFocusGrabber,
                     enableFocusGrabber: enableFocusGrabber,
-                    onFocus: onFocus
+                    onFocus: onFocus,
                 };
 
                 state.bindTo(methodsDict, state.focusGrabber, state);

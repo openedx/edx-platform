@@ -28,7 +28,7 @@
                 uniqueId: 0,
                 salt: makeSalt(),
 
-                getUniqueId: getUniqueId
+                getUniqueId: getUniqueId,
             };
 
             $(document).mousemove(function(event) {
@@ -64,13 +64,13 @@
                     event.pageX -
                     state.baseImageEl.offset().left -
                     state.currentMovingDraggable.iconWidth * 0.5
-                    - state.currentMovingDraggable.iconElLeftOffset
+                    - state.currentMovingDraggable.iconElLeftOffset,
                 );
                 state.currentMovingDraggable.iconEl.css(
                     'top',
                     event.pageY -
                     state.baseImageEl.offset().top -
-                    state.currentMovingDraggable.iconHeight * 0.5
+                    state.currentMovingDraggable.iconHeight * 0.5,
                 );
 
                 if (state.currentMovingDraggable.labelEl !== null) {
@@ -79,14 +79,14 @@
                         event.pageX -
                         state.baseImageEl.offset().left -
                         state.currentMovingDraggable.labelWidth * 0.5
-                        - 9 // Account for padding, border.
+                        - 9, // Account for padding, border.
                     );
                     state.currentMovingDraggable.labelEl.css(
                         'top',
                         event.pageY -
                         state.baseImageEl.offset().top +
                         state.currentMovingDraggable.iconHeight * 0.5 +
-                        5
+                        5,
                     );
                 }
             }

@@ -2,7 +2,7 @@
     'use strict';
     define([
         'jquery', 'underscore', 'backbone', 'js/edxnotes/utils/template',
-        'js/edxnotes/utils/logger', 'edx-ui-toolkit/js/utils/html-utils'
+        'js/edxnotes/utils/logger', 'edx-ui-toolkit/js/utils/html-utils',
     ], function($, _, Backbone, templateUtils, NotesLogger, HtmlUtils) {
         var NoteItemView = Backbone.View.extend({
             tagName: 'article',
@@ -13,7 +13,7 @@
             events: {
                 'click .note-excerpt-more-link': 'moreHandler',
                 'click .reference-unit-link': 'unitLinkHandler',
-                'click .reference-tags': 'tagHandler'
+                'click .reference-tags': 'tagHandler',
             },
 
             initialize: function(options) {
@@ -31,7 +31,7 @@
 
             getContext: function() {
                 return $.extend({}, this.model.toJSON(), {
-                    message: this.model.getQuote()
+                    message: this.model.getQuote(),
                 });
             },
 
@@ -51,7 +51,7 @@
                 this.logger.emit('edx.course.student_notes.used_unit_link', {
                     note_id: this.model.get('id'),
                     component_usage_id: this.model.get('usage_id'),
-                    view: this.options.view
+                    view: this.options.view,
                 }, REQUEST_TIMEOUT).always(_.bind(function() {
                     this.redirectTo(event.target.href);
                 }, this));
@@ -72,7 +72,7 @@
                 this.logger.destroy();
                 Backbone.View.prototype.remove.call(this);
                 return this;
-            }
+            },
         });
 
         return NoteItemView;

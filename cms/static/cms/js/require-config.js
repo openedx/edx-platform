@@ -43,8 +43,8 @@
 
             window.$.ajaxSetup({
                 contents: {
-                    script: false
-                }
+                    script: false,
+                },
             });
 
             // MathJax Fast Preview was introduced in 2.5. However, it
@@ -59,8 +59,8 @@
                     CHTMLpreview: false,
                     collapsible: true,
                     autocollapse: false,
-                    explorer: true
-                }
+                    explorer: true,
+                },
             };
         };
 
@@ -145,107 +145,107 @@
                 '//www.youtube.com/player_api?noext',
                 // if youtube fails to load, fallback on a local file
                 // so that require doesn't fall over
-                'js/src/youtube_fallback'
-            ]
+                'js/src/youtube_fallback',
+            ],
         },
         shim: {
             'gettext': {
-                exports: 'gettext'
+                exports: 'gettext',
             },
             'date': {
-                exports: 'Date'
+                exports: 'Date',
             },
             'jquery-migrate': ['jquery'],
             'jquery.ui': {
                 deps: ['jquery'],
-                exports: 'jQuery.ui'
+                exports: 'jQuery.ui',
             },
             'jquery.form': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.ajaxForm'
+                exports: 'jQuery.fn.ajaxForm',
             },
             'jquery.markitup': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.markitup'
+                exports: 'jQuery.fn.markitup',
             },
             'jquery.leanmodal': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.leanModal'
+                exports: 'jQuery.fn.leanModal',
             },
             'jquery.ajaxQueue': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.ajaxQueue'
+                exports: 'jQuery.fn.ajaxQueue',
             },
             'jquery.smoothScroll': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.smoothScroll'
+                exports: 'jQuery.fn.smoothScroll',
             },
             'jquery.cookie': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.cookie'
+                exports: 'jQuery.fn.cookie',
             },
             'jquery.qtip': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.qtip'
+                exports: 'jQuery.fn.qtip',
             },
             'jquery.scrollTo': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.scrollTo'
+                exports: 'jQuery.fn.scrollTo',
             },
             'jquery.flot': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.plot'
+                exports: 'jQuery.fn.plot',
             },
             'jquery.fileupload': {
                 deps: ['jquery.ui', 'jquery.iframe-transport'],
-                exports: 'jQuery.fn.fileupload'
+                exports: 'jQuery.fn.fileupload',
             },
             'jquery.fileupload-process': {
-                deps: ['jquery.fileupload']
+                deps: ['jquery.fileupload'],
             },
             'jquery.fileupload-validate': {
-                deps: ['jquery.fileupload']
+                deps: ['jquery.fileupload'],
             },
             'jquery.inputnumber': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.inputNumber'
+                exports: 'jQuery.fn.inputNumber',
             },
             'jquery.tinymce': {
                 deps: ['jquery', 'tinymce'],
-                exports: 'jQuery.fn.tinymce'
+                exports: 'jQuery.fn.tinymce',
             },
             'datepair': {
-                deps: ['jquery.ui', 'jquery.timepicker']
+                deps: ['jquery.ui', 'jquery.timepicker'],
             },
             'underscore': {
-                exports: '_'
+                exports: '_',
             },
             'backbone': {
                 deps: ['underscore', 'jquery'],
-                exports: 'Backbone'
+                exports: 'Backbone',
             },
             'backbone.associations': {
                 deps: ['backbone'],
-                exports: 'Backbone.Associations'
+                exports: 'Backbone.Associations',
             },
             'backbone.paginator': {
                 deps: ['backbone'],
-                exports: 'Backbone.PageableCollection'
+                exports: 'Backbone.PageableCollection',
             },
             'youtube': {
-                exports: 'YT'
+                exports: 'YT',
             },
             'codemirror': {
-                exports: 'CodeMirror'
+                exports: 'CodeMirror',
             },
             'codemirror/stex': {
-                deps: ['codemirror']
+                deps: ['codemirror'],
             },
             'tinymce': {
-                exports: 'tinymce'
+                exports: 'tinymce',
             },
             'lang_edx': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'mathjax': {
                 exports: 'MathJax',
@@ -254,13 +254,13 @@
                         tex2jax: {
                             inlineMath: [
                                 ['\\(', '\\)'],
-                                ['[mathjaxinline]', '[/mathjaxinline]']
+                                ['[mathjaxinline]', '[/mathjaxinline]'],
                             ],
                             displayMath: [
                                 ['\\[', '\\]'],
-                                ['[mathjax]', '[/mathjax]']
-                            ]
-                        }
+                                ['[mathjax]', '[/mathjax]'],
+                            ],
+                        },
                     });
                     // In order to eliminate all flashing during interactive
                     // preview, it is necessary to set processSectionDelay to 0
@@ -269,90 +269,90 @@
                     // the fast preview setting as shown in the context menu.
                     window.MathJax.Hub.processSectionDelay = 0;
                     window.MathJax.Hub.Configured();
-                }
+                },
             },
             'URI': {
-                exports: 'URI'
+                exports: 'URI',
             },
             'tooltip_manager': {
-                deps: ['jquery', 'underscore']
+                deps: ['jquery', 'underscore'],
             },
             'jquery.immediateDescendents': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'xblock/core': {
                 exports: 'XBlock',
-                deps: ['jquery', 'jquery.immediateDescendents']
+                deps: ['jquery', 'jquery.immediateDescendents'],
             },
             'xblock/runtime.v1': {
                 exports: 'XBlock',
-                deps: ['xblock/core']
+                deps: ['xblock/core'],
             },
             'cms/js/main': {
-                deps: ['js/src/ajax_prefix']
+                deps: ['js/src/ajax_prefix'],
             },
             'js/src/logger': {
                 exports: 'Logger',
-                deps: ['js/src/ajax_prefix']
+                deps: ['js/src/ajax_prefix'],
             },
 
             // the following are all needed for annotation tools
             'video.dev': {
-                exports: 'videojs'
+                exports: 'videojs',
             },
             'vjs.youtube': {
-                deps: ['video.dev']
+                deps: ['video.dev'],
             },
             'rangeslider': {
-                deps: ['video.dev']
+                deps: ['video.dev'],
             },
             'annotator': {
-                exports: 'Annotator'
+                exports: 'Annotator',
             },
             'annotator-harvardx': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'share-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'richText-annotator': {
-                deps: ['annotator', 'tinymce']
+                deps: ['annotator', 'tinymce'],
             },
             'reply-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'tags-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'diacritic-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'flagging-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'grouping-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'ova': {
                 exports: 'ova',
                 deps: ['annotator', 'annotator-harvardx', 'video.dev', 'vjs.youtube',
                     'rangeslider', 'share-annotator', 'richText-annotator', 'reply-annotator',
                     'tags-annotator', 'flagging-annotator', 'grouping-annotator', 'diacritic-annotator',
-                    'jquery-Watch', 'catch', 'handlebars', 'URI']
+                    'jquery-Watch', 'catch', 'handlebars', 'URI'],
             },
             'osda': {
                 exports: 'osda',
                 deps: ['annotator', 'annotator-harvardx', 'video.dev', 'vjs.youtube',
                     'rangeslider', 'share-annotator', 'richText-annotator', 'reply-annotator',
                     'tags-annotator', 'flagging-annotator', 'grouping-annotator', 'diacritic-annotator',
-                    'openseadragon', 'jquery-Watch', 'catch', 'handlebars', 'URI']
+                    'openseadragon', 'jquery-Watch', 'catch', 'handlebars', 'URI'],
             },
             // end of annotation tool files
 
             // patch for jquery's extend
             'jquery_extend_patch': {
-                deps: ['jquery']
-            }
-        }
+                deps: ['jquery'],
+            },
+        },
     });
 }).call(this, require, define);

@@ -14,7 +14,7 @@ mind, or whether to act, and in acting, to live."
             var template = [
                 '<div class="slider" role="application" title="',
                 gettext('Video position. Press space to toggle playback'),
-                '"></div>'
+                '"></div>',
             ].join('');
 
             // VideoProgressSlider() function - what this module "exports".
@@ -50,7 +50,7 @@ mind, or whether to act, and in acting, to live."
                     updateStartEndTimeRegion: updateStartEndTimeRegion,
                     notifyThroughHandleEnd: notifyThroughHandleEnd,
                     getTimeDescription: getTimeDescription,
-                    focusSlider: focusSlider
+                    focusSlider: focusSlider,
                 };
 
                 state.bindTo(methodsDict, state.videoProgressSlider, state);
@@ -90,7 +90,7 @@ mind, or whether to act, and in acting, to live."
                 // ARIA
                 // We just want the knob to be selectable with keyboard
                 state.videoProgressSlider.el.attr({
-                    tabindex: -1
+                    tabindex: -1,
                 });
 
                 // Let screen readers know that this div, representing the slider
@@ -104,7 +104,7 @@ mind, or whether to act, and in acting, to live."
                     'aria-valuemin': '0',
                     'aria-valuenow': state.videoPlayer.currentTime,
                     tabindex: '0',
-                    'aria-label': gettext('Video position. Press space to toggle playback')
+                    'aria-label': gettext('Video position. Press space to toggle playback'),
                 });
             }
 
@@ -117,7 +117,7 @@ mind, or whether to act, and in acting, to live."
 
             function buildSlider() {
                 var sliderContents = edx.HtmlUtils.joinHtml(
-                    edx.HtmlUtils.HTML('<div class="ui-slider-handle progress-handle"></div>')
+                    edx.HtmlUtils.HTML('<div class="ui-slider-handle progress-handle"></div>'),
                 );
 
                 // xss-lint: disable=javascript-jquery-append
@@ -130,7 +130,7 @@ mind, or whether to act, and in acting, to live."
                         max: this.config.endTime,
                         slide: this.videoProgressSlider.onSlide,
                         stop: this.videoProgressSlider.onStop,
-                        step: 5
+                        step: 5,
                     });
 
                 this.videoProgressSlider.sliderProgress = this.videoProgressSlider
@@ -191,7 +191,7 @@ mind, or whether to act, and in acting, to live."
 
                 return {
                     left: left + '%',
-                    width: width + '%'
+                    width: width + '%',
                 };
             }
 
@@ -213,18 +213,18 @@ mind, or whether to act, and in acting, to live."
                     'videoControl.updateVcrVidTime',
                     {
                         time: time,
-                        duration: endTime
-                    }
+                        duration: endTime,
+                    },
                 );
 
                 this.trigger(
                     'videoPlayer.onSlideSeek',
-                    {type: 'onSlideSeek', time: time}
+                    {type: 'onSlideSeek', time: time},
                 );
 
                 // ARIA
                 this.videoProgressSlider.handle.attr(
-                    'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime)
+                    'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime),
                 );
             }
 
@@ -240,13 +240,13 @@ mind, or whether to act, and in acting, to live."
                 if (this.videoProgressSlider.lastSeekValue !== ui.value) {
                     this.trigger(
                         'videoPlayer.onSlideSeek',
-                        {type: 'onSlideSeek', time: ui.value}
+                        {type: 'onSlideSeek', time: ui.value},
                     );
                 }
 
                 // ARIA
                 this.videoProgressSlider.handle.attr(
-                    'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime)
+                    'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime),
                 );
 
                 setTimeout(function() {
@@ -277,7 +277,7 @@ mind, or whether to act, and in acting, to live."
                 // Update aria values.
                 this.videoProgressSlider.handle.attr({
                     'aria-valuemax': endTime,
-                    'aria-valuenow': time
+                    'aria-valuenow': time,
                 });
             }
 
@@ -350,7 +350,7 @@ mind, or whether to act, and in acting, to live."
             // Shift focus to the progress slider container element.
             function focusSlider() {
                 this.videoProgressSlider.handle.attr(
-                    'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime)
+                    'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime),
                 );
                 this.videoProgressSlider.el.trigger('focus');
             }

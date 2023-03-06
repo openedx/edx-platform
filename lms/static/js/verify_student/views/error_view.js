@@ -15,7 +15,7 @@ var edx = edx || {};
             this.model = obj.model || new ErrorModel({
                 errorTitle: '',
                 errorMsg: '',
-                shown: false
+                shown: false,
             });
             this.listenTo(this.model, 'change', this.render);
         },
@@ -24,12 +24,12 @@ var edx = edx || {};
             var renderedHtml = edx.HtmlUtils.template($('#error-tpl').html())(
                 {
                     errorTitle: this.model.get('errorTitle'),
-                    errorMsg: this.model.get('errorMsg')
-                }
+                    errorMsg: this.model.get('errorMsg'),
+                },
             );
             edx.HtmlUtils.setHtml(
                 $(this.el),
-                renderedHtml
+                renderedHtml,
             );
 
             if (this.model.get('shown')) {
@@ -38,6 +38,6 @@ var edx = edx || {};
             } else {
                 $(this.el).hide();
             }
-        }
+        },
     });
 }($, _, Backbone));

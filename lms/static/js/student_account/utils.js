@@ -16,7 +16,7 @@
                 user = userCookie.replace(/\\/g, '').replace(/054/g, ',');
                 user = user.substring(1, user.length - 1);
                 return JSON.parse(user);
-            }
+            },
         };
 
         return edxUserCookieUtils;

@@ -7,11 +7,11 @@
         'gettext',
         'edx-ui-toolkit/js/utils/html-utils',
         'js/edxnotes/utils/logger',
-        'js/edxnotes/collections/notes'
+        'js/edxnotes/collections/notes',
     ], function($, _, Backbone, gettext, HtmlUtils, NotesLogger, NotesCollection) {
         var SearchBoxView = Backbone.View.extend({
             events: {
-                submit: 'submitHandler'
+                submit: 'submitHandler',
             },
 
             errorMessage: gettext('An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.'),
@@ -20,7 +20,7 @@
                 var message = gettext('Please enter a term in the {anchorStart} search field{anchorEnd}.');
                 return HtmlUtils.interpolateHtml(message, {
                     anchorStart: HtmlUtils.HTML('<a href="#search-notes-input">'),
-                    anchorEnd: HtmlUtils.HTML('</a>')
+                    anchorEnd: HtmlUtils.HTML('</a>'),
                 });
             }()),
 
@@ -30,7 +30,7 @@
                     beforeSearchStart: function() {},
                     search: function() {},
                     error: function() {},
-                    complete: function() {}
+                    complete: function() {},
                 });
                 this.logger = NotesLogger.getLogger('search_box', this.options.debug);
                 this.$el.removeClass('is-hidden');
@@ -109,7 +109,7 @@
                     this.options.search.apply(this, args);
                     this.logger.emit('edx.course.student_notes.searched', {
                         number_of_results: args[0].getTotalRecords(),
-                        search_string: args[1]
+                        search_string: args[1],
                     });
                 } else {
                     this.options.error(this.errorMessage, this.searchQuery);
@@ -156,11 +156,11 @@
                 this.collection = new NotesCollection([], {
                     text: text,
                     perPage: this.options.perPage,
-                    url: this.el.action
+                    url: this.el.action,
                 });
 
                 return this.collection.getPage(1);
-            }
+            },
         });
 
         return SearchBoxView;

@@ -12,7 +12,7 @@ define([
     'js/models/uploads',
     'js/views/uploads',
     'text!templates/signatory-editor.underscore',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/html-utils',
 ],
 function($, _, Backbone, gettext,
     TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog,
@@ -26,7 +26,7 @@ function($, _, Backbone, gettext,
             'change .signatory-organization-input': 'setSignatoryOrganization',
             'click  .signatory-panel-delete': 'deleteItem',
             'change .signatory-signature-input': 'setSignatorySignatureImagePath',
-            'click .action-upload-signature': 'uploadSignatureImage'
+            'click .action-upload-signature': 'uploadSignatureImage',
         },
 
         className: function() {
@@ -34,7 +34,7 @@ function($, _, Backbone, gettext,
             var index = this.getModelIndex(this.model);
             return [
                 'signatory-edit',
-                'signatory-edit-view-' + index
+                'signatory-edit-view-' + index,
             ].join(' ');
         },
 
@@ -71,13 +71,13 @@ function($, _, Backbone, gettext,
             // Assemble the editor view for this model
             var attributes = $.extend({
                 modelIsValid: this.model.isValid(),
-                error: this.model.validationError
+                error: this.model.validationError,
             }, this.model.attributes, {
                 signatory_number: this.getModelIndex(this.model) + 1,
                 signatories_count: this.model.collection.length,
                 isNew: this.model.isNew(),
                 is_editing_all_collections: this.isEditingAllCollections,
-                total_saved_signatories: this.getTotalSignatoriesOnServer()
+                total_saved_signatories: this.getTotalSignatoriesOnServer(),
             });
             return HtmlUtils.setHtml(this.$el, HtmlUtils.template(signatoryEditorTemplate)(attributes));
         },
@@ -88,7 +88,7 @@ function($, _, Backbone, gettext,
             this.model.set(
                 'name',
                 this.$('.signatory-name-input').val(),
-                {silent: true}
+                {silent: true},
             );
             this.toggleValidationErrorMessage('name');
             this.eventAgg.trigger('onSignatoryUpdated', this.model);
@@ -100,7 +100,7 @@ function($, _, Backbone, gettext,
             this.model.set(
                 'title',
                 this.$('.signatory-title-input').val(),
-                {silent: true}
+                {silent: true},
             );
             this.toggleValidationErrorMessage('title');
             this.eventAgg.trigger('onSignatoryUpdated', this.model);
@@ -112,7 +112,7 @@ function($, _, Backbone, gettext,
             this.model.set(
                 'organization',
                 this.$('.signatory-organization-input').val(),
-                {silent: true}
+                {silent: true},
             );
             this.eventAgg.trigger('onSignatoryUpdated', this.model);
         },
@@ -122,7 +122,7 @@ function($, _, Backbone, gettext,
             this.model.set(
                 'signature_image_path',
                 this.$('.signatory-signature-input').val(),
-                {silent: true}
+                {silent: true},
             );
         },
 
@@ -139,7 +139,7 @@ function($, _, Backbone, gettext,
                         text: gettext('Delete'),
                         click: function() {
                             var deleting = new NotificationView.Mini({
-                                title: gettext('Deleting')
+                                title: gettext('Deleting'),
                             });
                             if (model.isNew()) {
                                 model.collection.remove(model);
@@ -151,19 +151,19 @@ function($, _, Backbone, gettext,
                                     success: function(model2) {
                                         deleting.hide();
                                         self.eventAgg.trigger('onSignatoryRemoved', model2);
-                                    }
+                                    },
                                 });
                             }
                             confirm.hide();
-                        }
+                        },
                     },
                     secondary: {
                         text: gettext('Cancel'),
                         click: function() {
                             confirm.hide();
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
             if (event && event.preventDefault) { event.preventDefault(); }
             confirm.show();
@@ -175,14 +175,14 @@ function($, _, Backbone, gettext,
             upload = new FileUploadModel({
                 title: gettext('Upload signature image.'),
                 message: gettext('Image must be in PNG format.'),
-                mimeTypes: ['image/png']
+                mimeTypes: ['image/png'],
             });
             self = this;
             modal = new FileUploadDialog({
                 model: upload,
                 onSuccess: function(response) {
                     self.model.set('signature_image_path', response.asset.url);
-                }
+                },
             });
             modal.show();
         },
@@ -207,7 +207,7 @@ function($, _, Backbone, gettext,
                 $(selector).removeClass('error');
                 $(selector + '>span.message-error').remove();
             }
-        }
+        },
 
     });
     return SignatoryEditorView;

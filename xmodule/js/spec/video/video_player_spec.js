@@ -90,7 +90,7 @@
                             onReady: state.videoPlayer.onReady,
                             onStateChange: state.videoPlayer.onStateChange,
                             onPlaybackQualityChange: state.videoPlayer.onPlaybackQualityChange,
-                            onError: state.videoPlayer.onError
+                            onError: state.videoPlayer.onError,
                         };
 
                         expect(YT.Player).toHaveBeenCalledWith('id', {
@@ -102,10 +102,10 @@
                                 enablejsapi: 1,
                                 modestbranding: 1,
                                 html5: 1,
-                                cc_load_policy: 0
+                                cc_load_policy: 0,
                             },
                             videoId: 'cogebirgzzM',
-                            events: events
+                            events: events,
                         });
                     });
 
@@ -129,10 +129,10 @@
                                 showinfo: 0,
                                 enablejsapi: 1,
                                 modestbranding: 1,
-                                cc_load_policy: 0
+                                cc_load_policy: 0,
                             },
                             videoId: 'abcdefghijkl',
-                            events: jasmine.any(Object)
+                            events: jasmine.any(Object),
                         });
 
                         expect(state.resizer.setElement).toHaveBeenCalled();
@@ -215,7 +215,7 @@
                             state.videoEl = $('video, iframe');
                             spyOn($.fn, 'trigger').and.callThrough();
                             state.videoPlayer.onStateChange({
-                                data: YT.PlayerState.ENDED
+                                data: YT.PlayerState.ENDED,
                             });
                         });
 
@@ -238,7 +238,7 @@
                             spyOn($.fn, 'trigger').and.callThrough();
 
                             state.videoPlayer.onStateChange({
-                                data: YT.PlayerState.PAUSED
+                                data: YT.PlayerState.PAUSED,
                             });
                         });
 
@@ -270,13 +270,13 @@
                             spyOn($.fn, 'trigger').and.callThrough();
 
                             state.videoPlayer.onStateChange({
-                                data: YT.PlayerState.PLAYING
+                                data: YT.PlayerState.PLAYING,
                             });
                         });
 
                         it('set update interval', function() {
                             expect(window.setInterval).toHaveBeenCalledWith(
-                                state.videoPlayer.update, 200
+                                state.videoPlayer.update, 200,
                             );
                             expect(state.videoPlayer.updateInterval).toEqual(100);
                         });
@@ -300,13 +300,13 @@
 
                             spyOn($.fn, 'trigger').and.callThrough();
                             state.videoPlayer.onStateChange({
-                                data: YT.PlayerState.PLAYING
+                                data: YT.PlayerState.PLAYING,
                             });
 
                             currentUpdateIntrval = state.videoPlayer.updateInterval;
 
                             state.videoPlayer.onStateChange({
-                                data: YT.PlayerState.PAUSED
+                                data: YT.PlayerState.PAUSED,
                             });
                         });
 
@@ -330,7 +330,7 @@
                             state.videoEl = $('video, iframe');
                             spyOn($.fn, 'trigger').and.callThrough();
                             state.videoPlayer.onStateChange({
-                                data: YT.PlayerState.ENDED
+                                data: YT.PlayerState.ENDED,
                             });
                         });
 
@@ -353,7 +353,7 @@
                     describe('when the video is playing', function() {
                         beforeEach(function() {
                             state.videoPlayer.onStateChange({
-                                data: YT.PlayerState.PLAYING
+                                data: YT.PlayerState.PLAYING,
                             });
                         });
 
@@ -399,7 +399,7 @@
                         it('seek the player', function() {
                             spyOn(state.videoPlayer.player, 'seekTo').and.callThrough();
                             state.videoProgressSlider.onSlide(
-                                jQuery.Event('slide'), {value: 30}
+                                jQuery.Event('slide'), {value: 30},
                             );
                             expect(state.videoPlayer.currentTime).toBe(30);
                             expect(state.videoPlayer.player.seekTo).toHaveBeenCalledWith(30, true);
@@ -408,7 +408,7 @@
                         it('call updatePlayTime on player', function() {
                             spyOn(state.videoPlayer, 'updatePlayTime').and.callThrough();
                             state.videoProgressSlider.onSlide(
-                                jQuery.Event('slide'), {value: 30}
+                                jQuery.Event('slide'), {value: 30},
                             );
                             expect(state.videoPlayer.currentTime).toBe(30);
                             expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(30, true);
@@ -417,12 +417,12 @@
 
                     it('when the player is not playing: set the current time', function() {
                         state.videoProgressSlider.onSlide(
-                            jQuery.Event('slide'), {value: 20}
+                            jQuery.Event('slide'), {value: 20},
                         );
                         state.videoPlayer.pause();
                         expect(state.videoPlayer.currentTime).toBe(20);
                         state.videoProgressSlider.onSlide(
-                            jQuery.Event('slide'), {value: 10}
+                            jQuery.Event('slide'), {value: 10},
                         );
                         expect(state.videoPlayer.currentTime).toBe(10);
                     });
@@ -525,8 +525,8 @@
                         state = jasmine.initializePlayer(
                             {
                                 start: START_TIME,
-                                end: END_TIME
-                            }
+                                end: END_TIME,
+                            },
                         );
 
                         state.videoEl = $('video, iframe');
@@ -614,7 +614,7 @@
                             expect(state.videoProgressSlider.updatePlayTime)
                                 .toHaveBeenCalledWith({
                                     time: 60,
-                                    duration: duration
+                                    duration: duration,
                                 });
                         }).always(done);
                     });
@@ -631,8 +631,8 @@
                             state = jasmine.initializePlayer(
                                 {
                                     start: START_TIME,
-                                    end: END_TIME
-                                }
+                                    end: END_TIME,
+                                },
                             );
 
                             state.videoEl = $('video, iframe');
@@ -687,10 +687,10 @@
                                 startTime: undefined,
                                 endTime: undefined,
                                 player: {
-                                    seekTo: function() {}
+                                    seekTo: function() {},
                                 },
                                 figureOutStartEndTime: jasmine.createSpy(),
-                                figureOutStartingTime: jasmine.createSpy().and.returnValue(0)
+                                figureOutStartingTime: jasmine.createSpy().and.returnValue(0),
                             },
                             config: {
                                 savedVideoPosition: 0,
@@ -700,12 +700,12 @@
                                 // video will be less than this, the code will reset
                                 // the end time to `null` - i.e. to the end of the video.
                                 // This is the expected behavior we will test for.
-                                endTime: 10000
+                                endTime: 10000,
                             },
                             currentPlayerMode: 'html5',
                             trigger: function() {},
                             browserIsFirefox: false,
-                            isFlashMode: jasmine.createSpy().and.returnValue(false)
+                            isFlashMode: jasmine.createSpy().and.returnValue(false),
                         };
                     });
                 });
@@ -838,7 +838,7 @@
 
                         var modules = [
                             state.videoControl, state.videoCaption, state.videoProgressSlider,
-                            state.videoSpeedControl, state.videoVolumeControl
+                            state.videoSpeedControl, state.videoVolumeControl,
                         ];
 
                         $.each(modules, function(index, module) {
@@ -888,9 +888,9 @@
                                 currentTime: 60,
                                 updatePlayTime: jasmine.createSpy(),
                                 setPlaybackRate: jasmine.createSpy(),
-                                player: jasmine.createSpyObj('player', ['setPlaybackRate'])
+                                player: jasmine.createSpyObj('player', ['setPlaybackRate']),
                             },
-                            isFlashMode: jasmine.createSpy().and.returnValue(false)
+                            isFlashMode: jasmine.createSpy().and.returnValue(false),
                         };
                     });
 
@@ -927,9 +927,9 @@
                                 updatePlayTime: jasmine.createSpy(),
                                 setPlaybackRate: jasmine.createSpy(),
                                 player: jasmine.createSpyObj('player', [
-                                    'setPlaybackRate', 'loadVideoById', 'cueVideoById'
-                                ])
-                            }
+                                    'setPlaybackRate', 'loadVideoById', 'cueVideoById',
+                                ]),
+                            },
                         };
                     });
 
@@ -1002,7 +1002,7 @@
                     it('shows error message if hls is not supported', function() {
                         expect($('.video-hls-error')).not.toHaveClass('is-hidden');
                         expect($('.video-hls-error').text().trim()).toEqual(
-                            'Your browser does not support this video format. Try using a different browser.'
+                            'Your browser does not support this video format. Try using a different browser.',
                         );
                     });
                 });
@@ -1077,7 +1077,7 @@
                     it('loads youtube if flag is disabled', function() {
                         state = jasmine.initializePlayer('video_all.html', {
                             prioritizeHls: false,
-                            streams: '0.5:7tqY6eQzVhE,1.0:cogebirgzzM,1.5:abcdefghijkl'
+                            streams: '0.5:7tqY6eQzVhE,1.0:cogebirgzzM,1.5:abcdefghijkl',
                         });
                         expect(state.config.prioritizeHls).toBeFalsy();
                         expect(YT.Player).toHaveBeenCalled();
@@ -1088,7 +1088,7 @@
                         state = jasmine.initializePlayer('video_all.html', {
                             prioritizeHls: true,
                             streams: '0.5:7tqY6eQzVhE,1.0:cogebirgzzM,1.5:abcdefghijkl',
-                            sources: ['/base/fixtures/test.mp4', '/base/fixtures/test.webm', '/base/fixtures/hls/hls.m3u8']
+                            sources: ['/base/fixtures/test.mp4', '/base/fixtures/test.webm', '/base/fixtures/hls/hls.m3u8'],
                         });
                         expect(state.config.prioritizeHls).toBeTruthy();
                         expect(YT.Player).not.toHaveBeenCalled();

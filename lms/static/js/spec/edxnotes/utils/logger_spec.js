@@ -1,5 +1,5 @@
 define([
-    'logger', 'js/edxnotes/utils/logger'
+    'logger', 'js/edxnotes/utils/logger',
 ], function(Logger, NotesLogger) {
     'use strict';
     describe('Edxnotes NotesLogger', function() {
@@ -114,7 +114,7 @@ define([
             var logger = getLogger('id', 0);
             logger.emit('event_name', {id: 'some_id'});
             expect(Logger.log).toHaveBeenCalledWith('event_name', {
-                id: 'some_id'
+                id: 'some_id',
             });
         });
     });

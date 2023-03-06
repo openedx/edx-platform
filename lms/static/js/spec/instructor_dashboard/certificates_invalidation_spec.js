@@ -4,7 +4,7 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/certificates/models/certificate_invalidation',
     'js/certificates/views/certificate_invalidation_view',
-    'js/certificates/collections/certificate_invalidation_collection'
+    'js/certificates/collections/certificate_invalidation_collection',
 ],
 function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationView,
     CertificateInvalidationCollection) {
@@ -24,13 +24,13 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
 
         var EXPECTED_ERRORS = {
             user_name_or_email_required: 'Student username/email field is required and can not be empty. ' +
-                'Kindly fill in username/email and then press "Invalidate Certificate" button.'
+                'Kindly fill in username/email and then press "Invalidate Certificate" button.',
         };
 
         beforeEach(function() {
             certificate_invalidation = new CertificateInvalidationModel({user: 'test_user'}, {url: 'test/url/'});
             certificate_invalidation.set({
-                notes: 'Test notes'
+                notes: 'Test notes',
             });
         });
 
@@ -58,22 +58,22 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
                     user: 'test1',
                     invalidated_by: 2,
                     created: 'Thursday, October 29, 2015',
-                    notes: 'test notes for test certificate invalidation'
+                    notes: 'test notes for test certificate invalidation',
                 },
                 {
                     id: 2,
                     user: 'test2',
                     invalidated_by: 2,
                     created: 'Thursday, October 29, 2015',
-                    notes: 'test notes for test certificate invalidation'
-                }
+                    notes: 'test notes for test certificate invalidation',
+                },
             ];
 
             beforeEach(function() {
                 certificate_invalidations = new CertificateInvalidationCollection(certificate_invalidations_json, {
                     parse: true,
                     canBeEmpty: true,
-                    url: certificate_invalidation_url
+                    url: certificate_invalidation_url,
                 });
             });
 
@@ -87,7 +87,7 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
                 expect(certificate_invalidations.models.length).toEqual(1);
                 expect(certificate_invalidations.get({id: 2})).toBe(undefined);
             });
-        }
+        },
     );
 
     describe('Certificate invalidation success/error messages on add/remove invalidations.', function() {
@@ -107,13 +107,13 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
                 duplicate_user: 'Certificate of ' + (duplicate_user) + ' has already been invalidated. ' +
                         'Please check your spelling and retry.',
                 server_error: 'Server Error, Please refresh the page and try again.',
-                from_server: 'Test Message from server'
+                from_server: 'Test Message from server',
             },
             success: {
                 saved: 'Certificate has been successfully invalidated for ' + new_user + '.',
                 re_validated: 'The certificate for this learner has been re-validated and ' +
-                        'the system is re-running the grade for this learner.'
-            }
+                        'the system is re-running the grade for this learner.',
+            },
         };
 
         var certificate_invalidations_json = [
@@ -122,21 +122,21 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
                 user: 'test1',
                 invalidated_by: 2,
                 created: 'Thursday, October 29, 2015',
-                notes: 'test notes for test certificate invalidation'
+                notes: 'test notes for test certificate invalidation',
             },
             {
                 id: 2,
                 user: 'test2',
                 invalidated_by: 2,
                 created: 'Thursday, October 29, 2015',
-                notes: 'test notes for test certificate invalidation'
-            }
+                notes: 'test notes for test certificate invalidation',
+            },
         ];
 
         beforeEach(function() {
             setFixtures();
             var fixture = readFixtures(
-                'templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore'
+                'templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore',
             );
 
             setFixtures(
@@ -144,14 +144,14 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
                     '   <h2>Invalidate Certificates</h2> ' +
                     "   <div id='certificate-invalidation'></div>" +
                     '</div>' +
-                    "<script type='text/template' id='certificate-invalidation-tpl'>" + fixture + '</script>'
+                    "<script type='text/template' id='certificate-invalidation-tpl'>" + fixture + '</script>',
             );
 
             var certificate_invalidations = new CertificateInvalidationCollection(certificate_invalidations_json, {
                 parse: true,
                 canBeEmpty: true,
                 url: certificate_invalidation_url,
-                generate_certificates_url: certificate_invalidation_url
+                generate_certificates_url: certificate_invalidation_url,
 
             });
 
@@ -174,7 +174,7 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
             var user = 'test3',
                 notes = 'test3 notes',
                 model = new CertificateInvalidationModel(
-                    {user: user, notes: notes}, {url: certificate_invalidation_url}
+                    {user: user, notes: notes}, {url: certificate_invalidation_url},
                 );
 
             // Add another model in collection and verify it is rendered
@@ -220,8 +220,8 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
                     user: 'test4',
                     validated_by: 5,
                     created: 'Thursday, December 29, 2015',
-                    notes: 'test notes for user test4'
-                }
+                    notes: 'test notes for user test4',
+                },
             );
             expect($('#certificate-invalidation div.message').text()).toEqual(messages.success.saved);
         });
@@ -256,11 +256,11 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
             $(re_validate_certificate).click();
             AjaxHelpers.respondWithError(requests, 400, {
                 success: false,
-                message: messages.error.from_server
+                message: messages.error.from_server,
             });
 
             expect($('#certificate-invalidation div.message').text()).toEqual(messages.error.from_server);
         });
     });
-}
+},
 );

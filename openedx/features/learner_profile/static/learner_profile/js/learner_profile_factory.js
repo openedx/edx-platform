@@ -18,7 +18,7 @@
         'learner_profile/js/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner',
-        'string_utils'
+        'string_utils',
     ], function (gettext, $, _, Backbone, Logger, StringUtils, PagingCollection, AccountSettingsModel,
         AccountPreferencesModel, FieldsView, LearnerProfileFieldsView, LearnerProfileView, BadgeModel,
         BadgeListContainer, AccountSettingsFieldViews, MessageBannerView){
@@ -31,22 +31,22 @@
                     {
                         default_public_account_fields: options.default_public_account_fields,
                         parental_consent_age_limit: options.parental_consent_age_limit,
-                        enable_coppa_compliance: options.enable_coppa_compliance
-                    }
+                        enable_coppa_compliance: options.enable_coppa_compliance,
+                    },
                 ),
-                {parse: true}
+                {parse: true},
             );
             var AccountPreferencesModelWithDefaults = AccountPreferencesModel.extend({
                 defaults: {
-                    account_privacy: options.default_visibility
-                }
+                    account_privacy: options.default_visibility,
+                },
             });
             var accountPreferencesModel = new AccountPreferencesModelWithDefaults(options.preferences_data);
 
             var editable = options.own_profile ? 'toggle' : 'never';
 
             var messageView = new MessageBannerView({
-                el: $('.message-banner')
+                el: $('.message-banner'),
             });
 
             var accountPrivacyFieldView,
@@ -74,11 +74,11 @@
                 valueAttribute: 'account_privacy',
                 options: [
                     ['private', gettext('Limited Profile')],
-                    ['all_users', gettext('Full Profile')]
+                    ['all_users', gettext('Full Profile')],
                 ],
                 helpMessage: '',
                 accountSettingsPageUrl: options.account_settings_page_url,
-                persistChanges: true
+                persistChanges: true,
             });
 
             profileImageFieldView = new LearnerProfileFieldsView.ProfileImageFieldView({
@@ -89,28 +89,28 @@
                 imageMaxBytes: options.profile_image_max_bytes,
                 imageMinBytes: options.profile_image_min_bytes,
                 imageUploadUrl: options.profile_image_upload_url,
-                imageRemoveUrl: options.profile_image_remove_url
+                imageRemoveUrl: options.profile_image_remove_url,
             });
 
             usernameFieldView = new FieldsView.ReadonlyFieldView({
                 model: accountSettingsModel,
                 screenReaderTitle: gettext('Username'),
                 valueAttribute: 'username',
-                helpMessage: ''
+                helpMessage: '',
             });
 
             nameFieldView = new FieldsView.ReadonlyFieldView({
                 model: accountSettingsModel,
                 screenReaderTitle: gettext('Full Name'),
                 valueAttribute: 'name',
-                helpMessage: ''
+                helpMessage: '',
             });
 
             sectionOneFieldViews = [
                 new LearnerProfileFieldsView.SocialLinkIconsView({
                     model: accountSettingsModel,
                     socialPlatforms: options.social_platforms,
-                    ownProfile: options.own_profile
+                    ownProfile: options.own_profile,
                 }),
 
                 new FieldsView.DateFieldView({
@@ -122,7 +122,7 @@
                     helpMessage: '',
                     userLanguage: accountSettingsModel.get('language'),
                     userTimezone: accountPreferencesModel.get('time_zone'),
-                    dateFormat: 'MMMM YYYY'  // not localized, but hopefully ok.
+                    dateFormat: 'MMMM YYYY',  // not localized, but hopefully ok.
                 }),
 
                 new FieldsView.DropdownFieldView({
@@ -137,7 +137,7 @@
                     valueAttribute: 'country',
                     options: options.country_options,
                     helpMessage: '',
-                    persistChanges: true
+                    persistChanges: true,
                 }),
 
                 new AccountSettingsFieldViews.LanguageProficienciesFieldView({
@@ -152,8 +152,8 @@
                     valueAttribute: 'language_proficiencies',
                     options: options.language_options,
                     helpMessage: '',
-                    persistChanges: true
-                })
+                    persistChanges: true,
+                }),
             ];
 
             sectionTwoFieldViews = [
@@ -168,14 +168,14 @@
                     helpMessage: '',
                     persistChanges: true,
                     messagePosition: 'header',
-                    maxCharacters: 300
-                })
+                    maxCharacters: 300,
+                }),
             ];
 
             BadgeCollection = PagingCollection.extend({
                 queryParams: {
-                    currentPage: 'current_page'
-                }
+                    currentPage: 'current_page',
+                },
             });
             badgeCollection = new BadgeCollection();
             badgeCollection.url = options.badges_api_url;
@@ -188,8 +188,8 @@
                 badgeMeta: {
                     badges_logo: options.badges_logo,
                     backpack_ui_img: options.backpack_ui_img,
-                    badges_icon: options.badges_icon
-                }
+                    badges_icon: options.badges_icon,
+                },
             });
 
             learnerProfileView = new LearnerProfileView({
@@ -205,7 +205,7 @@
                 sectionOneFieldViews: sectionOneFieldViews,
                 sectionTwoFieldViews: sectionTwoFieldViews,
                 badgeListContainer: badgeListContainer,
-                platformName: options.platform_name
+                platformName: options.platform_name,
             });
 
             getProfileVisibility = function (){
@@ -221,7 +221,7 @@
                 Logger.log('edx.user.settings.viewed', {
                     page: 'profile',
                     visibility: getProfileVisibility(),
-                    user_id: options.profile_user_id
+                    user_id: options.profile_user_id,
                 });
 
                 // Render the view for the first time
@@ -239,7 +239,7 @@
                 accountSettingsModel: accountSettingsModel,
                 accountPreferencesModel: accountPreferencesModel,
                 learnerProfileView: learnerProfileView,
-                badgeListContainer: badgeListContainer
+                badgeListContainer: badgeListContainer,
             };
         };
     });

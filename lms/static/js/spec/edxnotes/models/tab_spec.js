@@ -1,5 +1,5 @@
 define([
-    'js/edxnotes/collections/tabs'
+    'js/edxnotes/collections/tabs',
 ], function(TabsCollection) {
     'use strict';
     describe('EdxNotes TabModel', function() {

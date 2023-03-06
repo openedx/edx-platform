@@ -5,15 +5,15 @@
  * It is expected to be backed by a Group model.
  */
 define([
-    'js/views/list_item', 'js/views/group_configuration_details', 'js/views/group_configuration_editor', 'gettext'
+    'js/views/list_item', 'js/views/group_configuration_details', 'js/views/group_configuration_editor', 'gettext',
 ], function(
-    ListItemView, GroupConfigurationDetailsView, GroupConfigurationEditorView, gettext
+    ListItemView, GroupConfigurationDetailsView, GroupConfigurationEditorView, gettext,
 ) {
     'use strict';
 
     var GroupConfigurationItemView = ListItemView.extend({
         events: {
-            'click .delete': 'deleteItem'
+            'click .delete': 'deleteItem',
         },
 
         tagName: 'section',
@@ -28,7 +28,7 @@ define([
         attributes: function() {
             return {
                 id: this.model.get('id'),
-                tabindex: -1
+                tabindex: -1,
             };
         },
 
@@ -38,7 +38,7 @@ define([
 
         createDetailsView: function() {
             return new GroupConfigurationDetailsView({model: this.model});
-        }
+        },
     });
 
     return GroupConfigurationItemView;

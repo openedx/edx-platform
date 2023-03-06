@@ -20,14 +20,14 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             var TestAssetsCollection = AssetCollection.extend({
                 state: {
                     firstPage: 0,
-                    pageSize: 2
-                }
+                    pageSize: 2,
+                },
             });
             var collection = new TestAssetsCollection();
             collection.url = 'assets-url';
             assetsView = new AssetsView({
                 collection: collection,
-                el: $('#asset_table_body')
+                el: $('#asset_table_body'),
             });
 
             assetsView.render();
@@ -50,7 +50,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             end: 0,
             page: 0,
             pageSize: 2,
-            totalCount: 0
+            totalCount: 0,
         };
 
         var mockExampleAssetsResponse = {
@@ -89,12 +89,12 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                     locked: false,
                     external_url: 'localhost:8000/c4x/A/CS102/asset/test.odt',
                     static_full_url: '/c4x/A/CS102/asset/test.odt',
-                }
+                },
             ],
             pageSize: 2,
             totalCount: 2,
             start: 0,
-            page: 0
+            page: 0,
         };
 
         var mockExampleFilteredAssetsResponse = {
@@ -110,22 +110,22 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                     thumbnail: '/c4x/A/CS102/thumbnail/test.jpg',
                     locked: false,
                     external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg',
-                    static_full_url: '/c4x/A/CS102/asset/test.jpg'
-                }
+                    static_full_url: '/c4x/A/CS102/asset/test.jpg',
+                },
             ],
             pageSize: 1,
             totalCount: 1,
             start: 0,
-            page: 0
+            page: 0,
         };
 
         mockAssetUploadResponse = {
             asset: mockAsset,
-            msg: 'Upload completed'
+            msg: 'Upload completed',
         };
 
         mockFileUpload = {
-            files: [{name: 'largefile', size: 0}]
+            files: [{name: 'largefile', size: 0}],
         };
 
         var respondWithMockAssets = function(requests) {
@@ -379,7 +379,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                                 thumbnail: '/c4x/A/CS102/thumbnail/test.jpg',
                                 locked: false,
                                 external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg',
-                                static_full_url: '/c4x/A/CS102/asset/test.jpg'
+                                static_full_url: '/c4x/A/CS102/asset/test.jpg',
                             },
                             {
                                 display_name: 'test.pdf',
@@ -391,12 +391,12 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                                 locked: false,
                                 external_url: 'localhost:8000/c4x/A/CS102/asset/test.pdf',
                                 static_full_url: '/c4x/A/CS102/asset/test.pdf',
-                            }
+                            },
                         ],
                         pageSize: 2,
                         totalCount: 3,
                         start: 0,
-                        page: 0
+                        page: 0,
                     },
                     secondPageAssets = {
                         sort: 'uploadDate',
@@ -412,12 +412,12 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                                 locked: false,
                                 external_url: 'localhost:8000/c4x/A/CS102/asset/test.odt',
                                 static_full_url: '/c4x/A/CS102/asset/test.odt',
-                            }
+                            },
                         ],
                         pageSize: 2,
                         totalCount: 3,
                         start: 2,
-                        page: 1
+                        page: 1,
                     };
 
                 it('can move forward a page using the next page button', function() {

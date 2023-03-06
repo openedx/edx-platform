@@ -6,13 +6,13 @@
  */
 define([
     'js/views/list_item', 'js/views/content_group_editor', 'js/views/partition_group_details',
-    'gettext', 'common/js/components/utils/view_utils'
+    'gettext', 'common/js/components/utils/view_utils',
 ], function(ListItemView, ContentGroupEditorView, PartitionGroupDetailsView, gettext) {
     'use strict';
 
     var PartitionGroupItemView = ListItemView.extend({
         events: {
-            'click .delete': 'deleteItem'
+            'click .delete': 'deleteItem',
         },
 
         tagName: 'section',
@@ -26,7 +26,7 @@ define([
         attributes: function() {
             return {
                 id: this.model.get('id'),
-                tabindex: -1
+                tabindex: -1,
             };
         },
 
@@ -36,9 +36,9 @@ define([
 
         createDetailsView: function() {
             return new PartitionGroupDetailsView({model: this.model,
-                restrictEditing: this.options.restrictEditing
+                restrictEditing: this.options.restrictEditing,
             });
-        }
+        },
     });
 
     return PartitionGroupItemView;

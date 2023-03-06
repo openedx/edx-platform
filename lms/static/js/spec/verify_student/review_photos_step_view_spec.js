@@ -5,7 +5,7 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers',
     'js/verify_student/views/review_photos_step_view',
-    'js/verify_student/models/verification_model'
+    'js/verify_student/models/verification_model',
 ],
 function($, _, Backbone, AjaxHelpers, TemplateHelpers, ReviewPhotosStepView, VerificationModel) {
     'use strict';
@@ -23,9 +23,9 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, ReviewPhotosStepView, Ver
                 stepData: STEP_DATA,
                 model: new VerificationModel({
                     faceImage: FACE_IMAGE,
-                    identificationImage: PHOTO_ID_IMAGE
+                    identificationImage: PHOTO_ID_IMAGE,
                 }),
-                errorModel: new (Backbone.Model.extend({}))()
+                errorModel: new (Backbone.Model.extend({}))(),
             }).render();
         };
 
@@ -36,7 +36,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, ReviewPhotosStepView, Ver
             // Expect a request to the server
             AjaxHelpers.expectRequest(
                 requests, 'POST', '/verify_student/submit-photos/',
-                $.param(expectedParams)
+                $.param(expectedParams),
             );
 
             // Simulate the server response
@@ -76,9 +76,9 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, ReviewPhotosStepView, Ver
                 {
                     face_image: FACE_IMAGE,
                     photo_id_image: PHOTO_ID_IMAGE,
-                    full_name: FULL_NAME
+                    full_name: FULL_NAME,
                 },
-                true
+                true,
             );
         });
 
@@ -90,9 +90,9 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, ReviewPhotosStepView, Ver
                 requests,
                 {
                     face_image: FACE_IMAGE,
-                    photo_id_image: PHOTO_ID_IMAGE
+                    photo_id_image: PHOTO_ID_IMAGE,
                 },
-                true
+                true,
             );
 
             // Expect that submission is disabled to prevent
@@ -108,9 +108,9 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, ReviewPhotosStepView, Ver
                 requests,
                 {
                     face_image: FACE_IMAGE,
-                    photo_id_image: PHOTO_ID_IMAGE
+                    photo_id_image: PHOTO_ID_IMAGE,
                 },
-                false
+                false,
             );
 
             // Expect the submit button is re-enabled to allow
@@ -123,5 +123,5 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, ReviewPhotosStepView, Ver
             expect(view.errorModel.get('errorMsg')).toEqual(SERVER_ERROR_MSG);
         });
     });
-}
+},
 );

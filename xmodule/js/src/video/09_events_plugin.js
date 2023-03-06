@@ -53,7 +53,7 @@
                     'transcript:hide': this.onHideTranscript,
                     'captions:show': this.onShowCaptions,
                     'captions:hide': this.onHideCaptions,
-                    destroy: this.destroy
+                    destroy: this.destroy,
                 };
                 this.bindHandlers();
                 this.emitPlayVideoEvent = true;
@@ -98,7 +98,7 @@
                 this.log('seek_video', {
                     old_time: oldTime,
                     new_time: time,
-                    type: type
+                    type: type,
                 });
                 this.emitPlayVideoEvent = true;
             },
@@ -107,13 +107,13 @@
                 this.log('speed_change_video', {
                     current_time: this.getCurrentTime(),
                     old_speed: this.state.speedToString(oldSpeed),
-                    new_speed: this.state.speedToString(newSpeed)
+                    new_speed: this.state.speedToString(newSpeed),
                 });
             },
 
             onAutoAdvanceChange: function(event, enabled) {
                 this.log('auto_advance_change_video', {
-                    enabled: enabled
+                    enabled: enabled,
                 });
             },
 
@@ -156,10 +156,10 @@
                     id: this.state.id,
                     // eslint-disable-next-line no-nested-ternary
                     code: this.state.isYoutubeType() ? this.state.youtubeId() : this.state.canPlayHLS ? 'hls' : 'html5',
-                    duration: this.state.duration
+                    duration: this.state.duration,
                 }, data, this.options.data);
                 Logger.log(eventName, logInfo);
-            }
+            },
         };
 
         return EventsPlugin;

@@ -16,7 +16,7 @@ define([
     'js/views/modals/base_modal',
     'js/views/move_xblock_list',
     'js/views/move_xblock_breadcrumb',
-    'text!templates/move-xblock-modal.underscore'
+    'text!templates/move-xblock-modal.underscore',
 ],
 function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, HtmlUtils, StringUtils, Feedback,
     XBlockInfoModel, BaseModal, MoveXBlockListView, MoveXBlockBreadcrumbView, MoveXblockModalTemplate) {
@@ -24,7 +24,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
 
     var MoveXblockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
-            'click .action-move:not(.is-disabled)': 'moveXBlock'
+            'click .action-move:not(.is-disabled)': 'moveXBlock',
         }),
 
         options: $.extend({}, BaseModal.prototype.options, {
@@ -35,7 +35,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
             primaryActionButtonType: 'move',
             viewSpecificClasses: 'move-modal',
             primaryActionButtonTitle: gettext('Move'),
-            modalSRTitle: gettext('Choose a location to move your component to')
+            modalSRTitle: gettext('Choose a location to move your component to'),
         }),
 
         initialize: function() {
@@ -47,7 +47,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
             this.XBlockURLRoot = this.options.XBlockURLRoot;
             this.XBlockAncestorInfoURL = StringUtils.interpolate(
                 '{urlRoot}/{usageId}?fields=ancestorInfo',
-                {urlRoot: this.XBlockURLRoot, usageId: this.sourceXBlockInfo.get('id')}
+                {urlRoot: this.XBlockURLRoot, usageId: this.sourceXBlockInfo.get('id')},
             );
             this.outlineURL = this.options.outlineURL;
             this.options.title = this.getTitle();
@@ -64,7 +64,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
         getTitle: function() {
             return StringUtils.interpolate(
                 gettext('Move: {displayName}'),
-                {displayName: this.sourceXBlockInfo.get('display_name')}
+                {displayName: this.sourceXBlockInfo.get('display_name')},
             );
         },
 
@@ -101,7 +101,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
         fetchCourseOutline: function() {
             return $.when(
                 this.fetchData(this.outlineURL),
-                this.fetchData(this.XBlockAncestorInfoURL)
+                this.fetchData(this.XBlockAncestorInfoURL),
             );
         },
 
@@ -111,7 +111,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
                 url: url,
                 contentType: 'application/json',
                 dataType: 'json',
-                type: 'GET'
+                type: 'GET',
             }).done(function(data) {
                 deferred.resolve(data);
             }).fail(function() {
@@ -126,8 +126,8 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
                 {
                     model: new XBlockInfoModel(courseOutlineInfo, {parse: true}),
                     sourceXBlockInfo: this.sourceXBlockInfo,
-                    ancestorInfo: ancestorInfo
-                }
+                    ancestorInfo: ancestorInfo,
+                },
             );
         },
 
@@ -182,10 +182,10 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
                     sourceDisplayName: this.sourceXBlockInfo.get('display_name'),
                     sourceLocator: this.sourceXBlockInfo.id,
                     sourceParentLocator: this.sourceParentXBlockInfo.id,
-                    targetParentLocator: this.targetParentXBlockInfo.id
-                }
+                    targetParentLocator: this.targetParentXBlockInfo.id,
+                },
             );
-        }
+        },
     });
 
     return MoveXblockModal;

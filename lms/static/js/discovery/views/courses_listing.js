@@ -5,7 +5,7 @@
         'backbone',
         'gettext',
         'js/discovery/views/course_card',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function($, _, Backbone, gettext, CourseCardView, HtmlUtils) {
         'use strict';
 
@@ -41,7 +41,7 @@
                 }, this);
                 HtmlUtils.append(
                     this.$list,
-                    HtmlUtils.HTML(items)
+                    HtmlUtils.HTML(items),
                 );
                 /* eslint no-param-reassign: [2, { "props": false }] */
             },
@@ -61,7 +61,7 @@
                 var scrollBottom = this.$window.scrollTop() + this.$window.height();
                 var threshold = this.$document.height() - 200;
                 return scrollBottom >= threshold;
-            }
+            },
 
         });
     });

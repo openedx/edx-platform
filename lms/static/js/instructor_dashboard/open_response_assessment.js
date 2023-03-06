@@ -29,15 +29,15 @@
     }
 
     _.defaults(window, {
-        InstructorDashboard: {}
+        InstructorDashboard: {},
     });
 
     _.defaults(window.InstructorDashboard, {
-        sections: {}
+        sections: {},
     });
 
     _.defaults(window.InstructorDashboard.sections, {
-        OpenResponseAssessment: OpenResponseAssessment
+        OpenResponseAssessment: OpenResponseAssessment,
     });
 
     this.OpenResponseAssessment = OpenResponseAssessment;

@@ -1,3 +1,3 @@
 module.exports = {
-    extends: '@edx/stylelint-config-edx'
+    extends: '@edx/stylelint-config-edx',
 };

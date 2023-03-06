@@ -22,8 +22,8 @@ var edx = edx || {};
                 'edx.bi.credit.clicked_purchase_credit',
                 {
                     category: 'credit',
-                    label: courseKey
-                }
+                    label: courseKey,
+                },
             );
         });
 

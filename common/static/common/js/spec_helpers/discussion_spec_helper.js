@@ -17,7 +17,7 @@
             return {
                 username: 'test_user',
                 id: '567',
-                upvoted_ids: []
+                upvoted_ids: [],
             };
         };
 
@@ -25,7 +25,7 @@
             return {
                 Moderator: [],
                 Administrator: [],
-                'Community TA': []
+                'Community TA': [],
             };
         };
 
@@ -42,7 +42,7 @@
                 fakeAjax(params);
                 return {
                     always: function() {
-                    }
+                    },
                 };
             });
         };
@@ -59,19 +59,19 @@
                         entries: {
                             'Test Topic': {
                                 is_divided: true,
-                                id: 'test_topic'
+                                id: 'test_topic',
                             },
                             'Other Topic': {
                                 is_divided: true,
-                                id: 'other_topic'
-                            }
-                        }
+                                id: 'other_topic',
+                            },
+                        },
                     },
                     is_discussion_division_enabled: true,
                     allow_anonymous: false,
-                    allow_anonymous_to_peers: false
+                    allow_anonymous_to_peers: false,
                 },
-                options || {}
+                options || {},
             );
             return new DiscussionCourseSettings(context);
         };
@@ -196,7 +196,7 @@
                 '    </div>' +
                 '    <div class="search-alerts"></div>' +
                 '    <ul class="forum-nav-thread-list"></ul>' +
-                '</script>'
+                '</script>',
             );
 
             appendSetFixtures(
@@ -206,7 +206,7 @@
                 '   data-user-create-comment=\'true\'' +
                 '   data-user-create-subcomment=\'true\'' +
                 '   data-read-only=\'false\'' +
-                '></div>'
+                '></div>',
             );
         };
 

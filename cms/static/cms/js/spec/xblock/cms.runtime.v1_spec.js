@@ -27,11 +27,11 @@ describe('Studio Runtime v1', function() {
             notificationSpy = EditHelpers.createNotificationSpy();
         runtime.notify('save', {
             state: 'start',
-            message: title
+            message: title,
         });
         EditHelpers.verifyNotificationShowing(notificationSpy, title);
         runtime.notify('save', {
-            state: 'end'
+            state: 'end',
         });
         EditHelpers.verifyNotificationHidden(notificationSpy);
     });
@@ -42,7 +42,7 @@ describe('Studio Runtime v1', function() {
             notificationSpy = EditHelpers.createNotificationSpy('Error');
         runtime.notify('error', {
             title: title,
-            message: message
+            message: message,
         });
         EditHelpers.verifyNotificationShowing(notificationSpy, title);
     });
@@ -53,12 +53,12 @@ describe('Studio Runtime v1', function() {
         MockModal = BaseModal.extend({
             getContentHtml: function() {
                 return readFixtures('mock/mock-modal.underscore');
-            }
+            },
         });
 
         showMockModal = function() {
             modal = new MockModal({
-                title: 'Mock Modal'
+                title: 'Mock Modal',
             });
             modal.show();
         };

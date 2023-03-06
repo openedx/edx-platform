@@ -5,7 +5,7 @@ define([
     'edx-ui-toolkit/js/utils/html-utils',
     'js/edxnotes/views/search_box',
     'js/edxnotes/collections/notes',
-    'js/spec/edxnotes/helpers'
+    'js/spec/edxnotes/helpers',
 ], function($, _, AjaxHelpers, HtmlUtils, SearchBoxView, NotesCollection, Helpers) {
     'use strict';
     describe('EdxNotes SearchBoxView', function() {
@@ -18,7 +18,7 @@ define([
             start: 0,
             next: null,
             previous: null,
-            results: [null, null]
+            results: [null, null],
         };
 
         getSearchBox = function(options) {
@@ -28,7 +28,7 @@ define([
                 beforeSearchStart: jasmine.createSpy(),
                 search: jasmine.createSpy(),
                 error: jasmine.createSpy(),
-                complete: jasmine.createSpy()
+                complete: jasmine.createSpy(),
             });
 
             return new SearchBoxView(options);
@@ -68,7 +68,7 @@ define([
             Helpers.verifyUrl(
                 request.url,
                 form.action,
-                {text: 'test_text', page: '1', page_size: '10'}
+                {text: 'test_text', page: '1', page_size: '10'},
             );
         });
 
@@ -76,16 +76,16 @@ define([
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             expect(this.searchBox.options.beforeSearchStart).toHaveBeenCalledWith(
-                'test_text'
+                'test_text',
             );
             assertBoxIsDisabled(this.searchBox);
             AjaxHelpers.respondWithJson(requests, searchResponse);
             assertBoxIsEnabled(this.searchBox);
             expect(this.searchBox.options.search).toHaveBeenCalledWith(
-                jasmine.any(NotesCollection), 'test_text'
+                jasmine.any(NotesCollection), 'test_text',
             );
             expect(this.searchBox.options.complete).toHaveBeenCalledWith(
-                'test_text'
+                'test_text',
             );
         });
 
@@ -96,7 +96,7 @@ define([
 
             expect(Logger.log).toHaveBeenCalledWith('edx.course.student_notes.searched', {
                 number_of_results: 2,
-                search_string: 'test_text'
+                search_string: 'test_text',
             });
         });
 
@@ -106,10 +106,10 @@ define([
             AjaxHelpers.respondWithJson(requests, {});
             expect(this.searchBox.options.error).toHaveBeenCalledWith(
                 'An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.',
-                'test_text'
+                'test_text',
             );
             expect(this.searchBox.options.complete).toHaveBeenCalledWith(
-                'test_text'
+                'test_text',
             );
         });
 
@@ -119,10 +119,10 @@ define([
             AjaxHelpers.respondWithError(requests);
             expect(this.searchBox.options.error).toHaveBeenCalledWith(
                 'An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.',
-                'test_text'
+                'test_text',
             );
             expect(this.searchBox.options.complete).toHaveBeenCalledWith(
-                'test_text'
+                'test_text',
             );
         });
 
@@ -134,17 +134,17 @@ define([
             requests[0].respond(
                 500, {'Content-Type': 'application/json'},
                 JSON.stringify({
-                    error: 'test error message'
-                })
+                    error: 'test error message',
+                }),
             );
 
             assertBoxIsEnabled(this.searchBox);
             expect(this.searchBox.options.error).toHaveBeenCalledWith(
                 'test error message',
-                'test_text'
+                'test_text',
             );
             expect(this.searchBox.options.complete).toHaveBeenCalledWith(
-                'test_text'
+                'test_text',
             );
         });
 
@@ -165,7 +165,7 @@ define([
             assertBoxIsEnabled(this.searchBox);
             expect(this.searchBox.options.error).toHaveBeenCalledWith(
                 HtmlUtils.HTML('Please enter a term in the <a href="#search-notes-input"> search field</a>.'),
-                '   '
+                '   ',
             );
         });
 

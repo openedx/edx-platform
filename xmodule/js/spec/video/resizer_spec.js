@@ -15,7 +15,7 @@
                     '>',
                         'Content',
                         '</div>',
-                        '</div>'
+                        '</div>',
                     ].join(''),
                     config, $container, $element;
 
@@ -26,7 +26,7 @@
                     $element = $('.rszr-el');
                     config = {
                         container: $container,
-                        element: $element
+                        element: $element,
                     };
 
                     spyOn(console, 'log');
@@ -36,7 +36,7 @@
                     function() {
                         new Resizer({ });
                         expect(console.log).toHaveBeenCalled();
-                    }
+                    },
                 );
 
                 it('`alignByWidthOnly` works correctly', function() {

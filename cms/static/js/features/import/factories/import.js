@@ -5,7 +5,7 @@ define([
     'gettext',
     'jQuery-File-Upload/js/jquery.fileupload',
     'jquery.cookie',
-    '../../../../cms/js/main'
+    '../../../../cms/js/main',
 ], function(domReady, Import, $, gettext) {
     'use strict';
 
@@ -20,7 +20,7 @@ define([
                     gettext('There was an error during the upload process.') + '\n',
                     gettext('There was an error while unpacking the file.') + '\n',
                     gettext('There was an error while verifying the file you submitted.') + '\n',
-                    dbError + '\n'
+                    dbError + '\n',
                 ],
                 unloading = false,
                 previousImport = Import.storedImport(),
@@ -90,7 +90,7 @@ define([
 
                             Import.start(
                                 file.name,
-                                feedbackUrl.replace('fillerName', file.name)
+                                feedbackUrl.replace('fillerName', file.name),
                             ).then(onComplete);
 
                             $submitBtn.hide();
@@ -152,7 +152,7 @@ define([
                     }
                 },
                 sequentialUploads: true,
-                notifyOnError: false
+                notifyOnError: false,
             });
 
             domReady(function() {
@@ -164,6 +164,6 @@ define([
                         $('.view-import .file-input').click();
                     });
             });
-        }
+        },
     };
 });

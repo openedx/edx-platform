@@ -23,20 +23,20 @@
             {
                 name: 'PC',
                 isShown: false,
-                isTouch: null
+                isTouch: null,
             }, {
                 name: 'iPad',
                 isShown: true,
-                isTouch: ['iPad']
+                isTouch: ['iPad'],
             }, {
                 name: 'Android',
                 isShown: true,
-                isTouch: ['Android']
+                isTouch: ['Android'],
             }, {
                 name: 'iPhone',
                 isShown: false,
-                isTouch: ['iPhone']
-            }
+                isTouch: ['iPhone'],
+            },
         ];
 
         beforeEach(function() {
@@ -55,7 +55,7 @@
             expect(btnPlay).not.toHaveClass('is-hidden');
             expect(btnPlay).toHaveAttrs({
                 'aria-hidden': 'false',
-                tabindex: '0'
+                tabindex: '0',
             });
 
             state.videoPlayPlaceholder.hide();
@@ -63,7 +63,7 @@
             expect(btnPlay).toHaveClass('is-hidden');
             expect(btnPlay).toHaveAttrs({
                 'aria-hidden': 'true',
-                tabindex: '-1'
+                tabindex: '-1',
             });
         });
 
@@ -71,7 +71,7 @@
             var message = [
                 (data.isShown) ? 'is' : 'is not',
                 ' shown on',
-                data.name
+                data.name,
             ].join('');
 
             it(message, function() {

@@ -29,8 +29,8 @@
                         '.slider',
                         'ul.vcr',
                         'a.play',
-                        '.vidtime'
-                    ].join(',')
+                        '.vidtime',
+                    ].join(','),
                 );
 
                 expect($('.video-controls').find('.vidtime'))
@@ -47,7 +47,7 @@
                     window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
-                        savedVideoPosition: 0
+                        savedVideoPosition: 0,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -74,7 +74,7 @@
                     window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
-                        savedVideoPosition: 15
+                        savedVideoPosition: 15,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -104,7 +104,7 @@
                     window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
-                        savedVideoPosition: -15
+                        savedVideoPosition: -15,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -134,7 +134,7 @@
                     window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
-                        savedVideoPosition: 'a'
+                        savedVideoPosition: 'a',
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -164,7 +164,7 @@
                     window.VideoState = {};
                     state = jasmine.initializePlayer({
                         start: 10,
-                        savedVideoPosition: 10000
+                        savedVideoPosition: 10000,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -196,7 +196,7 @@
                     window.VideoState = {};
                     state = jasmine.initializePlayer({
                         end: 20,
-                        savedVideoPosition: 0
+                        savedVideoPosition: 0,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -226,7 +226,7 @@
                     window.VideoState = {};
                     state = jasmine.initializePlayer({
                         end: 20,
-                        savedVideoPosition: 15
+                        savedVideoPosition: 15,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -256,7 +256,7 @@
                     window.VideoState = {};
                     state = jasmine.initializePlayer({
                         end: 20,
-                        savedVideoPosition: -15
+                        savedVideoPosition: -15,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -286,7 +286,7 @@
                     window.VideoState = {};
                     state = jasmine.initializePlayer({
                         end: 20,
-                        savedVideoPosition: 'a'
+                        savedVideoPosition: 'a',
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -317,7 +317,7 @@
                     window.VideoState = {};
                     state = jasmine.initializePlayer({
                         end: 20,
-                        savedVideoPosition: 10000
+                        savedVideoPosition: 10000,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -349,7 +349,7 @@
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
-                        savedVideoPosition: 0
+                        savedVideoPosition: 0,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -380,7 +380,7 @@
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
-                        savedVideoPosition: 15
+                        savedVideoPosition: 15,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -411,7 +411,7 @@
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
-                        savedVideoPosition: -15
+                        savedVideoPosition: -15,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -442,7 +442,7 @@
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
-                        savedVideoPosition: 'a'
+                        savedVideoPosition: 'a',
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
@@ -473,7 +473,7 @@
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
-                        savedVideoPosition: 10000
+                        savedVideoPosition: 10000,
                     });
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);

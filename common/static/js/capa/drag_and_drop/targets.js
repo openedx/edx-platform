@@ -3,7 +3,7 @@
         return {
             initializeBaseTargets: initializeBaseTargets,
             initializeTargetField: initializeTargetField,
-            destroyTargetField: destroyTargetField
+            destroyTargetField: destroyTargetField,
         };
 
         function initializeBaseTargets(state) {
@@ -87,8 +87,8 @@
                     obj.x,
                     HtmlUtils.HTML('px; '),
                     borderCss,
-                    HtmlUtils.HTML('"aria-dropeffect=""></div>')
-                ).toString()
+                    HtmlUtils.HTML('"aria-dropeffect=""></div>'),
+                ).toString(),
             );
             if (fromTargetField === true) {
                 $targetEl.appendTo(draggableObj.iconEl);
@@ -110,8 +110,8 @@
                         obj.x,
                         obj.w - 24,
                         HtmlUtils.HTML('px; border: 1px solid black; text-align: center; z-index: 500;'),
-                        HtmlUtils.HTML('background-color: white; font-size: 0.95em; color: #009fe2; ">0</div>')
-                    ).toString()
+                        HtmlUtils.HTML('background-color: white; font-size: 0.95em; color: #009fe2; ">0</div>'),
+                    ).toString(),
                 );
             } else {
                 $numTextEl = null;
@@ -144,7 +144,7 @@
                 addDraggable: addDraggable,
 
                 type: 'base',
-                draggableObj: null
+                draggableObj: null,
             };
 
             if (fromTargetField === true) {

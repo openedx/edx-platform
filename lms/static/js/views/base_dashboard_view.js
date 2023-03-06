@@ -6,7 +6,7 @@
             // views. Included with this view in the pubSub object allowing for events to be triggered
             // and shared with other views.
             var BaseDashboardView = Backbone.View.extend({
-                pubSub: $.extend({}, Backbone.Events)
+                pubSub: $.extend({}, Backbone.Events),
             });
             return BaseDashboardView;
         });

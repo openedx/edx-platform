@@ -8,19 +8,19 @@
         'support/js/views/enrollment_modal',
         'support/js/collections/enrollment',
         'text!support/templates/enrollment.underscore',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function(Backbone, _, moment, EnrollmentModal, EnrollmentCollection, enrollmentTemplate, HtmlUtils) {
         return Backbone.View.extend({
 
             ENROLLMENT_CHANGE_REASONS: {
                 'Financial Assistance': gettext('Financial Assistance'),
                 'Upset Learner': gettext('Upset Learner'),
-                'Teaching Assistant': gettext('Teaching Assistant')
+                'Teaching Assistant': gettext('Teaching Assistant'),
             },
 
             events: {
                 'submit .enrollment-form': 'search',
-                'click .change-enrollment-btn': 'changeEnrollment'
+                'click .change-enrollment-btn': 'changeEnrollment',
             },
 
             initialize: function(options) {
@@ -29,7 +29,7 @@
                 this.enrollmentSupportUrl = options.enrollmentSupportUrl;
                 this.enrollments = new EnrollmentCollection([], {
                     user: user,
-                    baseUrl: options.enrollmentsUrl
+                    baseUrl: options.enrollmentsUrl,
                 });
                 this.enrollments.on('change', _.bind(this.render, this));
             },
@@ -43,8 +43,8 @@
                         enrollments: this.enrollments,
                         formatDate: function(date) {
                             return date ? moment.utc(date).format('lll z') : 'N/A';
-                        }
-                    })
+                        },
+                    }),
                 );
                 this.checkInitialSearch();
                 return this;
@@ -77,7 +77,7 @@
                 this.enrollments.fetch({
                     success: _.bind(function() {
                         this.render();
-                    }, this)
+                    }, this),
                 });
             },
 
@@ -95,9 +95,9 @@
                     el: this.$('.enrollment-modal-wrapper'),
                     enrollment: enrollment,
                     modes: modes,
-                    reasons: this.ENROLLMENT_CHANGE_REASONS
+                    reasons: this.ENROLLMENT_CHANGE_REASONS,
                 }).show();
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

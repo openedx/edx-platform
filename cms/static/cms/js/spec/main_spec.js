@@ -35,7 +35,7 @@
                 server = null;
                 beforeEach(function() {
                     appendSetFixtures(sandbox({
-                        id: 'page-notification'
+                        id: 'page-notification',
                     }));
                 });
                 afterEach(function() {
@@ -44,8 +44,8 @@
                 it('successful AJAX request does not pop an error notification', function() {
                     server = AjaxHelpers.server([
                         200, {
-                            'Content-Type': 'application/json'
-                        }, '{}'
+                            'Content-Type': 'application/json',
+                        }, '{}',
                     ]);
                     expect($('#page-notification')).toBeEmpty();
                     $.ajax('/test');
@@ -56,8 +56,8 @@
                 it('AJAX request with error should pop an error notification', function() {
                     server = AjaxHelpers.server([
                         500, {
-                            'Content-Type': 'application/json'
-                        }, '{}'
+                            'Content-Type': 'application/json',
+                        }, '{}',
                     ]);
                     $.ajax('/test');
                     server.respond();
@@ -67,12 +67,12 @@
                 it('can override AJAX request with error so it does not pop an error notification', function() {
                     server = AjaxHelpers.server([
                         500, {
-                            'Content-Type': 'application/json'
-                        }, '{}'
+                            'Content-Type': 'application/json',
+                        }, '{}',
                     ]);
                     $.ajax({
                         url: '/test',
-                        notifyOnError: false
+                        notifyOnError: false,
                     });
                     server.respond();
                     expect($('#page-notification')).toBeEmpty();

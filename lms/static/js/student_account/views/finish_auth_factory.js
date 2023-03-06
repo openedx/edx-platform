@@ -7,6 +7,6 @@
                 var view = new FinishAuthView({});
                 view.render();
             };
-        }
+        },
     );
 }).call(this, define || RequireJS.define);

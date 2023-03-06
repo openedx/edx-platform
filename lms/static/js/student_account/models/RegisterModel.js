@@ -12,7 +12,7 @@
                     gender: '',
                     year_of_birth: '',
                     mailing_address: '',
-                    goals: ''
+                    goals: '',
                 },
                 ajaxType: '',
                 urlRoot: '',
@@ -48,9 +48,9 @@
                         },
                         error: function(error) {
                             model.trigger('error', error);
-                        }
+                        },
                     });
-                }
+                },
             });
         });
 }).call(this, define || RequireJS.define);

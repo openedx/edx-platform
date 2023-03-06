@@ -9,7 +9,7 @@ define([
     'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils',
     'text!templates/active-video-upload-list.underscore',
-    'jquery.fileupload'
+    'jquery.fileupload',
 ],
 function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, CourseVideoSettingsView,
     HtmlUtils, StringUtils, activeVideoUploadListTemplate) {
@@ -21,7 +21,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         events: {
             'click .file-drop-area': 'chooseFile',
             'dragleave .file-drop-area': 'dragleave',
-            'drop .file-drop-area': 'dragleave'
+            'drop .file-drop-area': 'dragleave',
         },
 
         uploadHeader: gettext('Upload Videos'),
@@ -29,8 +29,8 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
             gettext('Drag and drop or {spanStart}browse your computer{spanEnd}.'),
             {
                 spanStart: HtmlUtils.HTML('<span class="upload-text-link">'),
-                spanEnd: HtmlUtils.HTML('</span>')
-            }
+                spanEnd: HtmlUtils.HTML('</span>'),
+            },
         ),
         defaultFailureMessage: gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'),  // eslint-disable-line max-len
 
@@ -55,25 +55,25 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
             this.maxSizeText = StringUtils.interpolate(
                 gettext('Maximum file size: {maxFileSize} GB'),
                 {
-                    maxFileSize: this.videoUploadMaxFileSizeInGB
-                }
+                    maxFileSize: this.videoUploadMaxFileSizeInGB,
+                },
             );
             this.supportedVideosText = edx.StringUtils.interpolate(
                 gettext('Supported file types: {supportedVideoTypes}'),
                 {
-                    supportedVideoTypes: this.videoSupportedFileFormats.join(', ')
-                }
+                    supportedVideoTypes: this.videoSupportedFileFormats.join(', '),
+                },
             );
             if (this.isVideoTranscriptEnabled) {
                 this.listenTo(
                     Backbone,
                     'coursevideosettings:syncActiveTranscriptPreferences',
-                    this.syncActiveTranscriptPreferences
+                    this.syncActiveTranscriptPreferences,
                 );
                 this.listenTo(
                     Backbone,
                     'coursevideosettings:destroyCourseVideoSettingsView',
-                    this.destroyCourseVideoSettingsView
+                    this.destroyCourseVideoSettingsView,
                 );
             }
         },
@@ -87,7 +87,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 this.courseVideoSettingsView = new CourseVideoSettingsView({
                     activeTranscriptPreferences: this.activeTranscriptPreferences,
                     transcriptOrganizationCredentials: this.transcriptOrganizationCredentials,
-                    videoTranscriptSettings: this.videoTranscriptSettings
+                    videoTranscriptSettings: this.videoTranscriptSettings,
                 });
                 this.courseVideoSettingsView.render();
                 event.stopPropagation();
@@ -107,8 +107,8 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                     uploadHeader: this.uploadHeader,
                     uploadText: this.uploadText,
                     maxSizeText: this.maxSizeText,
-                    supportedVideosText: this.supportedVideosText
-                })
+                    supportedVideosText: this.supportedVideosText,
+                }),
             );
             _.each(this.itemViews, this.renderUploadView.bind(this));
             this.$uploadForm = this.$('.file-upload-form');
@@ -123,7 +123,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 send: this.fileUploadSend.bind(this),
                 progress: this.fileUploadProgress.bind(this),
                 done: this.fileUploadDone.bind(this),
-                fail: this.fileUploadFail.bind(this)
+                fail: this.fileUploadFail.bind(this),
             });
 
             // Disable default drag and drop behavior for the window (which
@@ -164,8 +164,8 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                         {
                             edxVideoId: model.get('videoId'),
                             status: 'upload_cancelled',
-                            message: 'User cancelled video upload'
-                        }
+                            message: 'User cancelled video upload',
+                        },
                     );
                 }
             });
@@ -215,7 +215,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
             if (uploadData.redirected) {
                 model = new ActiveVideoUpload({
                     fileName: uploadData.files[0].name,
-                    videoId: uploadData.videoId
+                    videoId: uploadData.videoId,
                 });
                 this.collection.add(model);
                 uploadData.cid = model.cid; // eslint-disable-line no-param-reassign
@@ -226,7 +226,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 _.each(errors, function(error) {
                     view.addUploadFailureView(error.fileName, error.message);
                     uploadData.files.splice(
-                        _.findIndex(uploadData.files, function(file) { return file.name === error.fileName; }), 1
+                        _.findIndex(uploadData.files, function(file) { return file.name === error.fileName; }), 1,
                     );
                 });
                 _.each(
@@ -236,11 +236,11 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                             url: view.postUrl,
                             contentType: 'application/json',
                             data: JSON.stringify({
-                                files: [{file_name: file.name, content_type: file.type}]
+                                files: [{file_name: file.name, content_type: file.type}],
                             }),
                             dataType: 'json',
                             type: 'POST',
-                            global: false   // Do not trigger global AJAX error handler
+                            global: false,   // Do not trigger global AJAX error handler
                         }).done(function(responseData) {
                             _.each(
                                 responseData.files,
@@ -253,9 +253,9 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                                         videoId: file.edx_video_id,
                                         multipart: false,
                                         global: false,  // Do not trigger global AJAX error handler
-                                        redirected: true
+                                        redirected: true,
                                     });
-                                }
+                                },
                             );
                         }).fail(function(response) {
                             try {
@@ -265,7 +265,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                             }
                             view.addUploadFailureView(file.name, errorMsg);
                         });
-                    }
+                    },
                 );
             }
         },
@@ -294,16 +294,16 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
             this.readMessages([
                 StringUtils.interpolate(
                     gettext('Upload completed for video {fileName}'),
-                    {fileName: model.get('fileName')}
-                )
+                    {fileName: model.get('fileName')},
+                ),
             ]);
 
             this.sendStatusUpdate([
                 {
                     edxVideoId: model.get('videoId'),
                     status: 'upload_completed',
-                    message: 'Uploaded completed'
-                }
+                    message: 'Uploaded completed',
+                },
             ]).done(function() {
                 self.setStatus(data.cid, ActiveVideoUpload.STATUS_COMPLETED);
                 self.setProgress(data.cid, 1);
@@ -328,16 +328,16 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
             this.readMessages([
                 StringUtils.interpolate(
                     gettext('Upload failed for video {fileName}'),
-                    {fileName: model.get('fileName')}
-                )
+                    {fileName: model.get('fileName')},
+                ),
             ]);
 
             this.sendStatusUpdate([
                 {
                     edxVideoId: model.get('videoId'),
                     status: status,
-                    message: message
-                }
+                    message: message,
+                },
             ]);
             this.setStatus(data.cid, ActiveVideoUpload.STATUS_FAILED, message);
         },
@@ -346,14 +346,14 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
             var model = new ActiveVideoUpload({
                 fileName: fileName,
                 status: ActiveVideoUpload.STATUS_FAILED,
-                failureMessage: failureMessage
+                failureMessage: failureMessage,
             });
             this.collection.add(model);
             this.readMessages([
                 StringUtils.interpolate(
                     gettext('Upload failed for video {fileName}'),
-                    {fileName: model.get('fileName')}
-                )
+                    {fileName: model.get('fileName')},
+                ),
             ]);
         },
 
@@ -381,13 +381,13 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 if (!_.contains(self.videoSupportedFileFormats, fileType)) {
                     error = gettext(
                         '{filename} is not in a supported file format. ' +
-                            'Supported file formats are {supportedFileFormats}.'
+                            'Supported file formats are {supportedFileFormats}.',
                     )
                         .replace('{filename}', fileName)
                         .replace('{supportedFileFormats}', self.videoSupportedFileFormats.join(' and '));
                 } else if (file.size > self.getMaxFileSizeInBytes()) {
                     error = gettext(
-                        '{filename} exceeds maximum size of {maxFileSizeInGB} GB.'
+                        '{filename} exceeds maximum size of {maxFileSizeInGB} GB.',
                     )
                         .replace('{filename}', fileName)
                         .replace('{maxFileSizeInGB}', self.videoUploadMaxFileSizeInGB);
@@ -396,7 +396,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 if (error) {
                     errors.push({
                         fileName: fileName,
-                        message: error
+                        message: error,
                     });
                     error = null;
                 }
@@ -442,11 +442,11 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 contentType: 'application/json',
                 data: JSON.stringify(statusUpdates),
                 dataType: 'json',
-                type: 'POST'
+                type: 'POST',
             });
-        }
+        },
     });
 
     return ActiveVideoUploadListView;
-}
+},
 );

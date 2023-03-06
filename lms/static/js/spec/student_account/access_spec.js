@@ -10,7 +10,7 @@
         'js/student_account/views/FormView',
         'js/student_account/enrollment',
         'js/student_account/shoppingcart',
-        'js/student_account/emailoptin'
+        'js/student_account/emailoptin',
     ],
     function($, _, Backbone, TemplateHelpers, AjaxHelpers, AccessView, FormView, EnrollmentInterface,
         ShoppingCartInterface) {
@@ -29,7 +29,7 @@
                             required: true,
                             placeholder: 'xsy@edx.org',
                             instructions: 'Enter your email here.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             name: 'username',
@@ -40,10 +40,10 @@
                             placeholder: 'Xsy',
                             instructions: 'Enter your username here.',
                             restrictions: {
-                                max_length: 200
-                            }
-                        }
-                    ]
+                                max_length: 200,
+                            },
+                        },
+                    ],
                 },
                 FORWARD_URL = (
                     '/account/finish_auth' +
@@ -60,14 +60,14 @@
                             currentProvider: null,
                             providers: [],
                             secondaryProviders: [{name: 'provider'}],
-                            finishAuthUrl: finishAuthUrl
+                            finishAuthUrl: finishAuthUrl,
                         },
                         login_redirect_url: nextUrl, // undefined for default
                         platform_name: 'edX',
                         login_form_desc: FORM_DESCRIPTION,
                         registration_form_desc: FORM_DESCRIPTION,
                         password_reset_form_desc: FORM_DESCRIPTION,
-                        account_creation_allowed: createAccountOption
+                        account_creation_allowed: createAccountOption,
                     },
                     $logistrationElement = $('#login-and-registration-container');
 

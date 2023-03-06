@@ -4,7 +4,7 @@ define([
     'backbone',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers',
-    'js/verify_student/views/make_payment_step_view'
+    'js/verify_student/views/make_payment_step_view',
 ],
 function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
     'use strict';
@@ -12,7 +12,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
     describe('edx.verify_student.MakePaymentStepView', function() {
         var PAYMENT_PARAMS = {
             orderId: 'test-order',
-            signature: 'abcd1234'
+            signature: 'abcd1234',
         };
 
         var STEP_DATA = {
@@ -20,7 +20,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             currency: 'usd',
             processors: ['test-payment-processor'],
             courseKey: 'edx/test/test',
-            courseModeSlug: 'verified'
+            courseModeSlug: 'verified',
         };
 
         var SERVER_ERROR_MSG = 'An error occurred!';
@@ -29,7 +29,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             var view = new MakePaymentStepView({
                 el: $('#current-step-container'),
                 stepData: _.extend(_.clone(STEP_DATA), stepDataOverrides),
-                errorModel: new (Backbone.Model.extend({}))()
+                errorModel: new (Backbone.Model.extend({}))(),
             }).render();
 
             // Stub the payment form submission
@@ -66,7 +66,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
                 contribution: kwargs.amount || '',
                 course_id: kwargs.courseId || '',
                 processor: kwargs.processor || '',
-                sku: kwargs.sku || ''
+                sku: kwargs.sku || '',
             };
 
             // Click the "go to payment" button
@@ -74,7 +74,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
 
             // Verify that the request was made to the server
             AjaxHelpers.expectPostRequest(
-                requests, '/verify_student/create_order/', $.param(params)
+                requests, '/verify_student/create_order/', $.param(params),
             );
 
             // Simulate the server response
@@ -136,7 +136,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
                 amount: STEP_DATA.minPrice,
                 courseId: STEP_DATA.courseKey,
                 processor: STEP_DATA.processors[0],
-                succeeds: true
+                succeeds: true,
             });
             expectPaymentSubmitted(view, {foo: 'bar'});
         });
@@ -148,17 +148,17 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
                 userTimezone: 'PDT',
                 userLanguage: 'es-ES',
                 requirements: {
-                    isVisible: true
+                    isVisible: true,
                 },
                 verificationDeadline: verificationDeadline,
-                isActive: true
+                isActive: true,
             });
             // Verify user does not get user activation message when he is already activated.
             expect($('p.instruction-info:contains("test@example.com")').length).toEqual(0);
             // Verify user gets verification message.
             expect($('p.localized-datetime').attr('data-string')).toEqual(
                 'You can pay now even if you don\'t have the following items available,' +
-                    ' but you will need to have these by {date} to qualify to earn a Verified Certificate.'
+                    ' but you will need to have these by {date} to qualify to earn a Verified Certificate.',
             );
             expect($('p.localized-datetime').attr('data-timezone')).toEqual('PDT');
             expect($('p.localized-datetime').attr('data-language')).toEqual('es-ES');
@@ -168,10 +168,10 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             createView({
                 userEmail: 'test@example.com',
                 requirements: {
-                    isVisible: true
+                    isVisible: true,
                 },
                 verificationDeadline: true,
-                isActive: false
+                isActive: false,
             });
             // Verify un-activated user gets activation message.
             expect($('p.instruction-info:contains("test@example.com")').length).toEqual(1);
@@ -192,7 +192,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             checkPaymentButtons(AjaxHelpers.requests(this), {
                 cybersource: 'Checkout',
                 paypal: 'Checkout with PayPal',
-                other: 'Checkout with other'
+                other: 'Checkout with other',
             });
         });
 
@@ -207,7 +207,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
                 amount: STEP_DATA.minPrice,
                 courseId: STEP_DATA.courseKey,
                 processor: STEP_DATA.processors[0],
-                succeeds: true
+                succeeds: true,
             });
             expectPaymentSubmitted(view, {foo: 'bar'});
         });
@@ -215,7 +215,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         it('min price is always selected even if contribution amount is provided', function() {
             // Pre-select a price NOT in the suggestions
             createView({
-                contributionAmount: '99.99'
+                contributionAmount: '99.99',
             });
 
             // Expect that the price is filled in
@@ -235,7 +235,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
                 amount: STEP_DATA.minPrice,
                 courseId: STEP_DATA.courseKey,
                 processor: STEP_DATA.processors[0],
-                succeeds: false
+                succeeds: false,
             });
 
             // Expect that an error is displayed
@@ -251,10 +251,10 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             var view = createView({processors: []});
             expect(view.errorModel.get('shown')).toBe(true);
             expect(view.errorModel.get('errorTitle')).toEqual(
-                'All payment options are currently unavailable.'
+                'All payment options are currently unavailable.',
             );
             expect(view.errorModel.get('errorMsg')).toEqual(
-                'Try the transaction again in a few minutes.'
+                'Try the transaction again in a few minutes.',
             );
         });
         it('check Initialize method without AB testing ', function() {
@@ -263,5 +263,5 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             expect(view.btnClass).toEqual('action-primary');
         });
     });
-}
+},
 );

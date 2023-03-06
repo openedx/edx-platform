@@ -7,7 +7,7 @@
         'js/student_account/views/account_settings_fields',
         'js/student_account/views/account_settings_view',
         'edx-ui-toolkit/js/utils/string-utils',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function(gettext, $, _, Backbone, Logger, UserAccountModel, UserPreferencesModel,
         AccountSettingsFieldViews, AccountSettingsView, StringUtils, HtmlUtils) {
         return function(
@@ -31,7 +31,7 @@
             extendedProfileFields,
             displayAccountDeletion,
             isSecondaryEmailFeatureEnabled,
-            betaLanguage
+            betaLanguage,
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
@@ -59,12 +59,12 @@
                         link_start: HtmlUtils.HTML(
                             StringUtils.interpolate(
                                 '<a href="{edx_support_url}">', {
-                                    edx_support_url: edxSupportUrl
-                                }
-                            )
+                                    edx_support_url: edxSupportUrl,
+                                },
+                            ),
                         ),
-                        link_end: HtmlUtils.HTML('</a>')
-                    }
+                        link_end: HtmlUtils.HTML('</a>'),
+                    },
                 );
             }
 
@@ -74,17 +74,17 @@
                 valueAttribute: 'email',
                 helpMessage: StringUtils.interpolate(
                     gettext('You receive messages from {platform_name} and course teams at this address.'),  // eslint-disable-line max-len
-                    {platform_name: platformName}
+                    {platform_name: platformName},
                 ),
-                persistChanges: true
+                persistChanges: true,
             };
             if (!allowEmailChange || (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('email') !== -1)) {  // eslint-disable-line max-len
                 emailFieldView = {
-                    view: new AccountSettingsFieldViews.ReadonlyFieldView(emailFieldData)
+                    view: new AccountSettingsFieldViews.ReadonlyFieldView(emailFieldData),
                 };
             } else {
                 emailFieldView = {
-                    view: new AccountSettingsFieldViews.EmailFieldView(emailFieldData)
+                    view: new AccountSettingsFieldViews.EmailFieldView(emailFieldData),
                 };
             }
 
@@ -93,7 +93,7 @@
                 title: gettext('Recovery Email Address'),
                 valueAttribute: 'secondary_email',
                 helpMessage: gettext('You may access your account with this address if single-sign on or access to your primary email is not available.'),  // eslint-disable-line max-len
-                persistChanges: true
+                persistChanges: true,
             };
 
             fullNameFieldData = {
@@ -101,15 +101,15 @@
                 title: gettext('Full Name'),
                 valueAttribute: 'name',
                 helpMessage: gettext('The name that is used for ID verification and that appears on your certificates.'),  // eslint-disable-line max-len,
-                persistChanges: true
+                persistChanges: true,
             };
             if (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('name') !== -1) {
                 fullnameFieldView = {
-                    view: new AccountSettingsFieldViews.ReadonlyFieldView(fullNameFieldData)
+                    view: new AccountSettingsFieldViews.ReadonlyFieldView(fullNameFieldData),
                 };
             } else {
                 fullnameFieldView = {
-                    view: new AccountSettingsFieldViews.TextFieldView(fullNameFieldData)
+                    view: new AccountSettingsFieldViews.TextFieldView(fullNameFieldData),
                 };
             }
 
@@ -120,18 +120,18 @@
                 valueAttribute: 'country',
                 options: fieldsData.country.options,
                 persistChanges: true,
-                helpMessage: gettext('The country or region where you live.')
+                helpMessage: gettext('The country or region where you live.'),
             };
             if (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('country') !== -1) {
                 countryFieldData.editable = 'never';
                 countryFieldView = {
                     view: new AccountSettingsFieldViews.DropdownFieldView(
-                        countryFieldData
-                    )
+                        countryFieldData,
+                    ),
                 };
             } else {
                 countryFieldView = {
-                    view: new AccountSettingsFieldViews.DropdownFieldView(countryFieldData)
+                    view: new AccountSettingsFieldViews.DropdownFieldView(countryFieldData),
                 };
             }
 
@@ -156,9 +156,9 @@
                                 valueAttribute: 'username',
                                 helpMessage: StringUtils.interpolate(
                                     gettext('The name that identifies you on {platform_name}. You cannot change your username.'),  // eslint-disable-line max-len
-                                    {platform_name: platformName}
-                                )
-                            })
+                                    {platform_name: platformName},
+                                ),
+                            }),
                         },
                         fullnameFieldView,
                         emailFieldView,
@@ -172,8 +172,8 @@
                                 passwordResetSupportUrl: passwordResetSupportUrl,
                                 linkTitle: gettext('Reset Your Password'),
                                 linkHref: fieldsData.password.url,
-                                helpMessage: gettext('Check your email account for instructions to reset your password.')  // eslint-disable-line max-len
-                            })
+                                helpMessage: gettext('Check your email account for instructions to reset your password.'),  // eslint-disable-line max-len
+                            }),
                         },
                         {
                             view: new AccountSettingsFieldViews.LanguagePreferenceFieldView({
@@ -184,12 +184,12 @@
                                 refreshPageOnSave: true,
                                 helpMessage: StringUtils.interpolate(
                                     gettext('The language used throughout this site. This site is currently available in a limited number of languages. Changing the value of this field will cause the page to refresh.'),  // eslint-disable-line max-len
-                                    {platform_name: platformName}
+                                    {platform_name: platformName},
                                 ),
                                 options: fieldsData.language.options,
                                 persistChanges: true,
-                                focusNextID: '#u-field-select-country'
-                            })
+                                focusNextID: '#u-field-select-country',
+                            }),
                         },
                         countryFieldView,
                         {
@@ -202,12 +202,12 @@
                                 groupOptions: [{
                                     groupTitle: gettext('All Time Zones'),
                                     selectOptions: fieldsData.time_zone.options,
-                                    nullValueOptionLabel: gettext('Default (Local Time Zone)')
+                                    nullValueOptionLabel: gettext('Default (Local Time Zone)'),
                                 }],
-                                persistChanges: true
-                            })
-                        }
-                    ]
+                                persistChanges: true,
+                            }),
+                        },
+                    ],
                 },
                 {
                     title: gettext('Additional Information'),
@@ -218,8 +218,8 @@
                                 title: gettext('Education Completed'),
                                 valueAttribute: 'level_of_education',
                                 options: levelOfEducationFieldData,
-                                persistChanges: true
-                            })
+                                persistChanges: true,
+                            }),
                         },
                         {
                             view: new AccountSettingsFieldViews.DropdownFieldView({
@@ -227,8 +227,8 @@
                                 title: gettext('Gender'),
                                 valueAttribute: 'gender',
                                 options: fieldsData.gender.options,
-                                persistChanges: true
-                            })
+                                persistChanges: true,
+                            }),
                         },
                         {
                             view: new AccountSettingsFieldViews.DropdownFieldView({
@@ -236,8 +236,8 @@
                                 title: gettext('Year of Birth'),
                                 valueAttribute: 'year_of_birth',
                                 options: fieldsData.year_of_birth.options,
-                                persistChanges: true
-                            })
+                                persistChanges: true,
+                            }),
                         },
                         {
                             view: new AccountSettingsFieldViews.LanguageProficienciesFieldView({
@@ -245,11 +245,11 @@
                                 title: gettext('Preferred Language'),
                                 valueAttribute: 'language_proficiencies',
                                 options: fieldsData.preferred_language.options,
-                                persistChanges: true
-                            })
-                        }
-                    ]
-                }
+                                persistChanges: true,
+                            }),
+                        },
+                    ],
+                },
             ];
 
             if (enableCoppaCompliance){
@@ -269,16 +269,16 @@
                             StringUtils.interpolate(
                                 gettext('We\'ve sent a confirmation message to {new_secondary_email_address}. Click the link in the message to update your secondary email address.'),  // eslint-disable-line max-len
                                 {
-                                    new_secondary_email_address: this.fieldValue()
-                                }
-                            )
-                        );}
+                                    new_secondary_email_address: this.fieldValue(),
+                                },
+                            ),
+                        );},
                 };
                 emailFieldViewIndex = aboutSectionsData[0].fields.indexOf(emailFieldView);
 
                 // Insert secondary email address after email address field.
                 aboutSectionsData[0].fields.splice(
-                    emailFieldViewIndex + 1, 0, secondaryEmailFieldView
+                    emailFieldViewIndex + 1, 0, secondaryEmailFieldView,
                 )
             }
 
@@ -293,8 +293,8 @@
                             title: fieldItem.field_label,
                             fieldName: fieldItem.field_name,
                             valueAttribute: 'extended_profile',
-                            persistChanges: true
-                        })
+                            persistChanges: true,
+                        }),
                     });
                 } else {
                     if (fieldItem.field_type === 'ListField') {
@@ -305,8 +305,8 @@
                                 fieldName: fieldItem.field_name,
                                 options: fieldItem.field_options,
                                 valueAttribute: 'extended_profile',
-                                persistChanges: true
-                            })
+                                persistChanges: true,
+                            }),
                         });
                     }
                 }
@@ -317,7 +317,7 @@
             socialFields = {
                 title: gettext('Social Media Links'),
                 subtitle: gettext('Optionally, link your personal accounts to the social media icons on your edX profile.'),  // eslint-disable-line max-len
-                fields: []
+                fields: [],
             };
 
             for (var socialPlatform in socialPlatforms) {  // eslint-disable-line guard-for-in, no-restricted-syntax, vars-on-top, max-len
@@ -328,18 +328,18 @@
                             model: userAccountModel,
                             title: StringUtils.interpolate(
                                 gettext('{platform_display_name} Link'),
-                                {platform_display_name: platformData.display_name}
+                                {platform_display_name: platformData.display_name},
                             ),
                             valueAttribute: 'social_links',
                             helpMessage: StringUtils.interpolate(
                                 gettext('Enter your {platform_display_name} username or the URL to your {platform_display_name} page. Delete the URL to remove the link.'),  // eslint-disable-line max-len
-                                {platform_display_name: platformData.display_name}
+                                {platform_display_name: platformData.display_name},
                             ),
                             platform: socialPlatform,
                             persistChanges: true,
-                            placeholder: platformData.example
-                        })
-                    }
+                            placeholder: platformData.example,
+                        }),
+                    },
                 );
             }
             aboutSectionsData.push(socialFields);
@@ -350,7 +350,7 @@
                     title: gettext('Delete My Account'),
                     fields: [],
                     // Used so content can be rendered external to Backbone
-                    domHookId: 'account-deletion-container'
+                    domHookId: 'account-deletion-container',
                 };
                 aboutSectionsData.push(accountDeletionFields);
             }
@@ -374,7 +374,7 @@
                     title: gettext('Linked Accounts'),
                     subtitle: StringUtils.interpolate(
                         gettext('You can link your social media accounts to simplify signing in to {platform_name}.'),
-                        {platform_name: platformName}
+                        {platform_name: platformName},
                     ),
                     fields: _.map(authData.providers, function(provider) {
                         return {
@@ -386,11 +386,11 @@
                                 connectUrl: provider.connect_url,
                                 acceptsLogins: provider.accepts_logins,
                                 disconnectUrl: provider.disconnect_url,
-                                platformName: platformName
-                            })
+                                platformName: platformName,
+                            }),
                         };
-                    })
-                }
+                    }),
+                },
             ];
 
             ordersHistoryData.unshift(
@@ -398,8 +398,8 @@
                     title: gettext('ORDER NAME'),
                     order_date: gettext('ORDER PLACED'),
                     price: gettext('TOTAL'),
-                    number: gettext('ORDER NUMBER')
-                }
+                    number: gettext('ORDER NUMBER'),
+                },
             );
 
             ordersSectionData = [
@@ -407,7 +407,7 @@
                     title: gettext('My Orders'),
                     subtitle: StringUtils.interpolate(
                         gettext('This page contains information about orders that you have placed with {platform_name}.'),  // eslint-disable-line max-len
-                        {platform_name: platformName}
+                        {platform_name: platformName},
                     ),
                     fields: _.map(ordersHistoryData, function(order) {
                         orderNumber = order.number;
@@ -421,11 +421,11 @@
                                 orderDate: order.order_date,
                                 receiptUrl: order.receipt_url,
                                 valueAttribute: 'order-' + orderNumber,
-                                lines: order.lines
-                            })
+                                lines: order.lines,
+                            }),
                         };
-                    })
-                }
+                    }),
+                },
             ];
 
             accountSettingsView = new AccountSettingsView({
@@ -435,11 +435,11 @@
                 tabSections: {
                     aboutTabSections: aboutSectionsData,
                     accountsTabSections: accountsSectionData,
-                    ordersTabSections: ordersSectionData
+                    ordersTabSections: ordersSectionData,
                 },
                 userPreferencesModel: userPreferencesModel,
                 disableOrderHistoryTab: disableOrderHistoryTab,
-                betaLanguage: betaLanguage
+                betaLanguage: betaLanguage,
             });
 
             accountSettingsView.render();
@@ -450,7 +450,7 @@
 
                     // Scroll to top of selected element
                     $('html, body').animate({
-                        scrollTop: $(focusId).offset().top
+                        scrollTop: $(focusId).offset().top,
                     }, 'slow');
                 }
                 $(focusId).attr({tabindex: tabIndex}).focus();
@@ -462,7 +462,7 @@
                 Logger.log('edx.user.settings.viewed', {
                     page: 'account',
                     visibility: null,
-                    user_id: accountUserId
+                    user_id: accountUserId,
                 });
             };
 
@@ -475,16 +475,16 @@
                     // Fetch the user preferences model
                     userPreferencesModel.fetch({
                         success: showAccountSettingsPage,
-                        error: showLoadingError
+                        error: showLoadingError,
                     });
                 },
-                error: showLoadingError
+                error: showLoadingError,
             });
 
             return {
                 userAccountModel: userAccountModel,
                 userPreferencesModel: userPreferencesModel,
-                accountSettingsView: accountSettingsView
+                accountSettingsView: accountSettingsView,
             };
         };
     });

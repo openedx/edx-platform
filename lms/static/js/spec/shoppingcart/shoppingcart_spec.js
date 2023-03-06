@@ -10,7 +10,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/sh
                 setFixtures('<section class="wrapper confirm-enrollment shopping-cart cart-view"><form action="" method="post"><input type="hidden" name="" value="" /><span class="icon fa fa-caret-right"></span><input type="submit" value="Payment"/></form></section>'); // eslint-disable-line max-len
 
                 view = new edx.shoppingcart.showcart.CartView({
-                    el: $('.confirm-enrollment.cart-view form')
+                    el: $('.confirm-enrollment.cart-view form'),
                 });
 
                 spyOn(view, 'responseFromServer').and.callFake(function() {});
@@ -23,7 +23,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/sh
                 // Verify that the client contacts the server to
                 // check for all th valid cart items
                 AjaxHelpers.expectRequest(
-                    requests, 'GET', '/shoppingcart/verify_cart/'
+                    requests, 'GET', '/shoppingcart/verify_cart/',
                 );
             });
 
@@ -32,7 +32,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/sh
                 // parameter 'is_course_enrollment_closed'. This decides that
                 // do we have all the cart items valid in the cart or not
                 AjaxHelpers.respondWithJson(requests, {
-                    is_course_enrollment_closed: true
+                    is_course_enrollment_closed: true,
                 });
 
                 expect(view.responseFromServer).toHaveBeenCalled();
@@ -45,7 +45,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/sh
                 // parameter 'is_course_enrollment_closed'. This decides that
                 // do we have all the cart items valid in the cart or not
                 AjaxHelpers.respondWithJson(requests, {
-                    is_course_enrollment_closed: false
+                    is_course_enrollment_closed: false,
                 });
 
                 expect(view.responseFromServer).toHaveBeenCalled();
@@ -53,5 +53,5 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/sh
                 expect(data.is_course_enrollment_closed).toBe(false);
             });
         });
-    }
+    },
 );

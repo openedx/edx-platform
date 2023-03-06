@@ -13,14 +13,14 @@
                 created_at: '2013-04-03T20:08:39Z',
                 abuse_flaggers: ['123'],
                 votes: {
-                    up_count: '42'
+                    up_count: '42',
                 },
                 type: 'thread',
-                roles: []
+                roles: [],
             };
             this.thread = new Thread(this.threadData);
             this.view = new DiscussionContentView({
-                model: this.thread
+                model: this.thread,
             });
             this.view.setElement($('#fixture-element'));
             return this.view.render();

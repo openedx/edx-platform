@@ -13,7 +13,7 @@
             spyOn(DiscussionUtil, 'makeWmdEditor');
             this.threadData = DiscussionViewSpecHelper.makeThreadWithProps({
                 commentable_id: 'test_topic',
-                title: 'test thread title'
+                title: 'test thread title',
             });
             this.thread = new Thread(this.threadData);
             this.course_settings = DiscussionSpecHelper.createTestCourseSettings();
@@ -23,7 +23,7 @@
                     container: $('#fixture-element'),
                     model: this.thread,
                     mode: 'tab',
-                    course_settings: this.course_settings
+                    course_settings: this.course_settings,
                 }, options);
                 this.view = new DiscussionThreadEditView(options);
                 this.view.render();
@@ -44,7 +44,7 @@
                 params.success();
                 return {
                     always: function() {
-                    }
+                    },
                 };
             });
             view.$el.find('.topic-title').filter(function(idx, el) {
@@ -100,25 +100,25 @@
                         children: [
                             ['Topic', 'entry'],
                             ['General', 'entry'],
-                            ['Basic Question', 'entry']
+                            ['Basic Question', 'entry'],
                         ],
                         entries: {
                             Topic: {
                                 is_divided: true,
-                                id: 'topic'
+                                id: 'topic',
                             },
                             General: {
                                 sort_key: 'General',
                                 is_divided: false,
-                                id: '6.00.1x_General'
+                                id: '6.00.1x_General',
                             },
                             'Basic Question': {
                                 is_divided: false,
-                                id: "6>00'1x\"Basic_Question"
-                            }
-                        }
+                                id: "6>00'1x\"Basic_Question",
+                            },
+                        },
                     },
-                    is_cohorted: true
+                    is_cohorted: true,
                 });
             });
 

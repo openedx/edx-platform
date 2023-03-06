@@ -70,6 +70,6 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'common/js/spec_hel
             hideModalIfShowing: hideModalIfShowing,
             pressModalButton: pressModalButton,
             cancelModal: cancelModal,
-            cancelModalIfShowing: cancelModalIfShowing
+            cancelModalIfShowing: cancelModalIfShowing,
         });
     });

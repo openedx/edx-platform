@@ -8,8 +8,8 @@
                 facet: '',
                 term: '',
                 count: 0,
-                selected: false
-            }
+                selected: false,
+            },
         });
     });
 }(define || RequireJS.define));

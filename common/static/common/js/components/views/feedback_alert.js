@@ -4,7 +4,7 @@
         function($, _, str, SystemFeedbackView) {
             var Alert = SystemFeedbackView.extend({
                 options: $.extend({}, SystemFeedbackView.prototype.options, {
-                    type: 'alert'
+                    type: 'alert',
                 }),
                 slide_speed: 900,
                 show: function() {
@@ -15,11 +15,11 @@
                 },
                 hide: function() {
                     this.$el.slideUp({
-                        duration: this.slide_speed
+                        duration: this.slide_speed,
                     });
                     setTimeout(_.bind(SystemFeedbackView.prototype.hide, this, arguments),
                         this.slideSpeed);
-                }
+                },
             });
 
             // create Alert.Warning, Alert.Confirmation, etc
@@ -30,8 +30,8 @@
                 var subclass;
                 subclass = Alert.extend({
                     options: $.extend({}, Alert.prototype.options, {
-                        intent: intent
-                    })
+                        intent: intent,
+                    }),
                 });
                 Alert[capitalCamel(intent)] = subclass;
             });

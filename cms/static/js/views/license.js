@@ -1,12 +1,12 @@
 define([
     'js/views/baseview',
     'underscore',
-    'text!templates/license-selector.underscore'
+    'text!templates/license-selector.underscore',
 ], function(BaseView, _, licenseSelectorTemplate) {
     var defaultLicenseInfo = {
         'all-rights-reserved': {
             name: gettext('All Rights Reserved'),
-            tooltip: gettext('You reserve all rights for your work')
+            tooltip: gettext('You reserve all rights for your work'),
         },
         'creative-commons': {
             name: gettext('Creative Commons'),
@@ -16,44 +16,44 @@ define([
                 ver: {
                     name: gettext('Version'),
                     type: 'string',
-                    default: '4.0'
+                    default: '4.0',
                 },
                 BY: {
                     name: gettext('Attribution'),
                     type: 'boolean',
                     default: true,
                     help: gettext('Allow others to copy, distribute, display and perform your copyrighted work but only if they give credit the way you request. Currently, this option is required.'),
-                    disabled: true
+                    disabled: true,
                 },
                 NC: {
                     name: gettext('Noncommercial'),
                     type: 'boolean',
                     default: true,
-                    help: gettext('Allow others to copy, distribute, display and perform your work - and derivative works based upon it - but for noncommercial purposes only.')
+                    help: gettext('Allow others to copy, distribute, display and perform your work - and derivative works based upon it - but for noncommercial purposes only.'),
                 },
                 ND: {
                     name: gettext('No Derivatives'),
                     type: 'boolean',
                     default: true,
                     help: gettext('Allow others to copy, distribute, display and perform only verbatim copies of your work, not derivative works based upon it. This option is incompatible with "Share Alike".'),
-                    conflictsWith: ['SA']
+                    conflictsWith: ['SA'],
                 },
                 SA: {
                     name: gettext('Share Alike'),
                     type: 'boolean',
                     default: false,
                     help: gettext('Allow others to distribute derivative works only under a license identical to the license that governs your work. This option is incompatible with "No Derivatives".'),
-                    conflictsWith: ['ND']
-                }
+                    conflictsWith: ['ND'],
+                },
             },
-            option_order: ['BY', 'NC', 'ND', 'SA']
-        }
+            option_order: ['BY', 'NC', 'ND', 'SA'],
+        },
     };
 
     var LicenseView = BaseView.extend({
         events: {
             'click ul.license-types li button': 'onLicenseClick',
-            'click ul.license-options li': 'onOptionClick'
+            'click ul.license-options li': 'onOptionClick',
         },
 
         initialize: function(options) {
@@ -87,7 +87,7 @@ define([
                 licenseString: this.model.toString() || '',
                 licenseInfo: this.licenseInfo,
                 showPreview: this.showPreview,
-                previewButton: false
+                previewButton: false,
             }));
             return this;
         },
@@ -100,7 +100,7 @@ define([
             if (licenseType != this.model.attributes.type) {
                 this.model.set({
                     type: licenseType,
-                    options: this.getDefaultOptionsForLicenseType(licenseType)
+                    options: this.getDefaultOptionsForLicenseType(licenseType),
                 });
                 // Fire the change event manually
                 this.model.trigger('change change:type');
@@ -141,7 +141,7 @@ define([
             // fire the change event manually.
             this.model.trigger('change change:options');
             e.preventDefault();
-        }
+        },
 
     });
     return LicenseView;

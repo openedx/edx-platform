@@ -6,10 +6,10 @@
             setFixtures('<div class="xblock" data-handler-prefix="/xblock/fake-usage-id/handler"/>');
             this.children = [
                 {
-                    name: 'childA'
+                    name: 'childA',
                 }, {
-                    name: 'childB'
-                }
+                    name: 'childB',
+                },
             ];
             this.element = $('.xblock')[0];
             $(this.element).prop('xblock_children', this.children);

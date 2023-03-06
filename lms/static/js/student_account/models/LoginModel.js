@@ -3,12 +3,12 @@
     define([
         'jquery',
         'backbone',
-        'jquery.url'
+        'jquery.url',
     ], function($, Backbone) {
         return Backbone.Model.extend({
             defaults: {
                 email: '',
-                password: ''
+                password: '',
             },
 
             ajaxType: '',
@@ -30,7 +30,7 @@
                 // in analytics events.
                 if (courseId) {
                     analytics = JSON.stringify({
-                        enroll_course_id: decodeURIComponent(courseId)
+                        enroll_course_id: decodeURIComponent(courseId),
                     });
                 }
 
@@ -47,9 +47,9 @@
                     },
                     error: function(error) {
                         model.trigger('error', error);
-                    }
+                    },
                 });
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

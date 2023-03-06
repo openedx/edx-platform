@@ -1,6 +1,6 @@
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/discovery/models/facet_option',
-    'js/discovery/views/refine_sidebar'
+    'js/discovery/views/refine_sidebar',
 ], function($, TemplateHelpers, FacetOption, RefineSidebar) {
     'use strict';
 
@@ -8,22 +8,22 @@ define([
         org: {
             name: 'Organization',
             terms: {
-                edX1: 'edX_1'
-            }
+                edX1: 'edX_1',
+            },
         },
         modes: {
             name: 'Course Type',
             terms: {
                 honor: 'Honor',
-                verified: 'Verified'
-            }
+                verified: 'Verified',
+            },
         },
         language: {
             terms: {
                 en: 'English',
-                hr: 'Croatian'
-            }
-        }
+                hr: 'Croatian',
+            },
+        },
     };
 
 
@@ -32,13 +32,13 @@ define([
             loadFixtures('js/fixtures/discovery.html');
             TemplateHelpers.installTemplates([
                 'templates/discovery/facet',
-                'templates/discovery/facet_option'
+                'templates/discovery/facet_option',
             ]);
             this.facetOptions = new Backbone.Collection([], {model: FacetOption});
             this.facetOptions.add([
                 {facet: 'language', term: 'es', count: 12},
                 {facet: 'language', term: 'en', count: 10},
-                {facet: 'modes', term: 'honor', count: 2, selected: true}
+                {facet: 'modes', term: 'honor', count: 2, selected: true},
             ]);
             this.sidebar = new RefineSidebar({collection: this.facetOptions, meanings: MEANINGS});
             this.sidebar.render();

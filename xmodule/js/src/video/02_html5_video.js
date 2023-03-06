@@ -74,7 +74,7 @@
                             // Check whether the url already has a '?' inside, and if so,
                             // use '&' instead of '?' to prevent breaking the url's integrity.
                             (source.indexOf('?') === -1 ? '?' : '&'),
-                            (new Date()).getTime(), '" />'
+                            (new Date()).getTime(), '" />',
                         ].join('');
                     });
 
@@ -85,7 +85,7 @@
                     // sources from previous step. Set playback not supported error message.
                     errorMessage = [
                         gettext('This browser cannot play .mp4, .ogg, or .webm files.'),
-                        gettext('Try using a different browser, such as Google Chrome.')
+                        gettext('Try using a different browser, such as Google Chrome.'),
                     ].join('');
                     this.video.innerHTML = sourceList.join('') + errorMessage;
 
@@ -130,7 +130,7 @@
                 Player.prototype.callStateChangeCallback = function() {
                     if ($.isFunction(this.config.events.onStateChange)) {
                         this.config.events.onStateChange({
-                            data: this.playerState
+                            data: this.playerState,
                         });
                     }
                 };
@@ -213,7 +213,7 @@
                         .find('.spinner')
                         .attr({
                             'aria-hidden': 'true',
-                            tabindex: -1
+                            tabindex: -1,
                         });
                 };
 
@@ -284,7 +284,7 @@
                             'emptied', 'stalled', 'play', 'pause', 'loadedmetadata',
                             'loadeddata', 'waiting', 'playing', 'canplay', 'canplaythrough',
                             'seeking', 'seeked', 'timeupdate', 'ended', 'ratechange',
-                            'durationchange', 'volumechange'
+                            'durationchange', 'volumechange',
                         ],
                         self = this,
                         callback;
@@ -330,7 +330,7 @@
                         self.video.addEventListener(eventName, function() {
                             self.logs.push({
                                 'event name': eventName,
-                                state: self.playerState
+                                state: self.playerState,
                             });
 
                             if (self.debug) {
@@ -338,7 +338,7 @@
                                     'event name:', eventName,
                                     'state:', self.playerState,
                                     'readyState:', self.video.readyState,
-                                    'networkState:', self.video.networkState
+                                    'networkState:', self.video.networkState,
                                 );
                             }
 
@@ -381,7 +381,7 @@
                 PLAYING: 1,
                 PAUSED: 2,
                 BUFFERING: 3,
-                CUED: 5
+                CUED: 5,
             };
 
             // HTML5Video object - what this module exports.

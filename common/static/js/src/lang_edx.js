@@ -44,7 +44,7 @@ var Language = (function() {
                 notifyOnError: false,
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
-                }
+                },
             }).done(function() {
                 callback();
             }).fail(function() {
@@ -58,7 +58,7 @@ var Language = (function() {
         refresh: function() {
             // reloading the page so we can get the latest state of released languages from model
             location.reload();
-        }
+        },
 
     };
 }());

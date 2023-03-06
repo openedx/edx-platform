@@ -1,6 +1,6 @@
 define([
     'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/view_helpers',
-    'js/factories/manage_users_lib', 'common/js/components/utils/view_utils'
+    'js/factories/manage_users_lib', 'common/js/components/utils/view_utils',
 ],
 function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
     'use strict';
@@ -31,11 +31,11 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                     [
                         {id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'},
                         {id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'},
-                        {id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'}
+                        {id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'},
                     ],
                     changeRoleUrl,
                     10000,
-                    true
+                    true,
                 );
 
                 jasmine.waitUntil(function() {
@@ -126,11 +126,11 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                     [
                         {id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'},
                         {id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'},
-                        {id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'}
+                        {id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'},
                     ],
                     'dummy_change_role_url',
                     10000,
-                    false
+                    false,
                 );
             });
 

@@ -47,7 +47,7 @@
                 registerFilterableColumn: function(columnName, displayName, fieldName) {
                     this.filterableColumns[columnName] = {
                         displayName: displayName,
-                        fieldName: fieldName
+                        fieldName: fieldName,
                     };
                 },
 
@@ -84,7 +84,7 @@
                     this.sortableColumns[columnName] = {
                         displayName: displayName,
                         fieldName: fieldName,
-                        defaultSortDirection: defaultSortDirection
+                        defaultSortDirection: defaultSortDirection,
                     };
                 },
 
@@ -138,7 +138,7 @@
                     }
                     this.filterColumn = filterColumn;
                     this.collection.setPage(1);
-                }
+                },
             });
             return PagingView;
         }); // end define();

@@ -4,7 +4,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
     'common/js/spec_helpers/template_helpers',
     'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
     'js/groups/models/course_cohort_settings', 'js/utils/animation', 'js/vendor/jquery.qubit',
-    'js/groups/views/course_cohort_settings_notification'
+    'js/groups/views/course_cohort_settings_notification',
 ],
 function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection, ContentGroupModel,
     CourseCohortSettingsModel, AnimationUtil, Qubit, CourseCohortSettingsNotificationView) {
@@ -38,7 +38,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 assignment_type: assignmentType || MOCK_MANUAL_ASSIGNMENT,
                 user_count: userCount !== undefined ? userCount : 0,
                 group_id: groupId,
-                user_partition_id: userPartitionId
+                user_partition_id: userPartitionId,
             };
         };
 
@@ -46,32 +46,32 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             return {
                 cohorts: [
                     createMockCohort('Cat Lovers', 1, catCount || catLoversInitialCount),
-                    createMockCohort('Dog Lovers', 2, dogCount || dogLoversInitialCount)
-                ]
+                    createMockCohort('Dog Lovers', 2, dogCount || dogLoversInitialCount),
+                ],
             };
         };
 
         createMockContentGroups = function() {
             return [
                 new ContentGroupModel({
-                    id: 0, name: 'Dog Content', user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
+                    id: 0, name: 'Dog Content', user_partition_id: MOCK_COHORTED_USER_PARTITION_ID,
                 }),
                 new ContentGroupModel({
-                    id: 1, name: 'Cat Content', user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
-                })
+                    id: 1, name: 'Cat Content', user_partition_id: MOCK_COHORTED_USER_PARTITION_ID,
+                }),
             ];
         };
 
         createMockCohortSettingsJson = function(isCohorted) {
             return {
                 id: 0,
-                is_cohorted: isCohorted || false
+                is_cohorted: isCohorted || false,
             };
         };
 
         createMockCohortSettings = function(isCohorted) {
             return new CourseCohortSettingsModel(
-                createMockCohortSettingsJson(isCohorted)
+                createMockCohortSettingsJson(isCohorted),
             );
         };
 
@@ -94,7 +94,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     uploadCohortsCsvUrl: MOCK_UPLOAD_COHORTS_CSV_URL,
                     studioAdvancedSettingsUrl: MOCK_STUDIO_ADVANCED_SETTINGS_URL,
                     studioGroupConfigurationsUrl: MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
-                }
+                },
             });
 
             cohortsView.render();
@@ -116,8 +116,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     user_count: 0,
                     assignment_type: assignmentType,
                     group_id: groupId,
-                    user_partition_id: userPartitionId
-                }
+                    user_partition_id: userPartitionId,
+                },
             );
         };
 
@@ -169,8 +169,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             expect(cohortsView.$('.cohort-select').val()).toBe(expectedCohortId.toString());
             expect(cohortsView.$('.cohort-select option:selected').text()).toBe(
                 interpolate_text(
-                    '{title} ({count})', {title: expectedTitle, count: expectedCount}
-                )
+                    '{title} ({count})', {title: expectedTitle, count: expectedCount},
+                ),
             );
             expect(header.find('.title-value').text()).toBe(expectedTitle);
             expect(header.find('.group-count').text()).toBe(
@@ -178,8 +178,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     '(contains {count} student)',
                     '(contains {count} students)',
                     expectedCount,
-                    {count: expectedCount}
-                )
+                    {count: expectedCount},
+                ),
             );
             assignmentType = assignmentType || MOCK_MANUAL_ASSIGNMENT;
             var manualMessage = 'Learners are added to this cohort only when you provide their email addresses ' +
@@ -235,7 +235,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             verifyMessage(
                 'You currently have no cohorts configured',
                 'warning',
-                'Add Cohort'
+                'Add Cohort',
             );
 
             // If no cohorts have been created, can't upload a CSV file.
@@ -308,22 +308,22 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 cohortsView.$('.cohorts-state').prop('checked', true).change();
                 AjaxHelpers.expectJsonRequest(
                     requests, 'PATCH', '/mock_service/cohorts/settings',
-                    {is_cohorted: true}
+                    {is_cohorted: true},
                 );
                 AjaxHelpers.respondWithJson(
                     requests,
-                    {is_cohorted: true}
+                    {is_cohorted: true},
                 );
                 expect(cohortsView.$('.cohorts-state').prop('checked')).toBeTruthy();
 
                 cohortsView.$('.cohorts-state').prop('checked', false).change();
                 AjaxHelpers.expectJsonRequest(
                     requests, 'PATCH', '/mock_service/cohorts/settings',
-                    {is_cohorted: false}
+                    {is_cohorted: false},
                 );
                 AjaxHelpers.respondWithJson(
                     requests,
-                    {is_cohorted: false}
+                    {is_cohorted: false},
                 );
                 expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
             });
@@ -364,7 +364,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                         name: newCohortName,
                         assignment_type: assignment_type,
                         group_id: null,
-                        user_partition_id: null
+                        user_partition_id: null,
                     };
                 };
                 createCohortsView(this, {
@@ -374,10 +374,10 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                             name: cohortName,
                             assignment_type: MOCK_RANDOM_ASSIGNMENT,
                             group_id: 111,
-                            user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
-                        }
+                            user_partition_id: MOCK_COHORTED_USER_PARTITION_ID,
+                        },
                     ],
-                    selectCohort: 1
+                    selectCohort: 1,
                 });
 
                 // Select settings tab
@@ -394,11 +394,11 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 cohortsView.$('.action-save').click();
                 AjaxHelpers.expectJsonRequest(
                     requests, 'PATCH', '/mock_service/cohorts/1',
-                    expectedRequest(MOCK_MANUAL_ASSIGNMENT)
+                    expectedRequest(MOCK_MANUAL_ASSIGNMENT),
                 );
                 AjaxHelpers.respondWithJson(
                     requests,
-                    createMockCohort(newCohortName, 1, 0, null, null)
+                    createMockCohort(newCohortName, 1, 0, null, null),
                 );
 
                 verifyHeader(1, newCohortName, 0, MOCK_MANUAL_ASSIGNMENT);
@@ -447,17 +447,17 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                         name: defaultCohortName,
                         assignment_type: assignmentType,
                         group_id: contentGroupId,
-                        user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
-                    }
+                        user_partition_id: MOCK_COHORTED_USER_PARTITION_ID,
+                    },
                 );
                 AjaxHelpers.respondWithJson(
                     requests,
-                    {cohorts: createMockCohort(defaultCohortName, 1, 0, null, null, assignmentType)}
+                    {cohorts: createMockCohort(defaultCohortName, 1, 0, null, null, assignmentType)},
                 );
                 verifyMessage(
                     'The ' + defaultCohortName + ' cohort has been created.' +
                             ' You can manually add students to this cohort below.',
-                    'confirmation'
+                    'confirmation',
                 );
                 verifyHeader(1, defaultCohortName, 0, MOCK_RANDOM_ASSIGNMENT);
                 expect(cohortsView.$('.cohort-management-nav')).not.toHaveClass('is-disabled');
@@ -479,12 +479,12 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                         name: cohortName,
                         assignment_type: MOCK_MANUAL_ASSIGNMENT,
                         group_id: null,
-                        user_partition_id: null
-                    }
+                        user_partition_id: null,
+                    },
                 );
                 AjaxHelpers.respondWithJson(
                     requests,
-                    {cohorts: createMockCohort(cohortName, 1, 0, null, null, MOCK_MANUAL_ASSIGNMENT)}
+                    {cohorts: createMockCohort(cohortName, 1, 0, null, null, MOCK_MANUAL_ASSIGNMENT)},
                 );
                 verifyHeader(1, cohortName, 0, MOCK_MANUAL_ASSIGNMENT);
             });
@@ -519,7 +519,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 cohortsView.$('.radio-yes').prop('checked', true).change();
                 saveFormAndExpectErrors('add', [
                     'You must specify a name for the cohort',
-                    'You did not select a content group'
+                    'You did not select a content group',
                 ]);
             });
 
@@ -532,12 +532,12 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 addModal.find('.cohort-name').val(defaultCohortName);
                 addModal.find('.action-save').click();
                 AjaxHelpers.respondWithError(requests, 400, {
-                    error: 'You cannot add two cohorts with the same name'
+                    error: 'You cannot add two cohorts with the same name',
                 });
                 verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
                 verifyMessage(
                     'You cannot add two cohorts with the same name',
-                    'error'
+                    'error',
                 );
             });
 
@@ -560,7 +560,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 verifyMessage(
                     'You currently have no cohorts configured',
                     'warning',
-                    'Add Cohort'
+                    'Add Cohort',
                 );
             });
 
@@ -608,7 +608,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 AjaxHelpers.respondWithJson(
                     requests,
                     _.extend({unknown: [], added: [], present: [], changed: [], not_allowed: [],
-                        success: true, preassigned: [], invalid: []}, result)
+                        success: true, preassigned: [], invalid: []}, result),
                 );
             };
 
@@ -635,7 +635,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 createCohortsView(this, {selectCohort: 1});
                 addStudents('unknown@sample.com');
                 AjaxHelpers.expectRequest(
-                    requests, 'POST', '/mock_service/cohorts/1/add', 'users=unknown%40sample.com'
+                    requests, 'POST', '/mock_service/cohorts/1/add', 'users=unknown%40sample.com',
                 );
                 respondToAdd({preassigned: ['unknown@sample.com']});
                 respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
@@ -651,13 +651,13 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 createCohortsView(this, {selectCohort: 1});
                 addStudents('unknown@');
                 AjaxHelpers.expectRequest(
-                    requests, 'POST', '/mock_service/cohorts/1/add', 'users=unknown%40'
+                    requests, 'POST', '/mock_service/cohorts/1/add', 'users=unknown%40',
                 );
                 respondToAdd({invalid: ['unknown@']});
                 respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
                 verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
                 verifyDetailedMessage('There was an error when trying to add learners:', 'error',
-                    [invalidEmailMessage('unknown@')]
+                    [invalidEmailMessage('unknown@')],
                 );
             });
 
@@ -665,13 +665,13 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 createCohortsView(this, {selectCohort: 1});
                 addStudents('unknown');
                 AjaxHelpers.expectRequest(
-                    requests, 'POST', '/mock_service/cohorts/1/add', 'users=unknown'
+                    requests, 'POST', '/mock_service/cohorts/1/add', 'users=unknown',
                 );
                 respondToAdd({unknown: ['unknown']});
                 respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
                 verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
                 verifyDetailedMessage('There was an error when trying to add learners:', 'error',
-                    [unknownUserMessage('unknown')]
+                    [unknownUserMessage('unknown')],
                 );
             });
 
@@ -679,13 +679,13 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 createCohortsView(this, {selectCohort: 1});
                 addStudents('not_allowed');
                 AjaxHelpers.expectRequest(
-                    requests, 'POST', '/mock_service/cohorts/1/add', 'users=not_allowed'
+                    requests, 'POST', '/mock_service/cohorts/1/add', 'users=not_allowed',
                 );
                 respondToAdd({not_allowed: ['not_allowed']});
                 respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
                 verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
                 verifyDetailedMessage('There was an error when trying to add learners:', 'error',
-                    [notAllowedUserMessage('not_allowed')]
+                    [notAllowedUserMessage('not_allowed')],
                 );
             });
 
@@ -696,7 +696,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 addStudents(sixUsers);
                 AjaxHelpers.expectRequest(
                     requests, 'POST', '/mock_service/cohorts/1/add',
-                    'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')
+                    'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+'),
                 );
                 respondToAdd({unknown: [
                     'unknown1',
@@ -704,16 +704,16 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     'unknown3',
                     'unknown4',
                     'unknown5',
-                    'unknown6']
+                    'unknown6'],
                 });
                 respondToRefresh(catLoversInitialCount + 6, dogLoversInitialCount);
                 verifyDetailedMessage('6 learners could not be added to this cohort:', 'error',
                     [
                         unknownUserMessage('unknown1'), unknownUserMessage('unknown2'),
                         unknownUserMessage('unknown3'), unknownUserMessage('unknown4'),
-                        unknownUserMessage('unknown5')
+                        unknownUserMessage('unknown5'),
                     ],
-                    'View all errors'
+                    'View all errors',
                 );
                 expect(getStudentInput().val()).toBe(sixUsers);
                 // Click "View all"
@@ -722,8 +722,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     [
                         unknownUserMessage('unknown1'), unknownUserMessage('unknown2'),
                         unknownUserMessage('unknown3'), unknownUserMessage('unknown4'),
-                        unknownUserMessage('unknown5'), unknownUserMessage('unknown6')
-                    ]
+                        unknownUserMessage('unknown5'), unknownUserMessage('unknown6'),
+                    ],
                 );
             });
 
@@ -733,15 +733,15 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
 
                 addStudents(sixUsers);
                 AjaxHelpers.expectRequest(requests, 'POST', '/mock_service/cohorts/1/add',
-                    'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')
+                    'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+'),
                 );
                 respondToAdd({
                     changed: [
                         {email: 'moved1@sample.com', name: 'moved1', previous_cohort: 'cohort 2', username: 'moved1'},
                         {email: 'moved2@sample.com', name: 'moved2', previous_cohort: 'cohort 2', username: 'moved2'},
-                        {email: 'moved3@sample.com', name: 'moved3', previous_cohort: 'cohort 3', username: 'moved3'}
+                        {email: 'moved3@sample.com', name: 'moved3', previous_cohort: 'cohort 3', username: 'moved3'},
                     ],
-                    present: ['alreadypresent@sample.com']
+                    present: ['alreadypresent@sample.com'],
                 });
                 respondToRefresh();
 
@@ -749,8 +749,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     [
                         '2 learners were moved from cohort 2',
                         '1 learner was moved from cohort 3',
-                        '1 learner was already in the cohort'
-                    ]
+                        '1 learner was already in the cohort',
+                    ],
                 );
                 expect(getStudentInput().val()).toBe('');
             });
@@ -791,10 +791,10 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                                 name: 'Cat Lovers',
                                 assignment_type: MOCK_RANDOM_ASSIGNMENT,
                                 group_id: 999,
-                                user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
-                            }
+                                user_partition_id: MOCK_COHORTED_USER_PARTITION_ID,
+                            },
                         ],
-                        selectCohort: 1
+                        selectCohort: 1,
                     });
                 };
 
@@ -826,12 +826,12 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                             name: 'Cat Lovers',
                             assignment_type: MOCK_MANUAL_ASSIGNMENT,
                             group_id: 0,
-                            user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
-                        }
+                            user_partition_id: MOCK_COHORTED_USER_PARTITION_ID,
+                        },
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockCohort('Cat Lovers', 1, catLoversInitialCount, 0, 0)
+                        createMockCohort('Cat Lovers', 1, catLoversInitialCount, 0, 0),
                     );
                     verifyMessage('Saved cohort', 'confirmation');
                 });
@@ -839,9 +839,9 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 it('can clear selected content group', function() {
                     createCohortsView(this, {
                         cohorts: [
-                            {id: 1, name: 'Cat Lovers', group_id: 0, assignment_type: MOCK_MANUAL_ASSIGNMENT}
+                            {id: 1, name: 'Cat Lovers', group_id: 0, assignment_type: MOCK_MANUAL_ASSIGNMENT},
                         ],
-                        selectCohort: 1
+                        selectCohort: 1,
                     });
                     cohortsView.$('.tab-settings a').click();
                     expect(cohortsView.$('.radio-yes').prop('checked')).toBeTruthy();
@@ -855,12 +855,12 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                             name: 'Cat Lovers',
                             assignment_type: MOCK_MANUAL_ASSIGNMENT,
                             group_id: null,
-                            user_partition_id: null
-                        }
+                            user_partition_id: null,
+                        },
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockCohort('Cat Lovers', 1, catLoversInitialCount, 0, 0)
+                        createMockCohort('Cat Lovers', 1, catLoversInitialCount, 0, 0),
                     );
                     verifyMessage('Saved cohort', 'confirmation');
                 });
@@ -878,7 +878,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     cohortsView.$('.tab-settings a').click();
                     expect(cohortsView.$('option.option-unavailable').text().trim()).toBe('Deleted Content Group');
                     expect(cohortsView.$('.cohort-management-details-association-course .copy-error').text().trim()).toBe(
-                        'Warning: The previously selected content group was deleted. Select another content group.'
+                        'Warning: The previously selected content group was deleted. Select another content group.',
                     );
                 });
 
@@ -892,7 +892,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     cohortsView.$('.action-save').click();
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockCohort('Cat Lovers', 1, catLoversInitialCount, 0, 0, MOCK_RANDOM_ASSIGNMENT)
+                        createMockCohort('Cat Lovers', 1, catLoversInitialCount, 0, 0, MOCK_RANDOM_ASSIGNMENT),
                     );
                     verifyMessage('Saved cohort', 'confirmation');
 
@@ -914,7 +914,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     AjaxHelpers.respondWithError(requests);
                     verifyMessage(
                         'We\'ve encountered an error. Refresh your browser and then try again.',
-                        'error'
+                        'error',
                     );
                 });
 
@@ -928,7 +928,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     expect(message).toContain('Create a content group');
                     expect(
                         cohortsView.$('.msg-inline a').attr('href'),
-                        MOCK_STUDIO_GROUP_CONFIGURATIONS_URL
+                        MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
                     );
                 });
 
@@ -940,7 +940,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                             name: newCohortName,
                             assignment_type: assignment_type,
                             group_id: null,
-                            user_partition_id: null
+                            user_partition_id: null,
                         };
                     };
                     createCohortsView(this, {
@@ -950,10 +950,10 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                                 name: cohortName,
                                 assignment_type: MOCK_RANDOM_ASSIGNMENT,
                                 group_id: 111,
-                                user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
-                            }
+                                user_partition_id: MOCK_COHORTED_USER_PARTITION_ID,
+                            },
                         ],
-                        selectCohort: 1
+                        selectCohort: 1,
                     });
 
                     // Select settings tab
@@ -973,11 +973,11 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     cohortsView.$('.action-save').click();
                     AjaxHelpers.expectJsonRequest(
                         requests, 'PATCH', '/mock_service/cohorts/1',
-                        expectedRequest(MOCK_MANUAL_ASSIGNMENT)
+                        expectedRequest(MOCK_MANUAL_ASSIGNMENT),
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockCohort(newCohortName, 1, 0, null, null)
+                        createMockCohort(newCohortName, 1, 0, null, null),
                     );
 
                     // Verify the new/updated cohort values
@@ -1002,10 +1002,10 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                                 name: 'Cohort.me',
                                 assignment_type: MOCK_RANDOM_ASSIGNMENT,
                                 group_id: 111,
-                                user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
-                            }
+                                user_partition_id: MOCK_COHORTED_USER_PARTITION_ID,
+                            },
                         ],
-                        selectCohort: 1
+                        selectCohort: 1,
                     });
 
                     // We have a single random cohort so we should not be allowed to change it assignment type

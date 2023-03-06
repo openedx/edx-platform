@@ -100,7 +100,7 @@ function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
                     title: title,
                     message: message,
                     closeIcon: false,
-                    shown: false
+                    shown: false,
                 });
                 this.alert.show();
             }
@@ -112,7 +112,7 @@ function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
             if (data.state === 'start') {
                 message = data.message || gettext('Saving');
                 this.notification = new NotificationView.Mini({
-                    title: message
+                    title: message,
                 });
                 this.notification.show();
             } else if (data.state === 'end') {

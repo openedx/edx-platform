@@ -23,7 +23,7 @@
                 'click .cohort-management-add-form .action-save': 'saveAddCohortForm',
                 'click .cohort-management-add-form .action-cancel': 'cancelAddCohortForm',
                 'click .link-cross-reference': 'showSection',
-                'click .toggle-cohort-management-secondary': 'showCsvUpload'
+                'click .toggle-cohort-management-secondary': 'showCsvUpload',
             },
 
             initialize: function(options) {
@@ -46,7 +46,7 @@
             render: function() {
                 HtmlUtils.setHtml(this.$el, this.template({
                     cohorts: this.model.models,
-                    cohortsEnabled: this.cohortSettings.get('is_cohorted')
+                    cohortsEnabled: this.cohortSettings.get('is_cohorted'),
                 }));
                 this.onSync();
                 return this;
@@ -55,14 +55,14 @@
             renderSelector: function(selectedCohort) {
                 HtmlUtils.setHtml(this.$('.cohort-select'), this.selectorTemplate({
                     cohorts: this.model.models,
-                    selectedCohort: selectedCohort
+                    selectedCohort: selectedCohort,
                 }));
             },
 
             renderCourseCohortSettingsNotificationView: function() {
                 var cohortStateMessageNotificationView = new CourseCohortSettingsNotificationView({
                     el: $('.cohort-state-message'),
-                    cohortEnabled: this.getCohortsEnabled()
+                    cohortEnabled: this.getCohortsEnabled(),
                 });
                 cohortStateMessageNotificationView.render();
             },
@@ -97,7 +97,7 @@
                         title: gettext('You currently have no cohorts configured'),
                         actionText: gettext('Add Cohort'),
                         actionClass: 'action-create',
-                        actionIconClass: 'fa-plus'
+                        actionIconClass: 'fa-plus',
                     });
                 }
             },
@@ -125,7 +125,7 @@
                     fieldData = {is_cohorted: this.getCohortsEnabled()};
                 cohortSettings = this.cohortSettings;
                 cohortSettings.save(
-                    fieldData, {patch: true, wait: true}
+                    fieldData, {patch: true, wait: true},
                 ).done(function() {
                     self.render();
                     self.renderCourseCohortSettingsNotificationView();
@@ -134,7 +134,7 @@
                     self.showNotification({
                         type: 'error',
                         title: gettext("We've encountered an error. Refresh your browser and then try again.")},
-                    self.$('.cohorts-state-section')
+                    self.$('.cohorts-state-section'),
                     );
                 });
             },
@@ -154,7 +154,7 @@
                         model: cohort,
                         cohorts: this.model,
                         contentGroups: this.contentGroups,
-                        context: this.context
+                        context: this.context,
                     });
                     this.editor.render();
                     $('.cohort-management-group .group-header-title').focus();
@@ -165,7 +165,7 @@
                 var model = new NotificationModel(options);
                 this.removeNotification();
                 this.notification = new NotificationView({
-                    model: model
+                    model: model,
                 });
 
                 if (!beforeElement) {
@@ -194,7 +194,7 @@
                 this.cohortFormView = new CohortFormView({
                     model: newCohort,
                     contentGroups: this.contentGroups,
-                    context: this.context
+                    context: this.context,
                 });
                 this.cohortFormView.render();
                 this.$('.cohort-management-add-form').append(this.cohortFormView.$el);
@@ -235,8 +235,8 @@
                                 type: 'confirmation',
                                 title: interpolate_text(
                                     gettext('The {cohortGroupName} cohort has been created. You can manually add students to this cohort below.'),
-                                    {cohortGroupName: newCohort.get('name')}
-                                )
+                                    {cohortGroupName: newCohort.get('name')},
+                                ),
                             });
                         });
                     });
@@ -272,20 +272,20 @@
                         url: this.context.uploadCohortsCsvUrl,
                         successNotification: function(file, event, data) {
                             var message = interpolate_text(gettext(
-                                "Your file '{file}' has been uploaded. Allow a few minutes for processing."
+                                "Your file '{file}' has been uploaded. Allow a few minutes for processing.",
                             ), {file: file});
                             return new NotificationModel({
                                 type: 'confirmation',
-                                title: message
+                                title: message,
                             });
-                        }
+                        },
                     }).render();
                 }
             },
 
             getSectionCss: function(section) {
                 return ".instructor-nav .nav-item [data-section='" + section + "']";
-            }
+            },
         });
         return CohortsView;
     });

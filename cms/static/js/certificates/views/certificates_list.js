@@ -3,7 +3,7 @@
 define([
     'gettext',
     'js/views/list',
-    'js/certificates/views/certificate_item'
+    'js/certificates/views/certificate_item',
 ],
 function(gettext, ListView, CertificateItemView) {
     'use strict';
@@ -23,7 +23,7 @@ function(gettext, ListView, CertificateItemView) {
         createItemView: function(options) {
             // Returns either an editor view or a details view, depending on context
             return new CertificateItemView(options);
-        }
+        },
     });
     return CertificatesListView;
 });

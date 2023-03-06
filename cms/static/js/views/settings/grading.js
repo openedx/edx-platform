@@ -4,7 +4,7 @@ define(['js/views/validation',
     'jquery.ui',
     'js/views/settings/grader',
     'edx-ui-toolkit/js/utils/string-utils',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/html-utils',
 ],
 function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
     var GradingView = ValidatingView.extend({
@@ -22,16 +22,16 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             'click .add-grading-data': 'addAssignmentType',
             // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
             'focus :input': 'inputFocus',
-            'blur :input': 'inputUnfocus'
+            'blur :input': 'inputUnfocus',
         },
         initialize: function() {
         //  load template for grading view
             var self = this;
             this.template = HtmlUtils.template(
-                $('#course_grade_policy-tpl').text()
+                $('#course_grade_policy-tpl').text(),
             );
             this.gradeCutoffTemplate = HtmlUtils.template(
-                $('#course_grade_cutoff-tpl').text()
+                $('#course_grade_cutoff-tpl').text(),
             );
             this.setupCutoffs();
 
@@ -93,7 +93,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         },
         fieldToSelectorMap: {
             grace_period: 'course-grading-graceperiod',
-            minimum_grade_credit: 'course-minimum_grade_credit'
+            minimum_grade_credit: 'course-minimum_grade_credit',
         },
         renderGracePeriod: function() {
             var format = function(time) {
@@ -101,13 +101,13 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             };
             var grace_period = this.model.get('grace_period');
             this.$el.find('#course-grading-graceperiod').val(
-                format(grace_period.hours) + ':' + format(grace_period.minutes)
+                format(grace_period.hours) + ':' + format(grace_period.minutes),
             );
         },
         renderMinimumGradeCredit: function() {
             var minimum_grade_credit = this.model.get('minimum_grade_credit');
             this.$el.find('#course-minimum_grade_credit').val(
-                Math.round(parseFloat(minimum_grade_credit) * 100)
+                Math.round(parseFloat(minimum_grade_credit) * 100),
             );
         },
         setGracePeriod: function(event) {
@@ -166,7 +166,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                     descriptor: cutoff.designation,
                     width: nextWidth,
                     contenteditable: true,
-                    removable: removable})
+                    removable: removable}),
                 );
                 if (draggable) {
                     var newBar = gradelist.children().last(); // get the dom object not the unparsed string
@@ -175,7 +175,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                         containment: 'parent',
                         start: this.startMoveClosure(),
                         resize: this.moveBarClosure(),
-                        stop: this.stopDragClosure()
+                        stop: this.stopDragClosure(),
                     });
                 }
                 // prepare for next
@@ -189,14 +189,14 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 descriptor: this.failLabel(),
                 width: nextWidth,
                 contenteditable: false,
-                removable: false
+                removable: false,
             }));
             gradelist.children().last().resizable({
                 handles: 'e',
                 containment: 'parent',
                 start: this.startMoveClosure(),
                 resize: this.moveBarClosure(),
-                stop: this.stopDragClosure()
+                stop: this.stopDragClosure(),
             });
 
             this.renderGradeRanges();
@@ -321,7 +321,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 containment: 'parent',
                 start: this.startMoveClosure(),
                 resize: this.moveBarClosure(),
-                stop: this.stopDragClosure()
+                stop: this.stopDragClosure(),
             });
 
             // Munge existing grade labels?
@@ -396,7 +396,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 this.save_message,
                 _.bind(this.saveView, this),
                 _.bind(this.revertView, this));
-        }
+        },
     });
 
     return GradingView;

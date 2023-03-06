@@ -35,13 +35,13 @@ describe('CourseOutlinePage', function() {
             child_info: {
                 category: 'chapter',
                 display_name: 'Section',
-                children: []
+                children: [],
             },
             unit_level_discussions: false,
             user_partitions: [],
             user_partition_info: {},
             highlights_enabled: true,
-            highlights_enabled_for_messaging: false
+            highlights_enabled_for_messaging: false,
         }, options, {child_info: {children: children}});
     };
 
@@ -62,13 +62,13 @@ describe('CourseOutlinePage', function() {
             child_info: {
                 category: 'chapter',
                 display_name: 'Section',
-                children: []
+                children: [],
             },
             user_partitions: [],
             show_review_rules: true,
             user_partition_info: {},
             highlights_enabled: true,
-            highlights_enabled_for_messaging: false
+            highlights_enabled_for_messaging: false,
         }, options, {child_info: {children: children}});
     };
 
@@ -87,13 +87,13 @@ describe('CourseOutlinePage', function() {
             child_info: {
                 category: 'sequential',
                 display_name: 'Subsection',
-                children: []
+                children: [],
             },
             user_partitions: [],
             group_access: {},
             user_partition_info: {},
             highlights: [],
-            highlights_enabled: true
+            highlights_enabled: true,
         }, options, {child_info: {children: children}});
     };
 
@@ -119,11 +119,11 @@ describe('CourseOutlinePage', function() {
             child_info: {
                 category: 'vertical',
                 display_name: 'Unit',
-                children: []
+                children: [],
             },
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {},
         }, options, {child_info: {children: children}});
     };
 
@@ -141,7 +141,7 @@ describe('CourseOutlinePage', function() {
             edited_by: 'MockUser',
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {},
         }, options);
     };
 
@@ -149,12 +149,12 @@ describe('CourseOutlinePage', function() {
         if (option) {
             return JSON.stringify({
                 developer_message: 'Course has been successfully reindexed.',
-                user_message: 'Course has been successfully reindexed.'
+                user_message: 'Course has been successfully reindexed.',
             });
         } else {
             return JSON.stringify({
                 developer_message: 'Could not reindex course.',
-                user_message: 'Could not reindex course.'
+                user_message: 'Could not reindex course.',
             });
         }
     };
@@ -217,7 +217,7 @@ describe('CourseOutlinePage', function() {
         model = new XBlockOutlineInfo(courseJSON, {parse: true});
         outlinePage = new CourseOutlinePage({
             model: model,
-            el: $('#content')
+            el: $('#content'),
         });
         if (!createOnly) {
             outlinePage.render();
@@ -242,13 +242,13 @@ describe('CourseOutlinePage', function() {
 
         it('can be published', function() {
             var mockCourseJSON = getMockCourseJSON({
-                has_changes: true
+                has_changes: true,
             });
             createCourseOutlinePageAndShowUnit(this, mockCourseJSON);
             getItemHeaders(type).find('.publish-button').click();
             $('.wrapper-modal-window .action-publish').click();
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-' + type, {
-                publish: 'make_public'
+                publish: 'make_public',
             });
             expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
             AjaxHelpers.respondWithJson(requests, {});
@@ -258,7 +258,7 @@ describe('CourseOutlinePage', function() {
         it('should show publish button if it is not published and not changed', function() {
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: false,
-                published: false
+                published: false,
             });
             verifyPublishButton(this, mockCourseJSON);
         });
@@ -266,7 +266,7 @@ describe('CourseOutlinePage', function() {
         it('should show publish button if it is published and changed', function() {
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: true,
-                published: true
+                published: true,
             });
             verifyPublishButton(this, mockCourseJSON);
         });
@@ -274,7 +274,7 @@ describe('CourseOutlinePage', function() {
         it('should show publish button if it is not published, but changed', function() {
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: true,
-                published: false
+                published: false,
             });
             verifyPublishButton(this, mockCourseJSON);
         });
@@ -282,7 +282,7 @@ describe('CourseOutlinePage', function() {
         it('should hide publish button if it is not changed, but published', function() {
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: false,
-                published: true
+                published: true,
             });
             createCourseOutlinePageAndShowUnit(this, mockCourseJSON);
             expect(getItemHeaders(type).find('.publish-button')).not.toExist();
@@ -296,7 +296,7 @@ describe('CourseOutlinePage', function() {
             url_name: 'course_name',
             org: 'course_org',
             num: 'course_num',
-            revision: 'course_rev'
+            revision: 'course_rev',
         });
 
         EditHelpers.installMockAnalytics();
@@ -308,33 +308,33 @@ describe('CourseOutlinePage', function() {
             'staff-lock-editor', 'unit-access-editor', 'discussion-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
-            'course-highlights-enable'
+            'course-highlights-enable',
         ]);
         appendSetFixtures(mockOutlinePage);
         mockCourseJSON = createMockCourseJSON({}, [
             createMockSectionJSON({}, [
                 createMockSubsectionJSON({}, [
-                    createMockVerticalJSON()
-                ])
-            ])
+                    createMockVerticalJSON(),
+                ]),
+            ]),
         ]);
         mockCourseJSONWithReviewRules = createMockCourseJSONWithReviewRules({}, [
             createMockSectionJSON({}, [
                 createMockSubsectionJSON({}, [
-                    createMockVerticalJSON()
-                ])
-            ])
+                    createMockVerticalJSON(),
+                ]),
+            ]),
         ]);
         mockEmptyCourseJSON = createMockCourseJSON();
         mockSingleSectionCourseJSON = createMockCourseJSON({}, [
-            createMockSectionJSON()
+            createMockSectionJSON(),
         ]);
         mockCourseEntranceExamJSON = createMockCourseJSON({}, [
             createMockSectionJSON({}, [
                 createMockSubsectionJSON({is_header_visible: false}, [
-                    createMockVerticalJSON()
-                ])
-            ])
+                    createMockVerticalJSON(),
+                ]),
+            ]),
         ]);
 
         // Create a mock Course object as the JS now expects it.
@@ -344,7 +344,7 @@ describe('CourseOutlinePage', function() {
             url_name: 'course_name',
             org: 'course_org',
             num: 'course_num',
-            revision: 'course_rev'
+            revision: 'course_rev',
         });
     });
 
@@ -404,11 +404,11 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                 category: 'chapter',
                 display_name: 'Section',
-                parent_locator: 'mock-course'
+                parent_locator: 'mock-course',
             });
             AjaxHelpers.respondWithJson(requests, {
                 locator: 'mock-section',
-                courseKey: 'slashes:MockCourse'
+                courseKey: 'slashes:MockCourse',
             });
             AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
             AjaxHelpers.respondWithJson(requests, mockSingleSectionCourseJSON);
@@ -423,11 +423,11 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                 category: 'chapter',
                 display_name: 'Section',
-                parent_locator: 'mock-course'
+                parent_locator: 'mock-course',
             });
             AjaxHelpers.respondWithJson(requests, {
                 locator: 'mock-section-2',
-                courseKey: 'slashes:MockCourse'
+                courseKey: 'slashes:MockCourse',
             });
             // Expect the UI to just fetch the new section and repaint it
             AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section-2');
@@ -486,12 +486,12 @@ describe('CourseOutlinePage', function() {
             // verify content of request
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                 duplicate_source_locator: xblockLocator,
-                parent_locator: parentLocator
+                parent_locator: parentLocator,
             });
 
             // send the response
             AjaxHelpers.respondWithJson(requests, {
-                locator: 'locator-duplicated-xblock'
+                locator: 'locator-duplicated-xblock',
             });
         };
 
@@ -554,11 +554,11 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                 category: 'chapter',
                 display_name: 'Section',
-                parent_locator: 'mock-course'
+                parent_locator: 'mock-course',
             });
             AjaxHelpers.respondWithJson(requests, {
                 locator: 'mock-section',
-                courseKey: 'slashes:MockCourse'
+                courseKey: 'slashes:MockCourse',
             });
             AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
             AjaxHelpers.respondWithJson(requests, mockSingleSectionCourseJSON);
@@ -573,7 +573,7 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                 category: 'chapter',
                 display_name: 'Section',
-                parent_locator: 'mock-course'
+                parent_locator: 'mock-course',
             });
             AjaxHelpers.respondWithError(requests);
             AjaxHelpers.expectNoRequests(requests);
@@ -592,8 +592,8 @@ describe('CourseOutlinePage', function() {
         createCourse = function(sectionOptions, courseOptions) {
             createCourseOutlinePage(this,
                 createMockCourseJSON(courseOptions, [
-                    createMockSectionJSON(sectionOptions)
-                ])
+                    createMockSectionJSON(sectionOptions),
+                ]),
             );
         };
 
@@ -631,15 +631,15 @@ describe('CourseOutlinePage', function() {
                 AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-course', {
                     publish: 'republish',
                     metadata: {
-                        highlights_enabled_for_messaging: true
-                    }
+                        highlights_enabled_for_messaging: true,
+                    },
                 });
                 AjaxHelpers.respondWithJson(requests, {});
 
                 // GET updated course
                 AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
                 AjaxHelpers.respondWithJson(
-                    requests, createMockCourseJSON({highlights_enabled_for_messaging: true})
+                    requests, createMockCourseJSON({highlights_enabled_for_messaging: true}),
                 );
             };
 
@@ -743,7 +743,7 @@ describe('CourseOutlinePage', function() {
                     expect(highlights[i]).toHaveValue('');
                     expect(highlights[i]).toHaveAttr(
                         'placeholder',
-                        'A highlight to look forward to this week.'
+                        'A highlight to look forward to this week.',
                     );
                 }
             };
@@ -753,8 +753,8 @@ describe('CourseOutlinePage', function() {
                 AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
                     publish: 'republish',
                     metadata: {
-                        highlights: highlights
-                    }
+                        highlights: highlights,
+                    },
                 });
                 AjaxHelpers.respondWithJson(requests, {});
 
@@ -820,14 +820,14 @@ describe('CourseOutlinePage', function() {
             it('can add highlights', function() {
                 expectHighlightsToUpdate(
                     mockHighlightValues(0),
-                    mockHighlightValues(1)
+                    mockHighlightValues(1),
                 );
             });
 
             it('can remove highlights', function() {
                 expectHighlightsToUpdate(
                     mockHighlightValues(5),
-                    mockHighlightValues(3)
+                    mockHighlightValues(3),
                 );
             });
 
@@ -851,7 +851,7 @@ describe('CourseOutlinePage', function() {
             var promptSpy = EditHelpers.createPromptSpy();
             createCourseOutlinePage(this, createMockCourseJSON({}, [
                 createMockSectionJSON(),
-                createMockSectionJSON({id: 'mock-section-2', display_name: 'Mock Section 2'})
+                createMockSectionJSON({id: 'mock-section-2', display_name: 'Mock Section 2'}),
             ]));
             getItemHeaders('section').find('.delete-button').first().click();
             EditHelpers.confirmPrompt(promptSpy);
@@ -893,11 +893,11 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                 category: 'sequential',
                 display_name: 'Subsection',
-                parent_locator: 'mock-section'
+                parent_locator: 'mock-section',
             });
             AjaxHelpers.respondWithJson(requests, {
                 locator: 'new-mock-subsection',
-                courseKey: 'slashes:MockCourse'
+                courseKey: 'slashes:MockCourse',
             });
             // Note: verification of the server response and the UI's handling of it
             // is handled in the acceptance tests.
@@ -946,22 +946,22 @@ describe('CourseOutlinePage', function() {
             $('.wrapper-modal-window .action-save').click();
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
                 metadata: {
-                    start: '2015-01-02T00:00:00.000Z'
-                }
+                    start: '2015-01-02T00:00:00.000Z',
+                },
             });
             expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
 
             // This is the response for the change operation.
             AjaxHelpers.respondWithJson(requests, {});
             var mockResponseSectionJSON = createMockSectionJSON({
-                release_date: 'Jan 02, 2015 at 00:00 UTC'
+                release_date: 'Jan 02, 2015 at 00:00 UTC',
             }, [
                 createMockSubsectionJSON({}, [
                     createMockVerticalJSON({
                         has_changes: true,
-                        published: false
-                    })
-                ])
+                        published: false,
+                    }),
+                ]),
             ]);
             AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
             AjaxHelpers.respondWithJson(requests, mockResponseSectionJSON);
@@ -973,9 +973,9 @@ describe('CourseOutlinePage', function() {
             return createMockCourseJSON({}, [
                 createMockSectionJSON(options, [
                     createMockSubsectionJSON({}, [
-                        createMockVerticalJSON()
-                    ])
-                ])
+                        createMockVerticalJSON(),
+                    ]),
+                ]),
             ]);
         });
 
@@ -985,18 +985,18 @@ describe('CourseOutlinePage', function() {
                         createMockSubsectionJSON({has_changes: true}, [
                             createMockVerticalJSON(),
                             createMockVerticalJSON({has_changes: true, display_name: 'Unit 100'}),
-                            createMockVerticalJSON({published: false, display_name: 'Unit 50'})
+                            createMockVerticalJSON({published: false, display_name: 'Unit 50'}),
                         ]),
                         createMockSubsectionJSON({has_changes: true}, [
-                            createMockVerticalJSON({has_changes: true, display_name: 'Unit 1'})
+                            createMockVerticalJSON({has_changes: true, display_name: 'Unit 1'}),
                         ]),
-                        createMockSubsectionJSON({}, [createMockVerticalJSON])
+                        createMockSubsectionJSON({}, [createMockVerticalJSON]),
                     ]),
                     createMockSectionJSON({has_changes: true}, [
                         createMockSubsectionJSON({has_changes: true}, [
-                            createMockVerticalJSON({has_changes: true})
-                        ])
-                    ])
+                            createMockVerticalJSON({has_changes: true}),
+                        ]),
+                    ]),
                 ]),
                 modalWindow;
 
@@ -1005,7 +1005,7 @@ describe('CourseOutlinePage', function() {
             var $modalWindow = $('.wrapper-modal-window');
             expect($modalWindow.find('.outline-unit').length).toBe(3);
             expect(_.compact(_.map($modalWindow.find('.outline-unit').text().split('\n'), $.trim))).toEqual(
-                ['Unit 100', 'Unit 50', 'Unit 1']
+                ['Unit 100', 'Unit 50', 'Unit 1'],
             );
             expect($modalWindow.find('.outline-subsection').length).toBe(2);
         });
@@ -1090,9 +1090,9 @@ describe('CourseOutlinePage', function() {
             delete mockSubsectionJSON.prereq_min_completion;
             return createMockCourseJSON({
                 enable_proctored_exams: false,
-                enable_timed_exams: false
+                enable_timed_exams: false,
             }, [
-                createMockSectionJSON({}, [mockSubsectionJSON])
+                createMockSectionJSON({}, [mockSubsectionJSON]),
             ]);
         };
 
@@ -1105,8 +1105,8 @@ describe('CourseOutlinePage', function() {
                 is_time_limited: false,
                 is_proctored_enabled: false,
                 default_time_limit_minutes: null,
-                is_onboarding_exam: false
-            }
+                is_onboarding_exam: false,
+            },
         };
 
         modalSettingsWithExamReviewRules = {
@@ -1118,13 +1118,13 @@ describe('CourseOutlinePage', function() {
                 is_time_limited: false,
                 is_proctored_enabled: false,
                 default_time_limit_minutes: null,
-                is_onboarding_exam: false
-            }
+                is_onboarding_exam: false,
+            },
         };
 
         // Contains hard-coded dates because dates are presented in different formats.
         mockServerValuesJson = createMockSectionJSON({
-            release_date: 'Jan 01, 2970 at 05:00 UTC'
+            release_date: 'Jan 01, 2970 at 05:00 UTC',
         }, [
             createMockSubsectionJSON({
                 graded: true,
@@ -1141,13 +1141,13 @@ describe('CourseOutlinePage', function() {
                 is_practice_exam: false,
                 is_proctored_exam: false,
                 default_time_limit_minutes: 150,
-                hide_after_due: true
+                hide_after_due: true,
             }, [
                 createMockVerticalJSON({
                     has_changes: true,
-                    published: false
-                })
-            ])
+                    published: false,
+                }),
+            ]),
         ]);
 
         it('can be deleted', function() {
@@ -1170,11 +1170,11 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                 category: 'vertical',
                 display_name: 'Unit',
-                parent_locator: 'mock-subsection'
+                parent_locator: 'mock-subsection',
             });
             AjaxHelpers.respondWithJson(requests, {
                 locator: 'new-mock-unit',
-                courseKey: 'slashes:MockCourse'
+                courseKey: 'slashes:MockCourse',
             });
             expect(redirectSpy).toHaveBeenCalledWith('/container/new-mock-unit?action=new');
         });
@@ -1193,9 +1193,9 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.respondWithJson(requests,
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({
-                        display_name: updatedDisplayName
-                    })
-                ])
+                        display_name: updatedDisplayName,
+                    }),
+                ]),
             );
             // Find the display name again in the refreshed DOM and verify it
             displayNameWrapper = getItemHeaders('subsection').find('.wrapper-xblock-field');
@@ -1258,8 +1258,8 @@ describe('CourseOutlinePage', function() {
         it('can show correct editors for self_paced course', function() {
             var mockCourseJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
-                    createMockSubsectionJSON({}, [])
-                ])
+                    createMockSubsectionJSON({}, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseJSON, false);
             setSelfPaced();
@@ -1323,7 +1323,7 @@ describe('CourseOutlinePage', function() {
                     default_time_limit_minutes: 150,
                     hide_after_due: true,
                     is_onboarding_exam: false,
-                }
+                },
             });
             expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
             AjaxHelpers.respondWithJson(requests, {});
@@ -1333,16 +1333,16 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.expectNoRequests(requests);
 
             expect($('.outline-subsection .status-release-value')).toContainText(
-                'Jul 09, 2014 at 00:00 UTC'
+                'Jul 09, 2014 at 00:00 UTC',
             );
             expect($('.outline-subsection .status-grading-date')).toContainText(
-                'Due: Jul 10, 2014 at 00:00 UTC'
+                'Due: Jul 10, 2014 at 00:00 UTC',
             );
             expect($('.outline-subsection .status-grading-value')).toContainText(
-                'Lab'
+                'Lab',
             );
             expect($('.outline-subsection .status-message-copy')).toContainText(
-                'Contains staff only content'
+                'Contains staff only content',
             );
 
             expect($('.outline-item .outline-subsection .status-grading-value')).toContainText('Lab');
@@ -1400,7 +1400,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: true,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1410,10 +1410,10 @@ describe('CourseOutlinePage', function() {
                         is_proctored_exam: true,
                         default_time_limit_minutes: 150,
                         supports_onboarding: true,
-                        show_review_rules: true
+                        show_review_rules: true,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
 
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
@@ -1435,7 +1435,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: true,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1446,8 +1446,8 @@ describe('CourseOutlinePage', function() {
                         default_time_limit_minutes: 150,
                         supports_onboarding: true,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
 
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
@@ -1463,7 +1463,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: true,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1474,8 +1474,8 @@ describe('CourseOutlinePage', function() {
                         default_time_limit_minutes: 150,
                         supports_onboarding: false,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
 
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
@@ -1504,7 +1504,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: true,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1516,8 +1516,8 @@ describe('CourseOutlinePage', function() {
                         supports_onboarding: false,
                         show_review_rules: true,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1552,7 +1552,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: true,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1561,10 +1561,10 @@ describe('CourseOutlinePage', function() {
                         is_practice_exam: false,
                         is_proctored_exam: false,
                         default_time_limit_minutes: 150,
-                        hide_after_due: false
+                        hide_after_due: false,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1581,7 +1581,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: true,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1590,10 +1590,10 @@ describe('CourseOutlinePage', function() {
                         is_practice_exam: false,
                         is_proctored_exam: false,
                         default_time_limit_minutes: 10,
-                        hide_after_due: true
+                        hide_after_due: true,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1610,7 +1610,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: true,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1619,10 +1619,10 @@ describe('CourseOutlinePage', function() {
                         is_practice_exam: false,
                         is_proctored_exam: false,
                         default_time_limit_minutes: 10,
-                        hide_after_due: false
+                        hide_after_due: false,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1640,7 +1640,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: true,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1648,10 +1648,10 @@ describe('CourseOutlinePage', function() {
                         is_time_limited: true,
                         is_practice_exam: true,
                         is_proctored_exam: true,
-                        default_time_limit_minutes: 150
+                        default_time_limit_minutes: 150,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1668,7 +1668,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: true,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1676,10 +1676,10 @@ describe('CourseOutlinePage', function() {
                         is_time_limited: true,
                         is_practice_exam: false,
                         is_proctored_exam: true,
-                        default_time_limit_minutes: 150
+                        default_time_limit_minutes: 150,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1696,7 +1696,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: true,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1706,10 +1706,10 @@ describe('CourseOutlinePage', function() {
                         is_proctored_exam: true,
                         default_time_limit_minutes: 150,
                         supports_onboarding: true,
-                        is_onboarding_exam: true
+                        is_onboarding_exam: true,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1726,7 +1726,7 @@ describe('CourseOutlinePage', function() {
                 createMockSectionJSON({
                     has_changes: true,
                     enable_proctored_exams: false,
-                    enable_timed_exams: true
+                    enable_timed_exams: true,
 
                 }, [
                     createMockSubsectionJSON({
@@ -1735,10 +1735,10 @@ describe('CourseOutlinePage', function() {
                         is_practice_exam: false,
                         is_proctored_exam: false,
                         default_time_limit_minutes: 150,
-                        hide_after_due: true
+                        hide_after_due: true,
                     }, [
-                    ])
-                ])
+                    ]),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1761,9 +1761,9 @@ describe('CourseOutlinePage', function() {
             var mockCourseWithPrequisiteJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({
-                        is_prereq: true
-                    }, [])
-                ])
+                        is_prereq: true,
+                    }, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithPrequisiteJSON, false);
             getItemHeaders('subsection').find('.delete-button').click();
@@ -1777,9 +1777,9 @@ describe('CourseOutlinePage', function() {
             var mockCourseWithPrequisiteJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({
-                        is_prereq: true
-                    }, [])
-                ])
+                        is_prereq: true,
+                    }, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithPrequisiteJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1796,9 +1796,9 @@ describe('CourseOutlinePage', function() {
             var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({
-                        prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}]
-                    }, [])
-                ])
+                        prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}],
+                    }, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1809,9 +1809,9 @@ describe('CourseOutlinePage', function() {
             var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({
-                        prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}]
-                    }, [])
-                ])
+                        prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}],
+                    }, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1831,13 +1831,13 @@ describe('CourseOutlinePage', function() {
                         visibility_state: 'gated',
                         prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}],
                         prereq: 'usage_key',
-                        prereq_min_score: '80'
-                    }, [])
-                ])
+                        prereq_min_score: '80',
+                    }, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
             expect($('.outline-subsection .status-message-copy')).toContainText(
-                'Prerequisite: Prereq Subsection 1'
+                'Prerequisite: Prereq Subsection 1',
             );
         });
 
@@ -1848,9 +1848,9 @@ describe('CourseOutlinePage', function() {
                         prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}],
                         prereq: 'usage_key',
                         prereq_min_score: '80',
-                        prereq_min_completion: '50'
-                    }, [])
-                ])
+                        prereq_min_completion: '50',
+                    }, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1869,9 +1869,9 @@ describe('CourseOutlinePage', function() {
                         prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}],
                         prereq: 'usage_key',
                         prereq_min_score: '',
-                        prereq_min_completion: '50'
-                    }, [])
-                ])
+                        prereq_min_completion: '50',
+                    }, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1887,9 +1887,9 @@ describe('CourseOutlinePage', function() {
             var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({
-                        prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}]
-                    }, [])
-                ])
+                        prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}],
+                    }, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1934,9 +1934,9 @@ describe('CourseOutlinePage', function() {
             var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({
-                        prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}]
-                    }, [])
-                ])
+                        prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}],
+                    }, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1966,9 +1966,9 @@ describe('CourseOutlinePage', function() {
             var mockCourseWithPreqsJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({
-                        prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}]
-                    }, [])
-                ])
+                        prereqs: [{block_usage_key: 'usage_key', block_display_name: 'Prereq Subsection 1'}],
+                    }, []),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseWithPreqsJSON, false);
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -1997,16 +1997,16 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.respondWithJson(requests, mockServerValuesJson);
 
             expect($('.outline-subsection .status-release-value')).toContainText(
-                'Jul 09, 2014 at 00:00 UTC'
+                'Jul 09, 2014 at 00:00 UTC',
             );
             expect($('.outline-subsection .status-grading-date')).toContainText(
-                'Due: Jul 10, 2014 at 00:00 UTC'
+                'Due: Jul 10, 2014 at 00:00 UTC',
             );
             expect($('.outline-subsection .status-grading-value')).toContainText(
-                'Lab'
+                'Lab',
             );
             expect($('.outline-subsection .status-message-copy')).toContainText(
-                'Contains staff only content'
+                'Contains staff only content',
             );
 
             outlinePage.$('.outline-subsection .configure-button').click();
@@ -2029,15 +2029,15 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.respondWithJson(requests, {});
             // This is the response for the subsequent fetch operation.
             AjaxHelpers.respondWithJson(requests,
-                createMockSectionJSON({}, [createMockSubsectionJSON()])
+                createMockSectionJSON({}, [createMockSubsectionJSON()]),
             );
             expect($('.outline-subsection .status-release-value')).not.toContainText(
-                'Jul 09, 2014 at 00:00 UTC'
+                'Jul 09, 2014 at 00:00 UTC',
             );
             expect($('.outline-subsection .status-grading-date')).not.toExist();
             expect($('.outline-subsection .status-grading-value')).not.toExist();
             expect($('.outline-subsection .status-message-copy')).not.toContainText(
-                'Contains staff only content'
+                'Contains staff only content',
             );
         });
 
@@ -2053,8 +2053,8 @@ describe('CourseOutlinePage', function() {
                     it('show_correctness="' + showCorrectness + '"', function() {
                         var mockCourseJSONCorrectness = createMockCourseJSON({}, [
                             createMockSectionJSON({}, [
-                                createMockSubsectionJSON({show_correctness: showCorrectness}, [])
-                            ])
+                                createMockSubsectionJSON({show_correctness: showCorrectness}, []),
+                            ]),
                         ]);
                         createCourseOutlinePage(this, mockCourseJSONCorrectness, false);
                         outlinePage.$('.outline-subsection .configure-button').click();
@@ -2096,9 +2096,9 @@ describe('CourseOutlinePage', function() {
             return createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON(options, [
-                        createMockVerticalJSON()
-                    ])
-                ])
+                        createMockVerticalJSON(),
+                    ]),
+                ]),
             ]);
         });
 
@@ -2108,13 +2108,13 @@ describe('CourseOutlinePage', function() {
                         createMockSubsectionJSON({has_changes: true}, [
                             createMockVerticalJSON(),
                             createMockVerticalJSON({has_changes: true, display_name: 'Unit 100'}),
-                            createMockVerticalJSON({published: false, display_name: 'Unit 50'})
+                            createMockVerticalJSON({published: false, display_name: 'Unit 50'}),
                         ]),
                         createMockSubsectionJSON({has_changes: true}, [
-                            createMockVerticalJSON({has_changes: true})
+                            createMockVerticalJSON({has_changes: true}),
                         ]),
-                        createMockSubsectionJSON({}, [createMockVerticalJSON])
-                    ])
+                        createMockSubsectionJSON({}, [createMockVerticalJSON]),
+                    ]),
                 ]),
                 $modalWindow;
 
@@ -2123,7 +2123,7 @@ describe('CourseOutlinePage', function() {
             $modalWindow = $('.wrapper-modal-window');
             expect($modalWindow.find('.outline-unit').length).toBe(2);
             expect(_.compact(_.map($modalWindow.find('.outline-unit').text().split('\n'), $.trim))).toEqual(
-                ['Unit 100', 'Unit 50']
+                ['Unit 100', 'Unit 50'],
             );
             expect($modalWindow.find('.outline-subsection')).not.toExist();
         });
@@ -2132,8 +2132,8 @@ describe('CourseOutlinePage', function() {
             beforeEach(function() {
                 var mockCourseJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({}, [
-                        createMockSubsectionJSON({}, [])
-                    ])
+                        createMockSubsectionJSON({}, []),
+                    ]),
                 ]);
                 createCourseOutlinePage(this, mockCourseJSON, false);
                 setSelfPacedCustomPLS();
@@ -2150,7 +2150,7 @@ describe('CourseOutlinePage', function() {
             }
 
             mockCustomPacingServerValuesJson = createMockSectionJSON({
-                release_date: 'Jan 01, 2970 at 05:00 UTC'
+                release_date: 'Jan 01, 2970 at 05:00 UTC',
             }, [
                 createMockSubsectionJSON({
                     graded: true,
@@ -2167,9 +2167,9 @@ describe('CourseOutlinePage', function() {
                 }, [
                     createMockVerticalJSON({
                         has_changes: true,
-                        published: false
-                    })
-                ])
+                        published: false,
+                    }),
+                ]),
             ]);
 
             it('can show correct editors for self_paced course with custom pacing', function (){
@@ -2197,7 +2197,7 @@ describe('CourseOutlinePage', function() {
                         is_proctored_enabled: false,
                         default_time_limit_minutes: null,
                         is_onboarding_exam: false,
-                    }
+                    },
                 });
                 expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
                 AjaxHelpers.respondWithJson(requests, {});
@@ -2207,14 +2207,14 @@ describe('CourseOutlinePage', function() {
                 AjaxHelpers.expectNoRequests(requests);
 
                 expect($('.outline-subsection .status-custom-grading-date').text().trim()).toEqual(
-                    'Custom due date: 3 weeks from enrollment'
+                    'Custom due date: 3 weeks from enrollment',
                 );
 
                 expect($('.outline-subsection .status-grading-value')).toContainText(
-                    'Lab'
+                    'Lab',
                 );
                 expect($('.outline-subsection .status-message-copy')).toContainText(
-                    'Contains staff only content'
+                    'Contains staff only content',
                 );
 
                 expect($('.outline-item .outline-subsection .status-grading-value')).toContainText('Lab');
@@ -2280,14 +2280,14 @@ describe('CourseOutlinePage', function() {
                 AjaxHelpers.respondWithJson(requests, mockCustomPacingServerValuesJson);
 
                 expect($('.outline-subsection .status-custom-grading-date').text().trim()).toEqual(
-                    'Custom due date: 3 weeks from enrollment'
+                    'Custom due date: 3 weeks from enrollment',
                 );
 
                 expect($('.outline-subsection .status-grading-value')).toContainText(
-                    'Lab'
+                    'Lab',
                 );
                 expect($('.outline-subsection .status-message-copy')).toContainText(
-                    'Contains staff only content'
+                    'Contains staff only content',
                 );
 
                 outlinePage.$('.outline-subsection .configure-button').click();
@@ -2307,13 +2307,13 @@ describe('CourseOutlinePage', function() {
                 AjaxHelpers.respondWithJson(requests, {});
                 // This is the response for the subsequent fetch operation.
                 AjaxHelpers.respondWithJson(requests,
-                    createMockSectionJSON({}, [createMockSubsectionJSON()])
+                    createMockSectionJSON({}, [createMockSubsectionJSON()]),
                 );
 
                 expect($('.outline-subsection .status-custom-grading-date')).not.toExist();
                 expect($('.outline-subsection .status-grading-value')).not.toExist();
                 expect($('.outline-subsection .status-message-copy')).not.toContainText(
-                    'Contains staff only content'
+                    'Contains staff only content',
                 );
             });
         })
@@ -2326,9 +2326,9 @@ describe('CourseOutlinePage', function() {
             mockCourseJSON = createMockCourseJSON(courseOptions, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({}, [
-                        createMockVerticalJSON(options)
-                    ])
-                ])
+                        createMockVerticalJSON(options),
+                    ]),
+                ]),
             ]);
             createCourseOutlinePage(this, mockCourseJSON);
             expandItemsAndVerifyState('subsection');
@@ -2360,7 +2360,7 @@ describe('CourseOutlinePage', function() {
             var messages = getUnitStatus({has_partition_group_components: true});
             expect(messages.length).toBe(1);
             expect(messages).toContainText(
-                'Access to some content in this unit is restricted to specific groups of learners'
+                'Access to some content in this unit is restricted to specific groups of learners',
             );
         });
 
@@ -2374,17 +2374,17 @@ describe('CourseOutlinePage', function() {
                             deleted: false,
                             selected: true,
                             id: 2,
-                            name: 'Group 2'
+                            name: 'Group 2',
                         },
                         {
                             deleted: false,
                             selected: true,
                             id: 3,
-                            name: 'Group 3'
-                        }
+                            name: 'Group 3',
+                        },
                     ],
-                    name: 'Content Group Configuration'
-                }
+                    name: 'Content Group Configuration',
+                },
             ];
             var messages = getUnitStatus({
                 has_partition_group_components: true,
@@ -2393,12 +2393,12 @@ describe('CourseOutlinePage', function() {
                 user_partition_info: {
                     selected_partition_index: 1,
                     selected_groups_label: '1, 2',
-                    selectable_partitions: partitions
-                }
+                    selectable_partitions: partitions,
+                },
             });
             expect(messages.length).toBe(1);
             expect(messages).toContainText(
-                'Access to this unit is restricted to'
+                'Access to this unit is restricted to',
             );
         });
 
@@ -2409,7 +2409,7 @@ describe('CourseOutlinePage', function() {
 
         it('does not show partition group information if staff locked', function() {
             var messages = getUnitStatus(
-                {has_partition_group_components: true, staff_only_message: true}
+                {has_partition_group_components: true, staff_only_message: true},
             );
             expect(messages.length).toBe(1);
             expect(messages).toContainText('Contains staff only content');
@@ -2428,9 +2428,9 @@ describe('CourseOutlinePage', function() {
             return createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({}, [
-                        createMockVerticalJSON(options)
-                    ])
-                ])
+                        createMockVerticalJSON(options),
+                    ]),
+                ]),
             ]);
         });
     });

@@ -29,7 +29,7 @@ var edx = edx || {};
         var isCourseEnrollmentAllowed = function() {
             return $.ajax({
                 url: '/shoppingcart/verify_cart/',
-                type: 'GET'
+                type: 'GET',
             });
         };
 
@@ -45,7 +45,7 @@ var edx = edx || {};
                 this.$el = params.el;
                 _.bindAll(view,
                     'submit', 'responseFromServer',
-                    'submitPaymentForm', 'errorFromServer'
+                    'submitPaymentForm', 'errorFromServer',
                 );
                 return this;
             },
@@ -106,7 +106,7 @@ var edx = edx || {};
             */
             submitPaymentForm: function(form) {
                 form.submit();
-            }
+            },
         };
 
         view.initialize(params);
@@ -126,7 +126,7 @@ var edx = edx || {};
             }
             var $container = $('.confirm-enrollment.cart-view form');
             var view = new edx.shoppingcart.showcart.CartView({
-                el: $container
+                el: $container,
             }).submit(event);
         });
     });

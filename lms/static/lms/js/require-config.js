@@ -43,8 +43,8 @@
 
             window.$.ajaxSetup({
                 contents: {
-                    script: false
-                }
+                    script: false,
+                },
             });
         };
 
@@ -109,93 +109,93 @@
         shim: {
             'annotator_1.2.9': {
                 deps: ['jquery'],
-                exports: 'Annotator'
+                exports: 'Annotator',
             },
             'date': {
-                exports: 'Date'
+                exports: 'Date',
             },
             'jquery': {
-                exports: 'jQuery'
+                exports: 'jQuery',
             },
             'jquery-migrate': ['jquery'],
             'jquery.cookie': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.cookie'
+                exports: 'jQuery.fn.cookie',
             },
             'jquery.timeago': {
                 deps: ['jquery'],
-                exports: 'jQuery.timeago'
+                exports: 'jQuery.timeago',
             },
             'jquery.url': {
                 deps: ['jquery'],
-                exports: 'jQuery.url'
+                exports: 'jQuery.url',
             },
             'jquery.fileupload': {
                 deps: ['jquery.ui', 'jquery.iframe-transport'],
-                exports: 'jQuery.fn.fileupload'
+                exports: 'jQuery.fn.fileupload',
             },
             'jquery.tinymce': {
                 deps: ['jquery', 'tinymce'],
-                exports: 'jQuery.fn.tinymce'
+                exports: 'jQuery.fn.tinymce',
             },
             'backbone.paginator': {
                 deps: ['backbone'],
-                exports: 'Backbone.PageableCollection'
+                exports: 'Backbone.PageableCollection',
             },
             'backbone-super': {
-                deps: ['backbone']
+                deps: ['backbone'],
             },
             'bootstrap': {
-                deps: ['jquery']
+                deps: ['jquery'],
             },
             'string_utils': {
                 deps: ['underscore'],
-                exports: 'interpolate_text'
+                exports: 'interpolate_text',
             },
             // Needed by OVA
             'video.dev': {
-                exports: 'videojs'
+                exports: 'videojs',
             },
             'vjs.youtube': {
-                deps: ['video.dev']
+                deps: ['video.dev'],
             },
             'rangeslider': {
-                deps: ['video.dev']
+                deps: ['video.dev'],
             },
             'annotator': {
-                exports: 'Annotator'
+                exports: 'Annotator',
             },
             'annotator-harvardx': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'share-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'richText-annotator': {
-                deps: ['annotator', 'tinymce']
+                deps: ['annotator', 'tinymce'],
             },
             'reply-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'tags-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'diacritic-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'flagging-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'grouping-annotator': {
-                deps: ['annotator']
+                deps: ['annotator'],
             },
             'ova': {
                 exports: 'ova',
                 deps: [
                     'annotator', 'annotator-harvardx', 'video.dev', 'vjs.youtube', 'rangeslider', 'share-annotator',
                     'richText-annotator', 'reply-annotator', 'tags-annotator', 'flagging-annotator',
-                    'grouping-annotator', 'diacritic-annotator', 'jquery-Watch', 'catch', 'handlebars', 'URI'
-                ]
+                    'grouping-annotator', 'diacritic-annotator', 'jquery-Watch', 'catch', 'handlebars', 'URI',
+                ],
             },
             'osda': {
                 exports: 'osda',
@@ -203,29 +203,29 @@
                     'annotator', 'annotator-harvardx', 'video.dev', 'vjs.youtube', 'rangeslider', 'share-annotator',
                     'richText-annotator', 'reply-annotator', 'tags-annotator', 'flagging-annotator',
                     'grouping-annotator', 'diacritic-annotator', 'openseadragon', 'jquery-Watch', 'catch', 'handlebars',
-                    'URI'
-                ]
+                    'URI',
+                ],
             },
             'tinymce': {
-                exports: 'tinymce'
+                exports: 'tinymce',
             },
             // End of needed by OVA
             'moment': {
-                exports: 'moment'
+                exports: 'moment',
             },
             'moment-timezone': {
                 exports: 'moment',
-                deps: ['moment']
+                deps: ['moment'],
             },
             // Because Draggabilly is being used by video code, the namespaced version of
             // require is not being recognized. Therefore the library is being added to the
             // global namespace instead of being registered in require.
             'draggabilly': {
-                exports: 'Draggabilly'
+                exports: 'Draggabilly',
             },
             'hls': {
-                exports: 'Hls'
-            }
-        }
+                exports: 'Hls',
+            },
+        },
     });
 }).call(this, require || RequireJS.require, define || RequireJS.define);

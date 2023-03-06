@@ -29,6 +29,6 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers) {
     };
 
     return {
-        verifyAuthField: verifyAuthField
+        verifyAuthField: verifyAuthField,
     };
 });

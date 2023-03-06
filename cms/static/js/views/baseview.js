@@ -13,14 +13,14 @@ function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
 
     var BaseView = Backbone.View.extend({
         events: {
-            'click .ui-toggle-expansion': 'toggleExpandCollapse'
+            'click .ui-toggle-expansion': 'toggleExpandCollapse',
         },
 
         options: {
             // UX is moving towards using 'is-collapsed' in preference over 'collapsed',
             // but use the old scheme as the default so that existing code doesn't need
             // to be rewritten.
-            collapsedClass: 'collapsed'
+            collapsedClass: 'collapsed',
         },
 
         // override the constructor function
@@ -83,7 +83,7 @@ function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
              */
         loadTemplate: function(name) {
             return TemplateUtils.loadTemplate(name);
-        }
+        },
     });
 
     return BaseView;

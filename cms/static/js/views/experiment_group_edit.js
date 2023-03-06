@@ -3,7 +3,7 @@
  * It is expected to be backed by a Group model.
  */
 define([
-    'js/views/baseview', 'underscore', 'underscore.string', 'gettext', 'text!templates/group-edit.underscore'
+    'js/views/baseview', 'underscore', 'underscore.string', 'gettext', 'text!templates/group-edit.underscore',
 ],
 function(BaseView, _, str, gettext, groupEditTemplate) {
     'use strict';
@@ -13,7 +13,7 @@ function(BaseView, _, str, gettext, groupEditTemplate) {
             'click .action-close': 'removeGroup',
             'change .group-name': 'changeName',
             'focus .group-name': 'onFocus',
-            'blur .group-name': 'onBlur'
+            'blur .group-name': 'onBlur',
         },
 
         className: function() {
@@ -33,7 +33,7 @@ function(BaseView, _, str, gettext, groupEditTemplate) {
                 name: this.model.get('name'),
                 allocation: this.getAllocation(),
                 index: index,
-                error: this.model.validationError
+                error: this.model.validationError,
             }));
 
             return this;
@@ -42,7 +42,7 @@ function(BaseView, _, str, gettext, groupEditTemplate) {
         changeName: function(event) {
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set({
-                name: this.$('.group-name').val()
+                name: this.$('.group-name').val(),
             }, {silent: true});
 
             return this;
@@ -64,7 +64,7 @@ function(BaseView, _, str, gettext, groupEditTemplate) {
 
         onBlur: function() {
             this.$el.closest('.groups-fields').removeClass('is-focused');
-        }
+        },
     });
 
     return ExperimentGroupEditView;

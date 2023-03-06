@@ -3,7 +3,7 @@ define([
     'URI',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'edx-ui-toolkit/js/pagination/paging-collection',
-    'common/js/components/views/search_field'
+    'common/js/components/views/search_field',
 ], function(_, URI, AjaxHelpers, PagingCollection, SearchFieldView) {
     'use strict';
     describe('SearchFieldView', function() {
@@ -14,15 +14,15 @@ define([
             var results = _.map(_.range(size), function(i) { return {foo: i}; });
             var TestPagingCollection = PagingCollection.extend({
                 state: {
-                    pageSize: 5
-                }
+                    pageSize: 5,
+                },
             });
 
             var collection = new TestPagingCollection({
                 count: results.length,
                 num_pages: Math.ceil(results.length / perPage),
                 page: 1,
-                results: _.first(results, perPage)
+                results: _.first(results, perPage),
             }, {parse: true});
 
             collection.url = mockUrl;
@@ -34,9 +34,9 @@ define([
                 {
                     type: 'test',
                     collection: newCollection(5, 4),
-                    el: $('.test-search')
+                    el: $('.test-search'),
                 },
-                options || {}
+                options || {},
             );
             return new SearchFieldView(options);
         };
@@ -65,7 +65,7 @@ define([
 
         it('can display with an initial search string', function() {
             searchFieldView = createSearchFieldView({
-                searchString: 'foo'
+                searchString: 'foo',
             }).render();
             expect(searchFieldView.$('.search-field').val(), 'foo');
         });
@@ -78,14 +78,14 @@ define([
             assertQueryParams(requests[0], {
                 page: '1',
                 page_size: '5',
-                text_search: 'foo'
+                text_search: 'foo',
             });
 
             AjaxHelpers.respondWithJson(requests, {
                 count: 10,
                 page: 1,
                 num_pages: 1,
-                results: []
+                results: [],
             });
             expect(searchFieldView.$('.search-field').val(), 'foo');
         });
@@ -93,7 +93,7 @@ define([
         it('can clear the search', function() {
             var requests = AjaxHelpers.requests(this);
             searchFieldView = createSearchFieldView({
-                searchString: 'foo'
+                searchString: 'foo',
             }).render();
             searchFieldView.$('.action-clear').click();
             assertNotInQueryParams('text_search');
@@ -102,7 +102,7 @@ define([
                 count: 10,
                 page: 1,
                 num_pages: 1,
-                results: []
+                results: [],
             });
             expect(searchFieldView.$('.search-field').val(), '');
             expect(searchFieldView.$('.action-clear')).toHaveClass('is-hidden');

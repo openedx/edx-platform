@@ -12,7 +12,7 @@
                 return $local('.' + cls_identifier).html('<textarea></textarea>');
             });
             this.discussion = new Discussion([], {
-                pages: 1
+                pages: 1,
             });
         });
         checkVisibility = function(view, expectedVisible, expectedDisabled, render) {
@@ -39,17 +39,17 @@
                         entries: {
                             Topic: {
                                 is_divided: true,
-                                id: 'topic'
+                                id: 'topic',
                             },
                             General: {
                                 is_divided: true,
-                                id: 'general'
+                                id: 'general',
                             },
                             'Not Cohorted': {
                                 is_divided: false,
-                                id: 'not-cohorted'
-                            }
-                        }
+                                id: 'not-cohorted',
+                            },
+                        },
                     },
                     allow_anonymous: false,
                     allow_anonymous_to_peers: false,
@@ -57,19 +57,19 @@
                     groups: [
                         {
                             id: 1,
-                            name: 'Cohort1'
+                            name: 'Cohort1',
                         }, {
                             id: 2,
-                            name: 'Cohort2'
-                        }
-                    ]
+                            name: 'Cohort2',
+                        },
+                    ],
                 });
                 this.view = new NewPostView({
                     el: $('#fixture-element'),
                     collection: this.discussion,
                     course_settings: this.course_settings,
                     is_commententable_cohorted: true,
-                    mode: 'tab'
+                    mode: 'tab',
                 });
             });
             it('is not visible to students', function() {
@@ -140,7 +140,7 @@
                 this.course_settings = new DiscussionCourseSettings({
                     category_map: {
                         children: [],
-                        entries: {}
+                        entries: {},
                     },
                     allow_anonymous: false,
                     allow_anonymous_to_peers: false,
@@ -148,18 +148,18 @@
                     groups: [
                         {
                             id: 1,
-                            name: 'Cohort1'
+                            name: 'Cohort1',
                         }, {
                             id: 2,
-                            name: 'Cohort2'
-                        }
-                    ]
+                            name: 'Cohort2',
+                        },
+                    ],
                 });
                 this.view = new NewPostView({
                     el: $('#fixture-element'),
                     collection: this.discussion,
                     course_settings: this.course_settings,
-                    mode: 'tab'
+                    mode: 'tab',
                 });
             });
             it('disables the group menu if it is set false', function() {
@@ -192,29 +192,29 @@
                             'Week 1': {
                                 subcategories: {},
                                 children: [
-                                    ['Topic-Level Student-Visible Label', 'entry']
+                                    ['Topic-Level Student-Visible Label', 'entry'],
                                 ],
                                 entries: {
                                     'Topic-Level Student-Visible Label': {
                                         sort_key: null,
                                         is_divided: false,
-                                        id: '2b3a858d0c884eb4b272dbbe3f2ffddd'
-                                    }
-                                }
-                            }
+                                        id: '2b3a858d0c884eb4b272dbbe3f2ffddd',
+                                    },
+                                },
+                            },
                         },
                         children: [
                             ['General', 'entry'],
-                            ['Week 1', 'subcategory']
+                            ['Week 1', 'subcategory'],
                         ],
                         entries: {
                             General: {
                                 sort_key: 'General',
                                 is_divided: false,
-                                id: 'i4x-waqastest-waqastest-course-waqastest'
-                            }
-                        }
-                    }
+                                id: 'i4x-waqastest-waqastest-course-waqastest',
+                            },
+                        },
+                    },
                 });
             });
             checkPostCancelReset = function(mode, discussion, course_settings) {
@@ -223,7 +223,7 @@
                     el: $('#fixture-element'),
                     collection: discussion,
                     course_settings: course_settings,
-                    mode: mode
+                    mode: mode,
                 });
                 view.render();
                 eventSpy = jasmine.createSpy('eventSpy');
@@ -269,29 +269,29 @@
                             'Week 1': {
                                 subcategories: {},
                                 children: [
-                                    ['Topic-Level Student-Visible Label', 'entry']
+                                    ['Topic-Level Student-Visible Label', 'entry'],
                                 ],
                                 entries: {
                                     'Topic-Level Student-Visible Label': {
                                         sort_key: null,
                                         is_divided: false,
-                                        id: '2b3a858d0c884eb4b272dbbe3f2ffddd'
-                                    }
-                                }
-                            }
+                                        id: '2b3a858d0c884eb4b272dbbe3f2ffddd',
+                                    },
+                                },
+                            },
                         },
                         children: [
                             ['First topic', 'entry'],
-                            ['Week 1', 'subcategory']
+                            ['Week 1', 'subcategory'],
                         ],
                         entries: {
                             'First topic': {
                                 sort_key: 'First topic',
                                 is_divided: false,
-                                id: 'i4x-waqastest-waqastest-course-waqastest'
-                            }
-                        }
-                    }
+                                id: 'i4x-waqastest-waqastest-course-waqastest',
+                            },
+                        },
+                    },
                 });
             });
 
@@ -301,7 +301,7 @@
                     el: $('#fixture-element'),
                     collection: this.discussion,
                     course_settings: this.course_settings,
-                    mode: 'tab'
+                    mode: 'tab',
                 });
                 view.render();
                 eventSpy = jasmine.createSpy('eventSpy');
@@ -326,7 +326,7 @@
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('create_thread', topicId));
                 return {
                     always: function() {
-                    }
+                    },
                 };
             });
             view = new NewPostView({
@@ -334,10 +334,10 @@
                 collection: this.discussion,
                 course_settings: new DiscussionCourseSettings({
                     allow_anonymous: false,
-                    allow_anonymous_to_peers: false
+                    allow_anonymous_to_peers: false,
                 }),
                 mode: 'inline',
-                topicId: topicId
+                topicId: topicId,
             });
             view.render();
             view.$('.forum-new-post-form').submit();

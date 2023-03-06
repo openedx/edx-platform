@@ -6,14 +6,14 @@
         'moment',
         'edx-ui-toolkit/js/utils/html-utils',
         'support/js/models/manage_user',
-        'text!support/templates/manage_user.underscore'
+        'text!support/templates/manage_user.underscore',
     ], function(Backbone, _, moment, HtmlUtils, ManageUserModel, manageUserTemplate) {
         return Backbone.View.extend({
             manageUserTpl: HtmlUtils.template(manageUserTemplate),
 
             events: {
                 'submit .manage-user-form': 'search',
-                'click .disable-account-btn': 'disableAccount'
+                'click .disable-account-btn': 'disableAccount',
             },
             initialize: function(options) {
                 var user = options.user;
@@ -21,7 +21,7 @@
                 this.userSupportUrl = options.userSupportUrl;
                 this.user_profile = new ManageUserModel({
                     user: user,
-                    baseUrl: options.userDetailUrl
+                    baseUrl: options.userDetailUrl,
                 });
                 this.user_profile.on('change', _.bind(this.render, this));
             },
@@ -32,7 +32,7 @@
                     user_profile: this.user_profile,
                     formatDate: function(date) {
                         return date ? moment.utc(date).format('lll z') : 'N/A';
-                    }
+                    },
                 }));
 
                 this.checkInitialSearch();
@@ -68,15 +68,15 @@
                         this.user_profile.set('response', '');
                         this.user_profile.set(
                             'date_joined',
-                            moment(this.user_profile.get('date_joined')).format('YYYY-MM-DD')
+                            moment(this.user_profile.get('date_joined')).format('YYYY-MM-DD'),
                         );
                         this.render();
-                    }, this)
+                    }, this),
                 });
             },
             disableAccount: function() {
                 this.user_profile.disableAccount();
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

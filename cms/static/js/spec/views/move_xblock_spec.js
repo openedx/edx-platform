@@ -31,21 +31,21 @@ describe('MoveXBlock', function() {
         course: 'section',
         section: 'subsection',
         subsection: 'unit',
-        unit: 'component'
+        unit: 'component',
     };
 
     categoryMap = {
         section: 'chapter',
         subsection: 'sequential',
         unit: 'vertical',
-        component: 'component'
+        component: 'component',
     };
 
     courseOutlineOptions = {
         section: 2,
         subsection: 2,
         unit: 2,
-        component: 2
+        component: 2,
     };
 
     xblockAncestorInfo = {
@@ -53,30 +53,30 @@ describe('MoveXBlock', function() {
             {
                 category: 'vertical',
                 display_name: 'unit_display_name_0',
-                id: 'unit_ID_0'
+                id: 'unit_ID_0',
             },
             {
                 category: 'sequential',
                 display_name: 'subsection_display_name_0',
-                id: 'subsection_ID_0'
+                id: 'subsection_ID_0',
             },
             {
                 category: 'chapter',
                 display_name: 'section_display_name_0',
-                id: 'section_ID_0'
+                id: 'section_ID_0',
             },
             {
                 category: 'course',
                 display_name: 'Demo Course',
-                id: 'COURSE_ID_101'
-            }
-        ]
+                id: 'COURSE_ID_101',
+            },
+        ],
     };
 
     sourceParentXBlockInfo = new XBlockInfo({
         id: sourceParentLocator,
         display_name: 'unit_display_name_0',
-        category: 'vertical'
+        category: 'vertical',
     });
 
     createContainerPage = function() {
@@ -84,7 +84,7 @@ describe('MoveXBlock', function() {
             model: sourceParentXBlockInfo,
             templates: EditHelpers.mockComponentTemplates,
             el: $('#content'),
-            isUnitPage: true
+            isUnitPage: true,
         });
     };
 
@@ -94,7 +94,7 @@ describe('MoveXBlock', function() {
         TemplateHelpers.installTemplates([
             'basic-modal',
             'modal-button',
-            'move-xblock-modal'
+            'move-xblock-modal',
         ]);
         appendSetFixtures(mockContainerPage);
 
@@ -104,7 +104,7 @@ describe('MoveXBlock', function() {
             url_name: "course_name",
             org: "course_org",
             num: "course_num",
-            revision: "course_rev"
+            revision: "course_rev",
         });
 
         createContainerPage();
@@ -124,10 +124,10 @@ describe('MoveXBlock', function() {
             sourceXBlockInfo: new XBlockInfo({
                 id: sourceLocator,
                 display_name: sourceDisplayName,
-                category: 'component'
+                category: 'component',
             }),
             sourceParentXBlockInfo: sourceParentXBlockInfo,
-            XBlockUrlRoot: '/xblock'
+            XBlockUrlRoot: '/xblock',
         });
         modal.show();
     };
@@ -144,7 +144,7 @@ describe('MoveXBlock', function() {
         var childInfo = {
             category: categoryMap[category],
             display_name: category + '_display_name_' + xblockIndex,
-            id: category + '_ID_' + xblockIndex
+            id: category + '_ID_' + xblockIndex,
         };
         return createXBlockInfo(parentChildMap[category], outlineOptions, childInfo);
     };
@@ -161,7 +161,7 @@ describe('MoveXBlock', function() {
         var childInfo = {
                 category: categoryMap[category],
                 display_name: category,
-                children: []
+                children: [],
             },
             xblocks;
 
@@ -173,7 +173,7 @@ describe('MoveXBlock', function() {
         outline.child_info = childInfo; // eslint-disable-line no-param-reassign
         _.each(_.range(xblocks), function(xblockIndex) {
             childInfo.children.push(
-                createChildXBlockInfo(category, outlineOptions, xblockIndex)
+                createChildXBlockInfo(category, outlineOptions, xblockIndex),
             );
         });
         return outline;
@@ -189,7 +189,7 @@ describe('MoveXBlock', function() {
         var courseXBlockInfo = {
             category: 'course',
             display_name: 'Demo Course',
-            id: 'COURSE_ID_101'
+            id: 'COURSE_ID_101',
         };
         return createXBlockInfo('section', outlineOptions, courseXBlockInfo);
     };
@@ -217,12 +217,12 @@ describe('MoveXBlock', function() {
             currentLocationText: viewEl.find('.current-location').text().trim(),
             xblockCount: viewEl.find('.xblock-item').length,
             xblockDisplayNames: viewEl.find('.xblock-item .xblock-displayname').map(
-                function() { return $(this).text().trim(); }
+                function() { return $(this).text().trim(); },
             ).get(),
             forwardButtonSRTexts: viewEl.find('.xblock-item .forward-sr-text').map(
-                function() { return $(this).text().trim(); }
+                function() { return $(this).text().trim(); },
             ).get(),
-            forwardButtonCount: viewEl.find('.fa-arrow-right.forward-sr-icon').length
+            forwardButtonCount: viewEl.find('.fa-arrow-right.forward-sr-icon').length,
         };
     };
 
@@ -240,7 +240,7 @@ describe('MoveXBlock', function() {
         expect(displayedInfo.xblockDisplayNames).toEqual(
             _.map(_.range(expectedXBlocksCount), function(xblockIndex) {
                 return category + '_display_name_' + xblockIndex;
-            })
+            }),
         );
         if (category === 'component') {
             if (hasCurrentLocation) {
@@ -253,7 +253,7 @@ describe('MoveXBlock', function() {
             expect(displayedInfo.forwardButtonSRTexts).toEqual(
                 _.map(_.range(expectedXBlocksCount), function() {
                     return 'View child items';
-                })
+                }),
             );
             expect(displayedInfo.forwardButtonCount).toEqual(expectedXBlocksCount);
         }
@@ -267,7 +267,7 @@ describe('MoveXBlock', function() {
      */
     verifyBreadcrumbViewInfo = function(category, xblockIndex) {
         var displayedBreadcrumbs = modal.moveXBlockBreadcrumbView.$el.find('.breadcrumbs .bc-container').map(
-                function() { return $(this).text().trim(); }
+                function() { return $(this).text().trim(); },
             ).get(),
             categories = _.keys(parentChildMap).concat(['component']),
             visitedCategories = categories.slice(0, _.indexOf(categories, category));
@@ -276,7 +276,7 @@ describe('MoveXBlock', function() {
             _.map(visitedCategories, function(visitedCategory) {
                 return visitedCategory === 'course' ?
                     'Course Outline' : visitedCategory + '_display_name_' + xblockIndex;
-            })
+            }),
         );
     };
 
@@ -370,7 +370,7 @@ describe('MoveXBlock', function() {
         AjaxHelpers.respondWithJson(requests, {
             move_source_locator: sourceLocator,
             parent_locator: sourceParentLocator,
-            target_index: sourceIndex
+            target_index: sourceIndex,
         });
         ViewHelpers.verifyNotificationHidden(notificationSpy);
     };
@@ -397,12 +397,12 @@ describe('MoveXBlock', function() {
 
         responseData = expectedData = {
             move_source_locator: xblockLocator,
-            parent_locator: modal.targetParentXBlockInfo.id
+            parent_locator: modal.targetParentXBlockInfo.id,
         };
 
         if (targetIndex !== undefined) {
             expectedData = _.extend(expectedData, {
-                targetIndex: targetIndex
+                targetIndex: targetIndex,
             });
         }
 
@@ -411,7 +411,7 @@ describe('MoveXBlock', function() {
 
         // send the response
         AjaxHelpers.respondWithJson(requests, _.extend(responseData, {
-            source_index: sourceIndex
+            source_index: sourceIndex,
         }));
     };
 
@@ -446,8 +446,8 @@ describe('MoveXBlock', function() {
             .trim())
             .toEqual(StringUtils.interpolate('Success! "{displayName}" has been moved.',
                 {
-                    displayName: displayName
-                })
+                    displayName: displayName,
+                }),
             );
     };
 
@@ -461,9 +461,9 @@ describe('MoveXBlock', function() {
             StringUtils.interpolate(
                 'Move cancelled. "{sourceDisplayName}" has been moved back to its original location.',
                 {
-                    sourceDisplayName: displayName
-                }
-            )
+                    sourceDisplayName: displayName,
+                },
+            ),
         );
     };
 
@@ -532,23 +532,23 @@ describe('MoveXBlock', function() {
         var outlinesInfo = [
             {
                 outline: createCourseOutline({}),
-                message: 'This course has no sections'
+                message: 'This course has no sections',
             },
             {
                 outline: createCourseOutline({section: 1}),
                 message: 'This section has no subsections',
-                forwardClicks: 1
+                forwardClicks: 1,
             },
             {
                 outline: createCourseOutline({section: 1, subsection: 1}),
                 message: 'This subsection has no units',
-                forwardClicks: 2
+                forwardClicks: 2,
             },
             {
                 outline: createCourseOutline({section: 1, subsection: 1, unit: 1}),
                 message: 'This unit has no components',
-                forwardClicks: 3
-            }
+                forwardClicks: 3,
+            },
         ];
 
         _.each(outlinesInfo, function(info) {
@@ -596,7 +596,7 @@ describe('MoveXBlock', function() {
                     category: 'library_content',
                     display_name: 'Library Content',
                     has_children: true,
-                    id: 'LIBRARY_CONTENT_ID'
+                    id: 'LIBRARY_CONTENT_ID',
                 },
                 outlineOptions = {library_content: 1, component: 1};
 
@@ -617,7 +617,7 @@ describe('MoveXBlock', function() {
                     category: 'split_test',
                     display_name: 'Content Experiment',
                     has_children: true,
-                    id: 'SPLIT_TEST_ID'
+                    id: 'SPLIT_TEST_ID',
                 },
                 outlineOptions = {split_test: 1, unit: 2, component: 1};
 
@@ -644,7 +644,7 @@ describe('MoveXBlock', function() {
                     category: 'split_test',
                     display_name: 'Content Experiment',
                     has_children: true,
-                    id: 'SPLIT_TEST_ID'
+                    id: 'SPLIT_TEST_ID',
                 },
                 outlineOptions = {split_test: 1, unit: 2, component: 1};
 
@@ -665,7 +665,7 @@ describe('MoveXBlock', function() {
                 category: 'vertical',
                 display_name: 'Parentable Component',
                 has_children: true,
-                id: 'PARENTABLE_ID'
+                id: 'PARENTABLE_ID',
             };
             renderViews(parentableXBlockInfo);
 
@@ -679,7 +679,7 @@ describe('MoveXBlock', function() {
                 category: 'conditional',
                 display_name: 'Parentable Component',
                 has_children: true,
-                id: 'PARENTABLE_ID'
+                id: 'PARENTABLE_ID',
             });
             // navigate and verify move button is enabled
             renderViews(courseOutline);
@@ -696,7 +696,7 @@ describe('MoveXBlock', function() {
                 category: 'html',
                 display_name: 'Non Parentable Component',
                 has_children: false,
-                id: 'NON_PARENTABLE_ID'
+                id: 'NON_PARENTABLE_ID',
             };
             renderViews(nonParentableXBlockInfo);
 
@@ -732,7 +732,7 @@ describe('MoveXBlock', function() {
             AjaxHelpers.respondWithJson(requests, {
                 move_source_locator: sourceLocator,
                 parent_locator: sourceParentLocator,
-                target_index: sourceIndex
+                target_index: sourceIndex,
             });
             verifyUndoConfirmationFeedbackTitleText(sourceDisplayName);
         });

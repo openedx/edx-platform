@@ -15,7 +15,7 @@
             }
 
             _.bindAll(
-                this, 'showMainVideoHandler', 'destroy', 'skipByDuration', 'destroyAndResolve'
+                this, 'showMainVideoHandler', 'destroy', 'skipByDuration', 'destroyAndResolve',
             );
             this.dfd = $.Deferred();
             this.element = state.el;
@@ -96,14 +96,14 @@
                 this.element.off(events, this.showMainVideoHandler);
                 this.element.off({
                     timeupdate: this.skipByDuration,
-                    initialize: this.destroyAndResolve
+                    initialize: this.destroyAndResolve,
                 });
                 this.element.removeClass('is-bumper');
                 if (_.isFunction(this.state.videoPlayer.destroy)) {
                     this.state.videoPlayer.destroy();
                 }
                 delete this.state.videoBumper;
-            }
+            },
         };
 
         return VideoBumper;

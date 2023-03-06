@@ -6,7 +6,7 @@ define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification',
             createNotification = function(modelVals) {
                 var notificationModel = new NotificationModel(modelVals);
                 notificationView = new NotificationView({
-                    model: notificationModel
+                    model: notificationModel,
                 });
                 notificationView.render();
                 return notificationView;

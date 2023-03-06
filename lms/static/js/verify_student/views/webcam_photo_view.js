@@ -4,7 +4,7 @@
  */
 var edx = edx || {},
     key = {
-        enter: 13
+        enter: 13,
     };
 
 (function($, _, Backbone, gettext) {
@@ -37,10 +37,10 @@ var edx = edx || {},
                                 // Specify the `fake` constraint if we detect we are running in a test
                                 // environment. In Chrome, this will do nothing, but in Firefox, it will
                                 // instruct the browser to use a fake video device.
-                                fake: window.location.hostname === 'localhost'
+                                fake: window.location.hostname === 'localhost',
                             },
                             _.bind(this.getUserMediaCallback, this),
-                            _.bind(this.handleVideoFailure, this)
+                            _.bind(this.handleVideoFailure, this),
                         );
                     }
                 },
@@ -106,9 +106,9 @@ var edx = edx || {},
                     this.trigger(
                         'error',
                         gettext('Video Capture Error'),
-                        gettext('Please verify that your webcam is connected and that you have allowed your browser to access it.')
+                        gettext('Please verify that your webcam is connected and that you have allowed your browser to access it.'),
                     );
-                }
+                },
             },
 
             flash: {
@@ -186,7 +186,7 @@ var edx = edx || {},
                             'error',
                             gettext('No Webcam Detected'),
                             gettext("You don't seem to have a webcam connected.") + '  ' +
-                            gettext('Double-check that your webcam is connected and working to continue.')
+                            gettext('Double-check that your webcam is connected and working to continue.'),
                         );
                     }
 
@@ -198,8 +198,8 @@ var edx = edx || {},
 
                     // Otherwise, the flash player says it has a camera,
                     // so we don't need to keep checking.
-                }
-            }
+                },
+            },
         },
 
         initialize: function(obj) {
@@ -213,7 +213,7 @@ var edx = edx || {},
             this.backend.initialize({
                 wrapper: '#camera',
                 video: '#photo_id_video',
-                canvas: '#photo_id_canvas'
+                canvas: '#photo_id_canvas',
             });
 
             this.listenTo(this.backend, 'error', this.handleError);
@@ -234,7 +234,7 @@ var edx = edx || {},
 
             // Load the template for the webcam into the DOM
             renderedHtml = edx.HtmlUtils.template($(this.template).html())(
-                {backendName: this.backend.name}
+                {backendName: this.backend.name},
             );
             edx.HtmlUtils.setHtml($(this.el), renderedHtml);
 
@@ -315,7 +315,7 @@ var edx = edx || {},
                 this.errorModel.set({
                     errorTitle: errorTitle,
                     errorMsg: errorMsg,
-                    shown: true
+                    shown: true,
                 });
             }
         },
@@ -340,7 +340,7 @@ var edx = edx || {},
         isMobileDevice: function() {
             // Check whether user is using mobile device or not
             return (!!navigator.userAgent.match(/(Android|iPad|iPhone|iPod)/g));
-        }
+        },
     });
 
     /**
@@ -376,7 +376,7 @@ var edx = edx || {},
             view.backend.trigger(
                 'error',
                 gettext('No Flash Detected'),
-                gettext("You don't seem to have Flash installed. Get Flash to continue your verification.")
+                gettext("You don't seem to have Flash installed. Get Flash to continue your verification."),
             );
             return view;
         }

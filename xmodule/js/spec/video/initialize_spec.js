@@ -19,7 +19,7 @@
                         state.config.transcriptLanguages = {
                             de: 'German',
                             en: 'English',
-                            uk: 'Ukrainian'
+                            uk: 'Ukrainian',
                         };
                     });
 
@@ -48,7 +48,7 @@
                         state.lang = 'zh';
                         state.config.transcriptLanguages = {
                             de: 'German',
-                            uk: 'Ukrainian'
+                            uk: 'Ukrainian',
                         };
                         expected = Initialize.prototype.getCurrentLanguage.call(state);
                         expect(expected).toBe('uk');
@@ -70,18 +70,18 @@
                             speed: '1.50',
                             metadata: {
                                 testId: {
-                                    duration: 'PT6M40S'
+                                    duration: 'PT6M40S',
                                 },
                                 videoId: {
-                                    duration: 'PT1M40S'
-                                }
+                                    duration: 'PT1M40S',
+                                },
                             },
                             videos: {
                                 '1.0': 'testId',
-                                '1.50': 'videoId'
+                                '1.50': 'videoId',
                             },
                             youtubeId: Initialize.prototype.youtubeId,
-                            isFlashMode: jasmine.createSpy().and.returnValue(false)
+                            isFlashMode: jasmine.createSpy().and.returnValue(false),
                         };
                     });
 
@@ -123,9 +123,9 @@
                             videos: {
                                 '0.50': '7tqY6eQzVhE',
                                 '1.0': 'cogebirgzzM',
-                                '1.50': 'abcdefghijkl'
+                                '1.50': 'abcdefghijkl',
                             },
-                            isFlashMode: jasmine.createSpy().and.returnValue(false)
+                            isFlashMode: jasmine.createSpy().and.returnValue(false),
                         };
                     });
 
@@ -133,7 +133,7 @@
                         it('return the video id for given speed', function() {
                             $.each(state.videos, function(speed, videoId) {
                                 var expected = Initialize.prototype.youtubeId.call(
-                                    state, speed
+                                    state, speed,
                                 );
 
                                 expect(videoId).toBe(expected);
@@ -174,14 +174,14 @@
                         beforeEach(function() {
                             state = {
                                 speeds: ['0.25', '0.50', '1.0', '1.50', '2.0'],
-                                storage: jasmine.createSpyObj('storage', ['setItem'])
+                                storage: jasmine.createSpyObj('storage', ['setItem']),
                             };
                         });
 
                         it('check mapping', function() {
                             var map = {
                                 0.75: '0.50',
-                                1.25: '1.50'
+                                1.25: '1.50',
                             };
 
                             $.each(map, function(key, expected) {
@@ -195,7 +195,7 @@
                         beforeEach(function() {
                             state = {
                                 speeds: ['0.75', '1.0', '1.25', '1.50', '2.0'],
-                                storage: jasmine.createSpyObj('storage', ['setItem'])
+                                storage: jasmine.createSpyObj('storage', ['setItem']),
                             };
                         });
 
@@ -233,7 +233,7 @@
                         it('check mapping', function() {
                             var map = {
                                 0.25: '0.75',
-                                '0.50': '0.75'
+                                '0.50': '0.75',
                             };
 
                             $.each(map, function(key, expected) {
@@ -247,7 +247,7 @@
                 describe('setPlayerMode', function() {
                     beforeEach(function() {
                         state = {
-                            currentPlayerMode: 'flash'
+                            currentPlayerMode: 'flash',
                         };
                     });
 
@@ -271,7 +271,7 @@
                 describe('getPlayerMode', function() {
                     beforeEach(function() {
                         state = {
-                            currentPlayerMode: 'flash'
+                            currentPlayerMode: 'flash',
                         };
                     });
 
@@ -286,7 +286,7 @@
                 describe('isFlashMode', function() {
                     it('returns `true` if player in `flash` mode', function() {
                         var testState = {
-                                getPlayerMode: jasmine.createSpy().and.returnValue('flash')
+                                getPlayerMode: jasmine.createSpy().and.returnValue('flash'),
                             },
                             isFlashMode = Initialize.prototype.isFlashMode,
                             actual = isFlashMode.call(testState);
@@ -296,7 +296,7 @@
 
                     it('returns `false` if player is not in `flash` mode', function() {
                         var testState = {
-                                getPlayerMode: jasmine.createSpy().and.returnValue('html5')
+                                getPlayerMode: jasmine.createSpy().and.returnValue('html5'),
                             },
                             isFlashMode = Initialize.prototype.isFlashMode,
                             actual = isFlashMode.call(testState);
@@ -308,7 +308,7 @@
                 describe('isHtml5Mode', function() {
                     it('returns `true` if player in `html5` mode', function() {
                         var testState = {
-                                getPlayerMode: jasmine.createSpy().and.returnValue('html5')
+                                getPlayerMode: jasmine.createSpy().and.returnValue('html5'),
                             },
                             isHtml5Mode = Initialize.prototype.isHtml5Mode,
                             actual = isHtml5Mode.call(testState);
@@ -318,7 +318,7 @@
 
                     it('returns `false` if player is not in `html5` mode', function() {
                         var testState = {
-                                getPlayerMode: jasmine.createSpy().and.returnValue('flash')
+                                getPlayerMode: jasmine.createSpy().and.returnValue('flash'),
                             },
                             isHtml5Mode = Initialize.prototype.isHtml5Mode,
                             actual = isHtml5Mode.call(testState);

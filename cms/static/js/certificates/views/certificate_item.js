@@ -5,13 +5,13 @@ define([
     'gettext',
     'js/views/list_item',
     'js/certificates/views/certificate_details',
-    'js/certificates/views/certificate_editor'
+    'js/certificates/views/certificate_editor',
 ],
 function(gettext, ListItemView, CertificateDetailsView, CertificateEditorView) {
     'use strict';
     var CertificateItemView = ListItemView.extend({
         events: {
-            'click .delete': 'deleteItem'
+            'click .delete': 'deleteItem',
         },
         tagName: 'section',
         baseClassName: 'certificate',
@@ -24,7 +24,7 @@ function(gettext, ListItemView, CertificateDetailsView, CertificateEditorView) {
             // Retrieves the defined attribute set
             return {
                 id: this.model.get('id'),
-                tabindex: -1
+                tabindex: -1,
             };
         },
 
@@ -36,7 +36,7 @@ function(gettext, ListItemView, CertificateDetailsView, CertificateEditorView) {
         createDetailsView: function() {
             // Renders the details view for this model
             return new CertificateDetailsView({model: this.model});
-        }
+        },
     });
     return CertificateItemView;
 });

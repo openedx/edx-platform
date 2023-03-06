@@ -8,7 +8,7 @@ define([
     'gettext',
     'cms/js/main',
     'js/certificates/models/signatory',
-    'js/certificates/collections/signatories'
+    'js/certificates/collections/signatories',
 ],
 function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeSrcMain,
     SignatoryModel, SignatoryCollection) {
@@ -25,7 +25,7 @@ function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeS
 
             // Internal-use only, not displayed in web forms
             version: 1,
-            is_active: false
+            is_active: false,
         },
 
         // Certificate child collection/model mappings (backbone-relational)
@@ -36,8 +36,8 @@ function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeS
             collectionType: SignatoryCollection,
             reverseRelation: {
                 key: 'certificate',
-                includeInJSON: 'id'
-            }
+                includeInJSON: 'id',
+            },
         }],
 
         initialize: function(attributes, options) {
@@ -75,7 +75,7 @@ function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeS
             if (!attrs.name.trim()) {
                 return {
                     message: gettext('Certificate name is required.'),
-                    attributes: {name: true}
+                    attributes: {name: true},
                 };
             }
             var allSignatoriesValid = _.every(attrs.signatories.models, function(signatory) {
@@ -84,7 +84,7 @@ function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeS
             if (!allSignatoriesValid) {
                 return {
                     message: gettext('Signatory field(s) has invalid data.'),
-                    attributes: {signatories: attrs.signatories.models}
+                    attributes: {signatories: attrs.signatories.models},
                 };
             }
         },
@@ -92,7 +92,7 @@ function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeS
         reset: function() {
             // Revert the attributes of this model instance back to initial state
             this.set(this._originalAttributes, {parse: true, validate: true});
-        }
+        },
     });
     return Certificate;
 });

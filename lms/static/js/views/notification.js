@@ -1,7 +1,7 @@
 (function(Backbone, $, _) {
     var NotificationView = Backbone.View.extend({
         events: {
-            'click .action-primary': 'triggerCallback'
+            'click .action-primary': 'triggerCallback',
         },
 
         initialize: function() {
@@ -16,7 +16,7 @@
                 details: this.model.get('details'),
                 actionText: this.model.get('actionText'),
                 actionClass: this.model.get('actionClass'),
-                actionIconClass: this.model.get('actionIconClass')
+                actionIconClass: this.model.get('actionIconClass'),
             }));
             this.$('.message').focus();
             return this;
@@ -28,7 +28,7 @@
             if (actionCallback) {
                 actionCallback(this);
             }
-        }
+        },
     });
 
     this.NotificationView = NotificationView;

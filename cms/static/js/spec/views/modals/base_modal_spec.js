@@ -6,12 +6,12 @@ define(['jquery', 'underscore', 'js/views/modals/base_modal', 'js/spec_helpers/m
             MockModal = BaseModal.extend({
                 getContentHtml: function() {
                     return readFixtures('mock/mock-modal.underscore');
-                }
+                },
             });
 
             showMockModal = function() {
                 modal = new MockModal({
-                    title: 'Mock Modal'
+                    title: 'Mock Modal',
                 });
                 modal.show();
             };
@@ -59,7 +59,7 @@ define(['jquery', 'underscore', 'js/views/modals/base_modal', 'js/spec_helpers/m
                     showMockModal();
                     nestedModal = new MockModal({
                         title: 'Nested Modal',
-                        parent: modal
+                        parent: modal,
                     });
                     nestedModal.show();
                 };

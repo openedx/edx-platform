@@ -4,7 +4,7 @@
         'jquery',
         'underscore',
         'common/js/spec_helpers/template_helpers',
-        'js/student_account/views/InstitutionLoginView'
+        'js/student_account/views/InstitutionLoginView',
     ],
     function($, _, TemplateHelpers, InstitutionLoginView) {
         describe('edx.student.account.InstitutionLoginView', function() {
@@ -19,16 +19,16 @@
                             name: 'Google',
                             iconClass: 'fa-google-plus',
                             loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
-                            registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
+                            registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register',
                         },
                         {
                             id: 'oa2-facebook',
                             name: 'Facebook',
                             iconClass: 'fa-facebook',
                             loginUrl: '/auth/login/facebook/?auth_entry=account_login',
-                            registerUrl: '/auth/login/facebook/?auth_entry=account_register'
-                        }
-                    ]
+                            registerUrl: '/auth/login/facebook/?auth_entry=account_register',
+                        },
+                    ],
                 };
 
             var createInstLoginView = function(mode) {
@@ -36,7 +36,7 @@
                 view = new InstitutionLoginView({
                     mode: mode,
                     thirdPartyAuth: THIRD_PARTY_AUTH,
-                    platformName: PLATFORM_NAME
+                    platformName: PLATFORM_NAME,
                 });
                 view.render();
             };
@@ -55,12 +55,12 @@
                 $google = $('li a:contains("Google")');
                 expect($google).toBeVisible();
                 expect($google).toHaveAttr(
-                    'href', '/auth/login/google-oauth2/?auth_entry=account_login'
+                    'href', '/auth/login/google-oauth2/?auth_entry=account_login',
                 );
                 $facebook = $('li a:contains("Facebook")');
                 expect($facebook).toBeVisible();
                 expect($facebook).toHaveAttr(
-                    'href', '/auth/login/facebook/?auth_entry=account_login'
+                    'href', '/auth/login/facebook/?auth_entry=account_login',
                 );
             });
 
@@ -72,12 +72,12 @@
                 $google = $('li a:contains("Google")');
                 expect($google).toBeVisible();
                 expect($google).toHaveAttr(
-                    'href', '/auth/login/google-oauth2/?auth_entry=account_register'
+                    'href', '/auth/login/google-oauth2/?auth_entry=account_register',
                 );
                 $facebook = $('li a:contains("Facebook")');
                 expect($facebook).toBeVisible();
                 expect($facebook).toHaveAttr(
-                    'href', '/auth/login/facebook/?auth_entry=account_register'
+                    'href', '/auth/login/facebook/?auth_entry=account_register',
                 );
             });
         });

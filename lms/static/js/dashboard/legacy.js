@@ -62,9 +62,9 @@ var edx = edx || {};
                 return {
                     category: 'linkedin',
                     label: $el.data('course-id'),
-                    mode: $el.data('certificate-mode')
+                    mode: $el.data('certificate-mode'),
                 };
-            }
+            },
         );
 
 
@@ -119,7 +119,7 @@ var edx = edx || {};
         $('#failed-verification-button-dismiss').click(function() {
             $.ajax({
                 url: urls.verifyToggleBannerFailedOff,
-                type: 'post'
+                type: 'post',
             });
             $('#failed-verification-banner').addClass('is-hidden');
         });
@@ -149,7 +149,7 @@ var edx = edx || {};
             var request = $.ajax({
                 url: courseRefundUrl,
                 method: 'GET',
-                dataType: 'json'
+                dataType: 'json',
             });
             request.success(function(data, textStatus, xhr) {
                 if (xhr.status === 200) {
@@ -165,19 +165,19 @@ var edx = edx || {};
                             courseNumber: edx.HtmlUtils.joinHtml(
                                 edx.HtmlUtils.HTML('<span id="unenroll_course_number">'),
                                 courseNumber,
-                                edx.HtmlUtils.HTML('</span>')
+                                edx.HtmlUtils.HTML('</span>'),
                             ),
                             courseName: edx.HtmlUtils.joinHtml(
                                 edx.HtmlUtils.HTML('<span id="unenroll_course_name">'),
                                 courseName,
-                                edx.HtmlUtils.HTML('</span>')
+                                edx.HtmlUtils.HTML('</span>'),
                             ),
                             certNameLong: edx.HtmlUtils.joinHtml(
                                 edx.HtmlUtils.HTML('<span id="unenroll_cert_name">'),
                                 certNameLong,
-                                edx.HtmlUtils.HTML('</span>')
-                            )
-                        }, true)
+                                edx.HtmlUtils.HTML('</span>'),
+                            ),
+                        }, true),
                     );
 
 
@@ -189,7 +189,7 @@ var edx = edx || {};
                 } else {
                     $('#unenroll_error').text(
                         gettext('Unable to determine whether we should give you a refund because' +
-                                ' of System Error. Please try again later.')
+                                ' of System Error. Please try again later.'),
                     ).stop()
                         .css('display', 'block');
 
@@ -199,7 +199,7 @@ var edx = edx || {};
             request.fail(function() {
                 $('#unenroll_error').text(
                     gettext('Unable to determine whether we should give you a refund because' +
-                                ' of System Error. Please try again later.')
+                                ' of System Error. Please try again later.'),
                 ).stop()
                     .css('display', 'block');
 
@@ -223,7 +223,7 @@ var edx = edx || {};
                     if (xhr.status === 403) {
                         location.href = urls.signInUser;
                     }
-                }
+                },
             });
             return false;
         });
@@ -245,10 +245,10 @@ var edx = edx || {};
                          'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
                          // xss-lint: disable=javascript-concat-html
                          '<path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="#178253"/>\n' +
-                         '</svg>'
+                         '</svg>',
                             );
                         }, 500); // adding timeout to make spinner animation longer
-                }
+                },
             });
             e.preventDefault();
             $('#activate-account-modal p svg').remove();
@@ -260,7 +260,7 @@ var edx = edx || {};
                'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
                // xss-lint: disable=javascript-concat-html
                '<path d="M22 12A10 10 0 116.122 3.91l1.176 1.618A8 8 0 1020 12h2z" fill="#6c757d"/>\n' +
-               '</svg>'
+               '</svg>',
             );
         });
 
@@ -271,7 +271,7 @@ var edx = edx || {};
         if ($('#activate-account-modal').css('display') === 'block') {
             $('#lean_overlay').css({
                 display: 'block',
-                'z-index': 0
+                'z-index': 0,
             });
             $('#activate-account-modal').focus()
         }
@@ -284,7 +284,7 @@ var edx = edx || {};
                 trigger,
                 '#email-settings-modal .close-modal',
                 '#email-settings-modal',
-                '#dashboard-main'
+                '#dashboard-main',
             );
         });
 
@@ -296,7 +296,7 @@ var edx = edx || {};
                 trigger,
                 '#unenroll-modal .close-modal',
                 '#unenroll-modal',
-                '#dashboard-main'
+                '#dashboard-main',
             );
         });
 

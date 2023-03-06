@@ -16,7 +16,7 @@ define(['js/views/baseview', 'js/views/utils/xblock_utils', 'edx-ui-toolkit/js/u
                 'click .xblock-string-field-editor': 'onClickEditor',
                 'change .xblock-field-input': 'updateField',
                 'focusout .xblock-field-input': 'onInputFocusLost',
-                'keyup .xblock-field-input': 'handleKeyUp'
+                'keyup .xblock-field-input': 'handleKeyUp',
             },
 
             // takes XBlockInfo as a model
@@ -34,7 +34,7 @@ define(['js/views/baseview', 'js/views/utils/xblock_utils', 'edx-ui-toolkit/js/u
                     // xss-lint: disable=javascript-escape
                     value: this.model.escape(this.fieldName),
                     fieldName: this.fieldName,
-                    fieldDisplayName: this.fieldDisplayName
+                    fieldDisplayName: this.fieldDisplayName,
                 };
                 this.$el.append(HtmlUtils.HTML(this.template(attributes)).toString());
                 return this;
@@ -121,7 +121,7 @@ define(['js/views/baseview', 'js/views/utils/xblock_utils', 'edx-ui-toolkit/js/u
                 if (event.keyCode === 27) {   // Revert the changes if the user hits escape
                     this.cancelInput();
                 }
-            }
+            },
         });
 
         return XBlockStringFieldEditor;

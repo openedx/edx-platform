@@ -15,7 +15,7 @@ define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/
             this.create = function(libraryInfo, errorHandler) {
                 $.postJSON(
                     '/library/',
-                    libraryInfo
+                    libraryInfo,
                 ).done(function(data) {
                     ViewUtils.redirect(data.url);
                 }).fail(function(jqXHR, textStatus, errorThrown) {

@@ -2,7 +2,7 @@ define(
     [
         'jquery', 'backbone', 'underscore',
         'js/views/video/transcripts/utils',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ],
     function($, Backbone, _, TranscriptUtils, HtmlUtils) {
         'use strict';
@@ -14,7 +14,7 @@ define(
 
             events: {
                 'change .file-input': 'changeHandler',
-                'click .setting-upload': 'clickHandler'
+                'click .setting-upload': 'clickHandler',
             },
 
             uploadTpl: '#file-upload',
@@ -22,7 +22,7 @@ define(
             initialize: function(options) {
                 _.bindAll(this,
                     'changeHandler', 'clickHandler', 'xhrResetProgressBar', 'xhrProgressHandler', 'xhrCompleteHandler',
-                    'render'
+                    'render',
                 );
                 this.options = _.extend({}, options);
                 this.file = false;
@@ -42,7 +42,7 @@ define(
                     this.template = HtmlUtils.template(tpl);
                     HtmlUtils.setHtml(tplContainer, this.template({
                         ext: this.validFileExtensions,
-                        component_locator: this.options.component_locator
+                        component_locator: this.options.component_locator,
                     }));
 
                     this.$form = this.$el.find('.file-chooser');
@@ -59,7 +59,7 @@ define(
         */
             upload: function() {
                 var data = {
-                    edx_video_id: TranscriptUtils.Storage.get('edx_video_id') || ''
+                    edx_video_id: TranscriptUtils.Storage.get('edx_video_id') || '',
                 };
 
                 if (!this.file) {
@@ -70,7 +70,7 @@ define(
                     beforeSend: this.xhrResetProgressBar,
                     uploadProgress: this.xhrProgressHandler,
                     complete: this.xhrCompleteHandler,
-                    data: data
+                    data: data,
                 });
             },
 
@@ -202,7 +202,7 @@ define(
                 } else {
                     this.options.messenger.showError(err);
                 }
-            }
+            },
         });
 
         return FileUploader;

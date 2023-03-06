@@ -3,7 +3,7 @@
 define([
     'backbone',
     'gettext',
-    'js/certificates/models/certificate'
+    'js/certificates/models/certificate',
 ],
 function(Backbone, gettext, Certificate) {
     'use strict';
@@ -66,7 +66,7 @@ function(Backbone, gettext, Certificate) {
                 this.push(item);
             }, this);
             return this.models;
-        }
+        },
     });
     return CertificateCollection;
 });

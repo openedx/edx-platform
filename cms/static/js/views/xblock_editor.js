@@ -9,7 +9,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
         // takes XBlockInfo as a model
 
         options: $.extend({}, XBlockView.prototype.options, {
-            view: 'studio_view'
+            view: 'studio_view',
         }),
 
         initialize: function() {
@@ -39,7 +39,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
             pluginEl = this.$('.wrapper-comp-plugins');
             if (pluginEl.length > 0) {
                 this.pluginEditor = new BaseView({
-                    el: pluginEl
+                    el: pluginEl,
                 });
             }
         },
@@ -47,7 +47,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
         getDefaultModes: function() {
             return [
                 {id: 'editor', name: gettext('Editor')},
-                {id: 'settings', name: gettext('Settings')}
+                {id: 'settings', name: gettext('Settings')},
             ];
         },
 
@@ -76,7 +76,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
                 }
                 metadataView = new MetadataView.Editor({
                     el: metadataEditor,
-                    collection: new MetadataCollection(models)
+                    collection: new MetadataCollection(models),
                 });
                 if (xblock.setMetadataEditor) {
                     xblock.setMetadataEditor(metadataView);
@@ -173,7 +173,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
         setEditorActivation: function(editor, isActive) {
             editor.removeClass('is-active').removeClass('is-inactive');
             editor.addClass(isActive ? 'is-active' : 'is-inactive');
-        }
+        },
     });
 
     return XBlockEditorView;

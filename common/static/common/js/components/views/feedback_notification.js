@@ -5,8 +5,8 @@
             var Notification = SystemFeedbackView.extend({
                 options: $.extend({}, SystemFeedbackView.prototype.options, {
                     type: 'notification',
-                    closeIcon: false
-                })
+                    closeIcon: false,
+                }),
             });
 
             // create Notification.Warning, Notification.Confirmation, etc
@@ -17,8 +17,8 @@
                 var subclass;
                 subclass = Notification.extend({
                     options: $.extend({}, Notification.prototype.options, {
-                        intent: intent
-                    })
+                        intent: intent,
+                    }),
                 });
                 Notification[capitalCamel(intent)] = subclass;
             });
@@ -29,6 +29,6 @@
             miniOptions.closeIcon = false;
 
             return Notification;
-        }
+        },
     );
 }).call(this, define || RequireJS.define);

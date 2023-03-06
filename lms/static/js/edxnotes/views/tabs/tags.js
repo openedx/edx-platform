@@ -2,7 +2,7 @@
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
-        'js/edxnotes/views/tab_view', 'edx-ui-toolkit/js/utils/html-utils'
+        'js/edxnotes/views/tab_view', 'edx-ui-toolkit/js/utils/html-utils',
     ], function(gettext, $, _, NoteGroupView, TabPanelView, TabView, HtmlUtils) {
         var view = 'Tags';
         var TagsView = TabView.extend({
@@ -14,12 +14,12 @@
 
                 displayedTitle = this.contentView.titleMap[tagName.toLowerCase()];
                 titleElement = this.$el.find('.tags-title').filter(
-                    function() { return $(this).text() === displayedTitle; }
+                    function() { return $(this).text() === displayedTitle; },
                 );
                 $('html,body').animate(
                     {scrollTop: titleElement.offset().top - 10},
                     'slow',
-                    function() { titleElement.focus(); }
+                    function() { titleElement.focus(); },
                 );
             },
 
@@ -95,7 +95,7 @@
                         noteGroup = notesByTag[tagName];
                         var tagTitle = interpolate_text(
                             '{tagName} ({numberOfNotesWithTag})',
-                            {tagName: tagName, numberOfNotesWithTag: noteGroup.length}
+                            {tagName: tagName, numberOfNotesWithTag: noteGroup.length},
                         );
                         group = this.getGroup(tagTitle);
                         titleMap[tagName] = tagTitle;
@@ -112,11 +112,11 @@
                     var group = new NoteGroupView.GroupView({
                         displayName: tagName,
                         template: '<h3 class="tags-title sr-is-focusable" tabindex="-1"><%- displayName %></h3>',
-                        className: 'note-group'
+                        className: 'note-group',
                     });
                     this.children.push(group);
                     return group;
-                }
+                },
             }),
 
             tabInfo: {
@@ -127,8 +127,8 @@
                 name: gettext('Tags'),
                 identifier: 'view-tags',
                 icon: 'fa fa-tag',
-                view: view
-            }
+                view: view,
+            },
         });
 
         return TagsView;

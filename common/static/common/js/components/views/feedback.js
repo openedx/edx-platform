@@ -6,7 +6,7 @@
         'underscore.string',
         'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
-        'text!../../../../common/templates/components/system-feedback.underscore'
+        'text!../../../../common/templates/components/system-feedback.underscore',
     ],
     function($, _, str, Backbone, HtmlUtils, systemFeedbackTemplate) {
         var tabbableElements = [
@@ -18,7 +18,7 @@
             "button:not([disabled]):not([tabindex='-1'])",
             "iframe:not([tabindex='-1'])",
             "[tabindex]:not([tabindex='-1'])",
-            "[contentEditable=true]:not([tabindex='-1'])"
+            "[contentEditable=true]:not([tabindex='-1'])",
         ];
         var SystemFeedback = Backbone.View.extend({
             options: {
@@ -31,7 +31,7 @@
                 closeIcon: true,  // should we render a close button in the top right corner?
                 minShown: 0,  // ms after this view has been shown before it can be hidden
                 maxShown: Infinity,  // ms after this view has been shown before it will be automatically hidden
-                outFocusElement: null  // element to send focus to on hide
+                outFocusElement: null,  // element to send focus to on hide
 
                 /* Could also have an "actions" hash: here is an example demonstrating
                     the expected structure. For each action, by default the framework
@@ -146,7 +146,7 @@
             events: {
                 'click .action-close': 'hide',
                 'click .action-primary': 'primaryClick',
-                'click .action-secondary': 'secondaryClick'
+                'click .action-secondary': 'secondaryClick',
             },
 
             render: function() {
@@ -195,7 +195,7 @@
                 if (secondary.click) {
                     secondary.click.call(event.target, this, event);
                 }
-            }
+            },
         });
         return SystemFeedback;
     });

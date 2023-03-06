@@ -11,7 +11,7 @@
                 targetOutline: true,
                 labelBgColor: '#d6d6d6',
                 individualTargets: null, // Depends on 'targets'.
-                foundErrors: false // Whether or not we find errors while processing the config.
+                foundErrors: false, // Whether or not we find errors while processing the config.
             };
 
             getDraggables(state, config);
@@ -167,7 +167,7 @@
             if (obj.target_fields.every(
                 function(targetObj) {
                     return processTarget(state, targetObj, false);
-                }
+                },
             ) === false) {
                 return false;
             }

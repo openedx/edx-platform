@@ -56,11 +56,11 @@
                             return {
                                 pass: _.difference(labelsList, _.map(actual, function(item) {
                                     return $(item).text();
-                                })).length === 0
+                                })).length === 0,
                             };
-                        }
+                        },
                     };
-                }
+                },
             });
         });
 
@@ -107,14 +107,14 @@
                 menuItems.each(function() {
                     expect($(this)).toHaveAttrs({
                         'aria-selected': 'false',
-                        role: 'menuitem'
+                        role: 'menuitem',
                     });
                 });
 
                 expect(menuSubmenuItem).toHaveAttrs({
                     'aria-expanded': 'false',
                     'aria-haspopup': 'true',
-                    role: 'menuitem'
+                    role: 'menuitem',
                 });
 
                 // Submenu and its items.

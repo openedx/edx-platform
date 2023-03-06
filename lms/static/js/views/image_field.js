@@ -4,7 +4,7 @@
         'gettext', 'jquery', 'underscore', 'backbone',
         'edx-ui-toolkit/js/utils/html-utils', 'js/views/fields',
         'text!templates/fields/field_image.underscore',
-        'backbone-super', 'jquery.fileupload'
+        'backbone-super', 'jquery.fileupload',
     ], function(gettext, $, _, Backbone, HtmlUtils, FieldViews, FieldImageTemplate) {
         var ImageFieldView = FieldViews.FieldView.extend({
 
@@ -34,7 +34,7 @@
                 'click .u-field-remove-button': 'clickedRemoveButton',
                 'click .upload-submit': 'clickedUploadButton',
                 'focus .upload-button-input': 'showHoverState',
-                'blur .upload-button-input': 'hideHoverState'
+                'blur .upload-button-input': 'hideHoverState',
             },
 
             initialize: function(options) {
@@ -54,7 +54,7 @@
                     uploadButtonTitle: _.result(this, 'uploadButtonTitle'),
                     removeButtonIcon: _.result(this, 'iconRemove'),
                     removeButtonTitle: _.result(this, 'removeButtonTitle'),
-                    screenReaderTitle: _.result(this, 'screenReaderTitle')
+                    screenReaderTitle: _.result(this, 'screenReaderTitle'),
                 };
                 this.$el.html(HtmlUtils.HTML(this.template(attributes)).toString());
                 this.delegateEvents();
@@ -123,7 +123,7 @@
                     type: 'POST',
                     add: this.fileSelected,
                     done: this.imageChangeSucceeded,
-                    fail: this.imageChangeFailed
+                    fail: this.imageChangeFailed,
                 });
             },
 
@@ -134,7 +134,7 @@
                 this.showRemovalInProgressMessage();
                 $.ajax({
                     type: 'POST',
-                    url: this.options.imageRemoveUrl
+                    url: this.options.imageRemoveUrl,
                 }).done(function() {
                     view.imageChangeSucceeded();
                 }).fail(function(jqXHR) {
@@ -168,16 +168,16 @@
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMinBytes);
                     this.showErrorMessage(
                         interpolate_text(
-                            gettext('The file must be at least {size} in size.'), {size: humanReadableSize}
-                        )
+                            gettext('The file must be at least {size} in size.'), {size: humanReadableSize},
+                        ),
                     );
                     return false;
                 } else if (imageBytes > this.options.imageMaxBytes) {
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMaxBytes);
                     this.showErrorMessage(
                         interpolate_text(
-                            gettext('The file must be smaller than {size} in size.'), {size: humanReadableSize}
-                        )
+                            gettext('The file must be smaller than {size} in size.'), {size: humanReadableSize},
+                        ),
                     );
                     return false;
                 }
@@ -225,7 +225,7 @@
                     ++i;
                 }
                 return size.toFixed(1) * 1 + ' ' + units[i];
-            }
+            },
         });
 
         return ImageFieldView;

@@ -17,7 +17,7 @@ export default function LibraryFactory(componentTemplates, XBlockInfoJson, optio
         templates: new ComponentTemplates(componentTemplates, {parse: true}),
         action: 'view',
         viewClass: LibraryContainerView,
-        canEdit: true
+        canEdit: true,
     };
 
     xmoduleLoader.done(function() {

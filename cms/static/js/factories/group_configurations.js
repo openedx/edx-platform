@@ -1,5 +1,5 @@
 define([
-    'js/collections/group_configuration', 'js/models/group_configuration', 'js/views/pages/group_configurations'
+    'js/collections/group_configuration', 'js/models/group_configuration', 'js/views/pages/group_configurations',
 ], function(GroupConfigurationCollection, GroupConfigurationModel, GroupConfigurationsPage) {
     'use strict';
     return function(experimentsEnabled,
@@ -8,7 +8,7 @@ define([
         groupConfigurationUrl,
         courseOutlineUrl) {
         var experimentGroupConfigurations = new GroupConfigurationCollection(
-                experimentGroupConfigurationsJson, {parse: true}
+                experimentGroupConfigurationsJson, {parse: true},
             ),
             allGroupConfigurations = [],
             newGroupConfig,
@@ -28,7 +28,7 @@ define([
             el: $('#content'),
             experimentsEnabled: experimentsEnabled,
             experimentGroupConfigurations: experimentGroupConfigurations,
-            allGroupConfigurations: allGroupConfigurations
+            allGroupConfigurations: allGroupConfigurations,
         }).render();
     };
 });

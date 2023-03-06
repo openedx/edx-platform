@@ -13,9 +13,9 @@
  */
 define([
     'js/views/baseview', 'jquery', 'gettext',
-    'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils'
+    'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils',
 ], function(
-    BaseView, $, gettext, ViewUtils, HtmlUtils
+    BaseView, $, gettext, ViewUtils, HtmlUtils,
 ) {
     'use strict';
 
@@ -36,7 +36,7 @@ define([
                 'wrapper-collection-' + index,
                 this.baseClassName,
                 this.baseClassName + 's-list-item',
-                this.baseClassName + 's-list-item-' + index
+                this.baseClassName + 's-list-item-' + index,
             ].join(' ');
         },
 
@@ -49,13 +49,13 @@ define([
                 interpolate(
                     // Translators: "item_display_name" is the name of the item to be deleted.
                     gettext('Delete this %(item_display_name)s?'),
-                    {item_display_name: itemDisplayName}, true
+                    {item_display_name: itemDisplayName}, true,
                 ),
                 interpolate(
                     // Translators: "item_display_name" is the name of the item to be deleted.
                     gettext('Deleting this %(item_display_name)s is permanent and cannot be undone.'),
                     {item_display_name: itemDisplayName},
-                    true
+                    true,
                 ),
                 gettext('Delete'),
                 function() {
@@ -63,9 +63,9 @@ define([
                         gettext('Deleting'),
                         function() {
                             return model.destroy({wait: true});
-                        }
+                        },
                     );
-                }
+                },
             );
         },
 
@@ -85,7 +85,7 @@ define([
             this.$el.html(HtmlUtils.HTML(this.view.render().el).toString());
 
             return this;
-        }
+        },
     });
 
     return ListItemView;

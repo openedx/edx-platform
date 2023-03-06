@@ -28,7 +28,7 @@ define(['backbone'],
          */
         preventBackboneChangingUrl = function() {
             var history = {
-                currentFragment: ''
+                currentFragment: '',
             };
 
             // Stub out the Backbone router so that the browser doesn't actually navigate
@@ -44,6 +44,6 @@ define(['backbone'],
 
         return {
             getLocationHash: getLocationHash,
-            preventBackboneChangingUrl: preventBackboneChangingUrl
+            preventBackboneChangingUrl: preventBackboneChangingUrl,
         };
     });

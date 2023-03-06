@@ -9,7 +9,7 @@
         'gettext',
         'backbone',
         'js/certificates/models/certificate_exception',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ],
     function($, _, gettext, Backbone, CertificateExceptionModel, HtmlUtils) {
         return Backbone.View.extend({
@@ -17,7 +17,7 @@
             message_div: '.message',
 
             events: {
-                'click #add-exception': 'addException'
+                'click #add-exception': 'addException',
             },
 
             render: function() {
@@ -51,18 +51,18 @@
                         user_name: user_name,
                         user_email: user_email,
                         notes: notes,
-                        new: true
+                        new: true,
                     },
                     {
-                        url: this.collection.url
-                    }
+                        url: this.collection.url,
+                    },
                 );
                 var message = '';
 
                 if (this.collection.findWhere(model)) {
                     message = gettext('<%- user %> already in exception list.');
                     this.escapeAndShowMessage(
-                        _.template(message)({user: (user_name || user_email)})
+                        _.template(message)({user: (user_name || user_email)}),
                     );
                 } else if (certificate_exception.isValid()) {
                     message = gettext('<%- user %> has been successfully added to the exception list. Click Generate Exception Certificate below to send the certificate.');  // eslint-disable-line max-len
@@ -72,10 +72,10 @@
                             success: this.showSuccess(
                                 this,
                                 true,
-                                _.template(message)({user: (user_name || user_email)})
+                                _.template(message)({user: (user_name || user_email)}),
                             ),
-                            error: this.showError(this)
-                        }
+                            error: this.showError(this),
+                        },
                     );
                 } else {
                     this.escapeAndShowMessage(certificate_exception.validationError);
@@ -109,12 +109,12 @@
                         caller.escapeAndShowMessage(response_data.message);
                     } catch (exception) {
                         caller.escapeAndShowMessage(
-                            gettext('Server Error, Please refresh the page and try again.')
+                            gettext('Server Error, Please refresh the page and try again.'),
                         );
                     }
                 };
-            }
+            },
         });
-    }
+    },
     );
 }).call(this, define || RequireJS.define);

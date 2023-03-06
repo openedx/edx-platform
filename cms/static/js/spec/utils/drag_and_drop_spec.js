@@ -14,9 +14,9 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                         droppableClass: 'ol.sortable-unit-list',
                         parentLocationSelector: 'li.courseware-subsection',
                         refresh: jasmine.createSpy('Spy on Unit'),
-                        ensureChildrenRendered: jasmine.createSpy('Spy on Unit')
+                        ensureChildrenRendered: jasmine.createSpy('Spy on Unit'),
                     });
-                }
+                },
             );
             _.each(
                 $('.courseware-subsection'),
@@ -27,9 +27,9 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                         droppableClass: '.sortable-subsection-list',
                         parentLocationSelector: 'section',
                         refresh: jasmine.createSpy('Spy on Subsection'),
-                        ensureChildrenRendered: jasmine.createSpy('Spy on Subsection')
+                        ensureChildrenRendered: jasmine.createSpy('Spy on Subsection'),
                     });
-                }
+                },
             );
         });
 
@@ -39,7 +39,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 $ele = $('#unit-1');
                 $ele.offset({
                     top: $ele.offset().top + 10,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, 1);
                 expect(destination.ele).toEqual($('#unit-2'));
@@ -51,7 +51,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 $unit4 = $('#unit-4');
                 $ele.offset({
                     top: $unit4.offset().top + 8,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, 1);
                 expect(destination.ele).toEqual($unit4);
@@ -61,7 +61,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect(destination.attachMethod).toBe('before');
                 $ele.offset({
                     top: $unit4.offset().top + $unit4.height() + 1,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, 0);
                 expect(destination.ele).toEqual($unit4);
@@ -69,7 +69,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 $unit0 = $('#unit-0');
                 $ele.offset({
                     top: $unit0.offset().top - 16,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, 0);
                 expect(destination.ele).toEqual($unit0);
@@ -80,7 +80,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 $ele = $('#subsection-2');
                 $ele.offset({
                     top: $('#subsection-0').offset().top - 5,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, -1);
                 expect(destination.ele).toEqual($('#subsection-0'));
@@ -91,14 +91,14 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 $ele = $('#unit-4');
                 $ele.offset({
                     top: $('#unit-3').offset().bottom + 4,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, -1);
                 expect(destination.ele).toEqual($('#unit-3'));
                 expect(destination.attachMethod).toBe('after');
                 $ele.offset({
                     top: $('#unit-3').offset().top + 4,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, -1);
                 expect(destination.ele).toEqual($('#unit-3'));
@@ -109,7 +109,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 $ele = $('#subsection-2');
                 $ele.offset({
                     top: $('#subsection-4').offset().top - 1,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, 1);
                 expect(destination.ele).toEqual($('#subsection-4'));
@@ -120,7 +120,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 $ele = $('#unit-1');
                 $ele.offset({
                     top: $('#subsection-3').offset().top + 10,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, 1);
                 expect(destination.ele).toEqual($('#subsection-list-3'));
@@ -131,12 +131,12 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 $ele = $('#unit-1');
                 $ele.offset({
                     top: $ele.offset().top + 200,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, 1);
                 expect(destination).toEqual({
                     ele: null,
-                    attachMethod: ''
+                    attachMethod: '',
                 });
             });
             it('can drag into a collapsed list', function() {
@@ -145,7 +145,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 $ele = $('#unit-2');
                 $ele.offset({
                     top: $('#subsection-2').offset().top + 3,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 destination = ContentDragger.findDestination($ele, 1);
                 expect(destination.ele).toEqual($('#subsection-list-2'));
@@ -157,20 +157,20 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
             it('sets the dragState to its default values', function() {
                 expect(ContentDragger.dragState).toEqual({});
                 ContentDragger.onDragStart({
-                    element: $('#unit-1')
+                    element: $('#unit-1'),
                 }, null, null);
                 expect(ContentDragger.dragState).toEqual({
                     dropDestination: null,
                     attachMethod: '',
                     parentList: null,
                     lastY: 0,
-                    dragDirection: 0
+                    dragDirection: 0,
                 });
             });
             it('collapses expanded elements', function() {
                 expect($('#subsection-1')).not.toHaveClass('is-collapsed');
                 ContentDragger.onDragStart({
-                    element: $('#subsection-1')
+                    element: $('#subsection-1'),
                 }, null, null);
                 expect($('#subsection-1')).toHaveClass('is-collapsed');
                 expect($('#subsection-1')).toHaveClass('expand-on-drop');
@@ -187,15 +187,15 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 dragX = $ele.offset().left;
                 $ele.offset({
                     top: dragY,
-                    left: dragX
+                    left: dragX,
                 });
                 ContentDragger.onDragMove({
                     element: $ele,
                     dragPoint: {
-                        y: dragY
-                    }
+                        y: dragY,
+                    },
                 }, '', {
-                    clientX: dragX
+                    clientX: dragX,
                 });
                 expect($('#unit-2')).toHaveClass('drop-target drop-target-before');
                 expect($ele).toHaveClass('valid-drop');
@@ -206,32 +206,32 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 dragY = $ele.offset().top + 10;
                 $ele.offset({
                     top: dragY,
-                    left: $ele.offset().left
+                    left: $ele.offset().left,
                 });
                 ContentDragger.onDragMove({
                     element: $ele,
                     dragPoint: {
-                        y: dragY
-                    }
+                        y: dragY,
+                    },
                 }, '', {
-                    clientX: $ele.offset().left - 3
+                    clientX: $ele.offset().left - 3,
                 });
                 expect($('#unit-2')).not.toHaveClass('drop-target drop-target-before');
                 expect($ele).not.toHaveClass('valid-drop');
             });
             it('scrolls up if necessary', function() {
                 ContentDragger.onDragMove({
-                    element: $('#unit-1')
+                    element: $('#unit-1'),
                 }, '', {
-                    clientY: 2
+                    clientY: 2,
                 });
                 expect(this.redirectSpy).toHaveBeenCalledWith(0, -10);
             });
             it('scrolls down if necessary', function() {
                 ContentDragger.onDragMove({
-                    element: $('#unit-1')
+                    element: $('#unit-1'),
                 }, '', {
-                    clientY: window.innerHeight - 5
+                    clientY: window.innerHeight - 5,
                 });
                 expect(this.redirectSpy).toHaveBeenCalledWith(0, 10);
             });
@@ -249,24 +249,24 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 ContentDragger.dragState.parentList = $('#subsection-1');
                 $('#unit-1').offset({
                     top: $('#unit-1').offset().top + 10,
-                    left: $('#unit-1').offset().left
+                    left: $('#unit-1').offset().left,
                 });
                 ContentDragger.onDragEnd({
-                    element: $('#unit-1')
+                    element: $('#unit-1'),
                 }, null, {
-                    clientX: $('#unit-1').offset().left
+                    clientX: $('#unit-1').offset().left,
                 });
                 expect(this.reorderSpy).toHaveBeenCalled();
             });
             it('clears out the drag state', function() {
                 ContentDragger.onDragEnd({
-                    element: $('#unit-1')
+                    element: $('#unit-1'),
                 }, null, null);
                 expect(ContentDragger.dragState).toEqual({});
             });
             it('sets the element to the correct position', function() {
                 ContentDragger.onDragEnd({
-                    element: $('#unit-1')
+                    element: $('#unit-1'),
                 }, null, null);
                 expect(['0px', 'auto']).toContain($('#unit-1').css('top'));
                 expect(['0px', 'auto']).toContain($('#unit-1').css('left'));
@@ -275,7 +275,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 $('#subsection-1').addClass('is-collapsed');
                 $('#subsection-1').addClass('expand-on-drop');
                 ContentDragger.onDragEnd({
-                    element: $('#subsection-1')
+                    element: $('#subsection-1'),
                 }, null, null);
                 expect($('#subsection-1')).not.toHaveClass('is-collapsed');
                 expect($('#subsection-1')).not.toHaveClass('expand-on-drop');
@@ -290,9 +290,9 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 ContentDragger.dragState.attachMethod = 'prepend';
                 ContentDragger.dragState.parentList = $('#subsection-2');
                 ContentDragger.onDragEnd({
-                    element: $('#unit-1')
+                    element: $('#unit-1'),
                 }, null, {
-                    clientX: $('#unit-1').offset().left
+                    clientX: $('#unit-1').offset().left,
                 });
 
                 // verify collapsed element expands while ensuring its children are properly rendered
@@ -319,12 +319,12 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 ContentDragger.dragState.parentList = $('#subsection-2');
                 $('#unit-1').offset({
                     top: $('#unit-4').offset().top + 10,
-                    left: $('#unit-4').offset().left
+                    left: $('#unit-4').offset().left,
                 });
                 ContentDragger.onDragEnd({
-                    element: $('#unit-1')
+                    element: $('#unit-1'),
                 }, null, {
-                    clientX: $('#unit-1').offset().left
+                    clientX: $('#unit-1').offset().left,
                 });
                 request = AjaxHelpers.currentRequest(requests);
                 expect(this.savingSpies.constructor).toHaveBeenCalled();
@@ -351,17 +351,17 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 ContentDragger.dragState.parentList = $('#subsection-1');
                 $('#unit-1').offset({
                     top: $('#unit-1').offset().top + 10,
-                    left: $('#unit-1').offset().left
+                    left: $('#unit-1').offset().left,
                 });
                 ContentDragger.onDragEnd({
-                    element: $('#unit-1')
+                    element: $('#unit-1'),
                 }, null, {
-                    clientX: $('#unit-1').offset().left
+                    clientX: $('#unit-1').offset().left,
                 });
                 request = AjaxHelpers.currentRequest(requests);
                 expect($('#unit-1')).toHaveClass('was-dropped');
                 expect(request.requestBody).toEqual(
-                    '{"children":["second-unit-id","first-unit-id","third-unit-id"]}'
+                    '{"children":["second-unit-id","first-unit-id","third-unit-id"]}',
                 );
                 request.respond(204);
                 this.clock.tick(1001);

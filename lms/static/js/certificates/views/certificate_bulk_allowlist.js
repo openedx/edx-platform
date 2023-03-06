@@ -8,7 +8,7 @@
         'jquery',
         'underscore',
         'gettext',
-        'backbone'
+        'backbone',
     ],
 
     function($, _, gettext, Backbone) {
@@ -16,7 +16,7 @@
             bulk_exception: '.bulk-allowlist-exception',
             upload_csv_button: '.upload-csv-button',
             browse_file: '.browse-file',
-            bulk_allowlist_exception_form: 'form#bulk-allowlist-exception-form'
+            bulk_allowlist_exception_form: 'form#bulk-allowlist-exception-form',
         };
 
         var MESSAGE_GROUP = {
@@ -26,7 +26,7 @@
             user_not_exist: 'user-not-exist',
             user_already_allowlisted: 'user-already-allowlisted',
             user_not_enrolled: 'user-not-enrolled',
-            user_on_certificate_invalidation_list: 'user-on-certificate-invalidation-list'
+            user_on_certificate_invalidation_list: 'user-on-certificate-invalidation-list',
         };
 
         return Backbone.View.extend({
@@ -34,7 +34,7 @@
             events: {
                 'change #browseBtn-bulk-csv': 'chooseFile',
                 'click .upload-csv-button': 'uploadCSV',
-                'click .arrow': 'toggleMessageDetails'
+                'click .arrow': 'toggleMessageDetails',
             },
 
             initialize: function(options) {
@@ -67,7 +67,7 @@
                         contentType: false,
                         success: function(data_from_server) {
                             self.display_response(data_from_server);
-                        }
+                        },
                     });
                     e.preventDefault(); // avoid to execute the actual submit of the form.
                 });
@@ -81,16 +81,16 @@
                 function generateDiv(group, heading, displayData) {
                     // inner function generate div and display response messages.
                     $('<div/>', {
-                        class: 'message ' + group
+                        class: 'message ' + group,
                     }).appendTo('.bulk-exception-results').prepend( // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target,javascript-jquery-prepend
                         "<button type='button' id= '" + group + "' class='arrow'> + </button>" + heading) // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
                         .append($('<ul/>', {
-                            class: group
+                            class: group,
                         }));
 
                     for (var i = 0; i < displayData.length; i++) { // eslint-disable-line vars-on-top
                         $('<li/>', {
-                            text: displayData[i]
+                            text: displayData[i],
                         }).appendTo('div.message > .' + group); // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target
                     }
                     $('div.message > .' + group).hide();
@@ -161,7 +161,7 @@
                     generateDiv(
                         MESSAGE_GROUP.general_errors,
                         gettext('Uploaded file issues. Click on "+" to view.'),
-                        errors
+                        errors,
                     );
                 }
 
@@ -171,7 +171,7 @@
                     generateDiv(
                         MESSAGE_GROUP.successfully_added,
                         getDisplayText(success_data.length, MESSAGE_GROUP.successfully_added),
-                        success_data
+                        success_data,
                     );
                 }
 
@@ -184,7 +184,7 @@
                         generateDiv(
                             MESSAGE_GROUP.data_format_error,
                             getDisplayText(format_errors.length, MESSAGE_GROUP.data_format_error),
-                            format_errors
+                            format_errors,
                         );
                     }
                     if (row_errors.user_not_exist.length) {
@@ -192,7 +192,7 @@
                         generateDiv(
                             MESSAGE_GROUP.user_not_exist,
                             getDisplayText(user_not_exist.length, MESSAGE_GROUP.user_not_exist),
-                            user_not_exist
+                            user_not_exist,
                         );
                     }
                     if (row_errors.user_already_allowlisted.length) {
@@ -201,9 +201,9 @@
                             MESSAGE_GROUP.user_already_allowlisted,
                             getDisplayText(
                                 user_already_allowlisted.length,
-                                MESSAGE_GROUP.user_already_allowlisted
+                                MESSAGE_GROUP.user_already_allowlisted,
                             ),
-                            user_already_allowlisted
+                            user_already_allowlisted,
                         );
                     }
                     if (row_errors.user_not_enrolled.length) {
@@ -211,7 +211,7 @@
                         generateDiv(
                             MESSAGE_GROUP.user_not_enrolled,
                             getDisplayText(user_not_enrolled.length, MESSAGE_GROUP.user_not_enrolled),
-                            user_not_enrolled
+                            user_not_enrolled,
                         );
                     }
                     if (row_errors.user_on_certificate_invalidation_list.length) {
@@ -221,9 +221,9 @@
                             MESSAGE_GROUP.user_on_certificate_invalidation_list,
                             getDisplayText(
                                 UserOnCertificateInvalidationList.length,
-                                MESSAGE_GROUP.user_on_certificate_invalidation_list
+                                MESSAGE_GROUP.user_on_certificate_invalidation_list,
                             ),
-                            UserOnCertificateInvalidationList
+                            UserOnCertificateInvalidationList,
                         );
                     }
                 }
@@ -248,8 +248,8 @@
                     this.$el.find(DOM_SELECTORS.browse_file).val(
                         event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf('\\') + 1));
                 }
-            }
+            },
         });
-    }
+    },
     );
 }).call(this, define || RequireJS.define);

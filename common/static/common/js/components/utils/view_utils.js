@@ -62,7 +62,7 @@
                         click: function(prompt) {
                             prompt.hide();
                             operation();
-                        }
+                        },
                     },
                     secondary: {
                         text: gettext('Cancel'),
@@ -71,9 +71,9 @@
                                 onCancelCallback();
                             }
                             return prompt.hide();
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             }).show();
         };
 
@@ -87,7 +87,7 @@
         runOperationShowingMessage = function(message, operation) {
             var notificationView;
             notificationView = new NotificationView.Mini({
-                title: gettext(message)
+                title: gettext(message),
             });
             notificationView.show();
             return operation().done(function() {
@@ -104,7 +104,7 @@
         showErrorMeassage = function(heading, message, timeInterval) {
             var errorNotificationView = new NotificationView.Error({
                 title: gettext(heading),
-                message: gettext(message)
+                message: gettext(message),
             });
             errorNotificationView.show();
 
@@ -153,7 +153,7 @@
                 $.ajax({
                     url: $(this).data('dismiss-link'),
                     type: 'DELETE',
-                    success: callback
+                    success: callback,
                 });
             };
         };
@@ -164,7 +164,7 @@
              */
         setScrollTop = function(scrollTop) {
             $('html, body').animate({
-                scrollTop: scrollTop
+                scrollTop: scrollTop,
             }, 500);
         };
 
@@ -256,7 +256,7 @@
             var totalLength = _.reduce(
                 keyFieldSelectors,
                 function(sum, ele) { return sum + $(ele).val().length; },
-                0
+                0,
             );
             return totalLength <= MAX_SUM_KEY_LENGTH;
         };
@@ -268,11 +268,11 @@
                 tempHtml = HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<p>'),
                     HtmlUtils.template(messageTpl)({limit: MAX_SUM_KEY_LENGTH}),
-                    HtmlUtils.HTML('</p>')
+                    HtmlUtils.HTML('</p>'),
                 );
                 HtmlUtils.setHtml(
                     $(selectors.errorMessage),
-                    tempHtml
+                    tempHtml,
                 );
                 $(selectors.save).addClass(classes.disabled);
             } else {
@@ -324,7 +324,7 @@
             validateURLItemEncoding: validateURLItemEncoding,
             validateTotalKeyLength: validateTotalKeyLength,
             checkTotalKeyLengthViolations: checkTotalKeyLengthViolations,
-            loadJavaScript: loadJavaScript
+            loadJavaScript: loadJavaScript,
         };
     });
 }).call(this, define || RequireJS.define, require || RequireJS.require);

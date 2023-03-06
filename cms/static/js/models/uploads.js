@@ -9,15 +9,15 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             totalBytes: 0,
             finished: false,
             mimeTypes: [],
-            fileFormats: []
+            fileFormats: [],
         },
         validate: function(attrs, options) {
             if (attrs.selectedFile && !this.checkTypeValidity(attrs.selectedFile)) {
                 return {
                     message: _.template(gettext('Only <%- fileTypes %> files can be uploaded. Please select a file ending in <%- (fileExtensions) %> to upload.'))(  // eslint-disable-line max-len
-                        this.formatValidTypes()
+                        this.formatValidTypes(),
                     ),
-                    attributes: {selectedFile: true}
+                    attributes: {selectedFile: true},
                 };
             }
         },
@@ -27,13 +27,13 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                     this.attributes.mimeTypes,
                     function(type) {
                         return type.split('/')[1].toUpperCase();
-                    }
+                    },
                 ),
                 fileFormats = _.map(
                     this.attributes.fileFormats,
                     function(type) {
                         return type.toUpperCase();
-                    }
+                    },
                 );
 
             return mimeTypes.concat(fileFormats);
@@ -57,7 +57,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             if (attrs.mimeTypes.concat(attrs.fileFormats).length === 1) {
                 return {
                     fileTypes: this.fileTypes()[0],
-                    fileExtensions: '.' + this.fileTypes()[0].toLowerCase()
+                    fileExtensions: '.' + this.fileTypes()[0].toLowerCase(),
                 };
             }
             var or = gettext('or');
@@ -65,7 +65,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                 return _.template('<%- initial %> <%- or %> <%- last %>')({
                     initial: _.initial(types).join(', '),
                     or: or,
-                    last: _.last(types)
+                    last: _.last(types),
                 });
             };
             return {
@@ -74,10 +74,10 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                     _.map(this.fileTypes(),
                         function(type) {
                             return '.' + type.toLowerCase();
-                        })
-                )
+                        }),
+                ),
             };
-        }
+        },
     });
 
     return FileUpload;

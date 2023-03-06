@@ -2,7 +2,7 @@
 define([
     'jquery',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'js/instructor_dashboard/certificates'
+    'js/instructor_dashboard/certificates',
 ],
 function($, AjaxHelpers) {
     'use strict';
@@ -14,13 +14,13 @@ function($, AjaxHelpers) {
             success_message: 'Certificate regeneration task has been started. ' +
                     'You can view the status of the generation task in the "Pending Tasks" section.',
             error_message: 'Please select one or more certificate statuses that require certificate regeneration.',
-            server_error_message: 'Error while regenerating certificates. Please try again.'
+            server_error_message: 'Error while regenerating certificates. Please try again.',
         };
         var expected = {
             url: 'test/url/',
             postData: [],
             selected_statuses: ['downloadable', 'error'],
-            body: 'certificate_statuses=downloadable&certificate_statuses=error'
+            body: 'certificate_statuses=downloadable&certificate_statuses=error',
         };
 
         var select_options = function(option_values) {
@@ -114,5 +114,5 @@ function($, AjaxHelpers) {
             expect($certificate_regeneration_status.text()).toEqual(MESSAGES.success_message);
         });
     });
-}
+},
 );

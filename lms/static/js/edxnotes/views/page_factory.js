@@ -1,7 +1,7 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'jquery', 'js/edxnotes/collections/notes', 'js/edxnotes/views/notes_page'
+        'jquery', 'js/edxnotes/collections/notes', 'js/edxnotes/views/notes_page',
     ], function($, NotesCollection, NotesPageView) {
     /**
      * Factory method for the Notes page.
@@ -19,8 +19,8 @@
                 {
                     url: params.notesEndpoint,
                     perPage: params.pageSize,
-                    parse: true
-                }
+                    parse: true,
+                },
             );
 
             return new NotesPageView({
@@ -28,7 +28,7 @@
                 collection: collection,
                 debug: params.debugMode,
                 perPage: params.pageSize,
-                disabledTabs: params.disabledTabs
+                disabledTabs: params.disabledTabs,
             });
         };
     });

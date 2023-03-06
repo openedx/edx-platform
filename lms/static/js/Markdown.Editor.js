@@ -13,7 +13,7 @@
         uaSniffed = {
             isIE: /msie/.test(nav.userAgent.toLowerCase()),
             isIE_5or6: /msie 6/.test(nav.userAgent.toLowerCase()) || /msie 5/.test(nav.userAgent.toLowerCase()),
-            isOpera: /opera/.test(nav.userAgent.toLowerCase())
+            isOpera: /opera/.test(nav.userAgent.toLowerCase()),
         };
 
 
@@ -41,7 +41,7 @@
         imageDescriptionHelpText = gettext("e.g. 'Sky with clouds'. The description is helpful for users who cannot see the image."),  // eslint-disable-line max-len
         imageDescriptionHelpLink = {
             href: 'http://www.w3.org/TR/html5/embedded-content-0.html#alt',
-            text: gettext('How to create useful text alternatives.')
+            text: gettext('How to create useful text alternatives.'),
         },
         imageIsDecorativeLabel = gettext('This image is for decorative purposes only and does not require a description.');  // eslint-disable-line max-len
 
@@ -1057,11 +1057,11 @@
                         ngettext(
                             // Translators: 'errorCount' is the number of errors found in the form.
                             '%(errorCount)s error found in form.', '%(errorCount)s errors found in form.',
-                            errorCount
-                        ), {errorCount: errorCount}, true
+                            errorCount,
+                        ), {errorCount: errorCount}, true,
                     ),
                     !isValidUrl ? urlErrorMsg.textContent : '',
-                    !isValidDesc ? descErrorMsg.textContent : ''
+                    !isValidDesc ? descErrorMsg.textContent : '',
                 ].join(' ');
 
                 document.getElementById('wmd-editor-dialog-form-errors').focus();
@@ -1089,7 +1089,7 @@
                 cancelText: gettext('Cancel'),
                 chooseFileText: gettext('Choose File'),
                 imageIsDecorativeLabel: imageIsDecorativeLabel,
-                imageUploadHandler: imageUploadHandler
+                imageUploadHandler: imageUploadHandler,
             });
             dialog.setAttribute('dir', doc.head.getAttribute('dir'));
             dialog.setAttribute('role', 'dialog');
@@ -1757,7 +1757,7 @@
                         imageDefaultText,
                         linkEnteredCallback,
                         imageIsDecorativeLabel,
-                        imageUploadHandler
+                        imageUploadHandler,
                     );
                 }
             } else {
@@ -1771,7 +1771,7 @@
                     '',
                     linkDestinationError,
                     linkDefaultText,
-                    linkEnteredCallback
+                    linkEnteredCallback,
                 );
             }
             return true;
@@ -1914,7 +1914,7 @@
             function(totalMatch) {
                 chunk.endTag = totalMatch;
                 return '';
-            }
+            },
         );
 
         var replaceBlanksInTags = function(useBracket) {

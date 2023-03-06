@@ -12,7 +12,7 @@ describe('utility.rewriteStaticLinks', function() {
     });
     it('does not replace of "from" to "to" if "from" is part of absolute url', function() {
         expect(
-            rewriteStaticLinks('<img src="http://www.mysite.org/static/foo.x"/>', '/static/', 'howdy')
+            rewriteStaticLinks('<img src="http://www.mysite.org/static/foo.x"/>', '/static/', 'howdy'),
         ).toBe('<img src="http://www.mysite.org/static/foo.x"/>');
     });
 });

@@ -8,7 +8,7 @@ var FaceBook = (function() {
                 FB.init({
                     appId: _args.facebook_app_id,
                     xfbml: true,
-                    version: 'v2.3'
+                    version: 'v2.3',
                 });
             };
             (function(d, s, id) {
@@ -27,12 +27,12 @@ var FaceBook = (function() {
                     name: feed_data.share_text,
                     link: feed_data.share_link,
                     picture: feed_data.picture_link,
-                    description: feed_data.description
+                    description: feed_data.description,
                 },
                 // The Facebook API now requires a callback. Since we weren't doing anything after posting before,
                 // I'm leaving this as an empty function.
-                function(response) {} // eslint-disable-line no-unused-vars
+                function(response) {}, // eslint-disable-line no-unused-vars
             );
-        }
+        },
     };
 }());

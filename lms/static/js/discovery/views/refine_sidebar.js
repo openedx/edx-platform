@@ -3,7 +3,7 @@
         'jquery',
         'underscore',
         'backbone',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function($, _, Backbone, HtmlUtils) {
         'use strict';
 
@@ -13,7 +13,7 @@
             events: {
                 'click li button': 'selectOption',
                 'click .show-less': 'collapse',
-                'click .show-more': 'expand'
+                'click .show-more': 'expand',
             },
 
             initialize: function(options) {
@@ -46,7 +46,7 @@
                     name: facetKey,
                     displayName: this.facetName(facetKey),
                     optionsHtml: this.renderOptions(options),
-                    listIsHuge: (options.length > 9)
+                    listIsHuge: (options.length > 9),
                 });
             },
 
@@ -57,7 +57,7 @@
                         if (options.length > 0) {
                             return this.renderFacet(facetKey, options);
                         }
-                    }, this)
+                    }, this),
                 );
                 HtmlUtils.setHtml(this.$container, htmlSnippet);
                 return this;
@@ -88,9 +88,9 @@
                     'selectOption',
                     $target.data('facet'),
                     $target.data('value'),
-                    $target.data('text')
+                    $target.data('text'),
                 );
-            }
+            },
 
         });
     });

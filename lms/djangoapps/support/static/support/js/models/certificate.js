@@ -9,8 +9,8 @@
                 status: null,
                 grade: null,
                 created: null,
-                modified: null
-            }
+                modified: null,
+            },
         });
     });
 }).call(this, define || RequireJS.define);

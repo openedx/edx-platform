@@ -1,6 +1,6 @@
 define([
     'backbone', 'underscore', 'underscore.string', 'gettext',
-    'backbone.associations'
+    'backbone.associations',
 ], function(Backbone, _, str, gettext) {
     'use strict';
     var Group = Backbone.AssociatedModel.extend({
@@ -9,7 +9,7 @@ define([
                 name: '',
                 version: 1,
                 order: null,
-                usage: []
+                usage: [],
             };
         },
         url: function() {
@@ -30,7 +30,7 @@ define([
                 id: this.get('id'),
                 name: this.get('name'),
                 version: this.get('version'),
-                usage: this.get('usage')
+                usage: this.get('usage'),
             };
         },
 
@@ -38,10 +38,10 @@ define([
             if (!str.trim(attrs.name)) {
                 return {
                     message: gettext('Group name is required'),
-                    attributes: {name: true}
+                    attributes: {name: true},
                 };
             }
-        }
+        },
     });
 
     return Group;

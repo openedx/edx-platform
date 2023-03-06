@@ -5,7 +5,7 @@
         'underscore',
         'backbone',
         'gettext',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function($, _, Backbone, gettext, HtmlUtils) {
         var CourseCohortSettingsNotificationView = Backbone.View.extend({
             initialize: function(options) {
@@ -16,7 +16,7 @@
             render: function() {
                 HtmlUtils.setHtml(
                     this.$el,
-                    this.template({})
+                    this.template({}),
                 );
                 this.showCohortStateMessage();
                 return this;
@@ -31,7 +31,7 @@
                 } else {
                     actionToggleMessage.text(gettext('Cohorts Disabled'));
                 }
-            }
+            },
         });
         return CourseCohortSettingsNotificationView;
     });

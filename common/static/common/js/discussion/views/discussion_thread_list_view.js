@@ -85,7 +85,7 @@
                 'click .forum-nav-thread-link': 'threadSelected',
                 'click .forum-nav-load-more-link': 'loadMorePages',
                 'change .forum-nav-filter-main-control': 'chooseFilter',
-                'change .forum-nav-filter-cohort-control': 'chooseGroup'
+                'change .forum-nav-filter-cohort-control': 'chooseGroup',
             };
 
             DiscussionThreadListView.prototype.initialize = function(options) {
@@ -94,7 +94,7 @@
                 this.supportsActiveThread = options.supportsActiveThread;
                 this.hideReadState = options.hideReadState || false;
                 this.displayedCollection = new Discussion(this.collection.models, {
-                    pages: this.collection.pages
+                    pages: this.collection.pages,
                 });
                 this.collection.on('change', this.reloadDisplayedCollection);
                 this.discussionIds = this.$el.data('discussion-id') || '';
@@ -111,14 +111,14 @@
                 this.mode = options.mode || 'commentables';
                 this.showThreadPreview = true;
                 this.searchAlertCollection = new Backbone.Collection([], {
-                    model: Backbone.Model
+                    model: Backbone.Model,
                 });
                 this.searchAlertCollection.on('add', function(searchAlert) {
                     var content;
                     content = edx.HtmlUtils.template($('#search-alert-template').html())({
                         messageHtml: searchAlert.attributes.message,
                         cid: searchAlert.cid,
-                        css_class: searchAlert.attributes.css_class
+                        css_class: searchAlert.attributes.css_class,
                     });
                     edx.HtmlUtils.append(self.$('.search-alerts'), content);
                     return self.$('#search-alert-' + searchAlert.cid + ' .dismiss')
@@ -195,8 +195,8 @@
                     this.$el,
                     this.template({
                         isDiscussionDivisionEnabled: this.courseSettings.get('is_discussion_division_enabled'),
-                        isPrivilegedUser: DiscussionUtil.isPrivilegedUser()
-                    })
+                        isPrivilegedUser: DiscussionUtil.isPrivilegedUser(),
+                    }),
                 );
                 if (this.hideReadState) {
                     this.$('.forum-nav-filter-main').addClass('is-hidden');
@@ -253,7 +253,7 @@
                 if (this.displayedCollection.hasMorePages()) {
                     edx.HtmlUtils.append(
                         this.$('.forum-nav-thread-list'),
-                        edx.HtmlUtils.template($('#nav-load-more-link').html())({})
+                        edx.HtmlUtils.template($('#nav-load-more-link').html())({}),
                     );
                 }
             };
@@ -275,7 +275,7 @@
                 DiscussionUtil.makeFocusTrap(loadingElem);
                 loadingElem.focus();
                 options = {
-                    filter: this.filter
+                    filter: this.filter,
                 };
                 switch (this.mode) {
                 case 'search':
@@ -322,7 +322,7 @@
                     self.renderThreads();
                     DiscussionUtil.discussionAlert(
                         gettext('Error'),
-                        gettext('Additional posts could not be loaded. Refresh the page and try again.')
+                        gettext('Additional posts could not be loaded. Refresh the page and try again.'),
                     );
                 };
                 /*
@@ -331,7 +331,7 @@
                 from discussion/utils.js
                 */
                 return this.collection.retrieveAnotherPage(this.mode, options, {
-                    sort_key: this.$('.forum-nav-sort-control').val()
+                    sort_key: this.$('.forum-nav-sort-control').val(),
                 }, error);
             };
 
@@ -355,9 +355,9 @@
                             threadUrl: thread.urlFor('retrieve'),
                             threadPreview: threadPreview,
                             showThreadPreview: this.showThreadPreview,
-                            hideReadState: this.hideReadState
+                            hideReadState: this.hideReadState,
                         },
-                        thread.toJSON()
+                        thread.toJSON(),
                     );
                 var $threadHTML = $(this.threadListItemTemplate(context).toString());
                 var previewBody = $threadHTML.find('.thread-preview-body').text();
@@ -388,7 +388,7 @@
                 $srElem = edx.HtmlUtils.joinHtml(
                     edx.HtmlUtils.HTML('<span class="sr">'),
                     edx.HtmlUtils.ensureHtml(gettext('Current conversation')),
-                    edx.HtmlUtils.HTML('</span>')
+                    edx.HtmlUtils.HTML('</span>'),
                 ).toString();
                 this.$(".forum-nav-thread[data-id='" + threadId + "'] .forum-nav-thread-link")
                     .addClass('is-active').find('.forum-nav-thread-wrapper-1')
@@ -442,7 +442,7 @@
                         if (callback) {
                             callback();
                         }
-                    }
+                    },
                 });
             };
 
@@ -492,7 +492,7 @@
                 return DiscussionUtil.safeAjax({
                     $elem: $searchInput,
                     data: {
-                        text: text
+                        text: text,
                     },
                     url: url,
                     type: 'GET',
@@ -506,8 +506,8 @@
                             edx.HtmlUtils.joinHtml(
                                 edx.HtmlUtils.HTML("<li class='forum-nav-load-more'>"),
                                 self.getLoadingContent(gettext('Loading posts list')),
-                                edx.HtmlUtils.HTML('</li>')
-                            )
+                                edx.HtmlUtils.HTML('</li>'),
+                            ),
                         );
                     },
                     loadedCallback: function() {
@@ -525,21 +525,21 @@
                                 noResponseMsg = _.escape(
                                     gettext(
                                         'No results found for {original_query}. ' +
-                                        'Showing results for {suggested_query}.'
-                                    )
+                                        'Showing results for {suggested_query}.',
+                                    ),
                                 );
                                 message = edx.HtmlUtils.interpolateHtml(
                                     noResponseMsg,
                                     {
                                         original_query: edx.HtmlUtils.joinHtml(
-                                            edx.HtmlUtils.HTML('<em>'), text, edx.HtmlUtils.HTML('</em>')
+                                            edx.HtmlUtils.HTML('<em>'), text, edx.HtmlUtils.HTML('</em>'),
                                         ),
                                         suggested_query: edx.HtmlUtils.joinHtml(
                                             edx.HtmlUtils.HTML('<em>'),
                                             response.corrected_text,
-                                            edx.HtmlUtils.HTML('</em>')
-                                        )
-                                    }
+                                            edx.HtmlUtils.HTML('</em>'),
+                                        ),
+                                    },
                                 );
                                 self.addSearchAlert(message);
                             } else if (response.discussion_data.length === 0) {
@@ -554,7 +554,7 @@
                             }
                         }
                         return response;
-                    }
+                    },
                 });
             };
 
@@ -562,7 +562,7 @@
                 var self = this;
                 return DiscussionUtil.safeAjax({
                     data: {
-                        username: text
+                        username: text,
                     },
                     url: DiscussionUtil.urlFor('users'),
                     type: 'GET',
@@ -574,18 +574,18 @@
                             username = edx.HtmlUtils.joinHtml(
                                 edx.HtmlUtils.interpolateHtml(
                                     edx.HtmlUtils.HTML('<a class="link-jump" href="{url}">'),
-                                    {url: DiscussionUtil.urlFor('user_profile', response.users[0].id)}
+                                    {url: DiscussionUtil.urlFor('user_profile', response.users[0].id)},
                                 ),
                                 response.users[0].username,
-                                edx.HtmlUtils.HTML('</a>')
+                                edx.HtmlUtils.HTML('</a>'),
                             );
 
                             message = edx.HtmlUtils.interpolateHtml(
-                                gettext('Show posts by {username}.'), {username: username}
+                                gettext('Show posts by {username}.'), {username: username},
                             );
                             self.addSearchAlert(message, 'search-by-user');
                         }
-                    }
+                    },
                 });
             };
 
@@ -609,7 +609,7 @@
                     type: 'POST',
                     error: function() {
                         $checkbox.prop('checked', !checked);
-                    }
+                    },
                 });
             };
 

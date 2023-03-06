@@ -9,7 +9,7 @@ define([
     'common/js/components/utils/view_utils',
     'common/js/components/views/feedback_notification',
     'text!templates/certificate-web-preview.underscore',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/html-utils',
 ],
 function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPreviewTemplate, HtmlUtils) {
     'use strict';
@@ -17,7 +17,7 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
         el: $('.preview-certificate'),
         events: {
             'change #course-modes': 'courseModeChanged',
-            'click .activate-cert': 'toggleCertificateActivation'
+            'click .activate-cert': 'toggleCertificateActivation',
         },
 
         initialize: function(options) {
@@ -31,14 +31,14 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
             HtmlUtils.setHtml(this.$el, HtmlUtils.template(certificateWebPreviewTemplate)({
                 course_modes: this.course_modes,
                 certificate_web_view_url: this.certificate_web_view_url,
-                is_active: this.is_active
+                is_active: this.is_active,
             }));
             return this;
         },
 
         toggleCertificateActivation: function() {
             var notification = new NotificationView.Mini({
-                title: gettext(this.is_active ? 'Deactivating' : 'Activating')
+                title: gettext(this.is_active ? 'Deactivating' : 'Activating'),
             });
 
             $.ajax({
@@ -47,7 +47,7 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
                 dataType: 'json',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    is_active: !this.is_active
+                    is_active: !this.is_active,
                 }),
                 beforeSend: function() {
                     notification.show();
@@ -55,7 +55,7 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
                 success: function() {
                     notification.hide();
                     location.reload();
-                }
+                },
             });
         },
 
@@ -75,7 +75,7 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
             this.is_active = false;
             this.$el.empty();
             return this;
-        }
+        },
     });
     return CertificateWebPreview;
 });

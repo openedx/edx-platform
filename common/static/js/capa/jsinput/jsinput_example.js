@@ -7,7 +7,7 @@
     // to make the expected structure clear.
     var state = {
             availableChoices: [],
-            selectedChoice: ''
+            selectedChoice: '',
         },
         channel,
         select = document.getElementsByClassName('choices')[0],
@@ -64,7 +64,7 @@
         channel = Channel.build({
             window: window.parent,
             origin: '*',
-            scope: 'JSInput'
+            scope: 'JSInput',
         });
 
         channel.bind('getGrade', getGrade);
@@ -81,6 +81,6 @@
     return {
         getState: getState,
         setState: setState,
-        getGrade: getGrade
+        getGrade: getGrade,
     };
 }());

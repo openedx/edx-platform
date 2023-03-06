@@ -26,7 +26,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
 
         events: {
             'change input': 'clearValidationErrors',
-            'change textarea': 'clearValidationErrors'
+            'change textarea': 'clearValidationErrors',
         },
         fieldToSelectorMap: {
         // Your subclass must populate this w/ all of the model keys and dom selectors
@@ -120,7 +120,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
                             primaryClick();
                             self.confirmation.hide();
                             self.notificationBarShowing = false;
-                        }
+                        },
                     },
                     secondary: [{
                         text: gettext('Cancel'),
@@ -132,8 +132,8 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
                             self.model.clear({silent: true});
                             self.confirmation.hide();
                             self.notificationBarShowing = false;
-                        }
-                    }]
+                        },
+                    }],
                 }});
             this.notificationBarShowing = true;
             this.confirmation.show();
@@ -146,13 +146,13 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
             this.saved = new AlertView.Confirmation({
                 title: title || defaultTitle,
                 message: message,
-                closeIcon: false
+                closeIcon: false,
             });
             this.saved.show();
             $.smoothScroll({
                 offset: 0,
                 easing: 'swing',
-                speed: 1000
+                speed: 1000,
             });
         },
 
@@ -165,10 +165,10 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
                         self.showSavedBar();
                         self.render();
                     },
-                    silent: true
-                }
+                    silent: true,
+                },
             );
-        }
+        },
     });
 
     return ValidatingView;

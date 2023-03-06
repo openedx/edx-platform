@@ -35,7 +35,7 @@ function escapeSelector(id) {
 
 var formulaEquationPreview = {
     minDelay: 300,  // Minimum time between requests sent out.
-    errorDelay: 1500  // Wait time before showing error (prevent frustration).
+    errorDelay: 1500,  // Wait time before showing error (prevent frustration).
 };
 
 /** Setup the FormulaEquationInputs and associated javascript code. */
@@ -69,7 +69,7 @@ formulaEquationPreview.enable = function() {
             jax: null,  // Fill this in later.
             $img: $preview.find('img.loading'),
 
-            requestCallback: null  // Fill it in in a bit.
+            requestCallback: null,  // Fill it in in a bit.
         };
 
         // Give callback access to `inputData` (fill in first parameter).
@@ -79,7 +79,7 @@ formulaEquationPreview.enable = function() {
         var throttledRequest = _.throttle(
             sendRequest,
             formulaEquationPreview.minDelay,
-            {leading: false}
+            {leading: false},
         );
         // The following acts as a closure of `inputData`.
         var initializeRequest = function() {
@@ -123,7 +123,7 @@ formulaEquationPreview.enable = function() {
                 inputData.inputId,
                 'preview_formcalc',
                 {formula: formula, request_start: now},
-                inputData.requestCallback
+                inputData.requestCallback,
             );
             // ).fail(function () {
             //     // This is run when ajax call fails.
@@ -133,7 +133,7 @@ formulaEquationPreview.enable = function() {
         } else {
             inputData.requestCallback({
                 preview: '',
-                request_start: now
+                request_start: now,
             });
         }
     }
@@ -180,7 +180,7 @@ formulaEquationPreview.enable = function() {
                         if (inputData.jax) {
                             // Set the text as the latex code, and then update the MathJax.
                             MathJax.Hub.Queue(
-                                ['Text', inputData.jax, latex]
+                                ['Text', inputData.jax, latex],
                             );
                         } else if (latex) {
                             console.log('[FormulaEquationInput] Oops no mathjax for ', latex);

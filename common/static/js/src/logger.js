@@ -12,7 +12,7 @@
                 url: '/event',
                 type: 'POST',
                 data: data,
-                async: true
+                async: true,
             }, options);
             return request(options);
         };
@@ -49,7 +49,7 @@
                                     eventType: eventType,
                                     data: data,
                                     element: element,
-                                    error: err
+                                    error: err,
                                 });
                             }
                         });
@@ -60,7 +60,7 @@
                     event_type: eventType,
                     event: JSON.stringify(data),
                     courserun_key: typeof $$course_id !== 'undefined' ? $$course_id : null,
-                    page: window.location.href
+                    page: window.location.href,
                 }, requestOptions);
             },
 
@@ -88,10 +88,10 @@
                     sendRequest({
                         event_type: 'page_close',
                         event: '',
-                        page: window.location.href
+                        page: window.location.href,
                     }, {type: 'GET', async: false});
                 };
-            }
+            },
         };
     }());
 

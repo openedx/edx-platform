@@ -4,7 +4,7 @@
  */
 define([
     'js/views/baseview', 'underscore', 'gettext', 'underscore.string',
-    'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'
+    'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils',
 ],
 function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
     'use strict';
@@ -13,7 +13,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
         events: {
             'click .edit': 'editConfiguration',
             'click .show-groups': 'showGroups',
-            'click .hide-groups': 'hideGroups'
+            'click .hide-groups': 'hideGroups',
         },
 
         className: function() {
@@ -22,13 +22,13 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
             return [
                 'collection',
                 'group-configuration-details',
-                'group-configuration-details-' + index
+                'group-configuration-details-' + index,
             ].join(' ');
         },
 
         initialize: function() {
             this.template = HtmlUtils.template(
-                $('#group-configuration-details-tpl').text()
+                $('#group-configuration-details-tpl').text(),
             );
             this.listenTo(this.model, 'change', this.render);
         },
@@ -38,7 +38,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
                 groupsCountMessage: this.getGroupsCountTitle(),
                 usageCountMessage: this.getUsageCountTitle(),
                 courseOutlineUrl: this.model.collection.outlineUrl,
-                index: this.model.collection.indexOf(this.model)
+                index: this.model.collection.indexOf(this.model),
             });
             HtmlUtils.setHtml(this.$el, this.template(attrs));
             return this;
@@ -68,7 +68,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
                         configuration contains.
                     */
                     'Contains {count} group', 'Contains {count} groups',
-                    count
+                    count,
                 );
 
             return StringUtils.interpolate(message, {count: count});
@@ -87,12 +87,12 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
                         configuration is used in.
                     */
                     'Used in {count} location', 'Used in {count} locations',
-                    count
+                    count,
                 ),
-                {count: count}
+                {count: count},
                 );
             }
-        }
+        },
     });
 
     return GroupConfigurationDetailsView;

@@ -16,7 +16,7 @@ define(
                     '.gif': 'image/gif',
                     '.jpg': 'image/jpeg',
                     '.jpeg': 'image/jpeg',
-                    '.png': 'image/png'
+                    '.png': 'image/png',
                 },
                 videoListView,
                 videoThumbnailView,
@@ -44,11 +44,11 @@ define(
                         created: '2014-11-25T23:13:05',
                         edx_video_id: 'dummy_id',
                         status: 'uploading',
-                        transcripts: []
+                        transcripts: [],
                     },
                     collection = new Backbone.Collection(_.map(_.range(numVideos), function(num, index) {
                         return new Backbone.Model(
-                            _.extend({}, defaultData, {edx_video_id: 'dummy_id_' + index}, modelData)
+                            _.extend({}, defaultData, {edx_video_id: 'dummy_id_' + index}, modelData),
                         );
                     }));
                 videoListView = new PreviousVideoUploadListView({
@@ -61,11 +61,11 @@ define(
                         max_width: VIDEO_IMAGE_MAX_WIDTH,
                         max_height: VIDEO_IMAGE_MAX_HEIGHT,
                         supported_file_formats: VIDEO_IMAGE_SUPPORTED_FILE_FORMATS,
-                        video_image_upload_enabled: videoImageUploadEnabled
+                        video_image_upload_enabled: videoImageUploadEnabled,
                     },
                     transcriptAvailableLanguages: [],
                     videoSupportedFileFormats: [],
-                    videoTranscriptSettings: {}
+                    videoTranscriptSettings: {},
                 });
                 $videoListEl = videoListView.render().$el;
 
@@ -97,18 +97,18 @@ define(
 
                 if (additionalSRText) {
                     expect(
-                        $thumbnail.find('.thumbnail-action .action-text-sr').text().trim()
+                        $thumbnail.find('.thumbnail-action .action-text-sr').text().trim(),
                     ).toEqual(additionalSRText);
                 }
 
                 if (state !== 'error') {
                     expect($thumbnail.find('.action-icon').html().trim()).toEqual(
-                        videoThumbnailView.actionsInfo[state].icon
+                        videoThumbnailView.actionsInfo[state].icon,
                     );
                 }
 
                 expect($thumbnail.find('.action-text').html().trim()).toEqual(
-                    videoThumbnailView.actionsInfo[state].text
+                    videoThumbnailView.actionsInfo[state].text,
                 );
 
                 // Verify if messages are restored after focus moved away
@@ -157,7 +157,7 @@ define(
                         {duration: 103, machine: '1:43', humanize: 'Video duration is 1 minute and 43 seconds'},
                         {duration: 120, machine: '2:00', humanize: 'Video duration is 2 minutes'},
                         {duration: 500, machine: '8:20', humanize: 'Video duration is 8 minutes and 20 seconds'},
-                        {duration: 7425, machine: '123:45', humanize: 'Video duration is 123 minutes and 45 seconds'}
+                        {duration: 7425, machine: '123:45', humanize: 'Video duration is 123 minutes and 45 seconds'},
                     ],
                     expectedDuration;
 
@@ -193,7 +193,7 @@ define(
                     requests,
                     'POST',
                     IMAGE_UPLOAD_URL + '/dummy_id_' + videoViewIndex,
-                    new FormData()
+                    new FormData(),
                 );
 
                 // Send successful upload response
@@ -224,14 +224,14 @@ define(
                     'types are ' + videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.',
                     successData = {
                         files: [createFakeImageFile()],
-                        submit: function() {}
+                        submit: function() {},
                     },
                     failureData = {
                         jqXHR: {
                             responseText: JSON.stringify({
-                                error: errorMessage
-                            })
-                        }
+                                error: errorMessage,
+                            }),
+                        },
                     };
 
                 spyOn(videoThumbnailView, 'readMessages');
@@ -242,7 +242,7 @@ define(
                 expect(videoThumbnailView.readMessages).toHaveBeenCalledWith(['Video image upload completed']);
                 videoThumbnailView.imageUploadFailed({}, failureData);
                 expect(videoThumbnailView.readMessages).toHaveBeenCalledWith(
-                    ['Could not upload the video image file', errorMessage]
+                    ['Could not upload the video image file', errorMessage],
                 );
             });
 
@@ -271,7 +271,7 @@ define(
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                     .trim()).toEqual(
                     'Image upload failed. The selected image must be larger than ' +
-                    videoThumbnailView.getVideoImageMinSize().humanize + '.'
+                    videoThumbnailView.getVideoImageMinSize().humanize + '.',
                 );
             });
 
@@ -286,7 +286,7 @@ define(
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                     .trim()).toEqual(
                     'Image upload failed. The selected image must be smaller than ' +
-                    videoThumbnailView.getVideoImageMaxSize().humanize + '.'
+                    videoThumbnailView.getVideoImageMaxSize().humanize + '.',
                 );
             });
 
@@ -323,7 +323,7 @@ define(
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                     .trim()).toEqual(
                     'Image upload failed. This image file type is not supported. Supported file types are ' +
-                    videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.'
+                    videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.',
                 );
             });
 
@@ -338,5 +338,5 @@ define(
                 expect($videoListEl.find('.thumbnail-error-wrapper')).not.toExist();
             });
         });
-    }
+    },
 );

@@ -8,7 +8,7 @@ define(['backbone', 'js/models/chapter'], function(Backbone, ChapterModel) {
         },
         isEmpty: function() {
             return this.length === 0 || this.every(function(m) { return m.isEmpty(); });
-        }
+        },
     });
     return ChapterCollection;
 });

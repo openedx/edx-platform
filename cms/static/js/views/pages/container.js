@@ -22,12 +22,12 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .move-button': 'showMoveXBlockModal',
             'click .delete-button': 'deleteXBlock',
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
-            'click .new-component-button': 'scrollToNewComponentButtons'
+            'click .new-component-button': 'scrollToNewComponentButtons',
         },
 
         options: {
             collapsedClass: 'is-collapsed',
-            canEdit: true // If not specified, assume user has permission to make changes
+            canEdit: true, // If not specified, assume user has permission to make changes
         },
 
         view: 'container_preview',
@@ -46,12 +46,12 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             this.isLibraryPage = (this.model.attributes.category === 'library');
             this.nameEditor = new XBlockStringFieldEditor({
                 el: this.$('.wrapper-xblock-field'),
-                model: this.model
+                model: this.model,
             });
             this.nameEditor.render();
             if (!this.isLibraryPage) {
                 this.accessEditor = new XBlockAccessEditor({
-                    el: this.$('.wrapper-xblock-field')
+                    el: this.$('.wrapper-xblock-field'),
                 });
                 this.accessEditor.render();
             }
@@ -61,14 +61,14 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             this.xblockView = this.getXBlockView();
             this.messageView = new ContainerSubviews.MessageView({
                 el: this.$('.container-message'),
-                model: this.model
+                model: this.model,
             });
             this.messageView.render();
             // Display access message on units and split test components
             if (!this.isLibraryPage) {
                 this.containerAccessView = new ContainerSubviews.ContainerAccess({
                     el: this.$('.container-access'),
-                    model: this.model
+                    model: this.model,
                 });
                 this.containerAccessView.render();
 
@@ -76,25 +76,25 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     el: this.$('#publish-unit'),
                     model: this.model,
                     // When "Discard Changes" is clicked, the whole page must be re-rendered.
-                    renderPage: this.render
+                    renderPage: this.render,
                 });
                 this.xblockPublisher.render();
 
                 this.publishHistory = new ContainerSubviews.PublishHistory({
                     el: this.$('#publish-history'),
-                    model: this.model
+                    model: this.model,
                 });
                 this.publishHistory.render();
 
                 this.viewLiveActions = new ContainerSubviews.ViewLiveButtonController({
                     el: this.$('.nav-actions'),
-                    model: this.model
+                    model: this.model,
                 });
                 this.viewLiveActions.render();
 
                 this.unitOutlineView = new UnitOutlineView({
                     el: this.$('.wrapper-unit-overview'),
-                    model: this.model
+                    model: this.model,
                 });
                 this.unitOutlineView.render();
             }
@@ -106,7 +106,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             return {
                 el: this.$('.wrapper-xblock'),
                 model: this.model,
-                view: this.view
+                view: this.view,
             };
         },
 
@@ -148,7 +148,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     // Re-enable Backbone events for any updated DOM elements
                     self.delegateEvents();
                 },
-                block_added: options && options.block_added
+                block_added: options && options.block_added,
             });
         },
 
@@ -173,7 +173,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     var component = new AddXBlockComponent({
                         el: element,
                         createComponent: _.bind(self.createComponent, self),
-                        collection: self.options.templates
+                        collection: self.options.templates,
                     });
                     component.render();
                 });
@@ -211,7 +211,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 readOnlyView: !this.options.canEdit,
                 refresh: function() {
                     self.refreshXBlock(xblockElement, false);
-                }
+                },
             });
         },
 
@@ -238,7 +238,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 // Translators: "title" is the name of the current component or unit being edited.
                 titleFormat: gettext('Editing access for: {title}'),
                 viewSpecificClasses: '',
-                modalSize: 'med'
+                modalSize: 'med',
             });
         },
 
@@ -254,7 +254,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     sourceXBlockInfo: XBlockUtils.findXBlockInfo(xblockElement, this.model),
                     sourceParentXBlockInfo: XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
                     XBlockURLRoot: this.getURLRoot(),
-                    outlineURL: this.options.outlineURL
+                    outlineURL: this.options.outlineURL,
                 });
 
             event.preventDefault();
@@ -281,7 +281,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 scrollOffset = ViewUtils.getScrollOffset(buttonPanel),
                 $placeholderEl = $(this.createPlaceholderElement()),
                 requestData = _.extend(template, {
-                    parent_locator: parentLocator
+                    parent_locator: parentLocator,
                 }),
                 placeholderElement;
             placeholderElement = $placeholderEl.appendTo(listPanel);
@@ -323,7 +323,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         deleteComponent: function(xblockElement) {
             var self = this,
                 xblockInfo = new XBlockInfo({
-                    id: xblockElement.data('locator')
+                    id: xblockElement.data('locator'),
                 });
             XBlockUtils.deleteXBlock(xblockInfo).done(function() {
                 self.onDelete(xblockElement);
@@ -408,7 +408,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 TemporaryXBlockView,
                 temporaryView;
             xblockInfo = new XBlockInfo({
-                id: xblockElement.data('locator')
+                id: xblockElement.data('locator'),
             });
             // There is only one Backbone view created on the container page, which is
             // for the container xblock itself. Any child xblocks rendered inside the
@@ -419,26 +419,26 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     // Replace the element with the new HTML content, rather than adding
                     // it as child elements.
                     this.$el = $(html).replaceAll(element); // xss-lint: disable=javascript-jquery-insertion
-                }
+                },
             });
             temporaryView = new TemporaryXBlockView({
                 model: xblockInfo,
                 view: self.xblockView.new_child_view,
-                el: xblockElement
+                el: xblockElement,
             });
             return temporaryView.render({
                 success: function() {
                     self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
                     temporaryView.unbind();  // Remove the temporary view
                 },
-                initRuntimeData: this
+                initRuntimeData: this,
             });
         },
 
         scrollToNewComponentButtons: function(event) {
             event.preventDefault();
             $.scrollTo(this.$('.add-xblock-component'), {duration: 250});
-        }
+        },
     });
 
     return XBlockContainerPage;

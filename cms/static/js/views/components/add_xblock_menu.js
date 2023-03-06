@@ -18,11 +18,11 @@ define(['jquery', 'js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
                         support_legend: this.model.support_legend,
                         support_indicator_template: support_indicator_template,
                         support_legend_template: support_legend_template,
-                        HtmlUtils: HtmlUtils
-                    }))
+                        HtmlUtils: HtmlUtils,
+                    })),
                 );
                 // Make the tabs on problems into "real tabs"
                 this.$('.tab-group').tabs();
-            }
+            },
         });
     }); // end define();

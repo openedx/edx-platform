@@ -63,20 +63,20 @@ var commonFiles = {
         {pattern: 'edx-ui-toolkit/js/**/*.js'},
         {pattern: 'xmodule_js/common_static/common/js/**/!(*spec).js'},
         {pattern: 'xmodule_js/common_static/js/**/!(*spec).js'},
-        {pattern: 'xmodule_js/src/**/*.js'}
+        {pattern: 'xmodule_js/src/**/*.js'},
     ],
 
     sourceFiles: [
-        {pattern: 'common/js/!(spec_helpers)/**/!(*spec).js'}
+        {pattern: 'common/js/!(spec_helpers)/**/!(*spec).js'},
     ],
 
     specFiles: [
-        {pattern: 'common/js/spec_helpers/**/*.js'}
+        {pattern: 'common/js/spec_helpers/**/*.js'},
     ],
 
     fixtureFiles: [
-        {pattern: 'common/templates/**/*.underscore'}
-    ]
+        {pattern: 'common/templates/**/*.underscore'},
+    ],
 };
 
 webpackConfig[0].plugins.splice(commonsChunkPluginIndex, 1);
@@ -130,7 +130,7 @@ function getBasepathAndFilename(filepath) {
         // these will configure the reporters to create report files relative to this karma config file
         return {
             dir: undefined,
-            file: undefined
+            file: undefined,
         };
     }
     file = filepath.replace(/^.*[\\/]/, '');
@@ -138,7 +138,7 @@ function getBasepathAndFilename(filepath) {
 
     return {
         dir: dir,
-        file: file
+        file: file,
     };
 }
 
@@ -156,8 +156,8 @@ function coverageSettings(config) {
         includeAllSources: true,
         reporters: [
             {type: 'cobertura', file: pth.file},
-            {type: 'text-summary'}
-        ]
+            {type: 'text-summary'},
+        ],
     };
 }
 
@@ -175,7 +175,7 @@ function junitSettings(config) {
         suite: 'javascript',
         useBrowserName: false,
         nameFormatter: junitNameFormatter,
-        classNameFormatter: junitClassNameFormatter
+        classNameFormatter: junitClassNameFormatter,
     };
 }
 
@@ -246,13 +246,13 @@ function getBaseConfig(config, useRequireJs) {
             'node_modules/bootstrap/dist/js/bootstrap.js',
             'node_modules/underscore/underscore.js',
             'node_modules/backbone/backbone.js',
-            'common/static/js/test/i18n.js'
+            'common/static/js/test/i18n.js',
         ];
 
         if (useRequireJs) {
             files = files.concat([
                 'node_modules/requirejs/require.js',
-                'node_modules/karma-requirejs/lib/adapter.js'
+                'node_modules/karma-requirejs/lib/adapter.js',
             ]);
         }
 
@@ -271,7 +271,7 @@ function getBaseConfig(config, useRequireJs) {
                 pattern: path.join(appRoot, f),
                 included: true,
                 served: true,
-                watch: false
+                watch: false,
             });
         });
     };
@@ -279,7 +279,7 @@ function getBaseConfig(config, useRequireJs) {
     var hostname = 'localhost';
     var port = 9876;
     var customPlugin = {
-        'framework:custom': ['factory', initFrameworks]
+        'framework:custom': ['factory', initFrameworks],
     };
 
     if (process.env.hasOwnProperty('BOK_CHOY_HOSTNAME')) {
@@ -313,7 +313,7 @@ function getBaseConfig(config, useRequireJs) {
             'karma-selenium-webdriver-launcher',
             'karma-webpack',
             'karma-sourcemap-loader',
-            customPlugin
+            customPlugin,
         ],
 
 
@@ -326,7 +326,7 @@ function getBaseConfig(config, useRequireJs) {
         // Spec Reporter configuration
         specReporter: {
             maxLogLines: 5,
-            showSpecTiming: true
+            showSpecTiming: true,
         },
 
 
@@ -365,8 +365,8 @@ function getBaseConfig(config, useRequireJs) {
                 base: 'Firefox',
                 prefs: {
                     'app.update.auto': false,
-                    'app.update.enabled': false
-                }
+                    'app.update.enabled': false,
+                },
             },
             ChromeDocker: {
                 base: 'SeleniumWebdriver',
@@ -376,7 +376,7 @@ function getBaseConfig(config, useRequireJs) {
                         .forBrowser('chrome')
                         .usingServer('http://edx.devstack.chrome:4444/wd/hub')
                         .build();
-                }
+                },
             },
             FirefoxDocker: {
                 base: 'SeleniumWebdriver',
@@ -391,8 +391,8 @@ function getBaseConfig(config, useRequireJs) {
                         .usingServer('http://edx.devstack.firefox:4444/wd/hub')
                         .setFirefoxOptions(options)
                         .build();
-                }
-            }
+                },
+            },
         },
 
         // Continuous Integration mode
@@ -406,16 +406,16 @@ function getBaseConfig(config, useRequireJs) {
         browserNoActivityTimeout: 50000,
 
         client: {
-            captureConsole: false
+            captureConsole: false,
         },
 
         webpack: webpackConfig[0],
 
         webpackMiddleware: {
             watchOptions: {
-                poll: true
-            }
-        }
+                poll: true,
+            },
+        },
     };
 }
 
@@ -433,12 +433,12 @@ function configure(config, options) {
     files = _.flatten(
         _.map(
             ['libraryFilesToInclude', 'libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runFiles'],
-            function(collectionName) { return options[collectionName] || []; }
-        )
+            function(collectionName) { return options[collectionName] || []; },
+        ),
     );
 
     files.unshift(
-        {pattern: path.join(appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true}
+        {pattern: path.join(appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
     );
 
     if (useRequireJs) {
@@ -452,8 +452,8 @@ function configure(config, options) {
     filesForCoverage = _.flatten(
         _.map(
             ['sourceFiles', 'specFiles'],
-            function(collectionName) { return options[collectionName]; }
-        )
+            function(collectionName) { return options[collectionName]; },
+        ),
     );
 
     // If we give symlink paths to Istanbul, coverage for each path gets tracked
@@ -461,16 +461,16 @@ function configure(config, options) {
     preprocessors = _.extend(
         {},
         options.preprocessors,
-        normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc, options.preprocessors)
+        normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc, options.preprocessors),
     );
 
     config.set(_.extend(baseConfig, {
         files: files,
-        preprocessors: preprocessors
+        preprocessors: preprocessors,
     }));
 }
 
 module.exports = {
     configure: configure,
-    appRoot: appRoot
+    appRoot: appRoot,
 };

@@ -92,7 +92,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
                 inputLabel: 'test label',
                 inputTip: 'test tip',
                 submitButtonText: 'upload button text',
-                extensions: '.csv,.txt'
+                extensions: '.csv,.txt',
             }).render();
 
             verifyTitle('file upload title');
@@ -127,9 +127,9 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
                     var message = interpolate_text("Custom error for '{file}'", {file: file});
                     return new NotificationModel({
                         type: 'customized',
-                        title: message
+                        title: message,
                     });
-                }
+                },
             }).render();
             var requests = mimicUpload(this);
             respondWithError(requests, 'server error');
@@ -155,9 +155,9 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
                     var message = interpolate_text("Custom success message for '{file}'", {file: file});
                     return new NotificationModel({
                         type: 'customized',
-                        title: message
+                        title: message,
                     });
-                }
+                },
             }).render();
             var requests = mimicUpload(this);
             respondWithSuccess(requests);

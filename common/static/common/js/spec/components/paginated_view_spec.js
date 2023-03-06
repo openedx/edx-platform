@@ -4,7 +4,7 @@ define([
     'underscore',
     'edx-ui-toolkit/js/pagination/paging-collection',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/components/views/paginated_view'
+    'common/js/components/views/paginated_view',
 ], function($, Backbone, _, PagingCollection, AjaxHelpers, PaginatedView) {
     'use strict';
     describe('PaginatedView', function() {
@@ -17,7 +17,7 @@ define([
                 render: function() {
                     this.$el.text(this.model.get('text'));
                     return this;
-                }
+                },
             }),
             TestPaginatedView = PaginatedView.extend({type: 'test', itemViewClass: TestItemView}),
             testCollection,
@@ -28,7 +28,7 @@ define([
             generateItems = function(numItems) {
                 return _.map(_.range(numItems), function(i) {
                     return {
-                        text: 'item ' + i
+                        text: 'item ' + i,
                     };
                 });
             };
@@ -38,8 +38,8 @@ define([
             initialItems = generateItems(5);
             var TestPagingCollection = PagingCollection.extend({
                 state: {
-                    pageSize: 5
-                }
+                    pageSize: 5,
+                },
             });
 
             testCollection = new TestPagingCollection();
@@ -48,7 +48,7 @@ define([
                 count: 6,
                 num_pages: 2,
                 page: 1,
-                results: initialItems
+                results: initialItems,
             }, {parse: true});
             testView = new TestPaginatedView({el: '.test-container', collection: testCollection}).render();
         });
@@ -101,9 +101,9 @@ define([
                     num_pages: 1,
                     page: 1,
                     start: 0,
-                    results: initialItems
+                    results: initialItems,
                 },
-                {parse: true}
+                {parse: true},
             );
             expectHeader('Showing 1 out of 1 total');
             expectItems(initialItems);
@@ -122,7 +122,7 @@ define([
                 count: 6,
                 num_pages: 2,
                 page: 2,
-                results: newItems
+                results: newItems,
             });
             expectHeader('Showing 6-6 out of 6 total');
             expectItems(newItems);
@@ -138,9 +138,9 @@ define([
                     count: 6,
                     num_pages: 2,
                     page: 2,
-                    results: initialItems
+                    results: initialItems,
                 },
-                {parse: true}
+                {parse: true},
             );
             expectHeader('Showing 6-6 out of 6 total');
             expectItems(initialItems);
@@ -151,7 +151,7 @@ define([
                 count: 6,
                 num_pages: 2,
                 page: 1,
-                results: previousPageItems
+                results: previousPageItems,
             });
             expectHeader('Showing 1-5 out of 6 total');
             expectItems(previousPageItems);
@@ -166,7 +166,7 @@ define([
                 count: 6,
                 num_pages: 2,
                 page: 2,
-                results: generateItems(1)
+                results: generateItems(1),
             });
             expect(testView.$('.sr-is-focusable').focus).toHaveBeenCalled();
         });

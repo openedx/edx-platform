@@ -81,7 +81,7 @@
          */
                 isEnd: function() {
                     return this.index === this.lastIndex;
-                }
+                },
             };
 
             return Iterator;

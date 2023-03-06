@@ -15,14 +15,14 @@ define(
             UNPACKING: 1,
             VERIFYING: 2,
             UPDATING: 3,
-            SUCCESS: 4
+            SUCCESS: 4,
         };
 
         var STATE = {
             READY: 1,
             IN_PROGRESS: 2,
             SUCCESS: 3,
-            ERROR: 4
+            ERROR: 4,
         };
 
         var current = {stage: 0, state: STATE.READY};
@@ -32,7 +32,7 @@ define(
         var $dom = {
             stages: $('ol.status-progress').children(),
             successStage: $('.item-progresspoint-success'),
-            wrapper: $('div.wrapper-status')
+            wrapper: $('div.wrapper-status'),
         };
 
         var CourseImport;
@@ -77,7 +77,7 @@ define(
             $.cookie(COOKIE_NAME, JSON.stringify({
                 file: file,
                 date: moment().valueOf(),
-                completed: completed || false
+                completed: completed || false,
             }), {path: window.location.pathname});
         };
 
@@ -105,7 +105,7 @@ define(
                     stageMsg = HtmlUtils.joinHtml(
                         HtmlUtils.HTML('<p class="copy error">'),
                         stageMsg,
-                        HtmlUtils.HTML('</p>')
+                        HtmlUtils.HTML('</p>'),
                     );
                     $(stage)
                         .removeClass('is-started')
@@ -333,7 +333,7 @@ define(
              */
             storedImport: function() {
                 return JSON.parse($.cookie(COOKIE_NAME));
-            }
+            },
         };
 
         return CourseImport;

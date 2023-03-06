@@ -5,8 +5,8 @@
             idAttribute: 'id',
             defaults: {
                 name: '',
-                user_partition_id: null
-            }
+                user_partition_id: null,
+            },
         });
         return ContentGroupModel;
     });

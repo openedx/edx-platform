@@ -20,7 +20,7 @@ define([], function() {
                     currency: 'usd',
                     expiration_datetime: null,
                     description: null,
-                    sku: '6ED7EDC'
+                    sku: '6ED7EDC',
                 },
                 {
                     slug: 'verified',
@@ -30,8 +30,8 @@ define([], function() {
                     currency: 'usd',
                     expiration_datetime: null,
                     description: null,
-                    sku: '25A5354'
-                }
+                    sku: '25A5354',
+                },
             ],
             enrollment_start: null,
             course_id: testCourse,
@@ -40,7 +40,7 @@ define([], function() {
             verified_price: 5,
             verified_upgrade_deadline: null,
             verification_deadline: '2017-09-01T16:00:00Z',
-            manual_enrollment: {}
-        }
+            manual_enrollment: {},
+        },
     };
 });

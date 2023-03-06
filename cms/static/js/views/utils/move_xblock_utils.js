@@ -10,7 +10,7 @@ define([
     'js/views/utils/xblock_utils',
     'js/views/utils/move_xblock_utils',
     'edx-ui-toolkit/js/utils/string-utils',
-    'jquery.smoothScroll'
+    'jquery.smoothScroll',
 ],
 function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtils) {
     'use strict';
@@ -31,8 +31,8 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
                     StringUtils.interpolate(
                         gettext('Success! "{displayName}" has been moved.'),
                         {
-                            displayName: data.sourceDisplayName
-                        }
+                            displayName: data.sourceDisplayName,
+                        },
                     ),
                     {
                         sourceXBlockElement: data.sourceXBlockElement,
@@ -40,8 +40,8 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
                         sourceLocator: data.sourceLocator,
                         sourceParentLocator: data.sourceParentLocator,
                         targetParentLocator: data.targetParentLocator,
-                        targetIndex: response.source_index
-                    }
+                        targetIndex: response.source_index,
+                    },
                 );
                 Backbone.trigger('move:onXBlockMoved');
             });
@@ -56,9 +56,9 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
                     StringUtils.interpolate(
                         gettext('Move cancelled. "{sourceDisplayName}" has been moved back to its original location.'),
                         {
-                            sourceDisplayName: data.sourceDisplayName
-                        }
-                    )
+                            sourceDisplayName: data.sourceDisplayName,
+                        },
+                    ),
                 );
                 Backbone.trigger('move:onXBlockMoved');
             });
@@ -81,10 +81,10 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
                                     sourceDisplayName: data.sourceDisplayName,
                                     sourceLocator: data.sourceLocator,
                                     sourceParentLocator: data.sourceParentLocator,
-                                    targetIndex: data.targetIndex
-                                }
+                                    targetIndex: data.targetIndex,
+                                },
                             );
-                        }
+                        },
                     },
                     secondary: [
                         {
@@ -92,14 +92,14 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
                             class: 'action-cancel',
                             click: function() {
                                 redirectLink('/container/' + data.targetParentLocator);
-                            }
-                        }
-                    ]
-                }
+                            },
+                        },
+                    ],
+                },
             });
         } else {
             movedAlertView = new AlertView.Confirmation({
-                title: title
+                title: title,
             });
         }
         movedAlertView.show();
@@ -107,7 +107,7 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
         $.smoothScroll({
             offset: 0,
             easing: 'swing',
-            speed: 1000
+            speed: 1000,
         });
         movedAlertView.$('.wrapper').first().focus();
         return movedAlertView;
@@ -125,6 +125,6 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
         moveXBlock: moveXBlock,
         undoMoveXBlock: undoMoveXBlock,
         showMovedNotification: showMovedNotification,
-        hideMovedNotification: hideMovedNotification
+        hideMovedNotification: hideMovedNotification,
     };
 });

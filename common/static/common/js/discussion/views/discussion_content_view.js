@@ -43,7 +43,7 @@
                 'click .discussion-flag-abuse': 'toggleFlagAbuse',
                 'keydown .discussion-flag-abuse': function(event) {
                     return DiscussionUtil.activateOnSpace(event, this.toggleFlagAbuse);
-                }
+                },
             };
 
             DiscussionContentView.prototype.attrRenderer = {
@@ -62,7 +62,7 @@
                         }
                     }
                     return _results;
-                }
+                },
             };
 
             DiscussionContentView.prototype.abilityRenderer = {
@@ -72,7 +72,7 @@
                     },
                     disable: function() {
                         return this.$('.action-edit').closest('.actions-item').addClass('is-hidden');
-                    }
+                    },
                 },
                 can_delete: {
                     enable: function() {
@@ -80,7 +80,7 @@
                     },
                     disable: function() {
                         return this.$('.action-delete').closest('.actions-item').addClass('is-hidden');
-                    }
+                    },
                 },
                 can_openclose: {
                     enable: function() {
@@ -94,7 +94,7 @@
                         return _.each(['.action-close', '.action-pin'], function(selector) {
                             return self.$(selector).closest('.actions-item').addClass('is-hidden');
                         });
-                    }
+                    },
                 },
                 can_report: {
                     enable: function() {
@@ -102,7 +102,7 @@
                     },
                     disable: function() {
                         return this.$('.action-report').closest('.actions-item').addClass('is-hidden');
-                    }
+                    },
                 },
                 can_vote: {
                     enable: function() {
@@ -110,8 +110,8 @@
                     },
                     disable: function() {
                         this.$('.action-vote').closest('.actions-item').addClass('is-disabled');
-                    }
-                }
+                    },
+                },
             };
 
             DiscussionContentView.prototype.renderPartialAttrs = function() {
@@ -229,7 +229,7 @@
                     ['.action-edit', 'edit'],
                     ['.action-delete', '_delete'],
                     ['.action-report', 'toggleReport'],
-                    ['.action-close', 'toggleClose']
+                    ['.action-close', 'toggleClose'],
                 ],
                 function(obj, event) {
                     var funcName, selector;
@@ -243,7 +243,7 @@
                     };
                     return obj;
                 },
-                {}
+                {},
             );
 
             DiscussionContentShowView.prototype.updateButtonState = function(selector, checked) {
@@ -277,10 +277,10 @@
                         button = this.$el.find(selector);
                         numVotes = votes.up_count;
                         votesCountMsg = ngettext(
-                            'there is currently {numVotes} vote', 'there are currently {numVotes} votes', numVotes
+                            'there is currently {numVotes} vote', 'there are currently {numVotes} votes', numVotes,
                         );
                         button.find('.js-sr-vote-count').empty().text(
-                            edx.StringUtils.interpolate(votesCountMsg, {numVotes: numVotes})
+                            edx.StringUtils.interpolate(votesCountMsg, {numVotes: numVotes}),
                         );
                         votesText = edx.StringUtils.interpolate(
                             ngettext('{numVotes} Vote', '{numVotes} Votes', numVotes),
@@ -302,8 +302,8 @@
                         this.updateButtonState('.action-close', closed);
                         this.$('.post-label-closed').toggleClass('is-hidden', !closed);
                         return this.$('.display-vote').toggle(closed);
-                    }
-                }
+                    },
+                },
             );
 
             DiscussionContentShowView.prototype.toggleSecondaryActions = function(event) {
@@ -356,11 +356,11 @@
                     msg = gettext('You could not be unsubscribed from this post. Refresh the page and try again.');
                 }
                 return DiscussionUtil.updateWithUndo(this.model, {
-                    subscribed: isSubscribing
+                    subscribed: isSubscribing,
                 }, {
                     url: url,
                     type: 'POST',
-                    $elem: $(event.currentTarget)
+                    $elem: $(event.currentTarget),
                 }, msg);
             };
 
@@ -375,8 +375,8 @@
                     endorsement: isEndorsing ? {
                         username: DiscussionUtil.getUser().get('username'),
                         user_id: DiscussionUtil.getUser().id,
-                        time: new Date().toISOString()
-                    } : null
+                        time: new Date().toISOString(),
+                    } : null,
                 };
                 if (this.model.get('thread').get('thread_type') === 'question') {
                     if (isEndorsing) {
@@ -398,10 +398,10 @@
                         url: url,
                         type: 'POST',
                         data: {endorsed: isEndorsing},
-                        $elem: $(event.currentTarget)
+                        $elem: $(event.currentTarget),
                     },
                     msg,
-                    function() { return self.trigger('comment:endorse'); }
+                    function() { return self.trigger('comment:endorse'); },
                 ).always(this.trigger('comment:endorse'));
             };
 
@@ -413,13 +413,13 @@
                 isVoting = !user.voted(this.model);
                 url = this.model.urlFor(isVoting ? 'upvote' : 'unvote');
                 updates = {
-                    upvoted_ids: (isVoting ? _.union : _.difference)(user.get('upvoted_ids'), [this.model.id])
+                    upvoted_ids: (isVoting ? _.union : _.difference)(user.get('upvoted_ids'), [this.model.id]),
                 };
                 if (!$(event.target.closest('.actions-item')).hasClass('is-disabled')) {
                     return DiscussionUtil.updateWithUndo(user, updates, {
                         url: url,
                         type: 'POST',
-                        $elem: $(event.currentTarget)
+                        $elem: $(event.currentTarget),
                     }, gettext('This vote could not be processed. Refresh the page and try again.')).done(function() {
                         if (isVoting) {
                             return self.model.vote();
@@ -441,11 +441,11 @@
                     msg = gettext('This post could not be unpinned. Refresh the page and try again.');
                 }
                 return DiscussionUtil.updateWithUndo(this.model, {
-                    pinned: isPinning
+                    pinned: isPinning,
                 }, {
                     url: url,
                     type: 'POST',
-                    $elem: $(event.currentTarget)
+                    $elem: $(event.currentTarget),
                 }, msg);
             };
 
@@ -462,13 +462,13 @@
                 url = this.model.urlFor(isFlagging ? 'flagAbuse' : 'unFlagAbuse');
                 updates = {
                     abuse_flaggers: (isFlagging ? _.union : _.difference)(
-                        this.model.get('abuse_flaggers'), [DiscussionUtil.getUser().id]
-                    )
+                        this.model.get('abuse_flaggers'), [DiscussionUtil.getUser().id],
+                    ),
                 };
                 return DiscussionUtil.updateWithUndo(this.model, updates, {
                     url: url,
                     type: 'POST',
-                    $elem: $(event.currentTarget)
+                    $elem: $(event.currentTarget),
                 }, msg);
             };
 
@@ -482,13 +482,13 @@
                     msg = gettext('This post could not be reopened. Refresh the page and try again.');
                 }
                 updates = {
-                    closed: isClosing
+                    closed: isClosing,
                 };
                 return DiscussionUtil.updateWithUndo(this.model, updates, {
                     url: this.model.urlFor('close'),
                     type: 'POST',
                     data: updates,
-                    $elem: $(event.currentTarget)
+                    $elem: $(event.currentTarget),
                 }, msg);
             };
 
@@ -497,7 +497,7 @@
                     username: this.model.get('username') || null,
                     user_url: this.model.get('user_url'),
                     is_community_ta: this.model.get('community_ta_authored'),
-                    is_staff: this.model.get('staff_authored')
+                    is_staff: this.model.get('staff_authored'),
                 });
             };
 
@@ -510,7 +510,7 @@
                         user_url: DiscussionUtil.urlFor('user_profile', endorsement.user_id),
                         is_community_ta: DiscussionUtil.isTA(endorsement.user_id) ||
                                          DiscussionUtil.isGroupTA(endorsement.user_id),
-                        is_staff: DiscussionUtil.isStaff(endorsement.user_id)
+                        is_staff: DiscussionUtil.isStaff(endorsement.user_id),
                     });
                 } else {
                     return null;

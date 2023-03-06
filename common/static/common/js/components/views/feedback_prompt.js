@@ -6,7 +6,7 @@
                 options: $.extend({}, SystemFeedbackView.prototype.options, {
                     type: 'prompt',
                     closeIcon: false,
-                    icon: false
+                    icon: false,
                 }),
                 render: function() {
                     if (!window.$body) { window.$body = $(document.body); }
@@ -26,7 +26,7 @@
                 hide: function() {
                     SystemFeedbackView.prototype.hide.apply(this, arguments);
                     return this.outFocus();
-                }
+                },
             });
 
             // create Prompt.Warning, Prompt.Confirmation, etc
@@ -37,8 +37,8 @@
                 var subclass;
                 subclass = Prompt.extend({
                     options: $.extend({}, Prompt.prototype.options, {
-                        intent: intent
-                    })
+                        intent: intent,
+                    }),
                 });
                 Prompt[capitalCamel(intent)] = subclass;
             });

@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory'
+    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory',
 ], function($, _, Annotator, NotesFactory) {
     'use strict';
     describe('EdxNotes Shim', function() {
@@ -30,11 +30,11 @@ define([
             highlights = [];
             annotators = [
                 NotesFactory.factory($('#edx-notes-wrapper-123').get(0), {
-                    endpoint: 'http://example.com/'
+                    endpoint: 'http://example.com/',
                 }),
                 NotesFactory.factory($('#edx-notes-wrapper-456').get(0), {
-                    endpoint: 'http://example.com/'
-                })
+                    endpoint: 'http://example.com/',
+                }),
             ];
             _.each(annotators, function(annotator) {
                 highlights.push($('<span class="annotator-hl" />').appendTo(annotator.element));
@@ -132,10 +132,10 @@ define([
         it('should unbind events on destruction', function() {
             annotators[0].destroy();
             expect($.fn.off).toHaveBeenCalledWith(
-                'click', annotators[0].onNoteClick
+                'click', annotators[0].onNoteClick,
             );
             expect($.fn.off).toHaveBeenCalledWith(
-                'click', '.annotator-hl'
+                'click', '.annotator-hl',
             );
         });
 
@@ -144,7 +144,7 @@ define([
                 annotation = {
                     id: '01',
                     text: 'Test text',
-                    highlights: [highlights[0].get(0)]
+                    highlights: [highlights[0].get(0)],
                 };
 
             annotators[0].viewer.load([annotation]);
@@ -160,7 +160,7 @@ define([
                 var $element = $('<div />');
                 mockViewer = {
                     fields: [],
-                    element: $element
+                    element: $element,
                 };
 
                 mockViewer.on = jasmine.createSpy().and.returnValue(mockViewer);
@@ -227,7 +227,7 @@ define([
             it('should bind to browser mouseover and mouseout events', function() {
                 expect(mockViewer.element.bind).toHaveBeenCalledWith({
                     mouseover: annotators[0].clearViewerHideTimer,
-                    mouseout: annotators[0].startViewerHideTimer
+                    mouseout: annotators[0].startViewerHideTimer,
                 });
             });
 
@@ -243,7 +243,7 @@ define([
                         id: '01',
                         text: 'Test text',
                         tags: ['tag1', 'tag2', 'tag3'],
-                        highlights: [highlights[0].get(0)]
+                        highlights: [highlights[0].get(0)],
                     };
 
                 annotators[0].viewer.load([annotation]);

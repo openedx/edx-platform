@@ -65,7 +65,7 @@
                 'click .add-response-btn': 'scrollToAddResponse',
                 'keydown .wmd-button': function(event) {
                     return DiscussionUtil.handleKeypressInToolbar(event);
-                }
+                },
             };
 
             DiscussionThreadView.prototype.$ = function(selector) {
@@ -115,7 +115,7 @@
                     model: this.model,
                     el: this.el,
                     courseSettings: this.options.courseSettings,
-                    topicId: this.topicId
+                    topicId: this.topicId,
                 });
                 return this.render();
             };
@@ -131,7 +131,7 @@
                 templateData = _.extend(this.model.toJSON(), {
                     readOnly: this.readOnly,
                     startHeader: this.startHeader + 1, // this is a child so headers should be increased
-                    can_create_comment: $container.data('user-create-comment')
+                    can_create_comment: $container.data('user-create-comment'),
                 });
                 return this.template(templateData);
             };
@@ -153,7 +153,7 @@
                 if (this.isQuestion()) {
                     this.markedAnswers.on('add', function(response) {
                         return self.renderResponseToList(response, '.js-marked-answer-list', {
-                            collapseComments: true
+                            collapseComments: true,
                         });
                     });
                 }
@@ -167,7 +167,7 @@
                     this.$('.action-vote').toggle(!closed);
                     this.$('.display-vote').toggle(closed);
                     return this.renderAddResponseButton();
-                }
+                },
             });
 
             DiscussionThreadView.prototype.cleanup = function() {
@@ -183,11 +183,11 @@
                 var self = this;
                 this.responsesRequest = DiscussionUtil.safeAjax({
                     url: DiscussionUtil.urlFor(
-                        'retrieve_single_thread', this.model.get('commentable_id'), this.model.id
+                        'retrieve_single_thread', this.model.get('commentable_id'), this.model.id,
                     ),
                     data: {
                         resp_skip: this.responses.size(),
-                        resp_limit: responseLimit || void 0
+                        resp_limit: responseLimit || void 0,
                     },
                     $elem: $elem,
                     $loading: $elem,
@@ -201,12 +201,12 @@
                             self.markedAnswers.add(data.content.endorsed_responses);
                         }
                         self.responses.add(
-                            self.isQuestion() ? data.content.non_endorsed_responses : data.content.children
+                            self.isQuestion() ? data.content.non_endorsed_responses : data.content.children,
                         );
                         self.renderResponseCountAndPagination(
                             self.isQuestion() ?
                                 data.content.non_endorsed_resp_total :
-                                data.content.resp_total
+                                data.content.resp_total,
                         );
                         self.trigger('thread:responses:rendered');
                         self.loadedResponses = true;
@@ -218,20 +218,20 @@
                         if (xhr.status === 404) {
                             DiscussionUtil.discussionAlert(
                                 gettext('Error'),
-                                gettext('The post you selected has been deleted.')
+                                gettext('The post you selected has been deleted.'),
                             );
                         } else if (firstLoad) {
                             DiscussionUtil.discussionAlert(
                                 gettext('Error'),
-                                gettext('Responses could not be loaded. Refresh the page and try again.')
+                                gettext('Responses could not be loaded. Refresh the page and try again.'),
                             );
                         } else {
                             DiscussionUtil.discussionAlert(
                                 gettext('Error'),
-                                gettext('Additional responses could not be loaded. Refresh the page and try again.')
+                                gettext('Additional responses could not be loaded. Refresh the page and try again.'),
                             );
                         }
-                    }
+                    },
                 });
             };
 
@@ -245,18 +245,18 @@
                     self = this;
                 if (this.isQuestion() && this.markedAnswers.length !== 0) {
                     responseCountFormat = ngettext(
-                        '{numResponses} other response', '{numResponses} other responses', responseTotal
+                        '{numResponses} other response', '{numResponses} other responses', responseTotal,
                     );
                     if (responseTotal === 0) {
                         this.$el.find('.response-count').hide();
                     }
                 } else {
                     responseCountFormat = ngettext(
-                        '{numResponses} response', '{numResponses} responses', responseTotal
+                        '{numResponses} response', '{numResponses} responses', responseTotal,
                     );
                 }
                 this.$el.find('.response-count').text(
-                    edx.StringUtils.interpolate(responseCountFormat, {numResponses: responseTotal}, true)
+                    edx.StringUtils.interpolate(responseCountFormat, {numResponses: responseTotal}, true),
                 );
 
                 responsePagination = this.$el.find('.response-pagination');
@@ -269,10 +269,10 @@
                         showingResponsesText = edx.StringUtils.interpolate(
                             ngettext(
                                 'Showing first response', 'Showing first {numResponses} responses',
-                                this.responses.size()
+                                this.responses.size(),
                             ),
                             {numResponses: this.responses.size()},
-                            true
+                            true,
                         );
                     }
 
@@ -285,7 +285,7 @@
                         } else {
                             responseLimit = SUBSEQUENT_RESPONSE_PAGE_SIZE;
                             buttonText = edx.StringUtils.interpolate(gettext('Load next {numResponses} responses'), {
-                                numResponses: responseLimit
+                                numResponses: responseLimit,
                             }, true);
                         }
                         $loadMoreButton = $('<button>')
@@ -307,7 +307,7 @@
                 response.set('thread', this.model);
                 view = new ThreadResponseView($.extend({
                     model: response,
-                    startHeader: this.startHeader + 1 // this is a child so headers should be increased
+                    startHeader: this.startHeader + 1, // this is a child so headers should be increased
                 }, options));
                 view.on('comment:add', this.addComment);
                 view.on('comment:endorse', this.endorseThread);
@@ -360,15 +360,15 @@
                     created_at: (new Date()).toISOString(),
                     username: window.user.get('username'),
                     votes: {
-                        up_count: 0
+                        up_count: 0,
                     },
                     abuse_flaggers: [],
                     endorsed: false,
-                    user_id: window.user.get('id')
+                    user_id: window.user.get('id'),
                 });
                 comment.set('thread', this.model.get('thread'));
                 view = this.renderResponseToList(comment, '.js-response-list', {
-                    focusAddedResponse: true
+                    focusAddedResponse: true,
                 });
                 this.model.addComment();
                 this.renderAddResponseButton();
@@ -378,13 +378,13 @@
                     type: 'POST',
                     dataType: 'json',
                     data: {
-                        body: body
+                        body: body,
                     },
                     success: function(data) {
                         comment.updateInfo(data.annotated_content_info);
                         comment.set(data.content);
                         DiscussionUtil.typesetMathJax(view.$el.find('.response-body'));
-                    }
+                    },
                 });
             };
 
@@ -409,7 +409,7 @@
                     mode: this.mode,
                     context: this.context,
                     startHeader: this.startHeader,
-                    course_settings: this.options.courseSettings
+                    course_settings: this.options.courseSettings,
                 });
                 this.editView.bind('thread:updated thread:cancel_edit', this.closeEditView);
                 return this.editView.bind('comment:endorse', this.endorseThread);
@@ -430,7 +430,7 @@
                     model: this.model,
                     mode: this.mode,
                     startHeader: this.startHeader,
-                    is_commentable_divided: this.is_commentable_divided
+                    is_commentable_divided: this.is_commentable_divided,
                 });
                 this.showView.bind('thread:_delete', this._delete);
                 return this.showView.bind('thread:edit', this.edit);
@@ -464,7 +464,7 @@
                 return DiscussionUtil.safeAjax({
                     $elem: $elem,
                     url: url,
-                    type: 'POST'
+                    type: 'POST',
                 });
             };
 

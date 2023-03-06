@@ -5,11 +5,11 @@
     if (Backbone) {
         this.DiscussionTopicMenuView = Backbone.View.extend({
             events: {
-                'change .post-topic': 'handleTopicEvent'
+                'change .post-topic': 'handleTopicEvent',
             },
 
             attributes: {
-                class: 'post-field'
+                class: 'post-field',
             },
 
             initialize: function(options) {
@@ -17,7 +17,7 @@
                 this.currentTopicId = options.topicId;
                 this.group_name = options.group_name;
                 _.bindAll(this,
-                    'handleTopicEvent'
+                    'handleTopicEvent',
                 );
                 return this;
             },
@@ -33,7 +33,7 @@
 
                 if (this.getCurrentTopicId()) {
                     this.setTopic(this.$('.post-topic option').filter(
-                        '[data-discussion-id="' + this.getCurrentTopicId() + '"]'
+                        '[data-discussion-id="' + this.getCurrentTopicId() + '"]',
                     ));
                 } else if ($general.length > 0) {
                     this.setTopic($general.first());
@@ -56,12 +56,12 @@
                             html = entryTemplate({
                                 text: name,
                                 id: entry.id,
-                                is_divided: entry.is_divided
+                                is_divided: entry.is_divided,
                             });
                         } else { // subcategory
                             html = categoryTemplate({
                                 text: name,
-                                entries: this.renderCategoryMap(map.subcategories[name])
+                                entries: this.renderCategoryMap(map.subcategories[name]),
                             });
                         }
                         return html;
@@ -106,7 +106,7 @@
                 } else {
                     return this.topicText;
                 }
-            }
+            },
         });
     }
 }).call(this);

@@ -28,7 +28,7 @@ define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_
                 return this;
             },
             events: {
-                'click .new-button': 'addOne'
+                'click .new-button': 'addOne',
             },
             addOne: function(e) {
                 var $sectionEl, $inputEl;
@@ -46,7 +46,7 @@ define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_
             },
             handleDestroy: function(model, collection, options) {
                 collection.remove(model);
-            }
+            },
         });
         return ListTextbooks;
     });

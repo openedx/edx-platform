@@ -64,7 +64,7 @@ function($, NotificationView, Prompt, TemplateHelpers) {
         setUsageInfo(that.model);
         that.view.render();
         expect(that.view.$(SELECTORS.note)).toHaveAttr(
-            'data-tooltip', toolTipText
+            'data-tooltip', toolTipText,
         );
         expect(that.view.$(SELECTORS.warningMessage)).toContainText(warningText);
         expect(that.view.$(SELECTORS.warningIcon)).toExist();
@@ -83,6 +83,6 @@ function($, NotificationView, Prompt, TemplateHelpers) {
         inlineEdit: inlineEdit,
         verifyInlineEditChange: verifyInlineEditChange,
         installMockAnalytics: installMockAnalytics,
-        removeMockAnalytics: removeMockAnalytics
+        removeMockAnalytics: removeMockAnalytics,
     };
 });

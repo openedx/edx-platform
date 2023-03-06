@@ -43,7 +43,7 @@ define(['jquery', 'js/views/baseview'],
                     self.$('.ui-loading').addClass('is-hidden');
                 });
                 return this;
-            }
+            },
         });
 
         return BasePage;

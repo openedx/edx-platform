@@ -6,8 +6,8 @@ define(['backbone'], function(Backbone) {
 
         defaults: {
             updates: null,   // UpdateCollection
-            handouts: null    // HandoutCollection
-        }
+            handouts: null,    // HandoutCollection
+        },
     });
     return CourseInfo;
 });

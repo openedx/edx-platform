@@ -29,7 +29,7 @@
                 gettext('Play'),
                 '">',
                 '<span class="icon fa fa-play" aria-hidden="true"></span>',
-                '</button>'
+                '</button>',
             ].join(''),
 
             destroy: function() {
@@ -56,12 +56,12 @@
             /** Bind any necessary function callbacks to DOM events. */
             bindHandlers: function() {
                 this.el.on({
-                    click: this.onClick
+                    click: this.onClick,
                 });
                 this.state.el.on({
                     play: this.play,
                     'pause ended': this.pause,
-                    destroy: this.destroy
+                    destroy: this.destroy,
                 });
             },
 
@@ -88,7 +88,7 @@
                     .find('.icon')
                     .removeClass('fa-pause')
                     .addClass('fa-play');
-            }
+            },
         };
 
         return PlayPauseControl;

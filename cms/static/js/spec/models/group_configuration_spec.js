@@ -1,6 +1,6 @@
 define([
     'backbone', 'cms/js/main', 'js/models/group_configuration',
-    'js/models/group', 'js/collections/group', 'squire'
+    'js/models/group', 'js/collections/group', 'squire',
 ], function(Backbone, main, GroupConfigurationModel, GroupModel, GroupCollection, Squire) {
     'use strict';
 
@@ -95,14 +95,14 @@ define([
                             {
                                 version: 1,
                                 name: 'Group 1',
-                                usage: []
+                                usage: [],
                             }, {
                                 version: 1,
                                 name: 'Group 2',
-                                usage: []
-                            }
+                                usage: [],
+                            },
                         ],
-                        read_only: true
+                        read_only: true,
                     },
                     clientModelSpec = {
                         id: 10,
@@ -117,19 +117,19 @@ define([
                                 version: 1,
                                 order: 0,
                                 name: 'Group 1',
-                                usage: []
+                                usage: [],
                             }, {
                                 version: 1,
                                 order: 1,
                                 name: 'Group 2',
-                                usage: []
-                            }
+                                usage: [],
+                            },
                         ],
                         usage: [],
-                        read_only: true
+                        read_only: true,
                     },
                     model = new GroupConfigurationModel(
-                        serverModelSpec, {parse: true}
+                        serverModelSpec, {parse: true},
                     );
 
                 expect(deepAttributes(model)).toEqual(clientModelSpec);
@@ -176,7 +176,7 @@ define([
 
             it('requires all groups to have unique names', function() {
                 var model = new GroupConfigurationModel({
-                    name: 'foo', groups: [{name: 'Group A'}, {name: 'Group A'}]
+                    name: 'foo', groups: [{name: 'Group A'}, {name: 'Group A'}],
                 });
 
                 expect(model.isValid()).toBeFalsy();
@@ -232,7 +232,7 @@ define([
 
         it('is not empty if a group is not empty', function() {
             this.collection.add([
-                {name: ''}, {name: 'full'}, {name: ''}
+                {name: ''}, {name: 'full'}, {name: ''},
             ]);
 
             expect(this.collection.isEmpty()).toBeFalsy();

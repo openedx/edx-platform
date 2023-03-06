@@ -25,7 +25,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account
                     requests,
                     'POST',
                     ENROLL_URL,
-                    '{"course_id":"edX/DemoX/Fall"}'
+                    '{"course_id":"edX/DemoX/Fall"}',
                 );
 
                 // Simulate a successful response from the server
@@ -62,12 +62,12 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account
                 // explaining why he/she can't enroll.
                 AjaxHelpers.respondWithError(
                     requests, 403,
-                    {user_message_url: EMBARGO_MSG_URL}
+                    {user_message_url: EMBARGO_MSG_URL},
                 );
 
                 // Verify that the user was redirected
                 expect(EnrollmentInterface.redirect).toHaveBeenCalledWith(EMBARGO_MSG_URL);
             });
         });
-    }
+    },
 );

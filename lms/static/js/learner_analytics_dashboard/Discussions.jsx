@@ -41,7 +41,7 @@ class Discussions extends React.Component {
             <div className="count-chart">
                 <div className={classNames(
                     'chart-icon',
-                    {'fa fa-graduation-cap': !img}
+                    {'fa fa-graduation-cap': !img},
                 )}
                 style={{backgroundImage: !!img ? `url(${img})` : 'none'}}
                 aria-hidden="true"></div>
@@ -81,7 +81,7 @@ class Discussions extends React.Component {
 
 Discussions.propTypes = {
     content_authored: PropTypes.number.isRequired,
-    thread_votes: PropTypes.number.isRequired
+    thread_votes: PropTypes.number.isRequired,
 }
 
 export default Discussions;

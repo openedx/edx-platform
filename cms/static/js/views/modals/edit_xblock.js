@@ -12,7 +12,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         events: _.extend({}, BaseModal.prototype.events, {
             'click .action-save': 'save',
             'click .action-modes a': 'changeMode',
-            'click .title-edit-button': 'clickTitleButton'
+            'click .title-edit-button': 'clickTitleButton',
         }),
 
         options: $.extend({}, BaseModal.prototype.options, {
@@ -21,7 +21,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
             viewSpecificClasses: 'modal-editor confirm',
             // Translators: "title" is the name of the current component being edited.
             titleFormat: gettext('Editing: {title}'),
-            addPrimaryActionButton: true
+            addPrimaryActionButton: true,
         }),
 
         initialize: function() {
@@ -55,7 +55,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
 
         getContentHtml: function() {
             return this.template({
-                xblockInfo: this.xblockInfo
+                xblockInfo: this.xblockInfo,
             });
         },
 
@@ -63,10 +63,10 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
             this.editorView = new XBlockEditorView({
                 el: this.$('.xblock-editor'),
                 model: this.xblockInfo,
-                view: this.options.view
+                view: this.options.view,
             });
             this.editorView.render({
-                success: _.bind(this.onDisplayXBlock, this)
+                success: _.bind(this.onDisplayXBlock, this),
             });
         },
 
@@ -136,8 +136,8 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
             }
             return edx.StringUtils.interpolate(
                 this.options.titleFormat, {
-                    title: displayName
-                }
+                    title: displayName,
+                },
             );
         },
 
@@ -179,7 +179,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
                 ViewUtils.showErrorMeassage(
                     gettext("Studio's having trouble parsing the problem component's content"),
                     e.message,
-                    10000
+                    10000,
                 );
                 ViewUtils.setScrollOffset(editorView.$el, 100);
                 return null;
@@ -219,7 +219,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
             // xss-lint: disable=javascript-jquery-append
             buttonPanel.append(this.editorModeButtonTemplate({
                 mode: mode,
-                displayName: displayName
+                displayName: displayName,
             }));
         },
 
@@ -245,7 +245,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
             $input.focus().select();
             $(event.target).remove();
             return true;
-        }
+        },
 
     });
 

@@ -19,7 +19,7 @@
 
                 _.bindAll(this, 'keyDownHandler', 'updateVolumeSilently',
                     'onVolumeChangeHandler', 'openMenu', 'closeMenu',
-                    'toggleMuteHandler', 'keyDownButtonHandler', 'destroy'
+                    'toggleMuteHandler', 'keyDownButtonHandler', 'destroy',
                 );
                 this.state = state;
                 this.state.videoVolumeControl = this;
@@ -68,8 +68,8 @@
                     {
                         volumeInstructions: gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'),  // eslint-disable-line max-len
                         adjustVideoVolume: gettext('Adjust video volume'),
-                        volumeText: gettext('Volume')
-                    }
+                        volumeText: gettext('Volume'),
+                    },
                 ),
 
                 destroy: function() {
@@ -83,17 +83,17 @@
                         .off('play.volume')
                         .off({
                             keydown: this.keyDownHandler,
-                            volumechange: this.onVolumeChangeHandler
+                            volumechange: this.onVolumeChangeHandler,
                         });
                     this.el.off({
                         mouseenter: this.openMenu,
-                        mouseleave: this.closeMenu
+                        mouseleave: this.closeMenu,
                     });
                     this.button.off({
                         mousedown: this.toggleMuteHandler,
                         keydown: this.keyDownButtonHandler,
                         focus: this.openMenu,
-                        blur: this.closeMenu
+                        blur: this.closeMenu,
                     });
                     this.el.remove();
                     delete this.state.videoVolumeControl;
@@ -115,7 +115,7 @@
                     this.button = this.el.children('.control');
                     this.cookie = new CookieManager(this.min, this.max);
                     this.a11y = new Accessibility(
-                        this.button, this.min, this.max, this.i18n
+                        this.button, this.min, this.max, this.i18n,
                     );
                     volume = this.cookie.getVolume();
                     this.storedVolume = this.max;
@@ -141,7 +141,7 @@
                         range: 'min',
                         min: this.min,
                         max: this.max,
-                        slide: this.onSlideHandler.bind(this)
+                        slide: this.onSlideHandler.bind(this),
                     });
 
                     // We provide an independent behavior to adjust volume level.
@@ -159,18 +159,18 @@
                 bindHandlers: function() {
                     this.state.el.on({
                         'play.volume': _.once(this.updateVolumeSilently),
-                        volumechange: this.onVolumeChangeHandler
+                        volumechange: this.onVolumeChangeHandler,
                     });
                     this.state.el.find('.volume').on({
                         mouseenter: this.openMenu,
-                        mouseleave: this.closeMenu
+                        mouseleave: this.closeMenu,
                     });
                     this.button.on({
                         keydown: this.keyDownHandler,
                         click: false,
                         mousedown: this.toggleMuteHandler,
                         focus: this.openMenu,
-                        blur: this.closeMenu
+                        blur: this.closeMenu,
                     });
                     this.state.el.on('destroy', this.destroy);
                 },
@@ -181,7 +181,7 @@
          */
                 updateVolumeSilently: function() {
                     this.state.el.trigger(
-                        'volumechange:silent', [this.getVolume()]
+                        'volumechange:silent', [this.getVolume()],
                     );
                 },
 
@@ -428,7 +428,7 @@
          */
                 onVolumeChangeHandler: function(event, volume) {
                     this.checkMuteButtonStatus(volume);
-                }
+                },
             };
 
             /**
@@ -459,7 +459,7 @@
                     this.liveRegion = $('<div />', {
                         class: 'sr video-live-region',
                         'aria-hidden': 'false',
-                        'aria-live': 'polite'
+                        'aria-live': 'polite',
                     });
 
                     this.button.after(HtmlUtils.HTML(this.liveRegion).toString());
@@ -472,7 +472,7 @@
                 update: function(volume) {
                     this.liveRegion.text([
                         this.getVolumeDescription(volume),
-                        this.i18n.Volume + '.'
+                        this.i18n.Volume + '.',
                     ].join(' '));
 
                     $(this.button).parent().find('.volume-slider')
@@ -499,7 +499,7 @@
                     }
 
                     return this.i18n.Maximum;
-                }
+                },
             };
 
             /**
@@ -540,9 +540,9 @@
                 setVolume: function(value) {
                     $.cookie(this.cookieName, value, {
                         expires: 3650,
-                        path: '/'
+                        path: '/',
                     });
-                }
+                },
             };
 
             return VolumeControl;

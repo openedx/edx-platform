@@ -8,12 +8,12 @@
                 usage_id: '',
                 display_name: '',
                 path: [],
-                created: ''
+                created: '',
             },
 
             blockUrl: function() {
                 return '/courses/' + this.get('course_id') + '/jump_to/' + this.get('usage_id');
-            }
+            },
         });
     });
 }(define || RequireJS.define));

@@ -21,7 +21,7 @@ var edx = edx || {};
         VERIFICATION_VIEW_NAMES: [
             'face-photo-step',
             'id-photo-step',
-            'review-photos-step'
+            'review-photos-step',
         ],
 
         initialize: function(obj) {
@@ -33,7 +33,7 @@ var edx = edx || {};
             this.initializeStepViews(obj.stepInfo || {});
             this.currentStepIndex = _.indexOf(
                 _.pluck(this.displaySteps, 'name'),
-                obj.currentStep
+                obj.currentStep,
             );
         },
 
@@ -56,7 +56,7 @@ var edx = edx || {};
                 'face-photo-step': edx.verify_student.FacePhotoStepView,
                 'id-photo-step': edx.verify_student.IDPhotoStepView,
                 'review-photos-step': edx.verify_student.ReviewPhotosStepView,
-                'enrollment-confirmation-step': edx.verify_student.EnrollmentConfirmationStepView
+                'enrollment-confirmation-step': edx.verify_student.EnrollmentConfirmationStepView,
             };
 
             // Create the verification model, which is shared
@@ -69,7 +69,7 @@ var edx = edx || {};
             // this will associate the verification attempt with the checkpoint.
             verificationModel = new edx.verify_student.VerificationModel({
                 courseKey: this.courseKey,
-                checkpoint: this.checkpointLocation
+                checkpoint: this.checkpointLocation,
             });
 
             for (i = 0; i < this.displaySteps.length; i++) {
@@ -93,7 +93,7 @@ var edx = edx || {};
                     subviewConfig = {
                         errorModel: this.errorModel,
                         nextStepTitle: nextStepTitle,
-                        stepData: stepData
+                        stepData: stepData,
                     };
 
                     // For photo verification steps, set the shared photo model
@@ -127,7 +127,7 @@ var edx = edx || {};
             if (!$stepEl.length) {
                 $stepEl = edx.HtmlUtils.append(
                     $(this.el),
-                    edx.HtmlUtils.HTML('<div id="current-step-container"></div>').toString()
+                    edx.HtmlUtils.HTML('<div id="current-step-container"></div>').toString(),
                 );
             }
 
@@ -143,7 +143,7 @@ var edx = edx || {};
         nextStep: function() {
             this.currentStepIndex = Math.min(
                 this.currentStepIndex + 1,
-                this.displaySteps.length - 1
+                this.displaySteps.length - 1,
             );
             this.render();
         },
@@ -151,7 +151,7 @@ var edx = edx || {};
         goToStep: function(stepName) {
             var stepIndex = _.indexOf(
                 _.pluck(this.displaySteps, 'name'),
-                stepName
+                stepName,
             );
 
             if (stepIndex >= 0) {
@@ -159,6 +159,6 @@ var edx = edx || {};
             }
 
             this.render();
-        }
+        },
     });
 }(jQuery, _, Backbone, gettext));

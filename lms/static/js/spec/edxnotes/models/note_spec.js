@@ -1,5 +1,5 @@
 define([
-    'js/spec/edxnotes/helpers', 'js/edxnotes/collections/notes'
+    'js/spec/edxnotes/helpers', 'js/edxnotes/collections/notes',
 ], function(Helpers, NotesCollection) {
     'use strict';
     describe('EdxNotes NoteModel', function() {
@@ -14,12 +14,12 @@ define([
                     previous: null,
                     results: [
                         {quote: Helpers.LONG_TEXT, text: 'text\n with\r\nline\n\rbreaks \r'},
-                        {quote: Helpers.SHORT_TEXT, text: 'text\n with\r\nline\n\rbreaks \r'}
-                    ]
+                        {quote: Helpers.SHORT_TEXT, text: 'text\n with\r\nline\n\rbreaks \r'},
+                    ],
                 },
                 {
-                    perPage: 10, parse: true
-                }
+                    perPage: 10, parse: true,
+                },
             );
         });
 

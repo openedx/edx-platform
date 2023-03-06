@@ -7,7 +7,7 @@
         'backbone',
         'gettext',
         'logger',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function($, _, Backbone, gettext, Logger, HtmlUtils) {
         return Backbone.View.extend({
 
@@ -15,11 +15,11 @@
             className: 'search-results-item',
             attributes: {
                 role: 'region',
-                'aria-label': 'search result'
+                'aria-label': 'search result',
             },
 
             events: {
-                click: 'logSearchItem'
+                click: 'logSearchItem',
             },
 
             initialize: function(options) {
@@ -84,11 +84,11 @@
                 Logger.log('edx.course.search.result_selected', {
                     search_term: searchTerm,
                     result_position: (page * pageSize) + index,
-                    result_link: target
+                    result_link: target,
                 }).always(function() {
                     self.redirect(link);
                 });
-            }
+            },
 
         });
     });

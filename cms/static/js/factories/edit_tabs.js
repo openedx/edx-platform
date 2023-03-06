@@ -11,14 +11,14 @@ export default function EditTabsFactory(courseLocation, explicitUrl) {
     xmoduleLoader.done(function() {
         var model = new TabsModel({
                 id: courseLocation,
-                explicit_url: explicitUrl
+                explicit_url: explicitUrl,
             }),
             editView;
 
         editView = new TabsEditView({
             el: $('.tab-list'),
             model: model,
-            mast: $('.wrapper-mast')
+            mast: $('.wrapper-mast'),
         });
     });
 };

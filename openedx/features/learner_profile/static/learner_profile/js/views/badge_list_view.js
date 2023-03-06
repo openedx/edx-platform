@@ -8,7 +8,7 @@
         'edx-ui-toolkit/js/utils/html-utils',
         'common/js/components/views/list',
         'learner_profile/js/views/badge_view',
-        'text!learner_profile/templates/badge_placeholder.underscore'
+        'text!learner_profile/templates/badge_placeholder.underscore',
     ],
     function(gettext, $, _, HtmlUtils, ListView, BadgeView, badgePlaceholder) {
         var BadgeListView = ListView.extend({
@@ -32,7 +32,7 @@
                     $item = new BadgeView({
                         model: badge,
                         badgeMeta: this.badgeMeta,
-                        ownProfile: this.ownProfile
+                        ownProfile: this.ownProfile,
                     }).render().el;
 
                     if ($row) {
@@ -52,12 +52,12 @@
                     if ($row) {
                         HtmlUtils.append(
                             $row,
-                            this.template({find_courses_url: self.find_courses_url})
+                            this.template({find_courses_url: self.find_courses_url}),
                         );
                     }
                 }
                 return this;
-            }
+            },
         });
 
         return BadgeListView;

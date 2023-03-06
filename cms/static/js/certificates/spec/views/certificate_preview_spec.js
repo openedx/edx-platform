@@ -7,7 +7,7 @@ define([
     'js/certificates/views/certificate_preview',
     'common/js/spec_helpers/template_helpers',
     'common/js/spec_helpers/view_helpers',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
 ],
 function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHelpers) {
     'use strict';
@@ -15,7 +15,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
     var SELECTORS = {
         course_modes: '#course-modes',
         activate_certificate: '.activate-cert',
-        preview_certificate: '.preview-certificate-link'
+        preview_certificate: '.preview-certificate-link',
     };
 
     describe('Certificate Web Preview Spec:', function() {
@@ -33,7 +33,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
                 url_name: 'course_name',
                 org: 'course_org',
                 num: 'course_num',
-                revision: 'course_rev'
+                revision: 'course_rev',
             });
             window.CMS.User = {isGlobalStaff: true};
 
@@ -44,7 +44,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
                 course_modes: ['test1', 'test2', 'test3'],
                 certificate_web_view_url: '/users/1/courses/orgX/009/2016?preview=test1',
                 certificate_activation_handler_url: '/certificates/activation/' + window.course.id,
-                is_active: true
+                is_active: true,
             });
             appendSetFixtures(this.view.render().el);
         });
@@ -88,7 +88,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
                     notificationSpy = ViewHelpers.createNotificationSpy();
                 this.view.$(SELECTORS.activate_certificate).click();
                 AjaxHelpers.expectJsonRequest(requests, 'POST', '/certificates/activation/' + window.course.id, {
-                    is_active: false
+                    is_active: false,
                 });
                 ViewHelpers.verifyNotificationShowing(notificationSpy, /Deactivating/);
             });
@@ -99,7 +99,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
                 this.view.is_active = false;
                 this.view.$(SELECTORS.activate_certificate).click();
                 AjaxHelpers.expectJsonRequest(requests, 'POST', '/certificates/activation/' + window.course.id, {
-                    is_active: true
+                    is_active: true,
                 });
                 ViewHelpers.verifyNotificationShowing(notificationSpy, /Activating/);
             });

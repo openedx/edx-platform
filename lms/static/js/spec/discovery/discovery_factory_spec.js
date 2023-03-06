@@ -1,6 +1,6 @@
 define([
     'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
-    'js/discovery/discovery_factory'
+    'js/discovery/discovery_factory',
 ], function($, AjaxHelpers, TemplateHelpers, DiscoveryFactory) {
     'use strict';
 
@@ -9,22 +9,22 @@ define([
         org: {
             name: 'Organization',
             terms: {
-                edX1: 'edX_1'
-            }
+                edX1: 'edX_1',
+            },
         },
         modes: {
             name: 'Course Type',
             terms: {
                 honor: 'Honor',
-                verified: 'Verified'
-            }
+                verified: 'Verified',
+            },
         },
         language: {
             terms: {
                 en: 'English',
-                hr: 'Croatian'
-            }
-        }
+                hr: 'Croatian',
+            },
+        },
     };
 
 
@@ -34,7 +34,7 @@ define([
             {
                 data: {
                     modes: [
-                        'honor'
+                        'honor',
                     ],
                     course: 'edX/DemoX/Demo_Course',
                     enrollment_start: '2015-04-21T00:00:00+00:00',
@@ -42,14 +42,14 @@ define([
                     content: {
                         overview: ' About This Course Include your long course description here.',
                         display_name: 'edX Demonstration Course',
-                        number: 'DemoX'
+                        number: 'DemoX',
                     },
                     start: '1970-01-01T05:00:00+00:00',
                     image_url: '/c4x/edX/DemoX/asset/images_course_image.jpg',
                     org: 'edX',
-                    id: 'edX/DemoX/Demo_Course'
-                }
-            }
+                    id: 'edX/DemoX/Demo_Course',
+                },
+            },
         ],
         aggs: {
             org: {
@@ -80,18 +80,18 @@ define([
                     edX23: 1,
                     edX24: 1,
                     edX25: 1,
-                    edX26: 1
+                    edX26: 1,
                 },
-                other: 0
+                other: 0,
             },
             modes: {
                 total: 1,
                 terms: {
-                    honor: 1
+                    honor: 1,
                 },
-                other: 0
-            }
-        }
+                other: 0,
+            },
+        },
     };
 
 
@@ -103,7 +103,7 @@ define([
                 'templates/discovery/facet',
                 'templates/discovery/facet_option',
                 'templates/discovery/filter',
-                'templates/discovery/filter_bar'
+                'templates/discovery/filter_bar',
             ]);
             DiscoveryFactory(MEANINGS);
 

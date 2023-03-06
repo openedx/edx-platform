@@ -2,7 +2,7 @@ define([
     'backbone',
     'jquery',
     'js/staff_debug_actions',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
 ],
 function(Backbone, $, tmp, AjaxHelpers) {
     'use strict';
@@ -86,7 +86,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
                 var action = {
                     courseId: courseId,
                     locationName: esclocationName,
-                    success_msg: 'Successfully reset the attempts for user userman'
+                    success_msg: 'Successfully reset the attempts for user userman',
                 };
                 StaffDebug.doInstructorDashAction(action);
                 AjaxHelpers.respondWithJson(requests, action);
@@ -101,7 +101,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
                 var action = {
                     courseId: courseId,
                     locationName: esclocationName,
-                    error_msg: 'Failed to reset attempts for user.'
+                    error_msg: 'Failed to reset attempts for user.',
                 };
                 StaffDebug.doInstructorDashAction(action);
                 AjaxHelpers.respondWithTextError(requests);
@@ -122,10 +122,10 @@ function(Backbone, $, tmp, AjaxHelpers) {
                     unique_student_identifier: 'userman',
                     delete_module: false,
                     only_if_higher: undefined,
-                    score: undefined
+                    score: undefined,
                 });
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                    '/courses/course-v1:edX+DemoX+1/instructor/api/reset_student_attempts'
+                    '/courses/course-v1:edX+DemoX+1/instructor/api/reset_student_attempts',
                 );
                 $('#' + usernameFixtureID).remove();
             });
@@ -143,10 +143,10 @@ function(Backbone, $, tmp, AjaxHelpers) {
                     unique_student_identifier: 'userman',
                     delete_module: true,
                     only_if_higher: undefined,
-                    score: undefined
+                    score: undefined,
                 });
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                    '/courses/course-v1:edX+DemoX+1/instructor/api/reset_student_attempts'
+                    '/courses/course-v1:edX+DemoX+1/instructor/api/reset_student_attempts',
                 );
 
                 $('#' + usernameFixtureID).remove();
@@ -165,10 +165,10 @@ function(Backbone, $, tmp, AjaxHelpers) {
                     unique_student_identifier: 'userman',
                     delete_module: undefined,
                     only_if_higher: false,
-                    score: undefined
+                    score: undefined,
                 });
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                    '/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem'
+                    '/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem',
                 );
                 $('#' + usernameFixtureID).remove();
             });
@@ -186,10 +186,10 @@ function(Backbone, $, tmp, AjaxHelpers) {
                     unique_student_identifier: 'userman',
                     delete_module: undefined,
                     only_if_higher: true,
-                    score: undefined
+                    score: undefined,
                 });
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                    '/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem'
+                    '/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem',
                 );
                 $('#' + usernameFixtureID).remove();
             });
@@ -208,10 +208,10 @@ function(Backbone, $, tmp, AjaxHelpers) {
                     unique_student_identifier: 'userman',
                     delete_module: undefined,
                     only_if_higher: undefined,
-                    score: '1'
+                    score: '1',
                 });
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                    '/courses/course-v1:edX+DemoX+1/instructor/api/override_problem_score'
+                    '/courses/course-v1:edX+DemoX+1/instructor/api/override_problem_score',
                 );
                 $('#' + usernameFixtureID).remove();
             });

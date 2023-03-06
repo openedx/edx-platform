@@ -63,7 +63,7 @@
             if ($('.markdown-box', this.element).length !== 0) {
                 this.markdown_editor = CodeMirror.fromTextArea($('.markdown-box', element)[0], {
                     lineWrapping: true,
-                    mode: null
+                    mode: null,
                 });
                 this.setCurrentEditor(this.markdown_editor);
                 // Add listeners for toolbar buttons (only present for markdown editor)
@@ -86,7 +86,7 @@
             this.xml_editor = CodeMirror.fromTextArea($('.xml-box', this.element)[0], {
                 mode: 'xml',
                 lineNumbers: true,
-                lineWrapping: true
+                lineWrapping: true,
             });
             if (text) {
                 this.xml_editor.setValue(text);
@@ -182,26 +182,26 @@
                 return {
                     data: MarkdownEditingDescriptor.markdownToXml(this.markdown_editor.getValue()),
                     metadata: {
-                        markdown: this.markdown_editor.getValue()
-                    }
+                        markdown: this.markdown_editor.getValue(),
+                    },
                 };
             } else {
                 return {
                     data: this.xml_editor.getValue(),
-                    nullout: ['markdown']
+                    nullout: ['markdown'],
                 };
             }
         };
 
         MarkdownEditingDescriptor.insertMultipleChoice = function(selectedText) {
             return MarkdownEditingDescriptor.insertGenericChoice(selectedText, '(', ')',
-                MarkdownEditingDescriptor.multipleChoiceTemplate
+                MarkdownEditingDescriptor.multipleChoiceTemplate,
             );
         };
 
         MarkdownEditingDescriptor.insertCheckboxChoice = function(selectedText) {
             return MarkdownEditingDescriptor.insertGenericChoice(selectedText, '[', ']',
-                MarkdownEditingDescriptor.checkboxChoiceTemplate
+                MarkdownEditingDescriptor.checkboxChoiceTemplate,
             );
         };
 
@@ -233,31 +233,31 @@
 
         MarkdownEditingDescriptor.insertStringInput = function(selectedText) {
             return MarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '',
-                MarkdownEditingDescriptor.stringInputTemplate
+                MarkdownEditingDescriptor.stringInputTemplate,
             );
         };
 
         MarkdownEditingDescriptor.insertNumberInput = function(selectedText) {
             return MarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '',
-                MarkdownEditingDescriptor.numberInputTemplate
+                MarkdownEditingDescriptor.numberInputTemplate,
             );
         };
 
         MarkdownEditingDescriptor.insertSelect = function(selectedText) {
             return MarkdownEditingDescriptor.insertGenericInput(selectedText, '[[', ']]',
-                MarkdownEditingDescriptor.selectTemplate
+                MarkdownEditingDescriptor.selectTemplate,
             );
         };
 
         MarkdownEditingDescriptor.insertHeader = function(selectedText) {
             return MarkdownEditingDescriptor.insertGenericInput(selectedText, '', '\n====\n',
-                MarkdownEditingDescriptor.headerTemplate
+                MarkdownEditingDescriptor.headerTemplate,
             );
         };
 
         MarkdownEditingDescriptor.insertExplanation = function(selectedText) {
             return MarkdownEditingDescriptor.insertGenericInput(selectedText, '[explanation]\n', '\n[explanation]',
-                MarkdownEditingDescriptor.explanationTemplate
+                MarkdownEditingDescriptor.explanationTemplate,
             );
         };
 
@@ -277,7 +277,7 @@
                     i, splits, makeParagraph, serializer, responseType, $xml, responseTypesSelector,
                     inputtype, beforeInputtype, extractHint, demandhints;
                 var responseTypes = [
-                    'optionresponse', 'multiplechoiceresponse', 'stringresponse', 'numericalresponse', 'choiceresponse'
+                    'optionresponse', 'multiplechoiceresponse', 'stringresponse', 'numericalresponse', 'choiceresponse',
                 ];
 
                 // fix DOS \r\n line endings to look like \n
@@ -357,7 +357,7 @@
                         hint: hint,
                         label: label,
                         parens: parens,
-                        labelassign: labelassign
+                        labelassign: labelassign,
                     };
                 };
 
@@ -554,7 +554,7 @@
 
                         isRangeToleranceCase = function(answer) {
                             return _.contains(
-                                ['[', '('], answer[0]) && _.contains([']', ')'], answer[answer.length - 1]
+                                ['[', '('], answer[0]) && _.contains([']', ')'], answer[answer.length - 1],
                             );
                         },
 

@@ -38,7 +38,6 @@
     // Temporary Rules (Will be removed one-by-one to minimize file changes)
     "block-scoped-var": "off",
     "camelcase": "off",
-    "comma-dangle": "off",
     "consistent-return": "off",
     "curly": "off",
     "eqeqeq": "off",

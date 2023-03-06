@@ -45,7 +45,7 @@
                 this.itemViews = [];
                 this.renderCollection();
                 return this;
-            }
+            },
         });
         return ListView;
     });

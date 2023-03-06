@@ -4,11 +4,11 @@
     define([
         'course_search/js/views/search_results_view',
         'text!course_search/templates/course_search_results.underscore',
-        'text!course_search/templates/course_search_item.underscore'
+        'text!course_search/templates/course_search_item.underscore',
     ], function(
         SearchResultsView,
         courseSearchResultsTemplate,
-        courseSearchItemTemplate
+        courseSearchItemTemplate,
     ) {
         return SearchResultsView.extend({
             el: '.search-results',
@@ -17,7 +17,7 @@
             resultsTemplate: courseSearchResultsTemplate,
             itemTemplate: courseSearchItemTemplate,
             events: {
-                'click .search-load-next': 'loadNext'
+                'click .search-load-next': 'loadNext',
             },
 
             clear: function() {
@@ -29,7 +29,7 @@
             showResults: function() {
                 SearchResultsView.prototype.showResults.call(this);
                 $(this.coursewareResultsWrapperElement).css('display', 'table-cell');
-            }
+            },
 
         });
     });

@@ -18,7 +18,7 @@ define(['backbone'], function(Backbone) {
             var name_segments = this.get('display_name').split('.').reverse();
             var asset_type = (name_segments.length > 1) ? name_segments[0].toUpperCase() : '';
             return asset_type;
-        }
+        },
     });
     return Asset;
 });

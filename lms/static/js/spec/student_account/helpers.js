@@ -15,44 +15,44 @@ define(['underscore'], function(_) {
     var SYNC_LEARNER_PROFILE_DATA = true;
     var ENTERPRISE_NAME = 'Test Enterprise';
     var ENTERPRISE_READ_ONLY_ACCOUNT_FIELDS = {
-        fields: ['username', 'name', 'email', 'country']
+        fields: ['username', 'name', 'email', 'country'],
     };
     var EDX_SUPPORT_URL = 'https://support.edx.org/';
 
     var PROFILE_IMAGE = {
         image_url_large: '/media/profile-images/image.jpg',
-        has_image: true
+        has_image: true,
     };
     var FIELD_OPTIONS = [
         ['0', 'Option 0'],
         ['1', 'Option 1'],
         ['2', 'Option 2'],
-        ['3', 'Option 3']
+        ['3', 'Option 3'],
     ];
     var TIME_ZONE_RESPONSE = [{
         time_zone: 'America/Guyana',
-        description: 'America/Guyana (ECT, UTC-0500)'
+        description: 'America/Guyana (ECT, UTC-0500)',
     }];
     var FIELDS_DATA = {
         country: {
-            options: FIELD_OPTIONS
+            options: FIELD_OPTIONS,
         }, gender: {
-            options: FIELD_OPTIONS
+            options: FIELD_OPTIONS,
         }, language: {
-            options: FIELD_OPTIONS
+            options: FIELD_OPTIONS,
         }, beta_language: {
-            options: []
+            options: [],
         }, level_of_education: {
-            options: FIELD_OPTIONS
+            options: FIELD_OPTIONS,
         }, password: {
-            url: '/password_reset'
+            url: '/password_reset',
         }, year_of_birth: {
-            options: FIELD_OPTIONS
+            options: FIELD_OPTIONS,
         }, preferred_language: {
-            options: FIELD_OPTIONS
+            options: FIELD_OPTIONS,
         }, time_zone: {
-            options: FIELD_OPTIONS
-        }
+            options: FIELD_OPTIONS,
+        },
     };
     var AUTH_DATA = {
         providers: [
@@ -62,7 +62,7 @@ define(['underscore'], function(_) {
                 connected: true,
                 accepts_logins: 'true',
                 connect_url: 'yetanother1.com/auth/connect',
-                disconnect_url: 'yetanother1.com/auth/disconnect'
+                disconnect_url: 'yetanother1.com/auth/disconnect',
             },
             {
                 id: 'oa2-network2',
@@ -70,9 +70,9 @@ define(['underscore'], function(_) {
                 connected: true,
                 accepts_logins: 'true',
                 connect_url: 'yetanother2.com/auth/connect',
-                disconnect_url: 'yetanother2.com/auth/disconnect'
-            }
-        ]
+                disconnect_url: 'yetanother2.com/auth/disconnect',
+            },
+        ],
     };
     var IMAGE_MAX_BYTES = 1024 * 1024;
     var IMAGE_MIN_BYTES = 100;
@@ -80,18 +80,18 @@ define(['underscore'], function(_) {
         facebook: {
             display_name: 'Facebook',
             url_stub: 'facebook.com/',
-            example: 'https://www.facebook.com/username'
+            example: 'https://www.facebook.com/username',
         },
         twitter: {
             display_name: 'Twitter',
             url_stub: 'twitter.com/',
-            example: 'https://www.twitter.com/username'
+            example: 'https://www.twitter.com/username',
         },
         linkedin: {
             display_name: 'LinkedIn',
             url_stub: 'linkedin.com/in/',
-            example: 'https://www.linkedin.com/in/username'
-        }
+            example: 'https://www.linkedin.com/in/username',
+        },
     };
     var DEFAULT_ACCOUNT_SETTINGS_DATA = {
         username: 'student',
@@ -108,11 +108,11 @@ define(['underscore'], function(_) {
         social_links: [{platform: 'facebook', social_link: 'https://www.facebook.com/edX'}],
         language_proficiencies: [{code: '1'}],
         profile_image: PROFILE_IMAGE,
-        accomplishments_shared: false
+        accomplishments_shared: false,
     };
     var DEFAULT_USER_PREFERENCES_DATA = {
         'pref-lang': '2',
-        time_zone: 'America/New_York'
+        time_zone: 'America/New_York',
     };
 
     var createAccountSettingsData = function(options) {
@@ -244,6 +244,6 @@ define(['underscore'], function(_) {
         expectElementContainsField: expectElementContainsField,
         expectSettingsSectionsButNotFieldsToBeRendered: expectSettingsSectionsButNotFieldsToBeRendered,
         expectSettingsSectionsAndFieldsToBeRendered: expectSettingsSectionsAndFieldsToBeRendered,
-        expectSettingsSectionsAndFieldsToBeRenderedWithMessage: expectSettingsSectionsAndFieldsToBeRenderedWithMessage
+        expectSettingsSectionsAndFieldsToBeRenderedWithMessage: expectSettingsSectionsAndFieldsToBeRenderedWithMessage,
     };
 });

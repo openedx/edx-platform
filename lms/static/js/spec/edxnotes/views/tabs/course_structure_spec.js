@@ -1,9 +1,9 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers',
     'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs/course_structure'
+    'js/edxnotes/views/tabs/course_structure',
 ], function(
-    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, CourseStructureView
+    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, CourseStructureView,
 ) {
     'use strict';
     describe('EdxNotes CourseStructureView', function() {
@@ -22,7 +22,7 @@ define([
             options = _.defaults(options || {}, {
                 el: $('.wrapper-student-notes'),
                 collection: collection,
-                tabsCollection: tabsCollection
+                tabsCollection: tabsCollection,
             });
 
             view = new CourseStructureView(options);
@@ -34,7 +34,7 @@ define([
         beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
-                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
+                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item',
             ]);
 
             this.collection = new NotesCollection(notes, {perPage: 10, parse: true});
@@ -54,7 +54,7 @@ define([
                 icon: 'fa fa-list-ul',
                 is_active: true,
                 is_closable: false,
-                view: 'Location in Course'
+                view: 'Location in Course',
             });
             expect(view.$('#structure-panel')).toExist();
             expect(chapters).toEqual(['First Chapter', 'Second Chapter']);

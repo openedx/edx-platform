@@ -7,7 +7,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 graders: null,  // CourseGraderCollection
                 grade_cutoffs: null,  // CourseGradeCutoff model
                 grace_period: null, // either null or { hours: n, minutes: m, ...}
-                minimum_grade_credit: null // either null or percentage
+                minimum_grade_credit: null, // either null or percentage
             },
             parse: function(attributes) {
                 if (attributes.graders) {
@@ -26,7 +26,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 if (attributes.grace_period === null) {
                     attributes.grace_period = {
                         hours: 0,
-                        minutes: 0
+                        minutes: 0,
                     };
                 }
                 // If minimum_grade_credit is unset or equal to 0 on the server,
@@ -58,7 +58,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 var pieces = grace_period.split(/:/);
                 return {
                     hours: parseInt(pieces[0], 10),
-                    minutes: parseInt(pieces[1], 10)
+                    minutes: parseInt(pieces[1], 10),
                 };
             },
             parseMinimumGradeCredit: function(minimum_grade_credit) {
@@ -73,7 +73,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 if (_.has(attrs, 'grace_period')) {
                     if (attrs.grace_period === null) {
                         return {
-                            grace_period: gettext('Grace period must be specified in HH:MM format.')
+                            grace_period: gettext('Grace period must be specified in HH:MM format.'),
                         };
                     }
                 }
@@ -86,12 +86,12 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                             minimum_grade_credit: StringUtils.interpolate(
                                 gettext('Not able to set passing grade to less than %(minimum_grade_cutoff)s%.'),
                                 {minimum_grade_cutoff: minimumGradeCutoff * 100},
-                                true
-                            )
+                                true,
+                            ),
                         };
                     }
                 }
-            }
+            },
         });
 
         return CourseGradingPolicy;

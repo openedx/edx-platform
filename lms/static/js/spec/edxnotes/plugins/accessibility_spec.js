@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
+    'jquery', 'underscore', 'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory',
 ], function($, _, Annotator, Logger, NotesFactory) {
     'use strict';
     describe('EdxNotes Accessibility Plugin', function() {
@@ -28,8 +28,8 @@ define([
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             this.annotator = NotesFactory.factory(
                 $('div#edx-notes-wrapper-123').get(0), {
-                    endpoint: 'http://example.com/'
-                }
+                    endpoint: 'http://example.com/',
+                },
             );
             this.plugin = this.annotator.plugins.Accessibility;
             spyOn(Logger, 'log');
@@ -47,19 +47,19 @@ define([
                 spyOn(this.annotator, 'unsubscribe').and.callThrough();
                 this.plugin.destroy();
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
-                    'annotationViewerTextField', this.plugin.addAriaAttributes
+                    'annotationViewerTextField', this.plugin.addAriaAttributes,
                 );
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
-                    'annotationsLoaded', this.plugin.addDescriptions
+                    'annotationsLoaded', this.plugin.addDescriptions,
                 );
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
-                    'annotationCreated', this.plugin.addDescriptions
+                    'annotationCreated', this.plugin.addDescriptions,
                 );
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
-                    'annotationCreated', this.plugin.focusOnHighlightedText
+                    'annotationCreated', this.plugin.focusOnHighlightedText,
                 );
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
-                    'annotationDeleted', this.plugin.removeDescription
+                    'annotationDeleted', this.plugin.removeDescription,
                 );
                 expect($.fn.off).toHaveBeenCalledWith('.accessibility');
             });
@@ -73,7 +73,7 @@ define([
                 annotation = {
                     id: '01',
                     text: 'Test text',
-                    highlights: [highlight.get(0)]
+                    highlights: [highlight.get(0)],
                 };
             });
 
@@ -112,7 +112,7 @@ define([
                 annotation = {
                     id: '01',
                     text: 'Test text',
-                    highlights: [highlight.get(0)]
+                    highlights: [highlight.get(0)],
                 };
                 highlight.data('annotation', annotation);
                 spyOn(this.annotator, 'showViewer').and.callThrough();
@@ -165,7 +165,7 @@ define([
                 annotation = {
                     id: '01',
                     text: 'Test text',
-                    highlights: [highlight.get(0)]
+                    highlights: [highlight.get(0)],
                 };
                 highlight.data('annotation', annotation);
                 this.annotator.viewer.load([annotation]);
@@ -232,7 +232,7 @@ define([
                 annotation = {
                     id: '01',
                     text: 'Test text',
-                    highlights: [highlight.get(0)]
+                    highlights: [highlight.get(0)],
                 };
                 highlight.data('annotation', annotation);
                 this.annotator.editor.show(annotation, {left: 0, top: 0});

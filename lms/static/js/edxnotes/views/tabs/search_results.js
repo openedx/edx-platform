@@ -2,7 +2,7 @@
     'use strict';
     define([
         'jquery', 'underscore', 'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view',
-        'js/edxnotes/views/search_box', 'edx-ui-toolkit/js/utils/html-utils', 'edx-ui-toolkit/js/utils/string-utils'
+        'js/edxnotes/views/search_box', 'edx-ui-toolkit/js/utils/html-utils', 'edx-ui-toolkit/js/utils/string-utils',
     ], function($, _, gettext, TabPanelView, TabView, SearchBoxView, HtmlUtils, StringUtils) {
         var view = 'Search Results';
         var SearchResultsView = TabView.extend({
@@ -12,13 +12,13 @@
                 className: function() {
                     return [
                         TabPanelView.prototype.className,
-                        'note-group'
+                        'note-group',
                     ].join(' ');
                 },
                 renderContent: function() {
                     this.$el.append(HtmlUtils.HTML(this.getNotes(this.collection.toArray())).toString());
                     return this;
-                }
+                },
             }),
 
             NoResultsViewConstructor: TabPanelView.extend({
@@ -27,7 +27,7 @@
                 className: function() {
                     return [
                         TabPanelView.prototype.className,
-                        'note-group'
+                        'note-group',
                     ].join(' ');
                 },
                 renderContent: function() {
@@ -35,12 +35,12 @@
 
                     this.$el.append($('<p />', {
                         text: StringUtils.interpolate(message, {
-                            query_string: this.options.searchQuery
-                        }, true)
+                            query_string: this.options.searchQuery,
+                        }, true),
                     }));
 
                     return this;
-                }
+                },
             }),
 
             tabInfo: {
@@ -48,7 +48,7 @@
                 name: gettext('Search Results'),
                 icon: 'fa fa-search',
                 is_closable: true,
-                view: view
+                view: view,
             },
 
             initialize: function(options) {
@@ -62,7 +62,7 @@
                     perPage: this.options.perPage,
                     beforeSearchStart: this.onBeforeSearchStart,
                     search: this.onSearch,
-                    error: this.onSearchError
+                    error: this.onSearchError,
                 });
             },
 
@@ -84,11 +84,11 @@
                             collection: collection,
                             searchQuery: this.searchResults.searchQuery,
                             scrollToTag: this.options.scrollToTag,
-                            createHeaderFooter: this.options.createHeaderFooter
+                            createHeaderFooter: this.options.createHeaderFooter,
                         });
                     } else {
                         return new this.NoResultsViewConstructor({
-                            searchQuery: this.searchResults.searchQuery
+                            searchQuery: this.searchResults.searchQuery,
                         });
                     }
                 }
@@ -129,7 +129,7 @@
             onSearch: function(collection, searchQuery) {
                 this.searchResults = {
                     collection: collection,
-                    searchQuery: searchQuery
+                    searchQuery: searchQuery,
                 };
 
                 if (this.searchDeferred) {
@@ -146,7 +146,7 @@
                 if (this.searchDeferred) {
                     this.searchDeferred.reject();
                 }
-            }
+            },
         });
 
         return SearchResultsView;

@@ -6,7 +6,7 @@ define(['backbone',
     'js/spec/student_account/helpers',
     'js/views/fields',
     'js/student_account/models/user_account_model',
-    'js/student_account/views/account_settings_view'
+    'js/student_account/views/account_settings_view',
 ],
 function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel,
     AccountSettingsView) {
@@ -28,17 +28,17 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, User
                             view: new FieldViews.ReadonlyFieldView({
                                 model: model,
                                 title: 'Username',
-                                valueAttribute: 'username'
-                            })
+                                valueAttribute: 'username',
+                            }),
                         },
                         {
                             view: new FieldViews.TextFieldView({
                                 model: model,
                                 title: 'Full Name',
-                                valueAttribute: 'name'
-                            })
-                        }
-                    ]
+                                valueAttribute: 'name',
+                            }),
+                        },
+                    ],
                 },
                 {
                     title: 'Additional Information',
@@ -48,19 +48,19 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, User
                                 model: model,
                                 title: 'Education Completed',
                                 valueAttribute: 'level_of_education',
-                                options: Helpers.FIELD_OPTIONS
-                            })
-                        }
-                    ]
-                }
+                                options: Helpers.FIELD_OPTIONS,
+                            }),
+                        },
+                    ],
+                },
             ];
 
             var accountSettingsView = new AccountSettingsView({
                 el: $('.wrapper-account-settings'),
                 model: model,
                 tabSections: {
-                    aboutTabSections: aboutSectionsData
-                }
+                    aboutTabSections: aboutSectionsData,
+                },
             });
 
             return accountSettingsView;

@@ -12,10 +12,10 @@
                 body: 'this is a response',
                 created_at: '2013-04-03T20:08:39Z',
                 abuse_flaggers: ['123'],
-                roles: []
+                roles: [],
             });
             this.view = new ResponseCommentShowView({
-                model: this.comment
+                model: this.comment,
             });
             return spyOn(this.view, 'convertMath');
         });
@@ -49,8 +49,8 @@
                 DiscussionUtil.loadRoles([]);
                 this.comment.updateInfo({
                     ability: {
-                        can_delete: true
-                    }
+                        can_delete: true,
+                    },
                 });
                 this.view.render();
                 return DiscussionViewSpecHelper.checkButtonEvents(this.view, '_delete', '.action-delete');
@@ -68,8 +68,8 @@
                 DiscussionUtil.loadRoles([]);
                 this.comment.updateInfo({
                     ability: {
-                        can_edit: true
-                    }
+                        can_edit: true,
+                    },
                 });
                 this.view.render();
                 return DiscussionViewSpecHelper.checkButtonEvents(this.view, 'edit', '.action-edit');

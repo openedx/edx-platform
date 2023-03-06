@@ -6,7 +6,7 @@ define([
     'js/views/course_outline', 'common/js/components/utils/view_utils', 'common/js/components/views/feedback_alert',
     'common/js/components/views/feedback_notification', 'js/views/course_highlights_enable'],
 function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView,
-    CourseHighlightsEnableView
+    CourseHighlightsEnableView,
 ) {
     'use strict';
     var expandedLocators, CourseOutlinePage;
@@ -15,7 +15,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         // takes XBlockInfo as a model
 
         events: {
-            'click .button-toggle-expand-collapse': 'toggleExpandCollapse'
+            'click .button-toggle-expand-collapse': 'toggleExpandCollapse',
         },
 
         /**
@@ -31,7 +31,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         pollingDelay: 100,
 
         options: {
-            collapsedClass: 'is-collapsed'
+            collapsedClass: 'is-collapsed',
         },
 
         // Extracting this to a variable allows comprehensive themes to replace or extend `CourseOutlineView`.
@@ -88,7 +88,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
             if (this.model.get('highlights_enabled')) {
                 this.highlightsEnableView = new CourseHighlightsEnableView({
                     el: this.$('.status-highlights-enabled'),
-                    model: this.model
+                    model: this.model,
                 });
                 this.highlightsEnableView.render();
             }
@@ -98,7 +98,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
                 model: this.model,
                 isRoot: true,
                 initialState: this.initialState,
-                expandedLocators: this.expandedLocators
+                expandedLocators: this.expandedLocators,
             });
             this.outlineView.render();
             this.outlineView.setViewState(this.initialState || {});
@@ -176,14 +176,14 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
                 method: 'GET',
                 global: false,
                 contentType: 'application/json; charset=utf-8',
-                dataType: 'json'
+                dataType: 'json',
             });
         },
 
         onIndexSuccess: function(data) {
             var msg = new AlertView.Announcement({
                 title: gettext('Course Index'),
-                message: data.user_message
+                message: data.user_message,
             });
             msg.show();
         },
@@ -191,10 +191,10 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         onIndexError: function(data) {
             var msg = new NoteView.Error({
                 title: gettext('There were errors reindexing course.'),
-                message: data.user_message
+                message: data.user_message,
             });
             msg.show();
-        }
+        },
     });
 
     /**
@@ -243,7 +243,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
              */
         clear: function() {
             this.locators = [];
-        }
+        },
     };
 
     return CourseOutlinePage;

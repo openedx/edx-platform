@@ -9,7 +9,7 @@
     this.Collapsible = {
         setCollapsibles: setCollapsibles,
         toggleFull: toggleFull,
-        toggleHint: toggleHint
+        toggleHint: toggleHint,
     };
 
     return;
@@ -45,8 +45,8 @@
                 edx.HtmlUtils.joinHtml(
                     edx.HtmlUtils.HTML("<a href='#' class='full-custom'>"),
                     gettext(open_text),
-                    edx.HtmlUtils.HTML('</a>')
-                )
+                    edx.HtmlUtils.HTML('</a>'),
+                ),
             );
 
             $(elt).find('.full-custom').click(function(event) {

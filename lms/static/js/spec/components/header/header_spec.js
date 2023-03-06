@@ -4,7 +4,7 @@
     define(['jquery',
         'underscore',
         'js/components/header/views/header',
-        'js/components/header/models/header'
+        'js/components/header/models/header',
     ],
     function($, _, HeaderView, HeaderModel) {
         describe('header component view', function() {
@@ -22,10 +22,10 @@
             beforeEach(function() {
                 model = new HeaderModel({
                     title: 'Test title',
-                    description: 'Test description'
+                    description: 'Test description',
                 });
                 view = new HeaderView({
-                    model: model
+                    model: model,
                 });
             });
 
@@ -41,7 +41,7 @@
             it('shows breadcrumbs if they are supplied', function() {
                 testBreadcrumbs([
                     {url: 'url1', title: 'Crumb 1'},
-                    {url: 'url2', title: 'Crumb 2'}
+                    {url: 'url2', title: 'Crumb 2'},
                 ]);
                 testBreadcrumbs([{url: 'url1', title: 'Crumb 1'}]);
             });
@@ -52,6 +52,6 @@
                 expect(view.$el.text()).toContain('Changed title');
             });
         });
-    }
+    },
     );
 }).call(this, define || RequireJS.define);

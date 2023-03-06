@@ -12,7 +12,7 @@
         'js/views/fields',
         'js/views/image_field',
         'text!learner_profile/templates/social_icons.underscore',
-        'backbone-super'
+        'backbone-super',
     ], function(gettext, $, _, Backbone, StringUtils, HtmlUtils, FieldViews, ImageFieldView, socialIconsTemplate) {
         var LearnerProfileFieldViews = {};
 
@@ -20,7 +20,7 @@
 
             events: {
                 'click button.btn-change-privacy': 'finishEditing',
-                'change select': 'showSaveButton'
+                'change select': 'showSaveButton',
             },
 
             render: function() {
@@ -33,24 +33,24 @@
             showNotificationMessage: function() {
                 var accountSettingsLink = HtmlUtils.joinHtml(
                     HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML('<a href="{settings_url}">'), {settings_url: this.options.accountSettingsPageUrl}
+                        HtmlUtils.HTML('<a href="{settings_url}">'), {settings_url: this.options.accountSettingsPageUrl},
                     ),
                     gettext('Account Settings page.'),
-                    HtmlUtils.HTML('</a>')
+                    HtmlUtils.HTML('</a>'),
                 );
                 if (this.profileIsPrivate) {
                     this._super(
                         HtmlUtils.interpolateHtml(
                             gettext('You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}'),  // eslint-disable-line max-len
-                            {account_settings_page_link: accountSettingsLink}
-                        )
+                            {account_settings_page_link: accountSettingsLink},
+                        ),
                     );
                 } else if (this.requiresParentalConsent) {
                     this._super(
                         HtmlUtils.interpolateHtml(
                             gettext('You must be over 13 to share a full profile. If you are over 13, make sure that you have specified a birth year on the {account_settings_page_link}'),  // eslint-disable-line max-len
-                            {account_settings_page_link: accountSettingsLink}
-                        )
+                            {account_settings_page_link: accountSettingsLink},
+                        ),
                     );
                 } else {
                     this._super('');
@@ -66,7 +66,7 @@
 
             showSaveButton: function() {
                 $('.btn-change-privacy').removeClass('hidden');
-            }
+            },
         });
 
         LearnerProfileFieldViews.ProfileImageFieldView = ImageFieldView.extend({
@@ -80,7 +80,7 @@
             imageAltText: function() {
                 return StringUtils.interpolate(
                     gettext('Profile image for {username}'),
-                    {username: this.model.get('username')}
+                    {username: this.model.get('username')},
                 );
             },
 
@@ -136,7 +136,7 @@
             fileSelected: function(e, data) {
                 this.options.messageView.hideMessage();
                 this._super(e, data);
-            }
+            },
         });
 
         LearnerProfileFieldViews.SocialLinkIconsView = Backbone.View.extend({
@@ -158,10 +158,10 @@
 
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(socialIconsTemplate)({
                     socialLinks: socialLinks,
-                    ownProfile: this.options.ownProfile
+                    ownProfile: this.options.ownProfile,
                 }));
                 return this;
-            }
+            },
         });
 
         return LearnerProfileFieldViews;

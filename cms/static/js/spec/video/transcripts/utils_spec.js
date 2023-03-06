@@ -2,7 +2,7 @@ define(
     [
         'jquery', 'underscore',
         'js/views/video/transcripts/utils',
-        'underscore.string', 'xmodule'
+        'underscore.string', 'xmodule',
     ],
     function($, _, Utils, _str) {
         'use strict';
@@ -16,7 +16,7 @@ define(
                         'http://www.youtube.com/watch?v=%s#t=0m10s',
                         'http://www.youtube.com/embed/%s?rel=0',
                         'http://www.youtube.com/watch?v=%s',
-                        'http://youtu.be/%s'
+                        'http://youtu.be/%s',
                     ];
 
                     return $.map(links, function(link) {
@@ -36,7 +36,7 @@ define(
                             'https://somelink.com/sub/sub/%s.%s',
                             'http://cdn.somecdn.net/v/%s.%s',
                             'somelink.com/%s.%s',
-                            '%s.%s'
+                            '%s.%s',
                         ],
                         data = {};
 
@@ -58,7 +58,7 @@ define(
                         'http://goo.gl/%s',
                         'ftp://goo.gl/%s',
                         'https://goo.gl/%s',
-                        '%s'
+                        '%s',
                     ];
 
                     return $.map(links, function(link) {
@@ -74,8 +74,8 @@ define(
                     collection = jasmine.createSpyObj(
                         'Collection',
                         [
-                            'findWhere'
-                        ]
+                            'findWhere',
+                        ],
                     );
                 });
 
@@ -83,23 +83,23 @@ define(
                     Utils.getField(collection, testFieldName);
 
                     expect(collection.findWhere).toHaveBeenCalledWith({
-                        field_name: testFieldName
+                        field_name: testFieldName,
                     });
                 });
 
                 var wrongArgumentLists = [
                     {
                         argName: 'collection',
-                        list: [undefined, testFieldName]
+                        list: [undefined, testFieldName],
                     },
                     {
                         argName: 'field name',
-                        list: [collection, undefined]
+                        list: [collection, undefined],
                     },
                     {
                         argName: 'both',
-                        list: [undefined, undefined]
-                    }
+                        list: [undefined, undefined],
+                    },
                 ];
 
                 $.each(wrongArgumentLists, function(index, element) {
@@ -142,7 +142,7 @@ define(
                     var wrongUrls = [
                         'http://youtu.be/',
                         '/static/example',
-                        'http://google.com/somevideo.mp4'
+                        'http://google.com/somevideo.mp4',
                     ];
 
                     $.each(wrongUrls, function(index, link) {
@@ -164,7 +164,7 @@ define(
 
                                 expect(result).toEqual({
                                     video: html5FileName,
-                                    type: format
+                                    type: format,
                                 });
                             });
                         });
@@ -176,7 +176,7 @@ define(
 
                             expect(result).toEqual({
                                 video: otherLinkId,
-                                type: 'other'
+                                type: 'other',
                             });
                         });
                     });
@@ -204,7 +204,7 @@ define(
                         'http://example.com/.mp4',
                         'http://example.com/video_name.',
                         'http://example.com/',
-                        'http://example.com'
+                        'http://example.com',
                     ];
 
                     $.each(html5WrongUrls, function(index, link) {
@@ -232,23 +232,23 @@ define(
                         resp: {
                             mode: 'html5',
                             video: html5FileName,
-                            type: 'mp4'
-                        }
+                            type: 'mp4',
+                        },
                     },
                     youtube: {
                         link: ytLinksList[0],
                         resp: {
                             mode: 'youtube',
                             video: videoId,
-                            type: 'youtube'
-                        }
+                            type: 'youtube',
+                        },
                     },
                     incorrect: {
                         link: 'http://example.com',
                         resp: {
-                            mode: 'incorrect'
-                        }
-                    }
+                            mode: 'incorrect',
+                        },
+                    },
                 };
 
                 $.each(resultDataDict, function(mode, data) {

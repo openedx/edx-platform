@@ -5,7 +5,7 @@
         'backbone',
         'gettext',
         'edx-ui-toolkit/js/utils/date-utils',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function($, _, Backbone, gettext, DateUtils, HtmlUtils) {
         'use strict';
 
@@ -15,7 +15,7 @@
                 datetime: date,
                 language: userLanguage,
                 timezone: userTimezone,
-                format: DateUtils.dateFormatEnum.shortDate
+                format: DateUtils.dateFormatEnum.shortDate,
             };
             return DateUtils.localize(context);
         }
@@ -44,20 +44,20 @@
                     data.start = formatDate(
                         new Date(data.start),
                         userLanguage,
-                        userTimezone
+                        userTimezone,
                     );
                 }
                 data.enrollment_start = formatDate(
                     new Date(data.enrollment_start),
                     userLanguage,
-                    userTimezone
+                    userTimezone,
                 );
                 HtmlUtils.setHtml(
                     this.$el,
-                    this.tpl(data)
+                    this.tpl(data),
                 );
                 return this;
-            }
+            },
 
         });
     });

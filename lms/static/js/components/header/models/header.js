@@ -9,8 +9,8 @@
                 title: '',
                 description: '',
                 breadcrumbs: null,
-                nav_aria_label: ''
-            }
+                nav_aria_label: '',
+            },
         });
 
         return HeaderModel;

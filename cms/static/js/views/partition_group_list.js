@@ -3,7 +3,7 @@
  * It is expected to be backed by a Group collection.
  */
 define([
-    'underscore', 'js/views/list', 'js/views/partition_group_item', 'gettext'
+    'underscore', 'js/views/list', 'js/views/partition_group_item', 'gettext',
 ], function(_, ListView, PartitionGroupItemView, gettext) {
     'use strict';
 
@@ -26,7 +26,7 @@ define([
 
         createItemView: function(options) {
             return new PartitionGroupItemView(_.extend({}, options, {scheme: this.scheme}));
-        }
+        },
     });
 
     return PartitionGroupListView;

@@ -59,9 +59,9 @@
                                 data.levels.map(function(level) {
                                     return {
                                         bitrate: level.bitrate,
-                                        resolution: level.width + 'x' + level.height
+                                        resolution: level.width + 'x' + level.height,
                                     };
-                                })
+                                }),
                             );
                             self.config.onReadyHLS();
                         });
@@ -71,8 +71,8 @@
                                 '[HLS Video]: LEVEL_SWITCHED, qualityLevelInfo: ',
                                 {
                                     bitrate: level.bitrate,
-                                    resolution: level.width + 'x' + level.height
-                                }
+                                    resolution: level.width + 'x' + level.height,
+                                },
                             );
                         });
                     }
@@ -116,21 +116,21 @@
                         case HLS.ErrorTypes.NETWORK_ERROR:
                             console.error(
                                 '[HLS Video]: Fatal network error encountered, try to recover. Details: %s',
-                                data.details
+                                data.details,
                             );
                             this.hls.startLoad();
                             break;
                         case HLS.ErrorTypes.MEDIA_ERROR:
                             console.error(
                                 '[HLS Video]: Fatal media error encountered, try to recover. Details: %s',
-                                data.details
+                                data.details,
                             );
                             this.hls.recoverMediaError();
                             break;
                         default:
                             console.error(
                                 '[HLS Video]: Unrecoverable error encountered. Details: %s',
-                                data.details
+                                data.details,
                             );
                             break;
                         }

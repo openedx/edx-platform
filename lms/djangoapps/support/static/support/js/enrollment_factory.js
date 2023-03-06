@@ -3,7 +3,7 @@
 
     define([
         'underscore',
-        'support/js/views/enrollment'
+        'support/js/views/enrollment',
     ], function(_, EnrollmentView) {
         return function(options) {
             options = _.extend({el: '.enrollment-content'}, options);

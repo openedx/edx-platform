@@ -6,7 +6,7 @@
         'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
         'edx-ui-toolkit/js/utils/constants',
-        'text!discussion/templates/search.underscore'
+        'text!discussion/templates/search.underscore',
     ],
     function(_, Backbone, HtmlUtils, constants, searchTemplate) {
         /*
@@ -25,7 +25,7 @@
             render: function() {
                 HtmlUtils.setHtml(this.$el, this.template());
                 return this;
-            }
+            },
         });
 
         return searchView;

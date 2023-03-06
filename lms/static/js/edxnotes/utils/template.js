@@ -16,7 +16,7 @@
         };
 
         return {
-            loadTemplate: loadTemplate
+            loadTemplate: loadTemplate,
         };
     });
 }).call(this, define || RequireJS.define);

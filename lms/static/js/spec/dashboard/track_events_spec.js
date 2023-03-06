@@ -2,7 +2,7 @@
     'use strict';
     define([
         'jquery',
-        'js/dashboard/track_events'
+        'js/dashboard/track_events',
     ],
     function($) {
         describe('edx.dashboard.trackEvents', function() {
@@ -21,7 +21,7 @@
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
                     $courseTitle,
                     'edx.bi.dashboard.course_title.clicked',
-                    window.edx.dashboard.generateTrackProperties
+                    window.edx.dashboard.generateTrackProperties,
                 );
             });
 
@@ -34,7 +34,7 @@
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
                     $courseImage,
                     'edx.bi.dashboard.course_image.clicked',
-                    window.edx.dashboard.generateTrackProperties
+                    window.edx.dashboard.generateTrackProperties,
                 );
             });
 
@@ -48,7 +48,7 @@
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
                     $enterCourse,
                     'edx.bi.dashboard.enter_course.clicked',
-                    window.edx.dashboard.generateTrackProperties
+                    window.edx.dashboard.generateTrackProperties,
                 );
             });
 
@@ -61,7 +61,7 @@
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
                     $dropDown,
                     'edx.bi.dashboard.course_options_dropdown.clicked',
-                    window.edx.dashboard.generateTrackProperties
+                    window.edx.dashboard.generateTrackProperties,
                 );
             });
 
@@ -74,7 +74,7 @@
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
                     $learnVerified,
                     'edx.bi.dashboard.verified_info_link.clicked',
-                    window.edx.dashboard.generateTrackProperties
+                    window.edx.dashboard.generateTrackProperties,
                 );
             });
 
@@ -82,14 +82,14 @@
                 var $findCourse = $('.btn-find-courses'),
                     property = {
                         category: 'dashboard',
-                        label: null
+                        label: null,
                     };
                 window.edx.dashboard.trackFindCourseBtnClicked($findCourse, property);
                 // Verify that analytics events fire when the 'user clicks find the course' button.
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
                     $findCourse,
                     'edx.bi.dashboard.find_courses_button.clicked',
-                    property
+                    property,
                 );
             });
         });

@@ -36,7 +36,7 @@ function getActiveUserString(count) {
 function getAssignmentCounts(types, assignments) {
     const countsArray = types.map((type) => {
         return {
-            [type]: countByType(type, assignments)
+            [type]: countByType(type, assignments),
         }
     });
 
@@ -66,7 +66,7 @@ export function LearnerAnalyticsDashboard(props) {
         return {
             value: weight,
             label: type,
-            sliceIndex: index + 1
+            sliceIndex: index + 1,
         }
     });
 
@@ -94,7 +94,7 @@ export function LearnerAnalyticsDashboard(props) {
                         centerHole={true}
                         sliceBorder={{
                             strokeColor: '#f5f5f5',
-                            strokeWidth: 2
+                            strokeWidth: 2,
                         }}
                     />
                 </div>

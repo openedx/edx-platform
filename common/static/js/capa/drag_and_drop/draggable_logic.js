@@ -37,7 +37,7 @@
                 if (this.iconImgEl !== null) {
                     this.iconImgEl.css({
                         width: this.iconWidth,
-                        height: this.iconHeight
+                        height: this.iconHeight,
                     });
                 }
 
@@ -47,17 +47,17 @@
                     'padding-right': this.iconElPadding,
                     border: this.iconElBorder,
                     width: this.iconWidth,
-                    height: this.iconHeight
+                    height: this.iconHeight,
                 });
                 if (moveType === 'target') {
                     this.iconEl.css({
                         left: target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
-                        top: target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
+                        top: target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset,
                     });
                 } else {
                     this.iconEl.css({
                         left: target.x - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
-                        top: target.y - this.iconHeight * 0.5 + offset
+                        top: target.y - this.iconHeight * 0.5 + offset,
                     });
                 }
                 this.iconEl.appendTo(this.state.baseImageEl.parent());
@@ -70,17 +70,17 @@
                         'background-color': this.state.config.labelBgColor,
                         'padding-left': 8,
                         'padding-right': 8,
-                        border: '1px solid black'
+                        border: '1px solid black',
                     });
                     if (moveType === 'target') {
                         this.labelEl.css({
                             left: target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9, // Account for padding, border.
-                            top: target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
+                            top: target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset,
                         });
                     } else {
                         this.labelEl.css({
                             left: target.x - this.labelWidth * 0.5 + offset - 9, // Account for padding, border.
-                            top: target.y - this.iconHeight * 0.5 + this.iconHeight + 5 + offset
+                            top: target.y - this.iconHeight * 0.5 + this.iconHeight + 5 + offset,
                         });
                     }
                     this.labelEl.appendTo(this.state.baseImageEl.parent());
@@ -255,13 +255,13 @@
 
                 this.iconEl.css({
                     left: target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
-                    top: target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
+                    top: target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset,
                 });
 
                 if (this.labelEl !== null) {
                     this.labelEl.css({
                         left: target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9, // Acoount for padding, border.
-                        top: target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
+                        top: target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset,
                     });
                 }
             },
@@ -351,7 +351,7 @@
                 if (this.iconImgEl !== null) {
                     this.iconImgEl.css({
                         width: this.iconWidthSmall,
-                        height: this.iconHeightSmall
+                        height: this.iconHeightSmall,
                     });
                 }
                 this.iconEl.css({
@@ -367,7 +367,7 @@
                     // Before:
                     // 'top': ((this.labelEl !== null) ? (100 - this.iconHeightSmall - 25) * 0.5 : 50 - this.iconHeightSmall * 0.5)
                     // After:
-                    top: ((this.labelEl !== null) ? 37.5 : 50.0) - 0.5 * this.iconHeightSmall
+                    top: ((this.labelEl !== null) ? 37.5 : 50.0) - 0.5 * this.iconHeightSmall,
                 });
                 this.iconEl.appendTo(this.containerEl);
 
@@ -384,13 +384,13 @@
                         // Before:
                         // 'top': (100 - this.iconHeightSmall - 25) * 0.5 + this.iconHeightSmall + 5
                         // After:
-                        top: 42.5 + 0.5 * this.iconHeightSmall
+                        top: 42.5 + 0.5 * this.iconHeightSmall,
                     });
                     this.labelEl.appendTo(this.containerEl);
                 }
 
                 this.inContainer = true;
-            }
+            },
         }; // End-of: return {
     }); // End-of: define(['update_input', 'targets'], function (updateInput, Targets) {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

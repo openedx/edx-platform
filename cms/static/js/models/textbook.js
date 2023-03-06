@@ -7,14 +7,14 @@ function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
                 name: '',
                 chapters: new ChapterCollection([{}]),
                 showChapters: false,
-                editing: false
+                editing: false,
             };
         },
         relations: [{
             type: Backbone.Many,
             key: 'chapters',
             relatedModel: ChapterModel,
-            collectionType: ChapterCollection
+            collectionType: ChapterCollection,
         }],
         initialize: function() {
             this.setOriginalAttributes();
@@ -51,7 +51,7 @@ function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
         toJSON: function() {
             return {
                 tab_title: this.get('name'),
-                chapters: this.get('chapters').toJSON()
+                chapters: this.get('chapters').toJSON(),
             };
         },
         // NOTE: validation functions should return non-internationalized error
@@ -60,13 +60,13 @@ function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
             if (!attrs.name) {
                 return {
                     message: gettext('Textbook name is required'),
-                    attributes: {name: true}
+                    attributes: {name: true},
                 };
             }
             if (attrs.chapters.length === 0) {
                 return {
                     message: gettext('Please add at least one chapter'),
-                    attributes: {chapters: true}
+                    attributes: {chapters: true},
                 };
             } else {
                 // validate all chapters
@@ -79,11 +79,11 @@ function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
                 if (!_.isEmpty(invalidChapters)) {
                     return {
                         message: gettext('All chapters must have a name and asset'),
-                        attributes: {chapters: invalidChapters}
+                        attributes: {chapters: invalidChapters},
                     };
                 }
             }
-        }
+        },
     });
     return Textbook;
 });

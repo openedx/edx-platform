@@ -11,6 +11,6 @@
                 event.initEvent('error', false, false);
             }
             scriptTag.dispatchEvent(event);
-        }
+        },
     );
 }).call(this);

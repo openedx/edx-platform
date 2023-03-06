@@ -4,12 +4,12 @@
     define(
         [
             'gettext', 'jquery', 'underscore', 'backbone', 'text!learner_profile/templates/section_two.underscore',
-            'edx-ui-toolkit/js/utils/html-utils'
+            'edx-ui-toolkit/js/utils/html-utils',
         ],
         function(gettext, $, _, Backbone, sectionTwoTemplate, HtmlUtils) {
             var SectionTwoTab = Backbone.View.extend({
                 attributes: {
-                    class: 'wrapper-profile-section-two'
+                    class: 'wrapper-profile-section-two',
                 },
                 template: _.template(sectionTwoTemplate),
                 initialize: function(options) {
@@ -25,7 +25,7 @@
                         });
                     }
                     return this;
-                }
+                },
             });
 
             return SectionTwoTab;

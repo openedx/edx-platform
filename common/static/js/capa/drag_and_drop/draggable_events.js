@@ -48,7 +48,7 @@
                         if (this.iconImgEl !== null) {
                             this.iconImgEl.css({
                                 width: this.iconWidth,
-                                height: this.iconHeight
+                                height: this.iconHeight,
                             });
                         }
                         this.iconEl.css({
@@ -59,7 +59,7 @@
                             width: this.iconWidth,
                             height: this.iconHeight,
                             left: event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset,
-                            top: event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
+                            top: event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5,
                         });
                         this.iconEl.appendTo(this.state.baseImageEl.parent());
 
@@ -73,7 +73,7 @@
                                 'padding-right': 8,
                                 border: '1px solid black',
                                 left: event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9, // Account for padding, border.
-                                top: event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
+                                top: event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5,
                             });
                             this.labelEl.appendTo(this.state.baseImageEl.parent());
                         }
@@ -127,17 +127,17 @@
 
                     this.iconEl.css({
                         left: event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset,
-                        top: event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
+                        top: event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5,
                     });
 
                     if (this.labelEl !== null) {
                         this.labelEl.css({
                             left: event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9, // Acoount for padding, border.
-                            top: event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
+                            top: event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5,
                         });
                     }
                 }
-            }
+            },
         }; // End-of: return {
     }); // End-of: define([], function () {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

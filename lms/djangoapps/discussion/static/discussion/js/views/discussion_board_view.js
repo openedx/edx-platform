@@ -11,7 +11,7 @@
         'common/js/discussion/views/discussion_thread_list_view',
         'discussion/js/views/discussion_fake_breadcrumbs',
         'discussion/js/views/discussion_search_view',
-        'text!discussion/templates/discussion-home.underscore'
+        'text!discussion/templates/discussion-home.underscore',
     ],
     function(_, Backbone, HtmlUtils, Constants, DiscussionUtil,
         DiscussionThreadListView, DiscussionFakeBreadcrumbs, DiscussionSearchView, discussionHomeTemplate) {
@@ -27,7 +27,7 @@
                 'click .forum-nav-browse-menu-wrapper': 'ignoreClick',
                 'keydown .search-input': 'performSearch',
                 'click .search-button': 'performSearch',
-                'topic:selected': 'clearSearch'
+                'topic:selected': 'clearSearch',
             },
 
             initialize: function(options) {
@@ -47,10 +47,10 @@
                     el: this.$('.discussion-thread-list-container'),
                     courseSettings: this.courseSettings,
                     supportsActiveThread: true,
-                    mode: this.mode
+                    mode: this.mode,
                 }).render();
                 this.searchView = new DiscussionSearchView({
-                    el: this.$('.forum-search')
+                    el: this.$('.forum-search'),
                 }).render();
                 this.renderBreadcrumbs();
                 this.showBrowseMenu(true);
@@ -60,8 +60,8 @@
             renderBreadcrumbs: function() {
                 var BreadcrumbsModel = Backbone.Model.extend({
                     defaults: {
-                        contents: []
-                    }
+                        contents: [],
+                    },
                 });
 
                 this.breadcrumbs = new DiscussionFakeBreadcrumbs({
@@ -70,8 +70,8 @@
                     events: {
                         'click .all-topics': function(event) {
                             event.preventDefault();
-                        }
-                    }
+                        },
+                    },
                 }).render();
             },
 
@@ -152,7 +152,7 @@
                     type: 'GET',
                     success: function(response) {
                         $('input.email-setting').prop('checked', response.status);
-                    }
+                    },
                 });
             },
 
@@ -300,7 +300,7 @@
                             .contents()
                             .last()
                             .text()
-                            .trim()
+                            .trim(),
                     );
                 });
 
@@ -309,7 +309,7 @@
                 }
 
                 return crumbs;
-            }
+            },
 
         });
 

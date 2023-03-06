@@ -8,7 +8,7 @@
                 tpl: '#hinted_login-tpl',
 
                 events: {
-                    'click .proceed-button': 'proceedWithHintedAuth'
+                    'click .proceed-button': 'proceedWithHintedAuth',
                 },
 
                 formType: 'hinted-login',
@@ -25,8 +25,8 @@
                     HtmlUtils.setHtml(
                         $(this.el),
                         HtmlUtils.template(this.tpl)({
-                            hintedProvider: this.hintedProvider
-                        })
+                            hintedProvider: this.hintedProvider,
+                        }),
                     );
                     return this;
                 },
@@ -41,7 +41,7 @@
              */
                 redirect: function(url) {
                     window.location.href = url;
-                }
+                },
             });
         });
 }).call(this, define || RequireJS.define);

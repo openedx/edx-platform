@@ -13,7 +13,7 @@ define(
             // completed successfully
             STATUS_COMPLETED: gettext('Upload completed'),
             // Translators: This is the status of a video upload that has failed
-            STATUS_FAILED: gettext('Upload failed')
+            STATUS_FAILED: gettext('Upload failed'),
         };
 
         var ActiveVideoUpload = Backbone.Model.extend(
@@ -22,17 +22,17 @@ define(
                     videoId: null,
                     status: statusStrings.STATUS_QUEUED,
                     progress: 0,
-                    failureMessage: null
+                    failureMessage: null,
                 },
 
                 uploading: function() {
                     var status = this.get('status');
                     return (this.get('progress') < 1) && ((status === statusStrings.STATUS_UPLOADING));
-                }
+                },
             },
-            statusStrings
+            statusStrings,
         );
 
         return ActiveVideoUpload;
-    }
+    },
 );

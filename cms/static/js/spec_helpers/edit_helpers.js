@@ -18,7 +18,7 @@ var installMockXBlock, uninstallMockXBlock, installMockXModule, uninstallMockXMo
 installMockXBlock = function(mockResult) {
     window.MockXBlock = function(runtime, element) {
         var block = {
-            runtime: runtime
+            runtime: runtime,
         };
         if (mockResult) {
             block.save = function() {
@@ -37,7 +37,7 @@ installMockXModule = function(mockResult) {
     window.MockDescriptor = _.extend(XModule.Descriptor, {
         save: function() {
             return mockResult;
-        }
+        },
     });
 };
 
@@ -50,30 +50,30 @@ mockComponentTemplates = new ComponentTemplates([
         templates: [
             {
                 category: 'discussion',
-                display_name: 'Discussion'
+                display_name: 'Discussion',
             }],
         type: 'discussion',
-        support_legend: {show_legend: false}
+        support_legend: {show_legend: false},
     }, {
         templates: [
             {
                 category: 'html',
                 boilerplate_name: null,
-                display_name: 'Text'
+                display_name: 'Text',
             }, {
                 category: 'html',
                 boilerplate_name: 'announcement.yaml',
-                display_name: 'Announcement'
+                display_name: 'Announcement',
             }, {
                 category: 'html',
                 boilerplate_name: 'raw.yaml',
-                display_name: 'Raw HTML'
+                display_name: 'Raw HTML',
             }],
         type: 'html',
-        support_legend: {show_legend: false}
+        support_legend: {show_legend: false},
     }],
 {
-    parse: true
+    parse: true,
 });
 
 installEditTemplates = function(append) {
@@ -103,7 +103,7 @@ showEditModal = function(requests, xblockElement, model, mockHtml, options) {
     modal.edit(xblockElement, model, options);
     AjaxHelpers.respondWithJson(requests, {
         html: mockHtml,
-        resources: []
+        resources: [],
     });
     return modal;
 };
@@ -124,7 +124,7 @@ var editHelpers = $.extend(modal_helpers, {
     mockComponentTemplates: mockComponentTemplates,
     installEditTemplates: installEditTemplates,
     showEditModal: showEditModal,
-    verifyXBlockRequest: verifyXBlockRequest
+    verifyXBlockRequest: verifyXBlockRequest,
 });
 
 export default editHelpers;

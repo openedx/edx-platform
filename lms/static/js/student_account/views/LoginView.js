@@ -8,14 +8,14 @@
         'edx-ui-toolkit/js/utils/string-utils',
         'js/student_account/views/FormView',
         'text!templates/student_account/form_success.underscore',
-        'text!templates/student_account/form_status.underscore'
+        'text!templates/student_account/form_status.underscore',
     ], function(
         $, _, gettext,
         HtmlUtils,
         StringUtils,
         FormView,
         formSuccessTpl,
-        formStatusTpl
+        formStatusTpl,
     ) {
         return FormView.extend({
             el: '#login-form',
@@ -25,7 +25,7 @@
                 'click .forgot-password': 'forgotPassword',
                 'click .login-provider': 'thirdPartyAuth',
                 'click .enterprise-login': 'enterpriseSlugLogin',
-                'click .login-help': 'toggleLoginHelp'
+                'click .login-help': 'toggleLoginHelp',
             },
             formType: 'login',
             requiredStr: '',
@@ -86,10 +86,10 @@
                                 createAccountOption: this.createAccountOption,
                                 pipelineUserDetails: this.pipelineUserDetails,
                                 enterpriseName: this.enterpriseName,
-                                is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled
-                            }
-                        })
-                    )
+                                is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled,
+                            },
+                        }),
+                    ),
                 );
                 this.postRender();
 
@@ -106,7 +106,7 @@
                 if (this.errorMessage) {
                     formErrorsTitle = _.sprintf(
                         gettext('An error occurred when signing you in to %s.'),
-                        this.platformName
+                        this.platformName,
                     );
                     this.renderErrors(formErrorsTitle, [this.errorMessage]);
                 } else if (this.currentProvider) {
@@ -133,7 +133,7 @@
             renderMessage: function(message) {
                 this.renderFormFeedback(this.formStatusTpl, {
                     jsHook: message.tags,
-                    message: HtmlUtils.HTML(message.message)
+                    message: HtmlUtils.HTML(message.message),
                 });
             },
 
@@ -178,12 +178,12 @@
                             anchorStart: HtmlUtils.HTML(
                                 StringUtils.interpolate(
                                     '<a href="{passwordResetSupportUrl}">', {
-                                        passwordResetSupportUrl: this.passwordResetSupportUrl
-                                    }
-                                )
+                                        passwordResetSupportUrl: this.passwordResetSupportUrl,
+                                    },
+                                ),
                             ),
-                            anchorEnd: HtmlUtils.HTML('</a>')
-                        }
+                            anchorEnd: HtmlUtils.HTML('</a>'),
+                        },
                     );
 
                 this.clearFormErrors();
@@ -192,7 +192,7 @@
                 this.renderFormFeedback(this.formSuccessTpl, {
                     jsHook: this.passwordResetSuccessJsHook,
                     title: successTitle,
-                    messageHtml: successMessageHtml
+                    messageHtml: successMessageHtml,
                 });
             },
 
@@ -232,11 +232,11 @@
                                 StringUtils.interpolate(
                                     '<a href="{SupportUrl}">', {
                                         SupportUrl: this.supportURL,
-                                    }
-                                )
+                                    },
+                                ),
                             ),
-                            anchorEnd: HtmlUtils.HTML('</a>')
-                        }
+                            anchorEnd: HtmlUtils.HTML('</a>'),
+                        },
                     );
                 } else if (error.responseJSON !== undefined) {
                     msg = error.responseJSON.value;
@@ -248,9 +248,9 @@
                 this.errors = [
                     StringUtils.interpolate(
                         '<li>{msg}</li>', {
-                            msg: msg
-                        }
-                    )
+                            msg: msg,
+                        },
+                    ),
                 ];
                 this.clearPasswordResetSuccess();
 
@@ -273,13 +273,13 @@
                     gettext('You have successfully signed into %(currentProvider)s, but your %(currentProvider)s' +
                             ' account does not have a linked %(platformName)s account. To link your accounts,' +
                             ' sign in now using your %(platformName)s password.'),
-                    {currentProvider: this.currentProvider, platformName: this.platformName}
+                    {currentProvider: this.currentProvider, platformName: this.platformName},
                 );
 
                 this.clearAuthWarning();
                 this.renderFormFeedback(this.formStatusTpl, {
                     jsHook: this.authWarningJsHook,
-                    message: message
+                    message: message,
                 });
             },
 
@@ -291,7 +291,7 @@
             clearAuthWarning: function() {
                 var query = '.' + this.authWarningJsHook;
                 this.clearFormFeedbackItems(query);
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

@@ -34,7 +34,7 @@
                 var hash = this.getIdFromLocationHash();
                 this.annotator.logger.log('Scroller', {
                     'notes:': notes,
-                    hash: hash
+                    hash: hash,
                 });
                 _.each(notes, function(note) {
                     var $highlight, offset;
@@ -49,7 +49,7 @@
                         // Open the note
                         this.annotator.showFrozenViewer([note], {
                             top: offset.top + 0.5 * $highlight.height(),
-                            left: offset.left + 0.5 * $highlight.width()
+                            left: offset.left + 0.5 * $highlight.width(),
                         });
                         // Freeze the viewer
                         this.annotator.freezeAll();
@@ -61,7 +61,7 @@
 
             scrollIntoView: function(highlight) {
                 highlight.focus();
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

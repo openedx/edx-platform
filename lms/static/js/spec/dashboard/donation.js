@@ -8,7 +8,7 @@ function(TemplateHelpers, AjaxHelpers) {
         var PAYMENT_URL = 'https://fake.processor.com/pay/';
         var PAYMENT_PARAMS = {
             orderId: 'test-order',
-            signature: 'abcd1234'
+            signature: 'abcd1234',
         };
         var AMOUNT = '45.67';
         var COURSE_ID = 'edx/DemoX/Demo';
@@ -22,7 +22,7 @@ function(TemplateHelpers, AjaxHelpers) {
 
             view = new edx.dashboard.donation.DonationView({
                 el: $('#jasmine-fixtures'),
-                course: COURSE_ID
+                course: COURSE_ID,
             }).render();
 
             // Stub out the actual submission of the payment form
@@ -49,14 +49,14 @@ function(TemplateHelpers, AjaxHelpers) {
             // the signed payment params.
             AjaxHelpers.expectRequest(
                 requests, 'POST', '/shoppingcart/donation/',
-                $.param({amount: AMOUNT, course_id: COURSE_ID})
+                $.param({amount: AMOUNT, course_id: COURSE_ID}),
             );
 
             // Simulate a response from the server containing the signed
             // parameters to send to the payment processor
             AjaxHelpers.respondWithJson(requests, {
                 payment_url: PAYMENT_URL,
-                payment_params: PAYMENT_PARAMS
+                payment_params: PAYMENT_PARAMS,
             });
 
             // Verify that the payment form has the payment parameters
@@ -154,7 +154,7 @@ function(TemplateHelpers, AjaxHelpers) {
             // which the view would ordinarily retrieve from the LMS server.
             view.startPayment({
                 payment_url: PAYMENT_URL,
-                payment_params: PAYMENT_PARAMS
+                payment_params: PAYMENT_PARAMS,
             });
 
             // Verify that the analytics event was fired
@@ -162,10 +162,10 @@ function(TemplateHelpers, AjaxHelpers) {
                 'edx.bi.user.payment_processor.visited',
                 {
                     category: 'donations',
-                    label: COURSE_ID
-                }
+                    label: COURSE_ID,
+                },
             );
         });
     });
-}
+},
 );

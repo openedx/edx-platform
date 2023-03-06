@@ -18,9 +18,9 @@
                         event_type: 'example',
                         event: '"data"',
                         courserun_key: 'edX/999/test',
-                        page: window.location.href
+                        page: window.location.href,
                     },
-                    async: true
+                    async: true,
                 });
             });
 
@@ -34,9 +34,9 @@
                         event_type: 'example',
                         event: '"data"',
                         courserun_key: 'edX/999/test',
-                        page: window.location.href
+                        page: window.location.href,
                     },
-                    async: false
+                    async: false,
                 });
             });
         });
@@ -69,9 +69,9 @@
                         event_type: 'example',
                         event: '"data"',
                         courserun_key: 'edX/999/test',
-                        page: window.location.href
+                        page: window.location.href,
                     },
-                    async: true
+                    async: true,
                 });
             });
 
@@ -87,9 +87,9 @@
                         event_type: 'example',
                         event: '"data"',
                         courserun_key: 'edX/999/test',
-                        page: window.location.href
+                        page: window.location.href,
                     },
-                    async: true
+                    async: true,
                 });
             });
 
@@ -105,9 +105,9 @@
                         event_type: 'example',
                         event: '"data"',
                         courserun_key: 'edX/999/test',
-                        page: window.location.href
+                        page: window.location.href,
                     },
-                    async: true
+                    async: true,
                 });
             });
         });
@@ -188,9 +188,9 @@
                     data: {
                         event_type: 'page_close',
                         event: '',
-                        page: window.location.href
+                        page: window.location.href,
                     },
-                    async: false
+                    async: false,
                 });
             });
         });

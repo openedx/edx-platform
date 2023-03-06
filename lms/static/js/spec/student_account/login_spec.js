@@ -8,7 +8,7 @@
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/student_account/models/LoginModel',
         'js/student_account/views/LoginView',
-        'js/student_account/models/PasswordResetModel'
+        'js/student_account/models/PasswordResetModel',
     ],
     function($, _, sinon, TemplateHelpers, AjaxHelpers, LoginModel, LoginView, PasswordResetModel) {
         describe('edx.student.account.LoginView', function() {
@@ -32,16 +32,16 @@
                             name: 'Google',
                             iconClass: 'fa-google-plus',
                             loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
-                            registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
+                            registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register',
                         },
                         {
                             id: 'oa2-facebook',
                             name: 'Facebook',
                             iconClass: 'fa-facebook',
                             loginUrl: '/auth/login/facebook/?auth_entry=account_login',
-                            registerUrl: '/auth/login/facebook/?auth_entry=account_register'
-                        }
-                    ]
+                            registerUrl: '/auth/login/facebook/?auth_entry=account_register',
+                        },
+                    ],
                 },
                 FORM_DESCRIPTION = {
                     method: 'post',
@@ -55,7 +55,7 @@
                             type: 'email',
                             required: true,
                             instructions: 'Enter your email.',
-                            restrictions: {}
+                            restrictions: {},
                         },
                         {
                             placeholder: '',
@@ -65,9 +65,9 @@
                             type: 'password',
                             required: true,
                             instructions: 'Enter your password.',
-                            restrictions: {}
-                        }
-                    ]
+                            restrictions: {},
+                        },
+                    ],
                 },
                 COURSE_ID = 'edX/demoX/Fall';
 
@@ -75,13 +75,13 @@
                 // Initialize the login model
                 model = new LoginModel({}, {
                     url: FORM_DESCRIPTION.submit_url,
-                    method: FORM_DESCRIPTION.method
+                    method: FORM_DESCRIPTION.method,
                 });
 
                 // Initialize the passwordReset model
                 resetModel = new PasswordResetModel({}, {
                     method: 'GET',
-                    url: '#'
+                    url: '#',
                 });
 
                 // Initialize the login view
@@ -92,7 +92,7 @@
                     thirdPartyAuth: THIRD_PARTY_AUTH,
                     platformName: PLATFORM_NAME,
                     enterpriseSlugLoginURL: ENTERPRISE_SLUG_LOGIN_URL,
-                    isEnterpriseEnable: IS_ENTERPRISE_ENABLE
+                    isEnterpriseEnable: IS_ENTERPRISE_ENABLE,
                 });
 
                 // Spy on AJAX requests
@@ -119,7 +119,7 @@
                     // Force validation to return as expected
                     spyOn(view, 'validate').and.returnValue({
                         isValid: validationSuccess,
-                        message: 'Submission was validated.'
+                        message: 'Submission was validated.',
                     });
                 }
 
@@ -146,7 +146,7 @@
                 AjaxHelpers.expectRequest(
                     requests, 'POST',
                     FORM_DESCRIPTION.submit_url,
-                    $.param(USER_DATA)
+                    $.param(USER_DATA),
                 );
 
                 // Respond with status code 200
@@ -176,14 +176,14 @@
                 expectedData = {};
                 $.extend(expectedData, USER_DATA, {
                     analytics: JSON.stringify({
-                        enroll_course_id: COURSE_ID
-                    })
+                        enroll_course_id: COURSE_ID,
+                    }),
                 });
 
                 AjaxHelpers.expectRequest(
                     requests, 'POST',
                     FORM_DESCRIPTION.submit_url,
-                    $.param(expectedData)
+                    $.param(expectedData),
                 );
             });
 
@@ -203,7 +203,7 @@
                     thirdPartyAuth: THIRD_PARTY_AUTH,
                     platformName: PLATFORM_NAME,
                     enterpriseSlugLoginURL: ENTERPRISE_SLUG_LOGIN_URL,
-                    is_require_third_party_auth_enabled: true
+                    is_require_third_party_auth_enabled: true,
                 });
 
                 expect(thirdPartyAuthView).not.toContain(view.$submitButton);
@@ -218,7 +218,7 @@
                     thirdPartyAuth: THIRD_PARTY_AUTH,
                     platformName: PLATFORM_NAME,
                     enterpriseSlugLoginURL: ENTERPRISE_SLUG_LOGIN_URL,
-                    isEnterpriseEnable: false
+                    isEnterpriseEnable: false,
                 });
 
                 expect(enterpriseDisabledLoginView).not.toContain($('.enterprise-login'));
@@ -336,7 +336,7 @@
                 $error = view.$formFeedback.find('.' + view.formErrorsJsHook);
                 expect($error.length).toEqual(1);
                 expect($error.text()).toContain(
-                    'An error has occurred. Check your Internet connection and try again.'
+                    'An error has occurred. Check your Internet connection and try again.',
                 );
                 expect(authComplete).toBe(false);
 
@@ -359,7 +359,7 @@
                 $error = view.$formFeedback.find('.' + view.formErrorsJsHook);
                 expect($error.length).toEqual(1);
                 expect($error.text()).toContain(
-                    'An error has occurred. Try refreshing the page, or check your Internet connection.'
+                    'An error has occurred. Try refreshing the page, or check your Internet connection.',
                 );
                 expect(authComplete).toBe(false);
             });

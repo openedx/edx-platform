@@ -8,7 +8,7 @@
         'js/student_account/views/FinishAuthView',
         'js/student_account/enrollment',
         'js/student_account/shoppingcart',
-        'js/student_account/emailoptin'
+        'js/student_account/emailoptin',
     ],
     function($, url, utility, AjaxHelpers, FinishAuthView, EnrollmentInterface, ShoppingCartInterface,
         EmailOptInInterface) {
@@ -61,7 +61,7 @@
                 setFakeQueryParams({
                     '?enrollment_action': 'enroll',
                     '?course_id': COURSE_KEY,
-                    '?email_opt_in': 'true'
+                    '?email_opt_in': 'true',
                 });
 
                 ajaxSpyAndInitialize(this);
@@ -69,12 +69,12 @@
                 // Expect that the view tried to save the email opt in preference
                 expect(EmailOptInInterface.setPreference).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    'true'
+                    'true',
                 );
                 // Expect that the view tried to enroll the student
                 expect(EnrollmentInterface.enroll).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    '/course_modes/choose/' + COURSE_KEY + '/'
+                    '/course_modes/choose/' + COURSE_KEY + '/',
                 );
             });
 
@@ -82,7 +82,7 @@
                 // Simulate providing enrollment query string params
                 setFakeQueryParams({
                     '?enrollment_action': 'enroll',
-                    '?course_id': COURSE_KEY
+                    '?course_id': COURSE_KEY,
                 });
 
                 ajaxSpyAndInitialize(this);
@@ -90,7 +90,7 @@
                 // Expect that the view tried to enroll the student
                 expect(EnrollmentInterface.enroll).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    '/course_modes/choose/' + COURSE_KEY + '/'
+                    '/course_modes/choose/' + COURSE_KEY + '/',
                 );
             });
 
@@ -99,7 +99,7 @@
                 setFakeQueryParams({
                     '?enrollment_action': 'enroll',
                     '?course_id': COURSE_KEY,
-                    '?purchase_workflow': 'bulk'
+                    '?purchase_workflow': 'bulk',
                 });
 
                 ajaxSpyAndInitialize(this);
@@ -108,7 +108,7 @@
                 // mode select flow with the purchase_workflow parameter
                 expect(EnrollmentInterface.enroll).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    '/course_modes/choose/' + COURSE_KEY + '/?purchase_workflow=bulk'
+                    '/course_modes/choose/' + COURSE_KEY + '/?purchase_workflow=bulk',
                 );
             });
 
@@ -118,7 +118,7 @@
                 setFakeQueryParams({
                     '?enrollment_action': 'enroll',
                     '?course_id': COURSE_KEY,
-                    '?course_mode': 'verified'
+                    '?course_mode': 'verified',
                 });
 
                 ajaxSpyAndInitialize(this);
@@ -127,7 +127,7 @@
                 // with a redirect into the payment flow.
                 expect(EnrollmentInterface.enroll).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    '/verify_student/start-flow/' + COURSE_KEY + '/'
+                    '/verify_student/start-flow/' + COURSE_KEY + '/',
                 );
             });
 
@@ -139,7 +139,7 @@
                     '?enrollment_action': 'enroll',
                     '?course_id': COURSE_KEY,
                     '?course_mode': 'professional-no-id',
-                    '?purchase_workflow': 'bulk'
+                    '?purchase_workflow': 'bulk',
                 });
 
                 ajaxSpyAndInitialize(this);
@@ -149,7 +149,7 @@
                 // purchase_workflow parameter.
                 expect(EnrollmentInterface.enroll).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    '/verify_student/start-flow/' + COURSE_KEY + '/?purchase_workflow=bulk'
+                    '/verify_student/start-flow/' + COURSE_KEY + '/?purchase_workflow=bulk',
                 );
             });
 
@@ -159,7 +159,7 @@
                 setFakeQueryParams({
                     '?enrollment_action': 'enroll',
                     '?course_id': COURSE_KEY,
-                    '?course_mode': 'audit'
+                    '?course_mode': 'audit',
                 });
 
                 ajaxSpyAndInitialize(this);
@@ -174,7 +174,7 @@
                 // Simulate providing "add to cart" query string params
                 setFakeQueryParams({
                     '?enrollment_action': 'add_to_cart',
-                    '?course_id': COURSE_KEY
+                    '?course_id': COURSE_KEY,
                 });
 
                 ajaxSpyAndInitialize(this);

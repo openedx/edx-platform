@@ -7,11 +7,11 @@
         var ShoppingCartInterface = {
             urls: {
                 viewCart: '/shoppingcart/',
-                addCourse: '/shoppingcart/add/course/'
+                addCourse: '/shoppingcart/add/course/',
             },
 
             headers: {
-                'X-CSRFToken': $.cookie('csrftoken')
+                'X-CSRFToken': $.cookie('csrftoken'),
             },
 
             /**
@@ -24,7 +24,7 @@
                     type: 'POST',
                     data: {},
                     headers: this.headers,
-                    context: this
+                    context: this,
                 }).always(function() {
                     this.redirect(this.urls.viewCart);
                 });
@@ -36,7 +36,7 @@
              */
             redirect: function(url) {
                 window.location.href = url;
-            }
+            },
         };
 
         return ShoppingCartInterface;

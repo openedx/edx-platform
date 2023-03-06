@@ -7,7 +7,7 @@
         // Otherwise, create new one.
         if (!this.tooltip.length) {
             this.tooltip = $('<div />', {
-                class: this.className
+                class: this.className,
             }).appendTo(this.element); // xss-lint: disable=javascript-jquery-insert-into-target
         }
 
@@ -26,14 +26,14 @@
                 'mouseover.TooltipManager': this.showTooltip,
                 'mousemove.TooltipManager': this.moveTooltip,
                 'mouseout.TooltipManager': this.hideTooltip,
-                'click.TooltipManager': this.click
+                'click.TooltipManager': this.click,
             }, this.SELECTOR);
         },
 
         getCoords: function(pageX, pageY) {
             return {
                 left: pageX - 0.5 * this.tooltip.outerWidth(),
-                top: pageY - (this.tooltip.outerHeight() + 15)
+                top: pageY - (this.tooltip.outerHeight() + 15),
             };
         },
 
@@ -99,7 +99,7 @@
             // Unbind all delegated event handlers in the ".TooltipManager"
             // namespace.
             this.element.off('.TooltipManager', this.SELECTOR);
-        }
+        },
     };
 
     window.TooltipManager = TooltipManager;

@@ -3,7 +3,7 @@
         'edx-ui-toolkit/js/utils/html-utils'],
     function(draggableEvents, draggableLogic, HtmlUtils) {
         return {
-            init: init
+            init: init,
         };
 
         function init(state) {
@@ -45,28 +45,28 @@
                         width: draggableObj.iconWidthSmall,
                         height: draggableObj.iconHeightSmall,
                         left: 50 - draggableObj.iconWidthSmall * 0.5,
-                        top: ((draggableObj.originalConfigObj.label.length > 0) ? 5 : 50 - draggableObj.iconHeightSmall * 0.5)
+                        top: ((draggableObj.originalConfigObj.label.length > 0) ? 5 : 50 - draggableObj.iconHeightSmall * 0.5),
                     });
                     draggableObj.iconImgEl.css({
                         position: 'absolute',
                         width: draggableObj.iconWidthSmall,
                         height: draggableObj.iconHeightSmall,
                         left: 0,
-                        top: 0
+                        top: 0,
                     });
                     draggableObj.iconImgEl.appendTo(draggableObj.iconEl);
 
                     if (draggableObj.originalConfigObj.label.length > 0) {
                         draggableObj.labelEl = $(HtmlUtils.joinHtml(
                             HtmlUtils.HTML(
-                                '<div style="position: absolute; color: black; font-size: 0.95em; " role="label">'
+                                '<div style="position: absolute; color: black; font-size: 0.95em; " role="label">',
                             ),
                             draggableObj.originalConfigObj.label,
-                            HtmlUtils.HTML('</div>')
+                            HtmlUtils.HTML('</div>'),
                         ).toString());
                         draggableObj.labelEl.css({
                             left: 50 - draggableObj.labelWidth * 0.5,
-                            top: 5 + draggableObj.iconHeightSmall + 5
+                            top: 5 + draggableObj.iconHeightSmall + 5,
                         });
 
                         draggableObj.attachMouseEventsTo('labelEl');
@@ -87,11 +87,11 @@
                     draggableObj.iconEl = $(HtmlUtils.joinHtml(
                         HtmlUtils.HTML('<div style=" position: absolute; color: black; font-size: 0.95em; " >'),
                         draggableObj.originalConfigObj.label,
-                        HtmlUtils.HTML('</div>')
+                        HtmlUtils.HTML('</div>'),
                     ).toString());
                     draggableObj.iconEl.css({
                         left: 50 - draggableObj.iconWidthSmall * 0.5,
-                        top: 50 - draggableObj.iconHeightSmall * 0.5
+                        top: 50 - draggableObj.iconHeightSmall * 0.5,
                     });
 
                     draggableObj.attachMouseEventsTo('iconEl');
@@ -157,13 +157,13 @@
                 attachMouseEventsTo: draggableEvents.attachMouseEventsTo,
 
                 targetField: [],
-                numDraggablesOnMe: 0
+                numDraggablesOnMe: 0,
             };
 
             draggableObj.containerEl = $(HtmlUtils.joinHtml(
                 HtmlUtils.HTML('<div style=" width: 100px; height: 100px; display: inline-block; overflow: hidden; '),
                 HtmlUtils.HTML('border-left: 1px solid #CCC; border-right: 1px solid #CCC; text-align: center; '),
-                HtmlUtils.HTML('position: relative; cursor: move; " role="listitem"></div>')
+                HtmlUtils.HTML('position: relative; cursor: move; " role="listitem"></div>'),
             ).toString());
 
             draggableObj.containerEl.appendTo(state.sliderEl);
@@ -199,14 +199,14 @@
                         // Before:
                         // 'top': ((obj.label.length > 0) ? (100 - draggableObj.iconHeightSmall - 25) * 0.5 : 50 - draggableObj.iconHeightSmall * 0.5)
                         // After:
-                        top: ((obj.label.length > 0) ? 37.5 : 50.0) - 0.5 * draggableObj.iconHeightSmall
+                        top: ((obj.label.length > 0) ? 37.5 : 50.0) - 0.5 * draggableObj.iconHeightSmall,
                     });
                     draggableObj.iconImgEl.css({
                         position: 'absolute',
                         width: draggableObj.iconWidthSmall,
                         height: draggableObj.iconHeightSmall,
                         left: 0,
-                        top: 0
+                        top: 0,
                     });
                     draggableObj.iconImgEl.appendTo(draggableObj.iconEl);
                     draggableObj.iconEl.appendTo(draggableObj.containerEl);
@@ -214,10 +214,10 @@
                     if (obj.label.length > 0) {
                         draggableObj.labelEl = $(HtmlUtils.joinHtml(
                             HtmlUtils.HTML(
-                                '<div style=" position: absolute; color: black; font-size: 0.95em; cursor: move; " >'
+                                '<div style=" position: absolute; color: black; font-size: 0.95em; cursor: move; " >',
                             ),
                             obj.label,
-                            HtmlUtils.HTML('</div>')
+                            HtmlUtils.HTML('</div>'),
                         ).toString());
 
                         draggableObj.labelEl.appendTo(draggableObj.containerEl);
@@ -228,7 +228,7 @@
                             // Before:
                             // 'top': (100 - this.iconHeightSmall - 25) * 0.5 + this.iconHeightSmall + 5
                             // After:
-                            top: 42.5 + 0.5 * draggableObj.iconHeightSmall
+                            top: 42.5 + 0.5 * draggableObj.iconHeightSmall,
                         });
 
                         draggableObj.attachMouseEventsTo('labelEl');
@@ -249,11 +249,11 @@
 
                     draggableObj.iconEl = $(HtmlUtils.joinHtml(
                         HtmlUtils.HTML(
-                            '<div style=" position: absolute; color: black; font-size: 0.95em; cursor: move; " '
+                            '<div style=" position: absolute; color: black; font-size: 0.95em; cursor: move; " ',
                         ),
                         HtmlUtils.HTML('tabindex="0" aria-grabbed="false" role="listitem">'),
                         obj.label,
-                        HtmlUtils.HTML('</div>')
+                        HtmlUtils.HTML('</div>'),
                     ).toString());
 
                     draggableObj.iconEl.appendTo(draggableObj.containerEl);
@@ -265,7 +265,7 @@
 
                     draggableObj.iconEl.css({
                         left: 50 - draggableObj.iconWidthSmall * 0.5,
-                        top: 50 - draggableObj.iconHeightSmall * 0.5
+                        top: 50 - draggableObj.iconHeightSmall * 0.5,
                     });
 
                     draggableObj.hasLoaded = true;

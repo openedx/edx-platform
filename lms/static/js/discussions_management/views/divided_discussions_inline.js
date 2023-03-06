@@ -9,7 +9,7 @@
                 'change .check-discussion-subcategory-inline': 'setSaveButton',
                 'click .cohort-inline-discussions-form .action-save': 'saveInlineDiscussionsForm',
                 'change .check-all-inline-discussions': 'setAllInlineDiscussions',
-                'change .check-cohort-inline-discussions': 'setSomeInlineDiscussions'
+                'change .check-cohort-inline-discussions': 'setSomeInlineDiscussions',
             },
 
             initialize: function(options) {
@@ -20,12 +20,12 @@
             render: function() {
                 var inlineDiscussions = this.model.get('inline_discussions'),
                     alwaysDivideInlineDiscussions = this.discussionSettings.get(
-                        'always_divide_inline_discussions'
+                        'always_divide_inline_discussions',
                     );
 
                 HtmlUtils.setHtml(this.$('.inline-discussions-nav'), this.template({
                     inlineDiscussionTopicsHtml: this.getInlineDiscussionsHtml(inlineDiscussions),
-                    alwaysDivideInlineDiscussions: alwaysDivideInlineDiscussions
+                    alwaysDivideInlineDiscussions: alwaysDivideInlineDiscussions,
                 }));
 
                 // Provides the semantics for a nested list of tri-state checkboxes.
@@ -61,13 +61,13 @@
                             name: name,
                             id: entry.id,
                             is_divided: entry.is_divided,
-                            type: 'inline'
+                            type: 'inline',
                         });
                     } else { // subcategory
                         htmlSnippet = categoryTemplate({
                             name: name,
                             entriesHtml: this.getInlineDiscussionsHtml(subcategories[name]),
-                            isCategoryCohorted: isCategoryCohorted
+                            isCategoryCohorted: isCategoryCohorted,
                         });
                     }
                     return htmlSnippet;
@@ -123,13 +123,13 @@
             saveInlineDiscussionsForm: function(event) {
                 var self = this,
                     dividedInlineDiscussions = self.getDividedDiscussions(
-                        '.check-discussion-subcategory-inline:checked'
+                        '.check-discussion-subcategory-inline:checked',
                     ),
                     fieldData = {
                         divided_inline_discussions: dividedInlineDiscussions,
                         always_divide_inline_discussions: self.$(
-                            '.check-all-inline-discussions'
-                        ).prop('checked')
+                            '.check-all-inline-discussions',
+                        ).prop('checked'),
                     };
 
                 event.preventDefault();
@@ -146,7 +146,7 @@
                                 self.showMessage(errorMessage, self.$('.inline-discussion-topics'), 'error');
                             });
                     });
-            }
+            },
 
         });
         return InlineDiscussionsView;

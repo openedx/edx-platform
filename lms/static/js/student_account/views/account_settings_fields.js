@@ -13,7 +13,7 @@
         'text!templates/fields/field_social_link_account.underscore',
         'text!templates/fields/field_order_history.underscore',
         'edx-ui-toolkit/js/utils/string-utils',
-        'edx-ui-toolkit/js/utils/html-utils'
+        'edx-ui-toolkit/js/utils/html-utils',
     ], function(
         gettext, $, _, Backbone,
         FieldViews,
@@ -24,17 +24,17 @@
         field_social_link_template,
         field_order_history_template,
         StringUtils,
-        HtmlUtils
+        HtmlUtils,
     ) {
         var AccountSettingsFieldViews = {
             ReadonlyFieldView: FieldViews.ReadonlyFieldView.extend({
-                fieldTemplate: field_readonly_account_template
+                fieldTemplate: field_readonly_account_template,
             }),
             TextFieldView: FieldViews.TextFieldView.extend({
-                fieldTemplate: field_text_account_template
+                fieldTemplate: field_text_account_template,
             }),
             DropdownFieldView: FieldViews.DropdownFieldView.extend({
-                fieldTemplate: field_dropdown_account_template
+                fieldTemplate: field_dropdown_account_template,
             }),
             EmailFieldView: FieldViews.TextFieldView.extend({
                 fieldTemplate: field_text_account_template,
@@ -43,10 +43,10 @@
                         this.indicators.success,
                         StringUtils.interpolate(
                             gettext('We\'ve sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.'),  // eslint-disable-line max-len
-                            {new_email_address: this.fieldValue()}
-                        )
+                            {new_email_address: this.fieldValue()},
+                        ),
                     );
-                }
+                },
             }),
             LanguagePreferenceFieldView: FieldViews.DropdownFieldView.extend({
                 fieldTemplate: field_dropdown_account_template,
@@ -69,7 +69,7 @@
                 saveSucceeded: function() {
                     var data = {
                         language: this.modelValue(),
-                        next: window.location.href
+                        next: window.location.href,
                     };
 
                     var view = this;
@@ -85,12 +85,12 @@
                             view.showNotificationMessage(
                                 HtmlUtils.joinHtml(
                                     view.indicators.error,
-                                    gettext('You must sign out and sign back in before your language changes take effect.')  // eslint-disable-line max-len
-                                )
+                                    gettext('You must sign out and sign back in before your language changes take effect.'),  // eslint-disable-line max-len
+                                ),
                             );
-                        }
+                        },
                     });
-                }
+                },
 
             }),
             TimeZoneFieldView: FieldViews.DropdownFieldView.extend({
@@ -118,10 +118,10 @@
                             });
                             view.replaceOrAddGroupOption(
                                 'Country Time Zones',
-                                countryTimeZones
+                                countryTimeZones,
                             );
                             view.render();
-                        }
+                        },
                     });
                 },
 
@@ -131,7 +131,7 @@
                         options = [[this.modelValue(), this.displayValue(this.modelValue())]];
                         this.replaceOrAddGroupOption(
                             'Currently Selected Time Zone',
-                            options
+                            options,
                         );
                     }
                     this._super(); // eslint-disable-line no-underscore-dangle
@@ -140,7 +140,7 @@
                 replaceOrAddGroupOption: function(title, options) {
                     var groupOption = {
                         groupTitle: gettext(title),
-                        selectOptions: options
+                        selectOptions: options,
                     };
 
                     var index = _.findIndex(this.options.groupOptions, function(group) {
@@ -151,14 +151,14 @@
                     } else {
                         this.options.groupOptions.unshift(groupOption);
                     }
-                }
+                },
 
             }),
             PasswordFieldView: FieldViews.LinkFieldView.extend({
                 fieldType: 'button',
                 fieldTemplate: field_link_account_template,
                 events: {
-                    'click button': 'linkClicked'
+                    'click button': 'linkClicked',
                 },
                 initialize: function(options) {
                     this.options = _.extend({}, options);
@@ -187,7 +187,7 @@
                             view.showErrorMessage(xhr);
                             view.setMessageTimeout();
                             view.toggleDisableButton(false);
-                        }
+                        },
                     });
                 },
                 toggleDisableButton: function(disabled) {
@@ -212,15 +212,15 @@
                                 anchorStart: HtmlUtils.HTML(
                                     StringUtils.interpolate(
                                         '<a href="{passwordResetSupportUrl}">', {
-                                            passwordResetSupportUrl: this.options.passwordResetSupportUrl
-                                        }
-                                    )
+                                            passwordResetSupportUrl: this.options.passwordResetSupportUrl,
+                                        },
+                                    ),
                                 ),
-                                anchorEnd: HtmlUtils.HTML('</a>')
-                            }
-                        )
+                                anchorEnd: HtmlUtils.HTML('</a>'),
+                            },
+                        ),
                     );
-                }
+                },
             }),
             LanguageProficienciesFieldView: FieldViews.DropdownFieldView.extend({
                 fieldTemplate: field_dropdown_account_template,
@@ -240,7 +240,7 @@
                         attributes[this.options.valueAttribute] = value;
                         this.saveAttributes(attributes);
                     }
-                }
+                },
             }),
             SocialLinkTextFieldView: FieldViews.TextFieldView.extend({
                 render: function() {
@@ -249,7 +249,7 @@
                         title: this.options.title,
                         value: this.modelValue(),
                         message: this.options.helpMessage,
-                        placeholder: this.options.placeholder || ''
+                        placeholder: this.options.placeholder || '',
                     }));
                     this.delegateEvents();
                     return this;
@@ -273,7 +273,7 @@
                         attributes[this.options.valueAttribute] = value;
                         this.saveAttributes(attributes);
                     }
-                }
+                },
             }),
             ExtendedFieldTextFieldView: FieldViews.TextFieldView.extend({
                 render: function() {
@@ -282,7 +282,7 @@
                         title: this.options.title,
                         value: this.modelValue(),
                         message: this.options.helpMessage,
-                        placeholder: this.options.placeholder || ''
+                        placeholder: this.options.placeholder || '',
                     }));
                     this.delegateEvents();
                     return this;
@@ -306,7 +306,7 @@
                         attributes[this.options.valueAttribute] = value;
                         this.saveAttributes(attributes);
                     }
-                }
+                },
             }),
             ExtendedFieldListFieldView: FieldViews.DropdownFieldView.extend({
                 fieldTemplate: field_dropdown_account_template,
@@ -328,7 +328,7 @@
                         attributes[this.options.valueAttribute] = value;
                         this.saveAttributes(attributes);
                     }
-                }
+                },
             }),
             AuthFieldView: FieldViews.LinkFieldView.extend({
                 fieldTemplate: field_social_link_template,
@@ -346,25 +346,25 @@
                         subTitle = '',
                         screenReaderTitle = StringUtils.interpolate(
                             gettext('Link your {accountName} account'),
-                            {accountName: this.options.title}
+                            {accountName: this.options.title},
                         );
                     if (this.options.connected) {
                         linkTitle = gettext('Unlink This Account');
                         linkClass = 'social-field-linked';
                         subTitle = StringUtils.interpolate(
                             gettext('You can use your {accountName} account to sign in to your {platformName} account.'),  // eslint-disable-line max-len
-                            {accountName: this.options.title, platformName: this.options.platformName}
+                            {accountName: this.options.title, platformName: this.options.platformName},
                         );
                         screenReaderTitle = StringUtils.interpolate(
                             gettext('Unlink your {accountName} account'),
-                            {accountName: this.options.title}
+                            {accountName: this.options.title},
                         );
                     } else if (this.options.acceptsLogins) {
                         linkTitle = gettext('Link Your Account');
                         linkClass = 'social-field-unlinked';
                         subTitle = StringUtils.interpolate(
                             gettext('Link your {accountName} account to your {platformName} account and use {accountName} to sign in to {platformName}.'),  // eslint-disable-line max-len
-                            {accountName: this.options.title, platformName: this.options.platformName}
+                            {accountName: this.options.title, platformName: this.options.platformName},
                         );
                     }
 
@@ -376,7 +376,7 @@
                         subTitle: subTitle,
                         linkClass: linkClass,
                         linkHref: '#',
-                        message: this.helpMessage
+                        message: this.helpMessage,
                     }));
                     this.delegateEvents();
                     return this;
@@ -415,7 +415,7 @@
                         },
                         error: function(xhr) {
                             view.showErrorMessage(xhr);
-                        }
+                        },
                     });
                 },
                 inProgressMessage: function() {
@@ -425,7 +425,7 @@
                 },
                 successMessage: function() {
                     return HtmlUtils.joinHtml(this.indicators.success, gettext('Successfully unlinked.'));
-                }
+                },
             }),
 
             OrderHistoryFieldView: FieldViews.ReadonlyFieldView.extend({
@@ -445,12 +445,12 @@
                         orderDate: this.options.orderDate,
                         receiptUrl: this.options.receiptUrl,
                         valueAttribute: this.options.valueAttribute,
-                        lines: this.options.lines
+                        lines: this.options.lines,
                     }));
                     this.delegateEvents();
                     return this;
-                }
-            })
+                },
+            }),
         };
 
         return AccountSettingsFieldViews;

@@ -111,7 +111,7 @@
                 // Display the editor.
                 annotator.showEditor(annotation, position);
                 event.preventDefault();
-            }
+            },
         });
     });
 }).call(this, define || RequireJS.define);

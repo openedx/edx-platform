@@ -12,7 +12,7 @@
             'common/js/discussion/models/discussion_user',
             'common/js/discussion/views/new_post_view',
             'discussion/js/discussion_router',
-            'discussion/js/views/discussion_board_view'
+            'discussion/js/views/discussion_board_view',
         ],
         function($, Backbone, Content, Discussion, DiscussionUtil, DiscussionCourseSettings, DiscussionUser,
             NewPostView, DiscussionRouter, DiscussionBoardView) {
@@ -51,7 +51,7 @@
                 discussionBoardView = new DiscussionBoardView({
                     el: $('.discussion-board'),
                     discussion: discussion,
-                    courseSettings: courseSettings
+                    courseSettings: courseSettings,
                 });
                 discussionBoardView.render();
 
@@ -63,7 +63,7 @@
                     discussionBoardView: discussionBoardView,
                     mode: 'tab',
                     startHeader: 2,
-                    topicId: options.defaultTopicId
+                    topicId: options.defaultTopicId,
                 });
                 newPostView.render();
 
@@ -73,7 +73,7 @@
                     discussion: discussion,
                     courseSettings: courseSettings,
                     discussionBoardView: discussionBoardView,
-                    newPostView: newPostView
+                    newPostView: newPostView,
                 });
                 router.start();
                 routerEvents = {
@@ -84,7 +84,7 @@
                     // Clear search box when a thread is selected
                     'thread:selected': function() {
                         router.discussionBoardView.searchView.clearSearch();
-                    }
+                    },
                 };
                 Object.keys(routerEvents).forEach(function(key) {
                     router.discussionBoardView.on(key, routerEvents[key]);

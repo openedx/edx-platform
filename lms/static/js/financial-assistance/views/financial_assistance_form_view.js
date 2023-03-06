@@ -11,7 +11,7 @@
         'text!../../../templates/financial-assistance/financial_assessment_submitted.underscore',
         'text!templates/student_account/form_field.underscore',
         'edx-ui-toolkit/js/utils/html-utils',
-        'string_utils'
+        'string_utils',
     ],
     function(
         Backbone,
@@ -23,12 +23,12 @@
         formViewTpl,
         successTpl,
         formFieldTpl,
-        HtmlUtils
+        HtmlUtils,
     ) {
         return FormView.extend({
             el: '.financial-assistance-wrapper',
             events: {
-                'click .js-submit-form': 'submitForm'
+                'click .js-submit-form': 'submitForm',
             },
             tpl: formViewTpl,
             fieldTpl: formFieldTpl,
@@ -53,7 +53,7 @@
                     header_text: context.header_text,
                     platform_name: context.platform_name,
                     student_faq_url: context.student_faq_url,
-                    account_settings_url: context.account_settings_url
+                    account_settings_url: context.account_settings_url,
                 };
 
                 // Make the value accessible to this View
@@ -61,7 +61,7 @@
 
                 // Initialize the model and set user details
                 this.model = new FinancialAssistanceModel({
-                    url: context.submit_url
+                    url: context.submit_url,
                 });
                 this.model.set(context.user_details);
                 this.listenTo(this.model, 'error', this.saveError);
@@ -73,7 +73,7 @@
 
             render: function(html) {
                 var data = _.extend(this.model.toJSON(), this.context, {
-                    fields: html || ''
+                    fields: html || '',
                 });
 
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.tpl)(data));
@@ -87,7 +87,7 @@
             renderSuccess: function() {
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.successTpl)({
                     course: this.model.get('course'),
-                    dashboard_url: this.context.dashboard_url
+                    dashboard_url: this.context.dashboard_url,
                 }));
 
                 $('.js-success-message').focus();
@@ -97,7 +97,7 @@
                 /* jslint maxlen: 500 */
                 var txt = [
                         'An error has occurred. Wait a few minutes and then try to submit the application again.',
-                        'If you continue to have issues please contact support.'
+                        'If you continue to have issues please contact support.',
                     ],
                     msg = gettext(txt.join(' '));
 
@@ -106,7 +106,7 @@
                 }
 
                 this.errors = [HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<li>'), msg, HtmlUtils.HTML('</li>')
+                    HtmlUtils.HTML('<li>'), msg, HtmlUtils.HTML('</li>'),
                 ).toString()];
                 this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                 this.toggleDisableButton(false);
@@ -120,7 +120,7 @@
                 var $countryLabel = $('#user-country-title'),
                     txt = [
                         'Please go to your {link_start}profile page{link_end} ',
-                        'and provide your country of residence.'
+                        'and provide your country of residence.',
                     ],
                     msg = window.interpolate_text(
                         // Translators: link_start and link_end denote the html to link back to the profile page.
@@ -129,10 +129,10 @@
                             link_start: HtmlUtils.joinHtml(
                                 HtmlUtils.HTML('<a href="'),
                                 this.context.account_settings_url,
-                                HtmlUtils.HTML('">')
+                                HtmlUtils.HTML('">'),
                             ).toString(),
-                            link_end: '</a>'
-                        }
+                            link_end: '</a>',
+                        },
                     );
 
                 if (!this.model.get('country')) {
@@ -140,7 +140,7 @@
                     this.renderErrors(this.defaultFormErrorsTitle, [HtmlUtils.joinHtml(
                         HtmlUtils.HTML('<li>'),
                         HtmlUtils.HTML(msg),
-                        HtmlUtils.HTML('</li>')
+                        HtmlUtils.HTML('</li>'),
                     ).toString()]);
                     this.toggleDisableButton(true);
                 }
@@ -151,11 +151,11 @@
                     array[index].options.unshift({
                         name: '- ' + gettext('Choose one') + ' -',
                         value: '',
-                        default: true
+                        default: true,
                     });
                 }
-            }
+            },
         });
-    }
+    },
     );
 }).call(this, define || RequireJS.define);

@@ -10,7 +10,7 @@
                         current_url: window.location.href,
                         target_url: event.currentTarget.href,
                         target_name: $(this).find('p.accordion-display-name').text(),
-                        widget_placement: 'accordion'
+                        widget_placement: 'accordion',
                     });
             });
         };

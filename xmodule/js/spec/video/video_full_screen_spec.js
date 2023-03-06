@@ -31,7 +31,7 @@
                 var $fullScreenControl = $('.add-fullscreen');
 
                 expect($fullScreenControl).toHaveAttrs({
-                    'aria-disabled': 'false'
+                    'aria-disabled': 'false',
                 });
             });
 
@@ -52,11 +52,11 @@
                 var $fullScreenControl = $('.add-fullscreen');
                 $fullScreenControl.click();
                 expect($fullScreenControl).toHaveAttrs({
-                    'aria-disabled': 'false'
+                    'aria-disabled': 'false',
                 });
                 $fullScreenControl.click();
                 expect($fullScreenControl).toHaveAttrs({
-                    'aria-disabled': 'false'
+                    'aria-disabled': 'false',
                 });
             });
 

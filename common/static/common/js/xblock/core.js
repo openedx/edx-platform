@@ -31,7 +31,7 @@
             if (runtime || version || initFnName) {
                 console.log(
                     'Block ' + $element.outerHTML + ' is missing data-runtime, data-runtime-version or data-init, ' +
-                    'and can\'t be initialized'
+                    'and can\'t be initialized',
                 );
             } // else this XBlock doesn't have a JS init function.
             return null;
@@ -149,7 +149,7 @@
                 xblocks = xblocks.concat(asides);
             }
             return xblocks;
-        }
+        },
     };
 
     this.XBlock = XBlock;

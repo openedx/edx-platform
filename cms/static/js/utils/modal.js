@@ -77,6 +77,6 @@ define(['jquery'], function($) {
         showModal: showModal,
         hideModal: hideModal,
         showModalCover: showModalCover,
-        hideModalCover: hideModalCover
+        hideModalCover: hideModalCover,
     };
 });

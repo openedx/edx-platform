@@ -28,7 +28,7 @@
 
             ThreadResponseEditView.prototype.events = {
                 'click .post-update': 'update',
-                'click .post-cancel': 'cancel_edit'
+                'click .post-cancel': 'cancel_edit',
             };
 
             ThreadResponseEditView.prototype.$ = function(selector) {
@@ -46,7 +46,7 @@
                 this.template = edx.HtmlUtils.template($('#thread-response-edit-template').html());
                 edx.HtmlUtils.setHtml(
                     this.$el,
-                    this.template(context)
+                    this.template(context),
                 );
                 this.delegateEvents();
                 DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), 'edit-post-body');

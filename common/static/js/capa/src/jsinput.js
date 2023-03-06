@@ -67,7 +67,7 @@ var JSInput = (function($, undefined) {
             channel = Channel.build({
                 window: cWindow,
                 origin: path,
-                scope: 'JSInput'
+                scope: 'JSInput',
             });
         }
 
@@ -85,7 +85,7 @@ var JSInput = (function($, undefined) {
                     state = unescape(_deepKey(cWindow, stateGetter)()); // xss-lint: disable=javascript-escape
                     store = {
                         answer: answer,
-                        state: state
+                        state: state,
                     };
                     inputField.val(JSON.stringify(store));
                 } else {
@@ -109,17 +109,17 @@ var JSInput = (function($, undefined) {
                                     state = decodeURI(val.toString());
                                     store = {
                                         answer: answer,
-                                        state: state
+                                        state: state,
                                     };
                                     inputField.val(JSON.stringify(store));
                                     callback();
-                                }
+                                },
                             });
                         } else {
                             inputField.val(answer);
                             callback();
                         }
-                    }
+                    },
                 });
             }
         };
@@ -172,7 +172,7 @@ var JSInput = (function($, undefined) {
                                 method: 'setState',
                                 params: stateValue,
                                 success: function() {
-                                }
+                                },
                             });
                         }
                     } catch (err) {
@@ -216,6 +216,6 @@ var JSInput = (function($, undefined) {
 
     return {
         jsinputConstructor: jsinputConstructor,
-        walkDOM: walkDOM
+        walkDOM: walkDOM,
     };
 }(window.jQuery));

@@ -8,7 +8,7 @@
                 icon: '',
                 is_active: false,
                 is_closable: false,
-                view: ''
+                view: '',
             },
 
             initialize: function() {
@@ -24,7 +24,7 @@
                 }, this));
                 this.set('is_active', true);
                 this.logger.emit('edx.course.student_notes.notes_page_viewed', {
-                    view: this.get('view')
+                    view: this.get('view'),
                 });
             },
 
@@ -34,7 +34,7 @@
 
             isActive: function() {
                 return this.get('is_active');
-            }
+            },
         });
 
         return TabModel;

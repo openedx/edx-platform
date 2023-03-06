@@ -13,7 +13,7 @@ import * as Time from 'time.js';
                 .and.returnValue(null);
 
             state = jasmine.initializePlayer({
-                recordedYoutubeIsAvailable: true
+                recordedYoutubeIsAvailable: true,
             });
             spyOn(state.storage, 'setItem');
         });
@@ -54,8 +54,8 @@ import * as Time from 'time.js';
                     positionVal: videoPlayerCurrentTime,
                     data: undefined,
                     ajaxData: {
-                        saved_video_position: Time.formatFull(Math.round(videoPlayerCurrentTime))
-                    }
+                        saved_video_position: Time.formatFull(Math.round(videoPlayerCurrentTime)),
+                    },
                 });
             });
 
@@ -65,11 +65,11 @@ import * as Time from 'time.js';
                     speedVal: speed,
                     positionVal: undefined,
                     data: {
-                        speed: speed
+                        speed: speed,
                     },
                     ajaxData: {
-                        speed: speed
-                    }
+                        speed: speed,
+                    },
                 });
             });
 
@@ -79,11 +79,11 @@ import * as Time from 'time.js';
                     speedVal: undefined,
                     positionVal: newCurrentTime,
                     data: {
-                        saved_video_position: newCurrentTime
+                        saved_video_position: newCurrentTime,
                     },
                     ajaxData: {
-                        saved_video_position: Time.formatFull(Math.round(newCurrentTime))
-                    }
+                        saved_video_position: Time.formatFull(Math.round(newCurrentTime)),
+                    },
                 });
             });
 
@@ -94,12 +94,12 @@ import * as Time from 'time.js';
                     positionVal: Math.round(newCurrentTime),
                     data: {
                         speed: speed,
-                        saved_video_position: Math.round(newCurrentTime)
+                        saved_video_position: Math.round(newCurrentTime),
                     },
                     ajaxData: {
                         speed: speed,
-                        saved_video_position: Time.formatFull(Math.round(newCurrentTime))
-                    }
+                        saved_video_position: Time.formatFull(Math.round(newCurrentTime)),
+                    },
                 });
             });
 
@@ -109,7 +109,7 @@ import * as Time from 'time.js';
                     speedVal: undefined,
                     positionVal: undefined,
                     data: {},
-                    ajaxData: {}
+                    ajaxData: {},
                 });
             });
 
@@ -119,11 +119,11 @@ import * as Time from 'time.js';
                     speedVal: undefined,
                     positionVal: 0,
                     data: {
-                        saved_video_position: 0
+                        saved_video_position: 0,
                     },
                     ajaxData: {
-                        saved_video_position: Time.formatFull(Math.round(0))
-                    }
+                        saved_video_position: Time.formatFull(Math.round(0)),
+                    },
                 });
             });
 
@@ -141,14 +141,14 @@ import * as Time from 'time.js';
                     expect(state.storage.setItem).toHaveBeenCalledWith(
                         'speed',
                         speedVal,
-                        true
+                        true,
                     );
                 }
                 if (positionVal) {
                     expect(state.storage.setItem).toHaveBeenCalledWith(
                         'savedVideoPosition',
                         positionVal,
-                        true
+                        true,
                     );
                     expect(ajaxData.saved_video_position).toBe(Time.formatFull(positionVal));
                 }
@@ -157,7 +157,7 @@ import * as Time from 'time.js';
                     type: 'POST',
                     async: asyncVal,
                     dataType: 'json',
-                    data: ajaxData
+                    data: ajaxData,
                 });
             }
         });
@@ -165,7 +165,7 @@ import * as Time from 'time.js';
         it('can save state on speed change', function() {
             state.el.trigger('speedchange', ['2.0']);
             expect($.ajax).not.toHaveBeenCalledWith({
-                url: state.config.saveStateUrl
+                url: state.config.saveStateUrl,
             });
             state.config.saveStateEnabled = true;
             state.el.trigger('speedchange', ['2.0']);
@@ -174,7 +174,7 @@ import * as Time from 'time.js';
                 type: 'POST',
                 async: true,
                 dataType: 'json',
-                data: {speed: '2.0'}
+                data: {speed: '2.0'},
             });
         });
 
@@ -182,7 +182,7 @@ import * as Time from 'time.js';
             $.ajax.calls.reset();
             state.videoSaveStatePlugin.onUnload();
             expect($.ajax).not.toHaveBeenCalledWith({
-                url: state.config.saveStateUrl
+                url: state.config.saveStateUrl,
             })
             state.config.saveStateEnabled = true;
             $.ajax.calls.reset();
@@ -192,14 +192,14 @@ import * as Time from 'time.js';
                 type: 'POST',
                 async: false,
                 dataType: 'json',
-                data: {saved_video_position: '00:00:00'}
+                data: {saved_video_position: '00:00:00'},
             });
         });
 
         it('can save state on pause', function() {
             state.el.trigger('pause');
             expect($.ajax).not.toHaveBeenCalledWith({
-                url: state.config.saveStateUrl
+                url: state.config.saveStateUrl,
             })
             state.config.saveStateEnabled = true;
             state.el.trigger('pause');
@@ -208,7 +208,7 @@ import * as Time from 'time.js';
                 type: 'POST',
                 async: true,
                 dataType: 'json',
-                data: {saved_video_position: '00:00:00'}
+                data: {saved_video_position: '00:00:00'},
             });
         });
 
@@ -242,7 +242,7 @@ import * as Time from 'time.js';
                 type: 'POST',
                 async: true,
                 dataType: 'json',
-                data: {youtube_is_available: true}
+                data: {youtube_is_available: true},
             });
 
             // Test that we can go from available -> unavailable
@@ -253,7 +253,7 @@ import * as Time from 'time.js';
                 type: 'POST',
                 async: true,
                 dataType: 'json',
-                data: {youtube_is_available: false}
+                data: {youtube_is_available: false},
             });
         });
 
@@ -268,7 +268,7 @@ import * as Time from 'time.js';
                 play: plugin.bindUnloadHandler,
                 'pause destroy': plugin.saveStateHandler,
                 'language_menu:change': plugin.onLanguageChange,
-                youtube_availability: plugin.onYoutubeAvailability
+                youtube_availability: plugin.onYoutubeAvailability,
             });
             expect($.fn.off).toHaveBeenCalledWith('destroy', plugin.destroy);
             expect($.fn.off).toHaveBeenCalledWith('unload', plugin.onUnload);

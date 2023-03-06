@@ -64,14 +64,14 @@
             'video/09_poster.js',
             'video/09_completion.js',
             'video/10_commands.js',
-            'video/095_video_context_menu.js'
+            'video/095_video_context_menu.js',
         ],
         function(
             VideoStorage, initialize, FocusGrabber, VideoAccessibleMenu, VideoControl, VideoFullScreen,
             VideoQualityControl, VideoProgressSlider, VideoVolumeControl, VideoSpeedControl, VideoAutoAdvanceControl,
             VideoCaption, VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl, VideoSkipControl,
             VideoBumper, VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster,
-            VideoCompletionHandler, VideoCommands, VideoContextMenu
+            VideoCompletionHandler, VideoCommands, VideoContextMenu,
         ) {
             /* RequireJS */
             var youtubeXhr = null,
@@ -91,7 +91,7 @@
                         FocusGrabber, VideoControl, VideoPlayPlaceholder,
                         VideoPlayPauseControl, VideoProgressSlider, VideoSpeedControl,
                         VideoVolumeControl, VideoQualityControl, VideoFullScreen, VideoCaption, VideoCommands,
-                        VideoContextMenu, VideoSaveStatePlugin, VideoEventsPlugin, VideoCompletionHandler
+                        VideoContextMenu, VideoSaveStatePlugin, VideoEventsPlugin, VideoCompletionHandler,
                     ].concat(autoAdvanceEnabled ? [VideoAutoAdvanceControl] : []),
                     bumperVideoModules = [VideoControl, VideoPlaySkipControl, VideoSkipControl,
                         VideoVolumeControl, VideoCaption, VideoCommands, VideoSaveStatePlugin,
@@ -103,7 +103,7 @@
                         storage: storage,
                         options: {},
                         youtubeXhr: youtubeXhr,
-                        modules: mainVideoModules
+                        modules: mainVideoModules,
                     };
 
                 var getBumperState = function(metadata) {
@@ -112,12 +112,12 @@
                         id: id,
                         storage: storage,
                         options: {},
-                        youtubeXhr: youtubeXhr
+                        youtubeXhr: youtubeXhr,
                     }, {metadata: metadata});
 
                     bumperState.modules = bumperVideoModules;
                     bumperState.options = {
-                        SaveStatePlugin: {events: ['language_menu:change']}
+                        SaveStatePlugin: {events: ['language_menu:change']},
                     };
                     return bumperState;
                 };
@@ -132,7 +132,7 @@
 
                 VideoAccessibleMenu(el, {
                     storage: storage,
-                    saveStateUrl: state.metadata.saveStateUrl
+                    saveStateUrl: state.metadata.saveStateUrl,
                 });
 
                 if (bumperMetadata) {
@@ -152,7 +152,7 @@
                                     mainVideoPlayer();
                                 });
                             }
-                        })
+                        }),
                     });
                 } else {
                     initialize(state, element);
@@ -187,7 +187,7 @@
             // `window.Video` constructor.
             oldVideo(null, true);
             /* End RequireJS */
-        }
+        },
     );
 /* RequireJS */
 }(window.RequireJS.require, window.jQuery));

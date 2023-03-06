@@ -57,11 +57,11 @@ var options = {
         // Load RequireJS and move it into the RequireJS namespace
         {pattern: 'common_static/common/js/vendor/require.js', included: true},
         {pattern: 'RequireJS-namespace-undefine.js', included: true},
-        {pattern: 'spec/main_requirejs.js', included: true}
+        {pattern: 'spec/main_requirejs.js', included: true},
     ],
 
     libraryFiles: [
-        {pattern: 'common_static/edx-ui-toolkit/js/**/*.js'}
+        {pattern: 'common_static/edx-ui-toolkit/js/**/*.js'},
     ],
 
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
@@ -72,23 +72,23 @@ var options = {
         {pattern: 'src/javascript_loader.js', included: true},
         {pattern: 'src/collapsible.js', included: true},
         // Load everything else
-        {pattern: 'src/**/!(video)/!(poll|time).js', included: true}
+        {pattern: 'src/**/!(video)/!(poll|time).js', included: true},
     ],
 
     specFiles: [
         {pattern: 'spec/helper.js', included: true, ignoreCoverage: true}, // Helper which depends on source files.
         {pattern: 'spec/**/!(video)/*.js', included: true},
-        {pattern: 'spec/!(time_spec|video_helper).js', included: true}
+        {pattern: 'spec/!(time_spec|video_helper).js', included: true},
     ],
 
     fixtureFiles: [
         {pattern: 'fixtures/*.*'},
-        {pattern: 'fixtures/hls/**/*.*'}
+        {pattern: 'fixtures/hls/**/*.*'},
     ],
 
     runFiles: [
-        {pattern: 'karma_runner.js', included: true}
-    ]
+        {pattern: 'karma_runner.js', included: true},
+    ],
 };
 
 

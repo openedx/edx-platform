@@ -1,6 +1,6 @@
 define([
     'jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
-    'js/views/group_configurations_list', 'js/views/partition_group_list'
+    'js/views/group_configurations_list', 'js/views/partition_group_list',
 ],
 function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupListView) {
     'use strict';
@@ -14,7 +14,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
             if (this.experimentsEnabled) {
                 this.experimentGroupConfigurations = options.experimentGroupConfigurations;
                 this.experimentGroupsListView = new GroupConfigurationsListView({
-                    collection: this.experimentGroupConfigurations
+                    collection: this.experimentGroupConfigurations,
                 });
             }
 
@@ -26,8 +26,8 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
                     new PartitionGroupListView({
                         collection: this.allGroupConfigurations[i].get('groups'),
                         restrictEditing: this.allGroupConfigurations[i].get('read_only'),
-                        scheme: currentScheme
-                    })
+                        scheme: currentScheme,
+                    }),
                 );
             }
         },
@@ -97,14 +97,14 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
          */
         expandConfiguration: function(id) {
             var groupConfig = this.experimentsEnabled && this.experimentGroupConfigurations.findWhere({
-                id: parseInt(id)
+                id: parseInt(id),
             });
 
             if (groupConfig) {
                 groupConfig.set('showGroups', true);
                 this.$('#' + id).focus();
             }
-        }
+        },
     });
 
     return GroupConfigurationsPage;

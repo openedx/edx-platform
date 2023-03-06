@@ -13,10 +13,10 @@
                 params.success({
                     row_errors: [],
                     general_errors: [],
-                    warnings: []
+                    warnings: [],
                 });
                 return {
-                    always: function() {}
+                    always: function() {},
                 };
             });
             this.autoenrollment.render_notification_view = jasmine.createSpy(
@@ -37,18 +37,18 @@
                         {
                             username: 'testuser1',
                             email: 'testemail1@email.com',
-                            response: 'Username already exists'
-                        }
+                            response: 'Username already exists',
+                        },
                     ],
                     general_errors: [
                         {
-                            response: 'cannot read the line 2'
-                        }
+                            response: 'cannot read the line 2',
+                        },
                     ],
-                    warnings: []
+                    warnings: [],
                 });
                 return {
-                    always: function() {}
+                    always: function() {},
                 };
             });
             this.autoenrollment.render_notification_view = jasmine.createSpy(
@@ -71,12 +71,12 @@
                         {
                             username: 'user1',
                             email: 'user1email',
-                            response: 'email is in valid'
-                        }
-                    ]
+                            response: 'email is in valid',
+                        },
+                    ],
                 });
                 return {
-                    always: function() {}
+                    always: function() {},
                 };
             });
             this.autoenrollment.render_notification_view = jasmine.createSpy(

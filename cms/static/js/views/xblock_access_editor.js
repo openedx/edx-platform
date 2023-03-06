@@ -15,10 +15,10 @@ define(['js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
             render: function() {
                 HtmlUtils.append(
                     this.$el,
-                    HtmlUtils.HTML(this.template({}))
+                    HtmlUtils.HTML(this.template({})),
                 );
                 return this;
-            }
+            },
         });
 
         return XBlockAccessEditor;

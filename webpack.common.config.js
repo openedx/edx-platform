@@ -15,7 +15,7 @@ var filesWithRequireJSBlocks = [
     path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js'),
     /descriptors\/js/,
     /modules\/js/,
-    /xmodule\/js\/src\//
+    /xmodule\/js\/src\//,
 ];
 
 var defineHeader = /\(function ?\(((define|require|requirejs|\$)(, )?)+\) ?\{/;
@@ -35,32 +35,32 @@ var workerConfig = function() {
                 entry: require('../workers.json'),
                 output: {
                     filename: '[name].js',
-                    path: path.resolve(__dirname, 'common/static/bundles')
+                    path: path.resolve(__dirname, 'common/static/bundles'),
                 },
                 plugins: [
                     new BundleTracker({
                         path: process.env.STATIC_ROOT_LMS,
-                        filename: 'webpack-worker-stats.json'
+                        filename: 'webpack-worker-stats.json',
                     }),
                     new webpack.DefinePlugin({
                         'process.env.JS_ENV_EXTRA_CONFIG': JSON.parse(process.env.JS_ENV_EXTRA_CONFIG),
-                    })
+                    }),
                 ],
                 module: {
                     rules: [
                         {
                             test: /\.(js|jsx)$/,
                             include: [
-                                /node_modules\//
+                                /node_modules\//,
                             ],
-                            use: 'babel-loader'
-                        }
-                    ]
+                            use: 'babel-loader',
+                        },
+                    ],
                 },
                 resolve: {
-                    extensions: ['.js']
-                }
-            }
+                    extensions: ['.js'],
+                },
+            },
         };
     } catch (err) {
         return null;
@@ -122,12 +122,12 @@ module.exports = Merge.smart({
             ReactRenderer: './common/static/js/src/ReactRenderer.jsx',
             XModuleShim: './xmodule/js/src/xmodule.js',
             VerticalStudentView: './xmodule/assets/vertical/public/js/vertical_student_view.js',
-            commons: 'babel-polyfill'
+            commons: 'babel-polyfill',
         },
 
         output: {
             path: path.resolve(__dirname, 'common/static/bundles'),
-            libraryTarget: 'window'
+            libraryTarget: 'window',
         },
 
         plugins: [
@@ -135,11 +135,11 @@ module.exports = Merge.smart({
             new webpack.NamedModulesPlugin(),
             new BundleTracker({
                 path: process.env.STATIC_ROOT_CMS,
-                filename: 'webpack-stats.json'
+                filename: 'webpack-stats.json',
             }),
             new BundleTracker({
                 path: process.env.STATIC_ROOT_LMS,
-                filename: 'webpack-stats.json'
+                filename: 'webpack-stats.json',
             }),
             new webpack.ProvidePlugin({
                 _: 'underscore',
@@ -152,7 +152,7 @@ module.exports = Merge.smart({
                 AjaxPrefix: 'ajax_prefix',
                 // This is used by some XModules/XBlocks, which don't have
                 // any other way to declare that dependency.
-                $script: 'scriptjs'
+                $script: 'scriptjs',
             }),
 
             // Note: Until karma-webpack releases v3, it doesn't play well with
@@ -167,8 +167,8 @@ module.exports = Merge.smart({
                 // common/djangoapps/pipeline_mako/templates/static_content.html
                 name: 'commons',
                 filename: 'commons.js',
-                minChunks: 10
-            })
+                minChunks: 10,
+            }),
         ],
 
         module: {
@@ -177,7 +177,7 @@ module.exports = Merge.smart({
                 // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
                 // (I've tried every other suggestion solution on that page, this
                 // was the only one that worked.)
-                /\/sinon\.js|codemirror-compressed\.js|hls\.js|tinymce.js/
+                /\/sinon\.js|codemirror-compressed\.js|hls\.js|tinymce.js/,
             ],
             rules: [
                 {
@@ -188,33 +188,33 @@ module.exports = Merge.smart({
                             replacements: [
                                 {
                                     pattern: defineHeader,
-                                    replacement: function() { return ''; }
+                                    replacement: function() { return ''; },
                                 },
                                 {
                                     pattern: defineFooter,
-                                    replacement: function() { return ''; }
+                                    replacement: function() { return ''; },
                                 },
                                 {
                                     pattern: /(\/\* RequireJS) \*\//g,
-                                    replacement: function(match, p1) { return p1; }
+                                    replacement: function(match, p1) { return p1; },
                                 },
                                 {
                                     pattern: /\/\* Webpack/g,
-                                    replacement: function(match) { return match + ' */'; }
+                                    replacement: function(match) { return match + ' */'; },
                                 },
                                 {
                                     pattern: /text!(.*?\.underscore)/g,
-                                    replacement: function(match, p1) { return p1; }
+                                    replacement: function(match, p1) { return p1; },
                                 },
                                 {
                                     pattern: /RequireJS.require/g,
                                     replacement: function() {
                                         return 'require';
-                                    }
-                                }
-                            ]
-                        }
-                    )
+                                    },
+                                },
+                            ],
+                        },
+                    ),
                 },
                 {
                     test: /\.(js|jsx)$/,
@@ -222,16 +222,16 @@ module.exports = Merge.smart({
                         /node_modules/,
                         files.namespacedRequire,
                         files.textBangUnderscore,
-                        filesWithRequireJSBlocks
+                        filesWithRequireJSBlocks,
                     ],
-                    use: 'babel-loader'
+                    use: 'babel-loader',
                 },
                 {
                     test: /\.(js|jsx)$/,
                     include: [
-                        /paragon/
+                        /paragon/,
                     ],
-                    use: 'babel-loader'
+                    use: 'babel-loader',
                 },
                 {
                     test: path.resolve(__dirname, 'common/static/js/src/ajax_prefix.js'),
@@ -240,14 +240,14 @@ module.exports = Merge.smart({
                         {
                             loader: 'exports-loader',
                             options: {
-                                'this.AjaxPrefix': true
-                            }
-                        }
-                    ]
+                                'this.AjaxPrefix': true,
+                            },
+                        },
+                    ],
                 },
                 {
                     test: /\.underscore$/,
-                    use: 'raw-loader'
+                    use: 'raw-loader',
                 },
                 {
                     // This file is used by both RequireJS and Webpack and depends on window globals
@@ -259,77 +259,77 @@ module.exports = Merge.smart({
                             replacements: [
                                 {
                                     pattern: /\(function\(AjaxPrefix\) {/,
-                                    replacement: function() { return ''; }
+                                    replacement: function() { return ''; },
                                 },
                                 {
                                     pattern: /], function\(domReady, \$, str, Backbone, gettext, NotificationView\) {/,
                                     replacement: function() {
                                         // eslint-disable-next-line
                                         return '], function(domReady, $, str, Backbone, gettext, NotificationView, AjaxPrefix) {';
-                                    }
+                                    },
                                 },
                                 {
                                     pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
                                     replacement: function() {
                                         return "'../../common/js/components/views/feedback_notification'," +
                                                "'AjaxPrefix',";
-                                    }
+                                    },
                                 },
                                 {
                                     pattern: /}\).call\(this, AjaxPrefix\);/,
-                                    replacement: function() { return ''; }
+                                    replacement: function() { return ''; },
                                 },
                                 {
                                     pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
                                     replacement: function() {
                                         return "'../../common/js/components/views/feedback_notification'," +
                                                "'AjaxPrefix',";
-                                    }
-                                }
-                            ]
-                        }
-                    )
+                                    },
+                                },
+                            ],
+                        },
+                    ),
                 },
                 {
                     test: /\.(woff2?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-                    loader: 'file-loader'
+                    loader: 'file-loader',
                 },
                 {
                     test: /\.svg$/,
-                    loader: 'svg-inline-loader'
+                    loader: 'svg-inline-loader',
                 },
                 {
                     test: /xblock\/core/,
                     loader: 'exports-loader?window.XBlock!' +
-                            'imports-loader?jquery,jquery.immediateDescendents,this=>window'
+                            'imports-loader?jquery,jquery.immediateDescendents,this=>window',
                 },
                 {
                     test: /xblock\/runtime.v1/,
-                    loader: 'exports-loader?window.XBlock!imports-loader?XBlock=xblock/core,this=>window'
+                    loader: 'exports-loader?window.XBlock!imports-loader?XBlock=xblock/core,this=>window',
                 },
                 {
                     test: /descriptors\/js/,
-                    loader: 'imports-loader?this=>window'
+                    loader: 'imports-loader?this=>window',
                 },
                 {
                     test: /modules\/js/,
-                    loader: 'imports-loader?this=>window'
+                    loader: 'imports-loader?this=>window',
                 },
                 {
                     test: /codemirror/,
-                    loader: 'exports-loader?window.CodeMirror'
+                    loader: 'exports-loader?window.CodeMirror',
                 },
                 {
                     test: /tinymce/,
-                    loader: 'imports-loader?this=>window'
+                    loader: 'imports-loader?this=>window',
                 },
                 {
                     test: /xmodule\/js\/src\/xmodule/,
-                    loader: 'exports-loader?window.XModule!imports-loader?this=>window'
+                    loader: 'exports-loader?window.XModule!imports-loader?this=>window',
                 },
                 {
                     test: /mock-ajax/,
-                    loader: 'imports-loader?exports=>false'
+                    loader: 'imports-loader?exports=>false',
                 },
                 {
                     test: /d3.min/,
@@ -338,14 +338,14 @@ module.exports = Merge.smart({
                         {
                             loader: 'exports-loader',
                             options: {
-                                d3: true
-                            }
-                        }
-                    ]
+                                d3: true,
+                            },
+                        },
+                    ],
                 },
                 {
                     test: /logger/,
-                    loader: 'imports-loader?this=>window'
+                    loader: 'imports-loader?this=>window',
                 },
                 {
                     test: /\.css$/,
@@ -354,12 +354,12 @@ module.exports = Merge.smart({
                         {
                             loader: 'css-loader',
                             options: {
-                                modules: true
-                            }
-                        }
-                    ]
-                }
-            ]
+                                modules: true,
+                            },
+                        },
+                    ],
+                },
+            ],
         },
 
         resolve: {
@@ -388,7 +388,7 @@ module.exports = Merge.smart({
                 // (I've tried every other suggestion solution on that page, this
                 // was the only one that worked.)
                 sinon: __dirname + '/node_modules/sinon/pkg/sinon.js',
-                hls: 'hls.js/dist/hls.js'
+                hls: 'hls.js/dist/hls.js',
             },
             modules: [
                 'cms/djangoapps/pipeline_js/js',
@@ -409,14 +409,14 @@ module.exports = Merge.smart({
                 'common/static/js/vendor/jQuery-File-Upload/js/',
                 'common/static/js/vendor/tinymce/js/tinymce',
                 'node_modules',
-                'common/static/xmodule'
-            ]
+                'common/static/xmodule',
+            ],
         },
 
         resolveLoader: {
             alias: {
-                text: 'raw-loader'  // Compatibility with RequireJSText's text! loader, uses raw-loader under the hood
-            }
+                text: 'raw-loader',  // Compatibility with RequireJSText's text! loader, uses raw-loader under the hood
+            },
         },
 
         externals: {
@@ -429,16 +429,16 @@ module.exports = Merge.smart({
             underscore: '_',
             URI: 'URI',
             XBlockToXModuleShim: 'XBlockToXModuleShim',
-            XModule: 'XModule'
+            XModule: 'XModule',
         },
 
         watchOptions: {
-            poll: true
+            poll: true,
         },
 
         node: {
-            fs: 'empty'
-        }
+            fs: 'empty',
+        },
 
-    }
+    },
 }, {web: xmoduleJS}, workerConfig());

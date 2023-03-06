@@ -68,6 +68,6 @@ var DialogTabControls = (function() {
 
     return {
         initializeTabKeyValues: initializeTabKeyValues,
-        setKeydownListener: setKeydownListener
+        setKeydownListener: setKeydownListener,
     };
 }());

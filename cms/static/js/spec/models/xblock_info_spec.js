@@ -47,5 +47,5 @@ define(['backbone', 'js/models/xblock_info'],
                     .isHeaderVisible()).toBe(true);
             });
         });
-    }
+    },
 );

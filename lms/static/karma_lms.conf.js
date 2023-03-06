@@ -16,11 +16,11 @@ var options = {
         {pattern: '../../common/static/common/js/vendor/jquery-migrate.js', included: true},
         {pattern: '../../common/static/js/vendor/jquery.event.drag-2.2.js', included: true},
         {pattern: '../../common/static/js/vendor/slick.core.js', included: true},
-        {pattern: '../../common/static/js/vendor/slick.grid.js', included: true}
+        {pattern: '../../common/static/js/vendor/slick.grid.js', included: true},
     ],
 
     libraryFiles: [
-        {pattern: 'js/RequireJS-namespace-undefine.js'}
+        {pattern: 'js/RequireJS-namespace-undefine.js'},
     ],
 
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
@@ -34,7 +34,7 @@ var options = {
         {pattern: 'lms/js/**/!(*spec).js'},
         {pattern: 'support/js/**/!(*spec).js'},
         {pattern: 'teams/js/**/!(*spec).js'},
-        {pattern: 'completion/js/**/!(*spec).js'}
+        {pattern: 'completion/js/**/!(*spec).js'},
     ],
 
     specFiles: [
@@ -45,21 +45,21 @@ var options = {
         {pattern: 'completion/js/**/*_spec.js', webpack: true},
 
         // Add all remaining spec files to be used without Webpack
-        {pattern: '../**/*spec.js'}
+        {pattern: '../**/*spec.js'},
     ],
 
     fixtureFiles: [
         {pattern: '../**/fixtures/**/*.html'},
         {pattern: '../**/templates/**/*.html'},
         {pattern: '../**/*.underscore'},
-        {pattern: '../**/*.svg'}
+        {pattern: '../**/*.svg'},
     ],
 
     runFiles: [
-        {pattern: 'lms/js/spec/main.js', included: true}
+        {pattern: 'lms/js/spec/main.js', included: true},
     ],
 
-    preprocessors: {}
+    preprocessors: {},
 };
 
 options.specFiles

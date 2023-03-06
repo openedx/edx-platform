@@ -33,7 +33,7 @@
                 // Translators: Volume level in range ]80,99]%
                 'Very loud': gettext('Very loud'),
                 // Translators: Volume level equals 100%.
-                Maximum: gettext('Maximum')
+                Maximum: gettext('Maximum'),
             };
         });
 }(RequireJS.define));

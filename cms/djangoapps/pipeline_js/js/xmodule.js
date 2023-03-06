@@ -9,7 +9,7 @@ define(
         'jquery', 'underscore', 'codemirror', 'tinymce', 'scriptjs',
         'jquery.tinymce', 'jquery.qtip', 'jquery.scrollTo', 'jquery.flot',
         'jquery.cookie',
-        'utility'
+        'utility',
     ],
     function($, _, CodeMirror, tinymce, $script) {
         'use strict';
@@ -26,13 +26,13 @@ define(
                     tex2jax: {
                         inlineMath: [
                             ['\\(', '\\)'],
-                            ['[mathjaxinline]', '[/mathjaxinline]']
+                            ['[mathjaxinline]', '[/mathjaxinline]'],
                         ],
                         displayMath: [
                             ['\\[', '\\]'],
-                            ['[mathjax]', '[/mathjax]']
-                        ]
-                    }
+                            ['[mathjax]', '[/mathjax]'],
+                        ],
+                    },
                 });
 
                 // In order to eliminate all flashing during interactive
@@ -42,13 +42,13 @@ define(
                 // the fast preview setting as shown in the context menu.
                 window.MathJax.Hub.processSectionDelay = 0;
                 window.MathJax.Hub.Configured();
-            }
+            },
         );
         window.CodeMirror = CodeMirror;
         window.RequireJS = {
             requirejs: {}, // This is never used by current xmodules
             require: $script, // $script([deps], callback) acts approximately like the require function
-            define: define
+            define: define,
         };
         /**
          * Loads all modules one-by-one in exact order.
@@ -79,5 +79,5 @@ define(
         //     throw Error('window.xmoduleUrls must be defined');
         // }
         return requireQueue([]);
-    }
+    },
 );

@@ -8,7 +8,7 @@ define(
         'js/spec/student_account/helpers',
         'js/student_account/models/user_account_model',
         'learner_profile/js/views/learner_profile_fields',
-        'js/views/message_banner'
+        'js/views/message_banner',
     ],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, UserAccountModel, LearnerProfileFields,
         MessageBannerView) {
@@ -27,7 +27,7 @@ define(
 
                 var imageData = {
                     image_url_large: '/media/profile-images/default.jpg',
-                    has_image: !!options.hasImage
+                    has_image: !!options.hasImage,
                 };
 
                 var accountSettingsModel = new UserAccountModel();
@@ -38,7 +38,7 @@ define(
                 accountSettingsModel.url = Helpers.USER_ACCOUNTS_API_URL;
 
                 messageView = new MessageBannerView({
-                    el: $('.message-banner')
+                    el: $('.message-banner'),
                 });
 
                 return new LearnerProfileFields.ProfileImageFieldView({
@@ -49,7 +49,7 @@ define(
                     imageMaxBytes: imageMaxBytes,
                     imageMinBytes: imageMinBytes,
                     imageUploadUrl: Helpers.IMAGE_UPLOAD_API_URL,
-                    imageRemoveUrl: Helpers.IMAGE_REMOVE_API_URL
+                    imageRemoveUrl: Helpers.IMAGE_REMOVE_API_URL,
                 });
             };
 
@@ -60,7 +60,7 @@ define(
                 return new LearnerProfileFields.SocialLinkIconsView({
                     model: accountSettingsModel,
                     socialPlatforms: ['twitter', 'facebook', 'linkedin'],
-                    ownProfile: ownProfile
+                    ownProfile: ownProfile,
                 });
             };
 
@@ -68,7 +68,7 @@ define(
                 var fileFakeData = 'i63ljc6giwoskyb9x5sw0169bdcmcxr3cdz8boqv0lik971972cmd6yknvcxr5sw0nvc169bdcmcxsdf';
                 return new Blob(
                     [fileFakeData.substr(0, size)],
-                    {type: 'image/jpg'}
+                    {type: 'image/jpg'},
                 );
             };
 
@@ -78,7 +78,7 @@ define(
                     type: 'POST',
                     add: view.fileSelected,
                     done: view.imageChangeSucceeded,
-                    fail: view.imageChangeFailed
+                    fail: view.imageChangeFailed,
                 });
             };
 
@@ -140,7 +140,7 @@ define(
                     // get the url for newly uploaded image, So we need to send the response for that GET
                     data = {profile_image: {
                         image_url_large: '/media/profile-images/' + imageName,
-                        has_image: true
+                        has_image: true,
                     }};
                     AjaxHelpers.respondWithJson(requests, data);
 
@@ -179,7 +179,7 @@ define(
                     // So we need to send the response for that GET
                     data = {profile_image: {
                         image_url_large: '/media/profile-images/default.jpg',
-                        has_image: false
+                        has_image: false,
                     }};
                     AjaxHelpers.respondWithJson(requests, data);
 
@@ -315,16 +315,16 @@ define(
                     socialPlatformLinks = {
                         twitter: {
                             platform: 'twitter',
-                            social_link: 'https://www.twitter.com/edX'
+                            social_link: 'https://www.twitter.com/edX',
                         },
                         facebook: {
                             platform: 'facebook',
-                            social_link: 'https://www.facebook.com/edX'
+                            social_link: 'https://www.facebook.com/edX',
                         },
                         linkedin: {
                             platform: 'linkedin',
-                            social_link: ''
-                        }
+                            social_link: '',
+                        },
                     };
 
                     socialLinksView = createSocialLinksView(true, socialPlatformLinks);
@@ -351,16 +351,16 @@ define(
                     socialPlatformLinks = {
                         twitter: {
                             platform: 'twitter',
-                            social_link: ''
+                            social_link: '',
                         },
                         facebook: {
                             platform: 'facebook',
-                            social_link: ''
+                            social_link: '',
                         },
                         linkedin: {
                             platform: 'linkedin',
-                            social_link: ''
-                        }
+                            social_link: '',
+                        },
                     };
 
                     socialLinksView = createSocialLinksView(false, socialPlatformLinks);

@@ -16,7 +16,7 @@ function(ValidatingView, gettext, StringUtils, HtmlUtils, _, $) {
             'click .remove-grading-data': 'deleteModel',
             // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
             'focus :input': 'inputFocus',
-            'blur :input': 'inputUnfocus'
+            'blur :input': 'inputUnfocus',
         },
         initialize: function() {
             this.listenTo(this.model, 'invalid', this.handleValidationError);
@@ -32,7 +32,7 @@ function(ValidatingView, gettext, StringUtils, HtmlUtils, _, $) {
             short_label: 'course-grading-assignment-shortname',
             min_count: 'course-grading-assignment-totalassignments',
             drop_count: 'course-grading-assignment-droppable',
-            weight: 'course-grading-assignment-gradeweight'
+            weight: 'course-grading-assignment-gradeweight',
         },
         updateModel: function(event) {
         // HACK to fix model sometimes losing its pointer to the collection [I think I fixed this but leaving
@@ -58,8 +58,8 @@ function(ValidatingView, gettext, StringUtils, HtmlUtils, _, $) {
                         gettext('For grading to work, you must change all {oldName} subsections to {newName}.'),
                         {
                             oldName: this.oldName,
-                            newName: this.model.get('type')
-                        }
+                            newName: this.model.get('type'),
+                        },
                     );
                     HtmlUtils.append($(event.currentTarget).parent(), this.errorTemplate({message: message}));
                 }
@@ -72,7 +72,7 @@ function(ValidatingView, gettext, StringUtils, HtmlUtils, _, $) {
         deleteModel: function(e) {
             e.preventDefault();
             this.collection.remove(this.model);
-        }
+        },
     });
 
     return GraderView;
