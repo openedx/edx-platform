@@ -18,7 +18,7 @@ jobs:
           PULL_REQUEST_BODY: |
             This is an automated pull request from branch `hawthorn/main` into `hawthorn/prod` (production).
             Please review the changes and merge this pull request _before_ running the Tahoe production Cloud Build deployment.
-          PULL_REQUEST_REVIEWERS: "johnbaldwin amirtds bryanlandia"
+          PULL_REQUEST_REVIEWERS: "amirtds bryanlandia xscrio" 
   hawthorn-to-juniper-sync:
     name: PullRequestAction
     runs-on: ubuntu-latest
@@ -35,5 +35,5 @@ jobs:
             This is meant for making sure all of our Hawthorn changes gets merge into Juniper otherwise Juniper would stall.
             If tests passes merge this pull request.
             If there are merge conflicts, it needs to be resolved manually in a seperate pull request.
-          PULL_REQUEST_REVIEWERS: "melvinsoft shadinaif OmarIthawi thraxil"
+          PULL_REQUEST_REVIEWERS: "bryanlandia amirtds xscrio"
 
