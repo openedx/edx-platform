@@ -1,18 +1,18 @@
 # pylint: disable=missing-module-docstring
-import unittest
+
 from unittest.mock import patch
 
 import ddt
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in lms')
+@skip_unless_lms
 @ddt.ddt
 class TestCreateApiAccessRequest(TestCase):
     """ Test create_api_access_request command """

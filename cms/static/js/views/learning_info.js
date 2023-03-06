@@ -29,7 +29,7 @@ function($, _, Backbone, gettext, TemplateUtils, HtmlUtils) {
         },
 
         render: function() {
-             // rendering for this model
+            // rendering for this model
             $('li.course-settings-learning-fields').empty();
             var self = this;
             var learning_information = this.model.get('learning_info');

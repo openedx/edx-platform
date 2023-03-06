@@ -670,7 +670,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         }
         self.existing_comment = Comment(**make_minimal_cs_comment({
             "id": "existing_comment",
-            "thread_id": "existing_thread",
+            "thread_id": "dummy",
             "body": "Original body",
             "user_id": str(self.user.id),
             "username": self.user.username,
@@ -870,7 +870,14 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         }
         self.register_put_comment_response(cs_response_data)
         data = {"raw_body": "Edited body", "endorsed": True}
+        self.register_get_thread_response(
+            make_minimal_cs_thread({
+                "id": "dummy",
+                "course_id": str(self.course.id),
+            })
+        )
         saved = self.save_and_reserialize(data, instance=self.existing_comment)
+
         assert parsed_body(httpretty.last_request()) == {
             'body': ['Edited body'],
             'course_id': [str(self.course.id)],

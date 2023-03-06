@@ -568,7 +568,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             });
 
             this.setExamType(this.model.get('is_time_limited'), this.model.get('is_proctored_exam'),
-                            this.model.get('is_practice_exam'), this.model.get('is_onboarding_exam'));
+                this.model.get('is_practice_exam'), this.model.get('is_onboarding_exam'));
             this.setExamTime(this.model.get('default_time_limit_minutes'));
 
             this.setReviewRules(this.model.get('exam_review_rules'));
@@ -941,11 +941,27 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
             this.setStatus(this.currentValue());
+            this.showTipText();
         },
 
         currentValue: function() {
             var discussionEnabled = this.model.get('discussion_enabled');
             return discussionEnabled === true || discussionEnabled === 'enabled';
+        },
+
+        showTipText: function() {
+            if (this.model.get('published')) {
+                $('.un-published-tip').hide()
+            } else {
+                $('.un-published-tip').show()
+            }
+            let enabledForGraded = course.get('discussions_settings').enable_graded_units
+            if (this.model.get('graded') && !enabledForGraded) {
+                $('#discussion_enabled').prop('disabled', true);
+                $('.graded-tip').show()
+            } else {
+                $('.graded-tip').hide()
+            }
         },
 
         setStatus: function(value) {

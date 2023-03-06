@@ -7,7 +7,7 @@ from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenera
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
@@ -34,14 +34,14 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
             )
         ]
 
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.courses[0].location,
             category='chapter',
             display_name="Week 1",
             publish_item=True,
         )
 
-        self.chapter2 = ItemFactory.create(
+        self.chapter2 = BlockFactory.create(
             parent_location=self.courses[1].location,
             category='chapter',
             display_name="Week 1",

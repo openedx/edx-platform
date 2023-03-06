@@ -3,21 +3,19 @@ Unit tests for getting the list of courses for a user through iterating all cour
 by reversing group name formats.
 """
 
-
-import unittest
-
 from unittest import mock
 from django.conf import settings
 from django.test.client import Client
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed, set_prerequisite_courses
-from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -66,7 +64,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.client.logout()
         super().tearDown()
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_get_course_list(self):
         """
         Test getting courses
@@ -84,7 +82,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         courses_list = list(get_course_enrollments(self.student, None, []))
         assert len(courses_list) == 0
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_get_limited_number_of_courses_using_config(self):
         course_location = self.store.make_course_key('Org0', 'Course0', 'Run0')
         self._create_course_with_access_groups(course_location)

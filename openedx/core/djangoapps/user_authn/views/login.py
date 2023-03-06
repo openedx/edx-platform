@@ -22,13 +22,12 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
+from django_ratelimit.decorators import ratelimit
 from edx_django_utils.monitoring import set_custom_attribute
-from ratelimit.decorators import ratelimit
-from rest_framework.views import APIView
-
 from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import SESSION_LOGIN_COMPLETED
 from openedx_filters.learning.filters import StudentLoginRequested
+from rest_framework.views import APIView
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -46,6 +45,7 @@ from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError, VulnerablePasswordError
+from openedx.core.djangoapps.user_authn.tasks import check_pwned_password_and_send_track_event
 from openedx.core.djangoapps.user_authn.toggles import (
     is_require_third_party_auth_enabled,
     should_redirect_to_authn_microfrontend
@@ -53,7 +53,6 @@ from openedx.core.djangoapps.user_authn.toggles import (
 from openedx.core.djangoapps.user_authn.views.login_form import get_login_session_form
 from openedx.core.djangoapps.user_authn.views.password_reset import send_password_reset_email_for_user
 from openedx.core.djangoapps.user_authn.views.utils import API_V1, ENTERPRISE_ENROLLMENT_URL_REGEX, UUID4_REGEX
-from openedx.core.djangoapps.user_authn.tasks import check_pwned_password_and_send_track_event
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params  # lint-amnesty, pylint: disable=unused-import
@@ -142,7 +141,7 @@ def _get_user_by_email_or_username(request, api_version):
         user = _get_user_by_username(email_or_username)
 
     if not user:
-        digest = hashlib.shake_128(email_or_username.encode('utf-8')).hexdigest(16)  # pylint: disable=too-many-function-args
+        digest = hashlib.shake_128(email_or_username.encode('utf-8')).hexdigest(16)
         AUDIT_LOG.warning(f"Login failed - Unknown user email or username {digest}")
 
     return user
@@ -492,11 +491,13 @@ def enterprise_selection_page(request, user, next_url):
     key='openedx.core.djangoapps.util.ratelimit.request_post_email_or_username',
     rate=settings.LOGISTRATION_PER_EMAIL_RATELIMIT_RATE,
     method='POST',
+    block=False,
 )  # lint-amnesty, pylint: disable=too-many-statements
 @ratelimit(
     key='openedx.core.djangoapps.util.ratelimit.real_ip',
     rate=settings.LOGISTRATION_RATELIMIT_RATE,
     method='POST',
+    block=False,
 )  # lint-amnesty, pylint: disable=too-many-statements
 def login_user(request, api_version='v1'):  # pylint: disable=too-many-statements
     """

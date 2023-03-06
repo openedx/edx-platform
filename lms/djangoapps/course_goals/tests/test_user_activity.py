@@ -14,7 +14,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from mock import patch
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.models import CourseEnrollment
@@ -45,8 +45,8 @@ class UserActivityTests(UrlResetMixin, ModuleStoreTestCase):
             modulestore=self.store,
             discussion_topics={"Test Topic": {"id": "test_topic"}},
         )
-        chapter = ItemFactory(parent=self.course, category='chapter')
-        ItemFactory(parent=chapter, category='sequential')
+        chapter = BlockFactory(parent=self.course, category='chapter')
+        BlockFactory(parent=chapter, category='sequential')
 
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, self.course.id)

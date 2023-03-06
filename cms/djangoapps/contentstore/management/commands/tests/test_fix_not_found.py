@@ -7,7 +7,7 @@ from django.core.management import CommandError, call_command
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 
 class TestFixNotFound(ModuleStoreTestCase):
@@ -33,7 +33,7 @@ class TestFixNotFound(ModuleStoreTestCase):
 
     def test_fix_not_found(self):
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
-        ItemFactory.create(category='chapter', parent_location=course.location)
+        BlockFactory.create(category='chapter', parent_location=course.location)
 
         # get course again in order to update its children list
         course = self.store.get_course(course.id)

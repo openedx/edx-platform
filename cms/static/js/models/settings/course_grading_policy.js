@@ -12,7 +12,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
             parse: function(attributes) {
                 if (attributes.graders) {
                     var graderCollection;
-            // interesting race condition: if {parse:true} when newing, then parse called before .attributes created
+                    // interesting race condition: if {parse:true} when newing, then parse called before .attributes created
                     if (this.attributes && this.has('graders')) {
                         graderCollection = this.get('graders');
                         graderCollection.reset(attributes.graders, {parse: true});
@@ -21,16 +21,16 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                     }
                     attributes.graders = graderCollection;
                 }
-        // If grace period is unset or equal to 00:00 on the server,
-        // it's received as null
+                // If grace period is unset or equal to 00:00 on the server,
+                // it's received as null
                 if (attributes.grace_period === null) {
                     attributes.grace_period = {
                         hours: 0,
                         minutes: 0
                     };
                 }
-        // If minimum_grade_credit is unset or equal to 0 on the server,
-        // it's received as 0
+                // If minimum_grade_credit is unset or equal to 0 on the server,
+                // it's received as 0
                 if (attributes.minimum_grade_credit === null) {
                     attributes.minimum_grade_credit = 0;
                 }
@@ -51,7 +51,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 return newDate;
             },
             parseGracePeriod: function(grace_period) {
-        // Enforce hours:minutes format
+                // Enforce hours:minutes format
                 if (!/^\d{2,3}:\d{2}$/.test(grace_period)) {
                     return null;
                 }
@@ -62,7 +62,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 };
             },
             parseMinimumGradeCredit: function(minimum_grade_credit) {
-        // get the value of minimum grade credit value in percentage
+                // get the value of minimum grade credit value in percentage
                 if (isNaN(minimum_grade_credit)) {
                     return 0;
                 }
@@ -78,16 +78,16 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                     }
                 }
                 if (this.get('is_credit_course') && _.has(attrs, 'minimum_grade_credit')) {
-            // Getting minimum grade cutoff value
+                    // Getting minimum grade cutoff value
                     minimumGradeCutoff = _.min(_.values(attrs.grade_cutoffs));
                     if (isNaN(attrs.minimum_grade_credit) || attrs.minimum_grade_credit === null ||
                       attrs.minimum_grade_credit < minimumGradeCutoff) {
                         return {
                             minimum_grade_credit: StringUtils.interpolate(
-                        gettext('Not able to set passing grade to less than %(minimum_grade_cutoff)s%.'),
-                        {minimum_grade_cutoff: minimumGradeCutoff * 100},
-                        true
-                    )
+                                gettext('Not able to set passing grade to less than %(minimum_grade_cutoff)s%.'),
+                                {minimum_grade_cutoff: minimumGradeCutoff * 100},
+                                true
+                            )
                         };
                     }
                 }

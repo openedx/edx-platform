@@ -79,12 +79,12 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     return text
 
 
-def draft_node_constructor(module, url, parent_url, location=None, parent_location=None, index=None):
+def draft_node_constructor(block, url, parent_url, location=None, parent_location=None, index=None):
     """
     Contructs a draft_node namedtuple with defaults.
     """
     draft_node = namedtuple('draft_node', ['module', 'location', 'url', 'parent_location', 'parent_url', 'index'])
-    return draft_node(module, location, url, parent_location, parent_url, index)
+    return draft_node(block, location, url, parent_location, parent_url, index)
 
 
 def get_draft_subtree_roots(draft_nodes):

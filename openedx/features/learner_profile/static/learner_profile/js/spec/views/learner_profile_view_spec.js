@@ -20,8 +20,8 @@ define(
         'js/views/message_banner'
     ],
     function(gettext, Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
-              FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
-              BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
+        FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
+        BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
         'use strict';
 
         describe('edx.user.LearnerProfileView', function() {

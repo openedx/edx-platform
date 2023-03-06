@@ -1,7 +1,5 @@
 """ Tests for rendering functions in the mako pipeline. """
 
-
-from unittest import skipUnless
 from unittest.mock import patch
 
 import ddt
@@ -9,6 +7,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from common.djangoapps.pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 class RequireJSPathOverridesTest(TestCase):
@@ -40,7 +39,7 @@ class RequireJSPathOverridesTest(TestCase):
         self.assertCountEqual(list(map(str.strip, result.splitlines())), self.OVERRIDES_JS)
 
 
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+@skip_unless_lms
 @ddt.ddt
 class PipelineRenderTest(TestCase):
     """Test individual pipeline rendering functions. """

@@ -379,7 +379,7 @@ MODULESTORE:
                 ENGINE: xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore
                 NAME: split
                 OPTIONS:
-                    default_class: xmodule.hidden_module.HiddenDescriptor
+                    default_class: xmodule.hidden_block.HiddenBlock
                     fs_root: /edx/var/edxapp/data
                     render_template: common.djangoapps.edxmako.shortcuts.render_to_string
             -   DOC_STORE_CONFIG:
@@ -399,7 +399,7 @@ MODULESTORE:
                 ENGINE: xmodule.modulestore.mongo.DraftMongoModuleStore
                 NAME: draft
                 OPTIONS:
-                    default_class: xmodule.hidden_module.HiddenDescriptor
+                    default_class: xmodule.hidden_block.HiddenBlock
                     fs_root: /edx/var/edxapp/data
                     render_template: common.djangoapps.edxmako.shortcuts.render_to_string
 ORA2_FILE_PREFIX: default_env-default_deployment/ora2

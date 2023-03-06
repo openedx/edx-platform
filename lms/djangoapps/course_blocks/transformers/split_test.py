@@ -12,13 +12,13 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
 class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
     A nested transformer of the UserPartitionTransformer that honors the
-    block structure pathways created by split_test modules.
+    block structure pathways created by split_test blocks.
 
     To avoid code duplication, the implementation transforms its block
     access representation to the representation used by user_partitions.
-    Namely, the 'group_id_to_child' field on a split_test module is
+    Namely, the 'group_id_to_child' field on a split_test block is
     transformed into the, now standard, 'group_access' fields in the
-    split_test module's children.
+    split_test block's children.
 
     The implementation therefore relies on the UserPartitionTransformer
     to actually enforce the access using the 'user_partitions' and
@@ -61,7 +61,7 @@ class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer)
                 continue
 
             # Create dict of child location to group_id, using the
-            # group_id_to_child field on the split_test module.
+            # group_id_to_child field on the split_test block.
             child_to_group = {
                 xblock.group_id_to_child.get(str(group.id), None): group.id
                 for group in partition_for_this_block.groups
@@ -80,7 +80,7 @@ class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer)
         """
 
         # The UserPartitionTransformer will enforce group access, so
-        # go ahead and remove all extraneous split_test modules.
+        # go ahead and remove all extraneous split_test blocks.
         return [
             block_structure.create_removal_filter(
                 lambda block_key: block_key.block_type == 'split_test',

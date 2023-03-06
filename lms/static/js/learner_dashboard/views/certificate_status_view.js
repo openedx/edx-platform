@@ -6,19 +6,19 @@ import certificateStatusTpl from '../../../templates/learner_dashboard/certifica
 import certificateIconTpl from '../../../templates/learner_dashboard/certificate_icon.underscore';
 
 class CertificateStatusView extends Backbone.View {
-  initialize(options) {
-    this.statusTpl = HtmlUtils.template(certificateStatusTpl);
-    this.iconTpl = HtmlUtils.template(certificateIconTpl);
-    this.$el = options.$el;
-    this.render();
-  }
+    initialize(options) {
+        this.statusTpl = HtmlUtils.template(certificateStatusTpl);
+        this.iconTpl = HtmlUtils.template(certificateIconTpl);
+        this.$el = options.$el;
+        this.render();
+    }
 
-  render() {
-    let data = this.model.toJSON();
+    render() {
+        let data = this.model.toJSON();
 
-    data = $.extend(data, { certificateSvg: this.iconTpl() });
-    HtmlUtils.setHtml(this.$el, this.statusTpl(data));
-  }
+        data = $.extend(data, { certificateSvg: this.iconTpl() });
+        HtmlUtils.setHtml(this.$el, this.statusTpl(data));
+    }
 }
 
 export default CertificateStatusView;

@@ -7,7 +7,7 @@ from unittest.mock import patch
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
-from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
+from xmodule.modulestore.tests.factories import BlockFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.x_module import AUTHOR_VIEW
 
@@ -17,8 +17,8 @@ dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-
 @patch(
     'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
 )
-@patch('xmodule.html_module.HtmlBlock.author_view', dummy_render, create=True)
-@patch('xmodule.html_module.HtmlBlock.has_author_view', True, create=True)
+@patch('xmodule.html_block.HtmlBlock.author_view', dummy_render, create=True)
+@patch('xmodule.html_block.HtmlBlock.has_author_view', True, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
 class TestLibraryRoot(MixedSplitTestCase):
     """
@@ -35,7 +35,7 @@ class TestLibraryRoot(MixedSplitTestCase):
         message = "Hello world"
         library = LibraryFactory.create(modulestore=self.store)
         # Add one HTML block to the library:
-        ItemFactory.create(
+        BlockFactory.create(
             category="html",
             parent_location=library.location,
             user_id=self.user_id,
@@ -60,7 +60,7 @@ class TestLibraryRoot(MixedSplitTestCase):
         library = LibraryFactory.create(modulestore=self.store)
         # Add five HTML blocks to the library:
         blocks = [
-            ItemFactory.create(
+            BlockFactory.create(
                 category="html",
                 parent_location=library.location,
                 user_id=self.user_id,

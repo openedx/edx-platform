@@ -6,7 +6,6 @@ BlockStructures.
 
 from contextlib import contextmanager
 
-from . import config
 from .exceptions import BlockStructureNotFound, TransformerDataIncompatible, UsageKeyNotInBlockStructure
 from .factory import BlockStructureFactory
 from .store import BlockStructureStore
@@ -100,8 +99,6 @@ class BlockStructureManager:
             BlockStructureTransformers.verify_versions(block_structure)
 
         except (BlockStructureNotFound, TransformerDataIncompatible):
-            if config.RAISE_ERROR_WHEN_NOT_FOUND.is_enabled():
-                raise
             block_structure = self._update_collected()
 
         return block_structure

@@ -187,7 +187,7 @@
         });
     };
 
-   // Stub jQuery.cookie module.
+    // Stub jQuery.cookie module.
     $.cookie = jasmine.createSpy('jQuery.cookie').and.returnValue('1.0');
 
     // # Stub jQuery.qtip module.

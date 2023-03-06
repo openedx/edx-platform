@@ -38,11 +38,11 @@
                     lastFGEl = state.el.find('.focus_grabber.last'),
                     tcWrapperEl = state.el.find('.tc-wrapper');
 
-            // Existence check.
+                // Existence check.
                 expect(firstFGEl.length).toBe(1);
                 expect(lastFGEl.length).toBe(1);
 
-            // Position check.
+                // Position check.
                 expect(firstFGEl.index() + 1).toBe(tcWrapperEl.index());
                 expect(lastFGEl.index() - 1).toBe(tcWrapperEl.index());
             });

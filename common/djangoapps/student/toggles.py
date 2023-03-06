@@ -23,6 +23,24 @@ def should_show_amplitude_recommendations():
     return ENABLE_AMPLITUDE_RECOMMENDATIONS.is_enabled()
 
 
+# Waffle flag to enable fallback recommendations.
+# .. toggle_name: student.enable_fallback_recommendations
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Supports showing fallback recommendation in case of error on amplitude side.
+#                        Currently, fallback recommendations are picked from settings.GENERAL_RECOMMENDATIONS.
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2023-01-16
+# .. toggle_target_removal_date: None
+# .. toggle_warning: None
+# .. toggle_tickets: VAN-1239
+ENABLE_FALLBACK_RECOMMENDATIONS = WaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.enable_fallback_recommendations', __name__)
+
+
+def show_fallback_recommendations():
+    return ENABLE_FALLBACK_RECOMMENDATIONS.is_enabled()
+
+
 # Waffle flag to enable 2U Recommendations
 # .. toggle_name: student.enable_2u_recommendations
 # .. toggle_implementation: WaffleFlag

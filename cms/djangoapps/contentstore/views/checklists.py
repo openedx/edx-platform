@@ -27,9 +27,9 @@ def checklists_handler(request, course_key_string=None):
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
-    course_module = modulestore().get_course(course_key)
+    course_block = modulestore().get_course(course_key)
     return render_to_response('checklists.html', {
         'language_code': request.LANGUAGE_CODE,
-        'context_course': course_module,
-        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_module.id),
+        'context_course': course_block,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
     })

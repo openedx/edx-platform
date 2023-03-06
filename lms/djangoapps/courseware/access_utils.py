@@ -24,7 +24,7 @@ from lms.djangoapps.courseware.access_response import (
 )
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, COURSE_PRE_START_ACCESS_FLAG
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=wrong-import-order
 
 DEBUG_ACCESS = False
@@ -153,7 +153,7 @@ def check_public_access(course, visibilities):
     This checks if the unenrolled access waffle flag for the course is set
     and the course visibility matches any of the input visibilities.
 
-    The "visibilities" argument is one of these constants from xmodule.course_module:
+    The "visibilities" argument is one of these constants from xmodule.course_block:
     - COURSE_VISIBILITY_PRIVATE
     - COURSE_VISIBILITY_PUBLIC
     - COURSE_VISIBILITY_PUBLIC_OUTLINE

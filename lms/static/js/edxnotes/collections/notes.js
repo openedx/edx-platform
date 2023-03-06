@@ -23,7 +23,7 @@
                 PagingCollection.prototype.constructor.call(this, models, options);
             },
 
-        /**
+            /**
          * Returns course structure from the list of notes.
          * @return {Object}
          */

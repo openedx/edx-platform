@@ -5,7 +5,7 @@ like DISABLE_START_DATES.
 
 Note: The access control logic in this file does NOT check for enrollment in
   a course.  It is expected that higher layers check for enrollment so we
-  don't have to hit the enrollments table on every module load.
+  don't have to hit the enrollments table on every block load.
 
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
@@ -13,13 +13,11 @@ Note: The access control logic in this file does NOT check for enrollment in
 
 
 import logging
-from datetime import datetime
 
 from django.conf import settings  # pylint: disable=unused-import
 from django.contrib.auth.models import AnonymousUser
 from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from pytz import UTC
 from xblock.core import XBlock
 
 from lms.djangoapps.courseware.access_response import (
@@ -63,8 +61,8 @@ from common.djangoapps.util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     is_prerequisite_courses_enabled
 )
-from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
@@ -106,16 +104,16 @@ def has_access(user, action, obj, course_key=None):
     switching based on various settings.
 
     Things this module understands:
-    - start dates for modules
-    - visible_to_staff_only for modules
+    - start dates for blocks
+    - visible_to_staff_only for blocks
     - DISABLE_START_DATES
     - different access for instructor, staff, course staff, and students.
-    - mobile_available flag for course modules
+    - mobile_available flag for course blocks
 
     user: a Django user object. May be anonymous. If none is passed,
                     anonymous is assumed
 
-    obj: The object to check access for.  A module, descriptor, location, or
+    obj: The object to check access for.  A block, descriptor, location, or
                     certain special strings (e.g. 'global')
 
     action: A string specifying the action that the client is trying to perform.
@@ -250,22 +248,35 @@ def _can_enroll_courselike(user, courselike):
     # which actually points to a CourseKey. Sigh.
     course_key = courselike.id
 
+    course_enrollment_open = courselike.is_enrollment_open()
+
+    user_has_staff_access = _has_staff_access_to_descriptor(user, courselike, course_key)
+
     # If the user appears in CourseEnrollmentAllowed paired with the given course key,
     # they may enroll, except if the CEA has already been used by a different user.
     # Note that as dictated by the legacy database schema, the filter call includes
     # a `course_id` kwarg which requires a CourseKey.
     if user is not None and user.is_authenticated:
         cea = CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course_key).first()
-        if cea and cea.valid_for_user(user):
-            return ACCESS_GRANTED
-        elif cea:
-            debug("Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
-                cea.user.id,
-                user.id,
-            ))
-            return ACCESS_DENIED
+        if cea:
+            # DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED flag is used to disable enrollment for user invited
+            # to a course if user is registering when the course enrollment is closed
+            if (
+                settings.FEATURES.get('DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED') and
+                not course_enrollment_open and
+                not user_has_staff_access
+            ):
+                return ACCESS_DENIED
+            elif cea.valid_for_user(user):
+                return ACCESS_GRANTED
+            else:
+                debug("Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
+                    cea.user.id,
+                    user.id,
+                ))
+                return ACCESS_DENIED
 
-    if _has_staff_access_to_descriptor(user, courselike, course_key):
+    if user_has_staff_access:
         return ACCESS_GRANTED
 
     # Access denied when the course requires an invitation
@@ -273,10 +284,7 @@ def _can_enroll_courselike(user, courselike):
         debug("Deny: invitation only")
         return ACCESS_DENIED
 
-    now = datetime.now(UTC)
-    enrollment_start = courselike.enrollment_start or datetime.min.replace(tzinfo=UTC)
-    enrollment_end = courselike.enrollment_end or datetime.max.replace(tzinfo=UTC)
-    if enrollment_start < now < enrollment_end:
+    if course_enrollment_open:
         debug("Allow: in enrollment period")
         return ACCESS_GRANTED
 
@@ -549,9 +557,9 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
     def can_load():
         """
         NOTE: This does not check that the student is enrolled in the course
-        that contains this module.  We may or may not want to allow non-enrolled
-        students to see modules.  If not, views should check the course, so we
-        don't have to hit the enrollments table on every module load.
+        that contains this block.  We may or may not want to allow non-enrolled
+        students to see blocks.  If not, views should check the course, so we
+        don't have to hit the enrollments table on every block load.
         """
         # If the user (or the role the user is currently masquerading as) does not have
         # access to this content, then deny access. The problem with calling _has_staff_access_to_descriptor
@@ -561,7 +569,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         if not group_access_response:
             return group_access_response
 
-        # If the user has staff access, they can load the module and checks below are not needed.
+        # If the user has staff access, they can load the block and checks below are not needed.
         staff_access_response = _has_staff_access_to_descriptor(user, descriptor, course_key)
         if staff_access_response:
             return staff_access_response
@@ -587,17 +595,6 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
     }
 
     return _dispatch(checkers, action, user, descriptor)
-
-
-def _has_access_xmodule(user, action, xmodule, course_key):
-    """
-    Check if user has access to this xmodule.
-
-    Valid actions:
-      - same as the valid actions for xmodule.descriptor
-    """
-    # Delegate to the descriptor
-    return has_access(user, action, xmodule.descriptor, course_key)
 
 
 def _has_access_location(user, action, location, course_key):

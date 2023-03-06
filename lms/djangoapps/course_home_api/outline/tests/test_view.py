@@ -33,8 +33,8 @@ from openedx.features.course_experience import (
     ENABLE_COURSE_GOALS
 )
 from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -244,8 +244,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             enable_proctored_exams=True,
             proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
         )
-        chapter = ItemFactory.create(parent=course, category='chapter', display_name='Test Section')
-        sequence = ItemFactory.create(
+        chapter = BlockFactory.create(parent=course, category='chapter', display_name='Test Section')
+        sequence = BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -280,14 +280,14 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     def test_assignment(self):
         course = CourseFactory.create()
         with self.store.bulk_operations(course.id):
-            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-            sequential = ItemFactory.create(display_name='Test', category='sequential', graded=True, has_score=True,
-                                            parent_location=chapter.location)
-            ItemFactory.create(category='problem', graded=True, has_score=True, parent_location=sequential.location)
-            ItemFactory.create(category='problem', graded=True, has_score=True, parent_location=sequential.location)
-            sequential2 = ItemFactory.create(display_name='Ungraded', category='sequential',
+            chapter = BlockFactory.create(category='chapter', parent_location=course.location)
+            sequential = BlockFactory.create(display_name='Test', category='sequential', graded=True, has_score=True,
                                              parent_location=chapter.location)
-            ItemFactory.create(category='problem', parent_location=sequential2.location)
+            BlockFactory.create(category='problem', graded=True, has_score=True, parent_location=sequential.location)
+            BlockFactory.create(category='problem', graded=True, has_score=True, parent_location=sequential.location)
+            sequential2 = BlockFactory.create(display_name='Ungraded', category='sequential',
+                                              parent_location=chapter.location)
+            BlockFactory.create(category='problem', parent_location=sequential2.location)
         update_outline_from_modulestore(course.id)
         url = reverse('course-home:outline-tab', args=[course.id])
 

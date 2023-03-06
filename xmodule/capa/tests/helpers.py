@@ -83,31 +83,31 @@ def test_capa_system(render_template=None):
     return the_system
 
 
-def mock_capa_module():
+def mock_capa_block():
     """
-    capa response types needs just two things from the capa_module: location and publish.
+    capa response types needs just two things from the capa_block: location and publish.
     """
     def mock_location_text(self):  # lint-amnesty, pylint: disable=unused-argument
         """
-        Mock implementation of __unicode__ or __str__ for the module's location.
+        Mock implementation of __unicode__ or __str__ for the block's location.
         """
         return 'i4x://Foo/bar/mock/abc'
 
-    capa_module = Mock()
+    capa_block = Mock()
     if six.PY2:
-        capa_module.location.__unicode__ = mock_location_text
+        capa_block.location.__unicode__ = mock_location_text
     else:
-        capa_module.location.__str__ = mock_location_text
+        capa_block.location.__str__ = mock_location_text
     # The following comes into existence by virtue of being called
-    # capa_module.runtime.publish
-    return capa_module
+    # capa_block.runtime.publish
+    return capa_block
 
 
 def new_loncapa_problem(xml, problem_id='1', capa_system=None, seed=723, use_capa_render_template=False):
     """Construct a `LoncapaProblem` suitable for unit tests."""
     render_template = capa_render_template if use_capa_render_template else None
     return LoncapaProblem(xml, id=problem_id, seed=seed, capa_system=capa_system or test_capa_system(render_template),
-                          capa_module=mock_capa_module())
+                          capa_block=mock_capa_block())
 
 
 def load_fixture(relpath):

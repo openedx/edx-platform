@@ -95,7 +95,7 @@ class CourseModeModelTest(TestCase):
 
         self.create_mode('verified', 'Verified Certificate', 10)
         modes = CourseMode.modes_for_course(self.course_key)
-        mode = Mode('verified', 'Verified Certificate', 10, '', 'usd', None, None, None, None)
+        mode = Mode('verified', 'Verified Certificate', 10, '', 'usd', None, None, None, None, None, None)
         assert [mode] == modes
 
         modes_dict = CourseMode.modes_for_course_dict(self.course_key)
@@ -106,8 +106,8 @@ class CourseModeModelTest(TestCase):
         """
         Finding the modes when there's multiple modes
         """
-        mode1 = Mode('honor', 'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
-        mode2 = Mode('verified', 'Verified Certificate', 10, '', 'usd', None, None, None, None)
+        mode1 = Mode('honor', 'Honor Code Certificate', 0, '', 'usd', None, None, None, None, None, None)
+        mode2 = Mode('verified', 'Verified Certificate', 10, '', 'usd', None, None, None, None, None, None)
         set_modes = [mode1, mode2]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices)
@@ -126,14 +126,14 @@ class CourseModeModelTest(TestCase):
         assert 0 == CourseMode.min_course_price_for_currency(self.course_key, 'usd')
 
         # with mode with other currency, should get 0
-        mode = Mode('audit', 'Audit', 30, '', 'eur', None, None, None, None)
+        mode = Mode('audit', 'Audit', 30, '', 'eur', None, None, None, None, None, None)
         self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices, mode.currency)
         assert 0 == CourseMode.min_course_price_for_currency(self.course_key, 'usd')
 
         # create some modes
-        mode1 = Mode('honor', 'Honor Code Certificate', 10, '', 'usd', None, None, None, None)
-        mode2 = Mode('verified', 'Verified Certificate', 20, '', 'usd', None, None, None, None)
-        mode3 = Mode('honor', 'Honor Code Certificate', 80, '', 'cny', None, None, None, None)
+        mode1 = Mode('honor', 'Honor Code Certificate', 10, '', 'usd', None, None, None, None, None, None)
+        mode2 = Mode('verified', 'Verified Certificate', 20, '', 'usd', None, None, None, None, None, None)
+        mode3 = Mode('honor', 'Honor Code Certificate', 80, '', 'cny', None, None, None, None, None, None)
         set_modes = [mode1, mode2, mode3]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices, mode.currency)
@@ -148,7 +148,7 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_key)
         assert [CourseMode.DEFAULT_MODE] == modes
 
-        mode1 = Mode('honor', 'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
+        mode1 = Mode('honor', 'Honor Code Certificate', 0, '', 'usd', None, None, None, None, None, None)
         self.create_mode(mode1.slug, mode1.name, mode1.min_price, mode1.suggested_prices)
         modes = CourseMode.modes_for_course(self.course_key)
         assert [mode1] == modes
@@ -163,6 +163,8 @@ class CourseModeModelTest(TestCase):
             '',
             'usd',
             expiration_datetime,
+            None,
+            None,
             None,
             None,
             None

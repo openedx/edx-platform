@@ -13,7 +13,7 @@ from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.discussion_block import DiscussionXBlock
 from openedx.core.types import User
-from xmodule.course_module import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, Group  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order

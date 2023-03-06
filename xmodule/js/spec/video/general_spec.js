@@ -210,26 +210,26 @@
                 function() {
                     var numAjaxCalls = 0;
 
-                // Total ajax calls made.
+                    // Total ajax calls made.
                     numAjaxCalls = $.ajax.calls.length;
 
-                // Subtract ajax calls to get captions via
-                // state.videoCaption.fetchCaption() function.
+                    // Subtract ajax calls to get captions via
+                    // state.videoCaption.fetchCaption() function.
                     numAjaxCalls -= $.ajaxWithPrefix.calls.length;
 
-                // Subtract ajax calls to get metadata for each video via
-                // state.getVideoMetadata() function.
+                    // Subtract ajax calls to get metadata for each video via
+                    // state.getVideoMetadata() function.
                     numAjaxCalls -= 3;
 
-                // Subtract ajax calls to log event 'pause_video' via
-                // state.videoPlayer.log() function.
+                    // Subtract ajax calls to log event 'pause_video' via
+                    // state.videoPlayer.log() function.
                     numAjaxCalls -= 3;
 
-                // This should leave just one call. It was made to check
-                // for YT availability. This is done in state.initialize()
-                // function. SPecifically, with the statement
-                //
-                //     this.youtubeXhr = this.getVideoMetadata();
+                    // This should leave just one call. It was made to check
+                    // for YT availability. This is done in state.initialize()
+                    // function. SPecifically, with the statement
+                    //
+                    //     this.youtubeXhr = this.getVideoMetadata();
                     expect(numAjaxCalls).toBe(1);
                 });
         });

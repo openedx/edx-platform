@@ -1,6 +1,6 @@
 """
-A ModuleStore that knows about a special version DRAFT. Modules
-marked as DRAFT are read in preference to modules without the DRAFT
+A ModuleStore that knows about a special version DRAFT. Blocks
+marked as DRAFT are read in preference to blocks without the DRAFT
 version by this ModuleStore (so, access to i4x://org/course/cat/name
 returns the i4x://org/course/cat/name@draft object if that exists,
 and otherwise returns i4x://org/course/cat/name).
@@ -55,8 +55,8 @@ class DraftModuleStore(MongoModuleStore):
     Reads are first read with revision DRAFT, and then fall back
     to the baseline revision only if DRAFT doesn't exist.
 
-    This module also includes functionality to promote DRAFT modules (and their children)
-    to published modules.
+    This module store also includes functionality to promote DRAFT blocks (and their children)
+    to published blocks.
     """
     def get_item(self, usage_key, depth=0, revision=None, using_descriptor_system=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
@@ -66,7 +66,7 @@ class DraftModuleStore(MongoModuleStore):
             usage_key: A :class:`.UsageKey` instance
 
             depth (int): An argument that some module stores may use to prefetch
-                descendants of the queried modules for more efficient results later
+                descendants of the queried blocks for more efficient results later
                 in the request. The depth is counted in the number of calls to
                 get_children() to cache.  None indicates to cache all descendants.
 
@@ -219,42 +219,42 @@ class DraftModuleStore(MongoModuleStore):
                     setattr(new_course, key, value)
                 self.update_item(new_course, user_id)
 
-            # Get all modules under this namespace which is (tag, org, course) tuple
-            modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)
-            self._clone_modules(modules, dest_course_id, user_id)
+            # Get all blocks under this namespace which is (tag, org, course) tuple
+            blocks = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)
+            self._clone_blocks(blocks, dest_course_id, user_id)
             course_location = dest_course_id.make_usage_key('course', dest_course_id.run)
             self.publish(course_location, user_id)
 
-            modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.draft_only)
-            self._clone_modules(modules, dest_course_id, user_id)
+            blocks = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.draft_only)
+            self._clone_blocks(blocks, dest_course_id, user_id)
 
             return True
 
-    def _clone_modules(self, modules, dest_course_id, user_id):
-        """Clones each module into the given course"""
-        for module in modules:
-            original_loc = module.location
-            module.location = module.location.map_into_course(dest_course_id)
-            if module.location.block_type == 'course':
-                module.location = module.location.replace(name=module.location.run)
+    def _clone_blocks(self, blocks, dest_course_id, user_id):
+        """Clones each block into the given course"""
+        for block in blocks:
+            original_loc = block.location
+            block.location = block.location.map_into_course(dest_course_id)
+            if block.location.block_type == 'course':
+                block.location = block.location.replace(name=block.location.run)
 
-            log.info("Cloning module %s to %s....", original_loc, module.location)
+            log.info("Cloning block %s to %s....", original_loc, block.location)
 
-            if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, str):  # lint-amnesty, pylint: disable=line-too-long
-                module.data = rewrite_nonportable_content_links(
-                    original_loc.course_key, dest_course_id, module.data
+            if 'data' in block.fields and block.fields['data'].is_set_on(block) and isinstance(block.data, str):  # lint-amnesty, pylint: disable=line-too-long
+                block.data = rewrite_nonportable_content_links(
+                    original_loc.course_key, dest_course_id, block.data
                 )
 
             # repoint children
-            if module.has_children:
+            if block.has_children:
                 new_children = []
-                for child_loc in module.children:
+                for child_loc in block.children:
                     child_loc = child_loc.map_into_course(dest_course_id)
                     new_children.append(child_loc)
 
-                module.children = new_children
+                block.children = new_children
 
-            self.update_item(module, user_id, allow_not_found=True)
+            self.update_item(block, user_id, allow_not_found=True)
 
     def _get_raw_parent_locations(self, location, key_revision):
         """
@@ -321,8 +321,8 @@ class DraftModuleStore(MongoModuleStore):
 
     def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
-        Create the new xmodule but don't save it. Returns the new module with a draft locator if
-        the category allows drafts. If the category does not allow drafts, just creates a published module.
+        Create the new xblock but don't save it. Returns the new block with a draft locator if
+        the category allows drafts. If the category does not allow drafts, just creates a published block.
 
         :param location: a Location--must have a category
         :param definition_data: can be empty. The initial definition_data for the kvs
@@ -596,16 +596,16 @@ class DraftModuleStore(MongoModuleStore):
                 child_loc = UsageKey.from_string(child_loc).map_into_course(course_key)
 
                 # single parent can have 2 versions: draft and published
-                # get draft parents only while deleting draft module
+                # get draft parents only while deleting draft block
                 if draft_only:
                     revision = MongoRevisionKey.draft
                 else:
                     revision = ModuleStoreEnum.RevisionOption.all
 
                 parents = self._get_raw_parent_locations(child_loc, revision)
-                # Don't delete modules if one of its parents shouldn't be deleted
+                # Don't delete blocks if one of its parents shouldn't be deleted
                 # This should only be an issue for courses have ended up in
-                # a state where modules have multiple parents
+                # a state where blocks have multiple parents
                 if all(parent.to_deprecated_son() in to_be_deleted for parent in parents):
                     for rev_func in as_functions:
                         current_loc = rev_func(child_loc)

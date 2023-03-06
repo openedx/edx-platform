@@ -10,7 +10,7 @@ from django.urls import reverse
 from pytz import UTC
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import StaffFactory
@@ -42,7 +42,7 @@ class GradingPolicyTestMixin:
         )
         cls.course_id = str(cls.course.id)
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
-            cls.sequential = ItemFactory.create(
+            cls.sequential = BlockFactory.create(
                 category="sequential",
                 parent_location=cls.course.location,
                 display_name="Lesson 1",
@@ -53,7 +53,7 @@ class GradingPolicyTestMixin:
             factory = MultipleChoiceResponseXMLFactory()
             args = {'choices': [False, True, False]}
             problem_xml = factory.build_xml(**args)
-            cls.problem = ItemFactory.create(
+            cls.problem = BlockFactory.create(
                 category="problem",
                 parent_location=cls.sequential.location,
                 display_name="Problem 1",
@@ -61,13 +61,13 @@ class GradingPolicyTestMixin:
                 data=problem_xml,
             )
 
-            cls.video = ItemFactory.create(
+            cls.video = BlockFactory.create(
                 category="video",
                 parent_location=cls.sequential.location,
                 display_name="Video 1",
             )
 
-            cls.html = ItemFactory.create(
+            cls.html = BlockFactory.create(
                 category="html",
                 parent_location=cls.sequential.location,
                 display_name="HTML 1",

@@ -47,7 +47,7 @@ from openedx.features.enterprise_support.utils import (
     update_third_party_auth_context_for_enterprise
 )
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_PASSWORD = 'test'
 
@@ -569,16 +569,16 @@ class TestCourseAccessed(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
         """
         course = CourseFactory.create()
         with cls.store.bulk_operations(course.id):
-            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-            chapter2 = ItemFactory.create(category='chapter', parent_location=course.location)
-            sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
-            sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
-            sequential3 = ItemFactory.create(category='sequential', parent_location=chapter2.location)
-            sequential4 = ItemFactory.create(category='sequential', parent_location=chapter2.location)
-            vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
-            vertical2 = ItemFactory.create(category='vertical', parent_location=sequential2.location)
-            vertical3 = ItemFactory.create(category='vertical', parent_location=sequential3.location)
-            vertical4 = ItemFactory.create(category='vertical', parent_location=sequential4.location)
+            chapter = BlockFactory.create(category='chapter', parent_location=course.location)
+            chapter2 = BlockFactory.create(category='chapter', parent_location=course.location)
+            sequential = BlockFactory.create(category='sequential', parent_location=chapter.location)
+            sequential2 = BlockFactory.create(category='sequential', parent_location=chapter.location)
+            sequential3 = BlockFactory.create(category='sequential', parent_location=chapter2.location)
+            sequential4 = BlockFactory.create(category='sequential', parent_location=chapter2.location)
+            vertical = BlockFactory.create(category='vertical', parent_location=sequential.location)
+            vertical2 = BlockFactory.create(category='vertical', parent_location=sequential2.location)
+            vertical3 = BlockFactory.create(category='vertical', parent_location=sequential3.location)
+            vertical4 = BlockFactory.create(category='vertical', parent_location=sequential4.location)
         course.children = [chapter, chapter2]
         chapter.children = [sequential, sequential2]
         chapter2.children = [sequential3, sequential4]

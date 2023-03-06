@@ -3,11 +3,9 @@
 Tests for user enrollment.
 """
 
-
 import datetime
 import itertools
 import json
-import unittest
 from unittest.mock import patch
 from urllib.parse import quote
 
@@ -39,6 +37,7 @@ from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.models import RetirementState, UserOrgTag, UserRetirementStatus
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
@@ -67,6 +66,7 @@ class EnrollmentTestMixin:
             max_mongo_calls=0,
             linked_enterprise_customer=None,
             cohort=None,
+            force_enrollment=False,
     ):
         """
         Enroll in the course and verify the response's status code. If the expected status is 200, also validates
@@ -84,6 +84,7 @@ class EnrollmentTestMixin:
                 'course_id': course_id
             },
             'user': username,
+            'force_enrollment': force_enrollment,
             'enrollment_attributes': enrollment_attributes
         }
 
@@ -153,7 +154,7 @@ class EnrollmentTestMixin:
 
 @override_settings(EDX_API_KEY="i am a key")
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, EnterpriseServiceMockMixin):
     """
     Test user enrollment, especially with different course modes.
@@ -227,6 +228,75 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         assert is_active
         assert course_mode == enrollment_mode
+
+    @ddt.data(
+        # Default (no course modes in the database)
+        # Expect that users are automatically enrolled as the default
+        ([CourseMode.VERIFIED], CourseMode.VERIFIED, False),
+
+        # Audit / Verified
+        # We should always go to the "choose your course" page.
+        # We should also be enrolled as the default.
+        ([CourseMode.VERIFIED], CourseMode.VERIFIED, True),
+    )
+    @ddt.unpack
+    def test_force_enrollment(self, course_modes, enrollment_mode, force_enrollment):
+        # Create the course modes (if any) required for this test case
+        start_date = datetime.datetime(2021, 12, 1, 5, 0, 0, tzinfo=pytz.UTC)
+        end_date = datetime.datetime(2022, 12, 1, 5, 0, 0, tzinfo=pytz.UTC)
+        self.course = CourseFactory.create(
+            emit_signals=True,
+            start=start_date,
+            end=end_date,
+            enrollment_start=start_date,
+            enrollment_end=end_date,
+        )
+        for mode_slug in course_modes:
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode_slug,
+                mode_display_name=mode_slug,
+            )
+
+        # If a user enroll himself in expired course
+        # whether force_enrollmet is True or False
+        self.assert_enrollment_status(
+            mode=CourseMode.VERIFIED,
+            expected_status=status.HTTP_403_FORBIDDEN,
+            force_enrollment=force_enrollment,
+        )
+
+        self.client.logout()
+        AdminFactory.create(username='global_staff', email='global_staff@example.com', password=self.PASSWORD)
+        self.client.login(username="global_staff", password=self.PASSWORD)
+
+        if force_enrollment:
+            # Create an enrollment
+            resp = self.assert_enrollment_status(
+                username=self.USERNAME,
+                mode=CourseMode.VERIFIED,
+                force_enrollment=force_enrollment,
+            )
+
+            # Verify that the response contains the correct course_name
+            data = json.loads(resp.content.decode('utf-8'))
+            assert self.course.display_name_with_default == data['course_details']['course_name']
+
+            # Verify that the enrollment was created correctly
+            assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+            course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+            assert is_active
+            assert course_mode == enrollment_mode
+        else:
+            # If a staff user enroll other user in expired course
+            # This will raise the CourseEnrollmentClosedError excecption
+            # and return status will be 400
+            self.assert_enrollment_status(
+                username=self.USERNAME,
+                mode=CourseMode.VERIFIED,
+                expected_status=status.HTTP_400_BAD_REQUEST,
+                force_enrollment=force_enrollment,
+            )
 
     def test_check_enrollment(self):
         CourseModeFactory.create(
@@ -1143,7 +1213,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         assert enrollment.attributes.get(namespace='order', name='order_number').value == order_number
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """Test that enrollment is blocked from embargoed countries. """
 
@@ -1275,7 +1345,7 @@ def cross_domain_config(func):
     )
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentCrossDomainTest(ModuleStoreTestCase):
     """Test cross-domain calls to the enrollment end-points. """
 
@@ -1334,7 +1404,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
     """
     Tests unenrollment functionality. The API being tested is intended to
@@ -1487,7 +1557,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class UserRoleTest(ModuleStoreTestCase):
     """
     Tests the API call to list user roles.
@@ -1595,7 +1665,7 @@ class UserRoleTest(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
     """
     Test the course enrollments list API.

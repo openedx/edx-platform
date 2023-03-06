@@ -6,6 +6,7 @@ Asynchronous tasks for the LTI provider app.
 import logging
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
 import lms.djangoapps.lti_provider.outcomes as outcomes
@@ -18,6 +19,7 @@ log = logging.getLogger(__name__)
 
 
 @CELERY_APP.task(name='lms.djangoapps.lti_provider.tasks.send_composite_outcome')
+@set_code_owner_attribute
 def send_composite_outcome(user_id, course_id, assignment_id, version):
     """
     Calculate and transmit the score for a composite module (such as a
@@ -55,7 +57,7 @@ def send_composite_outcome(user_id, course_id, assignment_id, version):
     user = User.objects.get(id=user_id)
     course = modulestore().get_course(course_key, depth=0)
     course_grade = CourseGradeFactory().read(user, course)
-    earned, possible = course_grade.score_for_module(mapped_usage_key)
+    earned, possible = course_grade.score_for_block(mapped_usage_key)
     if possible == 0:
         weighted_score = 0
     else:
@@ -67,6 +69,7 @@ def send_composite_outcome(user_id, course_id, assignment_id, version):
 
 
 @CELERY_APP.task
+@set_code_owner_attribute
 def send_leaf_outcome(assignment_id, points_earned, points_possible):
     """
     Calculate and transmit the score for a single problem. This method assumes

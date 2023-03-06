@@ -25,3 +25,17 @@ class UserTour(models.Model):
     )
     show_courseware_tour = models.BooleanField(default=True)
     user = models.OneToOneField(User, related_name='tour', on_delete=models.CASCADE)
+
+
+class UserDiscussionsTours(models.Model):
+    """
+    Model to track which discussions tours a user has seen.
+    """
+    tour_name = models.CharField(max_length=255)
+    show_tour = models.BooleanField(default=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'tour_name']),
+        ]

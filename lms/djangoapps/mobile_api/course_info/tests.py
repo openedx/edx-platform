@@ -16,7 +16,7 @@ from common.djangoapps.student.tests.factories import UserFactory  # pylint: dis
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
-from xmodule.html_module import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.html_block import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order

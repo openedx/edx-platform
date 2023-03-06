@@ -4,7 +4,7 @@ Tests for the edx_proctoring integration into Studio
 
 
 from datetime import datetime, timedelta
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import ddt
 from django.conf import settings
@@ -12,7 +12,7 @@ from edx_proctoring.api import get_all_exams_for_course, get_review_policy_by_ex
 from pytz import UTC
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from common.djangoapps.student.tests.factories import UserFactory
@@ -20,6 +20,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+@patch('cms.djangoapps.contentstore.signals.handlers.transaction.on_commit',
+       new=Mock(side_effect=lambda func: func()),)  # run right away
 class TestProctoredExams(ModuleStoreTestCase):
     """
     Tests for the publishing of proctored exams
@@ -85,8 +87,8 @@ class TestProctoredExams(ModuleStoreTestCase):
         default_time_limit_minutes = 10
         is_proctored_exam = True
 
-        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        sequence = ItemFactory.create(
+        chapter = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        sequence = BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -120,8 +122,8 @@ class TestProctoredExams(ModuleStoreTestCase):
         """
         default_time_limit_minutes = 10
 
-        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        sequence = ItemFactory.create(
+        chapter = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        sequence = BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -156,8 +158,8 @@ class TestProctoredExams(ModuleStoreTestCase):
         Make sure that if we publish and then unpublish a proctored exam,
         the exam record stays, but is marked as is_active=False
         """
-        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        sequence = ItemFactory.create(
+        chapter = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        sequence = BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -188,8 +190,8 @@ class TestProctoredExams(ModuleStoreTestCase):
         Make sure we filter out all dangling items
         """
 
-        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        ItemFactory.create(
+        chapter = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -223,8 +225,8 @@ class TestProctoredExams(ModuleStoreTestCase):
         """
         Make sure the feature flag is honored
         """
-        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        ItemFactory.create(
+        chapter = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -259,8 +261,8 @@ class TestProctoredExams(ModuleStoreTestCase):
             enable_timed_exams=enable_timed_exams
         )
 
-        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        ItemFactory.create(
+        chapter = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -288,8 +290,8 @@ class TestProctoredExams(ModuleStoreTestCase):
             enable_timed_exams=True,
             self_paced=True,
         )
-        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        ItemFactory.create(
+        chapter = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -317,8 +319,8 @@ class TestProctoredExams(ModuleStoreTestCase):
         assert exams[0]['due_date'] is not None
 
     def test_async_waffle_flag_publishes(self):
-        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        sequence = ItemFactory.create(
+        chapter = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        sequence = BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -338,8 +340,8 @@ class TestProctoredExams(ModuleStoreTestCase):
         self._verify_exam_data(sequence, True)
 
     def test_async_waffle_flag_task(self):
-        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        ItemFactory.create(
+        chapter = BlockFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name='Test Proctored Exam',

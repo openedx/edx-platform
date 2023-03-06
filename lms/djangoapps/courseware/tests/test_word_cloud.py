@@ -10,7 +10,7 @@ from .helpers import BaseTestXmodule
 
 
 class TestWordCloud(BaseTestXmodule):
-    """Integration test for word cloud xmodule."""
+    """Integration test for Word Cloud Block."""
     CATEGORY = "word_cloud"
 
     def _get_resource_url(self, item):

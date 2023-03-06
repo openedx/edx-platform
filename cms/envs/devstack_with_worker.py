@@ -18,8 +18,5 @@ from cms.envs.devstack import *
 
 # Require a separate celery worker
 CELERY_ALWAYS_EAGER = False
-
-# Disable transaction management because we are using a worker. Views
-# that request a task and wait for the result will deadlock otherwise.
-for database_name in DATABASES:
-    DATABASES[database_name]['ATOMIC_REQUESTS'] = False
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = True
+BROKER_URL = 'redis://:password@edx.devstack.redis:6379/'

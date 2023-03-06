@@ -1,5 +1,5 @@
 """
-Tests for sequence module.
+Tests for sequence block.
 """
 # pylint: disable=no-member
 
@@ -18,7 +18,7 @@ from web_fragments.fragment import Fragment
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from xmodule.seq_module import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceBlock
+from xmodule.seq_block import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceBlock
 from xmodule.tests import get_test_system
 from xmodule.tests.helpers import StubUserService
 from xmodule.tests.xml import XModuleXmlImportTest
@@ -34,7 +34,7 @@ COURSE_END_DATE = TODAY + timedelta(days=21)
 @ddt.ddt
 class SequenceBlockTestCase(XModuleXmlImportTest):
     """
-    Base class for tests of Sequence Module.
+    Base class for tests of Sequence Block.
     """
 
     def setUp(self):
@@ -88,7 +88,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def _set_up_block(self, parent, index_in_parent):
         """
-        Sets up the stub sequence module for testing.
+        Sets up the stub sequence block for testing.
         """
         block = parent.get_children()[index_in_parent]
 
@@ -141,9 +141,9 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     def test_student_view_init(self):
         module_system = get_test_system()
         module_system.position = 2
-        seq_module = SequenceBlock(runtime=module_system, scope_ids=Mock())
-        seq_module.bind_for_student(module_system, 34)
-        assert seq_module.position == 2
+        seq_block = SequenceBlock(runtime=module_system, scope_ids=Mock())
+        seq_block.bind_for_student(module_system, 34)
+        assert seq_block.position == 2
         # matches position set in the runtime
 
     @ddt.unpack
@@ -165,7 +165,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         assert 'fa fa-check-circle check-circle is-hidden' not in html
 
     # pylint: disable=line-too-long
-    @patch('xmodule.seq_module.SequenceBlock.gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems')
+    @patch('xmodule.seq_block.SequenceBlock.gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems')
     def test_timed_exam_gating_waffle_flag(self, mocked_function):  # pylint: disable=unused-argument
         """
         Verify the code inside the waffle flag is not executed with the flag off
@@ -209,7 +209,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         )
         assert 'i_am_gated' in view
         # check a few elements to ensure the correct page was loaded
-        assert 'seq_module.html' in view
+        assert 'seq_block.html' in view
         assert 'NextSequential' in view
         assert 'PrevSequential' in view
 
@@ -240,7 +240,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def test_hidden_content_before_due(self):
         html = self._get_rendered_view(self.sequence_4_1)
-        assert 'seq_module.html' in html
+        assert 'seq_block.html' in html
         assert "'banner_text': None" in html
 
     def test_hidden_content_past_due(self):
@@ -259,14 +259,14 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 self.sequence_4_1,
                 extra_context=dict(specific_masquerade=True),
             )
-            assert 'seq_module.html' in html
+            assert 'seq_block.html' in html
             html = self.get_context_dict_from_string(html)
             assert 'Because the due date has passed, this assignment is hidden from the learner.' == html['banner_text']
 
     def test_hidden_content_self_paced_past_due_before_end(self):
         with freeze_time(PAST_DUE_BEFORE_END_DATE):
             html = self._get_rendered_view(self.sequence_4_1, self_paced=True)
-            assert 'seq_module.html' in html
+            assert 'seq_block.html' in html
             assert "'banner_text': None" in html
 
     def test_hidden_content_self_paced_past_end(self):
@@ -284,7 +284,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         Assert sequence content is gated
         """
-        assert 'seq_module.html' in html
+        assert 'seq_block.html' in html
         html = self.get_context_dict_from_string(html)
         assert html['banner_text'] is None
         assert [] == html['items']
@@ -299,7 +299,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         Assert sequence is a prerequisite with unfulfilled gates
         """
-        assert 'seq_module.html' in html
+        assert 'seq_block.html' in html
         html = self.get_context_dict_from_string(html)
         assert 'This section is a prerequisite. You must complete this section in order to unlock additional content.' == html['banner_text']
         assert not html['gated_content']['gated']
@@ -313,7 +313,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         Assert sequence is not gated
         """
-        assert 'seq_module.html' in html
+        assert 'seq_block.html' in html
         assert "'banner_text': None" in html
         assert "'gated': False" in html
         assert str(sequence.location) in html
@@ -464,5 +464,5 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         Retrieve dictionary from string.
         """
         # Replace tuple and un-necessary info from inside string and get the dictionary.
-        cleaned_data = data.replace("(('seq_module.html',\n", '').replace("),\n {})", '').strip()
+        cleaned_data = data.replace("(('seq_block.html',\n", '').replace("),\n {})", '').strip()
         return ast.literal_eval(cleaned_data)

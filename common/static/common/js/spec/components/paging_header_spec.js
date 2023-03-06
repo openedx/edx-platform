@@ -17,8 +17,8 @@ define([
                         start: 0,
                         results: _.first(results, perPage)
                     },
-                        {parse: true}
-                    );
+                    {parse: true}
+                );
                 collection.start = 0;
                 collection.totalCount = results.length;
                 return collection;
@@ -37,7 +37,7 @@ define([
                 collection: newCollection(20, 5)
             }).render();
             expect(pagingHeader.$el.find('.search-count').text())
-                    .toContain('Showing 1-5 out of 20 total');
+                .toContain('Showing 1-5 out of 20 total');
         });
 
         it('reports that all items are on the current page', function() {
@@ -45,7 +45,7 @@ define([
                 collection: newCollection(5, 5)
             }).render();
             expect(pagingHeader.$el.find('.search-count').text())
-                    .toContain('Showing 1-5 out of 5 total');
+                .toContain('Showing 1-5 out of 5 total');
         });
 
         it('reports that the page contains a single item', function() {
@@ -53,13 +53,13 @@ define([
                 collection: newCollection(1, 1)
             }).render();
             expect(pagingHeader.$el.find('.search-count').text())
-                    .toContain('Showing 1 out of 1 total');
+                .toContain('Showing 1 out of 1 total');
         });
 
         it('optionally shows sorting controls', function() {
             pagingHeader = sortableHeader().render();
             expect(pagingHeader.$el.find('.listing-sort').text())
-                    .toMatch(/Sorted by\s+Display Name/);
+                .toMatch(/Sorted by\s+Display Name/);
         });
 
         it('does not show sorting controls if the `showSortControls` option is not passed', function() {

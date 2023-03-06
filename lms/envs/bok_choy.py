@@ -102,7 +102,6 @@ YOUTUBE_PORT = 9080
 YOUTUBE['TEST_TIMEOUT'] = 5000
 YOUTUBE['API'] = f"http://{YOUTUBE_HOSTNAME}:{YOUTUBE_PORT}/get_youtube_api/"
 YOUTUBE['METADATA_URL'] = f"http://{YOUTUBE_HOSTNAME}:{YOUTUBE_PORT}/test_youtube/"
-YOUTUBE['TEXT_API']['url'] = f"{YOUTUBE_HOSTNAME}:{YOUTUBE_PORT}/test_transcripts_youtube/"
 
 ############################# SECURITY SETTINGS ################################
 # Default to advanced security in common.py, so tests can reset here to use

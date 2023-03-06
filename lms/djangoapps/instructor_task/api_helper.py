@@ -128,9 +128,9 @@ def generate_already_running_error_message(task_type):
     return message
 
 
-def _get_xmodule_instance_args(request, task_id):
+def _get_xblock_instance_args(request, task_id):
     """
-    Calculate parameters needed for instantiating xmodule instances.
+    Calculate parameters needed for instantiating xblock instances.
 
     The `request_info` will be passed to a tracking log function, to provide information
     about the source of the task request.
@@ -143,10 +143,10 @@ def _get_xmodule_instance_args(request, task_id):
                     'host': request.META['SERVER_NAME'],
                     }
 
-    xmodule_instance_args = {'request_info': request_info,
-                             'task_id': task_id,
-                             }
-    return xmodule_instance_args
+    xblock_instance_args = {'request_info': request_info,
+                            'task_id': task_id,
+                            }
+    return xblock_instance_args
 
 
 def _supports_rescore(descriptor):
@@ -460,7 +460,7 @@ def submit_task(request, task_type, task_class, course_key, task_input, task_key
     # make sure all data has been committed before handing off task to celery.
 
     task_id = instructor_task.task_id
-    task_args = [instructor_task.id, _get_xmodule_instance_args(request, task_id)]
+    task_args = [instructor_task.id, _get_xblock_instance_args(request, task_id)]
     try:
         task_class.apply_async(task_args, task_id=task_id)
 
@@ -494,7 +494,7 @@ def schedule_task(request, task_type, course_key, task_input, task_key, schedule
         instructor_task = InstructorTask.create(course_key, task_type, task_key, task_input, request.user)
 
         task_id = instructor_task.task_id
-        task_args = _get_xmodule_instance_args(request, task_id)
+        task_args = _get_xblock_instance_args(request, task_id)
         log.info(f"Creating a task schedule associated with instructor task '{instructor_task.id}' and due after "
                  f"'{schedule}'")
         InstructorTaskSchedule.objects.create(

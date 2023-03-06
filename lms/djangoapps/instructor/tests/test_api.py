@@ -15,6 +15,7 @@ import ddt
 import pytest
 import pytz
 from boto.exception import BotoServerError
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
@@ -35,7 +36,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -360,14 +361,14 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(
+        cls.chapter = BlockFactory.create(
             parent=cls.course,
             category='chapter',
             display_name="Chapter",
             publish_item=True,
             start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
         )
-        cls.sequential = ItemFactory.create(
+        cls.sequential = BlockFactory.create(
             parent=cls.chapter,
             category='sequential',
             display_name="Lesson",
@@ -375,14 +376,14 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
             metadata={'graded': True, 'format': 'Homework'},
         )
-        cls.vertical = ItemFactory.create(
+        cls.vertical = BlockFactory.create(
             parent=cls.sequential,
             category='vertical',
             display_name='Subsection',
             publish_item=True,
             start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
         )
-        cls.problem = ItemFactory.create(
+        cls.problem = BlockFactory.create(
             category="problem",
             parent=cls.vertical,
             display_name="A Problem Block",
@@ -2742,7 +2743,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
     @patch('lms.djangoapps.instructor_task.models.logger.error')
     @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3', 'ROOT_PATH': 'tmp/edx-s3/grades'})
     @ddt.data('list_report_downloads', 'instructor_api_v1:list_report_downloads')
-    def test_list_report_downloads_error(self, endpoint, mock_error):
+    def test_list_report_downloads_error_boto(self, endpoint, mock_error):
         """
         Tests the Rate-Limit exceeded is handled and does not raise 500 error.
         """
@@ -2759,6 +2760,39 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             self.course.id,
             ex_status,
             ex_reason,
+        )
+
+        res_json = json.loads(response.content.decode('utf-8'))
+        assert res_json == {'downloads': []}
+
+    @patch('lms.djangoapps.instructor_task.models.logger.error')
+    @patch(
+        'lms.djangoapps.instructor_task.models.DJANGO_STORE_STORAGE_CLASS',
+        'storages.backends.s3boto3.S3Boto3Storage'
+    )
+    @patch.dict(settings.GRADES_DOWNLOAD, {'STORAGE_TYPE': 's3', 'ROOT_PATH': 'tmp/edx-s3/grades'})
+    @ddt.data('list_report_downloads', 'instructor_api_v1:list_report_downloads')
+    def test_list_report_downloads_error_boto3(self, endpoint, mock_error):
+        """
+        Tests the Rate-Limit exceeded is handled and does not raise 500 error.
+        """
+        error_response = {'Error': {'Code': 503, 'Message': 'error found'}}
+        operation_name = 'test'
+        url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
+        with patch(
+            'storages.backends.s3boto3.S3Boto3Storage.listdir',
+            side_effect=ClientError(error_response, operation_name)
+        ):
+            if endpoint in INSTRUCTOR_GET_ENDPOINTS:
+                response = self.client.get(url)
+            else:
+                response = self.client.post(url, {})
+
+        mock_error.assert_called_with(
+            'Fetching files failed for course: %s, status: %s, reason: %s',
+            self.course.id,
+            error_response.get('Error'),
+            error_response.get('Error').get('Message')
         )
 
         res_json = json.loads(response.content.decode('utf-8'))
@@ -3105,27 +3139,27 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         cls.course_with_invalid_ee = CourseFactory.create(entrance_exam_id='invalid_exam')
 
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
-            cls.entrance_exam = ItemFactory.create(
+            cls.entrance_exam = BlockFactory.create(
                 parent=cls.course,
                 category='chapter',
                 display_name='Entrance exam'
             )
-            subsection = ItemFactory.create(
+            subsection = BlockFactory.create(
                 parent=cls.entrance_exam,
                 category='sequential',
                 display_name='Subsection 1'
             )
-            vertical = ItemFactory.create(
+            vertical = BlockFactory.create(
                 parent=subsection,
                 category='vertical',
                 display_name='Vertical 1'
             )
-            cls.ee_problem_1 = ItemFactory.create(
+            cls.ee_problem_1 = BlockFactory.create(
                 parent=vertical,
                 category="problem",
                 display_name="Exam Problem - Problem 1"
             )
-            cls.ee_problem_2 = ItemFactory.create(
+            cls.ee_problem_2 = BlockFactory.create(
                 parent=vertical,
                 category="problem",
                 display_name="Exam Problem - Problem 2"
@@ -3938,15 +3972,15 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
 
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
-            cls.week1 = ItemFactory.create(due=cls.due)
-            cls.week2 = ItemFactory.create(due=cls.due)
-            cls.week3 = ItemFactory.create()  # No due date
+            cls.week1 = BlockFactory.create(due=cls.due)
+            cls.week2 = BlockFactory.create(due=cls.due)
+            cls.week3 = BlockFactory.create()  # No due date
             cls.course.children = [
                 str(cls.week1.location),
                 str(cls.week2.location),
                 str(cls.week3.location)
             ]
-            cls.homework = ItemFactory.create(
+            cls.homework = BlockFactory.create(
                 parent_location=cls.week1.location,
                 due=cls.due
             )
@@ -4120,15 +4154,15 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
 
         with self.store.bulk_operations(self.course.id, emit_signals=False):
-            self.week1 = ItemFactory.create(due=self.due)
-            self.week2 = ItemFactory.create(due=self.due)
-            self.week3 = ItemFactory.create()  # No due date
+            self.week1 = BlockFactory.create(due=self.due)
+            self.week2 = BlockFactory.create(due=self.due)
+            self.week3 = BlockFactory.create()  # No due date
             self.course.children = [
                 self.week1.location,
                 self.week2.location,
                 self.week3.location
             ]
-            self.homework = ItemFactory.create(
+            self.homework = BlockFactory.create(
                 parent_location=self.week1.location,
                 due=self.due
             )

@@ -24,7 +24,7 @@ class RoleClassTestCase(ModuleStoreTestCase):
         super().setUp()
 
         # For course ID, syntax edx/classname/classdate is important
-        # because xmodel.course_module.id_to_location looks for a string to split
+        # because xmodel.course_block.id_to_location looks for a string to split
 
         self.course_id = ToyCourseFactory.create().id
         self.student_role = models.Role.objects.get_or_create(name="Student",

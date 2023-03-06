@@ -292,7 +292,7 @@ var Channel = (function() {
             var m = JSON.parse(e.data);
             if (typeof m !== 'object' || m === null) throw 'malformed';
         } catch (e) {
-          // just ignore any posted messages that do not consist of valid JSON
+            // just ignore any posted messages that do not consist of valid JSON
             return;
         }
 
@@ -501,7 +501,7 @@ var Channel = (function() {
             var setTransactionTimeout = function(transId, timeout, method) {
                 return window.setTimeout(function() {
                     if (outTbl[transId]) {
-                  // XXX: what if client code raises an exception here?
+                        // XXX: what if client code raises an exception here?
                         var msg = 'timeout (' + timeout + "ms) exceeded on method '" + method + "'";
                         (1, outTbl[transId].error)('timeout_error', msg);
                         delete outTbl[transId];
@@ -738,10 +738,10 @@ var Channel = (function() {
                     if (callbackNames.length) msg.callbacks = callbackNames;
 
                     if (m.timeout)
-                      // XXX: This function returns a timeout ID, but we don't do anything with it.
-                      // We might want to keep track of it so we can cancel it using clearTimeout()
-                      // when the transaction completes.
-                        { setTransactionTimeout(s_curTranId, m.timeout, scopeMethod(m.method)); }
+                    // XXX: This function returns a timeout ID, but we don't do anything with it.
+                    // We might want to keep track of it so we can cancel it using clearTimeout()
+                    // when the transaction completes.
+                    { setTransactionTimeout(s_curTranId, m.timeout, scopeMethod(m.method)); }
 
                     // insert into the transaction table
                     outTbl[s_curTranId] = {callbacks: callbacks, error: m.error, success: m.success};

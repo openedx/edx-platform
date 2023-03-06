@@ -251,7 +251,9 @@ def _get_user_info_cookie_data(request, user):
 
     # Add 'resume course' last completed block
     try:
-        header_urls['resume_block'] = retrieve_last_sitewide_block_completed(user)
+        block_url = retrieve_last_sitewide_block_completed(user)
+        if block_url:
+            header_urls['resume_block'] = block_url
     except User.DoesNotExist:
         pass
     except Exception as err:  # pylint: disable=broad-except

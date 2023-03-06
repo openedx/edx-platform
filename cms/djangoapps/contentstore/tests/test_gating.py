@@ -10,7 +10,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from cms.djangoapps.contentstore.signals.handlers import handle_item_deleted
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestHandleItemDeleted(ModuleStoreTestCase, MilestonesTestCaseMixin):
@@ -28,17 +28,17 @@ class TestHandleItemDeleted(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.course = CourseFactory.create()
         self.course.enable_subsection_gating = True
         self.course.save()
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent=self.course,
             category="chapter",
             display_name="Chapter"
         )
-        self.open_seq = ItemFactory.create(
+        self.open_seq = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name="Open Sequential"
         )
-        self.gated_seq = ItemFactory.create(
+        self.gated_seq = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name="Gated Sequential"

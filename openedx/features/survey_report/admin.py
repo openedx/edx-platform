@@ -11,14 +11,16 @@ class SurveyReportAdmin(admin.ModelAdmin):
     """
     Admin to manage survey reports.
     """
+    change_list_template = "survey_report/change_list.html"
+
     readonly_fields = (
         'courses_offered', 'learners', 'registered_learners',
         'enrollments', 'generated_certificates', 'extra_data',
-        'created_at'
+        'created_at', 'state',
     )
 
     list_display = (
-        'id', 'summary', 'created_at'
+        'id', 'summary', 'created_at', 'state'
     )
 
     def summary(self, obj) -> str:

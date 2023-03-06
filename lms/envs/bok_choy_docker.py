@@ -25,4 +25,3 @@ LOGGING['loggers']['tracking']['handlers'] = ['console']
 BOK_CHOY_HOST = os.environ['BOK_CHOY_HOSTNAME']
 YOUTUBE['API'] = f"http://{BOK_CHOY_HOST}:{YOUTUBE_PORT}/get_youtube_api/"
 YOUTUBE['METADATA_URL'] = f"http://{BOK_CHOY_HOST}:{YOUTUBE_PORT}/test_youtube/"
-YOUTUBE['TEXT_API']['url'] = f"{BOK_CHOY_HOST}:{YOUTUBE_PORT}/test_transcripts_youtube/"

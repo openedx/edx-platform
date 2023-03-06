@@ -19,7 +19,7 @@ define([
     'text!templates/move-xblock-modal.underscore'
 ],
 function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, HtmlUtils, StringUtils, Feedback,
-         XBlockInfoModel, BaseModal, MoveXBlockListView, MoveXBlockBreadcrumbView, MoveXblockModalTemplate) {
+    XBlockInfoModel, BaseModal, MoveXBlockListView, MoveXBlockBreadcrumbView, MoveXblockModalTemplate) {
     'use strict';
 
     var MoveXblockModal = BaseModal.extend({

@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -48,10 +48,10 @@ class ProgressTabTestViews(BaseCourseHomeTests):
 
     def add_subsection_with_problem(self, **kwargs):
         """Makes a chapter -> problem chain, and sets up the subsection as requested, returning the problem"""
-        chapter = ItemFactory(parent=self.course, category='chapter')
-        subsection = ItemFactory(parent=chapter, category='sequential', graded=True, **kwargs)
-        vertical = ItemFactory(parent=subsection, category='vertical', graded=True)
-        problem = ItemFactory(parent=vertical, category='problem', graded=True)
+        chapter = BlockFactory(parent=self.course, category='chapter')
+        subsection = BlockFactory(parent=chapter, category='sequential', graded=True, **kwargs)
+        vertical = BlockFactory(parent=subsection, category='vertical', graded=True)
+        problem = BlockFactory(parent=vertical, category='problem', graded=True)
         return problem
 
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
@@ -121,7 +121,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
     def test_has_scheduled_content_data(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         future = now() + timedelta(days=30)
-        ItemFactory(parent=self.course, category='chapter', start=future)
+        BlockFactory(parent=self.course, category='chapter', start=future)
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.json()['has_scheduled_content']
@@ -167,15 +167,15 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.status_code == 404
 
     def test_learner_has_access(self):
-        chapter = ItemFactory(parent=self.course, category='chapter')
-        gated = ItemFactory(parent=chapter, category='sequential')
-        ItemFactory.create(parent=gated, category='problem', graded=True, has_score=True)
-        ungated = ItemFactory(parent=chapter, category='sequential')
-        ItemFactory.create(parent=ungated, category='problem', graded=True, has_score=True,
-                           group_access={
-                               CONTENT_GATING_PARTITION_ID: [CONTENT_TYPE_GATE_GROUP_IDS['full_access'],
-                                                             CONTENT_TYPE_GATE_GROUP_IDS['limited_access']],
-                           })
+        chapter = BlockFactory(parent=self.course, category='chapter')
+        gated = BlockFactory(parent=chapter, category='sequential')
+        BlockFactory.create(parent=gated, category='problem', graded=True, has_score=True)
+        ungated = BlockFactory(parent=chapter, category='sequential')
+        BlockFactory.create(parent=ungated, category='problem', graded=True, has_score=True,
+                            group_access={
+                                CONTENT_GATING_PARTITION_ID: [CONTENT_TYPE_GATE_GROUP_IDS['full_access'],
+                                                              CONTENT_TYPE_GATE_GROUP_IDS['limited_access']],
+                            })
 
         CourseEnrollment.enroll(self.user, self.course.id)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
@@ -193,8 +193,8 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert ungated_score['learner_has_access']
 
     def test_override_is_visible(self):
-        chapter = ItemFactory(parent=self.course, category='chapter')
-        subsection = ItemFactory.create(parent=chapter, category="sequential", display_name="Subsection")
+        chapter = BlockFactory(parent=self.course, category='chapter')
+        subsection = BlockFactory.create(parent=chapter, category="sequential", display_name="Subsection")
 
         CourseEnrollment.enroll(self.user, self.course.id)
         course_grade_params = {
@@ -266,9 +266,9 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.data['username'] == other_user.username
 
     def test_url_hidden_if_subsection_hide_after_due(self):
-        chapter = ItemFactory(parent=self.course, category='chapter')
+        chapter = BlockFactory(parent=self.course, category='chapter')
         yesterday = now() - timedelta(days=1)
-        ItemFactory(parent=chapter, category='sequential', hide_after_due=True, due=yesterday)
+        BlockFactory(parent=chapter, category='sequential', hide_after_due=True, due=yesterday)
 
         CourseEnrollment.enroll(self.user, self.course.id)
 

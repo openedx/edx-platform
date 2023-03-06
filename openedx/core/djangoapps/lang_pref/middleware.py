@@ -1,8 +1,7 @@
 """
 Middleware for Language Preferences
 """
-
-
+from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
@@ -11,6 +10,7 @@ from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_HEADER, LANGUAGE_KEY
 from openedx.core.djangoapps.lang_pref import helpers as lang_pref_helpers
+from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserAPIRequestError
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
@@ -28,6 +28,9 @@ class LanguagePreferenceMiddleware(MiddlewareMixin):
         """
         If a user's UserPreference contains a language preference, use the user's preference.
         Save the current language preference cookie as the user's preferred language.
+
+        If you specify the LANGUAGE_CODE in SiteConfiguration, it will have a higher priority than the user's language
+        preference.
         """
         cookie_lang = lang_pref_helpers.get_language_cookie(request)
         if cookie_lang:
@@ -53,6 +56,10 @@ class LanguagePreferenceMiddleware(MiddlewareMixin):
             # Allow the new cookie setting to update the language in the user's session
             if LANGUAGE_SESSION_KEY in request.session and request.session[LANGUAGE_SESSION_KEY] != cookie_lang:
                 del request.session[LANGUAGE_SESSION_KEY]
+
+        # Apply language specified in SiteConfiguration, ignoring user preferences.
+        if language := get_value('LANGUAGE_CODE'):
+            request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = language
 
     def process_response(self, request, response):  # lint-amnesty, pylint: disable=missing-function-docstring
         # If the user is logged in, check for their language preference. Also check for real user

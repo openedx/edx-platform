@@ -8,6 +8,7 @@ from django.core.mail import EmailMultiAlternatives
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 
+from common.djangoapps.util.keyword_substitution import substitute_keywords_with_data
 from lms.djangoapps.bulk_email.message_types import BulkEmail
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
@@ -69,6 +70,14 @@ class ACEEmail(CourseEmailMessage):
         """
         self.site = site
         self.user = User.objects.get(email=email_context['email'])
+        text_message = email_context['course_email'].text_message
+        html_message = email_context['course_email'].html_message
+        formatted_text_message = substitute_keywords_with_data(text_message, email_context)
+        formatted_html_message = substitute_keywords_with_data(html_message, email_context)
+        email_context.update({
+            'formatted_text_message': formatted_text_message,
+            'formatted_html_message': formatted_html_message,
+        })
         message = BulkEmail(context=email_context).personalize(
             recipient=Recipient(email_context['user_id'], email_context['email']),
             language=email_context['course_language'],

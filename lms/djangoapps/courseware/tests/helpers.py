@@ -32,7 +32,7 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from common.djangoapps.util.date_utils import strftime_localized_html
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tests import get_test_descriptor_system, get_test_system  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -83,7 +83,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
             'category': self.CATEGORY
         })
 
-        self.item_descriptor = ItemFactory.create(**kwargs)
+        self.item_descriptor = BlockFactory.create(**kwargs)
 
         self.runtime = self.new_descriptor_runtime()
 
@@ -105,11 +105,11 @@ class BaseTestXmodule(ModuleStoreTestCase):
         modulestore().request_cache = None
         modulestore().metadata_inheritance_cache_subsystem = None
 
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent_location=self.course.location,
             category="sequential",
         )
-        self.section = ItemFactory.create(
+        self.section = BlockFactory.create(
             parent_location=chapter.location,
             category="sequential"
         )

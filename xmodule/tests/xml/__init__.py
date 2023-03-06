@@ -11,7 +11,7 @@ from lxml import etree
 from opaque_keys.edx.keys import CourseKey
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
-from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.x_module import XMLParsingSystem, policy_key
 

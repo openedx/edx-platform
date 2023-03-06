@@ -115,7 +115,7 @@ def get_user_enrollments(course_key):
     ).order_by('created')
 
 
-def create_course_enrollment(username, course_id, mode, is_active, enterprise_uuid=None):
+def create_course_enrollment(username, course_id, mode, is_active, enterprise_uuid=None, force_enrollment=False):
     """Create a new course enrollment for the given user.
 
     Creates a new course enrollment for the specified user username.
@@ -126,6 +126,7 @@ def create_course_enrollment(username, course_id, mode, is_active, enterprise_uu
         mode (str): (Optional) The mode for the new enrollment.
         is_active (boolean): (Optional) Determines if the enrollment is active.
         enterprise_uuid (str): Add course enterprise uuid
+        force_enrollment (bool): Enroll user even if course enrollment_end date is expired
 
     Returns:
         A serializable dictionary representing the new course enrollment.
@@ -147,7 +148,9 @@ def create_course_enrollment(username, course_id, mode, is_active, enterprise_uu
         raise UserNotFoundError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
     try:
-        enrollment = CourseEnrollment.enroll(user, course_key, check_access=True, enterprise_uuid=enterprise_uuid)
+        enrollment = CourseEnrollment.enroll(
+            user, course_key, check_access=True, can_upgrade=force_enrollment, enterprise_uuid=enterprise_uuid
+        )
         return _update_enrollment(enrollment, is_active=is_active, mode=mode)
     except NonExistentCourseError as err:
         raise CourseNotFoundError(str(err))  # lint-amnesty, pylint: disable=raise-missing-from

@@ -14,7 +14,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.signals import _listen_for_course_publish
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -97,15 +97,15 @@ class CourseModeSignalTest(ModuleStoreTestCase):
         AUDIT_ID = settings.COURSE_ENROLLMENT_MODES['audit']['id']
         VERIFIED_ID = settings.COURSE_ENROLLMENT_MODES['verified']['id']
         MASTERS_ID = settings.COURSE_ENROLLMENT_MODES['masters']['id']
-        verified_section = ItemFactory.create(
+        verified_section = BlockFactory.create(
             category="sequential",
             metadata={'group_access': {ENROLLMENT_TRACK_PARTITION_ID: [VERIFIED_ID]}}
         )
         # and a section with no restriction
-        section2 = ItemFactory.create(
+        section2 = BlockFactory.create(
             category="sequential",
         )
-        section3 = ItemFactory.create(
+        section3 = BlockFactory.create(
             category='sequential',
             metadata={'group_access': {ENROLLMENT_TRACK_PARTITION_ID: [AUDIT_ID]}}
         )

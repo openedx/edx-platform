@@ -8,7 +8,7 @@ from edx_django_utils.cache import RequestCache
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
-    ItemFactory
+    BlockFactory
 )
 
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
@@ -86,7 +86,7 @@ class CoursePublishHandlerTestCase(ModuleStoreTestCase):
         # create discussion block
         RequestCache().clear()
         discussion_id = 'discussion1'
-        discussion_block = ItemFactory.create(
+        discussion_block = BlockFactory.create(
             parent_location=course.location,
             category="discussion",
             discussion_id=discussion_id,

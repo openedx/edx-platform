@@ -16,7 +16,7 @@ import cms.djangoapps.contentstore.views.component as views
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .utils import StudioPageTestCase
 
@@ -31,25 +31,25 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
 
     def setUp(self):
         super().setUp()
-        self.vertical = self._create_item(self.sequential.location, 'vertical', 'Unit')
-        self.html = self._create_item(self.vertical.location, "html", "HTML")
-        self.child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
-        self.child_vertical = self._create_item(self.child_container.location, 'vertical', 'Child Vertical')
-        self.video = self._create_item(self.child_vertical.location, "video", "My Video")
+        self.vertical = self._create_block(self.sequential.location, 'vertical', 'Unit')
+        self.html = self._create_block(self.vertical.location, "html", "HTML")
+        self.child_container = self._create_block(self.vertical.location, 'split_test', 'Split Test')
+        self.child_vertical = self._create_block(self.child_container.location, 'vertical', 'Child Vertical')
+        self.video = self._create_block(self.child_vertical.location, "video", "My Video")
         self.store = modulestore()
 
         past = datetime.datetime(1970, 1, 1, tzinfo=UTC)
         future = datetime.datetime.now(UTC) + datetime.timedelta(days=1)
-        self.released_private_vertical = self._create_item(
+        self.released_private_vertical = self._create_block(
             parent_location=self.sequential.location, category='vertical', display_name='Released Private Unit',
             start=past)
-        self.unreleased_private_vertical = self._create_item(
+        self.unreleased_private_vertical = self._create_block(
             parent_location=self.sequential.location, category='vertical', display_name='Unreleased Private Unit',
             start=future)
-        self.released_public_vertical = self._create_item(
+        self.released_public_vertical = self._create_block(
             parent_location=self.sequential.location, category='vertical', display_name='Released Public Unit',
             start=past)
-        self.unreleased_public_vertical = self._create_item(
+        self.unreleased_public_vertical = self._create_block(
             parent_location=self.sequential.location, category='vertical', display_name='Unreleased Public Unit',
             start=future)
         self.store.publish(self.unreleased_public_vertical.location, self.user.id)
@@ -81,8 +81,8 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         Create the scenario of an xblock with children (non-vertical) on the container page.
         This should create a container page that is a child of another container page.
         """
-        draft_container = self._create_item(self.child_container.location, "wrapper", "Wrapper")
-        self._create_item(draft_container.location, "html", "Child HTML")
+        draft_container = self._create_block(self.child_container.location, "wrapper", "Wrapper")
+        self._create_block(draft_container.location, "html", "Child HTML")
 
         def test_container_html(xblock):
             self._test_html_content(
@@ -177,11 +177,11 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         self.validate_preview_html(self.child_container, self.container_view)
         self.validate_preview_html(self.child_vertical, self.reorderable_child_view)
 
-    def _create_item(self, parent_location, category, display_name, **kwargs):
+    def _create_block(self, parent_location, category, display_name, **kwargs):
         """
-        creates an item in the module store, without publishing it.
+        creates a block in the module store, without publishing it.
         """
-        return ItemFactory.create(
+        return BlockFactory.create(
             parent_location=parent_location,
             category=category,
             display_name=display_name,
@@ -194,7 +194,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         Verify that a public container rendered as a child of the container page returns the expected HTML.
         """
-        empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
+        empty_child_container = self._create_block(self.vertical.location, 'split_test', 'Split Test')
         published_empty_child_container = self.store.publish(empty_child_container.location, self.user.id)
         self.validate_preview_html(published_empty_child_container, self.reorderable_child_view, can_add=False)
 
@@ -202,7 +202,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         Verify that a draft container rendered as a child of the container page returns the expected HTML.
         """
-        empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
+        empty_child_container = self._create_block(self.vertical.location, 'split_test', 'Split Test')
         self.validate_preview_html(empty_child_container, self.reorderable_child_view, can_add=False)
 
     @patch(

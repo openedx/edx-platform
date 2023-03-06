@@ -11,7 +11,7 @@ from django.core.management import call_command
 from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 import openedx.core.djangoapps.content.block_structure.config as block_structure_config
 from openedx.core.djangoapps.content.block_structure.signals import update_block_structure_on_course_publish
@@ -34,7 +34,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         r"""
-        Creates two courses; one that's just a course module, and one that
+        Creates two courses; one that's just a course block, and one that
         looks like:
                         course
                            |
@@ -60,13 +60,13 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
         """
         super().setUpClass()
         cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(parent=cls.course, category='chapter')
-        cls.sequential = ItemFactory.create(parent=cls.chapter, category='sequential')
-        cls.vertical = ItemFactory.create(parent=cls.sequential, category='vertical', display_name='subject')
-        cls.html = ItemFactory.create(parent=cls.vertical, category='html')
-        cls.problem = ItemFactory.create(parent=cls.vertical, category='problem')
-        cls.video = ItemFactory.create(parent=cls.vertical, category='video', display_name='subject')
-        cls.video2 = ItemFactory.create(parent=cls.vertical, category='video')
+        cls.chapter = BlockFactory.create(parent=cls.course, category='chapter')
+        cls.sequential = BlockFactory.create(parent=cls.chapter, category='sequential')
+        cls.vertical = BlockFactory.create(parent=cls.sequential, category='vertical', display_name='subject')
+        cls.html = BlockFactory.create(parent=cls.vertical, category='html')
+        cls.problem = BlockFactory.create(parent=cls.vertical, category='problem')
+        cls.video = BlockFactory.create(parent=cls.vertical, category='video', display_name='subject')
+        cls.video2 = BlockFactory.create(parent=cls.vertical, category='video')
 
         cls.course2 = CourseFactory.create()
 

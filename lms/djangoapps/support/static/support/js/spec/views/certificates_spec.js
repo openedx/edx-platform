@@ -71,7 +71,7 @@ define([
                 }
                 view.triggerSearch();
 
-            // Simulate a response from the server
+                // Simulate a response from the server
                 AjaxHelpers.expectJsonRequest(requests, 'GET', url);
                 AjaxHelpers.respondWithJson(requests, response);
             },

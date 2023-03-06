@@ -17,7 +17,7 @@ from common.djangoapps.student import views as student_views
 from common.djangoapps.util import views as util_views
 from lms.djangoapps.branding import views as branding_views
 from lms.djangoapps.courseware.masquerade import MasqueradeView
-from lms.djangoapps.courseware.module_render import (
+from lms.djangoapps.courseware.block_render import (
     handle_xblock_callback,
     handle_xblock_callback_noauth,
     xblock_view,
@@ -54,6 +54,7 @@ from openedx.features.enterprise_support.api import enterprise_enabled
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
 RENDER_VIDEO_XBLOCK_NAME = 'render_public_video_xblock'
+RENDER_VIDEO_XBLOCK_EMBED_NAME = 'render_public_video_xblock_embed'
 COURSE_PROGRESS_NAME = 'progress'
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -198,6 +199,12 @@ urlpatterns = [
     # Learner Home
     path('api/learner_home/', include('lms.djangoapps.learner_home.urls', namespace='learner_home')),
 
+    # Learner Recommendations
+    path(
+        'api/learner_recommendations/',
+        include('lms.djangoapps.learner_recommendations.urls', namespace='learner_recommendations')
+    ),
+
     path(
         'api/experiments/',
         include(
@@ -324,6 +331,12 @@ urlpatterns += [
         courseware_views.render_public_video_xblock,
         name=RENDER_VIDEO_XBLOCK_NAME,
     ),
+    re_path(
+        fr'^videos/{settings.USAGE_KEY_PATTERN}/embed$',
+        courseware_views.render_public_video_xblock_embed,
+        name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
+    ),
+
 
     # xblock Resource URL
     re_path(
@@ -658,6 +671,12 @@ urlpatterns += [
     path(
         'u/',
         include('openedx.features.learner_profile.urls'),
+    ),
+
+    # Survey Report
+    re_path(
+        fr'^survey_report/',
+        include('openedx.features.survey_report.urls'),
     ),
 ]
 

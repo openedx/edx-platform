@@ -2,8 +2,6 @@
 Tests for the course modes Django admin interface.
 """
 
-
-import unittest
 from datetime import datetime, timedelta
 
 import ddt
@@ -20,6 +18,7 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 # Once the course admin tool is deployed, we can remove this dependency.
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import get_time_display
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -29,7 +28,7 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 # We can only test this in the LMS because the course modes admin relies
 # on verify student, which is not an installed app in Studio, so the verification
 # deadline table will not be created.
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class AdminCourseModePageTest(ModuleStoreTestCase):
     """
     Test the course modes Django admin interface.
@@ -78,7 +77,7 @@ class AdminCourseModePageTest(ModuleStoreTestCase):
         assert course_mode.expiration_datetime.replace(tzinfo=None) == expiration.replace(tzinfo=None)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @ddt.ddt
 class AdminCourseModeFormTest(ModuleStoreTestCase):
     """

@@ -10,12 +10,12 @@
         'text!templates/student_account/form_success.underscore',
         'text!templates/student_account/form_status.underscore'
     ], function(
-            $, _, gettext,
-            HtmlUtils,
-            StringUtils,
-            FormView,
-            formSuccessTpl,
-            formStatusTpl
+        $, _, gettext,
+        HtmlUtils,
+        StringUtils,
+        FormView,
+        formSuccessTpl,
+        formStatusTpl
     ) {
         return FormView.extend({
             el: '#login-form',
@@ -218,7 +218,7 @@
                     msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.'); // eslint-disable-line max-len
                 } else if (error.responseJSON !== undefined && error.responseJSON.error_code === 'inactive-user') {
                     msg = HtmlUtils.interpolateHtml(
-                    gettext('In order to sign in, you need to activate your account.{line_break}{line_break}' +
+                        gettext('In order to sign in, you need to activate your account.{line_break}{line_break}' +
                             'We just sent an activation link to {strong_start} {email} {strong_end}. If ' +
                             ' you do not receive an email, check your spam folders or ' +
                             ' {anchorStart}contact {platform_name} Support{anchorEnd}.'),

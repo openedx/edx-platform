@@ -14,13 +14,11 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockAside
 
 from xmodule.contentstore.django import contentstore
-from xmodule.lti_module import LTIBlock
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase, upload_file_to_course,
+    TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, upload_file_to_course,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from cms.djangoapps.contentstore.toggles import INDIVIDUALIZE_ANONYMOUS_USER_ID
@@ -39,14 +37,17 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
     Note that there are other existing test cases in test_contentstore that indirectly execute
     get_preview_fragment via the xblock RESTful API.
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
     def test_preview_fragment(self):
         """
         Test for calling get_preview_html. Ensures data-usage-id is correctly set and
         asides are correctly included.
         """
-        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
-        html = ItemFactory.create(
+        course = CourseFactory.create()
+        html = BlockFactory.create(
             parent_location=course.location,
             category="html",
             data={'data': "<html>foobar</html>"}
@@ -93,8 +94,8 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         Test for calling get_preview_html. Ensures data-usage-id is correctly set and
         asides are correctly excluded because they are not enabled.
         """
-        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
-        html = ItemFactory.create(
+        course = CourseFactory.create()
+        html = BlockFactory.create(
             parent_location=course.location,
             category="html",
             data={'data': "<html>foobar</html>"}
@@ -118,8 +119,8 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         self.assertNotRegex(html, r"data-block-type=[\"\']test_aside[\"\']")
         self.assertNotRegex(html, "Aside rendered")
 
-    @mock.patch('xmodule.conditional_module.ConditionalBlock.is_condition_satisfied')
-    def test_preview_conditional_module_children_context(self, mock_is_condition_satisfied):
+    @mock.patch('xmodule.conditional_block.ConditionalBlock.is_condition_satisfied')
+    def test_preview_conditional_block_children_context(self, mock_is_condition_satisfied):
         """
         Tests that when empty context is pass to children of ConditionalBlock it will not raise KeyError.
         """
@@ -127,52 +128,49 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         client = Client()
         client.login(username=self.user.username, password=self.user_password)
 
-        with self.store.default_store(ModuleStoreEnum.Type.split):
-            course = CourseFactory.create()
+        course = CourseFactory.create()
 
-            conditional_block = ItemFactory.create(
-                parent_location=course.location,
-                category="conditional"
-            )
+        conditional_block = BlockFactory.create(
+            parent_location=course.location,
+            category="conditional"
+        )
 
-            # child conditional_block
-            ItemFactory.create(
-                parent_location=conditional_block.location,
-                category="conditional"
-            )
+        # child conditional_block
+        BlockFactory.create(
+            parent_location=conditional_block.location,
+            category="conditional"
+        )
 
-            url = reverse_usage_url(
-                'preview_handler',
-                conditional_block.location,
-                kwargs={'handler': 'xmodule_handler/conditional_get'}
-            )
-            response = client.post(url)
-            self.assertEqual(response.status_code, 200)
+        url = reverse_usage_url(
+            'preview_handler',
+            conditional_block.location,
+            kwargs={'handler': 'xmodule_handler/conditional_get'}
+        )
+        response = client.post(url)
+        self.assertEqual(response.status_code, 200)
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
-    def test_block_branch_not_changed_by_preview_handler(self, default_store):
+    def test_block_branch_not_changed_by_preview_handler(self):
         """
         Tests preview_handler should not update blocks being previewed
         """
         client = Client()
         client.login(username=self.user.username, password=self.user_password)
 
-        with self.store.default_store(default_store):
-            course = CourseFactory.create()
+        course = CourseFactory.create()
 
-            block = ItemFactory.create(
-                parent_location=course.location,
-                category="problem"
-            )
+        block = BlockFactory.create(
+            parent_location=course.location,
+            category="problem"
+        )
 
-            url = reverse_usage_url(
-                'preview_handler',
-                block.location,
-                kwargs={'handler': 'xmodule_handler/problem_check'}
-            )
-            response = client.post(url)
-            self.assertEqual(response.status_code, 200)
-            self.assertFalse(modulestore().has_changes(modulestore().get_item(block.location)))
+        url = reverse_usage_url(
+            'preview_handler',
+            block.location,
+            kwargs={'handler': 'xmodule_handler/problem_check'}
+        )
+        response = client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(modulestore().has_changes(modulestore().get_item(block.location)))
 
 
 @XBlock.needs("field-data")
@@ -215,7 +213,7 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         """
         Tests that the 'user' and 'i18n' services are provided by the Studio runtime.
         """
-        descriptor = ItemFactory(category="pure", parent=self.course)
+        descriptor = BlockFactory(category="pure", parent=self.course)
         runtime = _preview_module_system(
             self.request,
             descriptor,
@@ -229,8 +227,8 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
     """
     Tests that the deprecated attributes in the Module System (XBlock Runtime) return the expected values.
     """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
-    COURSE_ID = 'edX/CmsModuleShimTest/2021_Fall'
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    COURSE_ID = 'course-v1:edX+LmsModuleShimTest+2021_Fall'
     PYTHON_LIB_FILENAME = 'test_python_lib.zip'
     PYTHON_LIB_SOURCE_FILE = './common/test/data/uploads/python_lib.zip'
 
@@ -239,31 +237,31 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         Set up the user, course and other fields that will be used to instantiate the runtime.
         """
         super().setUp()
-        org, number, run = self.COURSE_ID.split('/')
-        self.course = CourseFactory.create(org=org, number=number, run=run)
+        course = CourseFactory.create(org='edX', number='LmsModuleShimTest', run='2021_Fall')
         self.user = UserFactory()
         self.request = RequestFactory().get('/dummy-url')
         self.request.user = self.user
         self.request.session = {}
-        self.descriptor = ItemFactory(category="video", parent=self.course)
+        self.descriptor = BlockFactory(category="video", parent=course)
         self.field_data = mock.Mock()
         self.contentstore = contentstore()
         self.runtime = _preview_module_system(
             self.request,
-            descriptor=ItemFactory(category="problem", parent=self.course),
+            descriptor=BlockFactory(category="problem", parent=course),
             field_data=mock.Mock(),
         )
+        self.course = self.store.get_item(course.location)
 
     def test_get_user_role(self):
         assert self.runtime.get_user_role() == 'staff'
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     def test_render_template(self):
-        descriptor = ItemFactory(category="pure", parent=self.course)
+        descriptor = BlockFactory(category="pure", parent=self.course)
         html = get_preview_fragment(self.request, descriptor, {'element_id': 142}).content
         assert '<div id="142" ns="main">Testing the MakoService</div>' in html
 
-    @override_settings(COURSES_WITH_UNSAFE_CODE=[COURSE_ID])
+    @override_settings(COURSES_WITH_UNSAFE_CODE=[r'course-v1:edX\+LmsModuleShimTest\+2021_Fall'])
     def test_can_execute_unsafe_code(self):
         assert self.runtime.can_execute_unsafe_code()
 
@@ -307,7 +305,7 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         # Create the runtime with the flag turned on.
         runtime = _preview_module_system(
             self.request,
-            descriptor=ItemFactory(category="problem", parent=self.course),
+            descriptor=BlockFactory(category="problem", parent=self.course),
             field_data=mock.Mock(),
         )
         assert runtime.anonymous_student_id == '26262401c528d7c4a6bbeabe0455ec46'
@@ -318,7 +316,7 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         # Create the runtime with the flag turned on.
         runtime = _preview_module_system(
             self.request,
-            descriptor=ItemFactory(category="lti", parent=self.course, spec=LTIBlock),
+            descriptor=BlockFactory(category="lti", parent=self.course),
             field_data=mock.Mock(),
         )
-        assert runtime.anonymous_student_id == 'cf99fd26f9a41d4d9b4069739cc2be7b'
+        assert runtime.anonymous_student_id == 'ad503f629b55c531fed2e45aa17a3368'

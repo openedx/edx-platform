@@ -15,7 +15,7 @@ from lms.djangoapps.instructor_task.api import submit_rescore_problem_for_studen
 from openedx.core.djangolib.testing.utils import get_mock_request
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ... import events
 
@@ -34,19 +34,19 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         """
         with cls.store.default_store(ModuleStoreEnum.Type.split):
             cls.course = CourseFactory.create()
-            cls.chapter = ItemFactory.create(
+            cls.chapter = BlockFactory.create(
                 parent=cls.course,
                 category="chapter",
                 display_name="Test Chapter"
             )
-            cls.sequence = ItemFactory.create(
+            cls.sequence = BlockFactory.create(
                 parent=cls.chapter,
                 category='sequential',
                 display_name="Test Sequential 1",
                 graded=True,
                 format="Homework"
             )
-            cls.vertical = ItemFactory.create(
+            cls.vertical = BlockFactory.create(
                 parent=cls.sequence,
                 category='vertical',
                 display_name='Test Vertical 1'
@@ -56,7 +56,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 choices=[False, False, True, False],
                 choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
             )
-            cls.problem = ItemFactory.create(
+            cls.problem = BlockFactory.create(
                 parent=cls.vertical,
                 category="problem",
                 display_name="p1",

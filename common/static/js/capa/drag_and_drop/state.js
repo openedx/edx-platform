@@ -60,34 +60,34 @@
         function documentMouseMove(state, event) {
             if (state.currentMovingDraggable !== null) {
                 state.currentMovingDraggable.iconEl.css(
-                'left',
-                event.pageX -
+                    'left',
+                    event.pageX -
                     state.baseImageEl.offset().left -
                     state.currentMovingDraggable.iconWidth * 0.5
                     - state.currentMovingDraggable.iconElLeftOffset
-            );
+                );
                 state.currentMovingDraggable.iconEl.css(
-                'top',
-                event.pageY -
+                    'top',
+                    event.pageY -
                     state.baseImageEl.offset().top -
                     state.currentMovingDraggable.iconHeight * 0.5
-            );
+                );
 
                 if (state.currentMovingDraggable.labelEl !== null) {
                     state.currentMovingDraggable.labelEl.css(
-                    'left',
-                    event.pageX -
+                        'left',
+                        event.pageX -
                         state.baseImageEl.offset().left -
                         state.currentMovingDraggable.labelWidth * 0.5
                         - 9 // Account for padding, border.
-                );
+                    );
                     state.currentMovingDraggable.labelEl.css(
-                    'top',
-                    event.pageY -
+                        'top',
+                        event.pageY -
                         state.baseImageEl.offset().top +
                         state.currentMovingDraggable.iconHeight * 0.5 +
                         5
-                );
+                    );
                 }
             }
         }
