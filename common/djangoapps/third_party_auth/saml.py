@@ -90,15 +90,15 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         try:
             return super().get_user_id(details, response)
-        except KeyError as ex:
+        except (KeyError, IndexError) as ex:
             log.warning(
                 '[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
                 'Provider: {idp_name}, Message: {message}'.format(
-                    message=ex.message,  # lint-amnesty, pylint: disable=no-member
+                    message=str(ex),
                     idp_name=response.get('idp_name')
                 )
             )
-            raise IncorrectConfigurationException(self)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise IncorrectConfigurationException(self) from ex
 
     def generate_metadata_xml(self, idp_name=None):  # pylint: disable=arguments-differ
         """
