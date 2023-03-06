@@ -10627,8 +10627,10 @@ msgid "Count"
 msgstr "დათვლა"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "შეიყვანეთ კომპონენტების რაოდენობა, რომ ყოველმა სტუდენტმა ნახოს."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"

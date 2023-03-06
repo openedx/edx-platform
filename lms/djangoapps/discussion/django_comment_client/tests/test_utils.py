@@ -132,6 +132,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     Base testcase class for courseware context for the
     comment client service integration
     """
+
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
@@ -169,7 +170,8 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         def assertThreadCorrect(thread, discussion, expected_title):  # pylint: disable=invalid-name
             """Asserts that the given thread has the expected set of properties"""
             assert set(thread.keys()) == {'commentable_id', 'courseware_url', 'courseware_title'}
-            assert thread.get('courseware_url') == reverse('jump_to', kwargs={'course_id': str(self.course.id), 'location': str(discussion.location)})
+            assert thread.get('courseware_url') == reverse('jump_to', kwargs={'course_id': str(self.course.id),
+                                                                              'location': str(discussion.location)})
             assert thread.get('courseware_title') == expected_title
 
         assertThreadCorrect(threads[0], self.discussion1, "Chapter / Discussion 1")
@@ -342,6 +344,7 @@ class CategoryMapTestMixin:
     Provides functionality for classes that test
     `get_discussion_category_map`.
     """
+
     def assert_category_map_equals(self, expected, requesting_user=None):
         """
         Call `get_discussion_category_map`, and verify that it returns
@@ -357,6 +360,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
     Base testcase class for discussion categories for the
     comment client service integration
     """
+
     def setUp(self):
         super().setUp()
 
@@ -385,11 +389,13 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             **kwargs
         )
 
-    def assert_category_map_equals(self, expected, divided_only_if_explicit=False, exclude_unstarted=True):  # pylint: disable=arguments-differ
+    def assert_category_map_equals(self, expected, divided_only_if_explicit=False,
+                                   exclude_unstarted=True):  # pylint: disable=arguments-differ
         """
         Asserts the expected map with the map returned by get_discussion_category_map method.
         """
-        assert utils.get_discussion_category_map(self.course, self.instructor, divided_only_if_explicit, exclude_unstarted) == expected
+        assert utils.get_discussion_category_map(self.course, self.instructor, divided_only_if_explicit,
+                                                 exclude_unstarted) == expected
 
     def test_empty(self):
         self.assert_category_map_equals({"entries": {}, "subcategories": {}, "children": []})
@@ -976,6 +982,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
     Tests `get_discussion_category_map` on discussion xblocks which are
     only visible to some content groups.
     """
+
     def test_staff_user(self):
         """
         Verify that the staff user can access the alpha, beta, and
@@ -1198,7 +1205,8 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
             return topic_name_to_id(course, name)
 
         # no topics
-        assert not utils.is_commentable_divided(course.id, to_id('General')), "Course doesn't even have a 'General' topic"
+        assert not utils.is_commentable_divided(course.id,
+                                                to_id('General')), "Course doesn't even have a 'General' topic"
 
         # not cohorted
         config_course_cohorts(course, is_cohorted=False)
@@ -1221,7 +1229,8 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
 
         assert cohorts.is_course_cohorted(course.id)
         assert not utils.is_commentable_divided(course.id, to_id('General')), "Course is cohorted, but 'General' isn't."
-        assert utils.is_commentable_divided(course.id, to_id('Feedback')), 'Feedback was listed as cohorted.  Should be.'
+        assert utils.is_commentable_divided(course.id,
+                                            to_id('Feedback')), 'Feedback was listed as cohorted.  Should be.'
 
     def test_is_commentable_divided_inline_discussion(self):
         course = modulestore().get_course(self.toy_course_key)
@@ -1240,7 +1249,8 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
             divided_discussions=["Feedback", "random_inline"]
         )
 
-        assert not utils.is_commentable_divided(course.id, to_id('random')), 'By default, Non-top-level discussions are not cohorted in a cohorted courses.'
+        assert not utils.is_commentable_divided(course.id, to_id(
+            'random')), 'By default, Non-top-level discussions are not cohorted in a cohorted courses.'
 
         # if always_divide_inline_discussions is set to False, non-top-level discussion are always
         # not divided unless they are explicitly set in divided_discussions
@@ -1255,9 +1265,12 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
             always_divide_inline_discussions=False
         )
 
-        assert not utils.is_commentable_divided(course.id, to_id('random')), 'Non-top-level discussion is not cohorted if always_divide_inline_discussions is False.'
-        assert utils.is_commentable_divided(course.id, to_id('random_inline')), 'If always_divide_inline_discussions set to False, Non-top-level discussion is cohorted if explicitly set in cohorted_discussions.'
-        assert utils.is_commentable_divided(course.id, to_id('Feedback')), 'If always_divide_inline_discussions set to False, top-level discussion are not affected.'
+        assert not utils.is_commentable_divided(course.id, to_id(
+            'random')), 'Non-top-level discussion is not cohorted if always_divide_inline_discussions is False.'
+        assert utils.is_commentable_divided(course.id, to_id(
+            'random_inline')), 'If always_divide_inline_discussions set to False, Non-top-level discussion is cohorted if explicitly set in cohorted_discussions.'
+        assert utils.is_commentable_divided(course.id, to_id(
+            'Feedback')), 'If always_divide_inline_discussions set to False, top-level discussion are not affected.'
 
     def test_is_commentable_divided_team(self):
         course = modulestore().get_course(self.toy_course_key)
@@ -1430,7 +1443,8 @@ class GroupNameTestCase(ModuleStoreTestCase):
             self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
         )
         course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
-        assert {self.test_cohort_1.id: self.test_cohort_1.name, self.test_cohort_2.id: self.test_cohort_2.name} == get_group_names_by_id(course_discussion_settings)
+        assert {self.test_cohort_1.id: self.test_cohort_1.name,
+                self.test_cohort_2.id: self.test_cohort_2.name} == get_group_names_by_id(course_discussion_settings)
         assert self.test_cohort_2.name == utils.get_group_name(self.test_cohort_2.id, course_discussion_settings)
         # Test also with a group_id that doesn't exist.
         assert utils.get_group_name((- 1000), course_discussion_settings) is None
@@ -1462,10 +1476,14 @@ class PermissionsTestCase(ModuleStoreTestCase):
             'lms.djangoapps.discussion.django_comment_client.utils.check_permissions_by_view'
         ) as check_perm:
             check_perm.return_value = True
-            assert utils.get_ability(None, content, user) == {'editable': True, 'can_reply': True, 'can_delete': True, 'can_openclose': True, 'can_vote': False, 'can_report': False}
+            assert utils.get_ability(None, content, user) == {'editable': True, 'can_reply': True, 'can_delete': True,
+                                                              'can_openclose': True, 'can_vote': False,
+                                                              'can_report': False}
 
             content['user_id'] = '2'
-            assert utils.get_ability(None, content, user) == {'editable': True, 'can_reply': True, 'can_delete': True, 'can_openclose': True, 'can_vote': True, 'can_report': True}
+            assert utils.get_ability(None, content, user) == {'editable': True, 'can_reply': True, 'can_delete': True,
+                                                              'can_openclose': True, 'can_vote': True,
+                                                              'can_report': True}
 
     def test_get_ability_with_global_staff(self):
         """
@@ -1480,7 +1498,9 @@ class PermissionsTestCase(ModuleStoreTestCase):
             # check_permissions_by_view returns false because user is not enrolled in the course.
             check_perm.return_value = False
             global_staff = UserFactory(username='global_staff', email='global_staff@edx.org', is_staff=True)
-            assert utils.get_ability(None, content, global_staff) == {'editable': False, 'can_reply': False, 'can_delete': False, 'can_openclose': False, 'can_vote': False, 'can_report': True}
+            assert utils.get_ability(None, content, global_staff) == {'editable': False, 'can_reply': False,
+                                                                      'can_delete': False, 'can_openclose': False,
+                                                                      'can_vote': False, 'can_report': True}
 
     def test_is_content_authored_by(self):
         content = {}
@@ -1573,11 +1593,26 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         Group moderator should not have moderator permissions if the discussions are not divided.
         """
         content = {'user_id': self.plain_user.id, 'type': 'thread', 'username': self.plain_user.username}
-        assert utils.get_ability(self.course.id, content, self.group_moderator) == {'editable': False, 'can_reply': True, 'can_delete': False, 'can_openclose': False, 'can_vote': True, 'can_report': True}
+        assert utils.get_ability(self.course.id, content, self.group_moderator) == {'editable': False,
+                                                                                    'can_reply': True,
+                                                                                    'can_delete': False,
+                                                                                    'can_openclose': False,
+                                                                                    'can_vote': True,
+                                                                                    'can_report': True}
         content = {'user_id': self.cohorted_user.id, 'type': 'thread'}
-        assert utils.get_ability(self.course.id, content, self.group_moderator) == {'editable': False, 'can_reply': True, 'can_delete': False, 'can_openclose': False, 'can_vote': True, 'can_report': True}
+        assert utils.get_ability(self.course.id, content, self.group_moderator) == {'editable': False,
+                                                                                    'can_reply': True,
+                                                                                    'can_delete': False,
+                                                                                    'can_openclose': False,
+                                                                                    'can_vote': True,
+                                                                                    'can_report': True}
         content = {'user_id': self.verified_user.id, 'type': 'thread'}
-        assert utils.get_ability(self.course.id, content, self.group_moderator) == {'editable': False, 'can_reply': True, 'can_delete': False, 'can_openclose': False, 'can_vote': True, 'can_report': True}
+        assert utils.get_ability(self.course.id, content, self.group_moderator) == {'editable': False,
+                                                                                    'can_reply': True,
+                                                                                    'can_delete': False,
+                                                                                    'can_openclose': False,
+                                                                                    'can_vote': True,
+                                                                                    'can_report': True}
 
     @mock.patch(
         'lms.djangoapps.discussion.django_comment_client.permissions._check_condition',
@@ -1590,7 +1625,11 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         set_discussion_division_settings(self.course.id, enable_cohorts=True,
                                          division_scheme=CourseDiscussionSettings.COHORT)
         content = {'user_id': self.cohorted_user.id, 'type': 'thread', 'username': self.cohorted_user.username}
-        assert utils.get_ability(self.course.id, content, self.group_moderator) == {'editable': True, 'can_reply': True, 'can_delete': True, 'can_openclose': True, 'can_vote': True, 'can_report': True}
+        assert utils.get_ability(self.course.id, content, self.group_moderator) == {'editable': True, 'can_reply': True,
+                                                                                    'can_delete': True,
+                                                                                    'can_openclose': True,
+                                                                                    'can_vote': True,
+                                                                                    'can_report': True}
 
     @mock.patch(
         'lms.djangoapps.discussion.django_comment_client.permissions._check_condition',
@@ -1603,7 +1642,12 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         content = {'user_id': self.plain_user.id, 'type': 'thread', 'username': self.plain_user.username}
         set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.NONE)
 
-        assert utils.get_ability(self.course.id, content, self.group_moderator) == {'editable': False, 'can_reply': True, 'can_delete': False, 'can_openclose': False, 'can_vote': True, 'can_report': True}
+        assert utils.get_ability(self.course.id, content, self.group_moderator) == {'editable': False,
+                                                                                    'can_reply': True,
+                                                                                    'can_delete': False,
+                                                                                    'can_openclose': False,
+                                                                                    'can_vote': True,
+                                                                                    'can_report': True}
 
 
 class ClientConfigurationTestCase(TestCase):
@@ -1636,8 +1680,8 @@ class ClientConfigurationTestCase(TestCase):
 
 
 def set_discussion_division_settings(
-        course_key, enable_cohorts=False, always_divide_inline_discussions=False,
-        divided_discussions=[], division_scheme=CourseDiscussionSettings.COHORT
+    course_key, enable_cohorts=False, always_divide_inline_discussions=False,
+    divided_discussions=[], division_scheme=CourseDiscussionSettings.COHORT
 ):
     """
     Convenience method for setting cohort enablement and discussion settings.
@@ -1730,3 +1774,42 @@ class SanitizeTests(unittest.TestCase):
     def test_input_output(self, input_str, expected_output):
         """Test a range of inputs for cleanup."""
         assert utils.sanitize_body(input_str) == expected_output
+
+
+class TestConvertHtmlToMarkdown(unittest.TestCase):
+    """
+    Tests for the convert_html_to_markdown function.
+    """
+    def test_convert_a_to_markdown(self):
+        """
+        Tests that the convert_a_to_markdown function converts HTML anchor tags to Markdown.
+        """
+        input_text = '<a href="https://example.com">Example</a>'
+        expected_output = '[Example](https://example.com)'
+        self.assertEqual(utils.convert_a_to_markdown(input_text), expected_output)
+
+    def test_convert_img_to_markdown(self):
+        """
+        Tests that the convert_img_to_markdown function converts HTML image tags to Markdown.
+        """
+        input_text = '<img src="https://example.com/Full-form-of-URL-1-1024x824.jpg" width="1024" height="824" />'
+        expected_output = '![](https://example.com/Full-form-of-URL-1-1024x824.jpg "")'
+        self.assertEqual(utils.convert_img_to_markdown(input_text), expected_output)
+
+    def test_convert_p_to_markdown(self):
+        """
+        Tests that the convert_p_to_markdown function converts HTML paragraph tags to Markdown.
+        """
+        input_text = '<p>Paragraph text</p>'
+        expected_output = '\n\nParagraph text\n\n'
+        self.assertEqual(utils.convert_p_to_markdown(input_text), expected_output)
+
+    def test_convert_html_to_markdown(self):
+        """
+        Tests that the convert_html_to_markdown function converts HTML to Markdown.
+        """
+        input_text = '<a href="https://example.com">Example</a><p>Paragraph text</p> ' \
+                     '<img src="https://example.com/Full-form-of-URL-1-1024x824.jpg" width="1024" height="824" />'
+        # pylint: disable=line-too-long
+        expected_output = '[Example](https://example.com)\n\nParagraph text\n\n ![](https://example.com/Full-form-of-URL-1-1024x824.jpg "")'
+        self.assertEqual(utils.convert_html_to_markdown(input_text), expected_output)

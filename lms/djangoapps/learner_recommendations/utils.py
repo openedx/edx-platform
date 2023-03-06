@@ -192,7 +192,7 @@ def get_amplitude_course_recommendations(user_id, recommendation_id):
     return True, False, []
 
 
-def is_user_enrolled_in_masters_program(user):
+def is_user_enrolled_in_ut_austin_masters_program(user):
     """
     Checks if a user is enrolled in any masters program
 
@@ -200,7 +200,7 @@ def is_user_enrolled_in_masters_program(user):
         user: The user object
 
     Returns:
-        True if the user is enrolled in any masters program otherwise False
+        True if the user is enrolled in UT Austin masters program otherwise False
     """
     program_enrollments = fetch_program_enrollments_by_student(
         user=user,
@@ -210,7 +210,9 @@ def is_user_enrolled_in_masters_program(user):
     enrolled_programs = get_programs(uuids=uuids) or []
     for enrolled_program in enrolled_programs:
         if enrolled_program.get("type", None) == "Masters":
-            return True
+            authoring_organizations = enrolled_program.get("authoring_organizations", [])
+            if any(org.get("key", None) == "UTAustinX" for org in authoring_organizations):
+                return True
     return False
 
 
