@@ -24,16 +24,16 @@ class SurveyReportAdmin(admin.ModelAdmin):
         'id', 'summary', 'created_at', 'state'
     )
 
+    actions = ['send_report']
+
     @admin.action(description='Send report to external API')
     def send_report(self, request, queryset):
         """
         Add custom actions to send the reports to the external API.
         """
-        selected = queryset.values_list('id', flat=True)
-        for report_id in selected:
+        selected_reports = queryset.values_list('id', flat=True)
+        for report_id in selected_reports:
             send_report_to_external_api(report_id=report_id)
-
-    actions = [send_report]
 
     def summary(self, obj) -> str:
         """
