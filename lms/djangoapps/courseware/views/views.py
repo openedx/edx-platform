@@ -1703,6 +1703,15 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
         })
         course_about_page_url = reverse('about_course', kwargs={'course_id': str(course_key)})
 
+        utm_params = {}
+        for param, value in request.GET.items():
+            if param.startswith("utm_"):
+                utm_params[param] = value
+        if utm_params:
+            utm_params = urlencode(utm_params)
+            enroll_url += '&' + utm_params
+            course_about_page_url += '?' + utm_params
+
         context = {
             'fragment': fragment,
             'course': course,
