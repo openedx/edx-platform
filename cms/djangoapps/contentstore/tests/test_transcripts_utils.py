@@ -1,8 +1,8 @@
 """ Tests for transcripts_utils. """
 
-
 import copy
 import json
+import re
 import tempfile
 import textwrap
 import unittest
@@ -15,7 +15,7 @@ from django.conf import settings
 from django.test.utils import override_settings
 from django.utils import translation
 
-from cms.djangoapps.contentstore.tests.utils import mock_requests_get
+from cms.djangoapps.contentstore.tests.utils import setup_caption_responses
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -222,7 +222,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
 
     def test_success_downloading_subs(self):
 
-        response = textwrap.dedent("""<?xml version="1.0" encoding="utf-8" ?>
+        caption_response_string = textwrap.dedent("""<?xml version="1.0" encoding="utf-8" ?>
                 <transcript>
                     <text start="0" dur="0.27"></text>
                     <text start="0.27" dur="2.45">Test text 1.</text>
@@ -233,12 +233,16 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         good_youtube_sub = 'good_id_2'
         self.clear_sub_content(good_youtube_sub)
 
+        language_code = 'en'
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
-            mock_get.return_value = Mock(status_code=200, text=response, content=response.encode('utf-8'))
-            # Check transcripts_utils.GetTranscriptsFromYouTubeException not thrown
+            setup_caption_responses(mock_get, language_code, caption_response_string)
             transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
 
-        mock_get.assert_any_call('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_id_2'})
+            self.assertEqual(2, len(mock_get.mock_calls))
+            args, kwargs = mock_get.call_args_list[0]
+            self.assertEqual(args[0], 'https://www.youtube.com/watch?v=good_id_2')
+            args, kwargs = mock_get.call_args_list[1]
+            self.assertTrue(re.match(r"^https://www\.youtube\.com/api/timedtext.*", args[0]))
 
     def test_subs_for_html5_vid_with_periods(self):
         """
@@ -256,7 +260,8 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
     @patch('xmodule.video_module.transcripts_utils.requests.get')
     def test_fail_downloading_subs(self, mock_get):
 
-        mock_get.return_value = Mock(status_code=404, text='Error 404')
+        track_status_code = 404
+        setup_caption_responses(mock_get, 'en', 'Error 404', track_status_code)
 
         bad_youtube_sub = 'BAD_YOUTUBE_ID2'
         self.clear_sub_content(bad_youtube_sub)
@@ -286,71 +291,6 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
             self.assertTrue(contentstore().find(content_location))
 
         self.clear_sub_content(good_youtube_sub)
-
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
-    def test_get_transcript_name_youtube_server_success(self, mock_get):
-        """
-        Get transcript name from transcript_list fetch from youtube server api
-        depends on language code, default language in YOUTUBE Text Api is "en"
-        """
-        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
-        youtube_text_api['params']['v'] = 'dummy_video_id'
-        response_success = """
-        <transcript_list>
-            <track id="1" name="Custom" lang_code="en" />
-            <track id="0" name="Custom1" lang_code="en-GB"/>
-        </transcript_list>
-        """
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
-
-        transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
-        self.assertEqual(transcript_name, 'Custom')
-
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
-    def test_get_transcript_name_youtube_server_no_transcripts(self, mock_get):
-        """
-        When there are no transcripts of video transcript name will be None
-        """
-        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
-        youtube_text_api['params']['v'] = 'dummy_video_id'
-        response_success = "<transcript_list></transcript_list>"
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
-
-        transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
-        self.assertIsNone(transcript_name)
-
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
-    def test_get_transcript_name_youtube_server_language_not_exist(self, mock_get):
-        """
-        When the language does not exist in transcript_list transcript name will be None
-        """
-        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
-        youtube_text_api['params']['v'] = 'dummy_video_id'
-        youtube_text_api['params']['lang'] = 'abc'
-        response_success = """
-        <transcript_list>
-            <track id="1" name="Custom" lang_code="en" />
-            <track id="0" name="Custom1" lang_code="en-GB"/>
-        </transcript_list>
-        """
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
-
-        transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
-        self.assertIsNone(transcript_name)
-
-    @patch('xmodule.video_module.transcripts_utils.requests.get', side_effect=mock_requests_get)
-    def test_downloading_subs_using_transcript_name(self, mock_get):
-        """
-        Download transcript using transcript name in url
-        """
-        good_youtube_sub = 'good_id_2'
-        self.clear_sub_content(good_youtube_sub)
-
-        transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
-        mock_get.assert_any_call(
-            'http://video.google.com/timedtext',
-            params={'lang': 'en', 'v': 'good_id_2', 'name': 'Custom'}
-        )
 
 
 class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):  # lint-amnesty, pylint: disable=test-inherits-tests
@@ -520,20 +460,21 @@ class TestYoutubeTranscripts(unittest.TestCase):
     """
     @patch('xmodule.video_module.transcripts_utils.requests.get')
     def test_youtube_bad_status_code(self, mock_get):
-        mock_get.return_value = Mock(status_code=404, text='test')
+        track_status_code = 404
+        setup_caption_responses(mock_get, 'en', 'test', track_status_code)
         youtube_id = 'bad_youtube_id'
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
             transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
 
     @patch('xmodule.video_module.transcripts_utils.requests.get')
     def test_youtube_empty_text(self, mock_get):
-        mock_get.return_value = Mock(status_code=200, text='')
+        setup_caption_responses(mock_get, 'en', '')
         youtube_id = 'bad_youtube_id'
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
             transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
 
     def test_youtube_good_result(self):
-        response = textwrap.dedent("""<?xml version="1.0" encoding="utf-8" ?>
+        caption_response_string = textwrap.dedent("""<?xml version="1.0" encoding="utf-8" ?>
                 <transcript>
                     <text start="0" dur="0.27"></text>
                     <text start="0.27" dur="2.45">Test text 1.</text>
@@ -547,11 +488,17 @@ class TestYoutubeTranscripts(unittest.TestCase):
             'text': ['Test text 1.', 'Test text 2.', 'Test text 3.']
         }
         youtube_id = 'good_youtube_id'
+        language_code = 'en'
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
-            mock_get.return_value = Mock(status_code=200, text=response, content=response.encode('utf-8'))
+            setup_caption_responses(mock_get, language_code, caption_response_string)
             transcripts = transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
+
         self.assertEqual(transcripts, expected_transcripts)
-        mock_get.assert_called_with('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_youtube_id'})
+        self.assertEqual(2, len(mock_get.mock_calls))
+        args, kwargs = mock_get.call_args_list[0]
+        self.assertEqual(args[0], f'https://www.youtube.com/watch?v={youtube_id}')
+        args, kwargs = mock_get.call_args_list[1]
+        self.assertTrue(re.match(r"^https://www\.youtube\.com/api/timedtext.*", args[0]))
 
 
 class TestTranscript(unittest.TestCase):
