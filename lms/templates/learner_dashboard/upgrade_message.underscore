@@ -7,6 +7,6 @@
     <a href="<%- upgrade_url %>" class="btn-brand btn cta-primary upgrade-button single-course-run program_dashboard_course_upsell_button">
         <%- gettext('Upgrade with Subscription') %>
     <a>
-    <span class="price"><%- gettext('Pay $39/mos after 7-day free trial') %></span>
+    <div class="price"><%- gettext('Pay $39/mos after 7-day free trial') %></div>
 </div>
 <% } %>
