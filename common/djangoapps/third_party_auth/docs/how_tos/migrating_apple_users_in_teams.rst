@@ -2,7 +2,7 @@ Migrating Apple users while switching teams on Apple
 -----------------------------------------------
 
 This document explains how to migrate apple signed-in users in the event of
-switching teams on the Apple Developer console. When a user uses Apple to sign,
+switching teams on the Apple Developer console. When a user uses Apple to sign in,
 edx receives an `id_token from apple containing user information`_, including
 user's unique identifier with key `sub`. This unique identifier is unique to
 Apple team this user belongs to. Upon switching teams on Apple, developers need
@@ -23,7 +23,7 @@ migration process.
 
    ii. These transfer identifiers are available in the login information for 60 days after team transfer.
 
-   ii. The method get_user_id() in third_party_auth.appleid.AppleIdAuth enables existing users to sign in by matching the transfer_sub sent in the login information with stored records in third_party_auth.models.AppleMigrationUserIdInfo.
+   ii. The method get_user_id() in third_party_auth.appleid.AppleIdAuth enables existing users to sign in by matching the transfer_sub sent in the login information with stored records of old Apple unique identifiers in third_party_auth.models.AppleMigrationUserIdInfo.
 
 3. Update Apple Backend credentials in third_party_auth.models.OAuth2ProviderConfig for the Apple backend.
 
@@ -35,14 +35,9 @@ migration process.
 
    i. Run management command update_new_apple_ids_in_social_auth.
 
-5. Apple user migration is complete!
+6. Apple user migration is complete!
 
 
 .. _id_token from apple containing user information: https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/authenticating_users_with_sign_in_with_apple
 .. _Create transfer_identifiers for all apple users: https://developer.apple.com/documentation/sign_in_with_apple/transferring_your_apps_and_users_to_another_team
 .. _Apple continues to send the transfer identifier: https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/authenticating_users_with_sign_in_with_apple
-.. _OAuth2 standard: https://tools.ietf.org/html/rfc6749
-.. _Google's OAuth2 Playground: https://developers.google.com/oauthplayground
-.. _Authorization Code grant type: https://tools.ietf.org/html/rfc6749#section-4.1
-.. _Restricted Application: https://github.com/openedx/edx-platform/blob/dd136b457bc8a25892445fc4362ce02838179472/openedx/core/djangoapps/oauth_dispatch/models.py#L12
-.. _localtunnel: https://localtunnel.github.io/www/
