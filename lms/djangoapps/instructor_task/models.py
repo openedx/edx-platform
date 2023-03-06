@@ -332,14 +332,6 @@ class DjangoStorageReportStore(ReportStore):
             # Django's FileSystemStorage fails with an OSError if the course
             # dir does not exist; other storage types return an empty list.
             return []
-        except BotoServerError as ex:
-            logger.error(
-                'Fetching files failed for course: %s, status: %s, reason: %s',
-                course_id,
-                ex.status,
-                ex.reason
-            )
-            return []
         except ClientError as ex:
             logger.error(
                 'Fetching files failed for course: %s, status: %s, reason: %s',
@@ -347,6 +339,7 @@ class DjangoStorageReportStore(ReportStore):
                 ex.response.get('Error'), ex.response.get('Error', {}).get('Message')
             )
             return []
+
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
         files.sort(key=lambda f: self.storage.get_modified_time(f[1]), reverse=True)
         return [
