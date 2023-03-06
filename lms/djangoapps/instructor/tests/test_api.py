@@ -14,7 +14,6 @@ import dateutil
 import ddt
 import pytest
 import pytz
-from boto.exception import BotoServerError
 from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user

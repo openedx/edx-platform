@@ -19,7 +19,6 @@ import logging
 import os.path
 from uuid import uuid4
 
-from boto.exception import BotoServerError
 from botocore.exceptions import ClientError
 from django.apps import apps
 from django.conf import settings
