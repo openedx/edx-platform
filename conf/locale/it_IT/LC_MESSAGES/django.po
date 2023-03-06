@@ -11760,9 +11760,10 @@ msgid "Count"
 msgstr "Conta"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
 msgstr ""
-"Immettere il numero di componenti da visualizzare per ciascun studente."
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
