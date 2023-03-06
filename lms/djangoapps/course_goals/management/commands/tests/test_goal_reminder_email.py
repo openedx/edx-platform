@@ -110,9 +110,9 @@ class TestGoalReminderEmailCommand(TestCase):
         self.call_command(day=current_day, expect_sent=expect_sent)
 
     def test_will_send_at_the_right_time(self):
-        """ We only send the emails from 9am-12pm in the user's time"""
+        """ We only send the emails during the day in the user's time"""
         self.make_valid_goal()
-        self.call_command(expect_sent=False, time='2021-03-02 8:00:00')
+        self.call_command(expect_sent=False, time='2021-03-02 6:00:00')
         self.call_command(expect_sent=True, time='2021-03-02 10:00:00')
 
     def test_feature_disabled(self):

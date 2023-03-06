@@ -5,7 +5,7 @@ Tests for Source from Library XBlock
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from common.djangoapps.student.roles import CourseInstructorRole
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.tests import get_test_system
 from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=unused-import
 
@@ -21,7 +21,7 @@ class LibrarySourcedBlockTestCase(ContentLibrariesRestApiTest):
         course = CourseFactory.create(modulestore=self.store, user_id=self.user.id)
         CourseInstructorRole(course.id).add_users(self.user)
         # Add a "Source from Library" block to the course
-        self.source_block = ItemFactory.create(
+        self.source_block = BlockFactory.create(
             category="library_sourced",
             parent=course,
             parent_location=course.location,

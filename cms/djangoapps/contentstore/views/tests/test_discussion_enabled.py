@@ -5,7 +5,7 @@ Test module to test the discussion enabled flag.
 
 import json
 
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_usage_url
@@ -32,25 +32,25 @@ class TestDiscussionEnabled(CourseTestCase):
             run="2020_T2",
             modulestore=self.store
         )
-        self.chapter = ItemFactory(
+        self.chapter = BlockFactory(
             parent_location=self.course.location,
             category="chapter",
             display_name="What is SHIELD?",
             modulestore=self.store
         )
-        self.sequential = ItemFactory(
+        self.sequential = BlockFactory(
             parent_location=self.chapter.location,
             category="sequential",
             display_name="HQ",
             modulestore=self.store
         )
-        self.vertical = ItemFactory(
+        self.vertical = BlockFactory(
             parent_location=self.sequential.location,
             category="vertical",
             display_name="Triskelion",
             modulestore=self.store
         )
-        self.vertical_1 = ItemFactory(
+        self.vertical_1 = BlockFactory(
             parent_location=self.sequential.location,
             category="vertical",
             display_name="Helicarrier",

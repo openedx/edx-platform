@@ -21,7 +21,7 @@ from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlock
 
-from xmodule.course_module import Textbook
+from xmodule.course_block import Textbook
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mixed import strip_key
 from xmodule.modulestore.tests.sample_courses import TOY_BLOCK_INFO_TREE, default_block_info_tree
@@ -279,7 +279,7 @@ class LibraryFactory(XModuleFactory):
             return new_library
 
 
-class ItemFactory(XModuleFactory):
+class BlockFactory(XModuleFactory):
     """
     Factory for XModule items.
     """
@@ -330,7 +330,7 @@ class ItemFactory(XModuleFactory):
         """
         Uses ``**kwargs``:
 
-        :parent_location: (required): the location of the parent module
+        :parent_location: (required): the location of the parent block
             (e.g. the parent course or section)
 
         :category: the category of the resulting item.
@@ -400,7 +400,7 @@ class ItemFactory(XModuleFactory):
             if display_name is not None:
                 metadata['display_name'] = display_name
 
-            module = store.create_child(
+            block = store.create_child(
                 user_id,
                 parent.location,
                 location.block_type,
@@ -412,14 +412,14 @@ class ItemFactory(XModuleFactory):
             )
 
             if has_score:
-                module.has_score = has_score
+                block.has_score = has_score
             if submission_start:
-                module.submission_start = submission_start
+                block.submission_start = submission_start
             if submission_end:
-                module.submission_end = submission_end
-            store.update_item(module, user_id)
+                block.submission_end = submission_end
+            store.update_item(block, user_id)
 
-            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course block, so
             # if we add one then we need to also add it to the policy information (i.e. metadata)
             # we should remove this once we can break this reference from the course to static tabs
             if category == 'static_tab':
@@ -430,19 +430,19 @@ class ItemFactory(XModuleFactory):
                 store.update_item(course, user_id)
 
             # parent and publish the item, so it can be accessed
-            if 'detached' not in module._class_tags:  # lint-amnesty, pylint: disable=protected-access
+            if 'detached' not in block._class_tags:  # lint-amnesty, pylint: disable=protected-access
                 parent.children.append(location)
                 store.update_item(parent, user_id)
                 if publish_item:
                     published_parent = store.publish(parent.location, user_id)
-                    # module is last child of parent
+                    # block is last child of parent
                     return published_parent.get_children()[-1]
                 else:
                     return store.get_item(location)
             elif publish_item:
                 return store.publish(location, user_id)
             else:
-                return module
+                return block
 
 
 @contextmanager

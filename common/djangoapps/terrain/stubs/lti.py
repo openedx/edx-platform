@@ -234,7 +234,7 @@ class StubLtiHandler(StubHttpRequestHandler):
                 </html>
             """)).format(response=response_text, role=role, submit_form=submit_form)
 
-        # Currently LTI module doublequotes the lis_result_sourcedid parameter.
+        # Currently LTI block doublequotes the lis_result_sourcedid parameter.
         # Unquote response two times.
         return six.moves.urllib.parse.unquote(six.moves.urllib.parse.unquote(response_str))
 

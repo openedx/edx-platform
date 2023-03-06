@@ -1,7 +1,5 @@
 """Test Entitlements models"""
 
-
-import unittest
 from datetime import timedelta
 from unittest.mock import patch
 from uuid import uuid4
@@ -18,6 +16,7 @@ from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -27,7 +26,7 @@ if settings.ROOT_URLCONF == 'lms.urls':
     from common.djangoapps.entitlements.models import CourseEntitlement
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
     """
     Series of tests for the helper methods in the CourseEntitlement Model Class.
@@ -112,7 +111,7 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
             self.fail(error.message)  # lint-amnesty, pylint: disable=no-member
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestModels(TestCase):
     """Test entitlement with policy model functions."""
 

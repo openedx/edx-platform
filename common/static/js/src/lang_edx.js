@@ -9,7 +9,7 @@ var Language = (function() {
             this.listenForLanguagePreferenceChange();
         },
 
-            /**
+        /**
              * Listener on changing language from selector.
              * Send an ajax request to save user language preferences.
              */
@@ -21,8 +21,8 @@ var Language = (function() {
                 event.preventDefault();
                 self.submitAjaxRequest(language, url, function() {
                     if (is_user_authenticated) {
-                            // User language preference has been set successfully
-                            // Now submit the form in success callback.
+                        // User language preference has been set successfully
+                        // Now submit the form in success callback.
                         $('#language-settings-form').submit();
                     } else {
                         self.refresh();
@@ -31,7 +31,7 @@ var Language = (function() {
             });
         },
 
-            /**
+        /**
              * Send an ajax request to set user language preferences.
              */
         submitAjaxRequest: function(language, url, callback) {
@@ -52,11 +52,11 @@ var Language = (function() {
             });
         },
 
-            /**
+        /**
              * refresh the page.
              */
         refresh: function() {
-                // reloading the page so we can get the latest state of released languages from model
+            // reloading the page so we can get the latest state of released languages from model
             location.reload();
         }
 

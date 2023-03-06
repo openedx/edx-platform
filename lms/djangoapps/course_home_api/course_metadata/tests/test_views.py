@@ -100,7 +100,8 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         """ Test that metadata endpoint returns data for the streak celebration """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=True):
-            with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
+            UPDATES_METHOD_NAME = 'common.djangoapps.student.models.user.UserCelebration.perform_streak_updates'
+            with mock.patch(UPDATES_METHOD_NAME, return_value=3):
                 response = self.client.get(self.url, content_type='application/json')
                 celebrations = response.json()['celebrations']
                 assert celebrations['streak_length_to_celebrate'] == 3

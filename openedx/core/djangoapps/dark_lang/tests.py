@@ -14,7 +14,10 @@ from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from openedx.core.djangoapps.dark_lang.middleware import DarkLangMiddleware
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
+from openedx.core.djangoapps.site_configuration.tests.test_util import (
+    with_site_configuration,
+    with_site_configuration_context,
+)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import UserFactory
 
@@ -258,16 +261,6 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         session[LANGUAGE_SESSION_KEY] = session_language
         session.save()
 
-    @with_site_configuration(configuration={'LANGUAGE_CODE': 'rel'})
-    def test_site_configuration_language(self):
-        # `LANGUAGE_CODE` in site configuration should override session lang
-        self._set_client_session_language('notrel')
-        self.client.get('/home')
-        self.assert_session_lang_equals(
-            'rel',
-            self.client.session
-        )
-
     def test_preview_lang_with_released_language(self):
         # Preview lang should always override selection
         self._post_set_preview_lang('rel')
@@ -404,3 +397,25 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         assert settings.LANGUAGE_COOKIE_NAME in response.cookies
         assert response.cookies.get(settings.LANGUAGE_COOKIE_NAME).value == ''
         assert response['Content-Language'] == site_lang
+
+    @with_site_configuration(configuration={'LANGUAGE_CODE': 'es'})
+    def test_preview_language_ignores_site_configuration(self):
+        """
+        Test that the preview language has a higher priority than the language set in SiteConfiguration.
+        """
+        response = self.client.get('/')
+        assert response['Content-Language'] == 'es-419'
+
+        # Set preview language.
+        self._post_set_preview_lang('eo')
+        response = self.client.get('/')
+        assert response['Content-Language'] == 'eo'
+
+        # Reset preview language.
+        self._post_clear_preview_lang()
+        response = self.client.get('/')
+        assert response['Content-Language'] == 'es-419'
+
+        # Clean up by making a request to a Site without specific configuration.
+        with with_site_configuration_context():
+            self.client.get('/')

@@ -27,7 +27,7 @@
         var input_field = problem.find('input[type=hidden]');
         var protex_answer = protexCheckAnswer();
         var value = {protex_answer: protex_answer};
-            // console.log(JSON.stringify(value));
+        // console.log(JSON.stringify(value));
         input_field.val(JSON.stringify(value));
     }
 

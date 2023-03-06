@@ -29,9 +29,9 @@
                     index: 0,
                     children: []
                 },
-            // Flag indicating current state of the note: expanded or collapsed.
+                // Flag indicating current state of the note: expanded or collapsed.
                 is_expanded: false,
-            // Flag indicating whether `More` link should be shown.
+                // Flag indicating whether `More` link should be shown.
                 show_link: false
             },
 

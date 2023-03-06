@@ -15,7 +15,7 @@ define([
     'edx-ui-toolkit/js/utils/html-utils'
 ],
 function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView,
-          signatoryDetailsTemplate, signatoryActionsTemplate, HtmlUtils) {
+    signatoryDetailsTemplate, signatoryActionsTemplate, HtmlUtils) {
     'use strict';
     var SignatoryDetailsView = BaseView.extend({
         tagName: 'div',

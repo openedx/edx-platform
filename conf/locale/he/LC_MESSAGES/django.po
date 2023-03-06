@@ -128,7 +128,7 @@ msgid "Video"
 msgstr "סרטוני וידאו"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: common/lib/xmodule/xmodule/video_module/video_module.py
+#: common/lib/xmodule/xmodule/video_block/video_block.py
 msgid "Advanced"
 msgstr "מתקדם"
 
@@ -145,33 +145,33 @@ msgid "Unit"
 msgstr "יחידה"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Empty"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#: common/lib/xmodule/xmodule/video_block/video_handlers.py
 #, python-brace-format
 msgid "The following parameters are required: {missing}."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#: common/lib/xmodule/xmodule/video_block/video_handlers.py
 msgid ""
 "There is a problem with this transcript file. Try to upload a different "
 "file."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#: common/lib/xmodule/xmodule/video_block/video_handlers.py
 #, python-brace-format
 msgid "A transcript with the \"{language_code}\" language code already exists."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#: common/lib/xmodule/xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr ""
 
@@ -182,7 +182,7 @@ msgid "Name"
 msgstr "שם"
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Video ID"
 msgstr "מזהה סרטון וידאו"
 
@@ -218,7 +218,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/admin.py
 #: common/djangoapps/course_modes/models.py
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Mode"
 msgstr "מצב"
 
@@ -282,16 +282,16 @@ msgid "Professional Ed"
 msgstr "חינוך מקצועי"
 
 #: common/djangoapps/course_modes/models.py
-#: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/annotatable_block.py
+#: common/lib/xmodule/xmodule/capa_block.py
+#: common/lib/xmodule/xmodule/conditional_block.py
+#: common/lib/xmodule/xmodule/html_block.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 #: common/lib/xmodule/xmodule/library_sourced_block.py
-#: common/lib/xmodule/xmodule/lti_module.py
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 #: common/lib/xmodule/xmodule/unit_block.py
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 #: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: cms/templates/container.html cms/templates/library.html
@@ -1671,12 +1671,12 @@ msgid "Question {}"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Incorrect"
 msgstr "לא נכון"
 
 #: common/lib/capa/capa/capa_problem.py
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Correct"
 msgstr "נכון"
 
@@ -1835,7 +1835,7 @@ msgid "Incorrect:"
 msgstr "לא נכונה:"
 
 #: common/lib/capa/capa/responsetypes.py
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Answer"
 msgstr "תשובה"
 
@@ -2087,44 +2087,44 @@ msgstr "לא ניתן לפרש את תשובת הצוות כמספר."
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr "לא ניתן לפרש '{given_answer}' כמספר."
 
-#: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/annotatable_block.py
 msgid "XML data for the annotation"
 msgstr "מידע XML עבור הסברים"
 
-#: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/annotatable_block.py
+#: common/lib/xmodule/xmodule/capa_block.py
+#: common/lib/xmodule/xmodule/conditional_block.py
+#: common/lib/xmodule/xmodule/html_block.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
 #: common/lib/xmodule/xmodule/library_sourced_block.py
-#: common/lib/xmodule/xmodule/poll_module.py
+#: common/lib/xmodule/xmodule/poll_block.py
 #: common/lib/xmodule/xmodule/unit_block.py
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 #: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "The display name for this component."
 msgstr "שם התצוגה עבור רכיב זה"
 
-#: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/annotatable_block.py
 msgid "Annotation"
 msgstr "ביאור"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Blank Advanced Problem"
 msgstr "בעיה מתקדמת ריקה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "מספר ניסיונות שניצל הסטודנט בבעיה זו "
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr "מספר ניסיונות מרבי"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "Defines the number of times a student can try to answer this problem. If the"
 " value is not set, infinite attempts are allowed."
@@ -2132,43 +2132,43 @@ msgstr ""
 "מגדיר את מספר הפעמים בהן סטודנט יכול לנסות לענות על בעיה זו. אם הערך אינו "
 "נקבע, יתאפשרו אינסוף ניסיונות."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Date that this problem is due by"
 msgstr "תאריך יעד להשלמת הבעיה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr "משך הזמן לאחר תאריך היעד בו יתקבלו עדיין ההגשות "
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Results"
 msgstr "הצג תוצאות"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "Defines when to show whether a learner's answer to the problem is correct. "
 "Configured on the subsection."
 msgstr "מגדיר מתי להציג האם תשובת הלומד לבעיה נכונה. מוגדר בתת פרק."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Always"
 msgstr "תמיד"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Never"
 msgstr "לעולם לא"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Past Due"
 msgstr "תאריך היעד להגשה עבר"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Answer"
 msgstr "הצג תשובה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
@@ -2176,61 +2176,61 @@ msgstr ""
 "מגדיר מתי להראות את הפתרון עבור הבעיה. ניתן לקבוע ערך ברירת מחדל בהגדרות "
 "מתקדמות."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Answered"
 msgstr "נענה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Attempted or Past Due"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Closed"
 msgstr "נסגר"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Finished"
 msgstr "הושלם"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Correct or Past Due"
 msgstr "נכון או עבר תאריך יעד"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "After Some Number of Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "After All Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "After All Attempts or Correct"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Attempted"
 msgstr "נוסה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Show Answer: Number of Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "Number of times the student must attempt to answer the question before the "
 "Show Answer button appears."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Whether to force the save button to appear on the page"
 msgstr "האם לחייב הופעת לחצן 'שמירה' בעמוד"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Show Reset Button"
 msgstr "הצג לחצן 'איפוס'"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "Determines whether a 'Reset' button is shown so the user may reset their "
 "answer. A default value can be set in Advanced Settings."
@@ -2238,12 +2238,12 @@ msgstr ""
 "קובע אם לחצן 'אתחל' מוצג כדי שמשתמשים יוכלו לאתחל את תשובותיהם. ניתן לקבוע "
 "ערך ברירת מחדל בהגדרות מתקדמות."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr "הצג באופן אקראי"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "Defines when to randomize the variables specified in the associated Python "
 "script. For problems that do not randomize values, specify \"Never\". "
@@ -2251,55 +2251,55 @@ msgstr ""
 "מגדיר מתי להציג באופן אקראי את המשתנים שצוינו בתסריט Python המשויך. לבעיות "
 "שאינן מציגות אקראית ערכים, ציין \"לעולם לא\". "
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "On Reset"
 msgstr "באתחול"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Per Student"
 msgstr "לסטודנט"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "XML data for the problem"
 msgstr "מידע XML עבור בעיה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Dictionary with the correctness of current student answers"
 msgstr "מילון עם התשובות התקינות הנוכחיות של הסטודנטים."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Dictionary for maintaining the state of inputtypes"
 msgstr "מילון עבור שמירה על מצב סוגי קלט."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Dictionary with the current student responses"
 msgstr "מילון עם התשובות הנוכחיות של הסטודנט"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Dictionary with the current student score"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Whether or not the answers have been saved since last submit"
 msgstr "בין אם התשובות נשמרו או לא נשמרו מאז ההגשה האחרונה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Whether the student has answered the problem"
 msgstr "האם הסטודנט ענה על הבעיה."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Random seed for this student"
 msgstr "מקור אקראי עבור סטודנט זה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Last submission time"
 msgstr "זמן הגשה אחרונה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Timer Between Attempts"
 msgstr "זמן בין ניסיונות"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "Seconds a student must wait between submissions for a problem with multiple "
 "attempts."
@@ -2307,11 +2307,11 @@ msgstr ""
 "מספר השניות שעל סטודנט להמתין בין מועדי הגשה עבור בעיה עם ניסיונות הגשה "
 "מרובים."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Problem Weight"
 msgstr "משקל הבעיה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "Defines the number of points each problem is worth. If the value is not set,"
 " each response field in the problem is worth one point."
@@ -2319,26 +2319,26 @@ msgstr ""
 "מגדיר את מספר הנקודות שכל בעיה שווה. אם לא יקבע הערך, כל שדה הזנת תשובה יהיה"
 " שווה נקודה אחת. "
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Markdown source of this module"
 msgstr "סמן מקור של מודול זה"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "Source code for LaTeX and Word problems. This feature is not well-supported."
 msgstr "קוד מקור עבור בעיות מלל ו-LaTeX. תכונה זו אינה נתמכת היטב."
 
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid "Enable LaTeX templates?"
 msgstr "אפשר תבניות LaTeX? "
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
 msgstr "מפתח Matlab API"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
 "Service. This key is granted for exclusive use by this course for the "
@@ -2353,7 +2353,7 @@ msgstr ""
 " בו שימוש לרעה. כדי להשיג מפתח עבור הקורס שלך או כדי לדווח על בעיה, צור קשר "
 "עם moocsupport@mathworks.com"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "We're sorry, there was an error with processing your request. Please try "
 "reloading your page and trying again."
@@ -2361,25 +2361,25 @@ msgstr ""
 "מצטערים, אירעה שגיאה בעיבוד בקשתך. אנא נסה לטעון מחדש את העמוד שלך ונסה שוב."
 " "
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "The state of this problem has changed since you loaded this page. Please "
 "refresh your page."
 msgstr "מצב הבעיה השתנה מאז שטענת עמוד זה. נא רענן את העמוד שלך. "
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Answer ID"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Question"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Correct Answer"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
@@ -2394,23 +2394,23 @@ msgstr ""
 msgid "Submit"
 msgstr "הגש"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Submitting"
 msgstr "מגיש"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Warning: The problem has been reset to its initial state!"
 msgstr "אזהרה: הבעיה אותחלה למצבה הראשוני!"
 
 #. Translators: Following this message, there will be a bulleted list of
 #. items.
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid ""
 "The problem's state was corrupted by an invalid submission. The submission "
 "consisted of:"
 msgstr "מצב בעיה זו הושחת באמצעות הגשה לא חוקית. ההגשה הכילה: "
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "If this error persists, please contact the course staff."
 msgstr "אם שגיאה זו ממשיכה, אנא צור קשר עם צוות הקורס."
 
@@ -2419,7 +2419,7 @@ msgstr "אם שגיאה זו ממשיכה, אנא צור קשר עם צוות ה
 #. is a header for this hint, and {hint_text} is the text of the hint itself.
 #. This string is being passed to translation only for possible reordering of
 #. the placeholders.
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 msgstr ""
@@ -2427,18 +2427,18 @@ msgstr ""
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
 #. This text is shown in bold before the accompanying hint text.
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "רמז ({hint_num} מתוך {hints_count}):"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "Your answers were previously saved. Click '{button_name}' to grade them."
 msgstr "תשובותיך נשמרו קודם. לחץ על  '{button_name}' כדי לתת להן ציון."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
@@ -2447,7 +2447,7 @@ msgstr[1] "({progress} נקודות שגויות)"
 msgstr[2] "({progress} נקודות שגויות)"
 msgstr[3] "({progress} נקודות שגויות)"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
@@ -2456,7 +2456,7 @@ msgstr[1] "({progress} נקודות נכונות)"
 msgstr[2] "({progress} נקודות נכונות)"
 msgstr[3] "({progress} נקודות נכונות)"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
@@ -2465,37 +2465,37 @@ msgstr[1] " ({progress} נקודות נכונות חלקית)"
 msgstr[2] " ({progress} נקודות נכונות חלקית)"
 msgstr[3] " ({progress} נקודות נכונות חלקית)"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Partially Correct"
 msgstr "נכון חלקית"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Answer submitted."
 msgstr "תשובה נענתה."
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Problem is closed."
 msgstr "הבעיה סגורה."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Problem must be reset before it can be submitted again."
 msgstr "על הבעיה להיות מאותחלת בטרם ניתן יהיה לשלוח אותה שוב."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr "עליך להמתין לפחות {wait} שניות בין הגשות."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "You must wait at least {wait_secs} between submissions. {remaining_secs} "
 "remaining."
 msgstr "עליך להמתין לפחות {wait_secs} בין הגשות. נותרו {remaining_secs} ."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
@@ -2504,7 +2504,7 @@ msgstr[1] "{num_hour} שעות"
 msgstr[2] "{num_hour} שעות"
 msgstr[3] "{num_hour} שעות"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
@@ -2513,7 +2513,7 @@ msgstr[1] "{num_minute} דקות"
 msgstr[2] "{num_minute} דקות"
 msgstr[3] "{num_minute} דקות"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
@@ -2522,15 +2522,15 @@ msgstr[1] "{num_second} שניות"
 msgstr[2] "{num_second} שניות"
 msgstr[3] "{num_second} שניות"
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Problem needs to be reset prior to save."
 msgstr "יש לאתחל בעיה לפני שניתן יהיה לשמור."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Your answers have been saved."
 msgstr "תשובתך נשמרה."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 #, python-brace-format
 msgid ""
 "Your answers have been saved but not graded. Click '{button_name}' to grade "
@@ -2541,37 +2541,37 @@ msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "You cannot select Reset for a problem that is closed."
 msgstr "לא ניתן לבחור 'אתחול' לבעיה סגורה."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "You must submit an answer before you can select Reset."
 msgstr "עליך לשלוח תשובה בטרם תוכל לבחור 'אתחול'."
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Problem's definition does not support rescoring."
 msgstr "הגדרות הבעיה לא תומכות במתן ציון מחדש."
 
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/capa_block.py
 msgid "Problem must be answered before it can be graded again."
 msgstr "עליך לענות על התשובה לפני שניתן יהיה לבדוק אותה שוב. "
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid "Conditional"
 msgstr "מותנה"
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid "List of urls of children that are references to external modules"
 msgstr "רשימת כתובות מִשנה של URL שהן אזכורים למודלים חיצוניים"
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid "Source Components"
 msgstr "רכיבי מקור"
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid ""
 "The component location IDs of all source components that are used to "
 "determine whether a learner is shown the content of this conditional module."
@@ -2582,22 +2582,22 @@ msgstr ""
 " מותנה זה. העתק את מזהה מיקום הרכיב של רכיב מתיבת הדו-שיח  שלו 'הגדרות' "
 "ב'סטודיו'."
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid "Conditional Attribute"
 msgstr "מאפיין מותנה"
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
 "shown the content of this conditional module."
 msgstr ""
 "המאפיין של רכיבי המקור הקובע אם בפני לומד הוצג התוכן של מודול מותנה זה."
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid "Conditional Value"
 msgstr "ערך מותנה"
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
 " before a learner is shown the content of this conditional module."
@@ -2605,11 +2605,11 @@ msgstr ""
 "הערך שהמאפיין המותנה של רכיבי המקור חייב להתאים אליו לפני הצגת תוכן מודול "
 "מותנה זה ללומד"
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid "Blocked Content Message"
 msgstr "הודעה על תוכן חסום"
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 #, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
@@ -2621,66 +2621,66 @@ msgstr ""
 "כלול {link} בטקסט ההודעה כדי שהתלמידים יקבלו קישור ישיר ליחידות הדרושות. "
 "לדוגמה, 'עליך להשלים את {link} לפני שתוכל לגשת ליחידה זו'."
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 #, python-brace-format
 msgid "You must complete {link} before you can access this unit."
 msgstr "עליך להשלים את {link} לפני שתוכל לגשת ליחידה זו."
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid "This component has no source components configured yet."
 msgstr "לרכיב זה אין עדיין רכיבי מקור מוגדרים."
 
-#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/conditional_block.py
 msgid "Configure list of sources"
 msgstr "הגדר רשימת מקורות"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "LTI Passports"
 msgstr "סיסמאות LTI"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
 "\"id:client_key:client_secret\"."
 msgstr ""
 "הזן את ה-passports עבור כלי LTI בפורמט הבא: \"id:client_key:client_secret\"."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "List of Textbook objects with (title, url) for textbooks used in this course"
 msgstr ""
 "רשימת אובייקטים של ספר לימוד בעלי (כותרת, כתובת אתר) עבור ספרי הלימוד "
 "המשמשים בקורס זה"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Slug that points to the wiki for this course"
 msgstr "גרור את הנקודות הללו ל-Wiki עבור קורס זה"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Date that enrollment for this class is opened"
 msgstr "קבע תאריך להרשמה זו מאחר וכיתה זו פתוחה"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Date that enrollment for this class is closed"
 msgstr "קבע תאריך להרשמה זו מאחר וכיתה זו סגורה"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Start time when this module is visible"
 msgstr "שעת ההתחלה כאשר מודול זה גלוי"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Date that this class ends"
 msgstr "התאריך שבו כיתה זו מסיימת"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Date that certificates become available to learners"
 msgstr "תאריך בו התעודות הופכת זמינות ללומדים"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Cosmetic Course Display Price"
 msgstr "מחיר קורס לתצוגה"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "The cost displayed to students for enrolling in the course. If a paid course"
 " registration price is set by an administrator in the database, that price "
@@ -2689,11 +2689,11 @@ msgstr ""
 "העלות המוצגת לסטודנטים עבור הרשמה לקורס. אם עלות הרשמה לקורס נקבעת על ידי "
 "מנהל במאגר הנתונים, המחיר ההוא יוצג במקום זה. "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Advertised Start"
 msgstr "תחילת הקורס המפורסם"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter the text that you want to use as the advertised starting time frame "
 "for the course, such as \"Winter 2018\". If you enter null for this value, "
@@ -2702,62 +2702,62 @@ msgstr ""
 "הזן את הטקסט שבו ברצונך להשתמש בתור מסגרת זמן להתחלה שפורסמה עבור הקורס, "
 "למשל \"חורף 2018\". אם תזין null, התאריך יהיה תאריך תחילת הקורס שהגדרת."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Pre-Requisite Courses"
 msgstr "קורסי קדם"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Pre-Requisite Course key if this course has a pre-requisite course"
 msgstr "מפתח דרישות קדם לקורס אם ישנן דרישות קדם לקורס זה. "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Grading policy definition for this class"
 msgstr "הגדרת מדיניות הדירוג עבור כיתה זו"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Show Calculator"
 msgstr "הראה מחשבון"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. When true, students can see the calculator in the "
 "course."
 msgstr "הזן כן או לא. כאשר כן, סטודנטים יכולים לראות את המחשבון בקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enter the name of the course as it should appear in the course list."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Display Name"
 msgstr "שם תצוגת לקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Course Editor"
 msgstr "עורך קורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
 msgstr "הזן את השיטה בה הקורס נערך  (\"XML\" או \"Studio\")."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Survey URL"
 msgstr "כתובת URL לסקר הקורס. "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter the URL for the end-of-course survey. If your course does not have a "
 "survey, enter null."
 msgstr ""
 "הזן את כתובת ה-URL עבור סקר סוף הקורס. במידה ואין לקורס סקר, השאר ריק.  "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Discussion Blackout Dates"
 msgstr "תאריכי האפלה עבור דיון"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter pairs of dates between which students cannot post to discussion "
 "forums. Inside the provided brackets, enter an additional set of square "
@@ -2777,11 +2777,11 @@ msgstr ""
 "תקופות האפלה,כולל הזוג החיצוני של סוגריים מרובעים, נראית "
 "כך:[[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", \"2015-10-08\"]]"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Discussion Topic Mapping"
 msgstr "מיפוי נושאי דיון"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
@@ -2802,11 +2802,11 @@ msgstr ""
 "התכונה \"ברירת מחדל\" לאמת. לדוגמה,  \"Lydian Mode\": {\"id\": "
 "\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Discussion Sorting Alphabetical"
 msgstr "מיון דיונים על פי אלף בית"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, discussion categories and subcategories are "
 "sorted alphabetically. If false, they are sorted chronologically by creation"
@@ -2815,19 +2815,19 @@ msgstr ""
 "הזן כן או לא. אם כן, הקטגוריות ותת הקטגוריות של הדיון ממוינות לפי אלף-בית. "
 "אם לא, הן ממוינות באופן כרונולוגי לפי התאריך ושעת יצירתן."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Announcement Date"
 msgstr "תאריך הכרזת הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enter the date to announce your course."
 msgstr "הזן תאריך להכרזה על הקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Cohort Configuration"
 msgstr "הגדרת קבוצת לימוד "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter policy keys and values to enable the cohort feature, define automated "
 "student assignment to groups, or identify any course-wide discussion topics "
@@ -2837,64 +2837,64 @@ msgstr ""
 "אוטומטית של סטודנטים לקבוצה, או הגדר נושאי דיון כלליים בקורס כפרטיים לחברי "
 "קבוצת הלימוד."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Is New"
 msgstr "קורס חדש"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, the course appears in the list of new courses,"
 " and a New! badge temporarily appears next to the course image."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Mobile Course Available"
 msgstr "קורס זמין בנייד"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, the course will be available to mobile "
 "devices."
 msgstr "הזן כן או לא. אם כן, הקורס יהיה זמין למכשירים ניידים. "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Video Upload Credentials"
 msgstr "אישורי העלאת סרטון וידאו"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter the unique identifier for your course's video files provided by edX."
 msgstr "הזן את המזהה הייחודי עבור קבצי הווידאו שלך כפי שסיפקה EdX. "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Not Graded"
 msgstr "לא ניתן ציון בקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enter true or false. If true, the course will not be graded."
 msgstr "הזן כן או לא. אם כן, הקורס לא יקבל ציון."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Disable Progress Graph"
 msgstr "השבֵּת גרף התקדמות"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enter true or false. If true, students cannot view the progress graph."
 msgstr "הזן כן או לא. אם כן, סטודנטים אינם יכולים לראות את גרף ההתקדמות. "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "PDF Textbooks"
 msgstr "ספרי לימוד ב-PDF"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "List of dictionaries containing pdf_textbook configuration"
 msgstr "רשימת מילונים המכילים הגדרת pdf_textbook "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "HTML Textbooks"
 msgstr "ספרי לימוד ב-HTML"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "For HTML textbooks that appear as separate tabs in the course, enter the "
 "name of the tab (usually the title of the book) as well as the URLs and "
@@ -2903,11 +2903,11 @@ msgstr ""
 "עבור ספרי לימוד ב-HTML המופיעים ככרטיסיות נפרדות בקורס, הזן את שם הכרטיסייה "
 "(לרוב כותרת הספר) וכן את כתובות ה-URL והכותרות של כל פרק בספר."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Remote Gradebook"
 msgstr "יומן ציונים מרוחק"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter the remote gradebook mapping. Only use this setting when "
 "REMOTE_GRADEBOOK_URL has been specified."
@@ -2920,7 +2920,7 @@ msgstr ""
 #. a role created by a course Instructor to enable a person (the "Coach") to
 #. manage the custom course for
 #. his students.
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enable CCX"
 msgstr "הפעל CCX"
 
@@ -2929,7 +2929,7 @@ msgstr "הפעל CCX"
 #. a role created by a course Instructor to enable a person (the "Coach") to
 #. manage the custom course for
 #. his students.
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
 "manage Custom Courses on edX. When false, Custom Courses cannot be created, "
@@ -2941,11 +2941,11 @@ msgstr ""
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
 #. course content.
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "CCX Connector URL"
 msgstr "כתובת URL של CCX Connector"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "URL for CCX Connector application for managing creation of CCXs. (optional)."
 " Ignored unless 'Enable CCX' is set to 'true'."
@@ -2953,11 +2953,11 @@ msgstr ""
 "כתובת URL לאפליקצית CCX Connector לניהול יצירת CCXs. (אופציונלי). יש להתעלם "
 "אלא אם כן 'הפעל CCX' מוגדר כ'כן'."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Allow Anonymous Discussion Posts"
 msgstr "אפשר פוסטים אנונימיים בדיון"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to all users."
@@ -2965,11 +2965,11 @@ msgstr ""
 "הזן כן או לא. אם כן, סטודנטים יכולים ליצור פוסטים אנונימיים בדיון לכל "
 "המשתמשים."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Allow Anonymous Discussion Posts to Peers"
 msgstr "אפשר פוסטים אנונימים בדיון לעמיתים"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to other students. This setting does not make posts anonymous to "
@@ -2978,20 +2978,20 @@ msgstr ""
 "הזן כן או לא. אם לא, יכולים הסטודנטים ליצור פוסטים אנונימיים לסטודנטים "
 "אחרים. הגדרה זו אינה הופכת את הפוסטים לאנונימיים עבור צוות הקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Advanced Module List"
 msgstr "רשימת מודולים מתקדמת"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enter the names of the advanced modules to use in your course."
 msgstr "הזן את שמות המודולים המתקדמים שישמשו בקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Home Sidebar Name"
 msgstr "שם סרגל הצד של עמוד הבית של הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter the heading that you want students to see above your course handouts "
 "on the Course Home page. Your course handouts appear in the right panel of "
@@ -3000,13 +3000,13 @@ msgstr ""
 "הזן את הכותרת שברצונך שהסטודנטים יראו מעל דפי המידע של הקורס בעמוד הבית של "
 "הקורס. דפי המידע של הקורס יופיעו בחלונית הימנית של העמוד."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 #: lms/templates/courseware/info.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Handouts"
 msgstr "דפי מידע של הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
@@ -3014,11 +3014,11 @@ msgstr ""
 "'נכון' אם יש להציג את אזורי הזמן בתאריכי הקורס. מתיישן עבור "
 "due_date_display_format."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Due Date Display Format"
 msgstr "פורמט הצגת תאריך אחרון להגשה"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter the format for due dates. The default is Mon DD, YYYY. Enter "
 "\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
@@ -3028,19 +3028,19 @@ msgstr ""
 "\"%m-%d-%Y\" עבור MM-DD-YYYY, \"%d-%m-%Y\" עבור DD-MM-YYYY, \"%Y-%m-%d\" "
 "עבור YYYY-MM-DD, או  \"%Y-%d-%m\"  עבור YYYY-DD-MM.     "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "External Login Domain"
 msgstr "דומיין התחברות חיצוני"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enter the external login method students can use for the course."
 msgstr "הזן שיטת התחברות חיצונית שסטודנטים יכולים להשתמש בה עבור הקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Certificates Downloadable Before End"
 msgstr "ניתן להוריד תעודות סיום לפני מועד הסיום"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can download certificates before the "
 "course ends, if they've met certificate requirements."
@@ -3048,21 +3048,21 @@ msgstr ""
 "הזן כן או לא. אם כן, סטודנטים יכולים להוריד את התעודות בטרם הסתיים הקורס "
 "במידה ועמדו בתנאים לקבלת התעודה."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Certificates Display Behavior"
 msgstr "תעודות המציגות התנהגות"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "This field, together with certificate_available_date will determine when a "
 "user can see their certificate for the course"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course About Page Image"
 msgstr "תמונת עמוד אודות הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Edit the name of the course image file. You must upload this file on the "
 "Files & Uploads page. You can also set the course image on the Settings & "
@@ -3071,11 +3071,11 @@ msgstr ""
 "ערוך את שם קובץ של תמונת הקורס. יש להעלות קובץ זה בעמוד העלאות וקבצים. ניתן "
 "גם להגדיר את תמונת הקורס בעמוד הגדרות ופרטים."
 
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+#: common/lib/xmodule/xmodule/course_block.py cms/templates/settings.html
 msgid "Course Banner Image"
 msgstr "תמונת הבאנר של הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Edit the name of the banner image file. You can set the banner image on the "
 "Settings & Details page."
@@ -3083,11 +3083,11 @@ msgstr ""
 "ערוך את שם הקובץ של תמונת הבאנר. ניתן גם להגדיר את תמונת הבאנר בעמוד הגדרות "
 "ופרטים."
 
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+#: common/lib/xmodule/xmodule/course_block.py cms/templates/settings.html
 msgid "Course Video Thumbnail Image"
 msgstr "תמונת הווידאו הממוזערת של הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Edit the name of the video thumbnail image file. You can set the video "
 "thumbnail image on the Settings & Details page."
@@ -3095,17 +3095,17 @@ msgstr ""
 "ערוך את שם הקובץ של תמונת הווידאו הממוזערת. ניתן גם להגדיר את תמונת הווידאו "
 "הממוזערת בעמוד 'הגדרות ופרטים'."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Issue Open Badges"
 msgstr "תגים פתוחים לבעיה"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Issue Open Badges badges for this course. Badges are generated when "
 "certificates are created."
 msgstr "תגים פתוחים לבעיה עבור קורס זה. התגים נוצרים בעת יצירת התעודות."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -3114,11 +3114,11 @@ msgstr ""
 "השתמש בהגדרה זו בעת יצירת תעודות PDF. בין מרכאות, הזן את השם הקצר של סוג "
 "התעודה שמקבלים הסטודנטים בעת השלמת הקורס. למשל, \"תעודה\"."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Certificate Name (Short)"
 msgstr "שם תעודה (קצר)"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the long name of the type of certificate that students receive "
@@ -3127,27 +3127,27 @@ msgstr ""
 "השתמש בהגדרה זו בעת יצירת תעודות PDF. בין מרכאות, הזן את השם הארוך של סוג "
 "התעודה שמקבלים הסטודנטים בעת השלמת הקורס. למשל, \"תעודת הצטיינות\"."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Certificate Name (Long)"
 msgstr "שם תעודה (ארוך)"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Certificate Web/HTML View Enabled"
 msgstr "תצוגת אתר אינטרנט/HTML של תעודה מופעלת"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "If true, certificate Web/HTML views are enabled for the course."
 msgstr "אם נכון, תצוגות אתר אינטרנט או HTML של תעודה מופעלות עבור הקורס."
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Certificate Web/HTML View Overrides"
 msgstr "ביטולי תצוגת אתר אינטרנט/HTML של תעודה"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter course-specific overrides for the Web/HTML template parameters here "
 "(JSON format)"
@@ -3157,47 +3157,47 @@ msgstr ""
 
 #. Translators: This field is the container for course-specific certificate
 #. configuration values
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Certificate Configuration"
 msgstr "הגדרות תעודה"
 
 #. Translators: These overrides allow for an alternative configuration of the
 #. certificate web view
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enter course-specific configuration information here (JSON format)"
 msgstr "הזן פרטי הגדרת תצורה ספציפיים לקורס כאן (פורמט JSON)"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "CSS Class for Course Reruns"
 msgstr "CSS Class עבור הרצות חוזרות של הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Allows courses to share the same css class across runs even if they have "
 "different numbers."
 msgstr "מאפשר לקורסים לשתף את אותו כיתת CSS בהרצות גם אם יש להם מספרים שונים."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Discussion Forum External Link"
 msgstr "קישור חיצוני לפורום הדיונים"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Allows specification of an external link to replace discussion forums."
 msgstr "מאפשר מפרט של קישור חיצוני על מנת להחליף פורומי דיון."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Hide Progress Tab"
 msgstr "הסתר כרטיסיית התקדמות"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Allows hiding of the progress tab."
 msgstr "אפשר הסתרה של כרטיסיית ההתקדמות."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Organization Display String"
 msgstr "מחרוזת תצוגת ארגון הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter the course organization that you want to appear in the course. This "
 "setting overrides the organization that you entered when you created the "
@@ -3207,11 +3207,11 @@ msgstr ""
 "הזן את הארגון של הקורס שברצונך שיופיע בקורס. הגדרה זו מבטלת את הארגון שהזנת "
 "בעת יצירת הקורס. כדי להשתמש בארגון שהזנת בעת יצירת הקורס, הזן ביטול."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Number Display String"
 msgstr "מחרוזת תצוגת מספר הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter the course number that you want to appear in the course. This setting "
 "overrides the course number that you entered when you created the course. To"
@@ -3221,11 +3221,11 @@ msgstr ""
 "הזן את מספר הקורס שאתה רוצה שיופיע בקורס. הגדרה זו מבטלת את מספר הקורס שהזנת"
 " בעת יצירת הקורס. כדי להשתמש במספר הקורס שהזנת בעת יצירת הקורס, הזן ביטול."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Maximum Student Enrollment"
 msgstr "מספר מרבי של סטודנטים רשומים"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter the maximum number of students that can enroll in the course. To allow"
 " an unlimited number of students, enter null."
@@ -3233,37 +3233,37 @@ msgstr ""
 "הזן את המספר המרבי של סטודנטים היכולים להירשם לקורס. השאר ריק על מנת לאפשר "
 "מספר בלתי מוגבל. "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Allow Public Wiki Access"
 msgstr "אפשר גישה ציבורית ל-Wiki."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, students can view the course wiki even if "
 "they're not enrolled in the course."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Invitation Only"
 msgstr "בהזמנה בלבד"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Whether to restrict enrollment to invitation by the course staff."
 msgstr "האם להגביל את ההרשמה לנרשמים שהוזמנו על ידי צוות הקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Pre-Course Survey Name"
 msgstr "שם סקר טרום-קורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Name of SurveyForm to display as a pre-course survey to the user."
 msgstr "שם קובץ סקר להצגה כסקר טרום-קורס למשתמש."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Pre-Course Survey Required"
 msgstr "דרוש סקר טרום קורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Specify whether students must complete a survey before they can view your "
 "course content. If you set this value to true, you must add a name for the "
@@ -3272,13 +3272,13 @@ msgstr ""
 "פרט אם סטודנטים חייבים להשלים את הסקר לפני שיוכלו לצפות בתוכן הקורס שלך. אם "
 "הנך קובע ערך זה כ-כן, חובה להוסיף שם בהגדרת שם סקר הקורס מעלה."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Visibility In Catalog"
 msgstr "חשיפת הקורס בקטלוג"
 
 #. Translators: the quoted words 'both', 'about', and 'none' must be
 #. left untranslated.  Leave them as English words.
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Defines the access permissions for showing the course in the course catalog."
 " This can be set to one of three values: 'both' (show in catalog and allow "
@@ -3289,11 +3289,11 @@ msgstr ""
 "ערכים. 'שניהם' (מציג בקטלוג ונותן גישה לעמוד אודות), 'אודות' (מאפשר גישה רק "
 "לעמוד אודות), 'אף אחד' (אינו מוצג בקטלוג ואינו מאפשר גישה לעמוד אודות)."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Entrance Exam Enabled"
 msgstr "מבחן כניסה מופעל "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
 " your course content. Note, you must enable Entrance Exams for this course "
@@ -3302,11 +3302,11 @@ msgstr ""
 "ציין אם סטודנטים חייבים להשלים בחינת כניסה לפני שיוכלו לצפות בתוכן הקורס. "
 "שים לב, עליך לאפשר בחינות כניסה לקורס זה על מנת שההגדרות ייכנסו לתוקף."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Entrance Exam Minimum Score (%)"
 msgstr "ציון מינימלי למבחן כניסה (%)"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
 "view your course content. Note, you must enable Entrance Exams for this "
@@ -3315,19 +3315,19 @@ msgstr ""
 "קבע אחוז ציוני מינימלי לבחינת כניסה, לפני שסטודנטים יוכלו לצפות בתוכן הקורס."
 " שים לב, יש לאפשר מבחני כניסה על מנת שהגדרה זו תיכנס לתוקף.  "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Entrance Exam ID"
 msgstr "מזהה של מבחן כניסה"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Content module identifier (location) of entrance exam."
 msgstr "מזהה (מיקום) מודול תוכן עבור מבחן כניסה. "
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Social Media Sharing URL"
 msgstr "כתובת URL לשיתוף במדיה חברתית"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "If dashboard social sharing and custom course URLs are enabled, you can "
 "provide a URL (such as the URL to a course About page) that social media "
@@ -3339,19 +3339,19 @@ msgstr ""
 "מדיה חברתית יוכלו לקשר אליה. על כתובות האתר להיות מוסמכות לחלוטין. לדוגמה: "
 "http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
 
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+#: common/lib/xmodule/xmodule/course_block.py cms/templates/settings.html
 msgid "Course Language"
 msgstr "שפת הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Specify the language of your course."
 msgstr "ציין את שפת הקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Teams Configuration"
 msgstr "הגדרת תצורה של הצוותים"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Configure team sets, limit team sizes, and set visibility settings using "
 "JSON. See <a target=\"&#95;blank\" "
@@ -3360,11 +3360,11 @@ msgid ""
 "teams\">teams configuration documentation</a> for help and examples."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enable Proctored Exams"
 msgstr "אפשר מבחנים תחת פיקוח"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, proctored exams are enabled in "
 "your course. Note that enabling proctored exams will also enable timed "
@@ -3373,33 +3373,33 @@ msgstr ""
 "הזן כן או לא. אם הערך הוא כן, מבחנים תחת פיקוח מאופשרים בקורס שלך. שים לב "
 "שאיפשור מבחנים תחת פיקוח יאפשר גם מבחנים מתוזמנים."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Proctoring Provider"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 #, python-brace-format
 msgid ""
 "Enter the proctoring provider you want to use for this course run. Choose "
 "from the following options: {available_providers}."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Proctortrack Exam Escalation Contact"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Required if 'proctortrack' is selected as your proctoring provider. Enter an"
 " email address to be contacted by the support team whenever there are "
 "escalations (e.g. appeals, delayed reviews, etc.)."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Allow Opting Out of Proctored Exams"
 msgstr "אפשר הסכמה למבחני חוץ"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, learners can choose to take "
 "proctored exams without proctoring. If this value is false, all learners "
@@ -3410,21 +3410,21 @@ msgstr ""
 "השגחה. אם ערך זה לא נכון, כל הלומדים יהיו חייבים להיבחן תחת השגחה. הגדרה זו "
 "חלה במידה ומבחני החוץ מותאמים עבור הקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
 msgstr "צור כרטיסי Zendesk לניסיונות חשודים של מבחן תחת פיקוח"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, a Zendesk ticket will be created"
 " for suspicious attempts."
 msgstr "הזן כן או לא. אם הערך הוא כן, ייווצר כרטיס Zendesk לניסיונות חשודים."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enable Timed Exams"
 msgstr "אפשר מבחנים מתוזמנים"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
 "course. Regardless of this setting, timed exams are enabled if Enable "
@@ -3434,11 +3434,11 @@ msgstr ""
 " ללא קשר להגדרה זו, מבחנים מתוזמנים מותאמים במידה ו'אפשר מבחני חוץ' מוגדר "
 "כנכון."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Minimum Grade for Credit"
 msgstr "דירוג מינימלי לקבלת נקודות זכות"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "The minimum grade that a learner must earn to receive credit in the course, "
 "as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
@@ -3446,12 +3446,12 @@ msgstr ""
 "הציון המינימלי שתלמיד חייב להשיג הוא קבלת נקודת זכות בקורס, כמספר דצימלי בין"
 " 0.0 ל-1.0. לדוגמה, עבור 75% הזן 0.75."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr "קצב אישי"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
@@ -3461,11 +3461,11 @@ msgstr ""
 "הגדר זאת ל\"כן\" כדי לסמן את הקורס כקצב אישי. בקורסים בקצב אישי אין תאריכי "
 "יעד למטלות והסטודנטים יכולים להתקדם בקורס בכל קצב לפני סיום הקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enable Subsection Prerequisites"
 msgstr "אפשר דרישות מקדימות של תת סעיף"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
@@ -3473,21 +3473,21 @@ msgstr ""
 "הזן כן או לא. אם הערך הוא 'כן', באפשרותך להסתיר תת-פרק עד שהלומדים יזכו "
 "בציון מינימלי בתת-פרק אחר בעל דרישה מוקדמת."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Learning Information"
 msgstr "מידע על הלמידה בקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Specify what student can learn from the course."
 msgstr "ציין איזה סטודנט יכול ללמוד מהקורס."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Visibility For Unenrolled Learners"
 msgstr ""
 
 #. Translators: the quoted words 'private', 'public_outline', and 'public'
 #. must be left untranslated.  Leave them as English words.
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Defines the access permissions for unenrolled learners. This can be set to "
 "one of three values: 'private' (default visibility, only allowed for "
@@ -3495,19 +3495,19 @@ msgid ""
 "'public' (allow access to both outline and course content)."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "מדריך הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Enter the details for Course Instructor"
 msgstr "הזן את פרטיו של מדריך הקורס"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Add Unsupported Problems and Tools"
 msgstr "הוסף בעיות וכלים לא-נתמכים"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, you can add unsupported problems and tools to "
 "your course in Studio. Unsupported problems and tools are not recommended "
@@ -3519,11 +3519,11 @@ msgstr ""
 "בעיות וכלים לא נתמכים אינם מומלצים לשימוש בקורסים בשל אי ציות לאחת או יותר "
 "מהדרישות הבסיסיות, כגון בחינה, נגישות, אינטרנציונליזציה ותיעוד."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "Highlights Enabled for Messaging"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Enter true or false. If true, any highlights associated with content in the "
 "course will be messaged to learners at their scheduled time."
@@ -3535,7 +3535,7 @@ msgstr ""
 msgid "Other Course Settings"
 msgstr "הגדרות קורס נוספות"
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid ""
 "Any additional information about the course that the platform needs or that "
 "allows integration with external systems such as CRM software. Enter a "
@@ -3543,7 +3543,7 @@ msgid ""
 "\"value\", \"other_setting\": \"value\" }"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_block.py
 msgid "General"
 msgstr "כללי"
 
@@ -3580,26 +3580,26 @@ msgstr ""
 msgid "{short_label} Avg"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/hidden_module.py
+#: common/lib/xmodule/xmodule/hidden_block.py
 #, python-brace-format
 msgid ""
 "ERROR: \"{block_type}\" is an unknown component type. This component will be"
 " hidden in LMS."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid "Text"
 msgstr "טקסט"
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid "Html contents to display for this module"
 msgstr "תכני HTML להצגה עבור מודול זה"
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
 msgstr "קוד מקור עבור מסמכי LaTeX. תכונה זו אינה נתמכת היטב."
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid ""
 "Select Visual to enter content and have the editor automatically create the "
 "HTML. Select Raw to edit HTML directly. If you change this setting, you must"
@@ -3609,23 +3609,23 @@ msgstr ""
 "לעריכת HTML ישירות. אם הגדרה זו משתנה, עליך לשמור את הרכיב ולפתוח אותו מחדש "
 "לעריכה."
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid "Editor"
 msgstr "עורך"
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid "Visual"
 msgstr "חזותי"
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid "Raw"
 msgstr "גולמי"
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid "Hide Page From Learners"
 msgstr "הסתר את העמוד מהלומדים"
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid ""
 "If you select this option, only course team members with the Staff or Admin "
 "role see this page."
@@ -3633,99 +3633,99 @@ msgstr ""
 "אם תבחר באפשרות זו, רק חברי צוות הקורס בתפקיד צוות או מנהל מערכת יראו את "
 "העמוד."
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid "HTML for the additional pages"
 msgstr "HTML עבור עמודים נוספים"
 
-#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/html_block.py
 msgid "List of course update items"
 msgstr "רשימת פריטים שעודכנו בקורס "
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Any Type"
 msgstr "כל סוג"
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 #: cms/templates/widgets/header.html
 msgid "Library"
 msgstr "ספריה"
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Select the library from which you want to draw content."
 msgstr "בחר ספריה שממנה אתה רוצה לשלוף את התוכן."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Library Version"
 msgstr "גרסת ספריה"
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Determines how content is drawn from the library"
 msgstr "קובע כיצד תוכן נמשך מהספריה"
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Choose n at random"
 msgstr "בחר n באופן אקראי"
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Count"
 msgstr "ספירה"
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Enter the number of components to display to each student."
 msgstr "ערוך את מספר המרכיבים להצגה לכל סטודנט."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Problem Type"
 msgstr "סוג בעיה"
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid ""
 "Choose a problem type to fetch from the library. If \"Any Type\" is selected"
 " no filtering is applied."
 msgstr "בחר סוג בעיה לייבא מהספריה. אם \"כל סוג\" נבחר, לא יוחלו מסננים."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr "מרכיב זה מיושן. ישנו תוכן חדש בספריה."
 
 #. Translators: {refresh_icon} placeholder is substituted to "↻" (without
 #. double quotes)
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 #, python-brace-format
 msgid "{refresh_icon} Update now."
 msgstr "{refresh_icon} עדכן עכשיו."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Library is invalid, corrupt, or has been deleted."
 msgstr "הספרייה אינה חוקית, מושחתת או נמחקה."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Edit Library List."
 msgstr "ערוך רשימת ספריה"
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid ""
 "This course does not support content libraries. Contact your system "
 "administrator for more information."
 msgstr "קורס זה אינו תומך בספריות תוכן. למידע נוסף, צור קשר עם מנהל המערכת. "
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "A library has not yet been selected."
 msgstr "לא נבחרה ספריה."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Select a Library."
 msgstr "בחר ספריה."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "There are no matching problem types in the specified libraries."
 msgstr "אין סוגי בעיות תואמים בספריות שצוינו."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Select another problem type."
 msgstr "בחר סוג בעיה אחר."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 #, python-brace-format
 msgid "The specified library is configured to fetch {count} problem, "
 msgid_plural "The specified library is configured to fetch {count} problems, "
@@ -3734,7 +3734,7 @@ msgstr[1] "הספרייה שצוינה מוגדרת למשיכת {count}בעיו
 msgstr[2] "הספרייה שצוינה מוגדרת למשיכת {count}בעיות, "
 msgstr[3] "הספרייה שצוינה מוגדרת למשיכת {count}בעיות, "
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 #, python-brace-format
 msgid "but there is only {actual} matching problem."
 msgid_plural "but there are only {actual} matching problems."
@@ -3743,15 +3743,15 @@ msgstr[1] "אך יש רק {actual} בעיות התאמה."
 msgstr[2] "אך יש רק {actual} בעיות התאמה."
 msgstr[3] "אך יש רק {actual} בעיות התאמה."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Edit the library configuration."
 msgstr "ערוך את הגדרת הבעיה."
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "Invalid Library"
 msgstr "ספריה לא חוקית"
 
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_content_block.py
 msgid "No Library Selected"
 msgstr "לא נבחרה ספריה"
 
@@ -3790,18 +3790,18 @@ msgstr ""
 msgid "Importing Library Block failed - are the IDs valid and readable?"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
 "display name to identify this component."
 msgstr ""
 "שם הרכיב שמוצג. דוחות הניתוח יכולים להשתמש גם בשם התצוגה לזיהוי מרכיב זה."
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "LTI ID"
 msgstr "מזהה LTI "
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
@@ -3810,11 +3810,11 @@ msgid ""
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "LTI URL"
 msgstr "כתובת URL של LTI"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
@@ -3823,11 +3823,11 @@ msgid ""
 "on this setting."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Custom Parameters"
 msgstr "משתנים בהתאמה אישית"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
@@ -3836,11 +3836,11 @@ msgid ""
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Open in New Page"
 msgstr "פתח בעמוד חדש"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid ""
 "Select True if you want students to click a link that opens the LTI tool in "
 "a new window. Select False if you want the LTI content to open in an IFrame "
@@ -3851,21 +3851,21 @@ msgstr ""
 "בחר 'לא' אם ברצונך שתוכן ה-LTI ייפתח ב-IFrame בעמוד הנוכחי. הגדרה זו משמשת "
 "רק כאשר 'הסתר כלי חיצוני' מוגדר ל'לא'.  "
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Scored"
 msgstr "ניתן ציון"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid ""
 "Select True if this component will receive a numerical score from the "
 "external LTI system."
 msgstr "בחר 'כן' אם רכיב זה יקבל ציון מספרי ממערכת LTI חיצונית."
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Weight"
 msgstr "משקל"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid ""
 "Enter the number of points possible for this component.  The default value "
 "is 1.0.  This setting is only used when Scored is set to True."
@@ -3873,21 +3873,21 @@ msgstr ""
 "הזן את מספר הנקודות האפשריות עבור רכיב זה. ערך ברירת המחדל הינו 1.0 . שימוש "
 "בהגדרה זו אפשרי רק כאשר Scored קבועה כ-כן."
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid ""
 "The score kept in the xblock KVS -- duplicate of the published score in "
 "django DB"
 msgstr "הציון נשמר ב-xblock KVS -- שכפל את הציון שפורסם ב-django DB"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Comment as returned from grader, LTI2.0 spec"
 msgstr "הערה כפי שחזרה ממעניק הציון, LTI2.0 spec"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Hide External Tool"
 msgstr "הסתר כלי חיצוני"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid ""
 "Select True if you want to use this component as a placeholder for syncing "
 "with an external grading  system rather than launch an external tool.  This "
@@ -3897,31 +3897,31 @@ msgstr ""
 " במקום להפעיל כלי חיצוני.  הגדרה זו מסתירה את לחצן ההפעלה וכל IFrame שברכיב "
 "זה."
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Request user's username"
 msgstr "בקש מהמשתמש את שם המשתמש"
 
 #. Translators: This is used to request the user's username for a third party
 #. service.
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Select True to request the user's username."
 msgstr "בחר 'כן' כדי לבקש שם משתמש של המשתמש."
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Request user's email"
 msgstr "בקש את הדואר האלקטרוני של המשתמש"
 
 #. Translators: This is used to request the user's email for a third party
 #. service.
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Select True to request the user's email address."
 msgstr "בחר 'כן' כדי לבקש כתובת דואר אלקטרוני של המשתמש."
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "LTI Application Information"
 msgstr "מידע על יישומי LTI"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid ""
 "Enter a description of the third party application. If requesting username "
 "and/or email, use this text box to inform users why their username and/or "
@@ -3931,25 +3931,25 @@ msgstr ""
 "האלקטרוני, השתמש בתיבת טקסט זו כדי להודיע למשתמשים מדוע שם המשתמש ו/או כתובת"
 " הדואר האלקטרוני שלהם תועבר ליישום של גורם צד שלישי."
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Button Text"
 msgstr "טקסט שעל הלחצן"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid ""
 "Enter the text on the button used to launch the third party application."
 msgstr "הזן את הטקסט בלחצן שישמש להפעיל את היישום של הצד השלישי. "
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid "Accept grades past deadline"
 msgstr "קבל ציונים לאחר תאריך היעד"
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 msgid ""
 "Select True to allow third party systems to post grades past the deadline."
 msgstr "בחר כן לאפשר למערכות צד שלישי לשלוח ציונים לאחר תאריך היעד. "
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
@@ -3958,7 +3958,7 @@ msgstr ""
 "לא ניתן לנתח משתנה מותאם אישית: {custom_parameter}. צריכה להיות מחרוזת "
 "\"x=y\"."
 
-#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/lti_block.py
 #, python-brace-format
 msgid ""
 "Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
@@ -3968,7 +3968,7 @@ msgstr ""
 "\"id:key:secret\"."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: common/lib/xmodule/xmodule/seq_module.py lms/templates/ccx/schedule.html
+#: common/lib/xmodule/xmodule/seq_block.py lms/templates/ccx/schedule.html
 msgid "Due Date"
 msgstr "תאריך סיום"
 
@@ -3977,12 +3977,12 @@ msgid "Enter the default date by which problems are due."
 msgstr "הזן את תאריך היעד שיהווה ברירת מחדל להגשת הבעיות."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "Number of Relative Weeks Due By"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "Enter the number of weeks the problems are due by relative to the learner's "
 "enrollment date"
@@ -4223,46 +4223,46 @@ msgstr "קבוצות מסלול הרשמה"
 msgid "Partition for segmenting users by enrollment track"
 msgstr "חלוקה לקבוצות משתמשים לפי מסלול הרשמה"
 
-#: common/lib/xmodule/xmodule/poll_module.py
+#: common/lib/xmodule/xmodule/poll_block.py
 msgid "Whether this student has voted on the poll"
 msgstr "האם סטודנט זה השתתף בסקר"
 
-#: common/lib/xmodule/xmodule/poll_module.py
+#: common/lib/xmodule/xmodule/poll_block.py
 msgid "Student answer"
 msgstr "תשובת הסטודנט"
 
-#: common/lib/xmodule/xmodule/poll_module.py
+#: common/lib/xmodule/xmodule/poll_block.py
 msgid "Poll answers from all students"
 msgstr "תשובות כל הסטודנטים על הסקר"
 
-#: common/lib/xmodule/xmodule/poll_module.py
+#: common/lib/xmodule/xmodule/poll_block.py
 msgid "Poll answers from xml"
 msgstr "תשובות לסקר מקובץ xml"
 
-#: common/lib/xmodule/xmodule/poll_module.py
+#: common/lib/xmodule/xmodule/poll_block.py
 msgid "Poll question"
 msgstr "שאלה בסקר"
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "Enter the date by which problems are due."
 msgstr "הזן את תאריך היעד להגשת הבעיות."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "Hide sequence content After Due Date"
 msgstr "הסתר תוכן Sequence לאחר תאריך היעד"
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "If set, the sequence content is hidden for non-staff users after the due "
 "date has passed."
 msgstr ""
 "אם מוגדר, תוכן ה-Sequence חסוי למשתמשים שאינם צוות לאחר שחלף תאריך היעד."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "Is Entrance Exam"
 msgstr "היא בחינת כניסה"
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "Tag this course module as an Entrance Exam. Note, you must enable Entrance "
 "Exams for this course setting to take effect."
@@ -4270,11 +4270,11 @@ msgstr ""
 "תייג את מודול הקורס כמבחן כניסה. שים לב, עליך לאפשר מבחני כניסה כדי שהגדרת "
 "קורס זה תיכנס לתוקף."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "Is Time Limited"
 msgstr "מוגבל בזמן"
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "This setting indicates whether students have a limited time to view or "
 "interact with this courseware component."
@@ -4282,11 +4282,11 @@ msgstr ""
 "הגדרה זו מציינת אם לסטודנטים יש זמן מוגבל לצפייה או ליצירת אינטרקציה עם רכיב"
 " זה של תוכנת מחשב הקורס."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "Time Limit in Minutes"
 msgstr "הגבלת זמן בדקות"
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "The number of minutes available to students for viewing or interacting with "
 "this courseware component."
@@ -4294,19 +4294,19 @@ msgstr ""
 "מספר הדקות הזמין לסטודנטים לצפייה או ליצירת אינטרקציה עם רכיב זה של תוכנת "
 "המחשב של הקורס."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "Is Proctoring Enabled"
 msgstr "הפיקוח מופעל"
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "This setting indicates whether this exam is a proctored exam."
 msgstr "הגדרה זו מציינת אם מבחן זה הוא מבחן תחת פיקוח."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "Software Secure Review Rules"
 msgstr "כללי הסקירה המאובטחים של התוכנה"
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "This setting indicates what rules the proctoring team should follow when "
 "viewing the videos."
@@ -4314,11 +4314,11 @@ msgstr ""
 "הגדרה זו מציינת לפי אילו כללים צריך צוות הפיקוח לפעול בעת צפייה בסרטוני "
 "הווידאו."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "Is Practice Exam"
 msgstr "זהו מבחן תרגול"
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "This setting indicates whether this exam is for testing purposes only. "
 "Practice exams are not verified."
@@ -4326,70 +4326,70 @@ msgstr ""
 "הגדרה זו מציינת אם מבחן זה הוא מבחן למטרות בחינה בלבד. מבחני תרגול אינם "
 "מאומתים"
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "Is Onboarding Exam"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "This setting indicates whether this exam is an onboarding exam."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "This subsection is unlocked for learners when they meet the prerequisite "
 "requirements."
 msgstr "תת-קטע זה אינו נעול ללומדים כאשר הם עומדים בדרישות הקדם."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid "This exam is hidden from the learner."
 msgstr "מבחן זה חסוי ללומד."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "Because the course has ended, this assignment is hidden from the learner."
 msgstr "מכיוון שהקורס כבר נגמר, מטלה זו מוסתרת."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "Because the due date has passed, this assignment is hidden from the learner."
 msgstr "מכיוון שתאריך היעד כבר חלף, מטלה זו מוסתרת."
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "This section is a prerequisite. You must complete this section in order to "
 "unlock additional content."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/seq_block.py
 msgid ""
 "A list summarizing what students should look forward to in this section."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 #, python-brace-format
 msgid "Group ID {group_id}"
 msgstr "מזהה קבוצה {group_id}"
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid "Not Selected"
 msgstr "לא נבחר "
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid "The display name for this component. (Not shown to learners)"
 msgstr "שם הרכיב שמופיע בתצוגה. (לא מופיע לתלמידים)"
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid "Content Experiment"
 msgstr "ניסוי תוכן"
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
 msgstr "רשימת הגדרות קבוצה לחלוקת סטודנטים לקבוצות תוכן."
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid ""
 "The configuration defines how users are grouped for this content experiment."
 " Caution: Changing the group configuration of a student-visible experiment "
@@ -4398,35 +4398,35 @@ msgstr ""
 "הגדרה זו מגדירה את הדרך בה משתמשים מקובצים עבור ניסוי תוכן זה. זהירות: שינוי"
 " הגדרת הקבוצה עבור הניסוי הגלוי לסטודנט ישפיע על המידע של הניסוי."
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid "Group Configuration"
 msgstr "הגדרת קבוצה"
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid "Which child module students in a particular group_id should see"
 msgstr "איזה מודול מִשנֶה צריכים לראות הסטודנטים ב-group_id מסוים "
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 #, python-brace-format
 msgid "{group_name} (inactive)"
 msgstr "{group_name} (לא פעילה)"
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid "The experiment is not associated with a group configuration."
 msgstr "הניסוי אינו מקושר להגדרת קבוצה."
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid "Select a Group Configuration"
 msgstr "בחר הגדרת קבוצה"
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid ""
 "The experiment uses a deleted group configuration. Select a valid group "
 "configuration or delete this experiment."
 msgstr ""
 "הניסוי משתמש בתצורת קבוצה שנמחקה. בחר תצורת קבוצה חוקית או מחק ניסוי זה."
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid ""
 "The experiment uses a group configuration that is not supported for "
 "experiments. Select a valid group configuration or delete this experiment."
@@ -4434,16 +4434,16 @@ msgstr ""
 "הניסוי משתמש בתצורת קבוצה שאינה נתמכת בניסויים. בחר תצורת קבוצה חוקית או מחק"
 " ניסוי זה."
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid ""
 "The experiment does not contain all of the groups in the configuration."
 msgstr "הניסוי אינו כולל את כל הקבוצות שבתצורה."
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid "Add Missing Groups"
 msgstr "הוסף קבוצות חסרות"
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid ""
 "The experiment has an inactive group. Move content into active groups, then "
 "delete the inactive group."
@@ -4451,7 +4451,7 @@ msgstr ""
 "ישנה קבוצה לא פעילה בניסוי. העבר תוכן לקבוצות פעילות, לאחר מכן מחק את הקבוצה"
 " הלא פעילה."
 
-#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/split_test_block.py
 msgid "This content experiment has issues that affect content visibility."
 msgstr "קיימות בעיות בניסוי תוכן זה המשפיעות על הצגת התוכן."
 
@@ -4484,7 +4484,7 @@ msgstr ""
 msgid "Cancel"
 msgstr "ביטול"
 
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#: common/lib/xmodule/xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
@@ -4492,11 +4492,11 @@ msgid ""
 msgstr ""
 "לא ניתן לקבל תעתיקים מיוטיוב עבור {youtube_id}. קוד סטטוס: {status_code}."
 
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#: common/lib/xmodule/xmodule/video_block/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
 msgstr "אנו תומכים רק בפורמט תמליל SubRip (*.srt) "
 
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#: common/lib/xmodule/xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
@@ -4505,25 +4505,25 @@ msgstr ""
 "אירע שיבוש בקובץ התעתיקים SubRip במהלך הפיצול. ההודעה הפנימית היא "
 "{error_message}"
 
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#: common/lib/xmodule/xmodule/video_block/transcripts_utils.py
 msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr "אירע שיבוש בקובץ התעתיקים SubRip במהלך הפיצול."
 
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#: common/lib/xmodule/xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 "{exception_message}: לא ניתן למצוא את התעתיקים שהועלו: {user_filename}"
 
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#: common/lib/xmodule/xmodule/video_block/video_handlers.py
 msgid "Language is required."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/video_module/video_module.py
+#: common/lib/xmodule/xmodule/video_block/video_block.py
 msgid "Basic"
 msgstr "בסיסי"
 
-#: common/lib/xmodule/xmodule/video_module/video_module.py
+#: common/lib/xmodule/xmodule/video_block/video_block.py
 #, python-brace-format
 msgid "There is no transcript file associated with the {lang} language."
 msgid_plural ""
@@ -4533,7 +4533,7 @@ msgstr[1] "אין קבצי תמלול המשוייכים ל- {lang} שפות."
 msgstr[2] "אין קבצי תמלול המשוייכים ל- {lang} שפות."
 msgstr[3] "אין קבצי תמלול המשוייכים ל- {lang} שפות."
 
-#: common/lib/xmodule/xmodule/video_module/video_module.py
+#: common/lib/xmodule/xmodule/video_block/video_block.py
 msgid ""
 "The URL for your video. This can be a YouTube URL or a link to an .mp4, "
 ".ogg, or .webm video file hosted elsewhere on the Internet."
@@ -4541,58 +4541,58 @@ msgstr ""
 "כתובת ה-URL של סרטונך. זו יכולה להיות כתובת URL ביוטיוב או קישור לקובץ mp4 ,"
 " .ogg. או webm. המתארחים במקום אחר באינטרנט.  "
 
-#: common/lib/xmodule/xmodule/video_module/video_module.py
+#: common/lib/xmodule/xmodule/video_block/video_block.py
 msgid "Default Video URL"
 msgstr "כתובת URL כברירת מחדל לסרטון וידאו"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Component Display Name"
 msgstr "שם תצורה לרכיב"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Current position in the video."
 msgstr "מיקום נוכחי בסרטון הווידאו"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "Optional, for older browsers: the YouTube ID for the normal speed video."
 msgstr ""
 "זוהי אפשרות עבור דפדפנים ישנים יותר: מזהה יוטיוב לסרטונים בעלי מהירות רגילה."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "YouTube ID"
 msgstr "מזהה יוטיוב"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Optional, for older browsers: the YouTube ID for the .75x speed video."
 msgstr ""
 "זוהי אפשרות עבור דפדפנים ישנים יותר: מזהה יוטיוב לסרטונים בעלי מהירות ‎.75x"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "YouTube ID for .75x speed"
 msgstr "מזהה יוטיוב למהירות של ‎.75x"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "Optional, for older browsers: the YouTube ID for the 1.25x speed video."
 msgstr ""
 "זוהי אפשרות עבור דפדפנים ישנים יותר: מזהה יוטיוב לסרטונים בעלי מהירות "
 "‎1.25x."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "YouTube ID for 1.25x speed"
 msgstr "מזהה יוטיוב למהירות של ‎1.25x"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Optional, for older browsers: the YouTube ID for the 1.5x speed video."
 msgstr ""
 "זוהי אפשרות עבור דפדפנים ישנים יותר: מזהה יוטיוב לסרטונים בעלי מהירות ‎1.5x."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "YouTube ID for 1.5x speed"
 msgstr "מזהה יוטיוב למהירות של ‎1.5x"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "Time you want the video to start if you don't want the entire video to play."
 " Not supported in the native mobile app: the full video file will play. "
@@ -4602,11 +4602,11 @@ msgstr ""
 "שממנו יתחיל הסרטון לנגן. אפשרות זו אינה נתמכת באפליקציה לסמארטפונים, לכן "
 "הסרטון ינגן במלואו. ערך זמן  מרבי הוא  23:59:59."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Video Start Time"
 msgstr "זמן התחלת סרטון הווידאו"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "Time you want the video to stop if you don't want the entire video to play. "
 "Not supported in the native mobile app: the full video file will play. "
@@ -4616,11 +4616,11 @@ msgstr ""
 "שבו יסיים הסרטון לנגן. אפשרות זו אינה נתמכת באפליקציה לסמארטפונים, לכן "
 "הסרטון ינגן במלואו. ערך זמן מירבי הוא 23:59:59."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Video Stop Time"
 msgstr "זמן עצירת סרטון הווידאו"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "Allow students to download versions of this video in different formats if "
 "they cannot use the edX video player or do not have access to YouTube. You "
@@ -4630,11 +4630,11 @@ msgstr ""
 "יכולים להשתמש בנגן וידאו של edX או שאין להם גישה ליוטיוב. עלייך להוסיף לפחות"
 " כתובת URL אחת שאיננה כתובת של יוטיוב בשדה \"כתובות URL לקבצי וידאו\"."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Video Download Allowed"
 msgstr "אפשר הורדת סרטון וידאו"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "The URL or URLs where you've posted non-YouTube versions of the video. Each "
 "URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
@@ -4650,11 +4650,11 @@ msgstr ""
 "שברשימה והתואם למחשב הסטודנט. כדי לאפשר לסטודנטים להוריד את סרטוני הווידאו "
 "הללו, הגדר את 'הורדת סרטון וידאו מותרת' ל'כן'."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Video File URLs"
 msgstr "כתובות URL לקבצי וידאו "
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "By default, students can download an .srt or .txt transcript when you set "
 "Download Transcript Allowed to True. If you want to provide a downloadable "
@@ -4671,11 +4671,11 @@ msgstr ""
 "להוסיף את כתובת ה-URL לתמליל שכאן. סטודנטים יראו את קישור להורדת תמליל הנמצא"
 " בתחתית סרטון הווידאו."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Downloadable Transcript URL"
 msgstr "כתובת URL תמליל הניתן להורדה"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "Allow students to download the timed transcript. A link to download the file"
 " appears below the video. By default, the transcript is an .srt or .txt "
@@ -4686,11 +4686,11 @@ msgstr ""
 "לסרטון הווידאו. כברירת מחדל, התמליל הוא קובץ srt. או txt. אם ברצונך לספק את "
 "התמליל להורדה בפורמט שונה, העלה קובץ באמצעות שימוש בשדה 'העלה דף מידע'."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Download Transcript Allowed"
 msgstr "אפשר הורדת תמליל"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "The default transcript for the video, from the Default Timed Transcript "
 "field on the Basic tab. This transcript should be in English. You don't have"
@@ -4699,19 +4699,19 @@ msgstr ""
 "תעתיק ברירת המחדל לסרטון הווידאו, מהשדה 'תעתיק מתוזמן כברירת מחדל' בכרטיסייה"
 " 'בסיסי'. תעתיק זה צריך להיות באנגלית. אינך צריך לשנות הגדרה זו."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Default Timed Transcript"
 msgstr "ברירת מחדל של תמליל מתוזמן "
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Specify whether the transcripts appear with the video by default."
 msgstr "ציין אם התעתיקים מופיעים עם סרטון הווידאו כברירת מחדל."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Show Transcript"
 msgstr "הצג תמליל"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "Add transcripts in different languages. Click below to specify a language "
 "and upload an .srt transcript file for that language."
@@ -4719,51 +4719,51 @@ msgstr ""
 "הוספת תמלילים בשפות שונות. לחץ למטה כדי לציין שפה ולהעלות קובץ תמליל srt. "
 "עבור שפה זו."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Transcript Languages"
 msgstr "שפות התמליל"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Preferred language for transcript."
 msgstr "שפה מועדפת עבור תמליל."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Preferred language for transcript"
 msgstr "שפה מועדפת עבור תמליל"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Transcript file format to download by user."
 msgstr "פורמט קובץ תמליל להורדה על ידי משתמש."
 
 #. Translators: This is a type of file used for captioning in the video
 #. player.
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "SubRip (.srt) file"
 msgstr "קובץ SubRip (.srt) "
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Text (.txt) file"
 msgstr "קובץ Text (.txt)"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "The last speed that the user specified for the video."
 msgstr "המהירות האחרונה שפירט המשתמש עבור סרטון הווידאו."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "The default speed for the video."
 msgstr "מהירות ברירת המחדל עבור סרטו הווידאו."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "Specify whether to advance automatically to the next unit when the video "
 "ends."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Specify whether YouTube is available for the user."
 msgstr "ציין אם יוטיוב זמין למשתמש."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "Upload a handout to accompany this video. Students can download the handout "
 "by clicking Download Handout under the video."
@@ -4771,11 +4771,11 @@ msgstr ""
 "העלה דף מידע המלווה סרטון זה. סטודנטים יכולים להוריד את דף המידע באמצעות "
 "לחיצה 'הורד דף מידע' בתחתית סרטון הווידאו."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Upload Handout"
 msgstr "העלה דף מידע"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "Specify whether access to this video is limited to browsers only, or if it "
 "can be accessed from other applications including mobile apps."
@@ -4783,11 +4783,11 @@ msgstr ""
 "ציין אם הגישה לסרטון הווידאו הזה מוגבלת לדפדפנים בלבד או שניתן לגשת אליה "
 "מאפליקציות אחרות כולל אפליקציות לנייד."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Video Available on Web Only"
 msgstr "סרטון הווידאו זמין באינטרנט בלבד"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid ""
 "If you were assigned a Video ID by edX for the video to play in this "
 "component, enter the ID here. In this case, do not enter values in the "
@@ -4800,20 +4800,20 @@ msgstr ""
 "'כתובות URL קובץ הווידאו' וב'מזהה יוטיוב'. אם לא הוקצה בעבורך מזהה וידאו, "
 "הזן ערכים בשדות האחרים והתעלם משדה זה."
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Date of the last view of the bumper"
 msgstr "תאריך הצפיה האחרונה בבאמפר"
 
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/video_block/video_xfields.py
 msgid "Do not show bumper again"
 msgstr "אל תציג שוב את הבאמפר"
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 #: lms/templates/annotatable.html lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
 msgstr "הוראות"
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid ""
 "Add instructions to help learners understand how to use the word cloud. "
 "Clear instructions are important, especially for learners who have "
@@ -4822,44 +4822,44 @@ msgstr ""
 "הוסף הוראות על מנת לעזור ללומדים להבין כיצד להשתמש בענן המילים. הוראות "
 "ברורות הן חשובות, במיוחד עבור לומדים בעלי דרישות נגישוּת. "
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid "Inputs"
 msgstr "הכנסת נתונים"
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid ""
 "The number of text boxes available for learners to add words and sentences."
 msgstr "מספר תיבות הטקסט הזמינות עבור לומדים להוספת מילים ומשפטים."
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid "Maximum Words"
 msgstr "מספר מילים מרבי"
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid "The maximum number of words displayed in the generated word cloud."
 msgstr "מספר המילים המרבי המוצג בענן מחולל המילים."
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid "Show Percents"
 msgstr "הראה אחוזים"
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid "Statistics are shown for entered words near that word."
 msgstr "נתוני סטטיסטיקה, המוצגים עבור מילים, מוזנים ליד המילה."
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid "Whether this learner has posted words to the cloud."
 msgstr "האם העלה לומד זה מילים לענן."
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid "Student answer."
 msgstr "תשובת הסטודנט."
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid "All possible words from all learners."
 msgstr "כל המילים האפשריות מכל הלומדים."
 
-#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/word_cloud_block.py
 msgid "Top num_top_words words for word cloud."
 msgstr "מילות num_top_words מובילות עבור ענן המילים."
 
@@ -11842,63 +11842,63 @@ msgstr ""
 msgid "File upload failed. Please try again"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Invalid data"
 msgstr "נתונים לא חוקיים"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Invalid data ({details})"
 msgstr "נתונים לא חוקיים ({details})"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "Item is already present in target location."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into itself."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item into it's child."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "You can not move an item directly into content experiment."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{source_usage_key} not found in {parent_usage_key}."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "You can not move {source_usage_key} at an invalid index ({target_index})."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "העתקה של {0}"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "העתקה של '{0}'"
@@ -11906,7 +11906,7 @@ msgstr "העתקה של '{0}'"
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
@@ -11916,11 +11916,11 @@ msgstr ""
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 msgid "%"
 msgstr "%"
 
-#: cms/djangoapps/contentstore/views/item.py
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""

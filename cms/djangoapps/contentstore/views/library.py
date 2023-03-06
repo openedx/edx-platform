@@ -43,7 +43,7 @@ from ..config.waffle import REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND
 from ..utils import add_instructor, reverse_library_url
 from .component import CONTAINER_TEMPLATES, get_component_templates
 from .helpers import is_content_creator
-from .item import create_xblock_info
+from .block import create_xblock_info
 from .user import user_with_role
 
 __all__ = ['library_handler', 'manage_library_users']

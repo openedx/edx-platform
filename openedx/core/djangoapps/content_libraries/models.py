@@ -126,7 +126,8 @@ class ContentLibrary(models.Model):
         related_name='content_libraries',
         help_text=("List of authorized LTI tool configurations that can access "
                    "this library's content through LTI launches, if empty no LTI "
-                   "launch is allowed.")
+                   "launch is allowed."),
+        blank=True,
     )
 
     class Meta:

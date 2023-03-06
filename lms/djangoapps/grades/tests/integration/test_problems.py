@@ -10,7 +10,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -118,18 +118,18 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         super().setUp()
         self.course = CourseFactory.create()
         with self.store.bulk_operations(self.course.id):
-            self.chapter = ItemFactory.create(
+            self.chapter = BlockFactory.create(
                 parent=self.course,
                 category="chapter",
                 display_name="Test Chapter"
             )
-            self.sequence = ItemFactory.create(
+            self.sequence = BlockFactory.create(
                 parent=self.chapter,
                 category='sequential',
                 display_name="Test Sequential 1",
                 graded=True
             )
-            self.vertical = ItemFactory.create(
+            self.vertical = BlockFactory.create(
                 parent=self.sequence,
                 category='vertical',
                 display_name='Test Vertical 1'
@@ -162,7 +162,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         """
 
         metadata = self._get_altered_metadata(alterations)
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.vertical,
             category="problem",
             display_name="problem",
@@ -223,14 +223,14 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
         super().setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
-            cls.chapter = ItemFactory.create(parent=cls.course, category="chapter", display_name="chapter")
-            cls.sequential = ItemFactory.create(parent=cls.chapter, category="sequential", display_name="sequential")
-            cls.vertical = ItemFactory.create(parent=cls.sequential, category="vertical", display_name="vertical1")
+            cls.chapter = BlockFactory.create(parent=cls.course, category="chapter", display_name="chapter")
+            cls.sequential = BlockFactory.create(parent=cls.chapter, category="sequential", display_name="sequential")
+            cls.vertical = BlockFactory.create(parent=cls.sequential, category="vertical", display_name="vertical1")
             problem_xml = cls._create_problem_xml()
             cls.problems = []
             for i in range(2):
                 cls.problems.append(
-                    ItemFactory.create(
+                    BlockFactory.create(
                         parent=cls.vertical,
                         category="problem",
                         display_name=f"problem_{i}",

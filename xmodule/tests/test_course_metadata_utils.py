@@ -20,6 +20,7 @@ from xmodule.course_metadata_utils import (
     course_start_date_is_default,
     has_course_ended,
     has_course_started,
+    is_enrollment_open,
     number_for_course_location
 )
 from xmodule.modulestore.tests.utils import (
@@ -59,7 +60,21 @@ class CourseMetadataUtilsTestCase(TestCase):
                     user_id=-3,  # -3 refers to a "testing user"
                     fields={
                         "start": _LAST_MONTH,
-                        "end": _LAST_WEEK
+                        "end": _LAST_WEEK,
+                        "enrollment_start": _LAST_MONTH,
+                        "enrollment_end": _LAST_WEEK
+                    }
+                )
+            with mixed_store.default_store('mongo'):
+                self.demo_course_enrollment_end = mixed_store.create_course(
+                    org="edX",
+                    course="DemoX.2",
+                    run="Fall_2014_1",
+                    user_id=-3,  # -3 refers to a "testing user"
+                    fields={
+                        "start": _LAST_MONTH,
+                        "end": _LAST_WEEK,
+                        "enrollment_end": _LAST_WEEK
                     }
                 )
             with mixed_store.default_store('split'):
@@ -70,7 +85,20 @@ class CourseMetadataUtilsTestCase(TestCase):
                     user_id=-3,  # -3 refers to a "testing user"
                     fields={
                         "start": _NEXT_WEEK,
-                        "display_name": "Intro to <div>html</div>"
+                        "display_name": "Intro to <div>html</div>",
+                        "enrollment_start": _NEXT_WEEK,
+                    }
+                )
+            with mixed_store.default_store('split'):
+                self.html_course_enrollment_start = mixed_store.create_course(
+                    org="UniversityX",
+                    course="CS-204",
+                    run="Y2097",
+                    user_id=-3,  # -3 refers to a "testing user"
+                    fields={
+                        "start": _LAST_WEEK,
+                        "display_name": "Intro to <div>html</div>",
+                        "enrollment_start": _LAST_WEEK,
                     }
                 )
 
@@ -155,6 +183,18 @@ class CourseMetadataUtilsTestCase(TestCase):
             FunctionTest(has_course_ended, [
                 TestScenario((self.demo_course.end,), True),
                 TestScenario((self.html_course.end,), False),
+            ]),
+            FunctionTest(is_enrollment_open, [
+                TestScenario((self.demo_course.enrollment_start, self.demo_course.enrollment_end,), False),
+                TestScenario((
+                    self.demo_course_enrollment_end.enrollment_start,
+                    self.demo_course_enrollment_end.enrollment_end
+                ), False),
+                TestScenario((self.html_course.enrollment_start, self.html_course.enrollment_end,), False),
+                TestScenario((
+                    self.html_course_enrollment_start.enrollment_start,
+                    self.html_course_enrollment_start.enrollment_end,
+                ), True),
             ]),
             FunctionTest(course_start_date_is_default, [
                 TestScenario((test_datetime, advertised_start_parsable), False),

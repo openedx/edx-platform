@@ -9,7 +9,7 @@ from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class BaseCourseUpdatesTestCase(SharedModuleStoreTestCase):
@@ -23,9 +23,9 @@ class BaseCourseUpdatesTestCase(SharedModuleStoreTestCase):
                 cls.course = CourseFactory.create()
                 with cls.store.bulk_operations(cls.course.id):
                     # Create a basic course structure
-                    chapter = ItemFactory.create(category='chapter', parent_location=cls.course.location)
-                    section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-                    ItemFactory.create(category='vertical', parent_location=section.location)
+                    chapter = BlockFactory.create(category='chapter', parent_location=cls.course.location)
+                    section = BlockFactory.create(category='sequential', parent_location=chapter.location)
+                    BlockFactory.create(category='vertical', parent_location=section.location)
 
     @classmethod
     def setUpTestData(cls):

@@ -41,7 +41,7 @@
                 this.options = _.extend({}, options);
                 this._super(options);
                 _.bindAll(this, 'render', 'imageChangeSucceeded', 'imageChangeFailed', 'fileSelected',
-                          'watchForPageUnload', 'onBeforeUnload');
+                    'watchForPageUnload', 'onBeforeUnload');
             },
 
             render: function() {

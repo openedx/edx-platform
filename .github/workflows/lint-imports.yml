@@ -1,0 +1,52 @@
+name: Lint Python Imports
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  lint-imports:
+    name: Lint Python Imports
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install system requirements
+        run: sudo apt update && sudo apt install -y libxmlsec1-dev
+
+      - name: Install pip
+        run: python -m pip install -r requirements/pip.txt
+
+      - name: Get pip cache dir
+        id: pip-cache-dir
+        run: echo "::set-output name=dir::$(pip cache dir)"
+
+      - name: Cache pip dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Install python dependencies
+        run: pip install -r requirements/edx/development.txt
+
+      # As long there are sub-projects[1] in edx-platform, we analyze each
+      # project separately here, in order to make import-linting errors easier
+      # to pinpoint.
+      #
+      #  [1] https://openedx.atlassian.net/browse/BOM-2579
+
+      - name: Analyze imports (repo root)
+        run: make lint-imports

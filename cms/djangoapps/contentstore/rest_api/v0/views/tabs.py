@@ -81,8 +81,8 @@ class CourseTabListView(DeveloperErrorViewMixin, APIView):
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
 
-        course_module = modulestore().get_course(course_key)
-        tabs_to_render = get_course_tabs(course_module, request.user)
+        course_block = modulestore().get_course(course_key)
+        tabs_to_render = get_course_tabs(course_block, request.user)
         return Response(CourseTabSerializer(tabs_to_render, many=True).data)
 
 
@@ -147,12 +147,12 @@ class CourseTabSettingsView(DeveloperErrorViewMixin, APIView):
         tab_id_locator = TabIDLocatorSerializer(data=request.query_params)
         tab_id_locator.is_valid(raise_exception=True)
 
-        course_module = modulestore().get_course(course_key)
+        course_block = modulestore().get_course(course_key)
         serializer = CourseTabUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         edit_tab_handler(
-            course_module,
+            course_block,
             {
                 "tab_id_locator": tab_id_locator.data,
                 **serializer.data,
@@ -216,11 +216,11 @@ class CourseTabReorderView(DeveloperErrorViewMixin, APIView):
         if not has_studio_write_access(request.user, course_key):
             self.permission_denied(request)
 
-        course_module = modulestore().get_course(course_key)
+        course_block = modulestore().get_course(course_key)
         tab_id_locators = TabIDLocatorSerializer(data=request.data, many=True)
         tab_id_locators.is_valid(raise_exception=True)
         reorder_tabs_handler(
-            course_module,
+            course_block,
             tab_id_locators.validated_data,
             request.user,
         )

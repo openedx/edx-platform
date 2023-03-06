@@ -17,11 +17,11 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 class TestOrphanBase(CourseTestCase):
     """
-    Base class for Studio tests that require orphaned modules
+    Base class for Studio tests that require orphaned blocks
     """
     def create_course_with_orphans(self, default_store):
         """
-        Creates a course with 3 orphan modules, one of which
+        Creates a course with 3 orphan blocks, one of which
         has a child that's also in the course tree.
         """
         course = CourseFactory.create(default_store=default_store)
@@ -56,7 +56,7 @@ class TestOrphanBase(CourseTestCase):
         orphan_vertical.children.append(multi_parent_html.location)
         self.store.update_item(orphan_vertical, self.user.id)
 
-        # create an orphaned html module
+        # create an orphaned html block
         orphan_html = self.store.create_item(self.user.id, course.id, 'html', "OrphanHtml")
         self.store.publish(orphan_html.location, self.user.id)
 
@@ -145,7 +145,7 @@ class TestOrphan(TestOrphanBase):
             \     /
               html
         """
-        # Get a course with orphan modules
+        # Get a course with orphan blocks
         course = self.create_course_with_orphans(ModuleStoreEnum.Type.split)
 
         # Fetch the required course components.
@@ -194,7 +194,7 @@ class TestOrphan(TestOrphanBase):
                html
 
         """
-        # Get a course with orphan modules
+        # Get a course with orphan blocks
         course = self.create_course_with_orphans(ModuleStoreEnum.Type.split)
         orphan_chapter = self.store.get_item(BlockUsageLocator(course.id, 'chapter', 'OrphanChapter'))
         chapter1 = self.store.get_item(BlockUsageLocator(course.id, 'chapter', 'Chapter1'))

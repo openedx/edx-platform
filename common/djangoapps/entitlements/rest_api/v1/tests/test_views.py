@@ -4,7 +4,6 @@ Test file to test the Entitlement API Views.
 
 import json
 import logging
-import unittest
 import uuid
 from datetime import datetime, timedelta
 from unittest.mock import patch
@@ -24,6 +23,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.models import UserOrgTag
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -37,7 +37,7 @@ if settings.ROOT_URLCONF == 'lms.urls':
     from common.djangoapps.entitlements.rest_api.v1.views import set_entitlement_policy
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EntitlementViewSetTest(ModuleStoreTestCase):
     """
     Tests for the Entitlements API Views.
@@ -808,7 +808,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert reinstated_entitlement.is_entitlement_refundable() is False
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
     """
     Tests for the EntitlementEnrollmentViewSets

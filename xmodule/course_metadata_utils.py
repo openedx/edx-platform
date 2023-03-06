@@ -110,6 +110,20 @@ def has_course_ended(end_date):
     return datetime.now(utc) > end_date if end_date is not None else False
 
 
+def is_enrollment_open(enrollment_start_date, enrollment_end_date):
+    """
+    Given a course's enrollment start and end datetime, returns if enrollment is open
+
+    Arguments:
+        enrollment_start_date (datetime): The enrollment start datetime of the course.
+        enrollment_end_date (datetime): The enrollment end datetime of the course.
+    """
+    now = datetime.now(utc)
+    enrollment_start_date = enrollment_start_date or datetime.min.replace(tzinfo=utc)
+    enrollment_end_date = enrollment_end_date or datetime.max.replace(tzinfo=utc)
+    return enrollment_start_date < now < enrollment_end_date
+
+
 def course_starts_within(start_date, look_ahead_days):
     """
     Given a course's start datetime and look ahead days, returns True if

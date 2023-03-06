@@ -267,8 +267,8 @@ describe('MoveXBlock', function() {
      */
     verifyBreadcrumbViewInfo = function(category, xblockIndex) {
         var displayedBreadcrumbs = modal.moveXBlockBreadcrumbView.$el.find('.breadcrumbs .bc-container').map(
-            function() { return $(this).text().trim(); }
-        ).get(),
+                function() { return $(this).text().trim(); }
+            ).get(),
             categories = _.keys(parentChildMap).concat(['component']),
             visitedCategories = categories.slice(0, _.indexOf(categories, category));
 

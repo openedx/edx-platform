@@ -14,9 +14,9 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from pyquery import PyQuery as pq
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
@@ -27,7 +27,7 @@ from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import OrgInstructorFactory
 from common.djangoapps.student.tests.factories import OrgStaffFactory
 from common.djangoapps.student.tests.factories import StaffFactory
-from lms.djangoapps.courseware.module_render import load_single_xblock
+from lms.djangoapps.courseware.block_render import load_single_xblock
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -220,9 +220,9 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
                 block_args['weight'] = weight
             if graded and has_score and weight:
                 block_args['metadata'] = METADATA
-            block = ItemFactory.create(**block_args)
+            block = BlockFactory.create(**block_args)
             # Intersperse HTML so that the content-gating renders in all blocks
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=cls.blocks_dict['vertical'],
                 category='html',
                 graded=False,
@@ -240,7 +240,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
         scored_lti_metadata.update(METADATA)
 
         # add LTI blocks to default course
-        cls.blocks_dict['lti_block'] = ItemFactory.create(
+        cls.blocks_dict['lti_block'] = BlockFactory.create(
             parent=cls.blocks_dict['vertical'],
             category='lti_consumer',
             has_score=True,
@@ -248,12 +248,12 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
             metadata=scored_lti_metadata,
         )
         # Intersperse HTML so that the content-gating renders in all blocks
-        ItemFactory.create(
+        BlockFactory.create(
             parent=cls.blocks_dict['vertical'],
             category='html',
             graded=False,
         )
-        cls.blocks_dict['lti_block_not_scored'] = ItemFactory.create(
+        cls.blocks_dict['lti_block_not_scored'] = BlockFactory.create(
             parent=cls.blocks_dict['vertical'],
             category='lti_consumer',
             has_score=False,
@@ -261,14 +261,14 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
         )
 
         # Intersperse HTML so that the content-gating renders in all blocks
-        ItemFactory.create(
+        BlockFactory.create(
             parent=cls.blocks_dict['vertical'],
             category='html',
             graded=False,
         )
 
         # add ungraded problem for xblock_handler test
-        cls.blocks_dict['graded_problem'] = ItemFactory.create(
+        cls.blocks_dict['graded_problem'] = BlockFactory.create(
             parent=cls.blocks_dict['vertical'],
             category='problem',
             graded=True,
@@ -276,26 +276,26 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
         )
 
         # Intersperse HTML so that the content-gating renders in all blocks
-        ItemFactory.create(
+        BlockFactory.create(
             parent=cls.blocks_dict['vertical'],
             category='html',
             graded=False,
         )
 
-        cls.blocks_dict['ungraded_problem'] = ItemFactory.create(
+        cls.blocks_dict['ungraded_problem'] = BlockFactory.create(
             parent=cls.blocks_dict['vertical'],
             category='problem',
             graded=False,
         )
 
         # Intersperse HTML so that the content-gating renders in all blocks
-        ItemFactory.create(
+        BlockFactory.create(
             parent=cls.blocks_dict['vertical'],
             category='html',
             graded=False,
         )
 
-        cls.blocks_dict['audit_visible_graded_problem'] = ItemFactory.create(
+        cls.blocks_dict['audit_visible_graded_problem'] = BlockFactory.create(
             parent=cls.blocks_dict['vertical'],
             category='problem',
             graded=True,
@@ -308,7 +308,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
         )
 
         # Intersperse HTML so that the content-gating renders in all blocks
-        ItemFactory.create(
+        BlockFactory.create(
             parent=cls.blocks_dict['vertical'],
             category='html',
             graded=False,
@@ -409,28 +409,28 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
 
         with cls.store.bulk_operations(course.id):
             blocks_dict = {}
-            chapter = ItemFactory.create(
+            chapter = BlockFactory.create(
                 parent=course,
                 display_name='Overview',
             )
-            blocks_dict['chapter'] = ItemFactory.create(
+            blocks_dict['chapter'] = BlockFactory.create(
                 parent=course,
                 category='chapter',
                 display_name='Week 1',
             )
-            blocks_dict['sequential'] = ItemFactory.create(
+            blocks_dict['sequential'] = BlockFactory.create(
                 parent=chapter,
                 category='sequential',
                 display_name='Lesson 1',
             )
-            blocks_dict['vertical'] = ItemFactory.create(
+            blocks_dict['vertical'] = BlockFactory.create(
                 parent=blocks_dict['sequential'],
                 category='vertical',
                 display_name='Lesson 1 Vertical - Unit 1',
             )
 
             for component_type in component_types:
-                block = ItemFactory.create(
+                block = BlockFactory.create(
                     parent=blocks_dict['vertical'],
                     category=component_type,
                     graded=True,
@@ -438,7 +438,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
                 )
                 blocks_dict[component_type] = block
                 # Intersperse HTML so that the content-gating renders in all blocks
-                ItemFactory.create(
+                BlockFactory.create(
                     parent=blocks_dict['vertical'],
                     category='html',
                     graded=False,
@@ -834,12 +834,12 @@ class TestConditionalContentAccess(TestConditionalContent):
             value='1',
         )
         # Create blocks to go into the verticals
-        self.block_a = ItemFactory.create(
+        self.block_a = BlockFactory.create(
             category='problem',
             parent=self.vertical_a,
             metadata=METADATA,
         )
-        self.block_b = ItemFactory.create(
+        self.block_b = BlockFactory.create(
             category='problem',
             parent=self.vertical_b,
             metadata=METADATA,
@@ -918,17 +918,17 @@ class TestMessageDeduplication(ModuleStoreTestCase):
         CourseModeFactory.create(course_id=course.id, mode_slug='verified')
         blocks_dict = {}
         with self.store.bulk_operations(course.id):
-            blocks_dict['chapter'] = ItemFactory.create(
+            blocks_dict['chapter'] = BlockFactory.create(
                 parent=course,
                 category='chapter',
                 display_name='Week 1'
             )
-            blocks_dict['sequential'] = ItemFactory.create(
+            blocks_dict['sequential'] = BlockFactory.create(
                 parent=blocks_dict['chapter'],
                 category='sequential',
                 display_name='Lesson 1'
             )
-            blocks_dict['vertical'] = ItemFactory.create(
+            blocks_dict['vertical'] = BlockFactory.create(
                 parent=blocks_dict['sequential'],
                 category='vertical',
                 display_name='Lesson 1 Vertical - Unit 1'
@@ -947,7 +947,7 @@ class TestMessageDeduplication(ModuleStoreTestCase):
             course_id=course['course'].id,
             mode='audit'
         )
-        blocks_dict['graded_1'] = ItemFactory.create(
+        blocks_dict['graded_1'] = BlockFactory.create(
             parent_location=blocks_dict['vertical'].location,
             category='problem',
             graded=True,
@@ -966,13 +966,13 @@ class TestMessageDeduplication(ModuleStoreTestCase):
         ''' First graded problem should show message, second shouldn't '''
         course = self._create_course()
         blocks_dict = course['blocks']
-        blocks_dict['graded_1'] = ItemFactory.create(
+        blocks_dict['graded_1'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=True,
             metadata=METADATA,
         )
-        blocks_dict['graded_2'] = ItemFactory.create(
+        blocks_dict['graded_2'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=True,
@@ -1003,25 +1003,25 @@ class TestMessageDeduplication(ModuleStoreTestCase):
         ''' First graded problem should show message, all that follow shouldn't '''
         course = self._create_course()
         blocks_dict = course['blocks']
-        blocks_dict['graded_1'] = ItemFactory.create(
+        blocks_dict['graded_1'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=True,
             metadata=METADATA,
         )
-        blocks_dict['graded_2'] = ItemFactory.create(
+        blocks_dict['graded_2'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=True,
             metadata=METADATA,
         )
-        blocks_dict['graded_3'] = ItemFactory.create(
+        blocks_dict['graded_3'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=True,
             metadata=METADATA,
         )
-        blocks_dict['graded_4'] = ItemFactory.create(
+        blocks_dict['graded_4'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=True,
@@ -1066,18 +1066,18 @@ class TestMessageDeduplication(ModuleStoreTestCase):
         ''' Multiple graded content with ungraded between it should show message on either end '''
         course = self._create_course()
         blocks_dict = course['blocks']
-        blocks_dict['graded_1'] = ItemFactory.create(
+        blocks_dict['graded_1'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=True,
             metadata=METADATA,
         )
-        blocks_dict['ungraded_2'] = ItemFactory.create(
+        blocks_dict['ungraded_2'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=False,
         )
-        blocks_dict['graded_3'] = ItemFactory.create(
+        blocks_dict['graded_3'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=True,
@@ -1123,7 +1123,7 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
     to check whether a sequence contains content type gated blocks
     The content_type_gate_for_block can be used to return the content type gate for a given block
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         super().setUp()
@@ -1138,21 +1138,23 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
         CourseModeFactory.create(course_id=course.id, mode_slug='verified')
         blocks_dict = {}
         with self.store.bulk_operations(course.id):
-            blocks_dict['chapter'] = ItemFactory.create(
+            blocks_dict['chapter'] = BlockFactory.create(
                 parent=course,
                 category='chapter',
                 display_name='Week 1'
             )
-            blocks_dict['sequential'] = ItemFactory.create(
+            blocks_dict['sequential'] = BlockFactory.create(
                 parent=blocks_dict['chapter'],
                 category='sequential',
                 display_name='Lesson 1'
             )
-            blocks_dict['vertical'] = ItemFactory.create(
+            blocks_dict['vertical'] = BlockFactory.create(
                 parent=blocks_dict['sequential'],
                 category='vertical',
                 display_name='Lesson 1 Vertical - Unit 1'
             )
+        # get updated course
+        course = self.store.get_item(course.location)
         return {
             'course': course,
             'blocks': blocks_dict,
@@ -1167,13 +1169,13 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
             course_id=course['course'].id,
             mode='audit'
         )
-        blocks_dict['graded_1'] = ItemFactory.create(
+        blocks_dict['graded_1'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=True,
             metadata=METADATA,
         )
-        blocks_dict['not_graded_1'] = ItemFactory.create(
+        blocks_dict['not_graded_1'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=False,
@@ -1200,24 +1202,30 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
             course_id=course['course'].id,
             mode='audit'
         )
-        blocks_dict['not_graded_1'] = ItemFactory.create(
+        blocks_dict['not_graded_1'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=False,
             metadata=METADATA,
         )
+        # get updated course
+        course['course'] = self.store.get_item(course['course'].location)
+        blocks_dict['vertical'] = self.store.get_item(blocks_dict['vertical'].location)
 
         # The method returns a content type gate for blocks that should be gated
         assert ContentTypeGatingService().check_children_for_content_type_gating_paywall(
             blocks_dict['vertical'], course['course'].id
         ) is None
 
-        blocks_dict['graded_1'] = ItemFactory.create(
+        blocks_dict['graded_1'] = BlockFactory.create(
             parent=blocks_dict['vertical'],
             category='problem',
             graded=True,
             metadata=METADATA,
         )
+        # get updated course
+        course['course'] = self.store.get_item(course['course'].location)
+        blocks_dict['vertical'] = self.store.get_item(blocks_dict['vertical'].location)
 
         # The method returns None for blocks that should not be gated
         assert 'content-paywall' in ContentTypeGatingService().check_children_for_content_type_gating_paywall(

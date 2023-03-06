@@ -8,7 +8,7 @@ from unittest.mock import patch
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -76,7 +76,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         """
         block_type = block_hierarchy['#type']
         block_ref = block_hierarchy['#ref']
-        factory = (CourseFactory if block_type == 'course' else ItemFactory)
+        factory = (CourseFactory if block_type == 'course' else BlockFactory)
         kwargs = {key: value for key, value in block_hierarchy.items() if key[0] != '#'}
 
         if block_type != 'course':
@@ -239,7 +239,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
                 continue  # course already created
 
             self.xblock_keys.append(
-                ItemFactory.create(
+                BlockFactory.create(
                     parent=self.get_block(parents_index[0]),
                     category="vertical",
                 ).location

@@ -19,7 +19,7 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
-from xmodule.modulestore.xml_importer import StaticContentImporter, _update_and_import_module, _update_module_location
+from xmodule.modulestore.xml_importer import StaticContentImporter, _update_and_import_block, _update_block_location
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 
@@ -152,7 +152,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Move to different runtime w/ different course id
         target_location_namespace = CourseKey.from_string("org/course/run")
-        new_version = _update_and_import_module(
+        new_version = _update_and_import_block(
             self.xblock,
             modulestore(),
             999,
@@ -183,7 +183,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Remap the namespace
         target_location_namespace = BlockUsageLocator(CourseLocator("org", "course", "run"), "category", "stubxblock")
-        new_version = _update_and_import_module(
+        new_version = _update_and_import_block(
             self.xblock,
             modulestore(),
             999,
@@ -209,7 +209,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Remap the namespace
         target_location_namespace = BlockUsageLocator(CourseLocator("org", "course", "run"), "category", "stubxblock")
-        new_version = _update_and_import_module(
+        new_version = _update_and_import_block(
             self.xblock,
             modulestore(),
             999,
@@ -303,8 +303,8 @@ class UpdateLocationTest(ModuleStoreNoSettings):
 
         # Update location
         target_location = self.xblock.location.replace(revision='draft')
-        _update_module_location(self.xblock, target_location)
-        new_version = self.xblock  # _update_module_location updates in-place
+        _update_block_location(self.xblock, target_location)
+        new_version = self.xblock  # _update_block_location updates in-place
 
         # Check the XBlock's location
         assert new_version.location == target_location

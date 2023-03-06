@@ -18,7 +18,7 @@ TASK_LOG = logging.getLogger('edx.celery.task')
 FILTERED_OUT_ROLES = ['staff', 'instructor', 'finance_admin', 'sales_admin']
 
 
-def upload_may_enroll_csv(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):
+def upload_may_enroll_csv(_xblock_instance_args, _entry_id, course_id, task_input, action_name):
     """
     For a given `course_id`, generate a CSV file containing
     information about students who may enroll but have not done so
@@ -50,7 +50,7 @@ def upload_may_enroll_csv(_xmodule_instance_args, _entry_id, course_id, task_inp
     return task_progress.update_task_state(extra_meta=current_step)
 
 
-def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):
+def upload_students_csv(_xblock_instance_args, _entry_id, course_id, task_input, action_name):
     """
     For a given `course_id`, generate a CSV file containing profile
     information for all students that are enrolled, and store using a

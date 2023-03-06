@@ -14,7 +14,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -45,7 +45,7 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
             default_store=ModuleStoreEnum.Type.split,
         )
         assert str(self.course.id) == self.COURSE_KEY
-        self.problem = ItemFactory.create(
+        self.problem = BlockFactory.create(
             parent=self.course, category="problem", display_name="Test Problem", publish_item=False,
         )
         assert str(self.problem.location) == self.BLOCK_KEY

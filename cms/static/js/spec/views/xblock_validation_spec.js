@@ -42,7 +42,7 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
                     empty: false, summary: {text: 'Not configured', type: model.NOT_CONFIGURED},
                     xblock_id: 'id'
                 },
-                    {parse: true}
+                {parse: true}
                 );
                 nonRootView = new XBlockValidationView({model: notConfiguredModel});
                 nonRootView.render();
@@ -71,7 +71,7 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
                             text: 'First message', type: 'warning',
                             action_label: 'First Message Action', action_runtime_event: 'fix-up'
                         },
-                         {text: 'Second message', type: 'error'}
+                        {text: 'Second message', type: 'error'}
                     ],
                     xblock_id: 'id'
                 });

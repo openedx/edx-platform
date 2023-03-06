@@ -115,7 +115,8 @@ def list_courses(request,
                  org=None,
                  filter_=None,
                  search_term=None,
-                 permissions=None):
+                 permissions=None,
+                 active_only=False):
     """
     Yield all available courses.
 
@@ -144,12 +145,13 @@ def list_courses(request,
         permissions (list[str]):
             If specified, it filters visible `CourseOverview` objects by
             checking if each permission specified is granted for the username.
+        active_only (bool): Optional parameter that enables fetching active courses only.
 
     Return value:
         Yield `CourseOverview` objects representing the collection of courses.
     """
     user = get_effective_user(request.user, username)
-    course_qs = get_courses(user, org=org, filter_=filter_, permissions=permissions)
+    course_qs = get_courses(user, org=org, filter_=filter_, permissions=permissions, active_only=active_only)
     course_qs = _filter_by_search(course_qs, search_term)
     return course_qs
 

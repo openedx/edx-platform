@@ -764,6 +764,17 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 consent_client.provide_consent(**kwargs)
 
             enrollment_attributes = request.data.get('enrollment_attributes')
+            force_enrollment = request.data.get('force_enrollment')
+            # Check if the force enrollment status is None or a Boolean
+            if force_enrollment is not None and not isinstance(force_enrollment, bool):
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={
+                        'message': ("'{value}' is an invalid force enrollment status.").format(value=force_enrollment)
+                    }
+                )
+            # Only a staff user role can enroll a user forcefully
+            force_enrollment = force_enrollment and GlobalStaff().has_user(request.user)
             enrollment = api.get_enrollment(username, str(course_id))
             mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
             active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
@@ -809,7 +820,10 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     mode=mode,
                     is_active=is_active,
                     enrollment_attributes=enrollment_attributes,
-                    enterprise_uuid=request.data.get('enterprise_uuid')
+                    enterprise_uuid=request.data.get('enterprise_uuid'),
+                    force_enrollment=force_enrollment,
+                    # If we are creating enrollment by staff user with force_enrollment, we should allow expired modes
+                    include_expired=force_enrollment
                 )
 
             cohort_name = request.data.get('cohort')

@@ -6,7 +6,7 @@ import store from './data/store';
 import MainContainer from './components/Main/MainContainer.jsx';
 
 export const EntitlementSupportPage = props => (
-  <Provider store={store}>
-    <MainContainer {...props} />
-  </Provider>
+    <Provider store={store}>
+        <MainContainer {...props} />
+    </Provider>
 );

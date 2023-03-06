@@ -784,7 +784,7 @@ class ModuleStoreRead(ModuleStoreAssetBase, metaclass=ABCMeta):
         usage_key: A :class:`.UsageKey` subclass instance
 
         depth (int): An argument that some module stores may use to prefetch
-            descendents of the queried modules for more efficient results later
+            descendents of the queried blocks for more efficient results later
             in the request. The depth is counted in the number of calls to
             get_children() to cache. None indicates to cache all descendents
         """
@@ -1283,7 +1283,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Creates any necessary other things for the course as a side effect and doesn't return
         anything useful. The real subclass should call this before it returns the course.
         """
-        # clone a default 'about' overview module as well
+        # clone a default 'about' overview block as well
         about_location = self.make_course_key(org, course, run).make_usage_key('about', 'overview')
 
         about_descriptor = XBlock.load_class('about')

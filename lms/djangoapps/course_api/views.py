@@ -59,6 +59,9 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
             * `"timestamp"`: generated from the `start` timestamp
             * `"empty"`: no start date is specified
         * pacing: Course pacing. Possible values: instructor, self
+        * certificate_available_date (optional): Date the certificate will be available,
+            in ISO 8601 notation if the `certificates.auto_certificate_generation`
+            waffle switch is enabled
 
         Deprecated fields:
 
@@ -103,7 +106,8 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
                 "start": "2015-07-17T12:00:00Z",
                 "start_display": "July 17, 2015",
                 "start_type": "timestamp",
-                "pacing": "instructor"
+                "pacing": "instructor",
+                "certificate_available_date": "2015-08-14T00:00:00Z"
             }
     """
 
@@ -277,6 +281,11 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             Notice that Staff users are always granted permission to list any
             course.
 
+        active_only (optional):
+            If this boolean is specified, only the courses that have not ended or do not have any end
+            date are returned. This is different from search_term because this filtering is done on
+            CourseOverview and not ElasticSearch.
+
     **Returns**
 
         * 200 on success, with a list of course discovery objects as returned
@@ -333,7 +342,8 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             org=form.cleaned_data['org'],
             filter_=form.cleaned_data['filter_'],
             search_term=form.cleaned_data['search_term'],
-            permissions=form.cleaned_data['permissions']
+            permissions=form.cleaned_data['permissions'],
+            active_only=form.cleaned_data.get('active_only', False)
         )
 
 

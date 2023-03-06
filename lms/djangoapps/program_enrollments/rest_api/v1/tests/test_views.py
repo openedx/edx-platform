@@ -20,9 +20,9 @@ from organizations.tests.factories import OrganizationFactory as LMSOrganization
 from rest_framework import status
 from rest_framework.test import APITestCase
 from social_django.models import UserSocialAuth
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCourseFactory
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -96,7 +96,7 @@ class EnrollmentsDataMixin(ProgramCacheMixin):
     Mixin to define some shared test data objects for program/course enrollment
     view tests.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     view_name = 'SET-ME-IN-SUBCLASS'
 
     @classmethod
@@ -1637,7 +1637,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
     """
     Tests for the ProgramCourseEnrollmentOverview view GET method.
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     patch_resume_url = mock.patch(
         _UTILS_PATCH_FORMAT.format('get_resume_urls_for_enrollments'),
@@ -1891,7 +1891,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
     )
     @ddt.unpack
     def test_due_dates(self, now_time, course_in_progress):
-        section_1 = ItemFactory.create(
+        section_1 = BlockFactory.create(
             category='chapter',
             start=self.yesterday,
             due=self.tomorrow,
@@ -1899,27 +1899,27 @@ class ProgramCourseEnrollmentOverviewGetTests(
             display_name='section 1'
         )
 
-        subsection_1 = ItemFactory.create(
+        subsection_1 = BlockFactory.create(
             category='sequential',
             due=self.tomorrow,
             parent=section_1,
             display_name='subsection 1'
         )
 
-        subsection_2 = ItemFactory.create(
+        subsection_2 = BlockFactory.create(
             category='sequential',
             due=self.tomorrow - timedelta(1),
             parent=section_1,
             display_name='subsection 2'
         )
 
-        subsection_3 = ItemFactory.create(
+        subsection_3 = BlockFactory.create(
             category='sequential',
             parent=section_1,
             display_name='subsection 3'
         )
 
-        unit_1 = ItemFactory.create(
+        unit_1 = BlockFactory.create(
             category='vertical',
             due=self.tomorrow + timedelta(2),
             parent=subsection_3,
@@ -1944,25 +1944,25 @@ class ProgramCourseEnrollmentOverviewGetTests(
                 {
                     'name': section_1.display_name,
                     'url': ('http://testserver/courses/course-v1:edX+ToyX+Toy_Course/'
-                            'jump_to/i4x://edX/ToyX/chapter/section_1'),
+                            'jump_to/block-v1:edX+ToyX+Toy_Course+type@chapter+block@section_1'),
                     'date': '2019-01-02T00:00:00Z',
                 },
                 {
                     'name': subsection_1.display_name,
                     'url': ('http://testserver/courses/course-v1:edX+ToyX+Toy_Course/'
-                            'jump_to/i4x://edX/ToyX/sequential/subsection_1'),
+                            'jump_to/block-v1:edX+ToyX+Toy_Course+type@sequential+block@subsection_1'),
                     'date': '2019-01-02T00:00:00Z',
                 },
                 {
                     'name': subsection_2.display_name,
                     'url': ('http://testserver/courses/course-v1:edX+ToyX+Toy_Course/'
-                            'jump_to/i4x://edX/ToyX/sequential/subsection_2'),
+                            'jump_to/block-v1:edX+ToyX+Toy_Course+type@sequential+block@subsection_2'),
                     'date': '2019-01-01T00:00:00Z',
                 },
                 {
                     'name': unit_1.display_name,
                     'url': ('http://testserver/courses/course-v1:edX+ToyX+Toy_Course/'
-                            'jump_to/i4x://edX/ToyX/vertical/unit_1'),
+                            'jump_to/block-v1:edX+ToyX+Toy_Course+type@vertical+block@unit_1'),
                     'date': '2019-01-04T00:00:00Z',
                 },
             ]

@@ -5,7 +5,7 @@ Unit tests for getting the list of courses and the course outline.
 
 import datetime
 import json
-from unittest import SkipTest, mock, skip
+from unittest import mock, skip
 from unittest.mock import patch
 
 import ddt
@@ -35,16 +35,19 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..course import _deprecated_blocks_info, course_outline_initial_state, reindex_course_and_check_access
-from ..item import VisibilityState, create_xblock_info
+from ..block import VisibilityState, create_xblock_info
 
 
 class TestCourseIndex(CourseTestCase):
     """
     Unit tests for getting the list of courses and the course outline.
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """
@@ -136,14 +139,14 @@ class TestCourseIndex(CourseTestCase):
     def test_json_responses(self):
 
         outline_url = reverse_course_url('course_handler', self.course.id)
-        chapter = ItemFactory.create(parent_location=self.course.location, category='chapter', display_name="Week 1")
-        lesson = ItemFactory.create(parent_location=chapter.location, category='sequential', display_name="Lesson 1")
-        subsection = ItemFactory.create(
+        chapter = BlockFactory.create(parent_location=self.course.location, category='chapter', display_name="Week 1")
+        lesson = BlockFactory.create(parent_location=chapter.location, category='sequential', display_name="Lesson 1")
+        subsection = BlockFactory.create(
             parent_location=lesson.location,
             category='vertical',
             display_name='Subsection 1'
         )
-        ItemFactory.create(parent_location=subsection.location, category="video", display_name="My Video")
+        BlockFactory.create(parent_location=subsection.location, category="video", display_name="My Video")
 
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
 
@@ -333,6 +336,9 @@ class TestCourseIndexArchived(CourseTestCase):
     """
     Unit tests for testing the course index list when there are archived courses.
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     NOW = datetime.datetime.now(pytz.utc)
     DAY = datetime.timedelta(days=1)
     YESTERDAY = NOW - DAY
@@ -415,16 +421,15 @@ class TestCourseIndexArchived(CourseTestCase):
         archived_course_tab = parsed_html.find_class('archived-courses')
         self.assertEqual(len(archived_course_tab), 1 if separate_archived_courses else 0)
 
-    @skip('Skip test for old mongo course')
     @ddt.data(
         # Staff user has course staff access
         (True, 'staff', None, 0, 20),
         (False, 'staff', None, 0, 20),
         # Base user has global staff access
-        (True, 'user', ORG, 1, 20),
-        (False, 'user', ORG, 1, 20),
-        (True, 'user', None, 1, 20),
-        (False, 'user', None, 1, 20),
+        (True, 'user', ORG, 2, 20),
+        (False, 'user', ORG, 2, 20),
+        (True, 'user', None, 2, 20),
+        (False, 'user', None, 2, 20),
     )
     @ddt.unpack
     def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
@@ -452,6 +457,9 @@ class TestCourseOutline(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -460,16 +468,16 @@ class TestCourseOutline(CourseTestCase):
         """
         super().setUp()
 
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1"
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Lesson 1"
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location, category='vertical', display_name='Subsection 1'
         )
-        self.video = ItemFactory.create(
+        self.video = BlockFactory.create(
             parent_location=self.vertical.location, category="video", display_name="My Video"
         )
 
@@ -525,9 +533,9 @@ class TestCourseOutline(CourseTestCase):
                 self.assert_correct_json_response(child_response, is_concise)
 
     def test_course_outline_initial_state(self):
-        course_module = modulestore().get_item(self.course.location)
+        course_block = modulestore().get_item(self.course.location)
         course_structure = create_xblock_info(
-            course_module,
+            course_block,
             include_child_info=True,
             include_children_predicate=lambda xblock: not xblock.category == 'vertical'
         )
@@ -543,14 +551,14 @@ class TestCourseOutline(CourseTestCase):
         self.assertIn(str(self.sequential.location), expanded_locators)
         self.assertIn(str(self.vertical.location), expanded_locators)
 
-    def _create_test_data(self, course_module, create_blocks=False, publish=True, block_types=None):
+    def _create_test_data(self, course_block, create_blocks=False, publish=True, block_types=None):
         """
         Create data for test.
         """
         if create_blocks:
             for block_type in block_types:
-                ItemFactory.create(
-                    parent_location=self.vertical.location,
+                BlockFactory.create(
+                    parent=self.vertical,
                     category=block_type,
                     display_name=f'{block_type} Problem'
                 )
@@ -558,7 +566,9 @@ class TestCourseOutline(CourseTestCase):
             if not publish:
                 self.store.unpublish(self.vertical.location, self.user.id)
 
-        course_module.advanced_modules.extend(block_types)
+        # get updated vertical
+        self.vertical = modulestore().get_item(self.vertical.location)
+        course_block.advanced_modules.extend(block_types)
 
     def _verify_deprecated_info(self, course_id, advanced_modules, info, deprecated_block_types):
         """
@@ -584,6 +594,7 @@ class TestCourseOutline(CourseTestCase):
             reverse_course_url('advanced_settings_handler', course_id)
         )
 
+    @skip('OldMongo Deprecation. HiddenDescriptorWithMixins is not created for split.')
     @ddt.data(
         [{'publish': True}, ['notes']],
         [{'publish': False}, ['notes']],
@@ -594,16 +605,20 @@ class TestCourseOutline(CourseTestCase):
         """
         Verify deprecated warning info.
         """
-        course_module = modulestore().get_item(self.course.location)
-        self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
-        info = _deprecated_blocks_info(course_module, block_types)
+        course_block = modulestore().get_item(self.course.location)
+        self._create_test_data(course_block, create_blocks=True, block_types=block_types, publish=publish)
+        # get updated course_block
+        course_block = modulestore().get_item(self.course.location)
+
+        info = _deprecated_blocks_info(course_block, block_types)
         self._verify_deprecated_info(
-            course_module.id,
-            course_module.advanced_modules,
+            course_block.id,
+            course_block.advanced_modules,
             info,
             block_types
         )
 
+    @skip('OldMongo Deprecation. HiddenDescriptorWithMixins is not created for split.')
     @ddt.data(
         (["a", "b", "c"], ["a", "b", "c"]),
         (["a", "b", "c"], ["a", "b", "d"]),
@@ -611,17 +626,19 @@ class TestCourseOutline(CourseTestCase):
         (["a", "b", "c"], ["d", "e", "f"])
     )
     @ddt.unpack
-    def test_verify_warn_only_on_enabled_modules(self, enabled_block_types, deprecated_block_types):
+    def test_verify_warn_only_on_enabled_blocks(self, enabled_block_types, deprecated_block_types):
         """
         Verify that we only warn about block_types that are both deprecated and enabled.
         """
         expected_block_types = list(set(enabled_block_types) & set(deprecated_block_types))
-        course_module = modulestore().get_item(self.course.location)
-        self._create_test_data(course_module, create_blocks=True, block_types=enabled_block_types)
-        info = _deprecated_blocks_info(course_module, deprecated_block_types)
+        course_block = modulestore().get_item(self.course.location)
+        self._create_test_data(course_block, create_blocks=True, block_types=enabled_block_types)
+        # get updated course_module
+        course_block = modulestore().get_item(self.course.location)
+        info = _deprecated_blocks_info(course_block, deprecated_block_types)
         self._verify_deprecated_info(
-            course_module.id,
-            course_module.advanced_modules,
+            course_block.id,
+            course_block.advanced_modules,
             info,
             expected_block_types
         )
@@ -632,8 +649,6 @@ class TestCourseOutline(CourseTestCase):
         """
         Test to check proctored exam settings mfe url is rendering properly
         """
-        if self.course.id.deprecated:
-            raise SkipTest("Skip test for old mongo course")
         mock_validate_proctoring_settings.return_value = [
             {
                 'key': 'proctoring_provider',
@@ -655,6 +670,9 @@ class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
 
     ENABLED_SIGNALS = ['course_published']
@@ -669,20 +687,20 @@ class TestCourseReIndex(CourseTestCase):
         self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
         modulestore().update_item(self.course, self.user.id)
 
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1"
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Lesson 1"
         )
-        self.vertical = ItemFactory.create(
+        self.vertical = BlockFactory.create(
             parent_location=self.sequential.location, category='vertical', display_name='Subsection 1'
         )
-        self.video = ItemFactory.create(
+        self.video = BlockFactory.create(
             parent_location=self.vertical.location, category="video", display_name="My Video"
         )
 
-        self.html = ItemFactory.create(
+        self.html = BlockFactory.create(
             parent_location=self.vertical.location, category="html", display_name="My HTML",
             data="<div>This is my unique HTML content</div>",
 
@@ -728,7 +746,7 @@ class TestCourseReIndex(CourseTestCase):
         self.assertContains(response, self.SUCCESSFUL_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
-    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
+    @mock.patch('xmodule.html_block.HtmlBlock.index_dictionary')
     def test_reindex_course_search_index_error(self, mock_index_dictionary):
         """
         Test json response with mocked error data for html
@@ -748,7 +766,7 @@ class TestCourseReIndex(CourseTestCase):
         """
         Test json response with real data
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -769,12 +787,12 @@ class TestCourseReIndex(CourseTestCase):
             course_id=str(self.course.id))
         self.assertEqual(response['total'], 1)
 
-    @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
+    @mock.patch('xmodule.video_block.VideoBlock.index_dictionary')
     def test_reindex_video_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for video
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -791,12 +809,12 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             reindex_course_and_check_access(self.course.id, self.user)
 
-    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
+    @mock.patch('xmodule.html_block.HtmlBlock.index_dictionary')
     def test_reindex_html_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for html
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -813,12 +831,12 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             reindex_course_and_check_access(self.course.id, self.user)
 
-    @mock.patch('xmodule.seq_module.SequenceBlock.index_dictionary')
+    @mock.patch('xmodule.seq_block.SequenceBlock.index_dictionary')
     def test_reindex_seq_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for sequence
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -835,7 +853,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             reindex_course_and_check_access(self.course.id, self.user)
 
-    @mock.patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_course')
+    @mock.patch('xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course')
     def test_reindex_no_item(self, mock_get_course):
         """
         Test system logs an error if no item found.
@@ -858,7 +876,7 @@ class TestCourseReIndex(CourseTestCase):
         """
         Test do_course_reindex response with real data
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -879,12 +897,12 @@ class TestCourseReIndex(CourseTestCase):
             course_id=str(self.course.id))
         self.assertEqual(response['total'], 1)
 
-    @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
+    @mock.patch('xmodule.video_block.VideoBlock.index_dictionary')
     def test_indexing_video_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for video
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -901,12 +919,12 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
-    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
+    @mock.patch('xmodule.html_block.HtmlBlock.index_dictionary')
     def test_indexing_html_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for html
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -923,12 +941,12 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
-    @mock.patch('xmodule.seq_module.SequenceBlock.index_dictionary')
+    @mock.patch('xmodule.seq_block.SequenceBlock.index_dictionary')
     def test_indexing_seq_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for sequence
         """
-        # results are indexed because they are published from ItemFactory
+        # results are indexed because they are published from BlockFactory
         response = perform_search(
             "unique",
             user=self.user,
@@ -945,7 +963,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
-    @mock.patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_course')
+    @mock.patch('xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course')
     def test_indexing_no_item(self, mock_get_course):
         """
         Test system logs an error if no item found.

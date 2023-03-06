@@ -10,7 +10,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -49,17 +49,17 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
         self.course = CourseFactory(
             start=now() - timedelta(weeks=10),
         )
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             category='chapter',
             parent_location=self.course.location,
             display_name='Test Chapter'
         )
-        self.sequential = ItemFactory.create(
+        self.sequential = BlockFactory.create(
             category='sequential',
             parent_location=self.chapter.location,
             display_name='Test Sequential'
         )
-        ItemFactory.create(
+        BlockFactory.create(
             category='vertical',
             parent_location=self.sequential.location,
             display_name='Test Vertical'

@@ -83,24 +83,24 @@
 
                 var langHtml = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML(
-                    [
-                        '<div class="grouped-controls">',
-                        '<button class="control toggle-captions" aria-disabled="false">',
-                        '<span class="icon fa fa-cc" aria-hidden="true"></span>',
-                        '</button>',
-                        '<button class="control toggle-transcript" aria-disabled="false">',
-                        '<span class="icon fa fa-quote-left" aria-hidden="true"></span>',
-                        '</button>',
-                        '<div class="lang menu-container" role="application">',
-                        '<p class="sr instructions" id="lang-instructions-{courseId}"></p>',
-                        '<button class="control language-menu" aria-disabled="false"',
-                        'aria-describedby="lang-instructions-{courseId}" ',
-                        'title="{langTitle}">',
-                        '<span class="icon fa fa-caret-left" aria-hidden="true"></span>',
-                        '</button>',
-                        '</div>',
-                        '</div>'
-                    ].join('')),
+                        [
+                            '<div class="grouped-controls">',
+                            '<button class="control toggle-captions" aria-disabled="false">',
+                            '<span class="icon fa fa-cc" aria-hidden="true"></span>',
+                            '</button>',
+                            '<button class="control toggle-transcript" aria-disabled="false">',
+                            '<span class="icon fa fa-quote-left" aria-hidden="true"></span>',
+                            '</button>',
+                            '<div class="lang menu-container" role="application">',
+                            '<p class="sr instructions" id="lang-instructions-{courseId}"></p>',
+                            '<button class="control language-menu" aria-disabled="false"',
+                            'aria-describedby="lang-instructions-{courseId}" ',
+                            'title="{langTitle}">',
+                            '<span class="icon fa fa-caret-left" aria-hidden="true"></span>',
+                            '</button>',
+                            '</div>',
+                            '</div>'
+                        ].join('')),
                     {
                         langTitle: gettext('Open language menu'),
                         courseId: this.state.id
@@ -109,12 +109,12 @@
 
                 var subtitlesHtml = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML(
-                    [
-                        '<div class="subtitles" role="region" id="transcript-{courseId}">',
-                        '<h3 id="transcript-label-{courseId}" class="transcript-title sr"></h3>',
-                        '<ol id="transcript-captions-{courseId}" class="subtitles-menu" lang="{courseLang}"></ol>',
-                        '</div>'
-                    ].join('')),
+                        [
+                            '<div class="subtitles" role="region" id="transcript-{courseId}">',
+                            '<h3 id="transcript-label-{courseId}" class="transcript-title sr"></h3>',
+                            '<ol id="transcript-captions-{courseId}" class="subtitles-menu" lang="{courseLang}"></ol>',
+                            '</div>'
+                        ].join('')),
                     {
                         courseId: this.state.id,
                         courseLang: this.state.lang
@@ -164,7 +164,7 @@
                     mousewheel: this.onMovement,
                     DOMMouseScroll: this.onMovement
                 })
-                .on(events, 'span[data-index]', this.onCaptionHandler);
+                    .on(events, 'span[data-index]', this.onCaptionHandler);
                 this.container.on({
                     mouseenter: this.onContainerMouseEnter,
                     mouseleave: this.onContainerMouseLeave
@@ -268,7 +268,7 @@
                     keyCode = event.keyCode;
 
                 switch (keyCode) {
-                    // Handle keypresses
+                // Handle keypresses
                 case KEY.ENTER:
                 case KEY.SPACE:
                 case KEY.UP:
@@ -295,13 +295,13 @@
                 if (index === total) {
                     this.languageChooserEl
                         .find('.control-lang').first()
-                            .focus();
+                        .focus();
                 } else {
                     this.languageChooserEl
                         .find('li:eq(' + index + ')')
                         .next()
-                            .find('.control-lang')
-                                .focus();
+                        .find('.control-lang')
+                        .focus();
                 }
 
                 return false;
@@ -322,8 +322,8 @@
                     this.languageChooserEl
                         .find('li:eq(' + index + ')')
                         .prev()
-                            .find('.control-lang')
-                            .focus();
+                        .find('.control-lang')
+                        .focus();
                 }
 
                 return false;
@@ -340,7 +340,7 @@
 
                 menu
                     .find('.control-lang').last()
-                        .focus();
+                    .focus();
             },
 
             closeLanguageMenu: function(event) {
@@ -350,7 +350,7 @@
                 button
                     .removeClass('is-opened')
                     .find('.language-menu')
-                        .focus();
+                    .focus();
             },
 
             onCaptionHandler: function(event) {
@@ -653,11 +653,11 @@
             onResize: function() {
                 this.subtitlesEl
                     .find('.spacing').first()
-                        .height(this.topSpacingHeight());
+                    .height(this.topSpacingHeight());
 
                 this.subtitlesEl
                     .find('.spacing').last()
-                        .height(this.bottomSpacingHeight());
+                    .height(this.bottomSpacingHeight());
 
                 this.scrollCaption();
                 this.setSubtitlesHeight();
@@ -834,28 +834,28 @@
             */
             addPaddings: function() {
                 var topSpacer = HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML([
-                            '<li class="spacing" style="height: {height}px">',
+                    HtmlUtils.HTML([
+                        '<li class="spacing" style="height: {height}px">',
                                 '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>',  // eslint-disable-line max-len, indent
-                            '</li>'
-                        ].join('')),
+                        '</li>'
+                    ].join('')),
                     {
                         id: this.state.id,
                         height: this.topSpacingHeight()
                     }
-                    );
+                );
 
                 var bottomSpacer = HtmlUtils.interpolateHtml(
-                        HtmlUtils.HTML([
-                            '<li class="spacing" style="height: {height}px">',
+                    HtmlUtils.HTML([
+                        '<li class="spacing" style="height: {height}px">',
                                 '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>',  // eslint-disable-line max-len, indent
-                            '</li>'
-                        ].join('')),
+                        '</li>'
+                    ].join('')),
                     {
                         id: this.state.id,
                         height: this.bottomSpacingHeight()
                     }
-                    );
+                );
 
                 HtmlUtils.prepend(
                     this.subtitlesMenuEl,

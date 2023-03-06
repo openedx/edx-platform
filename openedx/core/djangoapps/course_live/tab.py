@@ -6,7 +6,7 @@ from lti_consumer.models import LtiConfiguration
 
 
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
-from xmodule.course_module import CourseBlock
+from xmodule.course_block import CourseBlock
 from xmodule.tabs import TabFragmentViewMixin
 from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE

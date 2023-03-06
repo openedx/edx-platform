@@ -1,6 +1,5 @@
 # lint-amnesty, pylint: disable=cyclic-import, missing-module-docstring
 
-import unittest
 from unittest.mock import Mock, patch
 
 import ddt
@@ -23,6 +22,7 @@ from common.djangoapps.edxmako.shortcuts import (
 )
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
+from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 
 
 @ddt.ddt
@@ -105,7 +105,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             link = marketing_link('TOS')
             assert link == expected_link
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_link_map_url_reverse(self):
         url_link_map = {
             'ABOUT': 'dashboard',
@@ -194,7 +194,7 @@ class MakoRequestContextTest(TestCase):
             # requestcontext should be None, because the cache isn't filled
             assert get_template_request_context() is None
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_render_to_string_when_no_global_context_lms(self):
         """
         Test render_to_string() when makomiddleware has not initialized
@@ -202,7 +202,7 @@ class MakoRequestContextTest(TestCase):
         """
         assert 'this module is temporarily unavailable' in render_to_string('courseware/error-message.html', None)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+    @skip_unless_cms
     def test_render_to_string_when_no_global_context_cms(self):
         """
         Test render_to_string() when makomiddleware has not initialized

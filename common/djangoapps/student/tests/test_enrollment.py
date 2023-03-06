@@ -2,8 +2,6 @@
 Tests for student enrollment.
 """
 
-
-import unittest
 from unittest.mock import patch
 
 import ddt
@@ -12,7 +10,7 @@ from django.conf import settings
 from django.urls import reverse
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -26,11 +24,12 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin):
     """
     Test student enrollment, especially with different course modes.
@@ -78,10 +77,10 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         """
         Helper function to create a proctored exam for a given course
         """
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             parent=course, category='chapter', display_name='Test Section', publish_item=True
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent=chapter, category='sequential', display_name='Test Proctored Exam',
             graded=True, is_time_limited=True, default_time_limit_minutes=10,
             is_proctored_enabled=True, publish_item=True
@@ -163,7 +162,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         """Confirm that we send the external updates experiment bucket with the activation signal"""
         with patch('openedx.core.djangoapps.schedules.config.set_up_external_updates_for_enrollment',
                    return_value=value):
-            with patch('common.djangoapps.student.models.segment') as mock_segment:
+            with patch('common.djangoapps.student.models.course_enrollment.segment') as mock_segment:
                 CourseEnrollment.enroll(self.user, self.course.id)
 
         assert mock_segment.track.call_count == 1
@@ -171,7 +170,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         assert mock_segment.track.call_args[0][2]['external_course_updates'] == value
 
     def test_enrollment_properties_in_segment_traits(self):
-        with patch('common.djangoapps.student.models.segment') as mock_segment:
+        with patch('common.djangoapps.student.models.course_enrollment.segment') as mock_segment:
             enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         assert mock_segment.track.call_count == 1
         assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.activated'
@@ -180,7 +179,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         assert traits['mode'] == 'audit'
         assert traits['email'] == self.EMAIL
 
-        with patch('common.djangoapps.student.models.segment') as mock_segment:
+        with patch('common.djangoapps.student.models.course_enrollment.segment') as mock_segment:
             enrollment.update_enrollment(mode='verified')
         assert mock_segment.track.call_count == 1
         assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.mode_changed'
@@ -242,7 +241,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         requirements should be sent. The email should not be sent for non-verified modes.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             # First enroll in a non-proctored course. This should not trigger the email.
@@ -259,7 +258,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         any proctored exams, they should not receive a proctoring requirements email.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             CourseEnrollment.enroll(
@@ -274,7 +273,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         should be sent.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             enrollment = CourseEnrollment.enroll(
@@ -293,7 +292,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         enroll in honor mode for a course with proctored exams.
         """
         with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
+            'common.djangoapps.student.emails.send_proctoring_requirements_email',
             return_value=None
         ) as mock_send_email:
             course_honor_mode = CourseFactory(

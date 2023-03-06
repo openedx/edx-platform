@@ -305,8 +305,8 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
 
         return qs, use_distinct
 
-    def queryset(self, request):
-        return super().queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
 
 class UserProfileInline(admin.StackedInline):

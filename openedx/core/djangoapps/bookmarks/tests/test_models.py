@@ -15,7 +15,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
@@ -57,31 +57,31 @@ class BookmarksTestsBase(ModuleStoreTestCase):
             self.course = CourseFactory.create(display_name='An Introduction to API Testing')
             self.course_id = str(self.course.id)
 
-            self.chapter_1 = ItemFactory.create(
+            self.chapter_1 = BlockFactory.create(
                 parent=self.course, category='chapter', display_name='Week 1'
             )
-            self.chapter_2 = ItemFactory.create(
+            self.chapter_2 = BlockFactory.create(
                 parent=self.course, category='chapter', display_name='Week 2'
             )
 
-            self.sequential_1 = ItemFactory.create(
+            self.sequential_1 = BlockFactory.create(
                 parent=self.chapter_1, category='sequential', display_name='Lesson 1'
             )
-            self.sequential_2 = ItemFactory.create(
+            self.sequential_2 = BlockFactory.create(
                 parent=self.chapter_1, category='sequential', display_name='Lesson 2'
             )
 
-            self.vertical_1 = ItemFactory.create(
+            self.vertical_1 = BlockFactory.create(
                 parent=self.sequential_1, category='vertical', display_name='Subsection 1'
             )
-            self.vertical_2 = ItemFactory.create(
+            self.vertical_2 = BlockFactory.create(
                 parent=self.sequential_2, category='vertical', display_name='Subsection 2'
             )
-            self.vertical_3 = ItemFactory.create(
+            self.vertical_3 = BlockFactory.create(
                 parent=self.sequential_2, category='vertical', display_name='Subsection 3'
             )
 
-            self.html_1 = ItemFactory.create(
+            self.html_1 = BlockFactory.create(
                 parent=self.vertical_2, category='html', display_name='Details 1'
             )
 
@@ -131,19 +131,19 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
         with self.store.bulk_operations(self.other_course.id):
 
-            self.other_chapter_1 = ItemFactory.create(
+            self.other_chapter_1 = BlockFactory.create(
                 parent=self.other_course, category='chapter', display_name='Other Week 1'
             )
-            self.other_sequential_1 = ItemFactory.create(
+            self.other_sequential_1 = BlockFactory.create(
                 parent=self.other_chapter_1, category='sequential', display_name='Other Lesson 1'
             )
-            self.other_sequential_2 = ItemFactory.create(
+            self.other_sequential_2 = BlockFactory.create(
                 parent=self.other_chapter_1, category='sequential', display_name='Other Lesson 2'
             )
-            self.other_vertical_1 = ItemFactory.create(
+            self.other_vertical_1 = BlockFactory.create(
                 parent=self.other_sequential_1, category='vertical', display_name='Other Subsection 1'
             )
-            self.other_vertical_2 = ItemFactory.create(
+            self.other_vertical_2 = BlockFactory.create(
                 parent=self.other_sequential_1, category='vertical', display_name='Other Subsection 2'
             )
 
@@ -179,7 +179,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
                 for block in blocks_at_current_level:
                     for __ in range(children_per_block):
-                        blocks_at_next_level += [ItemFactory.create(
+                        blocks_at_next_level += [BlockFactory.create(
                             parent_location=block.location, display_name=str(display_name)
                         )]
                         display_name += 1
@@ -195,7 +195,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
             course = CourseFactory.create()
 
-            blocks = [ItemFactory.create(
+            blocks = [BlockFactory.create(
                 parent=course, category='chapter', display_name=str(index)
             ) for index in range(count)]
 
@@ -251,7 +251,7 @@ class BookmarkModelTests(BookmarksTestsBase):
     def setUp(self):
         super().setUp()
 
-        self.vertical_4 = ItemFactory.create(
+        self.vertical_4 = BlockFactory.create(
             parent=self.sequential_2,
             category='vertical',
             display_name=None
@@ -344,7 +344,7 @@ class BookmarkModelTests(BookmarksTestsBase):
         block_path = [PathItem(UsageKey.from_string(EXAMPLE_USAGE_KEY_1), '1')]
         mock_get_path.return_value = block_path
 
-        html = ItemFactory.create(
+        html = BlockFactory.create(
             parent=self.other_chapter_1, category='html', display_name='Other Lesson 1'
         )
 

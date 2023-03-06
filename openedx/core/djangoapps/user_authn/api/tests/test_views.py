@@ -105,7 +105,9 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'countryCode': self.country_code
             },
             'registration_fields': {},
-            'optional_fields': {},
+            'optional_fields': {
+                'extended_profile': [],
+            },
         }
 
     @patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': False})
@@ -318,6 +320,18 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
         assert list(response.data['registration_fields']['fields'].keys()) == ['specialty']
+
+    @override_settings(
+        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
+    )
+    @patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': False})
+    def test_response_structure(self):
+        """
+        Test that API return valid response dictionary with both required and optional fields
+        """
+        response = self.client.get(self.url, self.query_params)
+
+        assert response.data == self.get_context()
 
 
 @skip_unless_lms

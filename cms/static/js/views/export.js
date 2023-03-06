@@ -117,8 +117,8 @@ define([
             _.map($dom.stages, completeStage);
 
             $dom.successStage
-                    .find('.item-progresspoint-success-date')
-                    .text('(' + date + ' at ' + time + ' UTC)');
+                .find('.item-progresspoint-success-date')
+                .text('(' + date + ' at ' + time + ' UTC)');
 
             break;
 

@@ -42,7 +42,7 @@ from lms.djangoapps.instructor_task.tests.test_base import (
 from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -322,10 +322,10 @@ class TestRescoringTask(TestIntegrationTask):
                                         answer_display="answer",
                                         grader_payload=grader_payload,
                                         num_responses=2)
-        ItemFactory.create(parent_location=self.problem_section.location,
-                           category="problem",
-                           display_name=str(problem_url_name),
-                           data=problem_xml)
+        BlockFactory.create(parent_location=self.problem_section.location,
+                            category="problem",
+                            display_name=str(problem_url_name),
+                            data=problem_xml)
 
     def test_rescoring_code_problem(self):
         """Run rescore scenario on problem with code submission"""
@@ -378,11 +378,11 @@ class TestRescoringTask(TestIntegrationTask):
             # correct answer, and call a second time with that answer to confirm it's graded as correct.
             # Per-student rerandomization will at least generate different seeds for different users, so
             # we get a little more test coverage.
-            ItemFactory.create(parent_location=self.problem_section.location,
-                               category="problem",
-                               display_name=str(problem_url_name),
-                               data=problem_xml,
-                               metadata={"rerandomize": "per_student"})
+            BlockFactory.create(parent_location=self.problem_section.location,
+                                category="problem",
+                                display_name=str(problem_url_name),
+                                data=problem_xml,
+                                metadata={"rerandomize": "per_student"})
 
     def test_rescoring_randomized_problem(self):
         """Run rescore scenario on custom problem that uses randomize"""

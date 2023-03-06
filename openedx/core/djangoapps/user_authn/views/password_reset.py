@@ -24,7 +24,7 @@ from django.views.decorators.http import require_POST
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
@@ -280,8 +280,8 @@ def request_password_change(email, is_secure):
 
 @csrf_exempt
 @require_POST
-@ratelimit(key=POST_EMAIL_KEY, rate=settings.PASSWORD_RESET_EMAIL_RATE)
-@ratelimit(key=REAL_IP_KEY, rate=settings.PASSWORD_RESET_IP_RATE)
+@ratelimit(key=POST_EMAIL_KEY, rate=settings.PASSWORD_RESET_EMAIL_RATE, block=False)
+@ratelimit(key=REAL_IP_KEY, rate=settings.PASSWORD_RESET_IP_RATE, block=False)
 def password_reset(request):
     """
     Attempts to send a password reset e-mail.
@@ -574,8 +574,8 @@ def _get_user_from_email(email):
 
 
 @require_POST
-@ratelimit(key=POST_EMAIL_KEY, rate=settings.PASSWORD_RESET_EMAIL_RATE)
-@ratelimit(key=REAL_IP_KEY, rate=settings.PASSWORD_RESET_IP_RATE)
+@ratelimit(key=POST_EMAIL_KEY, rate=settings.PASSWORD_RESET_EMAIL_RATE, block=False)
+@ratelimit(key=REAL_IP_KEY, rate=settings.PASSWORD_RESET_IP_RATE, block=False)
 def password_change_request_handler(request):
     """Handle password change requests originating from the account page.
 
@@ -727,13 +727,17 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
         """ Reset learner password using passed token and new credentials """
 
         reset_status = False
+        err_msg = _(
+            "An error has occurred. Try refreshing the page, or check your internet connection."
+        )
+        user_id = None
         uidb36 = kwargs.get('uidb36')
         token = kwargs.get('token')
 
         has_required_values, uid_int = self._check_token_has_required_values(uidb36, token)
         if not has_required_values:
             AUDIT_LOG.exception("Invalid password reset confirm token")
-            return Response({'reset_status': reset_status})
+            return Response({'reset_status': reset_status, 'token_invalid': True})
 
         request.data._mutable = True  # lint-amnesty, pylint: disable=protected-access
         request.data['new_password1'] = normalize_password(request.data['new_password1'])
@@ -742,9 +746,10 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
         password = request.data['new_password1']
         try:
             user = User.objects.get(id=uid_int)
+            user_id = user.id
             if not default_token_generator.check_token(user, token):
-                AUDIT_LOG.exception("Token validation failed")
-                return Response({'reset_status': reset_status})
+                AUDIT_LOG.exception(f"Token validation failed for user {user_id}")
+                return Response({'reset_status': reset_status, 'token_invalid': True})
 
             validate_password(password, user=user)
 
@@ -762,6 +767,7 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
             if form.is_valid():
                 form.save()
                 reset_status = True
+                err_msg = ''
 
                 if 'is_account_recovery' in request.GET:
                     try:
@@ -780,8 +786,9 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
                         )
                         user.save()
                     except ObjectDoesNotExist:
-                        err = 'Account recovery process initiated without AccountRecovery instance for user {username}'
-                        log.error(err.format(username=user.username))
+                        log.error(
+                            f'Account recovery process initiated without AccountRecovery instance for user {user_id}'
+                        )
 
                 # Handles clearing the failed login counter upon password reset.
                 if LoginFailures.is_feature_enabled():
@@ -790,16 +797,16 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
                 send_password_reset_success_email(user, request)
                 update_session_auth_hash(request, user)
         except ValidationError as err:
-            AUDIT_LOG.exception("Password validation failed")
+            AUDIT_LOG.exception(f"Password validation failed for {user_id}")
             error_status = {
                 'reset_status': reset_status,
                 'err_msg': ' '.join(err.messages)
             }
             return Response(error_status)
         except Exception:   # pylint: disable=broad-except
-            AUDIT_LOG.exception("Setting new password failed")
+            AUDIT_LOG.exception(f"Setting new password failed for {user_id}")
 
-        return Response({'reset_status': reset_status})
+        return Response({'reset_status': reset_status, 'err_msg': err_msg})
 
     def _check_token_has_required_values(self, uidb36, token):
         """

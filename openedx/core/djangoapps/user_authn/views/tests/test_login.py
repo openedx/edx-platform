@@ -92,7 +92,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
     def test_login_success(self):
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.user.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', ['Login success', self.user_email])
@@ -105,7 +105,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         self.user.is_active = False
         self.user.save()
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.user.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', ['Login success', self.user_email])
@@ -318,7 +318,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.user.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', ['Login success'])
@@ -330,14 +330,13 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         self.user.save()
 
         response, mock_audit_log = self._login_response(
-            unicode_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
+            unicode_email, self.password, patched_audit_log='common.djangoapps.student.models.user.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', ['Login success', unicode_email])
 
     def test_login_fail_no_user_exists(self):
         nonexistent_email = 'not_a_user@edx.org'
-        # pylint: disable=too-many-function-args
         email_hash = hashlib.shake_128(nonexistent_email.encode('utf-8')).hexdigest(16)
         response, mock_audit_log = self._login_response(
             nonexistent_email,
@@ -442,7 +441,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         the system does *not* send account activation email notification to the user.
         """
         nonexistent_email = 'incorrect@email.com'
-        # pylint: disable=too-many-function-args
         email_hash = hashlib.shake_128(nonexistent_email.encode('utf-8')).hexdigest(16)
         self.user.is_active = False
         self.user.save()
@@ -454,7 +452,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
     def test_login_unicode_email(self):
         unicode_email = self.user_email + chr(40960)
-        # pylint: disable=too-many-function-args
         email_hash = hashlib.shake_128(unicode_email.encode('utf-8')).hexdigest(16)
         response, mock_audit_log = self._login_response(
             unicode_email,
@@ -477,7 +474,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
-        with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
+        with patch('common.djangoapps.student.models.user.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         assert response.status_code == 200
         self._assert_audit_log(mock_audit_log, 'info', ['Logout', 'test'])
@@ -537,7 +534,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
-        with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
+        with patch('common.djangoapps.student.models.user.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         assert response.status_code == 200
         self._assert_audit_log(mock_audit_log, 'info', ['Logout'])

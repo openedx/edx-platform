@@ -2,12 +2,12 @@
 Tests the ``edx_clear_expired_tokens`` management command.
 """
 
-
-import unittest
 from datetime import timedelta
 from unittest.mock import patch
 
+import math
 import pytest
+import ddt
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
@@ -15,10 +15,11 @@ from django.db.models import QuerySet
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
-from oauth2_provider.models import AccessToken, RefreshToken
+from oauth2_provider.models import AccessToken, RefreshToken, Grant
 from testfixtures import LogCapture
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = 'openedx.core.djangoapps.oauth_dispatch.management.commands.edx_clear_expired_tokens'
@@ -37,7 +38,8 @@ def counter(fn):
     return _counted
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@ddt.ddt
+@skip_unless_lms
 class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     # patching REFRESH_TOKEN_EXPIRE_SECONDS because override_settings not working.
@@ -67,17 +69,17 @@ class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=mis
                 (
                     LOGGER_NAME,
                     'INFO',
-                    f'Cleaning {0} rows from {RefreshToken.__name__} table'
+                    f'Cleaned {0} rows from {RefreshToken.__name__} table'
                 ),
                 (
                     LOGGER_NAME,
                     'INFO',
-                    f'Cleaning {0} rows from {AccessToken.__name__} table',
+                    f'Cleaned {0} rows from {AccessToken.__name__} table',
                 ),
                 (
                     LOGGER_NAME,
                     'INFO',
-                    'Cleaning 0 rows from Grant table',
+                    f'Cleaned 0 rows from {Grant.__name__} table',
                 )
             )
         assert RefreshToken.objects.filter(application=application).exists()
@@ -97,7 +99,36 @@ class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=mis
         QuerySet.delete = counter(QuerySet.delete)
         try:
             call_command('edx_clear_expired_tokens', batch_size=1, sleep_time=0)
-            assert not QuerySet.delete.invocations != initial_count  # pylint: disable=no-member
+            # three being the number of tables we'll end up unnecessarily calling .delete on once
+            assert QuerySet.delete.invocations == initial_count + 3  # pylint: disable=no-member
             assert AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now).count() == 0
+        finally:
+            QuerySet.delete = original_delete
+
+    @override_settings()
+    @ddt.unpack
+    @ddt.data(
+        (5, 1),
+        (500, 1),
+        (7, 5),
+        (500, 50),
+    )
+    def test_clear_expired_refreshtokens(self, initial_count, batch_size):
+        settings.OAUTH2_PROVIDER['REFRESH_TOKEN_EXPIRE_SECONDS'] = 3600
+        now = timezone.now()
+        expires = now - timedelta(days=1)
+        refresh_expires = now - timedelta(seconds=3600)
+        users = UserFactory.create_batch(initial_count)
+        for user in users:
+            application = factories.ApplicationFactory(user=user)
+            access_token = factories.AccessTokenFactory(user=user, application=application, expires=expires)
+            factories.RefreshTokenFactory(access_token=access_token, application=application, user=user)
+        assert RefreshToken.objects.filter(access_token__expires__lt=refresh_expires).count() == initial_count
+        original_delete = QuerySet.delete
+        QuerySet.delete = counter(QuerySet.delete)
+        try:
+            call_command('edx_clear_expired_tokens', batch_size=batch_size, sleep_time=0)
+            assert QuerySet.delete.invocations == (math.ceil(initial_count / batch_size) * 2 + 3)
+            assert RefreshToken.objects.filter(access_token__expires__lt=refresh_expires).count() == 0
         finally:
             QuerySet.delete = original_delete

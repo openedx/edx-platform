@@ -1,11 +1,16 @@
 """
 Celery task tests
 """
+from unittest.mock import patch, Mock, PropertyMock
+
+import pytest
 from django.conf import settings
 from django.test.utils import override_settings
-from unittest.mock import patch, Mock
 
-from common.djangoapps.student.tasks import send_course_enrollment_email
+from common.djangoapps.student.tasks import (
+    MAX_RETRIES,
+    send_course_enrollment_email
+)
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -39,6 +44,7 @@ class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
             "short_description": "Short description of course",
             "course_ended": False,
             "pacing_type": "self-paced",
+            "track_mode": "audit",
         }
 
     @staticmethod
@@ -129,6 +135,7 @@ class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
             "course_title": self.send_course_enrollment_email_kwargs["course_title"],
             "short_description": self.send_course_enrollment_email_kwargs["short_description"],
             "pacing_type": self.send_course_enrollment_email_kwargs["pacing_type"],
+            "track_mode": self.send_course_enrollment_email_kwargs["track_mode"],
         }
 
         if add_course_dates:
@@ -269,3 +276,34 @@ class TestCourseEnrollmentEmailTask(ModuleStoreTestCase):
                 add_course_run_details=False
             ),
         )
+
+    @patch("common.djangoapps.student.tasks.get_course_uuid_for_course")
+    @patch("common.djangoapps.student.tasks.get_owners_for_course")
+    @patch("common.djangoapps.student.tasks.get_course_run_details")
+    @patch("common.djangoapps.student.tasks.get_course_dates_for_email")
+    def test_retry_with_braze_client_exception(
+        self,
+        mock_get_course_dates_for_email,
+        mock_get_course_run_details,
+        mock_get_owners_for_course,
+        mock_get_course_uuid_for_course,
+    ):
+        """
+        Test that we retry when an exception occurs from Braze Client
+        """
+
+        mock_get_course_uuid_for_course.return_value = self.course_uuid
+        mock_get_owners_for_course.return_value = self._get_course_owners()
+        mock_get_course_run_details.return_value = self._get_course_run()
+        mock_get_course_dates_for_email.return_value = self._get_course_dates()
+
+        with patch(
+            'common.djangoapps.student.tasks.get_braze_client',
+            new_callable=PropertyMock,
+            side_effect=Exception('Braze Client Exception')
+        ) as mock_get_braze_client:
+            task = send_course_enrollment_email.apply_async(
+                kwargs=self.send_course_enrollment_email_kwargs
+            )
+        pytest.raises(Exception, task.get)
+        self.assertEqual(mock_get_braze_client.call_count, (MAX_RETRIES + 1))

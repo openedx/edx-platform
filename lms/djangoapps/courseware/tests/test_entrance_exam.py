@@ -14,10 +14,10 @@ from lms.djangoapps.courseware.entrance_exams import (
     user_has_passed_entrance_exam
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback, toc_for_course
+from lms.djangoapps.courseware.block_render import get_block, handle_xblock_callback, toc_for_course
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangolib.testing.utils import get_mock_request
 from common.djangoapps.student.models import CourseEnrollment
@@ -55,55 +55,55 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                 'entrance_exam_enabled': True,
             }
         )
-        self.chapter = ItemFactory.create(
+        self.chapter = BlockFactory.create(
             parent=self.course,
             display_name='Overview'
         )
-        self.welcome = ItemFactory.create(
+        self.welcome = BlockFactory.create(
             parent=self.chapter,
             display_name='Welcome'
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent=self.course,
             category='chapter',
             display_name="Week 1"
         )
-        self.chapter_subsection = ItemFactory.create(
+        self.chapter_subsection = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name="Lesson 1"
         )
-        chapter_vertical = ItemFactory.create(
+        chapter_vertical = BlockFactory.create(
             parent=self.chapter_subsection,
             category='vertical',
             display_name='Lesson 1 Vertical - Unit 1'
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent=chapter_vertical,
             category="problem",
             display_name="Problem - Unit 1 Problem 1"
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent=chapter_vertical,
             category="problem",
             display_name="Problem - Unit 1 Problem 2"
         )
 
-        self.entrance_exam = ItemFactory.create(
+        self.entrance_exam = BlockFactory.create(
             parent=self.course,
             category="chapter",
             display_name="Entrance Exam Section - Chapter 1",
             is_entrance_exam=True,
             in_entrance_exam=True
         )
-        self.exam_1 = ItemFactory.create(
+        self.exam_1 = BlockFactory.create(
             parent=self.entrance_exam,
             category='sequential',
             display_name="Exam Sequential - Subsection 1",
             graded=True,
             in_entrance_exam=True
         )
-        subsection = ItemFactory.create(
+        subsection = BlockFactory.create(
             parent=self.exam_1,
             category='vertical',
             display_name='Exam Vertical - Unit 1'
@@ -113,13 +113,13 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             choices=[False, False, True, False],
             choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
         )
-        self.problem_1 = ItemFactory.create(
+        self.problem_1 = BlockFactory.create(
             parent=subsection,
             category="problem",
             display_name="Exam Problem - Problem 1",
             data=problem_xml
         )
-        self.problem_2 = ItemFactory.create(
+        self.problem_2 = BlockFactory.create(
             parent=subsection,
             category="problem",
             display_name="Exam Problem - Problem 2"
@@ -378,13 +378,13 @@ def answer_entrance_exam_problem(course, request, problem, user=None, value=1, m
         course,
         depth=2
     )
-    module = get_module(
+    block = get_block(
         user,
         request,
         problem.scope_ids.usage_id,
         field_data_cache,
     )
-    module.system.publish(problem, 'grade', grade_dict)
+    block.runtime.publish(problem, 'grade', grade_dict)
 
 
 def add_entrance_exam_milestone(course, entrance_exam):

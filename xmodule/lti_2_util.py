@@ -220,7 +220,7 @@ class LTI20BlockMixin:
             self.clear_user_module_score(real_user)
             return Response(status=200)
 
-        # Fall-through record the score and the comment in the module
+        # Fall-through record the score and the comment in the block
         self.set_user_module_score(real_user, score, self.max_score(), comment)
         return Response(status=200)
 

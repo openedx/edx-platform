@@ -12,7 +12,7 @@ from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, set_preview_mode
@@ -34,38 +34,38 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @classmethod
     def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
-        cls.chapter0 = ItemFactory.create(parent=cls.course,
-                                          display_name='Overview')
-        cls.chapter9 = ItemFactory.create(parent=cls.course,
-                                          display_name='factory_chapter')
-        cls.section0 = ItemFactory.create(parent=cls.chapter0,
-                                          display_name='Welcome')
-        cls.section9 = ItemFactory.create(parent=cls.chapter9,
-                                          display_name='factory_section')
-        cls.unit0 = ItemFactory.create(parent=cls.section0,
-                                       display_name='New Unit 0')
+        cls.chapter0 = BlockFactory.create(parent=cls.course,
+                                           display_name='Overview')
+        cls.chapter9 = BlockFactory.create(parent=cls.course,
+                                           display_name='factory_chapter')
+        cls.section0 = BlockFactory.create(parent=cls.chapter0,
+                                           display_name='Welcome')
+        cls.section9 = BlockFactory.create(parent=cls.chapter9,
+                                           display_name='factory_section')
+        cls.unit0 = BlockFactory.create(parent=cls.section0,
+                                        display_name='New Unit 0')
 
-        cls.chapterchrome = ItemFactory.create(parent=cls.course,
-                                               display_name='Chrome')
-        cls.chromelesssection = ItemFactory.create(parent=cls.chapterchrome,
-                                                   display_name='chromeless',
-                                                   chrome='none')
-        cls.accordionsection = ItemFactory.create(parent=cls.chapterchrome,
-                                                  display_name='accordion',
-                                                  chrome='accordion')
-        cls.tabssection = ItemFactory.create(parent=cls.chapterchrome,
-                                             display_name='tabs',
-                                             chrome='tabs')
-        cls.defaultchromesection = ItemFactory.create(
+        cls.chapterchrome = BlockFactory.create(parent=cls.course,
+                                                display_name='Chrome')
+        cls.chromelesssection = BlockFactory.create(parent=cls.chapterchrome,
+                                                    display_name='chromeless',
+                                                    chrome='none')
+        cls.accordionsection = BlockFactory.create(parent=cls.chapterchrome,
+                                                   display_name='accordion',
+                                                   chrome='accordion')
+        cls.tabssection = BlockFactory.create(parent=cls.chapterchrome,
+                                              display_name='tabs',
+                                              chrome='tabs')
+        cls.defaultchromesection = BlockFactory.create(
             parent=cls.chapterchrome,
             display_name='defaultchrome',
         )
-        cls.fullchromesection = ItemFactory.create(parent=cls.chapterchrome,
-                                                   display_name='fullchrome',
-                                                   chrome='accordion,tabs')
-        cls.tabtest = ItemFactory.create(parent=cls.chapterchrome,
-                                         display_name='pdf_textbooks_tab',
-                                         default_tab='progress')
+        cls.fullchromesection = BlockFactory.create(parent=cls.chapterchrome,
+                                                    display_name='fullchrome',
+                                                    chrome='accordion,tabs')
+        cls.tabtest = BlockFactory.create(parent=cls.chapterchrome,
+                                          display_name='pdf_textbooks_tab',
+                                          default_tab='progress')
 
         cls.user = GlobalStaffFactory(password='test')
 
@@ -206,7 +206,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.assert_request_status_code(200, url)
         self.assertContains(response, "No content has been added to this course")
 
-        section = ItemFactory.create(
+        section = BlockFactory.create(
             parent_location=self.test_course.location,
             display_name='New Section'
         )
@@ -218,7 +218,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertNotContains(response, "No content has been added to this course")
         self.assertContains(response, "New Section")
 
-        subsection = ItemFactory.create(
+        subsection = BlockFactory.create(
             parent_location=section.location,
             display_name='New Subsection',
         )
@@ -230,7 +230,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertContains(response, "New Subsection")
         self.assertNotContains(response, "sequence-nav")
 
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=subsection.location,
             display_name='New Unit',
         )

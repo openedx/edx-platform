@@ -22,7 +22,7 @@ from pytz import UTC
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, SampleCourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, SampleCourseFactory
 from xmodule.x_module import XModuleMixin
 from xmodule.capa.tests.response_xml_factory import StringResponseXMLFactory
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -179,15 +179,15 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         due = datetime.datetime(2016, 7, 8, 0, 0, tzinfo=UTC)
 
         cls.course = course = CourseFactory.create(enable_ccx=True, start=start)
-        chapter = ItemFactory.create(start=start, parent=course, category='chapter')
-        sequential = ItemFactory.create(
+        chapter = BlockFactory.create(start=start, parent=course, category='chapter')
+        sequential = BlockFactory.create(
             parent=chapter,
             start=start,
             due=due,
             category='sequential',
             metadata={'graded': True, 'format': 'Homework'}
         )
-        vertical = ItemFactory.create(
+        vertical = BlockFactory.create(
             parent=sequential,
             start=start,
             due=due,
@@ -198,7 +198,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         # Trying to wrap the whole thing in a bulk operation fails because it
         # doesn't find the parents. But we can at least wrap this part...
         with cls.store.bulk_operations(course.id, emit_signals=False):
-            flatten([ItemFactory.create(
+            flatten([BlockFactory.create(
                 parent=vertical,
                 start=start,
                 due=due,
@@ -811,16 +811,16 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         )
 
         self.chapters = [
-            ItemFactory.create(start=start, parent=course) for _ in range(2)
+            BlockFactory.create(start=start, parent=course) for _ in range(2)
         ]
         self.sequentials = flatten([
             [
-                ItemFactory.create(parent=chapter) for _ in range(2)
+                BlockFactory.create(parent=chapter) for _ in range(2)
             ] for chapter in self.chapters
         ])
         self.verticals = flatten([
             [
-                ItemFactory.create(
+                BlockFactory.create(
                     start=start, due=due, parent=sequential, graded=True, format='Homework', category='vertical'
                 ) for _ in range(2)
             ] for sequential in self.sequentials
@@ -831,7 +831,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         with self.store.bulk_operations(course.id, emit_signals=False):
             blocks = flatten([  # pylint: disable=unused-variable
                 [
-                    ItemFactory.create(parent=vertical) for _ in range(2)
+                    BlockFactory.create(parent=vertical) for _ in range(2)
                 ] for vertical in self.verticals
             ])
 
@@ -951,11 +951,11 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         cls.mooc_start = start = datetime.datetime(
             2010, 5, 12, 2, 42, tzinfo=UTC
         )
-        chapter = ItemFactory.create(
+        chapter = BlockFactory.create(
             start=start, parent=course, category='sequential'
         )
         cls.sections = sections = [
-            ItemFactory.create(
+            BlockFactory.create(
                 parent=chapter,
                 category="sequential",
                 metadata={'graded': True, 'format': 'Homework'})
@@ -964,7 +964,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         # making problems available at class level for possible future use in tests
         cls.problems = [
             [
-                ItemFactory.create(
+                BlockFactory.create(
                     parent=section,
                     category="problem",
                     data=StringResponseXMLFactory().build_xml(answer='foo'),

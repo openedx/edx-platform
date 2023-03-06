@@ -9,7 +9,7 @@ from django.test import TestCase
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
 
 import lms.djangoapps.lti_provider.outcomes as outcomes
 from common.djangoapps.student.tests.factories import UserFactory
@@ -306,9 +306,9 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
         self.outcome_service = self.create_outcome_service('outcomes')
         self.course = CourseFactory.create()
         with self.store.bulk_operations(self.course.id, emit_signals=False):
-            self.chapter = ItemFactory.create(parent=self.course, category="chapter")
-            self.vertical = ItemFactory.create(parent=self.chapter, category="vertical")
-            self.unit = ItemFactory.create(parent=self.vertical, category="unit")
+            self.chapter = BlockFactory.create(parent=self.course, category="chapter")
+            self.vertical = BlockFactory.create(parent=self.chapter, category="vertical")
+            self.unit = BlockFactory.create(parent=self.vertical, category="unit")
 
     def create_outcome_service(self, id_suffix):
         """

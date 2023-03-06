@@ -21,7 +21,7 @@
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
                     $courseTitle,
                     'edx.bi.dashboard.course_title.clicked',
-                     window.edx.dashboard.generateTrackProperties
+                    window.edx.dashboard.generateTrackProperties
                 );
             });
 

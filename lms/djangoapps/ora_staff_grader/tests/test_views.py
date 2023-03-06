@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import BlockFactory
 
 from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.ora_staff_grader.constants import (
@@ -51,7 +51,7 @@ class BaseViewTest(SharedModuleStoreTestCase, APITestCase):
         cls.course = CourseFactory.create()
         cls.course_key = cls.course.location.course_key
 
-        cls.ora_block = ItemFactory.create(
+        cls.ora_block = BlockFactory.create(
             category="openassessment",
             parent_location=cls.course.location,
             display_name="test",

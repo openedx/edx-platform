@@ -21,7 +21,7 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .field_overrides import OverrideModulestoreFieldData
 from .tests.helpers import MasqueradeMixin
@@ -101,23 +101,23 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
             default_store = self.store.default_modulestore.get_modulestore_type()
         with self.store.default_store(default_store):
             self.course = CourseFactory.create(**self.course_options())
-            chapter = ItemFactory.create(parent=self.course, category='chapter')
-            self.vertical_block = ItemFactory.create(
+            chapter = BlockFactory.create(parent=self.course, category='chapter')
+            self.vertical_block = BlockFactory.create(
                 parent_location=chapter.location,
                 category='vertical',
                 display_name="Vertical"
             )
-            self.html_block = ItemFactory.create(
+            self.html_block = BlockFactory.create(
                 parent=self.vertical_block,
                 category='html',
                 data="<p>Test HTML Content<p>"
             )
-            self.problem_block = ItemFactory.create(
+            self.problem_block = BlockFactory.create(
                 parent=self.vertical_block,
                 category='problem',
                 display_name='Problem'
             )
-            self.video_block = ItemFactory.create(
+            self.video_block = BlockFactory.create(
                 parent=self.vertical_block,
                 category='video',
                 display_name='Video'

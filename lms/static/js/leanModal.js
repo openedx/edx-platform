@@ -107,7 +107,7 @@
 
                     $(modalId).show().fadeTo(200, 1);
                     $(modalId).find('.notice').hide()
-                                              .html('');
+                        .html('');
                     notice = $(this).data('notice');
                     if (notice !== undefined) {
                         $notice = $(modalId).find('.notice');

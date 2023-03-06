@@ -2,10 +2,6 @@
 import uuid
 from unittest import mock
 
-from django.test import override_settings
-from edx_toggles.toggles.testutils import override_waffle_switch
-
-from openedx.core.djangoapps.credentials.config import USE_LEARNER_RECORD_MFE
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests import factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
@@ -93,69 +89,12 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         }
         assert kwargs['querystring'] == querystring
 
-    @override_settings(LEARNER_RECORD_MICROFRONTEND_URL=None)
-    @override_settings(CREDENTIALS_PUBLIC_SERVICE_URL="http://foo")
     def test_get_credentials_records_url(self):
         """
-        A test that verifies the functionality of the `get_credentials_records_url`. 
+        A test that verifies the functionality of the `get_credentials_records_url`.
         """
         result = get_credentials_records_url()
-        assert result == "http://foo/records/"
+        assert result == "https://credentials.example.com/records/"
 
         result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
-        assert result == "http://foo/records/programs/abcdefghijklmnopqrstuvwxyz123456/"
-
-    @override_settings(LEARNER_RECORD_MICROFRONTEND_URL="http://blah")
-    @override_settings(CREDENTIALS_PUBLIC_SERVICE_URL="http://foo")
-    @override_waffle_switch(USE_LEARNER_RECORD_MFE, False)
-    def test_get_credentials_records_mfe_url_waffle_disabled(self):
-        """
-        A test that verifies the results of the `get_credentials_records_url` function when the
-        LEARNER_RECORD_MICROFRONTEND_URL setting exists but the USE_LEARNER_RECORD_MFE waffle flag is disabled.
-        """
-        result = get_credentials_records_url()
-        assert result == "http://foo/records/"
-
-        result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
-        assert result == "http://foo/records/programs/abcdefghijklmnopqrstuvwxyz123456/"
-
-    @override_settings(LEARNER_RECORD_MICROFRONTEND_URL="http://blah")
-    @override_settings(CREDENTIALS_PUBLIC_SERVICE_URL="http://foo")
-    @override_waffle_switch(USE_LEARNER_RECORD_MFE, True)
-    def test_get_credentials_records_mfe_url_waffle_enabled(self):
-        """
-        A test that verifies the results of the `get_credentials_records_url` function when the
-        LEARNER_RECORD_MICROFRONTEND_URL setting exists but the USE_LEARNER_RECORD_MFE waffle flag is enabled.
-        """
-        result = get_credentials_records_url()
-        assert result == "http://blah/"
-
-        result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
-        assert result == "http://blah/abcdefghijklmnopqrstuvwxyz123456/"
-
-    @override_settings(CREDENTIALS_PUBLIC_SERVICE_URL=None)
-    @override_settings(LEARNER_RECORD_MICROFRONTEND_URL=None)
-    def test_get_credentials_records_url_expect_none(self):
-        """
-        A test that verifieis the results of the `get_credentials_records_url` function when the system is configured
-        to use neither the Credentials IDA or the Learner Record MFE.
-        """
-        result = get_credentials_records_url()
-        assert result is None
-
-        result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
-        assert result is None
-
-    @override_settings(LEARNER_RECORD_MICROFRONTEND_URL="http://blah")
-    @override_settings(CREDENTIALS_PUBLIC_SERVICE_URL=None)
-    @override_waffle_switch(USE_LEARNER_RECORD_MFE, True)
-    def test_get_credentials_records_url_only_mfe_configured(self):
-        """
-        A test that verifieis the results of the `get_credentials_records_url` function when the system is configured
-        to use only the Learner Record MFE.
-        """
-        result = get_credentials_records_url()
-        assert result == "http://blah/"
-
-        result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
-        assert result == "http://blah/abcdefghijklmnopqrstuvwxyz123456/"
+        assert result == "https://credentials.example.com/records/programs/abcdefghijklmnopqrstuvwxyz123456"

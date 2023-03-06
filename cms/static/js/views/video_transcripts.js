@@ -4,7 +4,7 @@ define(
         'common/js/components/utils/view_utils', 'text!templates/video-transcripts.underscore',
         'text!templates/video-transcript-upload-status.underscore'],
     function(_, gettext, BaseView, PromptView, HtmlUtils, StringUtils, ViewUtils, videoTranscriptsTemplate,
-                videoTranscriptUploadStatusTemplate) {
+        videoTranscriptUploadStatusTemplate) {
         'use strict';
 
         var VideoTranscriptsView = BaseView.extend({
@@ -166,7 +166,7 @@ define(
                     errorMessage = gettext(
                         'This file type is not supported. Supported file type is {supportedFileFormat}.'
                     )
-                    .replace('{supportedFileFormat}', this.videoTranscriptSettings.trancript_download_file_format);
+                        .replace('{supportedFileFormat}', this.videoTranscriptSettings.trancript_download_file_format);
                 }
 
                 return errorMessage;

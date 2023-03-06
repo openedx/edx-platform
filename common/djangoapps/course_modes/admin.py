@@ -191,6 +191,8 @@ class CourseModeAdmin(admin.ModelAdmin):
         '_expiration_datetime',
         'verification_deadline',
         'sku',
+        'android_sku',
+        'ios_sku',
         'bulk_sku'
     )
 
@@ -203,6 +205,8 @@ class CourseModeAdmin(admin.ModelAdmin):
         'min_price',
         'expiration_datetime_custom',
         'sku',
+        'android_sku',
+        'ios_sku',
         'bulk_sku'
     )
 

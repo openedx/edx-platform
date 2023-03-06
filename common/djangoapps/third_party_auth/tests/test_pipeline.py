@@ -78,7 +78,7 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
         ('S.K.', 'S_K', False),
         ('S.K.', 'S_K_-9fe2', True),
         ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlengthofm', False),
-        ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlengt-9fe', True),
+        ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlen-9fe2', True),
     )
     @ddt.unpack
     @mock.patch('common.djangoapps.third_party_auth.pipeline.user_exists')

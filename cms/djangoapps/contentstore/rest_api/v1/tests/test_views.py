@@ -77,7 +77,7 @@ class ProctoringExamSettingsTestMixin():
         response = self.make_request()
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_404_no_course_module(self):
+    def test_404_no_course_block(self):
         course_id = 'course-v1:edX+ToyX_Nonexistent_Course+Toy_Course'
         self.client.login(username=self.global_staff, password=self.password)
         response = self.make_request(course_id=course_id)

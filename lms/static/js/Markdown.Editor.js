@@ -9,7 +9,7 @@
         nav = window.navigator,
         SETTINGS = {lineLength: 72},
 
-    // Used to work around some browser bugs where we can't use feature testing.
+        // Used to work around some browser bugs where we can't use feature testing.
         uaSniffed = {
             isIE: /msie/.test(nav.userAgent.toLowerCase()),
             isIE_5or6: /msie 6/.test(nav.userAgent.toLowerCase()) || /msie 5/.test(nav.userAgent.toLowerCase()),
@@ -91,7 +91,7 @@
                 undoManager = new UndoManager(function() {
                     previewManager.refresh();
                     if (uiManager) // not available on the first call
-                        { uiManager.setUndoRedoButtonStates(); }
+                    { uiManager.setUndoRedoButtonStates(); }
                 }, panels);
                 this.textOperation = function(f) {
                     undoManager.setCommandMode();
@@ -777,12 +777,12 @@
             if (window.innerHeight) {
                 result = window.pageYOffset;
             } else
-                if (doc.documentElement && doc.documentElement.scrollTop) {
-                    result = doc.documentElement.scrollTop;
-                } else
-                    if (doc.body) {
-                        result = doc.body.scrollTop;
-                    }
+            if (doc.documentElement && doc.documentElement.scrollTop) {
+                result = doc.documentElement.scrollTop;
+            } else
+            if (doc.body) {
+                result = doc.body.scrollTop;
+            }
 
             return result;
         };
@@ -973,17 +973,17 @@
     //      It receives a single argument; either the entered text (if OK was chosen) or null (if Cancel
     //      was chosen).
     ui.prompt = function(title,
-                          urlLabel,
-                          urlHelp,
-                          urlError,
-                          urlDescLabel,
-                          urlDescHelp,
-                          urlDescHelpLink,
-                          urlDescError,
-                          defaultInputText,
-                          callback,
-                          imageIsDecorativeLabel,
-                          imageUploadHandler) {
+        urlLabel,
+        urlHelp,
+        urlError,
+        urlDescLabel,
+        urlDescHelp,
+        urlDescHelpLink,
+        urlDescError,
+        defaultInputText,
+        callback,
+        imageIsDecorativeLabel,
+        imageUploadHandler) {
         // These variables need to be declared at this level since they are used
         // in multiple functions.
         var dialog,         // The dialog box.
@@ -1076,21 +1076,21 @@
             dialog = doc.createElement('div');
             dialog.innerHTML = _.template(
                 document.getElementById('customwmd-prompt-template').innerHTML)({
-                    title: title,
-                    uploadFieldClass: (imageUploadHandler ? 'file-upload' : ''),
-                    urlLabel: urlLabel,
-                    urlError: urlError,
-                    urlHelp: urlHelp,
-                    urlDescLabel: urlDescLabel,
-                    descError: urlDescError,
-                    urlDescHelp: urlDescHelp,
-                    urlDescHelpLink: urlDescHelpLink,
-                    okText: gettext('OK'),
-                    cancelText: gettext('Cancel'),
-                    chooseFileText: gettext('Choose File'),
-                    imageIsDecorativeLabel: imageIsDecorativeLabel,
-                    imageUploadHandler: imageUploadHandler
-                });
+                title: title,
+                uploadFieldClass: (imageUploadHandler ? 'file-upload' : ''),
+                urlLabel: urlLabel,
+                urlError: urlError,
+                urlHelp: urlHelp,
+                urlDescLabel: urlDescLabel,
+                descError: urlDescError,
+                urlDescHelp: urlDescHelp,
+                urlDescHelpLink: urlDescHelpLink,
+                okText: gettext('OK'),
+                cancelText: gettext('Cancel'),
+                chooseFileText: gettext('Choose File'),
+                imageIsDecorativeLabel: imageIsDecorativeLabel,
+                imageUploadHandler: imageUploadHandler
+            });
             dialog.setAttribute('dir', doc.head.getAttribute('dir'));
             dialog.setAttribute('role', 'dialog');
             dialog.setAttribute('tabindex', '-1');
@@ -1882,7 +1882,7 @@
                 if (/^>/.test(line)) {                // a)
                     good = true;
                     if (!inChain && line.length > 1)  // c) any line that starts with ">" and has at least one more character starts the chain
-                        { inChain = true; }
+                    { inChain = true; }
                 } else if (/^[ \t]*$/.test(line)) {   // b)
                     good = true;
                 } else {
@@ -1957,10 +1957,10 @@
 
         if (!/\n/.test(chunk.selection)) {
             chunk.selection = chunk.selection.replace(/^(> *)/,
-            function(wholeMatch, blanks) {
-                chunk.startTag += blanks;
-                return '';
-            });
+                function(wholeMatch, blanks) {
+                    chunk.startTag += blanks;
+                    return '';
+                });
         }
     };
 
@@ -1995,7 +1995,7 @@
             } else {
                 if (/^[ ]{0,3}\S/m.test(chunk.selection)) {
                     if (/\n/.test(chunk.selection)) { chunk.selection = chunk.selection.replace(/^/gm, '    '); } else // if it's not multiline, do not select the four added spaces; this is more consistent with the doList behavior
-                        { chunk.before += '    '; }
+                    { chunk.before += '    '; }
                 } else {
                     chunk.selection = chunk.selection.replace(/^[ ]{4}/gm, '');
                 }

@@ -12,11 +12,11 @@
         'text!templates/fields/field_textarea.underscore',
         'backbone-super'
     ], function(gettext, $, _, Backbone, HtmlUtils, DateUtils,
-                 fieldReadOnlyTemplate,
-                 fieldDropDownTemplate,
-                 fieldLinkTemplate,
-                 fieldTextTemplate,
-                 fieldTextAreaTemplate
+        fieldReadOnlyTemplate,
+        fieldDropDownTemplate,
+        fieldLinkTemplate,
+        fieldTextTemplate,
+        fieldTextAreaTemplate
     ) {
         var messageRevertDelay = 6000;
         var FieldViews = {};
@@ -552,10 +552,10 @@
 
             createGroupOptions: function() {
                 return !(_.isUndefined(this.options.groupOptions)) ? this.options.groupOptions :
-                [{
-                    groupTitle: null,
-                    selectOptions: this.options.options
-                }];
+                    [{
+                        groupTitle: null,
+                        selectOptions: this.options.options
+                    }];
             }
         });
 

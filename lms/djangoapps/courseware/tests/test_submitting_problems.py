@@ -39,7 +39,7 @@ from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactor
 from openedx.core.lib.url_utils import quote_slashes
 from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -181,7 +181,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
             correct_option='Correct'
         )
 
-        problem = ItemFactory.create(
+        problem = BlockFactory.create(
             parent_location=section_location,
             category='problem',
             data=prob_xml,
@@ -200,13 +200,13 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
 
         # if we don't already have a chapter create a new one
         if not hasattr(self, 'chapter'):
-            self.chapter = ItemFactory.create(
+            self.chapter = BlockFactory.create(
                 parent_location=self.course.location,
                 category='chapter'
             )
 
         if late:
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent_location=self.chapter.location,
                 display_name=name,
                 category='sequential',
@@ -217,7 +217,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
                 },
             )
         elif reset:
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent_location=self.chapter.location,
                 display_name=name,
                 category='sequential',
@@ -229,7 +229,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
             )
 
         elif showanswer:
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent_location=self.chapter.location,
                 display_name=name,
                 category='sequential',
@@ -241,7 +241,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
             )
 
         else:
-            section = ItemFactory.create(
+            section = BlockFactory.create(
                 parent_location=self.chapter.location,
                 display_name=name,
                 category='sequential',
@@ -773,7 +773,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         xmldata = CodeResponseXMLFactory().build_xml(
             allowed_files=files, required_files=files,
         )
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.section.location,
             category='problem',
             display_name=name,
@@ -919,7 +919,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         script = self.SCHEMATIC_SCRIPT
 
         xmldata = SchematicResponseXMLFactory().build_xml(answer=script)
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.section.location,
             category='problem',
             boilerplate='circuitschematic.yaml',
@@ -943,7 +943,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         expect = self.CUSTOM_RESPONSE_CORRECT
         cfn_problem_xml = CustomResponseXMLFactory().build_xml(script=test_csv, cfn='test_csv', expect=expect)
 
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.section.location,
             category='problem',
             boilerplate='customgrader.yaml',
@@ -967,7 +967,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
 
         computed_xml = CustomResponseXMLFactory().build_xml(answer=script)
 
-        ItemFactory.create(
+        BlockFactory.create(
             parent_location=self.section.location,
             category='problem',
             boilerplate='customgrader.yaml',
@@ -1120,7 +1120,7 @@ class TestConditionalContent(TestSubmittingProblems):
         for index, url in enumerate([vertical_0_url, vertical_1_url]):
             group_id_to_child[str(index)] = url
 
-        split_test = ItemFactory.create(
+        split_test = BlockFactory.create(
             parent_location=self.homework_conditional.location,
             category="split_test",
             display_name="Split test",
@@ -1128,14 +1128,14 @@ class TestConditionalContent(TestSubmittingProblems):
             group_id_to_child=group_id_to_child,
         )
 
-        vertical_0 = ItemFactory.create(
+        vertical_0 = BlockFactory.create(
             parent_location=split_test.location,
             category="vertical",
             display_name="Condition 0 vertical",
             location=vertical_0_url,
         )
 
-        vertical_1 = ItemFactory.create(
+        vertical_1 = BlockFactory.create(
             parent_location=split_test.location,
             category="vertical",
             display_name="Condition 1 vertical",

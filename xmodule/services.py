@@ -147,7 +147,7 @@ class RebindUserService(Service):
     """
     An XBlock Service that allows modules to get rebound to real users if it was previously bound to an AnonymousUser.
 
-    This used to be a local function inside the `lms.djangoapps.courseware.module_render.get_module_system_for_user`
+    This used to be a local function inside the `lms.djangoapps.courseware.block_render.get_module_system_for_user`
     method, and was passed as a constructor argument to x_module.ModuleSystem. This has been refactored out into a
     service to simplify the ModuleSystem and lives in this module temporarily.
 
@@ -160,7 +160,7 @@ class RebindUserService(Service):
         course (Course) - Course Object
         get_module_system_for_user (function) - The helper function that will be called to create a module system
             for a specfic user. This is the parent function from which this service was reactored out.
-            `lms.djangoapps.courseware.module_render.get_module_system_for_user`
+            `lms.djangoapps.courseware.block_render.get_module_system_for_user`
         kwargs (dict) - all the keyword arguments that need to be passed to the `get_module_system_for_user`
             function when it is called during rebinding
     """

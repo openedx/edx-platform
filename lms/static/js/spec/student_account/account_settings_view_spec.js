@@ -8,84 +8,84 @@ define(['backbone',
     'js/student_account/models/user_account_model',
     'js/student_account/views/account_settings_view'
 ],
-    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel,
-              AccountSettingsView) {
-        'use strict';
+function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel,
+    AccountSettingsView) {
+    'use strict';
 
-        describe('edx.user.AccountSettingsView', function() {
-            var createAccountSettingsView = function() {
-                var model = new UserAccountModel();
-                model.set(Helpers.createAccountSettingsData());
+    describe('edx.user.AccountSettingsView', function() {
+        var createAccountSettingsView = function() {
+            var model = new UserAccountModel();
+            model.set(Helpers.createAccountSettingsData());
 
-                var aboutSectionsData = [
-                    {
-                        title: 'Basic Account Information',
-                        messageType: 'info',
-                        message: 'Your profile settings are managed by Test Enterprise. ' +
+            var aboutSectionsData = [
+                {
+                    title: 'Basic Account Information',
+                    messageType: 'info',
+                    message: 'Your profile settings are managed by Test Enterprise. ' +
                         'Contact your administrator or <a href="https://support.edx.org/">edX Support</a> for help.',
-                        fields: [
-                            {
-                                view: new FieldViews.ReadonlyFieldView({
-                                    model: model,
-                                    title: 'Username',
-                                    valueAttribute: 'username'
-                                })
-                            },
-                            {
-                                view: new FieldViews.TextFieldView({
-                                    model: model,
-                                    title: 'Full Name',
-                                    valueAttribute: 'name'
-                                })
-                            }
-                        ]
-                    },
-                    {
-                        title: 'Additional Information',
-                        fields: [
-                            {
-                                view: new FieldViews.DropdownFieldView({
-                                    model: model,
-                                    title: 'Education Completed',
-                                    valueAttribute: 'level_of_education',
-                                    options: Helpers.FIELD_OPTIONS
-                                })
-                            }
-                        ]
-                    }
-                ];
+                    fields: [
+                        {
+                            view: new FieldViews.ReadonlyFieldView({
+                                model: model,
+                                title: 'Username',
+                                valueAttribute: 'username'
+                            })
+                        },
+                        {
+                            view: new FieldViews.TextFieldView({
+                                model: model,
+                                title: 'Full Name',
+                                valueAttribute: 'name'
+                            })
+                        }
+                    ]
+                },
+                {
+                    title: 'Additional Information',
+                    fields: [
+                        {
+                            view: new FieldViews.DropdownFieldView({
+                                model: model,
+                                title: 'Education Completed',
+                                valueAttribute: 'level_of_education',
+                                options: Helpers.FIELD_OPTIONS
+                            })
+                        }
+                    ]
+                }
+            ];
 
-                var accountSettingsView = new AccountSettingsView({
-                    el: $('.wrapper-account-settings'),
-                    model: model,
-                    tabSections: {
-                        aboutTabSections: aboutSectionsData
-                    }
-                });
-
-                return accountSettingsView;
-            };
-
-            beforeEach(function() {
-                setFixtures('<div class="wrapper-account-settings"></div>');
+            var accountSettingsView = new AccountSettingsView({
+                el: $('.wrapper-account-settings'),
+                model: model,
+                tabSections: {
+                    aboutTabSections: aboutSectionsData
+                }
             });
 
-            it('shows loading error correctly', function() {
-                var accountSettingsView = createAccountSettingsView();
+            return accountSettingsView;
+        };
 
-                accountSettingsView.render();
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
+        beforeEach(function() {
+            setFixtures('<div class="wrapper-account-settings"></div>');
+        });
 
-                accountSettingsView.showLoadingError();
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, true);
-            });
+        it('shows loading error correctly', function() {
+            var accountSettingsView = createAccountSettingsView();
 
-            it('renders all fields as expected', function() {
-                var accountSettingsView = createAccountSettingsView();
+            accountSettingsView.render();
+            Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
 
-                accountSettingsView.render();
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView);
-            });
+            accountSettingsView.showLoadingError();
+            Helpers.expectLoadingErrorIsVisible(accountSettingsView, true);
+        });
+
+        it('renders all fields as expected', function() {
+            var accountSettingsView = createAccountSettingsView();
+
+            accountSettingsView.render();
+            Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
+            Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView);
         });
     });
+});

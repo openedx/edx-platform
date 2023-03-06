@@ -200,7 +200,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         if display_name is not None:
             metadata['display_name'] = display_name
 
-        # We should use the 'fields' kwarg for newer module settings/values (vs. metadata or data)
+        # We should use the 'fields' kwarg for newer block settings/values (vs. metadata or data)
         fields = {}
 
         # Entrance Exams: Chapter module positioning
@@ -254,7 +254,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
                         user
                     )
 
-        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course block, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if category == 'static_tab':

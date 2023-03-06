@@ -7,7 +7,7 @@ $(document).ready(function() {
         keyMap: 'accessible'
     });
 
-  // Store the inital contents so we can compare for unsaved changes
+    // Store the inital contents so we can compare for unsaved changes
     var initialContents = editor.getValue();
 
     // The Wiki associates a label with the text area that has ID "id_content". However, when we swap in

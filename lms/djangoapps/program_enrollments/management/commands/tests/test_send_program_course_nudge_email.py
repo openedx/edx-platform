@@ -105,7 +105,7 @@ class TestSendProgramCourseNudgeEmailCommand(SharedModuleStoreTestCase):
         False,
         True,
     )
-    @patch('common.djangoapps.student.models.segment.track')
+    @patch('common.djangoapps.student.models.course_enrollment.segment.track')
     @patch('lms.djangoapps.program_enrollments.management.commands.send_program_course_nudge_email.get_programs')
     @patch('lms.djangoapps.certificates.api.certificates_viewable_for_course', return_value=True)
     @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
@@ -143,7 +143,7 @@ class TestSendProgramCourseNudgeEmailCommand(SharedModuleStoreTestCase):
     @ddt.data(
         False, True
     )
-    @patch('common.djangoapps.student.models.segment.track')
+    @patch('common.djangoapps.student.models.course_enrollment.segment.track')
     @patch('lms.djangoapps.program_enrollments.management.commands.send_program_course_nudge_email.get_programs')
     @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     def test_email_no_course_recommendation(self, add_no_commit, get_programs_mock, mock_track):

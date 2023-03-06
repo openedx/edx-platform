@@ -66,6 +66,41 @@ from django.urls import reverse
   </div>
   %endif
 
+  %if context_course.discussions_settings.get('provider_type') == "openedx":
+  <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown" style="background-color:#F0CC00">
+    <div class="alert announcement has-actions">
+      <span class="feedback-symbol fa fa-bullhorn" style="color:black" aria-hidden="true"></span>
+      <div class="copy">
+        <div style="color:black; display:inline-block">
+            <div>
+                ${_("This course run is using an upgraded version of edx discussion forum. Discussion xblocks will no longer work.")}
+            </div>
+            <div style="margin-left:auto; width:fit-content;">
+                <span>
+                    <a href="${settings.DISCUSSIONS_INCONTEXT_LEARNMORE_URL}" target="_blank" rel="noreferrer noopener">${_(" Learn more")}</a>
+                    <i class="fa fa-share-square-o" aria-hidden="true"></i>
+                </span>
+                <span style="margin-left: 1rem">
+                    <a href="${settings.DISCUSSIONS_INCONTEXT_FEEDBACK_URL}" target="_blank" rel="noreferrer noopener">${_("Share feedback")}</a>
+                    <i class="fa fa-share-square-o" aria-hidden="true"></i>
+                </span>
+            </div>
+        </div>
+      </div>
+
+      <ul class="nav-actions">
+        <li class="action action-dismiss">
+          <a href="#" class="button dismiss-button" style="color:black; border-color:black">
+            <span class="icon fa fa-times-circle" aria-hidden="true"></span>
+            <span class="button-copy">${_("Dismiss")}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  %endif
+
+
     %if deprecated_blocks_info.get('blocks') or deprecated_blocks_info.get('deprecated_enabled_block_types'):
       <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
         <div class="alert announcement">

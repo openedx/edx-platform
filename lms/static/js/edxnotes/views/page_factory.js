@@ -15,13 +15,13 @@
      */
         return function(params) {
             var collection = new NotesCollection(
-            params.notes,
+                params.notes,
                 {
                     url: params.notesEndpoint,
                     perPage: params.pageSize,
                     parse: true
                 }
-        );
+            );
 
             return new NotesPageView({
                 el: $('.wrapper-student-notes').get(0),

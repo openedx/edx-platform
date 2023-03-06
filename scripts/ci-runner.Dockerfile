@@ -46,10 +46,10 @@ COPY openedx/core/lib openedx/core/lib
 COPY lms lms
 COPY cms cms
 COPY requirements/pip.txt requirements/pip.txt
+COPY requirements/edx/pip-tools.txt requirements/edx/pip-tools.txt
 COPY requirements/edx/testing.txt requirements/edx/testing.txt
-COPY requirements/edx/django.txt requirements/edx/django.txt
-RUN pip install -r requirements/pip.txt && \
-pip install -r requirements/edx/testing.txt -r requirements/edx/django.txt
+COPY Makefile Makefile
+RUN make test-requirements
 
 FROM base as runner
 

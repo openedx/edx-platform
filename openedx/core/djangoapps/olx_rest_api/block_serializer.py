@@ -94,7 +94,7 @@ class XBlockSerializer:
                 block.add_xml_to_node(olx_node)
                 block.children = children
 
-            # Now the block/module may have exported addtional data as files in
+            # Now the block may have exported addtional data as files in
             # 'filesystem'. If so, store them:
             for item in filesystem.walk():  # pylint: disable=not-callable
                 for unit_file in item.files:
