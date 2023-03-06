@@ -34,7 +34,7 @@
             submitAnswer: function(answer, answerObj) {
                 var _this;
 
-    // Make sure that the user can answer a question only once.
+                // Make sure that the user can answer a question only once.
                 if (this.questionAnswered === true) {
                     return;
                 }
@@ -46,29 +46,29 @@
 
                 answerObj.buttonEl.addClass('answered');
 
-    // Send the data to the server as an AJAX request. Attach a callback that will
-    // be fired on server's response.
+                // Send the data to the server as an AJAX request. Attach a callback that will
+                // be fired on server's response.
                 $.postWithPrefix(
-        _this.ajax_url + '/' + answer, {},
-        function(response) {
-            console.log('success! response = ');
-            console.log(response);
+                    _this.ajax_url + '/' + answer, {},
+                    function(response) {
+                        console.log('success! response = ');
+                        console.log(response);
 
-            _this.showAnswerGraph(response.poll_answers, response.total);
+                        _this.showAnswerGraph(response.poll_answers, response.total);
 
-            if (_this.canReset === true) {
-                _this.resetButton.show();
-            }
+                        if (_this.canReset === true) {
+                            _this.resetButton.show();
+                        }
 
-            // Initialize Conditional constructors.
-            if (_this.wrapperSectionEl !== null) {
-                $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function(index, value) {
-                    // eslint-disable-next-line no-new
-                    new window.Conditional(value, _this.runtime, _this.id.replace(/^poll_/, ''));
-                });
-            }
-        }
-    );
+                        // Initialize Conditional constructors.
+                        if (_this.wrapperSectionEl !== null) {
+                            $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function(index, value) {
+                                // eslint-disable-next-line no-new
+                                new window.Conditional(value, _this.runtime, _this.id.replace(/^poll_/, ''));
+                            });
+                        }
+                    }
+                );
             }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
 
@@ -79,69 +79,69 @@
 
                 console.log('submit reset');
 
-    // Send the data to the server as an AJAX request. Attach a callback that will
-    // be fired on server's response.
+                // Send the data to the server as an AJAX request. Attach a callback that will
+                // be fired on server's response.
                 $.postWithPrefix(
-        this.ajax_url + '/' + 'reset_poll',
-        {},
-        function(response) {
-            console.log('success! response = ');
-            console.log(response);
+                    this.ajax_url + '/' + 'reset_poll',
+                    {},
+                    function(response) {
+                        console.log('success! response = ');
+                        console.log(response);
 
-            if (
-                (response.hasOwnProperty('status') !== true) ||
+                        if (
+                            (response.hasOwnProperty('status') !== true) ||
                 (typeof response.status !== 'string') ||
                 (response.status.toLowerCase() !== 'success')) {
-                return;
-            }
+                            return;
+                        }
 
-            _this.questionAnswered = false;
-            _this.questionEl.find('.button.answered').removeClass('answered');
-            _this.questionEl.find('.stats').hide();
-            _this.resetButton.hide();
+                        _this.questionAnswered = false;
+                        _this.questionEl.find('.button.answered').removeClass('answered');
+                        _this.questionEl.find('.stats').hide();
+                        _this.resetButton.hide();
 
-            // Initialize Conditional constructors. We will specify the third parameter as 'true'
-            // notifying the constructor that this is a reset operation.
-            if (_this.wrapperSectionEl !== null) {
-                $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function(index, value) {
-                    // eslint-disable-next-line no-new
-                    new window.Conditional(value, _this.runtime, _this.id.replace(/^poll_/, ''));
-                });
-            }
-        }
-    );
+                        // Initialize Conditional constructors. We will specify the third parameter as 'true'
+                        // notifying the constructor that this is a reset operation.
+                        if (_this.wrapperSectionEl !== null) {
+                            $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function(index, value) {
+                                // eslint-disable-next-line no-new
+                                new window.Conditional(value, _this.runtime, _this.id.replace(/^poll_/, ''));
+                            });
+                        }
+                    }
+                );
             }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
             postInit: function() {
                 var _this;
 
-    // Access this object inside inner functions.
+                // Access this object inside inner functions.
                 _this = this;
 
                 if (
-        (this.jsonConfig.poll_answer.length > 0) &&
+                    (this.jsonConfig.poll_answer.length > 0) &&
         (this.jsonConfig.answers.hasOwnProperty(this.jsonConfig.poll_answer) === false)
-    ) {
+                ) {
                     HtmlUtils.append(this.questionEl, HtmlUtils.joinHtml(
                         HtmlUtils.HTML('<h3>Error!</h3>'),
                         HtmlUtils.HTML(
-                          '<p>XML data format changed. List of answers was modified, but poll data was not updated.</p>'
+                            '<p>XML data format changed. List of answers was modified, but poll data was not updated.</p>'
                         )
                     ));
 
                     return;
                 }
 
-    // Get the DOM id of the question.
+                // Get the DOM id of the question.
                 this.id = this.questionEl.attr('id');
 
-    // Get the URL to which we will post the users answer to the question.
+                // Get the URL to which we will post the users answer to the question.
                 this.ajax_url = this.questionEl.data('ajax-url');
 
                 this.questionHtmlMarkup = $('<div />').html(HtmlUtils.HTML(this.jsonConfig.question).toString()).text();
                 this.questionEl.append(HtmlUtils.HTML(this.questionHtmlMarkup).toString());
 
-    // When the user selects and answer, we will set this flag to true.
+                // When the user selects and answer, we will set this flag to true.
                 this.questionAnswered = false;
 
                 this.answersObj = {};
@@ -227,7 +227,7 @@
                     this.canReset = false;
                 }
 
-    // If it turns out that the user already answered the question, show the answers graph.
+                // If it turns out that the user already answered the question, show the answers graph.
                 if (this.questionAnswered === true) {
                     this.showAnswerGraph(this.jsonConfig.poll_answers, this.jsonConfig.total);
                 }
@@ -242,31 +242,31 @@
             this.runtime = runtime;
             this.questionEl = $(el).find('.poll_question');
             if (this.questionEl.length !== 1) {
-        // We require one question DOM element.
+                // We require one question DOM element.
                 console.log('ERROR: PollMain constructor requires one question DOM element.');
 
                 return;
             }
 
-    // Just a safety precussion. If we run this code more than once, multiple 'click' callback handlers will be
-    // attached to the same DOM elements. We don't want this to happen.
+            // Just a safety precussion. If we run this code more than once, multiple 'click' callback handlers will be
+            // attached to the same DOM elements. We don't want this to happen.
             if (this.questionEl.attr('poll_main_processed') === 'true') {
                 console.log(
-            'ERROR: PolMain JS constructor was called on a DOM element that has already been processed once.'
-        );
+                    'ERROR: PolMain JS constructor was called on a DOM element that has already been processed once.'
+                );
 
                 return;
             }
 
-    // This element was not processed earlier.
-    // Make sure that next time we will not process this element a second time.
+            // This element was not processed earlier.
+            // Make sure that next time we will not process this element a second time.
             this.questionEl.attr('poll_main_processed', 'true');
 
-    // Access this object inside inner functions.
+            // Access this object inside inner functions.
             _this = this;
 
-    // DOM element which contains the current poll along with any conditionals. By default we assume that such
-    // element is not present. We will try to find it.
+            // DOM element which contains the current poll along with any conditionals. By default we assume that such
+            // element is not present. We will try to find it.
             this.wrapperSectionEl = null;
 
             (function(tempEl, c1) {
@@ -275,15 +275,15 @@
                     c1 += 1;
 
                     if (
-                (tempEl.tagName.toLowerCase() === 'div') &&
+                        (tempEl.tagName.toLowerCase() === 'div') &&
                 ($(tempEl).data('block-type') === 'wrapper')
-            ) {
+                    ) {
                         _this.wrapperSectionEl = tempEl;
 
                         break;
                     } else if (c1 > 50) {
-                // In case something breaks, and we enter an endless loop, a sane
-                // limit for loop iterations.
+                        // In case something breaks, and we enter an endless loop, a sane
+                        // limit for loop iterations.
 
                         break;
                     }
@@ -294,28 +294,28 @@
                 this.jsonConfig = JSON.parse(this.questionEl.children('.poll_question_div').html());
 
                 $.postWithPrefix(
-            '' + this.questionEl.data('ajax-url') + '/' + 'get_state', {},
-            function(response) {
-                _this.jsonConfig.poll_answer = response.poll_answer;
-                _this.jsonConfig.total = response.total;
+                    '' + this.questionEl.data('ajax-url') + '/' + 'get_state', {},
+                    function(response) {
+                        _this.jsonConfig.poll_answer = response.poll_answer;
+                        _this.jsonConfig.total = response.total;
 
-                $.each(response.poll_answers, function(index, value) {
-                    _this.jsonConfig.poll_answers[index] = value;
-                });
+                        $.each(response.poll_answers, function(index, value) {
+                            _this.jsonConfig.poll_answers[index] = value;
+                        });
 
-                // xss-lint: disable=javascript-jquery-html
-                _this.questionEl.children('.poll_question_div').html(JSON.stringify(_this.jsonConfig));
+                        // xss-lint: disable=javascript-jquery-html
+                        _this.questionEl.children('.poll_question_div').html(JSON.stringify(_this.jsonConfig));
 
-                _this.postInit();
-            }
-        );
+                        _this.postInit();
+                    }
+                );
 
                 return;
             } catch (err) {
                 console.log(
-            'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
-            'Error messsage: "' + err.message + '".'
-        );
+                    'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
+                    'Error messsage: "' + err.message + '".'
+                );
 
                 return;
             }

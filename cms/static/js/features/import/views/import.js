@@ -150,13 +150,13 @@ define(
                 _.map($dom.stages, completeStage);
 
                 $dom.successStage
-                        .find('.item-progresspoint-success-date')
-                        .text('(' + date + ' at ' + time + ' UTC)');
+                    .find('.item-progresspoint-success-date')
+                    .text('(' + date + ' at ' + time + ' UTC)');
 
                 break;
 
             case STATE.ERROR:
-                    // Make all stages up to, and including, the error stage 'complete'.
+                // Make all stages up to, and including, the error stage 'complete'.
                 $prev = $dom.stages.slice(0, current.stage + 1);
                 $curr = $dom.stages.eq(current.stage);
                 $next = $dom.stages.slice(current.stage + 1);

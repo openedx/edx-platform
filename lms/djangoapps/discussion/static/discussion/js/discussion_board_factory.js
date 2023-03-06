@@ -15,7 +15,7 @@
             'discussion/js/views/discussion_board_view'
         ],
         function($, Backbone, Content, Discussion, DiscussionUtil, DiscussionCourseSettings, DiscussionUser,
-                 NewPostView, DiscussionRouter, DiscussionBoardView) {
+            NewPostView, DiscussionRouter, DiscussionBoardView) {
             return function(options) {
                 var userInfo = options.userInfo,
                     sortPreference = options.sortPreference,

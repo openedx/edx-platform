@@ -15,7 +15,7 @@ define([
     'js/certificates/spec/custom_matchers'
 ],
 function(_, Course, CertificatesCollection, CertificateModel, CertificateDetailsView, CertificatePreview,
-         Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
+    Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
     var SELECTORS = {

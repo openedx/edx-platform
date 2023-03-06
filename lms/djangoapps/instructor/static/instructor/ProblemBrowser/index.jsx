@@ -6,7 +6,7 @@ import MainContainer from './components/Main/MainContainer';
 
 
 export const ProblemBrowser = props => (
-  <Provider store={store}>
-    <MainContainer {...props} />
-  </Provider>
+    <Provider store={store}>
+        <MainContainer {...props} />
+    </Provider>
 );

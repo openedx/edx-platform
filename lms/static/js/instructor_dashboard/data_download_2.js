@@ -2,7 +2,7 @@
 
 (function() {
     'use strict';
-  // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars
     var DataDownloadV2, PendingInstructorTasks, ReportDownloads, statusAjaxError;
 
     statusAjaxError = function() {
@@ -175,7 +175,7 @@
                     success: function(data) {
                         if (data.grading_config_summary) {
                             edx.HtmlUtils.setHtml(
-                             dataDownloadObj.$download_display_text, edx.HtmlUtils.HTML(data.grading_config_summary));
+                                dataDownloadObj.$download_display_text, edx.HtmlUtils.HTML(data.grading_config_summary));
                         } else {
                             dataDownloadObj.$reports_request_response.text(data.status);
                             $('.msg-confirm').css({display: 'block'});
@@ -187,7 +187,7 @@
             this.OnError = function(error, errorMessage) {
                 dataDownloadObj.clear_display();
                 if (error.responseText) {
-                  // eslint-disable-next-line no-param-reassign
+                    // eslint-disable-next-line no-param-reassign
                     errorMessage = JSON.parse(error.responseText);
                 }
                 dataDownloadObj.$download_request_response_error.text(errorMessage);

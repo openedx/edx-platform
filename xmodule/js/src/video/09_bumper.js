@@ -15,8 +15,8 @@
             }
 
             _.bindAll(
-            this, 'showMainVideoHandler', 'destroy', 'skipByDuration', 'destroyAndResolve'
-        );
+                this, 'showMainVideoHandler', 'destroy', 'skipByDuration', 'destroyAndResolve'
+            );
             this.dfd = $.Deferred();
             this.element = state.el;
             this.element.addClass('is-bumper');

@@ -4,7 +4,7 @@ define(
         'edx-ui-toolkit/js/utils/string-utils', 'text!templates/video-thumbnail.underscore',
         'text!templates/video-thumbnail-error.underscore'],
     function(_, gettext, moment, DateUtils, BaseView, ViewUtils, HtmlUtils, StringUtils, VideoThumbnailTemplate,
-                VideoThumbnailErrorTemplate) {
+        VideoThumbnailErrorTemplate) {
         'use strict';
 
         var VideoThumbnailView = BaseView.extend({
@@ -301,7 +301,7 @@ define(
                 } else if (action === 'edit') {
                     this.$('.thumbnail-action .edit-container').toggle(true);
                     HtmlUtils.setHtml(
-                    this.$('.thumbnail-action .edit-container .action-icon'),
+                        this.$('.thumbnail-action .edit-container .action-icon'),
                         HtmlUtils.HTML(this.actionsInfo[action].icon)
                     );
                     HtmlUtils.setHtml(
@@ -361,16 +361,16 @@ define(
                 // If image url is not this.defaultVideoImageURL then it means image is uploaded
                 // so we should treat it as edit action otherwise default upload action.
                 this.action = this.$('.thumbnail-wrapper img').attr('src') !== this.defaultVideoImageURL
-                                ? 'edit' : 'upload';
+                    ? 'edit' : 'upload';
                 this.setActionInfo(this.action, true);
                 this.readMessages([gettext('Could not upload the video image file'), errorText]);
 
                 errorText = gettext('Image upload failed. ') + errorText;   // eslint-disable-line no-param-reassign
                 // Add error wrapper html to current video element row.
                 $parentRowEl.before(    // xss-lint: disable=javascript-jquery-insertion
-                   HtmlUtils.ensureHtml(
-                       this.thumbnailErrorTemplate({videoId: videoId, errorText: errorText})
-                   ).toString()
+                    HtmlUtils.ensureHtml(
+                        this.thumbnailErrorTemplate({videoId: videoId, errorText: errorText})
+                    ).toString()
                 );
                 this.$el.find('.thumbnail-wrapper').addClass('error');
             },

@@ -14,7 +14,7 @@
             }
         };
 
-    /**
+        /**
      * Removes a reference on the logger from `loggers`.
      * @param  {Object} logger An instance of Logger.
      */
@@ -32,7 +32,7 @@
             }
         };
 
-    /**
+        /**
      * NotesLogger constructor.
      * @constructor
      * @param {String} id Id of the logger.
@@ -42,12 +42,12 @@
             this.id = id;
             this.historyStorage = [];
             this.timeStorage = {};
-        // 0 - silent;
-        // 1 - show logs;
+            // 0 - silent;
+            // 1 - show logs;
             this.logLevel = mode;
         };
 
-    /**
+        /**
      * Outputs a message with appropriate type to the Web Console and
      * store it in the history.
      * @param  {String} logType The type of the log message.
@@ -58,7 +58,7 @@
                 return false;
             }
             this.updateHistory.apply(this, arguments);
-        // Adds ID at the first place
+            // Adds ID at the first place
             Array.prototype.unshift.call(args, this.id);
             if (console && console[logType]) {
                 if (console[logType].apply) {
@@ -69,28 +69,28 @@
             }
         };
 
-    /**
+        /**
      * Outputs a message to the Web Console and store it in the history.
      */
         NotesLogger.prototype.log = function() {
             this._log('log', arguments);
         };
 
-    /**
+        /**
      * Outputs an error message to the Web Console and store it in the history.
      */
         NotesLogger.prototype.error = function() {
             this._log('error', arguments);
         };
 
-    /**
+        /**
      * Adds information to the history.
      */
         NotesLogger.prototype.updateHistory = function() {
             this.historyStorage.push(arguments);
         };
 
-    /**
+        /**
      * Returns the history for the logger.
      * @return {Array}
      */
@@ -98,7 +98,7 @@
             return this.historyStorage;
         };
 
-    /**
+        /**
      * Starts a timer you can use to track how long an operation takes.
      * @param {String} label Timer name.
      */
@@ -106,7 +106,7 @@
             this.timeStorage[label] = now();
         };
 
-    /**
+        /**
      * Stops a timer that was previously started by calling NotesLogger.prototype.time().
      * @param {String} label Timer name.
      */
@@ -123,7 +123,7 @@
             destroyLogger(this);
         };
 
-    /**
+        /**
      * Emits the event.
      * @param  {String}  eventName The name of the event.
      * @param  {*}       data      Information about the event.

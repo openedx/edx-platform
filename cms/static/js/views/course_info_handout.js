@@ -30,7 +30,7 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
 
         render: function() {
             CourseInfoHelper.changeContentToPreview(
-            this.model, 'data', this.options.base_asset_url);
+                this.model, 'data', this.options.base_asset_url);
             this.$el.html(HtmlUtils.HTML($(this.template({model: this.model}))).toString());
             HtmlUtils.setHtml($('.handouts-content'), HtmlUtils.HTML(this.model.get('data')));
             this.$preview = this.$el.find('.handouts-content');
@@ -47,7 +47,7 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
             this.$form.show();
 
             this.$codeMirror = CourseInfoHelper.editWithCodeMirror(
-            self.model, 'data', self.options.base_asset_url, this.$editor.get(0));
+                self.model, 'data', self.options.base_asset_url, this.$editor.get(0));
 
             ModalUtils.showModalCover(false, function() { self.closeEditor(); });
         },

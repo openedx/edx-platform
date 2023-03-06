@@ -18,11 +18,11 @@
                         duration: this.slide_speed
                     });
                     setTimeout(_.bind(SystemFeedbackView.prototype.hide, this, arguments),
-                           this.slideSpeed);
+                        this.slideSpeed);
                 }
             });
 
-        // create Alert.Warning, Alert.Confirmation, etc
+            // create Alert.Warning, Alert.Confirmation, etc
             var capitalCamel, intents;
             capitalCamel = _.compose(str.capitalize, str.camelize);
             intents = ['warning', 'error', 'confirmation', 'announcement', 'step-required', 'help', 'mini'];

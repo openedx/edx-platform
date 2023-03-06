@@ -1281,14 +1281,14 @@
                     beforeEach(function() {
                         state.videoCaption.isMouseFocus = false;
                         $('.subtitles li span[data-index=0]')
-                        .trigger(jQuery.Event('focus'));
+                            .trigger(jQuery.Event('focus'));
                         $('.subtitles li span[data-index=0]')
-                        .trigger(jQuery.Event('mousedown'));
+                            .trigger(jQuery.Event('mousedown'));
                     });
 
                     it('does not show an outline around it', function() {
                         expect($('.subtitles li span[data-index=0]'))
-                        .not.toHaveClass('focused');
+                            .not.toHaveClass('focused');
                     });
 
                     it('has automatic scrolling enabled', function() {

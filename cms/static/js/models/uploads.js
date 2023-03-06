@@ -15,26 +15,26 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             if (attrs.selectedFile && !this.checkTypeValidity(attrs.selectedFile)) {
                 return {
                     message: _.template(gettext('Only <%- fileTypes %> files can be uploaded. Please select a file ending in <%- (fileExtensions) %> to upload.'))(  // eslint-disable-line max-len
-                    this.formatValidTypes()
-                ),
+                        this.formatValidTypes()
+                    ),
                     attributes: {selectedFile: true}
                 };
             }
         },
-    // Return a list of this uploader's valid file types
+        // Return a list of this uploader's valid file types
         fileTypes: function() {
             var mimeTypes = _.map(
-                this.attributes.mimeTypes,
-                function(type) {
-                    return type.split('/')[1].toUpperCase();
-                }
-            ),
+                    this.attributes.mimeTypes,
+                    function(type) {
+                        return type.split('/')[1].toUpperCase();
+                    }
+                ),
                 fileFormats = _.map(
-                this.attributes.fileFormats,
-                function(type) {
-                    return type.toUpperCase();
-                }
-            );
+                    this.attributes.fileFormats,
+                    function(type) {
+                        return type.toUpperCase();
+                    }
+                );
 
             return mimeTypes.concat(fileFormats);
         },
@@ -49,8 +49,8 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                 _.contains(attrs.mimeTypes, file.type) ||
                 getRegExp(attrs.fileFormats).test(file.name);
         },
-    // Return strings for the valid file types and extensions this
-    // uploader accepts, formatted as natural language
+        // Return strings for the valid file types and extensions this
+        // uploader accepts, formatted as natural language
         formatValidTypes: function() {
             var attrs = this.attributes;
 
@@ -71,11 +71,11 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             return {
                 fileTypes: formatTypes(this.fileTypes()),
                 fileExtensions: formatTypes(
-                _.map(this.fileTypes(),
-                      function(type) {
-                          return '.' + type.toLowerCase();
-                      })
-            )
+                    _.map(this.fileTypes(),
+                        function(type) {
+                            return '.' + type.toLowerCase();
+                        })
+                )
             };
         }
     });

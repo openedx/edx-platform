@@ -22,46 +22,46 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
 
     moveXBlock = function(data) {
         XBlockViewUtils.moveXBlock(data.sourceLocator, data.targetParentLocator)
-        .done(function(response) {
+            .done(function(response) {
             // hide modal
-            Backbone.trigger('move:hideMoveModal');
-            // hide xblock element
-            data.sourceXBlockElement.hide();
-            showMovedNotification(
-                StringUtils.interpolate(
-                    gettext('Success! "{displayName}" has been moved.'),
+                Backbone.trigger('move:hideMoveModal');
+                // hide xblock element
+                data.sourceXBlockElement.hide();
+                showMovedNotification(
+                    StringUtils.interpolate(
+                        gettext('Success! "{displayName}" has been moved.'),
+                        {
+                            displayName: data.sourceDisplayName
+                        }
+                    ),
                     {
-                        displayName: data.sourceDisplayName
+                        sourceXBlockElement: data.sourceXBlockElement,
+                        sourceDisplayName: data.sourceDisplayName,
+                        sourceLocator: data.sourceLocator,
+                        sourceParentLocator: data.sourceParentLocator,
+                        targetParentLocator: data.targetParentLocator,
+                        targetIndex: response.source_index
                     }
-                ),
-                {
-                    sourceXBlockElement: data.sourceXBlockElement,
-                    sourceDisplayName: data.sourceDisplayName,
-                    sourceLocator: data.sourceLocator,
-                    sourceParentLocator: data.sourceParentLocator,
-                    targetParentLocator: data.targetParentLocator,
-                    targetIndex: response.source_index
-                }
-            );
-            Backbone.trigger('move:onXBlockMoved');
-        });
+                );
+                Backbone.trigger('move:onXBlockMoved');
+            });
     };
 
     undoMoveXBlock = function(data) {
         XBlockViewUtils.moveXBlock(data.sourceLocator, data.sourceParentLocator, data.targetIndex)
-        .done(function() {
+            .done(function() {
             // show XBlock element
-            data.sourceXBlockElement.show();
-            showMovedNotification(
-                StringUtils.interpolate(
-                    gettext('Move cancelled. "{sourceDisplayName}" has been moved back to its original location.'),
-                    {
-                        sourceDisplayName: data.sourceDisplayName
-                    }
-                )
-            );
-            Backbone.trigger('move:onXBlockMoved');
-        });
+                data.sourceXBlockElement.show();
+                showMovedNotification(
+                    StringUtils.interpolate(
+                        gettext('Move cancelled. "{sourceDisplayName}" has been moved back to its original location.'),
+                        {
+                            sourceDisplayName: data.sourceDisplayName
+                        }
+                    )
+                );
+                Backbone.trigger('move:onXBlockMoved');
+            });
     };
 
     showMovedNotification = function(title, data) {

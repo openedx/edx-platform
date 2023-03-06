@@ -155,17 +155,17 @@
                     it(
                         'player state was changed, start/end was defined, ' +
                         'onReady called', function(done) {
-                        jasmine.fireEvent(state.videoPlayer.player.video, 'loadedmetadata');
-                        jasmine.waitUntil(function() {
-                            return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
-                        }).then(function() {
-                            expect(state.videoPlayer.player.getPlayerState())
-                                .toBe(STATUS.PAUSED);
-                            expect(state.videoPlayer.player.video.currentTime).toBe(0);
-                            expect(state.videoPlayer.player.config.events.onReady)
-                                .toHaveBeenCalled();
-                        }).always(done);
-                    });
+                            jasmine.fireEvent(state.videoPlayer.player.video, 'loadedmetadata');
+                            jasmine.waitUntil(function() {
+                                return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
+                            }).then(function() {
+                                expect(state.videoPlayer.player.getPlayerState())
+                                    .toBe(STATUS.PAUSED);
+                                expect(state.videoPlayer.player.video.currentTime).toBe(0);
+                                expect(state.videoPlayer.player.config.events.onReady)
+                                    .toHaveBeenCalled();
+                            }).always(done);
+                        });
                 });
 
                 describe('[ended]', function() {
