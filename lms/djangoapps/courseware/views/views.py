@@ -1729,6 +1729,7 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
             'disable_header': False,
             'disable_footer': False,
             'disable_window_wrap': True,
+            'disable_register_button': True,
             'edx_notes_enabled': False,
             'is_learning_mfe': True,
             'is_mobile_app': False,
