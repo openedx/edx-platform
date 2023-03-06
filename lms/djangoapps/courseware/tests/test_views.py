@@ -3066,35 +3066,23 @@ class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
         response = self.get_response(usage_key=self.html_block.location, is_embed=is_embed)
         self.assertContains(response, 'Page not found', status_code=404)
 
-    @ddt.data(True, False)
-    def test_render_xblock_with_video_usage_key_with_public_access(self, is_embed):
-        """
-        Verify that endpoint returns expected response if usage key block type is `video`
-        and video doesn't have 'public access' set as True
-        """
-        self.setup_course()
-        response = self.get_response(usage_key=self.video_block_public.location, is_embed=is_embed)
-        self.assertContains(response, 'Play video', status_code=200)
+    @ddt.unpack
+    @ddt.data(
+        (True, True, 200),
+        (True, False, 404),
+        (False, True, 404),
+        (False, False, 404),
+    )
+    def test_access(self, is_waffle_enabled, is_public_video, expected_status_code):
+        """ Tests for access control """
+        self.setup_course(enable_waffle=is_waffle_enabled)
+        target_video = self.video_block_public if is_public_video else self.video_block_not_public
 
-    @ddt.data(True, False)
-    def test_render_xblock_with_video_usage_key_with_non_public_access(self, is_embed):
-        """
-        Verify that endpoint returns expected response if usage key block type is `video`
-        and video doesn't have 'public access' set as False
-        """
-        self.setup_course()
-        response = self.get_response(usage_key=self.video_block_not_public.location, is_embed=is_embed)
-        self.assertContains(response, 'Play video', status_code=200)
+        response = self.get_response(usage_key=target_video.location, is_embed=False)
+        embed_response = self.get_response(usage_key=target_video.location, is_embed=True)
 
-    @ddt.data(True, False)
-    def test_render_xblock_with_video_waffle_not_enabled(self, is_embed):
-        """
-        Verify that endpoint returns expected response if waffle is not enabled for course.
-        """
-        self.setup_course(enable_waffle=False)
-        for block in (self.video_block_public, self.video_block_not_public):
-            response = self.get_response(usage_key=block.location, is_embed=is_embed)
-            self.assertContains(response, 'Page not found', status_code=404)
+        self.assertEqual(expected_status_code, response.status_code)
+        self.assertEqual(expected_status_code, embed_response.status_code)
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disable=test-inherits-tests
