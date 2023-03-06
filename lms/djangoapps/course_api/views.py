@@ -59,6 +59,9 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
             * `"timestamp"`: generated from the `start` timestamp
             * `"empty"`: no start date is specified
         * pacing: Course pacing. Possible values: instructor, self
+        * certificate_available_date (optional): Date the certificate will be available,
+            in ISO 8601 notation if the `certificates.auto_certificate_generation`
+            waffle switch is enabled
 
         Deprecated fields:
 
@@ -103,7 +106,8 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
                 "start": "2015-07-17T12:00:00Z",
                 "start_display": "July 17, 2015",
                 "start_type": "timestamp",
-                "pacing": "instructor"
+                "pacing": "instructor",
+                "certificate_available_date": "2015-08-14T00:00:00Z"
             }
     """
 

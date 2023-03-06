@@ -27,6 +27,7 @@ from openedx.core.djangoapps.programs.utils import (
 from lms.djangoapps.learner_recommendations.utils import (
     filter_recommended_courses,
     get_amplitude_course_recommendations,
+    is_user_enrolled_in_ut_austin_masters_program,
 )
 
 
@@ -391,10 +392,10 @@ class CourseRecommendationApiView(APIView):
             },
         )
 
-    def _general_recommendations_response(self, user_id, is_control, recommendations):
+    def _recommendations_response(self, user_id, is_control, recommendations, amplitude_recommendations):
         """Helper method for general recommendations response"""
         self._emit_recommendations_viewed_event(
-            user_id, is_control, recommendations, amplitude_recommendations=False
+            user_id, is_control, recommendations, amplitude_recommendations
         )
         return Response(
             {
@@ -417,9 +418,11 @@ class CourseRecommendationApiView(APIView):
     def get(self, request):
         """Retrieves course recommendations details of a user in a specified course."""
         user_id = request.user.id
-        fallback_recommendations = (
-            settings.GENERAL_RECOMMENDATIONS if show_fallback_recommendations() else []
-        )
+
+        if is_user_enrolled_in_ut_austin_masters_program(request.user):
+            return self._recommendations_response(user_id, None, [], False)
+
+        fallback_recommendations = settings.GENERAL_RECOMMENDATIONS if show_fallback_recommendations() else []
 
         try:
             (
@@ -429,15 +432,15 @@ class CourseRecommendationApiView(APIView):
             ) = get_amplitude_course_recommendations(user_id, settings.DASHBOARD_AMPLITUDE_RECOMMENDATION_ID)
         except Exception as ex:  # pylint: disable=broad-except
             logger.warning(f"Cannot get recommendations from Amplitude: {ex}")
-            return self._general_recommendations_response(
-                user_id, None, fallback_recommendations
+            return self._recommendations_response(
+                user_id, None, fallback_recommendations, False
             )
 
         is_control = is_control if has_is_control else None
 
         if is_control or is_control is None or not course_keys:
-            return self._general_recommendations_response(
-                user_id, is_control, fallback_recommendations
+            return self._recommendations_response(
+                user_id, is_control, fallback_recommendations, False
             )
 
         ip_address = get_client_ip(request)[0]
@@ -446,18 +449,11 @@ class CourseRecommendationApiView(APIView):
             request.user, course_keys, user_country_code=user_country_code, recommendation_count=5
         )
         if not filtered_courses:
-            return self._general_recommendations_response(
-                user_id, is_control, fallback_recommendations
+            return self._recommendations_response(
+                user_id, is_control, fallback_recommendations, False
             )
 
         recommended_courses = list(map(self._course_data, filtered_courses))
-        self._emit_recommendations_viewed_event(
-            user_id, is_control, recommended_courses
-        )
-        return Response(
-            {
-                "courses": recommended_courses,
-                "is_control": is_control,
-            },
-            status=200,
+        return self._recommendations_response(
+            user_id, is_control, recommended_courses, True
         )

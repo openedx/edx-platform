@@ -3,14 +3,14 @@
  * submitted photos for reverification.
  */
 
- var edx = edx || {};
+var edx = edx || {};
 
- (function() {
-     'use strict';
+(function() {
+    'use strict';
 
-     edx.verify_student = edx.verify_student || {};
+    edx.verify_student = edx.verify_student || {};
 
-     edx.verify_student.ReverifySuccessStepView = edx.verify_student.StepView.extend({
-         templateName: 'reverify_success_step'
-     });
- }());
+    edx.verify_student.ReverifySuccessStepView = edx.verify_student.StepView.extend({
+        templateName: 'reverify_success_step'
+    });
+}());

@@ -3,10 +3,10 @@ define([
 ], function(GroupConfigurationCollection, GroupConfigurationModel, GroupConfigurationsPage) {
     'use strict';
     return function(experimentsEnabled,
-                    experimentGroupConfigurationsJson,
-                    allGroupConfigurationJson,
-                    groupConfigurationUrl,
-                    courseOutlineUrl) {
+        experimentGroupConfigurationsJson,
+        allGroupConfigurationJson,
+        groupConfigurationUrl,
+        courseOutlineUrl) {
         var experimentGroupConfigurations = new GroupConfigurationCollection(
                 experimentGroupConfigurationsJson, {parse: true}
             ),

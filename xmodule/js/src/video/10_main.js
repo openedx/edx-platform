@@ -36,7 +36,7 @@
 
     // Main module.
     require(
-/* End RequireJS */
+        /* End RequireJS */
     /* Webpack
     define(
     /* End Webpack */

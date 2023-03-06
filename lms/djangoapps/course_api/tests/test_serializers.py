@@ -4,7 +4,7 @@ Test data created by CourseSerializer and CourseDetailSerializer
 
 
 from datetime import datetime
-from unittest import TestCase
+from unittest import TestCase, mock
 
 import ddt
 from opaque_keys.edx.locator import CourseLocator
@@ -15,6 +15,7 @@ from xmodule.course_block import DEFAULT_START_DATE
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
+from lms.djangoapps.certificates.api import can_show_certificate_available_date_field
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.models.course_details import CourseDetails
 
@@ -165,6 +166,32 @@ class TestCourseDetailSerializer(TestCourseSerializer):  # lint-amnesty, pylint:
         about_descriptor = XBlock.load_class('about')
         overview_template = about_descriptor.get_template('overview.yaml')
         self.expected_data['overview'] = overview_template.get('data')
+
+    # override test case
+    @mock.patch(
+        "lms.djangoapps.certificates.api.can_show_certificate_available_date_field",
+        mock.Mock(return_value=[True, False])
+    )
+    def test_basic(self):
+        """
+        Overridden from Test CourseDetailSerializer to
+        test certificate_available_date according to waffle
+        switch `certificates.auto_certificate_generation`
+        from CourseDetailSerializer serializer class.
+        """
+        course = self.create_course()
+        CourseDetails.update_about_video(course, 'test_youtube_id', self.staff_user.id)
+        course_overview = CourseOverview.get_from_id(course.id)
+        with check_mongo_calls(self.expected_mongo_calls):
+            result = self._get_result(course)
+        if can_show_certificate_available_date_field(course_overview):
+            self.expected_data['certificate_available_date'] = '2015-08-14T00:00:00Z'
+            result['certificate_available_date'] = (
+                result['certificate_available_date'].strftime('%Y-%m-%dT%H:%M:%SZ')
+                if isinstance(result['certificate_available_date'], datetime)
+                else None
+            )
+        self.assertDictEqual(result, self.expected_data)
 
 
 class TestCourseKeySerializer(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

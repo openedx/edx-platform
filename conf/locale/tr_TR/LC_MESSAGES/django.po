@@ -11485,8 +11485,10 @@ msgid "Count"
 msgstr "Say"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "Her bir öğrenciye gösterilecek bileşen sayısını giriniz."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -16451,6 +16453,8 @@ msgid ""
 "Get {start_bold}access to all course activities{end_bold}, including both "
 "graded and non-graded assignments, while the course is running"
 msgstr ""
+"Ders devam ederken hem not verilen hem de not verilmeyen ödevler dahil olmak"
+" üzere {start_bold}tüm ders etkinliklerine erişim{end_bold} elde edin"
 
 #: lms/templates/course_modes/fbe.html
 msgid "Show more"
@@ -16517,6 +16521,8 @@ msgid ""
 "Studies show that those who choose this option are  {start_bold}more engaged"
 " and motivated{end_bold} to complete their courses"
 msgstr ""
+"Araştırmalar, bu seçeneği tercih edenlerin derslerini tamamlamak için "
+"{start_bold}daha ilgili ve motive olduklarını{end_bold} gösteriyor"
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Access this course"
@@ -18711,6 +18717,12 @@ msgid ""
 "store the files, in accordance with your institution's data security "
 "policies.{li_end}{ul_end}"
 msgstr ""
+"{strong_start}Not{strong_end}: {ul_start}{li_start}Öğrenci verilerini "
+"güvende tutmak için bu bağlantıları kaydedemez veya doğrudan erişim için "
+"e-postayla gönderemezsiniz. Bağlantıların süresi 5 dakika içinde "
+"dolar.{li_end}{li_start}Rapor dosyaları oluşturulduktan 90 gün sonra "
+"silinir. Eski raporlara erişmeniz gerekiyorsa, kurumunuzun veri güvenliği "
+"politikalarına uygun olarak dosyaları indirip saklayın.{li_end}{ul_end}"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 msgid ""
@@ -18733,6 +18745,13 @@ msgid ""
 "old reports, download and store the files,         in accordance with your "
 "institution's data security policies.{li_end}{ul_end}"
 msgstr ""
+"{strong_start}Not{strong_end}: {ul_start}{li_start}Öğrenci verilerini "
+"güvende tutmak için bu bağlantıları kaydedemez          veya doğrudan erişim"
+" için e-postayla gönderemezsiniz. Bağlantıların süresi 5 dakika içinde "
+"dolar.{li_end}{li_start}Rapor dosyaları          oluşturulduktan 90 gün "
+"sonra silinir. Eski raporlara erişmeniz gerekiyorsa,           kurumunuzun "
+"veri güvenliği politikalarına uygun olarak dosyaları indirip "
+"saklayın.{li_end}{ul_end}"
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Edit Coupon Code"

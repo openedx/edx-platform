@@ -42,16 +42,23 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                             help='Comma-separated list of application IDs for which tokens will NOT be removed')
 
     def clear_table_data(self, query_set, batch_size, model, sleep_time):  # lint-amnesty, pylint: disable=missing-function-docstring
-        message = f'Cleaning {query_set.count()} rows from {model.__name__} table'
-        logger.info(message)
-        while query_set.exists():
+        total_deletions = 0
+        deletion_count = 1  # we expect to delete at least one row to start out with
+        while deletion_count:
+            deletion_count = 0
             qs = query_set[:batch_size]
+            if isinstance(qs, list) and not qs:
+                # if we are seeing an empty list here then that there's nothing more to delete
+                break
             batch_ids = qs.values_list('id', flat=True)
+            batch_id_list = list(batch_ids)
             with transaction.atomic():
-                model.objects.filter(pk__in=list(batch_ids)).delete()
-
-            if query_set.exists():
-                sleep(sleep_time)
+                deletions = model.objects.filter(pk__in=batch_id_list).delete()
+                deletion_count = deletions[0]
+            total_deletions += deletion_count
+            sleep(sleep_time)
+        message = f'Cleaned {total_deletions} rows from {model.__name__} table'
+        logger.info(message)
 
     def get_expiration_time(self, now):  # lint-amnesty, pylint: disable=missing-function-docstring
         refresh_token_expire_seconds = oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS

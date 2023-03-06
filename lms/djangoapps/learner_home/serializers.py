@@ -460,7 +460,7 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
 
     def get_credit(self, instance):
         """Pull credit statuses from context"""
-        credit_status = self.context["credit_statuses"].get(str(instance.course_id))
+        credit_status = self.context["credit_statuses"].get(instance.course_id)
 
         # If user or course is ineligible for credit, return empty
         if not credit_status:

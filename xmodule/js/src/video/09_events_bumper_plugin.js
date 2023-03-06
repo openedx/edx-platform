@@ -16,7 +16,7 @@
             }
 
             _.bindAll(this, 'onReady', 'onPlay', 'onEnded', 'onShowLanguageMenu', 'onHideLanguageMenu', 'onSkip',
-            'onShowCaptions', 'onHideCaptions', 'destroy');
+                'onShowCaptions', 'onHideCaptions', 'destroy');
             this.state = state;
             this.options = _.extend({}, options);
             this.state.videoEventsBumperPlugin = this;

@@ -530,7 +530,7 @@ such that the value can be defined later than this assignment (file load order).
                     // Translators: A list of users appears after this sentence;
                     renderList(gettext(
                         'These users could not be added as beta testers because their accounts are not yet activated:'),
-                        inActiveUsers);
+                    inActiveUsers);
                 }
             }
             if (successes.length && dataFromServer.action === 'remove') {

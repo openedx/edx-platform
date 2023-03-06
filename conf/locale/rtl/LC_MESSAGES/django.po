@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-21 15:16+0000\n"
-"PO-Revision-Date: 2023-02-21 15:16:38.756594\n"
+"POT-Creation-Date: 2023-03-05 20:35+0000\n"
+"PO-Revision-Date: 2023-03-05 20:35:45.010699\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8218,6 +8218,7 @@ msgid "Success"
 msgstr "Snɔɔǝss"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Ⱥɔʇᴉøns"
@@ -11296,8 +11297,12 @@ msgid "Count"
 msgstr "Ȼønnʇ"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "Ɇnʇǝɹ ʇɥǝ nnɯbǝɹ øɟ ɔøɯdønǝnʇs ʇø dᴉsdlɐʎ ʇø ǝɐɔɥ sʇndǝnʇ."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
+"Ɇnʇǝɹ ʇɥǝ nnɯbǝɹ øɟ ɔøɯdønǝnʇs ʇø dᴉsdlɐʎ ʇø ǝɐɔɥ sʇndǝnʇ. Sǝʇ ᴉʇ ʇø -1 ʇø "
+"dᴉsdlɐʎ ɐll ɔøɯdønǝnʇs."
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -23951,6 +23956,14 @@ msgstr "Ⱥɔɔǝss Sǝʇʇᴉnƃs"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Sǝʇ Ⱥɔɔǝss"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr "Ȼødʎ"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr "Mɐnɐƃǝ Ⱥɔɔǝss"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

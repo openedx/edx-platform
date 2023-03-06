@@ -127,6 +127,7 @@ newrelic                            # New Relic agent for performance monitoring
 nltk                                # Natural language processing; used by the chem package
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
+olxcleaner
 openedx-calc                        # Library supporting mathematical calculations for Open edX
 # openedx-events 3.1.0 introduces producer API
 openedx-events>=3.1.0               # Open edX Events from Hooks Extension Framework (OEP-50)

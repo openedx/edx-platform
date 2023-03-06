@@ -95,7 +95,7 @@ small size, and usually don't require a broad knowledge of the edX platform.
 It makes them good candidates for a first task, allowing you to focus on getting
 familiar with the development environment and the contribution process.
 
-.. _byte-sized bugs and tasks: http://bit.ly/edxbugs
+.. _byte-sized bugs and tasks: https://github.com/search?q=user%3Aopenedx+label%3A%22help+wanted%22&type=Issues&ref=advsearch&l=&l=
 
 Once you have identified a bug or task, `create an account on the tracker`_ and
 then comment on the ticket to indicate that you are working on it. Don't hesitate

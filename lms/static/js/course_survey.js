@@ -14,7 +14,7 @@ $(function() {
     toggleSubmitButton(true);
 
     $('#survey-form').on('submit', function() {
-      /* validate required fields */
+        /* validate required fields */
 
         var $inputs = $('#survey-form :input');
 
@@ -50,8 +50,8 @@ $(function() {
 
         if (cancel_submit) {
             $('.status.message.submission-error').
-            removeClass('is-hidden').
-            focus();
+                removeClass('is-hidden').
+                focus();
             $('html, body').animate({scrollTop: 0}, 'fast');
             return false;
         }
