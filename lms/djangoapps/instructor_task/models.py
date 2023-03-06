@@ -41,7 +41,7 @@ QUEUING = 'QUEUING'
 PROGRESS = 'PROGRESS'
 SCHEDULED = 'SCHEDULED'
 TASK_INPUT_LENGTH = 10000
-DJANGO_STORE_STORAGE_CLASS = 'storages.backends.s3boto.S3BotoStorage'
+DJANGO_STORE_STORAGE_CLASS = 'storages.backends.s3boto3.S3Boto3Storage'
 
 
 class InstructorTask(models.Model):
