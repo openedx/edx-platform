@@ -27,13 +27,16 @@ from util.organizations_helpers import get_organizations
 from xmodule.modulestore.django import SignalHandler, modulestore
 
 from lms.djangoapps.branding.api import get_privacy_url, get_tos_and_honor_code_url
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration.helpers import get_current_site_configuration
+from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.edly.constants import ESSENTIALS
+from openedx.features.edly.context_processor import Colour
 from openedx.features.edly.models import EdlySubOrganization, EdlyUserProfile
 
 LOGGER = logging.getLogger(__name__)
@@ -563,33 +566,43 @@ def compose_certificate_email(student, course, message_context):
         'student_name': student.profile.name,
         'course_name': course.display_name,
         'course_date': datetime.now().strftime('%m/%d/%Y'),
+        'cert_url': '{}{}{}'.format(
+            'http://' if settings.DEBUG else 'https://',
+            message_context['lms_base'],
+            message_context['cert_url'],
+        ),
     })
 
     return message_context
 
 
-def send_cert_email_to_course_staff(student_email, course_key, site_id, context_vars):
+def send_cert_email_to_course_staff(student_id, course_key, site_id, context_vars):
     """
     This celery task prepares context for course certificate email.
     """
-    student = get_user_model().objects.get(email=student_email)
+    student = get_user_model().objects.get(id=student_id)
     course = modulestore().get_course(course_key, depth=0)
     site = Site.objects.get(id=site_id)
-    from_address = context_vars.pop('from_address')
 
-    instructors = CourseAccessRole.objects.filter(org=course.org, course_id=course.id).select_related('user')
+    access_roles = CourseAccessRole.objects.filter(
+        org=course.org,
+        course_id=course.id,
+        user__is_active=True,
+    ).values_list('user__id')
+
+    instructors = get_user_model().objects.filter(id__in=access_roles)
+
     msg_context = compose_certificate_email(student, course, context_vars)
 
     for instructor in instructors:
-        instructor_user = instructor.user
-        msg = CertificateGeneration().personalize(
-            recipient=Recipient(instructor_user.username, instructor_user.email),
+        msg = CertificateGeneration(context=context_vars).personalize(
+            recipient=Recipient(instructor.username, instructor.email),
             language=preferences_api.get_user_preference(student, LANGUAGE_KEY),
             user_context=msg_context,
         )
+        msg.options['from_address'] = context_vars['contact_email']
 
-        msg.options['from_address'] = from_address
-        send_certificate_generation_email(msg, instructor_user, site)
+        send_certificate_generation_email(msg, instructor, site)
 
 
 def is_config_enabled(site, conf_key):
@@ -602,3 +615,40 @@ def is_config_enabled(site, conf_key):
 
     email_conf = site_conf.get_value('EMAILS_CONFIG', {})
     return email_conf.get(conf_key, True)
+
+
+def get_message_context(site):
+    """
+    get template context for site.
+    """
+    message_context = get_base_template_context(site)
+    color_dict = get_config_value_from_site_or_settings(
+        'COLORS',
+        site=site,
+    )
+    django_settings = get_config_value_from_site_or_settings(
+        'DJANGO_SETTINGS_OVERRIDE',
+        site=site,
+    )
+
+    primary_color = Colour(str(color_dict.get('primary')))
+
+    message_context.update({
+        'lms_base': django_settings.get('LMS_BASE'),
+        'platform_name': django_settings.get('PLATFORM_NAME'),
+        'edly_fonts_config': get_config_value_from_site_or_settings(
+            'FONTS',
+            site=site,
+        ),
+        'edly_branding_config': get_config_value_from_site_or_settings(
+            'BRANDING',
+            site=site,
+        ),
+        'edly_copyright_text': get_config_value_from_site_or_settings(
+            'EDLY_COPYRIGHT_TEXT',
+            site=site,
+        ),
+        'edly_colors_config': {'primary': primary_color},
+    })
+
+    return message_context

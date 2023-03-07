@@ -14,15 +14,16 @@
                 {% filter force_escape %}
                     {% blocktrans %}Hi {{ platform_name }} team,{% endblocktrans %}
                 {% endfilter %}
-                <br />
+            </p>
+            <p style="color: rgba(0,0,0,.75);">
                 {% filter force_escape %}
-                    {% blocktrans %}Congratulations, {{ student_name }} has completed the course - "{{ course_name }}" on {{ course_date }}.{% endblocktrans %}
+                    {% blocktrans %}Congratulations, {{ student_name }} has completed the course - "{{ course_name }}" on {{ course_date }} with certificate {{ cert_url }}.{% endblocktrans %}
                 {% endfilter %}  
-                <br />
+            </p>
+            <p style="color: rgba(0,0,0,.75);">
                 {% filter force_escape %}
                     {% blocktrans %}{{ student_name }} has earned a certificate. Lets, encourage {{ student_name }} to share this achievement with others by writing a personalised email to {{ student_email }}.{% endblocktrans %}
                 {% endfilter %}
-                <br />
             </p>
         </td>
     </tr>
