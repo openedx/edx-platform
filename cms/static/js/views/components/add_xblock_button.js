@@ -11,7 +11,8 @@ define(['js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
                 };
                 BaseView.prototype.initialize.call(this);
                 this.template = this.loadTemplate('add-xblock-component-button');
-                this.$el.html(HtmlUtils.HTML(this.template(attributes)).toString(),
+                // eslint-disable-next-line comma-dangle
+                this.$el.html(HtmlUtils.HTML(this.template(attributes)).toString()
                 );
             },
         });

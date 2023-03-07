@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 (function($) {  // eslint-disable-line wrap-iife
     'use strict';
     $.fn.extend({
@@ -56,7 +57,7 @@
                         modalClone.attr('id', 'modal_clone');
                         modalCloneHtml = edx.HtmlUtils.template(modalClone);
                         $(modalId).after(
-                            edx.HtmlUtils.ensureHtml(modalCloneHtml).toString(),
+                            edx.HtmlUtils.ensureHtml(modalCloneHtml).toString()
                         );
                         modalId = '#modal_clone';
                     }

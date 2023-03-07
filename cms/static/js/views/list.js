@@ -51,7 +51,8 @@ define([
 
             this.collection.each(function(model) {
                 this.$(this.listContainerCss).append(
-                    this.createItemView({model: model, restrictEditing: this.restrictEditing}).render().el,
+                    // eslint-disable-next-line comma-dangle
+                    this.createItemView({model: model, restrictEditing: this.restrictEditing}).render().el
                 );
             }, this);
 
