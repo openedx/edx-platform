@@ -42,9 +42,6 @@ var workerConfig = function() {
                         path: process.env.STATIC_ROOT_LMS,
                         filename: 'webpack-worker-stats.json'
                     }),
-                    new webpack.DefinePlugin({
-                        'process.env.JS_ENV_EXTRA_CONFIG': JSON.parse(process.env.JS_ENV_EXTRA_CONFIG),
-                    })
                 ],
                 module: {
                     rules: [
@@ -131,8 +128,6 @@ module.exports = Merge.smart({
         },
 
         plugins: [
-            new webpack.NoEmitOnErrorsPlugin(),
-            new webpack.NamedModulesPlugin(),
             new BundleTracker({
                 path: process.env.STATIC_ROOT_CMS,
                 filename: 'webpack-stats.json'
@@ -162,6 +157,7 @@ module.exports = Merge.smart({
             // recommended workaround, as this plugin is just an optimization. But
             // because of this, we really don't want to get too fancy with how we
             // invoke this plugin until we can upgrade karma-webpack.
+            /*
             new webpack.optimize.CommonsChunkPlugin({
                 // If the value below changes, update the render_bundle call in
                 // common/djangoapps/pipeline_mako/templates/static_content.html
@@ -169,6 +165,7 @@ module.exports = Merge.smart({
                 filename: 'commons.js',
                 minChunks: 10
             })
+            */
         ],
 
         module: {

@@ -96,7 +96,7 @@
     "karma-selenium-webdriver-launcher": "git+https://github.com/PSpSynedra/karma-selenium-webdriver-launcher",
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.20",
-    "karma-webpack": "4.0.0",
+    "karma-webpack": "4.0.2",
     "plato": "1.7.0",
     "react-test-renderer": "16.4.0",
     "selenium-webdriver": "3.6.0",
