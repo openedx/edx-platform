@@ -1683,6 +1683,10 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
             will_recheck_access=False
         )
 
+        # Block must be marked as public to be viewed
+        if not block.public_access:
+            raise Http404("Video not found.")
+
         fragment = block.render(view, context={
             'public_video_embed': is_embed,
         })
