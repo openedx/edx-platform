@@ -15,7 +15,7 @@ jobs:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
         node-version: [ 16 ]
-        npm-version: [ 8.5.x ]
+        npm-version: [ 8.19.x ]
 
     steps:
     - name: Checkout repo
