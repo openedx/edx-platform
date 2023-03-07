@@ -1021,7 +1021,7 @@ openedx-events==5.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
-openedx-filters==1.1.0
+openedx-filters==1.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
