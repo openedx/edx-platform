@@ -1688,8 +1688,8 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
         })
 
 
-        enroll_url, course_about_page_url = _get_public_video_cta_button_urls(request)
-        social_sharing_metadata = _get_social_sharing_metadata()
+        enroll_url, course_about_page_url = _get_public_video_cta_button_urls(request, course_key)
+        social_sharing_metadata = _get_social_sharing_metadata(course, block, is_embed)
 
         context = {
             'fragment': fragment,
