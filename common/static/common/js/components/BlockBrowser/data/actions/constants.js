@@ -4,5 +4,6 @@ export default {
         FAILURE: 'FETCH_COURSE_BLOCKS_FAILURE',
     },
     SELECT_BLOCK: 'SELECT_BLOCK',
-    CHANGE_ROOT: 'CHANGE_ROOT',
+    // eslint-disable-next-line comma-dangle
+    CHANGE_ROOT: 'CHANGE_ROOT'
 };
