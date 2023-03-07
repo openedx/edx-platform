@@ -5,7 +5,9 @@ import PropTypes from 'prop-types';
 import { Button, StatusAlert } from '@edx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
-function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarning, showDiscussionButton, reDirectUser, errorList }) {
+function LoggedInUser({
+ userInformation, onChangeCallback, handleClick, showWarning, showDiscussionButton, reDirectUser, errorList 
+}) {
     let courseElement;
     let detailElement;
     let discussionElement = '';

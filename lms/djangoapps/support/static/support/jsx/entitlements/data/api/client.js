@@ -16,7 +16,9 @@ const getEntitlements = username => fetch(
     },
 );
 
-const postEntitlement = ({ username, courseUuid, mode, action, comments = null }) => fetch(
+const postEntitlement = ({
+ username, courseUuid, mode, action, comments = null 
+}) => fetch(
     `${entitlementApi}`, {
         credentials: 'same-origin',
         method: 'post',
@@ -34,7 +36,9 @@ const postEntitlement = ({ username, courseUuid, mode, action, comments = null }
     },
 );
 
-const patchEntitlement = ({ uuid, action, unenrolledRun = null, comments = null }) => fetch(
+const patchEntitlement = ({
+ uuid, action, unenrolledRun = null, comments = null 
+}) => fetch(
     `${entitlementApi}${uuid}`, {
         credentials: 'same-origin',
         method: 'patch',

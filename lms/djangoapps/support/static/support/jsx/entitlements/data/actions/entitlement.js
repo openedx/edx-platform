@@ -76,7 +76,9 @@ const createEntitlementFailure = error =>
     dispatch =>
         dispatch(displayError('Error Creating Entitlement', error));
 
-const createEntitlement = ({ username, courseUuid, mode, comments }) =>
+const createEntitlement = ({
+ username, courseUuid, mode, comments 
+}) =>
     (dispatch) => {
         postEntitlement({
             username,

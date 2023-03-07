@@ -156,7 +156,9 @@ define([
                 updated_at: '2015-07-29T18:44:56Z',
                 group_name: 'Default Group',
                 pinned: false,
-                votes: {count: 0, down_count: 0, point: 0, up_count: 0},
+                votes: {
+count: 0, down_count: 0, point: 0, up_count: 0
+},
                 user_id: '9',
                 abuse_flaggers: [],
                 closed: false,
@@ -239,7 +241,9 @@ define([
                 resp_skip: 0,
                 id: '55c1323c56c02ce921000001',
                 pinned: false,
-                votes: {count: 0, down_count: 0, point: 0, up_count: 0},
+                votes: {
+count: 0, down_count: 0, point: 0, up_count: 0
+},
                 resp_limit: 25,
                 abuse_flaggers: [],
                 closed: false,

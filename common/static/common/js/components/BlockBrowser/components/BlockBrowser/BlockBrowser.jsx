@@ -33,7 +33,9 @@ const BlockType = PropTypes.shape({
     type: PropTypes.string.isRequired,
 });
 
-export const BlockList = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot }) => (
+export const BlockList = ({
+ blocks, selectedBlock, onSelectBlock, onChangeRoot 
+}) => (
     <ul className="block-list">
         {blocks.map(block => (
             <li
@@ -68,7 +70,9 @@ BlockList.defaultProps = {
     selectedBlock: null,
 };
 
-export const BlockBrowser = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot, className }) =>
+export const BlockBrowser = ({
+ blocks, selectedBlock, onSelectBlock, onChangeRoot, className 
+}) =>
     !!blocks && (
         <div className={classNames('block-browser', className)}>
             <div className="header">

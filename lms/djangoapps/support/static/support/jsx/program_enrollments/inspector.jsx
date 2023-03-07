@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, InputText, StatusAlert, InputSelect } from '@edx/paragon';
+import {
+ Button, InputText, StatusAlert, InputSelect 
+} from '@edx/paragon';
 
 /*
 To improve the UI here, we should move this tool to the support Micro-Frontend.

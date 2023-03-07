@@ -6,7 +6,9 @@ import PropTypes from 'prop-types';
 /** Experimental Carousel as part of https://openedx.atlassian.net/browse/LEARNER-3583 **/
 
 function NextArrow(props) {
-    const {currentSlide, slideCount, onClick, displayedSlides} = props;
+    const {
+currentSlide, slideCount, onClick, displayedSlides
+} = props;
     const showArrow = slideCount - currentSlide > displayedSlides;
     const opts = {
         className: classNames('js-carousel-nav', 'carousel-arrow', 'next', 'btn btn-secondary', {'active': showArrow}),

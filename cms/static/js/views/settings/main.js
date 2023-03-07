@@ -369,8 +369,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             if (!this.codeMirrors[thisTarget.id]) {
                 cachethis = this;
                 field = this.selectorToField[thisTarget.id];
-                this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
-                    mode: 'text/html', lineNumbers: true, lineWrapping: true});
+                this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {mode: 'text/html', lineNumbers: true, lineWrapping: true});
                 this.codeMirrors[thisTarget.id].on('change', function(mirror) {
                     mirror.save();
                     cachethis.clearValidationErrors();
@@ -423,7 +422,8 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                     self.licenseView.render();
                 },
                 reset: true,
-                silent: true});
+                silent: true
+});
         },
         setAndValidate: function(attr, value) {
         // If we call model.set() with {validate: true}, model fields

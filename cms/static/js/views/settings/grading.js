@@ -164,7 +164,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         // A does not have a drag bar (cannot change its upper limit)
         // Need to insert new bars in right place.
-        GRADES: ['A', 'B', 'C', 'D'],	// defaults for new grade designators
+        GRADES: ['A', 'B', 'C', 'D'], // defaults for new grade designators
         descendingCutoffs: [], // array of { designation : , cutoff : }
         gradeBarWidth: null, // cache of value since it won't change (more certain)
 
@@ -183,7 +183,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                     descriptor: cutoff.designation,
                     width: nextWidth,
                     contenteditable: true,
-                    removable: removable})
+                    removable: removable
+                })
                 );
                 if (draggable) {
                     var newBar = gradelist.children().last(); // get the dom object not the unparsed string
@@ -328,7 +329,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 descriptor: this.GRADES[gradeLength],
                 width: targetWidth,
                 contenteditable: true,
-                removable: true});
+                removable: true
+            });
             var gradeDom = this.$el.find('.grades');
             gradeDom.children().last().before(HtmlUtils.ensureHtml(newGradeHtml).toString());
             var newEle = gradeDom.children()[gradeLength];
@@ -403,7 +405,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                     self.renderCutoffBar();
                 },
                 reset: true,
-                silent: true});
+                silent: true
+            });
         },
         showNotificationBar: function() {
         // We always call showNotificationBar with the same args, just

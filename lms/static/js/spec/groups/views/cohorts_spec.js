@@ -332,7 +332,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 var createCourseCohortSettingsNotificationView = function(is_cohorted) {
                     var notificationView = new CourseCohortSettingsNotificationView({
                         el: $('.cohort-state-message'),
-                        cohortEnabled: is_cohorted});
+                        cohortEnabled: is_cohorted
+});
                     notificationView.render();
                     return notificationView;
                 };
@@ -606,8 +607,10 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             respondToAdd = function(result) {
                 AjaxHelpers.respondWithJson(
                     requests,
-                    _.extend({unknown: [], added: [], present: [], changed: [], not_allowed: [],
-                        success: true, preassigned: [], invalid: []}, result)
+                    _.extend({
+unknown: [], added: [], present: [], changed: [], not_allowed: [],
+                        success: true, preassigned: [], invalid: []
+}, result)
                 );
             };
 
@@ -697,7 +700,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     requests, 'POST', '/mock_service/cohorts/1/add',
                     'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')
                 );
-                respondToAdd({unknown: [
+                respondToAdd({
+unknown: [
                     'unknown1',
                     'unknown2',
                     'unknown3',
@@ -736,9 +740,15 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 );
                 respondToAdd({
                     changed: [
-                        {email: 'moved1@sample.com', name: 'moved1', previous_cohort: 'cohort 2', username: 'moved1'},
-                        {email: 'moved2@sample.com', name: 'moved2', previous_cohort: 'cohort 2', username: 'moved2'},
-                        {email: 'moved3@sample.com', name: 'moved3', previous_cohort: 'cohort 3', username: 'moved3'}
+                        {
+email: 'moved1@sample.com', name: 'moved1', previous_cohort: 'cohort 2', username: 'moved1'
+},
+                        {
+email: 'moved2@sample.com', name: 'moved2', previous_cohort: 'cohort 2', username: 'moved2'
+},
+                        {
+email: 'moved3@sample.com', name: 'moved3', previous_cohort: 'cohort 3', username: 'moved3'
+}
                     ],
                     present: ['alreadypresent@sample.com']
                 });
@@ -838,7 +848,9 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 it('can clear selected content group', function() {
                     createCohortsView(this, {
                         cohorts: [
-                            {id: 1, name: 'Cat Lovers', group_id: 0, assignment_type: MOCK_MANUAL_ASSIGNMENT}
+                            {
+id: 1, name: 'Cat Lovers', group_id: 0, assignment_type: MOCK_MANUAL_ASSIGNMENT
+}
                         ],
                         selectCohort: 1
                     });

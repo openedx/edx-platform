@@ -32,7 +32,9 @@ class GradeTable extends React.Component {
         });
         const multipleAssignments = groupData.length > 1;
 
-        const rows = groupData.map(({assignment_type, total_possible, total_earned, passing_grade}, index) => {
+        const rows = groupData.map(({
+assignment_type, total_possible, total_earned, passing_grade
+}, index) => {
             const label = multipleAssignments ? `${assignment_type} ${index + 1}` : assignment_type; 
             return (
                 <tr key={index}>

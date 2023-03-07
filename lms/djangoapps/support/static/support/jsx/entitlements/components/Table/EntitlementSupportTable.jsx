@@ -47,7 +47,9 @@ const entitlementColumns = [
 
 const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) =>
     entitlements.map((entitlement) => {
-        const { expiredAt, created, modified, orderNumber, enrollmentCourseRun } = entitlement;
+        const {
+ expiredAt, created, modified, orderNumber, enrollmentCourseRun 
+} = entitlement;
         return Object.assign({}, entitlement, {
             expiredAt: expiredAt ? moment(expiredAt).format('lll') : '',
             createdAt: moment(created).format('lll'),

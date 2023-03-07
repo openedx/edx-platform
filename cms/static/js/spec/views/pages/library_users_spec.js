@@ -29,9 +29,15 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 ManageUsersFactory(
                     'Mock Library',
                     [
-                        {id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'},
-                        {id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'},
-                        {id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'}
+                        {
+id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'
+},
+                        {
+id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'
+},
+                        {
+id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'
+}
                     ],
                     changeRoleUrl,
                     10000,
@@ -123,9 +129,15 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 ManageUsersFactory(
                     'Mock Library',
                     [
-                        {id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'},
-                        {id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'},
-                        {id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'}
+                        {
+id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'
+},
+                        {
+id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'
+},
+                        {
+id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'
+}
                     ],
                     'dummy_change_role_url',
                     10000,
