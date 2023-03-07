@@ -99,7 +99,8 @@ COURSES_INVITE_ONLY = SettingToggle('COURSES_INVITE_ONLY', default=False)
 # .. toggle_name: courseware.public_video_share
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Enables public viewing / sharing of all course videos.
+# .. toggle_description: Gates access to public videos. This flag must be enabled, and individual
+#                        videos must be marked as "public_access"
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2023-02-02
 # .. toggle_target_removal_date: None
