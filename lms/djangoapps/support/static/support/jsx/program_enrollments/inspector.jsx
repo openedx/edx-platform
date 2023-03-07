@@ -66,6 +66,7 @@ const renderEnrollmentsSection = enrollments => (
                 <h4>
                     <span className="font-weight-bold">
                         {enrollment.program_name}
+                    </span>
                     </span> Program ( <span className="font-weight-bold">
                         {enrollment.program_uuid}
                     </span>)
