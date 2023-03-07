@@ -8,7 +8,7 @@ import logging
 import urllib
 from collections import OrderedDict, namedtuple
 from datetime import datetime
-from urllib.parse import quote_plus, urlencode, urljoin
+from urllib.parse import quote_plus, urlencode, urljoin, urlparse, urlunparse
 
 import bleach
 import requests
@@ -1687,8 +1687,7 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
             'public_video_embed': is_embed,
         })
 
-
-        enroll_url, course_about_page_url = _get_public_video_cta_button_urls(request, course_key)
+        course_about_page_url, enroll_url = _get_public_video_cta_button_urls(request, course_key)
         social_sharing_metadata = _get_social_sharing_metadata(course, block, is_embed)
 
         context = {
@@ -1709,28 +1708,40 @@ def _render_public_video_xblock(request, usage_key_string, is_embed=False):
         }
         return render_to_response(template, context)
 
-def _get_public_video_cta_button_urls(request, course_key):
-    """
-    Get the links for the 'enroll' and 'learn more' buttons on the public video page
-    """
-    enroll_url = reverse('register_user')
-    enroll_url += '?' + urlencode({
-        'course_id': str(course_key),
-        'enrollment_action': 'enroll',
-        'email_opt_in': False,
-    })
-    course_about_page_url = reverse('about_course', kwargs={'course_id': str(course_key)})
 
+def _get_utm_params(request):
+    """ Helper function to pull all utm_ params from the request and return them as a dict """
     utm_params = {}
     for param, value in request.GET.items():
         if param.startswith("utm_"):
             utm_params[param] = value
-    if utm_params:
-        utm_params = urlencode(utm_params)
-        enroll_url += '&' + utm_params
-        course_about_page_url += '?' + utm_params
-        
-    return enroll_url, course_about_page_url
+    return utm_params
+
+def _build_url(base_url, params, utm_params):
+    """ Helper function to combine a base URL, params, and utm params into a full URL """
+    if not params and not utm_params:
+        return base_url
+    url_parts = urlparse(base_url)
+    full_params = {**params, **utm_params}
+    url_parts.query = urlencode(full_params)
+    return urlunparse(url_parts)
+
+def _get_public_video_cta_button_urls(request, course_key):
+    """
+    Get the links for the 'enroll' and 'learn more' buttons on the public video page
+    """
+    utm_params = _get_utm_params(request)
+    course_about_page_url = _build_url(
+        reverse('about_course', kwargs={'course_id': str(course_key)}),
+        {
+            'course_id': str(course_key),
+            'enrollment_action': 'enroll',
+            'email_opt_in': False,
+        },
+        utm_params
+    )
+    enroll_url = _build_url(reverse('register_user'), {}, utm_params)
+    return course_about_page_url, enroll_url
 
 def _get_social_sharing_metadata(course, block, is_embed):
     """
