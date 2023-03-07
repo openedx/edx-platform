@@ -1,0 +1,41 @@
+<div class="focusguard focusguard-start" tabindex="0"></div>
+<div class="badges-modal" tabindex="0">
+        <button class="close"><span class="fa fa-close" aria-hidden="true"></span><span class="sr"><%- gettext("Close") %></span></button>
+    <h1 class="modal-header"><%- gettext("Share on Mozilla Backpack") %></h1>
+    <p class="explanation"><%- gettext("To share your certificate on Mozilla Backpack, you must first have a Backpack account. Complete the following steps to add your certificate to Backpack.") %>
+    </p>
+    <hr class="modal-hr"/>
+    <img class="backpack-logo" src="<%- badgeMeta.badges_logo %>" alt="">
+    <ol class="badges-steps">
+      <li class="step">
+        <%= edx.HtmlUtils.interpolateHtml(
+            gettext("Create a {link_start}Mozilla Backpack{link_end} account, or log in to your existing account"),
+            {
+              link_start: edx.HtmlUtils.HTML('<a href="https://backpack.openbadges.org/" rel="noopener" target="_blank">'),
+              link_end: edx.HtmlUtils.HTML('</a>')
+            }
+          )
+        %>
+      </li>
+
+      <li class="step">
+        <%= edx.HtmlUtils.interpolateHtml(
+            gettext("{download_link_start}Download this image (right-click or option-click, save as){link_end} and then {upload_link_start}upload{link_end} it to your backpack."),
+            {
+              download_link_start: edx.HtmlUtils.joinHtml(
+                edx.HtmlUtils.HTML('<a class="badge-link" href="'),
+                image_url,
+                edx.HtmlUtils.HTML('" rel="noopener" target="_blank">'),
+              ),
+              link_end: edx.HtmlUtils.HTML('</a>'),
+              upload_link_start: edx.HtmlUtils.HTML('<a href="https://backpack.openbadges.org/backpack/add" rel="noopener" target="_blank">')
+            }
+        )
+        %>
+      </li>
+    </ol>
+    <div class="image-container">
+        <img class="badges-backpack-example" src="<%- badgeMeta.backpack_ui_img %>" alt="">
+    </div>
+</div>
+<div class="focusguard focusguard-end" tabindex="0"></div>

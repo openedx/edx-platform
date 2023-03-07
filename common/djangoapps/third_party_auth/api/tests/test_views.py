@@ -2,11 +2,10 @@
 Tests for the Third Party Auth REST API
 """
 
-import urllib
 from unittest.mock import patch
 
 import ddt
-from django.conf import settings
+import six
 from django.http import QueryDict
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -220,7 +219,7 @@ class UserViewV2APITests(UserViewsMixin, TpaAPITestCase):
         """
         return '?'.join([
             reverse('third_party_auth_users_api_v2'),
-            urllib.parse.urlencode(identifier)
+            six.moves.urllib.parse.urlencode(identifier)
         ])
 
 
@@ -378,12 +377,11 @@ class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
         """
         self.client.login(username=self.user.username, password=PASSWORD)
         response = self.client.get(self.url, content_type="application/json")
-        next_url = urllib.parse.quote(settings.ACCOUNT_MICROFRONTEND_URL, safe="")
         assert response.status_code == 200
         assert (response.data ==
                [{
                    'accepts_logins': True, 'name': 'Google',
                    'disconnect_url': '/auth/disconnect/google-oauth2/?',
-                   'connect_url': f'/auth/login/google-oauth2/?auth_entry=account_settings&next={next_url}',
+                   'connect_url': '/auth/login/google-oauth2/?auth_entry=account_settings&next=%2Faccount%2Fsettings',
                    'connected': False, 'id': 'oa2-google-oauth2'
                }])

@@ -52,6 +52,7 @@
 @import 'multicourse/survey-page';
 
 // base - specific views
+@import 'views/account-settings';
 @import 'views/course-entitlements';
 @import 'views/login-register';
 @import 'views/verification';
@@ -68,6 +69,7 @@
 // features
 @import 'features/bookmarks-v1';
 @import "features/announcements";
+@import 'features/learner-profile';
 @import 'features/_unsupported-browser-alert';
 @import 'features/content-type-gating';
 @import 'features/course-duration-limits';

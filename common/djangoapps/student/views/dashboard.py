@@ -519,7 +519,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     """
     user = request.user
     if not UserProfile.objects.filter(user=user).exists():
-        return redirect(settings.ACCOUNT_MICROFRONTEND_URL)
+        return redirect(reverse('account_settings'))
 
     if should_redirect_to_learner_home_mfe(user):
         return redirect(settings.LEARNER_HOME_MICROFRONTEND_URL)
@@ -624,7 +624,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
                         "Go to {link_start}your Account Settings{link_end}.")
                 ).format(
                     link_start=HTML("<a href='{account_setting_page}'>").format(
-                        account_setting_page=settings.ACCOUNT_MICROFRONTEND_URL,
+                        account_setting_page=reverse('account_settings'),
                     ),
                     link_end=HTML("</a>")
                 )
@@ -897,7 +897,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     except DashboardRenderStarted.RenderInvalidDashboard as exc:
         response = render_to_response(exc.dashboard_template, exc.template_context)
     except DashboardRenderStarted.RedirectToPage as exc:
-        response = HttpResponseRedirect(exc.redirect_to or settings.ACCOUNT_MICROFRONTEND_URL)
+        response = HttpResponseRedirect(exc.redirect_to or reverse('account_settings'))
     except DashboardRenderStarted.RenderCustomResponse as exc:
         response = exc.response
     else:
