@@ -22,11 +22,11 @@ from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
 from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.exceptions import IncorrectConfigurationException
 from common.djangoapps.third_party_auth.saml import SapSuccessFactorsIdentityProvider
 from common.djangoapps.third_party_auth.saml import log as saml_log
 from common.djangoapps.third_party_auth.tasks import fetch_saml_metadata
 from common.djangoapps.third_party_auth.tests import testutil, utils
-from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
 
@@ -143,6 +143,82 @@ class SamlIntegrationTestUtilities:
 
 @ddt.ddt
 @utils.skip_unless_thirdpartyauth()
+class TestIndexExceptionTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
+    """
+    To test SAML error handling when presented with an empty-list attribute value
+    """
+
+    TOKEN_RESPONSE_DATA = {
+        'access_token': 'access_token_value',
+        'expires_in': 'expires_in_value',
+    }
+    USER_RESPONSE_DATA = {
+        'lastName': 'lastName_value',
+        'id': 'id_value',
+        'firstName': 'firstName_value',
+        'idp_name': 'testshib',
+        'attributes': {'urn:oid:0.9.2342.19200300.100.1.1': [], 'name_id': '1'},
+        'session_index': '1',
+    }
+
+    def test_index_error_from_empty_list_saml_attribute(self):
+        """
+        The `urn:oid:0.9.2342.19200300.100.1.1` attribute is an empty list,
+        should throw a specific exception NOT an IndexException
+        """
+        self.provider = self._configure_testshib_provider()
+        request, strategy = self.get_request_and_strategy(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
+        with self.assertRaises(IncorrectConfigurationException):
+            request.backend.auth_complete = MagicMock(return_value=self.fake_auth_complete(strategy))
+
+    def get_response_data(self):
+        """Gets dict (string -> object) of merged data about the user."""
+        response_data = dict(self.TOKEN_RESPONSE_DATA)
+        response_data.update(self.USER_RESPONSE_DATA)
+        return response_data
+
+
+@ddt.ddt
+@utils.skip_unless_thirdpartyauth()
+class TestKeyExceptionTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
+    """
+    To test SAML error handling when presented with missing attributes
+    """
+
+    TOKEN_RESPONSE_DATA = {
+        'access_token': 'access_token_value',
+        'expires_in': 'expires_in_value',
+    }
+    USER_RESPONSE_DATA = {
+        'lastName': 'lastName_value',
+        'id': 'id_value',
+        'firstName': 'firstName_value',
+        'idp_name': 'testshib',
+        'attributes': {'name_id': '1'},
+        'session_index': '1',
+    }
+
+    def test_key_error_from_missing_saml_attributes(self):
+        """
+        The `urn:oid:0.9.2342.19200300.100.1.1` attribute is missing,
+        should throw a specific exception NOT a Key Error
+        """
+        self.provider = self._configure_testshib_provider()
+        request, strategy = self.get_request_and_strategy(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
+        with self.assertRaises(IncorrectConfigurationException):
+            request.backend.auth_complete = MagicMock(return_value=self.fake_auth_complete(strategy))
+
+    def get_response_data(self):
+        """Gets dict (string -> object) of merged data about the user."""
+        response_data = dict(self.TOKEN_RESPONSE_DATA)
+        response_data.update(self.USER_RESPONSE_DATA)
+        return response_data
+
+
+@ddt.ddt
+@utils.skip_unless_thirdpartyauth()
 class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
     """
     TestShib provider Integration Test, to test SAML functionality
@@ -162,12 +238,10 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
     }
 
     @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    @patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
     @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     def test_full_pipeline_succeeds_for_unlinking_testshib_account(
         self,
         mock_auth_provider,
-        mock_enterprise_customer_for_request_settings_view,
         mock_enterprise_customer_for_request,
     ):
 
@@ -207,7 +281,6 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         }
         mock_auth_provider.return_value.backend_name = 'tpa-saml'
         mock_enterprise_customer_for_request.return_value = enterprise_customer_data
-        mock_enterprise_customer_for_request_settings_view.return_value = enterprise_customer_data
 
         # Instrument the pipeline to get to the dashboard with the full expected state.
         self.client.get(
@@ -222,7 +295,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
                                 request=request)
 
         # First we expect that we're in the linked state, with a backend entry.
-        self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=True)
+        self.assert_third_party_accounts_state(request, linked=True)
         self.assert_social_auth_exists_for_user(request.user, strategy)
 
         FEATURES_WITH_ENTERPRISE_ENABLED = settings.FEATURES.copy()
@@ -250,7 +323,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
                 )
             )
             # Now we expect to be in the unlinked state, with no backend entry.
-            self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=False)
+            self.assert_third_party_accounts_state(request, linked=False)
             self.assert_social_auth_does_not_exist_for_user(user, strategy)
             assert EnterpriseCustomerUser.objects\
                 .filter(enterprise_customer=enterprise_customer, user_id=user.id).count() == 0

@@ -129,7 +129,7 @@ def _get_course_email_context(course):
         'course_url': course_url,
         'course_image_url': image_url,
         'course_end_date': course_end_date,
-        'account_settings_url': '{}{}'.format(lms_root_url, reverse('account_settings')),
+        'account_settings_url': settings.ACCOUNT_MICROFRONTEND_URL,
         'email_settings_url': '{}{}'.format(lms_root_url, reverse('dashboard')),
         'logo_url': get_logo_url_for_email(),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),

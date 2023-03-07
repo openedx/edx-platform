@@ -1740,6 +1740,7 @@ class BasePublicVideoXBlockView(View):
         Raises 404 if:
          - courseware.public_video_share waffle flag is not enabled for this course
          - block is not video
+         - block is not marked as "public_access"
          """
         usage_key = UsageKey.from_string(usage_key_string)
         usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
@@ -1763,6 +1764,10 @@ class BasePublicVideoXBlockView(View):
                 course=course,
                 will_recheck_access=False
             )
+            
+            # Block must be marked as public to be viewed
+            if not video_block.public_access:
+                raise Http404("Video not found.")
 
         return course, video_block
 
@@ -2055,7 +2060,7 @@ def financial_assistance_form(request, course_id=None):
         'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER),
         'student_faq_url': marketing_link('FAQ'),
         'dashboard_url': reverse('dashboard'),
-        'account_settings_url': reverse('account_settings'),
+        'account_settings_url': settings.ACCOUNT_MICROFRONTEND_URL,
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'user_details': {
             'email': user.email,
