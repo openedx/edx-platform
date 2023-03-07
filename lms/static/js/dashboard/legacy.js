@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 /**
  * Legacy JavaScript for the student dashboard.
  * Please do not add anything else to this file unless
@@ -233,17 +234,17 @@ var edx = edx || {};
                 data: $(this).serializeArray(),
                 success: function() {
                     setTimeout(
-                        function(){
+                        function() {
                             $('#activate-account-modal p svg').remove();
                             // xss-lint: disable=javascript-jquery-append
                             $('#activate-account-modal p').append(
                                 // xss-lint: disable=javascript-concat-html
-                                '<svg  style="vertical-align:bottom" width="20" height="20"'
+                                '<svg  style="vertical-align:bottom" width="20" height="20"' +
                          // xss-lint: disable=javascript-concat-html
-                         + 'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
+                         'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
                          // xss-lint: disable=javascript-concat-html
-                         + '<path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="#178253"/>\n'
-                         + '</svg>'
+                         '<path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="#178253"/>\n' +
+                         '</svg>'
                             );
                         }, 500); // adding timeout to make spinner animation longer
                 }
@@ -253,12 +254,12 @@ var edx = edx || {};
             // xss-lint: disable=javascript-jquery-append
             $('#activate-account-modal p').append(
                 // xss-lint: disable=javascript-concat-html
-                '<svg  class="fa-pulse" style="vertical-align:bottom" width="20" height="20"'
+                '<svg  class="fa-pulse" style="vertical-align:bottom" width="20" height="20"' +
                // xss-lint: disable=javascript-concat-html
-               + 'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
+               'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
                // xss-lint: disable=javascript-concat-html
-               + '<path d="M22 12A10 10 0 116.122 3.91l1.176 1.618A8 8 0 1020 12h2z" fill="#6c757d"/>\n'
-               + '</svg>'
+               '<path d="M22 12A10 10 0 116.122 3.91l1.176 1.618A8 8 0 1020 12h2z" fill="#6c757d"/>\n' +
+               '</svg>'
             );
         });
 

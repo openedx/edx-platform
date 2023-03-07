@@ -402,7 +402,7 @@
                         if (line.length > 0) {
                             textHint = extractHint(line, true);
                             if (!textHint.nothint) {
-                                throw new Error(gettext("An answer option has been left blank. Please review and edit the component."));
+                                throw new Error(gettext('An answer option has been left blank. Please review and edit the component.'));
                             }
                             correctstr = ' correct="' + (textHint.parens ? 'True' : 'False') + '"';
                             hintstr = '';
@@ -415,13 +415,11 @@
                                 hintstr = ' <optionhint' + label + '>' + textHint.hint + '</optionhint>';
                             }
                             // xss-lint: disable=javascript-concat-html
-                            optionlines += '    <option' + correctstr + '>' + textHint.nothint + hintstr
-                                + '</option>\n';
+                            optionlines += '    <option' + correctstr + '>' + textHint.nothint + hintstr + '</option>\n';
                         }
                     }
                     // xss-lint: disable=javascript-concat-html
-                    return '\n<optionresponse>\n  <optioninput>\n' + optionlines
-                        + '  </optioninput>\n</optionresponse>\n\n';
+                    return '\n<optionresponse>\n  <optioninput>\n' + optionlines + '  </optioninput>\n</optionresponse>\n\n';
                 });
 
                 // multiple choice questions
@@ -437,7 +435,7 @@
                         if (options[i].length > 0) {
                             value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
                             if (!value) {
-                                throw new Error(gettext("An answer option has been left blank. Please review and edit the component."));
+                                throw new Error(gettext('An answer option has been left blank. Please review and edit the component.'));
                             }
                             inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
                             correct = /x/i.test(inparens);
@@ -493,14 +491,13 @@
                                 hintbody = abhint[2];
                                 hintbody = hintbody.replace('&lf;', '\n').trim();
                                 // xss-lint: disable=javascript-concat-html
-                                endHints += '    <compoundhint value="' + abhint[1].trim() + '">' + hintbody
-                                    + '</compoundhint>\n';
+                                endHints += '    <compoundhint value="' + abhint[1].trim() + '">' + hintbody + '</compoundhint>\n';
                                 continue; // bail
                             }
 
                             value = options[i].split(/^\s*\[.?\]\s*/)[1];
                             if (!value) {
-                                throw new Error(gettext("An answer option has been left blank. Please review and edit the component."));
+                                throw new Error(gettext('An answer option has been left blank. Please review and edit the component.'));
                             }
                             correct = /^\s*\[x\]/i.test(options[i]);
                             hints = '';
@@ -516,14 +513,12 @@
                                 // <choicehint selected="true">You’re right that apple is a fruit.</choicehint>
                                 if (select) {
                                     // xss-lint: disable=javascript-concat-html
-                                    hints += '\n      <choicehint selected="true">' + select[2].trim()
-                                        + '</choicehint>';
+                                    hints += '\n      <choicehint selected="true">' + select[2].trim() + '</choicehint>';
                                 }
                                 select = /{\s*(u|unselected):((.|\n)*?)}/i.exec(inner);
                                 if (select) {
                                     // xss-lint: disable=javascript-concat-html
-                                    hints += '\n      <choicehint selected="false">' + select[2].trim()
-                                        + '</choicehint>';
+                                    hints += '\n      <choicehint selected="false">' + select[2].trim() + '</choicehint>';
                                 }
 
                                 // Blank out the original text only if the specific "selected" syntax is found
@@ -597,9 +592,7 @@
                             if (textHint.hint) {
                                 firstAnswer = textHint.nothint;
                                 // xss-lint: disable=javascript-concat-html
-                                hintLine = '  <correcthint' + textHint.labelassign + '>'
-                                // xss-lint: disable=javascript-concat-html
-                                    + textHint.hint + '</correcthint>\n';
+                                hintLine = '  <correcthint' + textHint.labelassign + '>' + textHint.hint + '</correcthint>\n';
                             }
 
                             // Range case
@@ -614,9 +607,7 @@
                                 numericalResponseString = '<numericalresponse answer="' + answerData.answer + '">\n';
                                 if (answerData.default) {
                                     // xss-lint: disable=javascript-concat-html
-                                    numericalResponseString += '  <responseparam type="tolerance" default="'
-                                    // xss-lint: disable=javascript-concat-html
-                                        + answerData.default + '" />\n';
+                                    numericalResponseString += '  <responseparam type="tolerance" default="' + answerData.default + '" />\n';
                                 }
                             }
 
@@ -640,11 +631,7 @@
 
                                     if (additionalTextHint.hint) {
                                         // xss-lint: disable=javascript-concat-html
-                                        additionalHintLine = '<correcthint'
-                                            // xss-lint: disable=javascript-concat-html
-                                            + additionalTextHint.labelassign + '>'
-                                            // xss-lint: disable=javascript-concat-html
-                                            + additionalTextHint.hint + '</correcthint>';
+                                        additionalHintLine = '<correcthint' + additionalTextHint.labelassign + '>' + additionalTextHint.hint + '</correcthint>';
                                     }
 
                                     // xss-lint: disable=javascript-concat-html
@@ -692,9 +679,7 @@
                                 notMatch = /^not\=\s*(.*)/.exec(textHint.nothint);
                                 if (notMatch) {
                                     // xss-lint: disable=javascript-concat-html
-                                    string += '  <stringequalhint answer="' + notMatch[1] + '"'
-                                        // xss-lint: disable=javascript-concat-html
-                                        + textHint.labelassign + '>' + textHint.hint + '</stringequalhint>\n';
+                                    string += '  <stringequalhint answer="' + notMatch[1] + '"' + textHint.labelassign + '>' + textHint.hint + '</stringequalhint>\n';
 
                                     continue;
                                 }
@@ -705,9 +690,7 @@
                                     string += '  <additional_answer answer="' + orMatch[1] + '">';
                                     if (textHint.hint) {
                                         // xss-lint: disable=javascript-concat-html
-                                        string += '<correcthint' + textHint.labelassign + '>'
-                                            // xss-lint: disable=javascript-concat-html
-                                            + textHint.hint + '</correcthint>';
+                                        string += '<correcthint' + textHint.labelassign + '>' + textHint.hint + '</correcthint>';
                                     }
                                     string += '</additional_answer>\n';
                                 }
@@ -724,9 +707,7 @@
                 // replace explanations
                 xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
                     // xss-lint: disable=javascript-concat-html
-                    return '<solution>\n<div class="detailed-solution">\n'
-                        // xss-lint: disable=javascript-concat-html
-                        + gettext('Explanation') + '\n\n' + p1 + '\n</div>\n</solution>';
+                    return '<solution>\n<div class="detailed-solution">\n' + gettext('Explanation') + '\n\n' + p1 + '\n</div>\n</solution>';
                 });
 
                 // replace code blocks

@@ -74,7 +74,6 @@
     "prefer-destructuring": "off",
     "prefer-rest-params": "off",
     "prefer-template": "off",
-    "quotes": "off",
     "radix": "off",
     "react/jsx-indent": "off",
     "react/jsx-indent-props": "off",
