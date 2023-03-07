@@ -1650,147 +1650,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         return render_to_response('courseware/courseware-chromeless.html', context)
 
 
-def _render_public_video_xblock(request, usage_key_string, is_embed=False):
-    """
-    Look up a given usage key and render the "public" view or the "embed" view
-    """
-    view = 'public_view'
-    if is_embed:
-        template = 'public_video_share_embed.html'
-    else:
-        template = 'public_video.html'
-
-    usage_key = UsageKey.from_string(usage_key_string)
-    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
-    course_key = usage_key.course_key
-
-    if not PUBLIC_VIDEO_SHARE.is_enabled(course_key):
-        raise Http404("Video not found.")
-
-    # usage key block type must be `video` else raise 404
-    if usage_key.block_type != 'video':
-        raise Http404("Video not found.")
-
-    with modulestore().bulk_operations(course_key):
-        course = get_course_by_id(course_key, 0)
-
-        block, _ = get_block_by_usage_id(
-            request,
-            str(course_key),
-            str(usage_key),
-            disable_staff_debug_info=True,
-            course=course,
-            will_recheck_access=False
-        )
-
-        fragment = block.render(view, context={
-            'public_video_embed': is_embed,
-        })
-
-        course_about_page_url, enroll_url = _get_public_video_cta_button_urls(request, course_key)
-        social_sharing_metadata = _get_social_sharing_metadata(course, block, is_embed)
-
-        context = {
-            'fragment': fragment,
-            'course': course,
-            'social_sharing_metadata': social_sharing_metadata,
-            'learn_more_url': course_about_page_url,
-            'enroll_url': enroll_url,
-            'disable_accordion': False,
-            'allow_iframing': True,
-            'disable_header': False,
-            'disable_footer': False,
-            'disable_window_wrap': True,
-            'disable_register_button': True,
-            'edx_notes_enabled': False,
-            'is_learning_mfe': True,
-            'is_mobile_app': False,
-        }
-        return render_to_response(template, context)
-
-
-def _get_utm_params(request):
-    """ Helper function to pull all utm_ params from the request and return them as a dict """
-    utm_params = {}
-    for param, value in request.GET.items():
-        if param.startswith("utm_"):
-            utm_params[param] = value
-    return utm_params
-
-def _build_url(base_url, params, utm_params):
-    """ Helper function to combine a base URL, params, and utm params into a full URL """
-    if not params and not utm_params:
-        return base_url
-    url_parts = urlparse(base_url)
-    full_params = {**params, **utm_params}
-    url_parts.query = urlencode(full_params)
-    return urlunparse(url_parts)
-
-def _get_public_video_cta_button_urls(request, course_key):
-    """
-    Get the links for the 'enroll' and 'learn more' buttons on the public video page
-    """
-    utm_params = _get_utm_params(request)
-    course_about_page_url = _build_url(
-        reverse('about_course', kwargs={'course_id': str(course_key)}),
-        {
-            'course_id': str(course_key),
-            'enrollment_action': 'enroll',
-            'email_opt_in': False,
-        },
-        utm_params
-    )
-    enroll_url = _build_url(reverse('register_user'), {}, utm_params)
-    return course_about_page_url, enroll_url
-
-def _get_social_sharing_metadata(course, block, is_embed):
-    """
-    Gather the information for the meta OpenGraph and Twitter-specific tags
-    """
-    video_description = f"Watch a video from the course {course.display_name} "
-    if course.display_organization is not None:
-        video_description += f"by {course.display_organization} "
-    video_description += "on edX.org"
-
-    video_poster = None
-    if not is_embed:
-        video_poster = block._poster()  # pylint: disable=protected-access
-            
-    return {
-        'video_title': block.display_name_with_default,
-        'video_description': video_description,
-        'video_thumbnail': video_poster if video_poster is not None else '',
-        'video_embed_url': urljoin(
-            settings.LMS_ROOT_URL,
-            reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(block.location)})
-        )
-    }
-
-
-@require_http_methods(["GET"])
-@ensure_valid_usage_key
-@xframe_options_exempt
-@transaction.non_atomic_requests
-def render_public_video_xblock_embed(request, usage_key_string):
-    """
-    Returns an HttpResponse with HTML content for the Video xBlock with the given usage_key.
-    The returned HTML consists of nothing but the Video xBlock content for use in social media embedding.
-    """
-    return _render_public_video_xblock(request, usage_key_string, is_embed=True)
-
-
-@require_http_methods(["GET"])
-@ensure_valid_usage_key
-@xframe_options_exempt
-@transaction.non_atomic_requests
-def render_public_video_xblock(request, usage_key_string):
-    """
-    Returns an HttpResponse with HTML content for the Video xBlock with the given usage_key.
-    The returned HTML is a chromeless rendering of the Video xBlock (excluding content of the containing courseware).
-    """
-    return _render_public_video_xblock(request, usage_key_string, is_embed=False)
-
-
 def get_optimization_flags_for_content(block, fragment):
     """
     Return a dict with a set of display options appropriate for the block.
@@ -1859,6 +1718,161 @@ class XBlockContentInspector:
                 return True
 
         return False
+
+
+class BasePublicVideoXBlockView(View):
+    """
+    Base functionality for public video xblock view and embed view
+    """
+
+    @method_decorator(ensure_valid_usage_key)
+    @method_decorator(xframe_options_exempt)
+    @method_decorator(transaction.non_atomic_requests)
+    def get(self, _, usage_key_string):
+        """ Load course and video and render public view """
+        course, video_block = self.get_course_and_video_block(usage_key_string)
+        template, context = self.get_template_and_context(course, video_block)
+        return render_to_response(template, context)
+
+    def get_course_and_video_block(self, usage_key_string):
+        """
+        Load course and video from modulestore.
+        Raises 404 if:
+         - courseware.public_video_share waffle flag is not enabled for this course
+         - block is not video
+         """
+        usage_key = UsageKey.from_string(usage_key_string)
+        usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+        course_key = usage_key.course_key
+
+        if not PUBLIC_VIDEO_SHARE.is_enabled(course_key):
+            raise Http404("Video not found.")
+
+        # usage key block type must be `video` else raise 404
+        if usage_key.block_type != 'video':
+            raise Http404("Video not found.")
+
+        with modulestore().bulk_operations(course_key):
+            course = get_course_by_id(course_key, 0)
+
+            video_block, _ = get_block_by_usage_id(
+                self.request,
+                str(course_key),
+                str(usage_key),
+                disable_staff_debug_info=True,
+                course=course,
+                will_recheck_access=False
+            )
+
+        return course, video_block
+
+
+class PublicVideoXBlockView(BasePublicVideoXBlockView):
+    """ View for displaying public videos """
+
+    def get_template_and_context(self, course, video_block):
+        """
+        Render video xblock, gather social media metadata, and generate CTA links
+        """
+        fragment = video_block.render('public_view', context={
+            'public_video_embed': False,
+        })
+        course_about_page_url, enroll_url = self.get_public_video_cta_button_urls(course)
+        social_sharing_metadata = self.get_social_sharing_metadata(course, video_block)
+        context = {
+            'fragment': fragment,
+            'course': course,
+            'social_sharing_metadata': social_sharing_metadata,
+            'learn_more_url': course_about_page_url,
+            'enroll_url': enroll_url,
+            'disable_window_wrap': True,
+            'disable_register_button': True,
+            'edx_notes_enabled': False,
+            'is_learning_mfe': True,
+            'is_mobile_app': False,
+        }
+        return 'public_video.html', context
+
+    def get_social_sharing_metadata(self, course, video_block):
+        """
+        Gather the information for the meta OpenGraph and Twitter-specific tags
+        """
+        video_description = f"Watch a video from the course {course.display_name} "
+        if course.display_organization is not None:
+            video_description += f"by {course.display_organization} "
+        video_description += "on edX.org"
+        video_poster = video_block._poster()  # pylint: disable=protected-access
+
+        return {
+            'video_title': video_block.display_name_with_default,
+            'video_description': video_description,
+            'video_thumbnail': video_poster if video_poster is not None else '',
+            'video_embed_url': urljoin(
+                settings.LMS_ROOT_URL,
+                reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(video_block.location)})
+            )
+        }
+
+    def get_public_video_cta_button_urls(self, course):
+        """
+        Get the links for the 'enroll' and 'learn more' buttons on the public video page
+        """
+        course_key = str(course.id)
+        utm_params = self.get_utm_params()
+        course_about_page_url = self.build_url(
+            reverse('about_course', kwargs={'course_id': course_key}), {}, utm_params
+        )
+        enroll_url = self.build_url(
+            reverse('register_user'),
+            {
+                'course_id': course_key,
+                'enrollment_action': 'enroll',
+                'email_opt_in': False,
+            },
+            utm_params
+        )
+        return course_about_page_url, enroll_url
+
+    def get_utm_params(self):
+        """
+        Helper function to pull all utm_ params from the request and return them as a dict
+        """
+        utm_params = {}
+        for param, value in self.request.GET.items():
+            if param.startswith("utm_"):
+                utm_params[param] = value
+        return utm_params
+
+    def build_url(self, base_url, params, utm_params):
+        """
+        Helper function to combine a base URL, params, and utm params into a full URL
+        """
+        if not params and not utm_params:
+            return base_url
+        url_parts = urlparse(base_url)
+        full_params = {**params, **utm_params}
+        return urlunparse((
+            url_parts.scheme,
+            url_parts.netloc,
+            url_parts.path,
+            url_parts.params,
+            urlencode(full_params),
+            url_parts.fragment
+        ))
+
+
+class PublicVideoXBlockEmbedView(BasePublicVideoXBlockView):
+    """ View for viewing public videos embedded within Twitter or other social media """
+    def get_template_and_context(self, course, video_block):
+        """ Render the embed view """
+        fragment = video_block.render('public_view', context={
+            'public_video_embed': True,
+        })
+        context = {
+            'fragment': fragment,
+            'course': course,
+        }
+        return 'public_video_share_embed.html', context
 
 
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a
