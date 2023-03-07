@@ -6,7 +6,7 @@ class CircleChartLegend extends React.Component {
     constructor(props) {
         super(props);
     }
-  
+
     getList() {
         const {data} = this.props;
 

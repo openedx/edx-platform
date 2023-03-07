@@ -93,7 +93,7 @@ export default class WordCloudMain {
         // Send the data to the server as an AJAX request. Attach a callback that will
         // be fired on server's response.
         $.postWithPrefix(
-            `${this.ajax_url}/submit`, 
+            `${this.ajax_url}/submit`,
             $.param(data),
             (response) => {
                 if (response.status !== 'success') {

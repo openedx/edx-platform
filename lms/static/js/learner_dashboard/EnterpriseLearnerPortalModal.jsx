@@ -158,4 +158,4 @@ class EnterpriseLearnerPortalModal extends React.Component {
     }
 }
 
-export { EnterpriseLearnerPortalModal }; 
+export { EnterpriseLearnerPortalModal };

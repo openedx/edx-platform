@@ -19,7 +19,7 @@ export class DemographicsCollectionBanner extends React.Component {
    * Utility function that controls hiding the CTA from the Course Dashboard where appropriate.
    * This can be called one of two ways - when a user clicks the "dismiss" button on the CTA
    * itself, or when the learner completes all of the questions within the modal.
-   * 
+   *
    * The dismiss button itself is nested inside of an <a>, so we need to call stopPropagation()
    * here to prevent the Modal from _also_ opening when the Dismiss button is clicked.
    */
@@ -43,7 +43,7 @@ export class DemographicsCollectionBanner extends React.Component {
         };
 
         await fetch(`${this.props.lmsRootUrl}/api/demographics/v1/demographics/status/`, requestOptions);
-        // No matter what the response is from the API call we always allow the learner to dismiss the 
+        // No matter what the response is from the API call we always allow the learner to dismiss the
         // banner when clicking the dismiss button
         this.setState({hideBanner: true});
     }

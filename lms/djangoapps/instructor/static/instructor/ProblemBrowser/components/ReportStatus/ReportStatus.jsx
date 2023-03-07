@@ -5,7 +5,7 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 
 const ReportStatus = ({
-    error, succeeded, inProgress, reportPath 
+    error, succeeded, inProgress, reportPath
 }) => {
     const progressMessage = (
         <div className="msg progress">

@@ -1874,7 +1874,7 @@
                 if (/^>/.test(line)) { // a)
                     good = true;
                     // c) any line that starts with ">" and has at least one more character starts the chain
-                    if (!inChain && line.length > 1) { inChain = true; } 
+                    if (!inChain && line.length > 1) { inChain = true; }
                 } else if (/^[ \t]*$/.test(line)) { // b)
                     good = true;
                 } else {

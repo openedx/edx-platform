@@ -14,7 +14,7 @@ class CircleChart extends React.Component {
         this.getCenter = this.getCenter.bind(this);
         this.getSlices = this.getSlices.bind(this);
     }
-  
+
     getCenter() {
         const {centerHole, sliceBorder} = this.props;
         if (centerHole) {

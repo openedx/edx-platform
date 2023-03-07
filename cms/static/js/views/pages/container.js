@@ -218,7 +218,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
          * If the new "Actions" menu is enabled, most XBlock actions like
          * Duplicate, Move, Delete, Manage Access, etc. are moved into this
          * menu. For this event, we just toggle displaying the menu.
-         * @param {*} event 
+         * @param {*} event
          */
         showXBlockActionsMenu: function(event) {
             const showActionsButton = event.currentTarget;
