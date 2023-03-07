@@ -55,8 +55,6 @@
     "newline-per-chained-call": "off",
     "no-console": "off",
     "no-lonely-if": "off",
-    "no-multi-spaces": "off",
-    "no-multiple-empty-lines": "off",
     "no-param-reassign": "off",
     "no-proto": "off",
     "no-prototype-builtins": "off",

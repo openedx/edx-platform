@@ -80,4 +80,3 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
         });
     };
 });
-

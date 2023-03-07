@@ -1,7 +1,7 @@
 define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
     var CourseGrader = Backbone.Model.extend({
         defaults: {
-            type: '',    // must be unique w/in collection (ie. w/in course)
+            type: '', // must be unique w/in collection (ie. w/in course)
             min_count: 1,
             drop_count: 0,
             short_label: '', // what to use in place of type if space is an issue

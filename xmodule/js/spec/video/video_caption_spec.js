@@ -292,7 +292,6 @@
                         expect($('.langs-list')).toExist();
                         expect($('.langs-list')).toHandle('click');
 
-
                         $('.langs-list li').each(function() {
                             var code = $(this).data('lang-code'),
                                 link = $(this).find('.control'),
@@ -423,7 +422,6 @@
                         .toBe(true);
                 });
 
-
                 it('bind all the transcript link', function() {
                     var handlerList = ['captionMouseOverOut', 'captionClick',
                         'captionMouseDown', 'captionFocus', 'captionBlur',
@@ -522,7 +520,6 @@
                 });
             });
         });
-
 
         describe('mouse movement', function() {
             var originalClearTimeout;

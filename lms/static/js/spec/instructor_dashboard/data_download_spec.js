@@ -34,7 +34,6 @@ function($, id, AjaxHelper) {
             expect(dataDownload.$reports_request_response.text()).toContain('Request is succeeded');
         });
 
-
         it('renders grading config returned by the server in case of successful request ', function() {
             dataDownload.downloadCSV($selected, errorMessage);
 
@@ -142,7 +141,6 @@ function($, id, AjaxHelper) {
             };
             data.queried_features.forEach(existInHtml);
         });
-
 
         it('calls renderDataTable function if data-datatable is true', function() {
             $selected = $selected.attr('data-datatable', true);

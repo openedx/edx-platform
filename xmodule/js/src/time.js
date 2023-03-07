@@ -1,4 +1,3 @@
-
 function format(time, formatFull) {
     var hours, minutes, seconds;
 

@@ -7,7 +7,6 @@ const mapStateToProps = state => ({
     selectedBlock: state.selectedBlock,
 });
 
-
 const mapDispatchToProps = dispatch => ({
     onSelectBlock: blockId => dispatch(selectBlock(blockId)),
     fetchCourseBlocks:

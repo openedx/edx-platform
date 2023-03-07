@@ -26,7 +26,6 @@
             return $.Deferred().resolve().promise();
         };
 
-
         SaveStatePlugin.moduleName = 'SaveStatePlugin';
         SaveStatePlugin.prototype = {
             destroy: function() {

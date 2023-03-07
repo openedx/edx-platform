@@ -1,7 +1,7 @@
 // Custom matcher library for Jasmine test assertions
 // http://tobyho.com/2012/01/30/write-a-jasmine-matcher/
 
-define(['jquery'], function($) {  // eslint-disable-line no-unused-vars
+define(['jquery'], function($) { // eslint-disable-line no-unused-vars
     'use strict';
     return function() {
         jasmine.addMatchers({

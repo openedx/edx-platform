@@ -71,7 +71,6 @@ class DueDates extends React.Component {
     }
 }
 
-
 DueDates.propTypes = {
     dates: PropTypes.array.isRequired
 }

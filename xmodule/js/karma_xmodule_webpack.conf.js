@@ -38,8 +38,6 @@ options.runFiles
         options.preprocessors[file.pattern] = ['webpack'];
     });
 
-
 module.exports = function(config) {
     configModule.configure(config, options);
 };
-

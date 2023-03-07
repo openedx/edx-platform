@@ -1,4 +1,3 @@
-
 import '../../common/static/js/src/ajax_prefix.js';
 import '../../common/static/common/js/vendor/underscore.js';
 import '../../common/static/common/js/vendor/backbone.js';
@@ -22,7 +21,6 @@ import '../../common/static/js/test/add_ajax_prefix.js';
 import '../../common/static/js/test/i18n.js';
 import '../../common/static/common/js/vendor/hls.js';
 import '../assets/vertical/public/js/vertical_student_view.js';
-
 
 import '../../common/static/js/vendor/jasmine-imagediff.js';
 import '../../common/static/common/js/spec_helpers/jasmine-waituntil.js';

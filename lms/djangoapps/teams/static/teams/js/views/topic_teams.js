@@ -19,7 +19,7 @@
         // 3. create a new team
         // Be careful to start each link with the appropriate start indicator
         // (e.g. {browse_span_start} for #1) and finish it with {span_end}.
-        var actionMessage = interpolate_text(  // eslint-disable-line no-undef
+        var actionMessage = interpolate_text( // eslint-disable-line no-undef
             _.escape(gettext(
                 '{browse_span_start}Browse teams in other ' +
                 'topics{span_end} or {search_span_start}search teams{span_end} ' +
@@ -76,7 +76,6 @@
                 }
                 return deferred.promise();
             },
-
 
             showActions: function() {
                 HtmlUtils.append(

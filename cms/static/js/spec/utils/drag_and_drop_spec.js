@@ -372,4 +372,3 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
         });
     });
 });
-

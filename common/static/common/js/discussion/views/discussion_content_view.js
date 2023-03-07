@@ -380,9 +380,9 @@
                 };
                 if (this.model.get('thread').get('thread_type') === 'question') {
                     if (isEndorsing) {
-                        msg = gettext('This response could not be marked as an answer. Refresh the page and try again.');  // eslint-disable-line max-len
+                        msg = gettext('This response could not be marked as an answer. Refresh the page and try again.'); // eslint-disable-line max-len
                     } else {
-                        msg = gettext('This response could not be unmarked as an answer. Refresh the page and try again.');  // eslint-disable-line max-len
+                        msg = gettext('This response could not be unmarked as an answer. Refresh the page and try again.'); // eslint-disable-line max-len
                     }
                 } else {
                     if (isEndorsing) {

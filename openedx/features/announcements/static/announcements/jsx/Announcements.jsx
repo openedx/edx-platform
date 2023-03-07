@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { Button } from '@edx/paragon';
 import $ from 'jquery';
 
-
 class AnnouncementSkipLink extends React.Component {
     constructor(props) {
         super(props);
@@ -24,7 +23,6 @@ class AnnouncementSkipLink extends React.Component {
     }
 }
 
-
 class Announcement extends React.Component {
     render() {
         return (
@@ -40,7 +38,6 @@ class Announcement extends React.Component {
 Announcement.propTypes = {
     content: PropTypes.string.isRequired,
 };
-
 
 class AnnouncementList extends React.Component {
     constructor(props) {
@@ -123,7 +120,6 @@ class AnnouncementList extends React.Component {
         );
     }
 }
-
 
 export default class AnnouncementsView {
     constructor() {

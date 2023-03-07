@@ -545,7 +545,7 @@ describe('Container Subviews', function() {
                     ancestor_has_staff_lock: false
                 });
                 containerPage.$('.action-staff-lock').click();
-                EditHelpers.confirmPrompt(promptSpy, true);    // Click 'No' to cancel
+                EditHelpers.confirmPrompt(promptSpy, true); // Click 'No' to cancel
                 AjaxHelpers.expectNoRequests(requests);
                 verifyExplicitStaffOnly(true);
                 verifyStaffOnly(true);

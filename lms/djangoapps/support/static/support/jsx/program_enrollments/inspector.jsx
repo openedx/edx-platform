@@ -35,7 +35,6 @@ const renderUserSection = userObj => (
     </div>
 );
 
-
 const renderVerificationSection = verificationStatus => (
     <div>
         <h3>ID Verification</h3>

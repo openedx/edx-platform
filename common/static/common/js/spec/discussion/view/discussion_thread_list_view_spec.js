@@ -532,7 +532,6 @@
                 expect(messages[1].css_class).toEqual('search-alert other-class');
             });
 
-
             it('clears all search alerts', function() {
                 this.view.clearSearchAlerts();
                 this.view.addSearchAlert('foo');

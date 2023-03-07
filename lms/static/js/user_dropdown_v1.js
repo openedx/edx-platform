@@ -22,7 +22,6 @@ $(document).ready(function() {
         space: 32
     };
 
-
     // bind menu toggle click for later use
     $dropdownMenuToggle.toggle(function() {
         $dropdownMenu.addClass('expanded').find('.dropdown-menuitem').first()

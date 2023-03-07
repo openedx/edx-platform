@@ -36,7 +36,6 @@ export const selectedBlock = (state = '', action) => {
     }
 };
 
-
 export const rootBlock = (state = null, action) => {
     switch (action.type) {
     case courseBlocksActions.fetch.SUCCESS:

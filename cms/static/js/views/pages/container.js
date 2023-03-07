@@ -32,7 +32,6 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
 
         view: 'container_preview',
 
-
         defaultViewClass: ContainerView,
 
         // Overridable by subclasses-- determines whether the XBlock component
@@ -464,7 +463,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             return temporaryView.render({
                 success: function() {
                     self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
-                    temporaryView.unbind();  // Remove the temporary view
+                    temporaryView.unbind(); // Remove the temporary view
                 },
                 initRuntimeData: this
             });

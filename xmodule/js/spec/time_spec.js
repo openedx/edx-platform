@@ -1,4 +1,3 @@
-
 'use strict';
 
 import * as Time from 'time.js';

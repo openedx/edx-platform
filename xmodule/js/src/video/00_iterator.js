@@ -87,4 +87,3 @@
             return Iterator;
         });
 }(RequireJS.define));
-

@@ -245,7 +245,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         renderProviders: function(state) {
             var $transcriptProviderWrapperEl = this.$el.find('.transcript-provider-wrapper');
             if (!state) {
-                state = this.selectedProvider ? 'selected' : 'empty';   // eslint-disable-line no-param-reassign
+                state = this.selectedProvider ? 'selected' : 'empty'; // eslint-disable-line no-param-reassign
             }
 
             // If no transcription plans are sentm return.
@@ -510,7 +510,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             // show some error to user
             try {
                 errorMessage = $.parseJSON(data).error;
-            } catch (e) {}   // eslint-disable-line no-empty
+            } catch (e) {} // eslint-disable-line no-empty
             this.renderResponseStatus(errorMessage || INTERNAL_SERVER_ERROR_MESSAGE, 'error');
         },
 
@@ -572,7 +572,6 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 $languagesEl = this.$el.find('.transcript-languages-wrapper'),
                 $videoSourcelanguageEl = this.$el.find('.video-source-language-wrapper');
 
-
             // Explicit None selected case.
             if (this.selectedProvider === '') {
                 return true;
@@ -614,7 +613,6 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 $OrganizationUsernameWrapperEl,
                 isValid = true,
                 $OrganizationApiKeyWrapperEl = this.$el.find('.' + this.selectedProvider + '-api-key-wrapper');
-
 
             // Explicit None selected case.
             if (this.selectedProvider === '') {
@@ -660,10 +658,10 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     provider: self.selectedProvider,
                     cielo24_fidelity: self.selectedFidelityPlan,
                     cielo24_turnaround: self.selectedProvider === CIELO24 ? self.selectedTurnaroundPlan : '',
-                    three_play_turnaround: self.selectedProvider === THREE_PLAY_MEDIA ? self.selectedTurnaroundPlan : '',   // eslint-disable-line max-len
+                    three_play_turnaround: self.selectedProvider === THREE_PLAY_MEDIA ? self.selectedTurnaroundPlan : '', // eslint-disable-line max-len
                     preferred_languages: self.selectedLanguages,
                     video_source_language: self.selectedVideoSourceLanguage,
-                    global: false   // Do not trigger global AJAX error handler
+                    global: false // Do not trigger global AJAX error handler
                 }, function(data) {
                     responseTranscriptPreferences = data ? data.transcript_preferences : null;
                     self.updateSuccessResponseStatus(responseTranscriptPreferences);
@@ -706,7 +704,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 api_key: apiKey,
                 api_secret_key: apiSecret,
                 username: username,
-                global: false   // Do not trigger global AJAX error handler
+                global: false // Do not trigger global AJAX error handler
             }, function() {
                 self.$el.find('.organization-credentials-wrapper').hide();
 
@@ -831,7 +829,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     $courseVideoSettingsButton.width() -
                     $courseVideoSettingsButton.css('padding-left').replace('px', '') -
                     $courseVideoSettingsButton.css('padding-right').replace('px', '') -
-                    $courseVideoSettingsButton.css('border-width').replace('px', '') - 5;   // Extra pixles for slack;
+                    $courseVideoSettingsButton.css('border-width').replace('px', '') - 5; // Extra pixles for slack;
 
             // Set to windows total height
             $courseVideoSettingsContainer.css('height', $(window).height());

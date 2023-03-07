@@ -141,7 +141,6 @@ define([
         expect(that.view.$(SELECTORS.warningIcon)).not.toExist();
     };
 
-
     beforeEach(function() {
         window.course = new Course({
             id: '5',

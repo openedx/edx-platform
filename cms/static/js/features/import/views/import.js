@@ -61,7 +61,7 @@ define(
          *
          */
         var initEventListeners = function() {
-            $(window).on('beforeunload.import', function() {  // eslint-disable-line consistent-return
+            $(window).on('beforeunload.import', function() { // eslint-disable-line consistent-return
                 if (current.stage < STAGE.UNPACKING) {
                     return gettext('Your import is in progress; navigating away will abort it.');
                 }

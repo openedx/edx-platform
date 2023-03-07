@@ -201,7 +201,7 @@ describe('MoveXBlock', function() {
      * @param {any} ancestorInfo           ancestors info
      */
     renderViews = function(courseOutlineInfo, ancestorInfo) {
-        var ancestorInfo = ancestorInfo || {ancestors: []};  // eslint-disable-line no-redeclare
+        var ancestorInfo = ancestorInfo || {ancestors: []}; // eslint-disable-line no-redeclare
         modal.renderViews(courseOutlineInfo, ancestorInfo);
     };
 
@@ -286,7 +286,7 @@ describe('MoveXBlock', function() {
      * @param {any} buttonIndex     forward button index
      */
     clickForwardButton = function(buttonIndex) {
-        buttonIndex = buttonIndex || 0;  // eslint-disable-line no-param-reassign
+        buttonIndex = buttonIndex || 0; // eslint-disable-line no-param-reassign
         modal.moveXBlockListView.$el.find('[data-item-index="' + buttonIndex + '"] button').click();
     };
 
@@ -336,7 +336,7 @@ describe('MoveXBlock', function() {
             }
             clickBreadcrumbButton();
         }
-        category = nextCategory(direction, category);  // eslint-disable-line no-param-reassign
+        category = nextCategory(direction, category); // eslint-disable-line no-param-reassign
 
         verifyXBlockInfo(outlineOptions, category, buttonIndex, direction, hasCurrentLocation);
     };
@@ -365,7 +365,7 @@ describe('MoveXBlock', function() {
      * @param {Integer} sourceIndex         source index of the xblock
      */
     verifyNotificationStatus = function(requests, notificationSpy, notificationText, sourceIndex) {
-        var sourceIndex = sourceIndex || 0;  // eslint-disable-line no-redeclare
+        var sourceIndex = sourceIndex || 0; // eslint-disable-line no-redeclare
         ViewHelpers.verifyNotificationShowing(notificationSpy, notificationText);
         AjaxHelpers.respondWithJson(requests, {
             move_source_locator: sourceLocator,

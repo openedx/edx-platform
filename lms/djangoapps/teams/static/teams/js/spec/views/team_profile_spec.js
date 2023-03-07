@@ -199,7 +199,7 @@ define([
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {});
 
-                teamModel.set('membership', DEFAULT_MEMBERSHIP);  // This should re-render the view.
+                teamModel.set('membership', DEFAULT_MEMBERSHIP); // This should re-render the view.
                 view.render();
                 expect(view.$('.btn-link.new-post-btn.is-hidden').length).toEqual(0);
             });

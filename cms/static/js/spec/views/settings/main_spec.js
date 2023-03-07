@@ -67,7 +67,6 @@ define([
                 $('<script>', {id: 'basic-instructor-info-tpl', type: 'text/template'}).text(instructorInfoTpl)
             );
 
-
             this.model = new CourseDetailsModel($.extend(true, {}, modelData, {
                 instructor_info: {
                     instructors: [{name: '', title: '', organization: '', image: '', bio: ''}]

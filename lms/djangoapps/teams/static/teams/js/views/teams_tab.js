@@ -498,7 +498,6 @@
                 return this.context.userInfo.privileged || this.context.userInfo.staff;
             },
 
-
             /**
                  * Returns whether the "Manage" tab should be shown to the user.
                  */

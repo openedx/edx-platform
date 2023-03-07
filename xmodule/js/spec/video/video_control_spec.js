@@ -52,7 +52,6 @@
                     sliderEl = state.videoProgressSlider.slider;
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
                         return isFinite(duration) && duration > 0 && isFinite(state.videoPlayer.startTime);

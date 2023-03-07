@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 
 import ShowProgress from './upload_progress';
 
-
 class FileUpload extends React.Component {
     constructor(props) {
         super(props);

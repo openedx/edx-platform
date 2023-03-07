@@ -35,7 +35,6 @@ var onCertificatesReady = null;
             window.location.reload();
         });
 
-
         /**
          * Start generating certificates for all students.
          */

@@ -39,7 +39,7 @@
         MarkdownEditingDescriptor.stringInputTemplate = '= ' + // eslint-disable-line no-use-before-define
             (gettext('answer')) + '\n';
 
-        MarkdownEditingDescriptor.numberInputTemplate = '= ' +  // eslint-disable-line no-use-before-define
+        MarkdownEditingDescriptor.numberInputTemplate = '= ' + // eslint-disable-line no-use-before-define
             (gettext('answer')) + ' +- 0.001%\n';
 
         MarkdownEditingDescriptor.selectTemplate = '[[' + // eslint-disable-line no-use-before-define
@@ -304,7 +304,7 @@
 
                 // Pull out demand hints,  || a hint ||
                 demandhints = '';
-                xml = xml.replace(/(^\s*\|\|.*?\|\|\s*$\n?)+/gm, function(match) {  // $\n
+                xml = xml.replace(/(^\s*\|\|.*?\|\|\s*$\n?)+/gm, function(match) { // $\n
                     var inner,
                         options = match.split('\n');
                     for (i = 0; i < options.length; i += 1) {
@@ -361,7 +361,6 @@
                     };
                 };
 
-
                 // replace selects
                 // [[ a, b, (c) ]]
                 // [[
@@ -378,7 +377,7 @@
                 xml = xml.replace(/\[\[((.|\n)+?)\]\]/g, function(match, group1) {
                     var textHint, options, optiontag, correct, lines, optionlines, line, correctstr, hintstr, label;
                     // decide if this is old style or new style
-                    if (match.indexOf('\n') === -1) {  // OLD style, [[ .... ]]  on one line
+                    if (match.indexOf('\n') === -1) { // OLD style, [[ .... ]]  on one line
                         options = group1.split(/\,\s*/g);
                         optiontag = '  <optioninput options="(';
                         for (i = 0; i < options.length; i += 1) {
@@ -434,7 +433,7 @@
                         value, inparens, correct,
                         fixed, hint, result;
                     for (i = 0; i < options.length; i++) {
-                        options[i] = options[i].trim();                   // trim off leading/trailing whitespace
+                        options[i] = options[i].trim(); // trim off leading/trailing whitespace
                         if (options[i].length > 0) {
                             value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
                             if (!value) {
@@ -481,7 +480,7 @@
                         hint, inner, select, hints;
 
                     groupString += '  <checkboxgroup>\n';
-                    endHints = '';  // save these up to emit at the end
+                    endHints = ''; // save these up to emit at the end
 
                     for (i = 0; i < options.length; i += 1) {
                         if (options[i].trim().length > 0) {
@@ -496,7 +495,7 @@
                                 // xss-lint: disable=javascript-concat-html
                                 endHints += '    <compoundhint value="' + abhint[1].trim() + '">' + hintbody +
                                     '</compoundhint>\n';
-                                continue;  // bail
+                                continue; // bail
                             }
 
                             value = options[i].split(/^\s*\[.?\]\s*/)[1];
@@ -509,7 +508,7 @@
                             //   {unselected: Remember that apple is also a fruit.}}
                             hint = extractHint(value);
                             if (hint.hint) {
-                                inner = '{' + hint.hint + '}';  // parsing is easier if we put outer { } back
+                                inner = '{' + hint.hint + '}'; // parsing is easier if we put outer { } back
 
                                 // include \n since we are downstream of extractHint()
                                 select = /{\s*(s|selected):((.|\n)*?)}/i.exec(inner);
@@ -544,7 +543,6 @@
 
                     return groupString;
                 });
-
 
                 // replace string and numerical, numericalresponse, stringresponse
                 // A fine example of the function-composition programming style.
@@ -722,7 +720,6 @@
 
                     return processNumericalResponse(answersList) || processStringResponse(answersList);
                 });
-
 
                 // replace explanations
                 xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {

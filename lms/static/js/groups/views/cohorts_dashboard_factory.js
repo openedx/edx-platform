@@ -39,4 +39,3 @@
         };
     });
 }).call(this, define || RequireJS.define);
-

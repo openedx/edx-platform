@@ -34,8 +34,8 @@ function escapeSelector(id) {
 }
 
 var formulaEquationPreview = {
-    minDelay: 300,  // Minimum time between requests sent out.
-    errorDelay: 1500  // Wait time before showing error (prevent frustration).
+    minDelay: 300, // Minimum time between requests sent out.
+    errorDelay: 1500 // Wait time before showing error (prevent frustration).
 };
 
 /** Setup the FormulaEquationInputs and associated javascript code. */
@@ -66,10 +66,10 @@ formulaEquationPreview.enable = function() {
 
             // Store the DOM/MathJax elements in which visible output occurs.
             $preview: $preview,
-            jax: null,  // Fill this in later.
+            jax: null, // Fill this in later.
             $img: $preview.find('img.loading'),
 
-            requestCallback: null  // Fill it in in a bit.
+            requestCallback: null // Fill it in in a bit.
         };
 
         // Give callback access to `inputData` (fill in first parameter).

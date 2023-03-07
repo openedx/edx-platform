@@ -112,7 +112,6 @@ define([
         );
     };
 
-
     /**
      * Verify that the given view shows cards for each of the teams included.
      * If showTeamset is included (true or false), the test will also verify that the teamset

@@ -152,7 +152,6 @@ define(
                 });
             },
 
-
             /**
          * Returns the placeholders for the values currently displayed in the
          * editor/view.

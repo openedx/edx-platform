@@ -87,7 +87,7 @@ define(
             };
 
             createFakeTranscriptFile = function(transcriptFileName) {
-                var transcriptFileName = transcriptFileName || 'test-transcript.srt',   // eslint-disable-line no-redeclare, max-len
+                var transcriptFileName = transcriptFileName || 'test-transcript.srt', // eslint-disable-line no-redeclare, max-len
                     size = 100,
                     type = '';
                 return new File([new Blob([Array(size).join('i')], {type: type})], transcriptFileName);
@@ -215,7 +215,7 @@ define(
                 );
 
                 _.each(transcripts, function(languageCode) {
-                    $transcriptEl = videoTranscriptsView.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
+                    $transcriptEl = videoTranscriptsView.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]'); // eslint-disable-line max-len
                     // Verify correct transcript title is set.
                     expect($transcriptEl.find('.transcript-title').html()).toEqual(
                         'Video client title n_' + languageCode + '.' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT
@@ -320,7 +320,7 @@ define(
                 );
 
                 expect($('#page-prompt #prompt-warning-description').html().trim()).toEqual(
-                    'If you remove this transcript, the transcript will not be available for any components that use this video.'   // eslint-disable-line max-len
+                    'If you remove this transcript, the transcript will not be available for any components that use this video.' // eslint-disable-line max-len
                 );
 
                 // Click remove button on prompt.
@@ -406,7 +406,7 @@ define(
             it('should show error message in case of unsupported transcript file format', function() {
                 var languageCode = 'en',
                     transcriptFileName = 'unsupported-transcript-file-format.txt',
-                    errorMessage = 'This file type is not supported. Supported file type is ' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT + '.',    // eslint-disable-line max-len
+                    errorMessage = 'This file type is not supported. Supported file type is ' + TRANSCRIPT_DOWNLOAD_FILE_FORMAT + '.', // eslint-disable-line max-len
                     $transcriptEl = videoTranscriptsView.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]'); // eslint-disable-line max-len
 
                 $transcriptEl.find('.upload-transcript-button').click();

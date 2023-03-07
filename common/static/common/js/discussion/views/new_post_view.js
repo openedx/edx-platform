@@ -241,7 +241,7 @@
             NewPostView.prototype.cancel = function(event) {
                 event.preventDefault();
                 if (this.formModified()) {
-                    if (!confirm(gettext('Your post will be discarded.'))) {  // eslint-disable-line no-alert
+                    if (!confirm(gettext('Your post will be discarded.'))) { // eslint-disable-line no-alert
                         return;
                     }
                 }

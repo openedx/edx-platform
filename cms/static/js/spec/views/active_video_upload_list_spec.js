@@ -339,8 +339,8 @@ define(
                             uploadView,
                             'Your file could not be uploaded',
                             StringUtils.interpolate(
-                                '{fileName} is not in a supported file format. Supported file formats are {supportedFormats}.',  // eslint-disable-line max-len
-                                {fileName: files[index].name, supportedFormats: videoSupportedFileFormats.join(' and ')}  // eslint-disable-line max-len
+                                '{fileName} is not in a supported file format. Supported file formats are {supportedFormats}.', // eslint-disable-line max-len
+                                {fileName: files[index].name, supportedFormats: videoSupportedFileFormats.join(' and ')} // eslint-disable-line max-len
                             )
                         );
                     });

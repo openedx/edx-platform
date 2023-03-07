@@ -71,7 +71,6 @@
                 this.listenTo(this.model, 'validation', this.renderLiveValidations);
             },
 
-
             renderFields: function(fields, className) {
                 var html = [],
                     i,
@@ -371,12 +370,12 @@
             },
 
             addValidationErrorMsgForScreenReader: function($el) {
-                var $validation_node =  this.$form.find('#' + $el.attr('id') + '-validation-error');
+                var $validation_node = this.$form.find('#' + $el.attr('id') + '-validation-error');
                 $validation_node.find('.sr-only').text('ERROR:');
             },
 
             removeValidationErrorMsgForScreenReader: function($el) {
-                var $validation_node =  this.$form.find('#' + $el.attr('id') + '-validation-error');
+                var $validation_node = this.$form.find('#' + $el.attr('id') + '-validation-error');
                 $validation_node.find('.sr-only').text('');
             },
 

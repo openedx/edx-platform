@@ -443,7 +443,6 @@
             // them available and sets up their context is makeFunctionsPublic().
             // ***************************************************************
 
-
             // function bindTo(methodsDict, obj, context, rewrite)
             // Creates a new function with specific context and assigns it to the provided
             // object.
@@ -677,7 +676,7 @@
                     '0.50': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
                     0.75: '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
                     1.25: '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
-                    2.0: '1.50'   // HTML5 or Youtube HTML5 -> Youtube Flash
+                    2.0: '1.50' // HTML5 or Youtube HTML5 -> Youtube Flash
                 };
 
                 if (_.contains(this.speeds, newSpeed)) {

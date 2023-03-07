@@ -562,7 +562,6 @@ define(
             }
         });
 
-
         /**
      * Provides convenient way to upload/download files in component edit.
      * The editor uploads files directly to course assets and stores link

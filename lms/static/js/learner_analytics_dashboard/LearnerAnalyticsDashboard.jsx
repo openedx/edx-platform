@@ -140,4 +140,3 @@ export function LearnerAnalyticsDashboard(props) {
         </div>
     );
 }
-

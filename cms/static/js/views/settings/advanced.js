@@ -138,7 +138,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
             this.model.save({}, {
                 success: function() {
                     var title = gettext('Your policy changes have been saved.');
-                    var message = gettext('No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.');  // eslint-disable-line max-len
+                    var message = gettext('No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.'); // eslint-disable-line max-len
                     self.render();
                     self.showSavedBar(title, message);
                     analytics.track('Saved Advanced Settings', {

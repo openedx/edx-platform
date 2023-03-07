@@ -32,7 +32,6 @@ export default class Main extends React.Component {
             this.props.selectedBlock);
     }
 
-
     render() {
         const { selectedBlock, onSelectBlock } = this.props;
         let selectorType = <Button onClick={this.handleToggleDropdown} label={gettext('Select a section or problem')} />;
@@ -51,7 +50,6 @@ export default class Main extends React.Component {
             </span>
         </span>);
         }
-
 
         return (
             <div className="problem-browser-container">

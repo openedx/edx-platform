@@ -72,11 +72,11 @@ define(
             it('shows a confirmation popup when the remove button is clicked', function() {
                 var $el = render();
                 $el.find('a.remove-video-button').click();
-                expect($('.prompt.warning .title').text()).toEqual('Are you sure you want to remove this video from the list?');  // eslint-disable-line max-len
+                expect($('.prompt.warning .title').text()).toEqual('Are you sure you want to remove this video from the list?'); // eslint-disable-line max-len
                 expect(
                     $('.prompt.warning .message').text()
                 ).toEqual(
-                    'Removing a video from this list does not affect course content. Any content that uses a previously uploaded video ID continues to display in the course.'  // eslint-disable-line max-len
+                    'Removing a video from this list does not affect course content. Any content that uses a previously uploaded video ID continues to display in the course.' // eslint-disable-line max-len
                 );
                 expect($('.prompt.warning .action-primary').text()).toEqual('Remove');
                 expect($('.prompt.warning .action-secondary').text()).toEqual('Cancel');

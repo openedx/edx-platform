@@ -165,7 +165,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         // A does not have a drag bar (cannot change its upper limit)
         // Need to insert new bars in right place.
         GRADES: ['A', 'B', 'C', 'D'],	// defaults for new grade designators
-        descendingCutoffs: [],  // array of { designation : , cutoff : }
+        descendingCutoffs: [], // array of { designation : , cutoff : }
         gradeBarWidth: null, // cache of value since it won't change (more certain)
 
         renderCutoffBar: function() {
@@ -223,7 +223,6 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             $(event.currentTarget).toggleClass('active');
             $(event.currentTarget).siblings.toggleClass('is-shown');
         },
-
 
         startMoveClosure: function() {
         // set min/max widths

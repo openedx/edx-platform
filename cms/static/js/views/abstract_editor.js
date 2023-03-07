@@ -1,4 +1,3 @@
-
 define(['js/views/baseview', 'underscore'], function(BaseView, _) {
     var AbstractEditor = BaseView.extend({
 

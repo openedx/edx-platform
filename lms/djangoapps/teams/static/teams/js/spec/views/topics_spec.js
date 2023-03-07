@@ -55,7 +55,7 @@ define([
                 {
                     course_id: TeamSpecHelpers.testCourseID,
                     page: '1',
-                    page_size: '5',  // currently the page size is determined by the size of the collection
+                    page_size: '5', // currently the page size is determined by the size of the collection
                     order_by: 'name',
                     text_search: ''
                 }
@@ -74,7 +74,7 @@ define([
                 {
                     course_id: TeamSpecHelpers.testCourseID,
                     page: '1',
-                    page_size: '5',  // currently the page size is determined by the size of the collection
+                    page_size: '5', // currently the page size is determined by the size of the collection
                     order_by: 'name',
                     text_search: ''
                 }

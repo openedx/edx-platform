@@ -26,7 +26,6 @@ define([
         }
     };
 
-
     describe('discovery.views.RefineSidebar', function() {
         beforeEach(function() {
             loadFixtures('js/fixtures/discovery.html');
@@ -70,4 +69,3 @@ define([
         });
     });
 });
-

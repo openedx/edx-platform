@@ -66,7 +66,6 @@ define(
                 waitForEvent,
                 createVideoListView;
 
-
             var createMockAjaxServer = function() {
                 var mockServer = AjaxHelpers.server(
                     [
@@ -80,7 +79,7 @@ define(
             };
 
             beforeEach(function() {
-                var tpl = sandbox({  // eslint-disable-line no-undef
+                var tpl = sandbox({ // eslint-disable-line no-undef
                     class: 'component',
                     'data-locator': component_locator
                 });
@@ -173,7 +172,7 @@ define(
                 var $container, editor, model, videoListView;
 
                 appendSetFixtures(
-                    sandbox({  // eslint-disable-line no-undef
+                    sandbox({ // eslint-disable-line no-undef
                         class: 'wrapper-comp-settings basic_metadata_edit',
                         'data-metadata': JSON.stringify({video_url: modelStub, edx_video_id: videoIDStub})
                     })
@@ -214,7 +213,6 @@ define(
                 });
             };
 
-
             it('Initialize', function(done) {
                 var view = createVideoListView(this.mockServer),
                     callArgs;
@@ -248,7 +246,7 @@ define(
                         abstractEditor.render.calls.reset();
                         Utils.command.calls.reset();
                         MessageManager.prototype.render.calls.reset();
-                        mockServer.requests.length = 0;  // eslint-disable-line no-param-reassign
+                        mockServer.requests.length = 0; // eslint-disable-line no-param-reassign
                     };
 
                 afterEach(function() {

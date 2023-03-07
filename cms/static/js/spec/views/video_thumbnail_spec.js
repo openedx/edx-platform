@@ -12,7 +12,7 @@ define(
                 VIDEO_IMAGE_MAX_HEIGHT = 720,
                 VIDEO_IMAGE_SUPPORTED_FILE_FORMATS = {
                     '.bmp': 'image/bmp',
-                    '.bmp2': 'image/x-ms-bmp',   // PIL gives x-ms-bmp format
+                    '.bmp2': 'image/x-ms-bmp', // PIL gives x-ms-bmp format
                     '.gif': 'image/gif',
                     '.jpg': 'image/jpeg',
                     '.jpeg': 'image/jpeg',
@@ -35,9 +35,9 @@ define(
              * @param {Integer} videoViewIndex  Index of video on which videoThumbnailView would be based.
              */
             createVideoListView = function(videoImageUploadEnabled, modelData, numVideos, videoViewIndex) {
-                var modelData = modelData || {},  // eslint-disable-line no-redeclare
-                    numVideos = numVideos || 1,   // eslint-disable-line no-redeclare
-                    videoViewIndex = videoViewIndex || 0,   // eslint-disable-line no-redeclare,
+                var modelData = modelData || {}, // eslint-disable-line no-redeclare
+                    numVideos = numVideos || 1, // eslint-disable-line no-redeclare
+                    videoViewIndex = videoViewIndex || 0, // eslint-disable-line no-redeclare,
                     defaultData = {
                         client_video_id: 'foo.mp4',
                         duration: 42,
@@ -77,10 +77,9 @@ define(
                 return videoListView;
             };
 
-
             createFakeImageFile = function(size, type) {
-                var size = size || VIDEO_IMAGE_MIN_BYTES,   // eslint-disable-line no-redeclare
-                    type = type || 'image/jpeg';    // eslint-disable-line no-redeclare
+                var size = size || VIDEO_IMAGE_MIN_BYTES, // eslint-disable-line no-redeclare
+                    type = type || 'image/jpeg'; // eslint-disable-line no-redeclare
                 return new Blob([Array(size + 1).join('i')], {type: type});
             };
 

@@ -67,7 +67,6 @@ var edx = edx || {};
             }
         );
 
-
         // Generate the properties object to be passed along with business intelligence events.
         function generateProperties(element) {
             var $el = $(element),
@@ -179,7 +178,6 @@ var edx = edx || {};
                             )
                         }, true)
                     );
-
 
                     if ('data-refund-info' in dialogMessageAttr) {
                         $('#refund-info').text(dialogMessageAttr['data-refund-info']);

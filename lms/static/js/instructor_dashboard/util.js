@@ -147,7 +147,7 @@
     subjectFormatter = function(row, cell, value) {
         var subjectText;
         if (value === null) {
-            return gettext('An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.');  // eslint-disable-line max-len
+            return gettext('An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.'); // eslint-disable-line max-len
         }
         subjectText = $('<span>').text(value.subject).html();
         return edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML(

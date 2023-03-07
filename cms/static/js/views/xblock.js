@@ -114,7 +114,7 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
              * may have thrown JavaScript errors after rendering in which case the xblock parameter
              * will be null.
              */
-        xblockReady: function(xblock) {  // eslint-disable-line no-unused-vars
+        xblockReady: function(xblock) { // eslint-disable-line no-unused-vars
             // Do nothing
         },
 

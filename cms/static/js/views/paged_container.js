@@ -257,7 +257,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
         },
 
         sortDisplayName: function() {
-            return gettext('Date added');  // TODO add support for sorting
+            return gettext('Date added'); // TODO add support for sorting
         },
 
         togglePreviews: function() {

@@ -160,7 +160,6 @@ define(
                                     removeBtn = item.find('.remove-setting'),
                                     passed;
 
-
                                 upload = upload ? uploadBtn.length : !uploadBtn.length;
                                 download = download ? downloadBtn.length : !downloadBtn.length;
                                 remove = remove ? removeBtn.length : !removeBtn.length;

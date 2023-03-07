@@ -360,7 +360,6 @@ function parameterized_suite(label, globalPageOptions) {
                     promptSpy = EditHelpers.createPromptSpy();
                 });
 
-
                 clickDelete = function(componentIndex, clickNo) {
                     // find all delete buttons for the given group
                     var deleteButtons = getGroupElement().find('.delete-button');

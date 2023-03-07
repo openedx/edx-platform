@@ -146,7 +146,6 @@
                 });
             };
 
-
             this.$downloadProblemReport.click(function() {
                 var data = {problem_location: dataDownloadObj.$list_problem_responses_csv_input.val()};
                 dataDownloadObj.downloadCSV($(this), false, data);

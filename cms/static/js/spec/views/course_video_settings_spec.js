@@ -108,7 +108,7 @@ define(
                     }
                 };
 
-            renderCourseVideoSettingsView = function(activeTranscriptPreferencesData, transcriptionPlansData, transcriptOrganizationCredentialsData) {  // eslint-disable-line max-len
+            renderCourseVideoSettingsView = function(activeTranscriptPreferencesData, transcriptionPlansData, transcriptOrganizationCredentialsData) { // eslint-disable-line max-len
                 // First destroy old referance to the view if present.
                 destroyCourseVideoSettingsView();
 
@@ -158,11 +158,11 @@ define(
             };
 
             verifyProviderList = function(selectedProvider) {
-                var $transcriptProvidersListEl = $courseVideoSettingsEl.find('.transcript-provider-wrapper .transcript-provider-group');    // eslint-disable-line max-len
+                var $transcriptProvidersListEl = $courseVideoSettingsEl.find('.transcript-provider-wrapper .transcript-provider-group'); // eslint-disable-line max-len
                 // Check None provider is selected.
                 expect($transcriptProvidersListEl.find('input[type=radio]:checked').val()).toEqual(selectedProvider.value); // eslint-disable-line max-len
                 _.each(providers, function(provider, key) {
-                    $transcriptProvidersListEl.find('label[for=transcript-provider-' + key + ']').val(provider.displayName);    // eslint-disable-line max-len
+                    $transcriptProvidersListEl.find('label[for=transcript-provider-' + key + ']').val(provider.displayName); // eslint-disable-line max-len
                 });
             };
 
@@ -603,14 +603,14 @@ define(
             });
 
             it('shows provider selected view if active provider is present', function() {
-                var $selectedProviderContainerEl = $courseVideoSettingsEl.find('.transcript-provider-wrapper .selected-transcript-provider');   // eslint-disable-line max-len
+                var $selectedProviderContainerEl = $courseVideoSettingsEl.find('.transcript-provider-wrapper .selected-transcript-provider'); // eslint-disable-line max-len
                 expect($selectedProviderContainerEl.find('span').html()).toEqual(courseVideoSettingsView.selectedProvider); // eslint-disable-line max-len
                 expect($selectedProviderContainerEl.find('button.action-change-provider')).toExist();
                 // Verify provider list view is not shown.
-                expect($courseVideoSettingsEl.find('.transcript-provider-wrapper .transcript-provider-group')).not.toExist();   // eslint-disable-line max-len
+                expect($courseVideoSettingsEl.find('.transcript-provider-wrapper .transcript-provider-group')).not.toExist(); // eslint-disable-line max-len
             });
 
-            it('does not show transcript preferences or organization credentials if None provider is saved', function() {   // eslint-disable-line max-len
+            it('does not show transcript preferences or organization credentials if None provider is saved', function() { // eslint-disable-line max-len
                 renderCourseVideoSettingsView(null, transcriptionPlans);
 
                 // Check None provider
@@ -618,10 +618,10 @@ define(
                 verifyProviderList(providers.none);
 
                 // Verify selected provider view is not shown.
-                expect($courseVideoSettingsEl.find('.transcript-provider-wrapper .selected-transcript-provider')).not.toExist();    // eslint-disable-line max-len
+                expect($courseVideoSettingsEl.find('.transcript-provider-wrapper .selected-transcript-provider')).not.toExist(); // eslint-disable-line max-len
             });
 
-            it('does not show transcript preferences or organization credentials if None provider is checked', function() {  // eslint-disable-line max-len
+            it('does not show transcript preferences or organization credentials if None provider is checked', function() { // eslint-disable-line max-len
                 renderCourseVideoSettingsView(null, transcriptionPlans);
 
                 // Check None provider
@@ -629,14 +629,14 @@ define(
                 verifyProviderList(providers.none);
 
                 // Verify selected provider view is not shown.
-                expect($courseVideoSettingsEl.find('.transcript-provider-wrapper .selected-transcript-provider')).not.toExist();    // eslint-disable-line max-len
+                expect($courseVideoSettingsEl.find('.transcript-provider-wrapper .selected-transcript-provider')).not.toExist(); // eslint-disable-line max-len
                 // Verify transcript preferences are not shown.
                 expect($courseVideoSettingsEl.find('.course-video-transcript-preferances-wrapper')).not.toExist();
                 // Verify org credentials are not shown.
                 expect($courseVideoSettingsEl.find('.organization-credentials-content')).not.toExist();
             });
 
-            it('shows organization credentials when organization credentials for selected provider are not present', function() {   // eslint-disable-line max-len
+            it('shows organization credentials when organization credentials for selected provider are not present', function() { // eslint-disable-line max-len
                 renderCourseVideoSettingsView(null, transcriptionPlans);
 
                 // Check Cielo24 provider
@@ -718,7 +718,7 @@ define(
                 );
             });
 
-            it('does not show warning message when changing organization credentials if not present already', function() {  // eslint-disable-line max-len
+            it('does not show warning message when changing organization credentials if not present already', function() { // eslint-disable-line max-len
                 verifyProviderSelectedView();
                 // Click change button to render organization credentials view.
                 $courseVideoSettingsEl.find('.action-change-provider').click();
@@ -731,7 +731,7 @@ define(
                 );
             });
 
-            it('shows validation errors if no organization credentials are provided when saving credentials', function() {  // eslint-disable-line max-len
+            it('shows validation errors if no organization credentials are provided when saving credentials', function() { // eslint-disable-line max-len
                 // Set selected provider to 3Play Media
                 changeProvider('3PlayMedia');
 

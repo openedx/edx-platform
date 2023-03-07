@@ -41,7 +41,6 @@
             return (timeToExpiry > 0) ? timeToExpiry : 0;
         };
 
-
         Annotator.Plugin.Tags.prototype.updateField = _.compose(
             function() {
             // Add screen reader label for edit mode. Note that the id of the tags element will not always be "1".
@@ -203,7 +202,6 @@
             '</form>',
             '</div>'
         ].join('');
-
 
         /**
      * Modifies Annotator.Editor.show, in the case of a keydown event, to remove

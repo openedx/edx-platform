@@ -594,7 +594,7 @@
                         } else if (!fetchWithYoutubeId && state.videoType === 'html5') {
                             canFetchWithYoutubeId = self.fetchCaption(true);
                             if (canFetchWithYoutubeId) {
-                                console.log('[Video info]: Html5 mode fetching caption with youtubeId.');  // eslint-disable-line max-len, no-console
+                                console.log('[Video info]: Html5 mode fetching caption with youtubeId.'); // eslint-disable-line max-len, no-console
                             } else {
                                 self.hideCaptions(true);
                                 self.languageChooserEl.hide();
@@ -804,7 +804,7 @@
                     self.state.el.addClass('is-captions-rendered');
 
                     self.subtitlesEl
-                        .attr('aria-label', gettext('Activating a link in this group will skip to the corresponding point in the video.'));  // eslint-disable-line max-len
+                        .attr('aria-label', gettext('Activating a link in this group will skip to the corresponding point in the video.')); // eslint-disable-line max-len
 
                     self.subtitlesEl.find('.transcript-title')
                         .text(gettext('Video transcript'));
@@ -818,7 +818,7 @@
                         .attr('lang', $('html').attr('lang'));
 
                     self.container.find('.menu-container .instructions')
-                        .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.'));  // eslint-disable-line max-len
+                        .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // eslint-disable-line max-len
                 };
 
                 this.rendered = false;
@@ -836,7 +836,7 @@
                 var topSpacer = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML([
                         '<li class="spacing" style="height: {height}px">',
-                                '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>',  // eslint-disable-line max-len, indent
+                                '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>', // eslint-disable-line max-len, indent
                         '</li>'
                     ].join('')),
                     {
@@ -848,7 +848,7 @@
                 var bottomSpacer = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML([
                         '<li class="spacing" style="height: {height}px">',
-                                '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>',  // eslint-disable-line max-len, indent
+                                '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>', // eslint-disable-line max-len, indent
                         '</li>'
                     ].join('')),
                     {

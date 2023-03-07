@@ -31,4 +31,4 @@ import '../../../js/spec/views/pages/course_outline_spec.js';
 import '../../../js/spec/views/xblock_editor_spec.js';
 import '../../../js/spec/views/xblock_string_field_editor_spec.js';
 
-window.__karma__.start();  // eslint-disable-line no-underscore-dangle
+window.__karma__.start(); // eslint-disable-line no-underscore-dangle

@@ -50,7 +50,6 @@
         updateProtexField();
     };
 
-
     /* function initializeProtex() {
         //Check to see if the two exported GWT functions protexSetTargetShape
         // and protexCheckAnswer have been appended to global scope -- this

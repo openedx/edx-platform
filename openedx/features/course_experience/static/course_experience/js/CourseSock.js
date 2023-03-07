@@ -1,6 +1,6 @@
 /* globals Logger */
 
-export class CourseSock {  // eslint-disable-line import/prefer-default-export
+export class CourseSock { // eslint-disable-line import/prefer-default-export
     constructor() {
         const $toggleActionButton = $('.action-toggle-verification-sock');
         const $verificationSock = $('.verification-sock .verification-main-panel');

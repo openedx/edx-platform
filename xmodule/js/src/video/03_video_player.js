@@ -97,7 +97,6 @@
                 _updateVcrAndRegion(this);
             }
 
-
             // function _initialize(state)
             //
             //     Create any necessary DOM elements, attach them, and set their
@@ -512,7 +511,6 @@
             function onEnded() {
                 var time = this.videoPlayer.duration();
 
-
                 this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
                     end: true
                 });
@@ -660,7 +658,6 @@
                 if (this.isHtml5Mode()) {
                     this.videoPlayer.player.setPlaybackRate(this.speed);
                 }
-
 
                 var duration = this.videoPlayer.duration(),
                     time = this.videoPlayer.figureOutStartingTime(duration);

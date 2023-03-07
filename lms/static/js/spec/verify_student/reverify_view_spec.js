@@ -42,7 +42,6 @@ function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
             expect($('.' + stepName).length > 0).toBe(true);
         };
 
-
         beforeEach(function() {
             window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
             navigator.getUserMedia = jasmine.createSpy();

@@ -98,7 +98,6 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 AjaxHelpers.expectNoRequests(requests);
             });
 
-
             it("can remove a user's permission to access the library", function() {
                 var requests = AjaxHelpers.requests(this);
                 var promptSpy = ViewHelpers.createPromptSpy();

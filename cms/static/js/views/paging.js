@@ -59,7 +59,6 @@
                     return filterInfo;
                 },
 
-
                 filterDisplayName: function() {
                     var filterColumn = this.filterColumn,
                         filterInfo = this.filterableColumnInfo(filterColumn);

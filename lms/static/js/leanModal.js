@@ -1,4 +1,4 @@
-(function($) {  // eslint-disable-line wrap-iife
+(function($) { // eslint-disable-line wrap-iife
     'use strict';
     $.fn.extend({
         /*
@@ -26,7 +26,7 @@
                 );
             }
 
-            options = $.extend(defaults, options);  // eslint-disable-line no-param-reassign
+            options = $.extend(defaults, options); // eslint-disable-line no-param-reassign
 
             function closeModal(modalId, e) {
                 $('#lean_overlay').fadeOut(200);
@@ -127,7 +127,7 @@
         }
     });
 
-    $(document).ready(function($) {  // eslint-disable-line no-shadow
+    $(document).ready(function($) { // eslint-disable-line no-shadow
         $('button[rel*=leanModal]').each(function() {
             var sep, embed;
 

@@ -123,7 +123,6 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
             },
         );
 
-
         return (
             <div className="delete-confirmation-wrapper">
                 <Modal

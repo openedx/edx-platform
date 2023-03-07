@@ -328,7 +328,6 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
             });
 
-
             it('shows an appropriate cohort status message', function() {
                 var createCourseCohortSettingsNotificationView = function(is_cohorted) {
                     var notificationView = new CourseCohortSettingsNotificationView({

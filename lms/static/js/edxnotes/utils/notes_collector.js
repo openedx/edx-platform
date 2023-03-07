@@ -67,8 +67,8 @@
                 })
                 .fail(function(jqXHR) {
                     // `_action` is used by AnnotatorJS to construct error message
-                    jqXHR._action = 'search';  // eslint-disable-line no-underscore-dangle, no-param-reassign
-                    Annotator.Plugin.Store.prototype._onError(jqXHR);  // eslint-disable-line no-underscore-dangle
+                    jqXHR._action = 'search'; // eslint-disable-line no-underscore-dangle, no-param-reassign
+                    Annotator.Plugin.Store.prototype._onError(jqXHR); // eslint-disable-line no-underscore-dangle
                 })
                 .always(function() {
                     cleanup();

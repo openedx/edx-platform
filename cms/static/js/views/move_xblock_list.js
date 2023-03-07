@@ -130,7 +130,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
             this.parentInfo.category = XBlockUtils.getXBlockType(this.parentInfo.parent.get('category'));
             if (!_.contains(_.keys(this.categoryRelationMap), this.parentInfo.category)) {
                 if (this.parentInfo.category === 'split_test') {
-                    childCategory = 'group';    // This is just to show groups text on group listing.
+                    childCategory = 'group'; // This is just to show groups text on group listing.
                 }
                 this.categoryRelationMap[this.parentInfo.category] = childCategory;
             }

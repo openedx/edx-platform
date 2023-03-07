@@ -219,7 +219,6 @@
                             });
                         });
 
-
                         describe('when new speed is not available', function() {
                             beforeEach(function() {
                                 Initialize.prototype.setSpeed.call(state, '1.75');

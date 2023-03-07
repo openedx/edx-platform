@@ -26,7 +26,6 @@ const FIELD_NAMES = {
     WORK_STATUS_DESCRIPTION: "work_status_description",
 };
 
-
 class DemographicsCollectionModal extends React.Component {
     constructor(props) {
         super(props);

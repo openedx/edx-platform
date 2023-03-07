@@ -71,7 +71,6 @@
                 );
             }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
-
             submitReset: function() {
                 var _this;
 

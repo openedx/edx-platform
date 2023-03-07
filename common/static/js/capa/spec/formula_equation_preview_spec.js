@@ -199,7 +199,7 @@ describe('Formula Equation Preview', function() {
             var iter = 0;
             jasmine.waitUntil(function() {
                 inputAnother(iter++);
-                return Date.now() > end;  // Stop when we get to `end`.
+                return Date.now() > end; // Stop when we get to `end`.
             }).then(function() {
                 jasmine.waitUntil(function() {
                     return window.Problem.inputAjax.calls.count() > 0 &&

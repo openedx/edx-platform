@@ -271,7 +271,6 @@ var edx = edx || {},
             $(this.submitButton).attr('title', '');
         },
 
-
         resetByEnter: function(event) {
             if (event.keyCode == key.enter) {
                 this.reset();

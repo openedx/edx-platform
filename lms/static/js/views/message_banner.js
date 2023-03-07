@@ -36,7 +36,7 @@
                 if (_.isUndefined(this.message) || _.isNull(this.message)) {
                     this.$el.html('');
                 } else {
-                    this.$el.html(_.template(messageBannerTemplate)(_.extend(this.options, {  // xss-lint: disable=javascript-jquery-html
+                    this.$el.html(_.template(messageBannerTemplate)(_.extend(this.options, { // xss-lint: disable=javascript-jquery-html
                         message: this.message,
                         HtmlUtils: HtmlUtils
                     })));

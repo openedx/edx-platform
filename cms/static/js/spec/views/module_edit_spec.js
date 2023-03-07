@@ -1,4 +1,3 @@
-
 import $ from 'jquery';
 import ViewUtils from 'common/js/components/utils/view_utils';
 import edit_helpers from 'js/spec_helpers/edit_helpers';

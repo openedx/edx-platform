@@ -38,7 +38,6 @@
                 );
             });
 
-
             it('sends an analytics event when the user clicks enter course link', function() {
                 var $enterCourse = $('.enter-course');
                 window.edx.dashboard.trackEnterCourseLinkClicked(

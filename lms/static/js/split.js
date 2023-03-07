@@ -113,4 +113,3 @@ _split = _split || (function(undef) {
 
     return self;
 }());
-

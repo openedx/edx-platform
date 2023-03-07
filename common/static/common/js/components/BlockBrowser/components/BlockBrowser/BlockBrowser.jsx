@@ -68,7 +68,6 @@ BlockList.defaultProps = {
     selectedBlock: null,
 };
 
-
 export const BlockBrowser = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot, className }) =>
     !!blocks && (
         <div className={classNames('block-browser', className)}>

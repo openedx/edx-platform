@@ -109,7 +109,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         keyHandler: function(event) {
-            if (event.which === 27) {  // escape key
+            if (event.which === 27) { // escape key
                 this.hide();
             }
         }
@@ -184,7 +184,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('.modal-section .' + tab).show();
         }
     });
-
 
     PublishXBlockModal = CourseOutlineXBlockModal.extend({
         events: _.extend({}, CourseOutlineXBlockModal.prototype.events, {

@@ -20,7 +20,7 @@ var optimizedConfig = Merge.smart(commonConfig, {
                 'process.env.NODE_ENV': JSON.stringify('production'),
                 'process.env.JS_ENV_EXTRA_CONFIG': process.env.JS_ENV_EXTRA_CONFIG
             }),
-            new webpack.LoaderOptionsPlugin({  // This may not be needed; legacy option for loaders written for webpack 1
+            new webpack.LoaderOptionsPlugin({ // This may not be needed; legacy option for loaders written for webpack 1
                 minimize: true
             }),
             new webpack.optimize.UglifyJsPlugin(),

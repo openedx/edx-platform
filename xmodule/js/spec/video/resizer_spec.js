@@ -121,7 +121,6 @@
                         resizer = new Resizer(config);
                     });
 
-
                     it('callbacks are called', function() {
                         $.each(spiesList, function(index, spy) {
                             resizer.callbacks.add(spy);
