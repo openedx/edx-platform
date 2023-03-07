@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    Button, InputText, StatusAlert, InputSelect 
+    Button, InputText, StatusAlert, InputSelect
 } from '@edx/paragon';
 
 /*
@@ -17,7 +17,7 @@ const renderUserSection = userObj => (
             {userObj.external_user_key && (
                 <div>
                     <span className="font-weight-bold">External User Key</span>
-          : {userObj.external_user_key}
+                    : {userObj.external_user_key}
                 </div>
             )}
             {userObj.sso_list ? (
@@ -50,7 +50,7 @@ const renderVerificationSection = verificationStatus => (
             {verificationStatus.verification_expiry && (
                 <div>
                     <span className="font-weight-bold">Verification Expiration Date</span>
-          : {verificationStatus.verification_expiry}
+                    : {verificationStatus.verification_expiry}
                 </div>
             )}
         </div>
@@ -66,6 +66,7 @@ const renderEnrollmentsSection = enrollments => (
                 <h4>
                     <span className="font-weight-bold">
                         {enrollment.program_name}
+                    </span>
                     </span> Program ( <span className="font-weight-bold">
                         {enrollment.program_uuid}
                     </span>)
@@ -75,7 +76,7 @@ const renderEnrollmentsSection = enrollments => (
                 <div> <span className="font-weight-bold">Last updated</span>: {enrollment.modified} </div>
                 <div>
                     <span className="font-weight-bold">External User Key</span>
-          : {enrollment.external_user_key}
+                    : {enrollment.external_user_key}
                 </div>
                 {enrollment.program_course_enrollments && enrollment.program_course_enrollments.map(
                     programCourseEnrollment => (
@@ -87,27 +88,27 @@ const renderEnrollmentsSection = enrollments => (
                             </h4>
                             <div>
                                 <span className="font-weight-bold">Status</span>
-                : {programCourseEnrollment.status}
+                                : {programCourseEnrollment.status}
                             </div>
                             <div>
                                 <span className="font-weight-bold">Created</span>
-                : {programCourseEnrollment.created}
+                                : {programCourseEnrollment.created}
                             </div>
                             <div>
                                 <span className="font-weight-bold">Last updated</span>
-                : {programCourseEnrollment.modified}
+                                : {programCourseEnrollment.modified}
                             </div>
                             {programCourseEnrollment.course_enrollment && (
                                 <div className="ml-5">
                                     <h4>Linked course enrollment</h4>
                                     <div><span className="font-weight-bold">Course ID</span>
-                    : {programCourseEnrollment.course_enrollment.course_id}
+                                        : {programCourseEnrollment.course_enrollment.course_id}
                                     </div>
                                     <div> <span className="font-weight-bold">Is Active</span>
-                    : {String(programCourseEnrollment.course_enrollment.is_active)}
+                                        : {String(programCourseEnrollment.course_enrollment.is_active)}
                                     </div>
                                     <div> <span className="font-weight-bold">Mode / Track</span>
-                    : {programCourseEnrollment.course_enrollment.mode}
+                                        : {programCourseEnrollment.course_enrollment.mode}
                                     </div>
                                 </div>
                             )}
@@ -153,7 +154,7 @@ export const ProgramEnrollmentsInspectorPage = props => (
                 />
             )}
             <div id="input_alert" className={'alert alert-danger'} hidden>
-        Search either by edx username or email, or Institution user key, but not both
+                Search either by edx username or email, or Institution user key, but not both
             </div>
             <div key="edX_accounts">
                 <InputText

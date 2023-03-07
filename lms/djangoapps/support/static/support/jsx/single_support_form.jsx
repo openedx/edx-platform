@@ -348,7 +348,7 @@ class RenderForm extends React.Component {
                             type="button"
                             onClick={() => this.handleSearchButton(document.getElementById('query').value)}
                         >
-              Search
+                            Search
                         </button>
                     </div>
                 </div>

@@ -16,7 +16,7 @@ const Main = props => (
             open={!!props.errorMessage}
         />
         <h2>
-      Student Support: Entitlement
+            Student Support: Entitlement
         </h2>
         <MainContent
             isFormOpen={props.isFormOpen}

@@ -101,16 +101,18 @@ export function LearnerAnalyticsDashboard(props) {
                     />
                 </div>
                 <CircleChartLegend data={gradeBreakdown} />
-            </div>
+               </div>
                     }
 
                     <h3 className="section-heading">Graded Assignments</h3>
                     {/* TODO: LEARNER-3854: If implementing Learner Analytics, rename to graded-assignments-wrapper. */}
                     <div className="graded-assessments-wrapper">
-                        <GradeTable assignmentTypes={assignmentTypes}
+                        <GradeTable
+                            assignmentTypes={assignmentTypes}
                             grades={grades}
                             passingGrade={passing_grade}
-                            percentGrade={percent_grade} />
+                            percentGrade={percent_grade}
+                        />
                         <div className="footnote">* Your current grade is calculated based on all assignments, including those you have not yet completed.</div>
                     </div>
                 </div>

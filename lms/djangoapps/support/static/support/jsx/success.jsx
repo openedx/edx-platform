@@ -21,29 +21,31 @@ function Success({
         );
         btnUrl = homepageUrl;
     }
-    return (<div className="contact-us-wrapper">
-        <div className="row">
-            <div className="col-sm-12">
-                <h2>{gettext('Contact Us')}</h2>
+    return (
+        <div className="contact-us-wrapper">
+            <div className="row">
+                <div className="col-sm-12">
+                    <h2>{gettext('Contact Us')}</h2>
+                </div>
             </div>
-        </div>
 
-        <div className="row">
-            <div className="col-sm-12">
-                <p>{gettext('Thank you for submitting a request! We appreciate your patience while we work to review your request.')}</p>
+            <div className="row">
+                <div className="col-sm-12">
+                    <p>{gettext('Thank you for submitting a request! We appreciate your patience while we work to review your request.')}</p>
+                </div>
             </div>
-        </div>
 
-        <div className="row">
-            <div className="col-sm-12">
-                <a
-                    href={btnUrl}
-                    className="btn btn-secondary help-button"
-                >{btnText}
-                </a>
+            <div className="row">
+                <div className="col-sm-12">
+                    <a
+                        href={btnUrl}
+                        className="btn btn-secondary help-button"
+                    >{btnText}
+                    </a>
+                </div>
             </div>
         </div>
-    </div>);
+    );
 }
 
 Success.propTypes = {

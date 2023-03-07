@@ -26,6 +26,7 @@
   "rules": {
     "func-names": "off",
     "indent": ["error", 4],
+    "react/jsx-indent": ["error", 4],
     "new-cap": "off",
     "no-else-return": "off",
     "no-shadow": "error",
@@ -72,8 +73,7 @@
     "prefer-rest-params": "off",
     "prefer-template": "off",
     "radix": "off",
-    "react/jsx-indent": "off",
-    "react/jsx-indent-props": "off",
+    "react/jsx-indent-props": ["error", 4],
     "react/jsx-wrap-multilines": "off",
     "react/prop-types": "off",
     "semi": "off",

@@ -38,11 +38,13 @@ class CircleChart extends React.Component {
             // Should we just draw a circle?
             if (value === total) {
                 return (
-                    <circle r={radius}
+                    <circle
+                        r={radius}
                         cx={center}
                         cy={center}
                         className="slice-1"
-                        key={index} />
+                        key={index}
+                    />
                 );
             }
 
@@ -78,11 +80,14 @@ class CircleChart extends React.Component {
             lastX = nextX;
             lastY = nextY;
 
-            return <path d={d}
+            // eslint-disable-next-line react/jsx-indent
+            return <path
+                d={d}
                 className={`slice-${sliceIndex}`}
                 key={index}
                 stroke={strokeColor}
-                strokeWidth={strokeWidth} />;
+                strokeWidth={strokeWidth}
+            />;
         });
     }
 

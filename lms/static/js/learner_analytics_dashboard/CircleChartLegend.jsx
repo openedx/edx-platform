@@ -14,8 +14,10 @@ class CircleChartLegend extends React.Component {
             const swatchClass = `swatch-${sliceIndex}`;
             return (
                 <li className="legend-item" key={index}>
-                    <div className={classNames('color-swatch', swatchClass)}
-                        aria-hidden="true"></div>
+                    <div
+                        className={classNames('color-swatch', swatchClass)}
+                        aria-hidden="true"
+                    />
                     <span className="label">{label}</span>
                     <span className="percentage">{this.getPercentage(value)}</span>
                 </li>

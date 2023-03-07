@@ -156,7 +156,7 @@ class LibrarySourcedBlockPicker extends React.Component {
                     <div className="message has-warnings" style={{margin: 0, color: 'white'}}>
                         <p className="warning">
                             <span className="icon fa fa-warning" aria-hidden="true"></span>
-                Hitting 'Save and Import' will import the latest versions of the selected blocks, overwriting any changes done to this block post-import.
+                            Hitting 'Save and Import' will import the latest versions of the selected blocks, overwriting any changes done to this block post-import.
                         </p>
                     </div>
                 </div>
