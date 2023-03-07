@@ -168,7 +168,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
         # defined with a date, otherwise cause a validation error.
         form = self._admin_form("verified", expiration_datetime_is_explicit=True)
         self._assert_form_has_error(form, (
-            "An upgrade deadline must be specified when setting Expiration datetime is explicit to True."
+            "An upgrade deadline must be specified when setting Lock upgrade deadline date to True."
         ))
 
     @ddt.data("honor", "no-id-professional", "credit")
