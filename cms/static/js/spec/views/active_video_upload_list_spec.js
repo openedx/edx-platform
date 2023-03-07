@@ -352,7 +352,7 @@ define(
                     [
                         {desc: 'larger than', additionalBytes: 1},
                         {desc: 'equal to', additionalBytes: 0},
-                        {desc: 'smaller than', additionalBytes: - 1}
+                        {desc: 'smaller than', additionalBytes: -1}
                     ],
                     function(caseInfo) {
                         it(caseInfo.desc + 'max file size', function() {

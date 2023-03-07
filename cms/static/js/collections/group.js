@@ -40,7 +40,7 @@ function(_, str, Backbone, gettext, GroupModel) {
 
             do {
                 name = str.sprintf(gettext('Group %s'), this.getGroupId(index));
-                index ++;
+                index++;
             } while (_.contains(usedNames, name));
 
             return name;

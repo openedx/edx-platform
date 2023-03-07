@@ -188,7 +188,7 @@
             * params:
             *   'position' can be any sequence position.
             */
-            return typeof(this.updatedProblems[position]) !== 'undefined';
+            return typeof (this.updatedProblems[position]) !== 'undefined';
         };
 
         Sequence.prototype.enableButton = function(buttonClass, buttonAction) {

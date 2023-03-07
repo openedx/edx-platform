@@ -394,7 +394,7 @@ var Channel = (function() {
 
             /* browser capabilities check */
             if (!window.postMessage) { throw ('jschannel cannot run this browser, no postMessage'); }
-            if (!window.JSON || !window.JSON.stringify || ! window.JSON.parse) {
+            if (!window.JSON || !window.JSON.stringify || !window.JSON.parse) {
                 throw ('jschannel cannot run this browser, no JSON parsing/serialization');
             }
 
@@ -579,7 +579,7 @@ var Channel = (function() {
                                     message = JSON.stringify(e);
                                     /* On MSIE8, this can result in 'out of memory', which
                                      * leaves message undefined. */
-                                    if (typeof(message) === 'undefined') { message = e.toString(); }
+                                    if (typeof (message) === 'undefined') { message = e.toString(); }
                                 } catch (e2) {
                                     message = e.toString();
                                 }

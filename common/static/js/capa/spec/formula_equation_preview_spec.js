@@ -211,7 +211,7 @@ describe('Formula Equation Preview', function() {
                     expect(window.Problem.inputAjax.calls.count()).not.toBeGreaterThan(3);
 
                     // The calls should happen approximately `minDelay` apart.
-                    for (var i = 1; i < this.ajaxTimes.length; i ++) {
+                    for (var i = 1; i < this.ajaxTimes.length; i++) {
                         var diff = this.ajaxTimes[i] - this.ajaxTimes[i - 1];
                         expect(diff).toBeGreaterThan(minDelay - 10);
                     }

@@ -129,7 +129,7 @@ define(
             checkExtValidity: function(file) {
                 var fileExtension;
                 if (!file.name) {
-                    return void(0);
+                    return void (0);
                 }
 
                 fileExtension = file.name

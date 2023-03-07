@@ -73,7 +73,6 @@
     "prefer-template": "off",
     "radix": "off",
     "react/jsx-indent-props": ["error", 4],
-    "react/jsx-wrap-multilines": "off",
     "react/prop-types": "off",
     "semi": "off",
     "vars-on-top": "off"
