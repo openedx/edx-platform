@@ -7,7 +7,6 @@
 
 (function() {
     'use strict';
-
     var indexOfHelper = [].indexOf
         || function(item) {
             var i, len;
