@@ -390,7 +390,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
                 useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
 
-            //find the block type in the locator if availible
+            // find the block type in the locator if availible
             if(data.hasOwnProperty('locator')){
                 var matchBlockTypeFromLocator = /\@(.*?)\+/;
                 var blockType = data.locator.match(matchBlockTypeFromLocator);

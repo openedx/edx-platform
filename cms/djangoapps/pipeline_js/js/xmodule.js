@@ -55,7 +55,7 @@ define(
          * The module should be used until we'll use RequireJS for XModules.
          * @param {Array} modules A list of urls.
          * @return {jQuery Promise}
-         **/
+         * */
         function requireQueue(modules) {
             var deferred = $.Deferred();
             function loadScript(queue) {

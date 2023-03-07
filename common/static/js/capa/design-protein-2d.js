@@ -10,7 +10,7 @@
         }
         /* if (typeof(protex) !== "undefined") {
             //initializeProtex();
-        }*/
+        } */
         else {
             setTimeout(function() { waitForProtex(); }, timeout);
         }
@@ -81,5 +81,5 @@
         else {
             setTimeout(function() {initializeProtex(); }, timeout);
         }
-    }*/
+    } */
 }).call(this);

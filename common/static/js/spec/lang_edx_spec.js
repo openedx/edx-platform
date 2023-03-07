@@ -1,4 +1,4 @@
-/* global Language:true*/
+/* global Language:true */
 (function() {
     'use strict';
     describe('Language change test for lang-edx.js', function() {

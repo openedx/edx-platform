@@ -6,7 +6,7 @@ define(
     function($, _, gettext, moment, HtmlUtils) {
         'use strict';
 
-        /** ******** Private properties ****************************************/
+        /** ******** Private properties *************************************** */
 
         var COOKIE_NAME = 'lastimportupload';
 
@@ -37,7 +37,7 @@ define(
 
         var CourseImport;
 
-        /** ******** Private functions *****************************************/
+        /** ******** Private functions **************************************** */
 
         /**
          * Destroys any event listener Import might have needed
@@ -218,7 +218,7 @@ define(
             deferred.resolve();
         };
 
-        /** ******** Public functions ******************************************/
+        /** ******** Public functions ***************************************** */
 
         CourseImport = {
 

@@ -150,7 +150,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                 error: function(model, response, options) {
                     var jsonResponse;
 
-                    /* Check that the server came back with a bad request error*/
+                    /* Check that the server came back with a bad request error */
                     if (response.status === 400) {
                         jsonResponse = $.parseJSON(response.responseText);
                         self.showErrorModal(jsonResponse);

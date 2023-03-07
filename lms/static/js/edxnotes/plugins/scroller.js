@@ -4,7 +4,7 @@
     /**
      * Adds the Scroller Plugin which scrolls to a note with a certain id and
      * opens it.
-     **/
+     * */
         Annotator.Plugin.Scroller = function() {
         // Call the Annotator.Plugin constructor this sets up the element and
         // options properties.

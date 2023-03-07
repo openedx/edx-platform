@@ -7,7 +7,7 @@ define([
 ], function($, _, gettext, moment, PromptView, HtmlUtils) {
     'use strict';
 
-    /** ******** Private properties ****************************************/
+    /** ******** Private properties *************************************** */
 
     var COOKIE_NAME = 'lastexport';
 
@@ -39,7 +39,7 @@ define([
         wrapper: $('div.wrapper-status')
     };
 
-    /** ******** Private functions *****************************************/
+    /** ******** Private functions **************************************** */
 
     /**
      * Makes Export feedback status list visible
@@ -181,7 +181,7 @@ define([
         }), {path: window.location.pathname});
     };
 
-    /** ******** Public functions ******************************************/
+    /** ******** Public functions ***************************************** */
 
     var CourseExport = {
         /**

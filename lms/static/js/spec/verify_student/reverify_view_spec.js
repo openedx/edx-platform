@@ -1,6 +1,6 @@
 /**
 * Tests for the reverification view.
-**/
+* */
 define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/views/review_photos_step_view',
     'js/verify_student/views/reverify_view'],
 function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {

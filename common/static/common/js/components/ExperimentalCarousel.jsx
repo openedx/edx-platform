@@ -3,7 +3,7 @@ import Slider from 'react-slick';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-/** Experimental Carousel as part of https://openedx.atlassian.net/browse/LEARNER-3583 **/
+/** Experimental Carousel as part of https://openedx.atlassian.net/browse/LEARNER-3583 * */
 
 function NextArrow(props) {
     const {

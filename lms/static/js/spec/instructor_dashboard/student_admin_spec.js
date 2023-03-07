@@ -1,4 +1,4 @@
-/* globals _, interpolate_text, statusAjaxError, PendingInstructorTasks, createTaskListTable*/
+/* globals _, interpolate_text, statusAjaxError, PendingInstructorTasks, createTaskListTable */
 define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function($, StudentAdmin, AjaxHelpers) {
         // 'js/instructor_dashboard/student_admin'
