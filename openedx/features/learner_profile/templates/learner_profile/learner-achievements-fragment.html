@@ -1,0 +1,69 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<div class="learner-achievements">
+    % if course_certificates or own_profile:
+        <h3 class="u-field-title">Course Certificates</h3>
+        % if course_certificates:
+            % for certificate in course_certificates:
+                <%
+                course = certificate['course']
+
+                completion_date_message_html = Text(_('Completed {completion_date_html}')).format(
+                    completion_date_html=HTML(
+                        '<span'
+                        '    class="localized-datetime start-date"'
+                        '    data-datetime="{completion_date}"'
+                        '    data-format="shortDate"'
+                        '    data-timezone="{user_timezone}"'
+                        '    data-language="{user_language}"'
+                        '></span>'
+                    ).format(
+                        completion_date=certificate['created'],
+                        user_timezone=user_timezone,
+                        user_language=user_language,
+                    ),
+                )
+                %>
+                <div class="card certificate-card mode-${certificate['type']}">
+                    <div class="card-logo">
+                        <h4 class="sr-only">
+                            ${_('{course_mode} certificate').format(
+                                course_mode=certificate['type'],
+                            )}
+                        </h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-supertitle">${course.display_org_with_default}</div>
+                        <div class="card-title">${course.display_name_with_default}</div>
+                        <p class="card-text">${completion_date_message_html}</p>
+                    </div>
+                </div>
+            % endfor
+        % elif own_profile:
+            <div class="learner-message">
+                <h4 class="message-header">${_("You haven't earned any certificates yet.")}</h4>
+                % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+                    <p class="message-actions">
+                        <a class="btn btn-brand" href="${marketing_link('COURSES')}">
+                            <span class="icon fa fa-search" aria-hidden="true"></span>
+                            ${_('Explore New Courses')}
+                        </a>
+                    </p>
+                % endif
+            </div>
+        % endif
+    % endif
+</div>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform('.localized-datetime');
+</%static:require_module_async>

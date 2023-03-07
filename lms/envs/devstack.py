@@ -375,7 +375,6 @@ EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
 ############## Settings for Microfrontends  #########################
 LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
 ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
-PROFILE_MICROFRONTEND_URL = 'http://localhost:1995'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
