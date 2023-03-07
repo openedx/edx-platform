@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
- Button, InputText, StatusAlert, InputSelect 
+    Button, InputText, StatusAlert, InputSelect 
 } from '@edx/paragon';
 
 /*

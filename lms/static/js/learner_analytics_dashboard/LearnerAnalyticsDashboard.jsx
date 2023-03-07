@@ -44,7 +44,7 @@ function getAssignmentCounts(types, assignments) {
 }
 
 function getStreakIcons(count) {
-    return Array.apply(null, { length: count }).map((e, i) => (
+    return Array.apply(null, {length: count}).map((e, i) => (
         <span className="fa fa-trophy" aria-hidden="true" key={i}></span>
     ));
 }
@@ -62,8 +62,8 @@ function getStreakString(count) {
 
 export function LearnerAnalyticsDashboard(props) {
     const {
-grading_policy, grades, schedule, schedule_raw, week_streak, weekly_active_users, discussion_info, profile_images, passing_grade, percent_grade
-} = props;
+        grading_policy, grades, schedule, schedule_raw, week_streak, weekly_active_users, discussion_info, profile_images, passing_grade, percent_grade
+    } = props;
     const gradeBreakdown = grading_policy.GRADER.map(({type, weight}, index) => {
         return {
             value: weight,

@@ -7,8 +7,8 @@ import PropTypes from 'prop-types';
 
 function NextArrow(props) {
     const {
-currentSlide, slideCount, onClick, displayedSlides
-} = props;
+        currentSlide, slideCount, onClick, displayedSlides
+    } = props;
     const showArrow = slideCount - currentSlide > displayedSlides;
     const opts = {
         className: classNames('js-carousel-nav', 'carousel-arrow', 'next', 'btn btn-secondary', {'active': showArrow}),
@@ -65,11 +65,11 @@ export default class ExperimentalCarousel extends React.Component {
     }
 
     afterChange(activeIndex) {
-        this.setState({ activeIndex });
+        this.setState({activeIndex});
     }
 
     componentDidUpdate() {
-        const { activeIndex } = this.state;
+        const {activeIndex} = this.state;
 
         if (!isNaN(activeIndex)) {
             this.carousels[activeIndex].focus();

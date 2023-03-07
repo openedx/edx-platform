@@ -210,7 +210,7 @@ describe('Container Subviews', function() {
             expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
             fetch({
-published: true, has_changes: false, visibility_state: VisibilityState.live,
+                published: true, has_changes: false, visibility_state: VisibilityState.live,
                 release_date: 'Jul 02, 1990 at 14:20 UTC'
             });
             expect(containerPage.$(headerCss).text()).toContain('Published and Live');
@@ -220,7 +220,7 @@ published: true, has_changes: false, visibility_state: VisibilityState.live,
             expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
             fetch({
-published: true, has_changes: false, visibility_state: VisibilityState.unscheduled,
+                published: true, has_changes: false, visibility_state: VisibilityState.unscheduled,
                 release_date: null
             });
             expect(containerPage.$(headerCss).text()).toContain('Published (not yet released)');

@@ -151,14 +151,14 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 url: certificateExceptionUrl + addStudents,
                 postData: [
                     {
-user_id: '',
+                        user_id: '',
                         user_name: 'test3',
                         user_email: '',
                         created: '',
                         notes: 'test3 notes',
                         certificate_generated: '',
                         new: true
-}
+                    }
                 ]
             };
             AjaxHelpers.expectJsonRequest(requests, 'POST', expected.url, expected.postData);

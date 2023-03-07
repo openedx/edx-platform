@@ -10,8 +10,8 @@ class ReactRendererException extends Error {
 
 export class ReactRenderer {
     constructor({
- component, selector, componentName, props = {} 
-}) {
+        component, selector, componentName, props = {} 
+    }) {
         Object.assign(this, {
             component,
             selector,

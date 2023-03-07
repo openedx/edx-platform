@@ -49,8 +49,8 @@ define([
                 learning_info: [''],
                 instructor_info: {
                     instructors: [{
-name: '', title: '', organization: '', image: '', bio: ''
-}]
+                        name: '', title: '', organization: '', image: '', bio: ''
+                    }]
                 },
                 self_paced: false
             },
@@ -72,10 +72,10 @@ name: '', title: '', organization: '', image: '', bio: ''
             this.model = new CourseDetailsModel($.extend(true, {}, modelData, {
                 instructor_info: {
                     instructors: [{
-name: '', title: '', organization: '', image: '', bio: ''
-}]
+                        name: '', title: '', organization: '', image: '', bio: ''
+                    }]
                 }
-}), {parse: true});
+            }), {parse: true});
             this.model.urlRoot = urlRoot;
             this.view = new MainView({
                 el: $('.settings-details'),

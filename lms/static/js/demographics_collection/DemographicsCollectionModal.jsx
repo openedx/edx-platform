@@ -3,8 +3,8 @@ import React from 'react';
 import get from 'lodash/get';
 import Wizard from './Wizard';
 import Cookies from 'js-cookie';
-import { SelectWithInput } from './SelectWithInput'
-import { MultiselectDropdown } from './MultiselectDropdown';
+import {SelectWithInput} from './SelectWithInput'
+import {MultiselectDropdown} from './MultiselectDropdown';
 import AxiosJwtTokenService from '../jwt_auth/AxiosJwtTokenService';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import AxiosCsrfTokenService from '../jwt_auth/AxiosCsrfTokenService';
@@ -75,7 +75,7 @@ class DemographicsCollectionModal extends React.Component {
         const options = await this.getDemographicsQuestionOptions();
         // gather previously answers questions
         const data = await this.getDemographicsData();
-        this.setState({ options: options.actions.POST, loading: false, selected: data });
+        this.setState({options: options.actions.POST, loading: false, selected: data});
     }
 
     componentWillUnmount() {
@@ -84,7 +84,7 @@ class DemographicsCollectionModal extends React.Component {
     }
 
     loadOptions(field) {
-        const { choices } = get(this.state.options, field, { choices: [] });
+        const {choices} = get(this.state.options, field, {choices: []});
         if (choices.length) {
             return choices.map((choice, i) => <option value={choice.value} key={choice.value + i}>{choice.display_name}</option>);
         }
@@ -110,7 +110,7 @@ class DemographicsCollectionModal extends React.Component {
             await this.jwtTokenService.getJwtToken();
             await fetch(url, options)
         } catch (error) {
-            this.setState({ loading: false, fieldError: true, errorMessage: error });
+            this.setState({loading: false, fieldError: true, errorMessage: error});
         }
 
         if (name === 'user_ethnicity') {
@@ -126,16 +126,16 @@ class DemographicsCollectionModal extends React.Component {
 
     handleMultiselectChange(values) {
         const decline = values.find(i => i === 'declined');
-        this.setState(({ selected }) => {
+        this.setState(({selected}) => {
             // decline was previously selected
             if (selected[FIELD_NAMES.ETHNICITY].find(i => i === 'declined')) {
-                return { selected: { ...selected, [FIELD_NAMES.ETHNICITY]: values.filter(value => value !== 'declined') } }
+                return {selected: {...selected, [FIELD_NAMES.ETHNICITY]: values.filter(value => value !== 'declined')}}
                 // decline was just selected
             } else if (decline) {
-                return { selected: { ...selected, [FIELD_NAMES.ETHNICITY]: [decline] } }
+                return {selected: {...selected, [FIELD_NAMES.ETHNICITY]: [decline]}}
                 // anything else was selected
             } else {
-                return { selected: { ...selected, [FIELD_NAMES.ETHNICITY]: values } }
+                return {selected: {...selected, [FIELD_NAMES.ETHNICITY]: values}}
             }
         });
     }
@@ -174,11 +174,11 @@ class DemographicsCollectionModal extends React.Component {
     // We gather the possible answers to any demographics questions from the OPTIONS of the api
     async getDemographicsQuestionOptions() {
         try {
-            const optionsResponse = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, { method: 'OPTIONS' })
+            const optionsResponse = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, {method: 'OPTIONS'})
             const demographicsOptions = await optionsResponse.json();
             return demographicsOptions;
         } catch (error) {
-            this.setState({ loading: false, error: true, errorMessage: error });
+            this.setState({loading: false, error: true, errorMessage: error});
         }
     }
 
@@ -198,7 +198,7 @@ class DemographicsCollectionModal extends React.Component {
             response = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`, requestOptions);
         } catch (e) {
             // an error other than "no entry found" occured
-            this.setState({ loading: false, error: true, errorMessage: e });
+            this.setState({loading: false, error: true, errorMessage: e});
         }
         // an entry was not found in demographics, so we need to create one
         if (response.status === 404) {
@@ -234,7 +234,7 @@ class DemographicsCollectionModal extends React.Component {
             const data = await postResponse.json();
             return data;
         } catch (e) {
-            this.setState({ loading: false, error: true, errorMessage: e });
+            this.setState({loading: false, error: true, errorMessage: e});
         }
     }
 
@@ -248,11 +248,11 @@ class DemographicsCollectionModal extends React.Component {
                     <Wizard
                         onWizardComplete={this.props.closeModal}
                         dismissBanner={this.props.dismissBanner}
-                        wizardContext={{ ...this.state.selected, options: this.state.options }}
+                        wizardContext={{...this.state.selected, options: this.state.options}}
                         error={this.state.error}
                     >
                         <Wizard.Header>
-                            {({ currentPage, totalPages }) => (
+                            {({currentPage, totalPages}) => (
                                 <div>
                                     <p className="font-weight-light">
                                         {StringUtils.interpolate(
@@ -282,7 +282,7 @@ class DemographicsCollectionModal extends React.Component {
                             )}
                         </Wizard.Header>
                         <Wizard.Page>
-                            {({ wizardConsumer }) =>
+                            {({wizardConsumer}) =>
                                 <div className="demographics-form-container" data-hj-suppress>
                                     {/* Gender Identity */}
                                     <SelectWithInput
@@ -308,7 +308,7 @@ class DemographicsCollectionModal extends React.Component {
                                     <MultiselectDropdown
                                         label={gettext('Which of the following describes you best?')}
                                         emptyLabel={gettext('Check all that apply')}
-                                        options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, { choices: [] }).choices}
+                                        options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, {choices: []}).choices}
                                         selected={wizardConsumer[FIELD_NAMES.ETHNICITY]}
                                         onChange={this.handleMultiselectChange}
                                         disabled={this.state.fieldError}
@@ -318,7 +318,7 @@ class DemographicsCollectionModal extends React.Component {
                                             const e = {
                                                 target: {
                                                     name: FIELD_NAMES.ETHNICITY,
-                                                    value: wizardConsumer[FIELD_NAMES.ETHNICITY].map(ethnicity => ({ ethnicity, value: ethnicity })),
+                                                    value: wizardConsumer[FIELD_NAMES.ETHNICITY].map(ethnicity => ({ethnicity, value: ethnicity})),
                                                 }
                                             }
                                             this.handleSelectChange(e);
@@ -346,7 +346,7 @@ class DemographicsCollectionModal extends React.Component {
                             }
                         </Wizard.Page>
                         <Wizard.Page>
-                            {({ wizardConsumer }) =>
+                            {({wizardConsumer}) =>
                                 <div className="demographics-form-container" data-hj-suppress>
                                     {/* Military History */}
                                     <div className="d-flex flex-column pb-3">
@@ -372,7 +372,7 @@ class DemographicsCollectionModal extends React.Component {
                             }
                         </Wizard.Page>
                         <Wizard.Page>
-                            {({ wizardConsumer }) =>
+                            {({wizardConsumer}) =>
                                 <div className="demographics-form-container" data-hj-suppress>
                                     {/* Learner Education Level */}
                                     <div className="d-flex flex-column pb-3">
@@ -418,7 +418,7 @@ class DemographicsCollectionModal extends React.Component {
                             }
                         </Wizard.Page>
                         <Wizard.Page>
-                            {({ wizardConsumer }) =>
+                            {({wizardConsumer}) =>
                                 <div className="demographics-form-container" data-hj-suppress>
                                     {/* Employment Status */}
                                     <SelectWithInput
@@ -501,4 +501,4 @@ class DemographicsCollectionModal extends React.Component {
     }
 }
 
-export { DemographicsCollectionModal };
+export {DemographicsCollectionModal};

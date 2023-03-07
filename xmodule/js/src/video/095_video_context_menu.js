@@ -638,8 +638,8 @@
                             items: _.map(state.speeds, function(speed) {
                                 var isSelected = parseFloat(speed) === state.speed;
                                 return {
-label: speed + 'x', callback: speedCallback, speed: speed, isSelected: isSelected
-};
+                                    label: speed + 'x', callback: speedCallback, speed: speed, isSelected: isSelected
+                                };
                             }),
                             initialize: function(menuitem) {
                                 state.el.on({

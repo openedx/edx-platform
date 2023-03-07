@@ -495,8 +495,8 @@ describe('MoveXBlock', function() {
 
     it('renders views with correct information', function() {
         var outlineOptions = {
-section: 1, subsection: 1, unit: 1, component: 1
-},
+                section: 1, subsection: 1, unit: 1, component: 1
+            },
             outline = createCourseOutline(outlineOptions);
 
         renderViews(outline, xblockAncestorInfo);
@@ -506,8 +506,8 @@ section: 1, subsection: 1, unit: 1, component: 1
 
     it('shows correct behavior on breadcrumb navigation', function() {
         var outline = createCourseOutline({
-section: 1, subsection: 1, unit: 1, component: 1
-});
+            section: 1, subsection: 1, unit: 1, component: 1
+        });
 
         renderViews(outline);
         _.each(_.range(3), function() {
@@ -524,8 +524,8 @@ section: 1, subsection: 1, unit: 1, component: 1
 
     it('shows the correct current location', function() {
         var outlineOptions = {
-section: 2, subsection: 2, unit: 2, component: 2
-},
+                section: 2, subsection: 2, unit: 2, component: 2
+            },
             outline = createCourseOutline(outlineOptions);
         renderViews(outline, xblockAncestorInfo);
         verifyXBlockInfo(outlineOptions, 'section', 0, 'forward', true);

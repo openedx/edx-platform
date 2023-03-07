@@ -62,7 +62,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                 mode: 'application/json',
                 lineNumbers: false,
                 lineWrapping: false
-});
+            });
             cm.on('change', function(instance, changeobj) {
                 instance.save();
                 // this event's being called even when there's no change :-(
@@ -177,10 +177,10 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
         renderTemplate: function(key, model) {
             var newKeyId = _.uniqueId('policy_key_'),
                 newEle = this.template({
-key: key, display_name: model.display_name, help: model.help,
+                    key: key, display_name: model.display_name, help: model.help,
                     value: JSON.stringify(model.value, null, 4), deprecated: model.deprecated,
                     keyUniqueId: newKeyId, valueUniqueId: _.uniqueId('policy_value_'), hidden: model.hidden
-});
+                });
 
             this.fieldToSelectorMap[key] = newKeyId;
             this.selectorToField[newKeyId] = key;

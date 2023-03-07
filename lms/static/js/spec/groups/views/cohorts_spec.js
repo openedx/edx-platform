@@ -333,7 +333,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     var notificationView = new CourseCohortSettingsNotificationView({
                         el: $('.cohort-state-message'),
                         cohortEnabled: is_cohorted
-});
+                    });
                     notificationView.render();
                     return notificationView;
                 };
@@ -608,9 +608,9 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 AjaxHelpers.respondWithJson(
                     requests,
                     _.extend({
-unknown: [], added: [], present: [], changed: [], not_allowed: [],
+                        unknown: [], added: [], present: [], changed: [], not_allowed: [],
                         success: true, preassigned: [], invalid: []
-}, result)
+                    }, result)
                 );
             };
 
@@ -701,13 +701,13 @@ unknown: [], added: [], present: [], changed: [], not_allowed: [],
                     'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')
                 );
                 respondToAdd({
-unknown: [
-                    'unknown1',
-                    'unknown2',
-                    'unknown3',
-                    'unknown4',
-                    'unknown5',
-                    'unknown6']
+                    unknown: [
+                        'unknown1',
+                        'unknown2',
+                        'unknown3',
+                        'unknown4',
+                        'unknown5',
+                        'unknown6']
                 });
                 respondToRefresh(catLoversInitialCount + 6, dogLoversInitialCount);
                 verifyDetailedMessage('6 learners could not be added to this cohort:', 'error',
@@ -741,14 +741,14 @@ unknown: [
                 respondToAdd({
                     changed: [
                         {
-email: 'moved1@sample.com', name: 'moved1', previous_cohort: 'cohort 2', username: 'moved1'
-},
+                            email: 'moved1@sample.com', name: 'moved1', previous_cohort: 'cohort 2', username: 'moved1'
+                        },
                         {
-email: 'moved2@sample.com', name: 'moved2', previous_cohort: 'cohort 2', username: 'moved2'
-},
+                            email: 'moved2@sample.com', name: 'moved2', previous_cohort: 'cohort 2', username: 'moved2'
+                        },
                         {
-email: 'moved3@sample.com', name: 'moved3', previous_cohort: 'cohort 3', username: 'moved3'
-}
+                            email: 'moved3@sample.com', name: 'moved3', previous_cohort: 'cohort 3', username: 'moved3'
+                        }
                     ],
                     present: ['alreadypresent@sample.com']
                 });
@@ -849,8 +849,8 @@ email: 'moved3@sample.com', name: 'moved3', previous_cohort: 'cohort 3', usernam
                     createCohortsView(this, {
                         cohorts: [
                             {
-id: 1, name: 'Cat Lovers', group_id: 0, assignment_type: MOCK_MANUAL_ASSIGNMENT
-}
+                                id: 1, name: 'Cat Lovers', group_id: 0, assignment_type: MOCK_MANUAL_ASSIGNMENT
+                            }
                         ],
                         selectCohort: 1
                     });

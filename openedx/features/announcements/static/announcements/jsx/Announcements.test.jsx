@@ -2,7 +2,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import testAnnouncements from './test-announcements.json'
 
-import { AnnouncementSkipLink, AnnouncementList } from './Announcements'
+import {AnnouncementSkipLink, AnnouncementList} from './Announcements'
 
 describe('Announcements component', () => {
     test('render skip link', () => {

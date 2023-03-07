@@ -33,7 +33,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#course-organization').val(this.model.get('org'));
             this.$el.find('#course-number').val(this.model.get('course_id'));
             this.$el.find('#course-name').val(this.model.get('run'));
-            this.$el.find('.set-date').datepicker({ dateFormat: 'm/d/yy' });
+            this.$el.find('.set-date').datepicker({dateFormat: 'm/d/yy'});
             this.$el.find('#certificates-display-behavior').val(this.model.get('certificates_display_behavior'));
             this.updateCertificatesDisplayBehavior();
 
@@ -423,7 +423,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 },
                 reset: true,
                 silent: true
-});
+            });
         },
         setAndValidate: function(attr, value) {
         // If we call model.set() with {validate: true}, model fields

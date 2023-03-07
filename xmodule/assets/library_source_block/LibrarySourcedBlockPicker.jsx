@@ -220,4 +220,4 @@ LibrarySourcedBlockPicker.defaultProps = {
     selectedXblocks: [],
 };
 
-export { LibrarySourcedBlockPicker }; // eslint-disable-line import/prefer-default-export
+export {LibrarySourcedBlockPicker}; // eslint-disable-line import/prefer-default-export

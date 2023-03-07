@@ -130,9 +130,9 @@ describe('Formula Equation Preview', function() {
                 'THE_ID',
                 'preview_formcalc',
                 {
-formula: 'PREFILLED_VALUE',
+                    formula: 'PREFILLED_VALUE',
                     request_start: jasmine.any(Number)
-},
+                },
                 jasmine.any(Function)
             ]);
         });

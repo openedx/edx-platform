@@ -44,9 +44,9 @@
 
                 // Create a discussion model
                 discussion = new Discussion(threads, {
-pages: threadPages, sort: sortPreference,
+                    pages: threadPages, sort: sortPreference,
                     is_commentable_divided: isCommentableDivided
-});
+                });
                 courseSettings = new DiscussionCourseSettings(options.courseSettings);
 
                 // Create the discussion board view

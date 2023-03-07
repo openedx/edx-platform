@@ -132,8 +132,8 @@
             var sep, embed;
 
             $(this).leanModal({
-top: 120, overlay: 1, closeButton: '.close-modal', position: 'absolute'
-});
+                top: 120, overlay: 1, closeButton: '.close-modal', position: 'absolute'
+            });
             embed = $($(this).attr('href')).find('iframe');
             if (embed.length > 0 && embed.attr('src')) {
                 sep = (embed.attr('src').indexOf('?') > 0) ? '&' : '?';

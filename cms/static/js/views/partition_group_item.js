@@ -36,7 +36,7 @@ define([
 
         createDetailsView: function() {
             return new PartitionGroupDetailsView({
-model: this.model,
+                model: this.model,
                 restrictEditing: this.options.restrictEditing
             });
         }

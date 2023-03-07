@@ -41,12 +41,12 @@ class MultiselectDropdown extends React.Component {
 
     handleKeydown(event) {
         if (this.state.open && event.keyCode == 27) {
-            this.setState({ open: false }, this.focusButton);
+            this.setState({open: false}, this.focusButton);
         }
     }
 
     handleButtonClick(e) {
-        this.setState({ open: !this.state.open });
+        this.setState({open: !this.state.open});
     }
 
     handleRemoveAllClick(e) {
@@ -136,7 +136,7 @@ class MultiselectDropdown extends React.Component {
                     // and close the dropdown.
                     if (!e.currentTarget.contains(e.relatedTarget)) {
                         this.props.onBlur(e);
-                        this.setState({ open: false })
+                        this.setState({open: false})
                     }
                 }}
             >
@@ -155,7 +155,7 @@ class MultiselectDropdown extends React.Component {
     }
 }
 
-export { MultiselectDropdown };
+export {MultiselectDropdown};
 
 MultiselectDropdown.propTypes = {
     label: PropTypes.string,

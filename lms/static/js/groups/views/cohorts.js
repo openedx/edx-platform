@@ -134,7 +134,7 @@
                     self.showNotification({
                         type: 'error',
                         title: gettext("We've encountered an error. Refresh your browser and then try again.")
-},
+                    },
                     self.$('.cohorts-state-section')
                     );
                 });

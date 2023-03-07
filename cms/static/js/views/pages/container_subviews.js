@@ -218,7 +218,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                 return xblockInfo.save({
                     publish: 'republish',
                     metadata: {visible_to_staff_only: enableStaffLock ? true : null}
-},
+                },
                 {patch: true}
                 ).always(function() {
                     xblockInfo.set('publish', null);

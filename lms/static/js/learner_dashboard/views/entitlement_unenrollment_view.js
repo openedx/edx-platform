@@ -146,8 +146,8 @@ class EntitlementUnenrollmentView extends Backbone.View {
 
         if (price || dissastisfied || difficult || time || unavailable || email) {
             const results = {
- price, dissastisfied, difficult, time, unavailable, email 
-};
+                price, dissastisfied, difficult, time, unavailable, email 
+            };
 
             window.analytics.track('entitlement_unenrollment_reason.selected', {
                 category: 'user-engagement',

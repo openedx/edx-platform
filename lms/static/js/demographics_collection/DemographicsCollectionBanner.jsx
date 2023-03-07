@@ -1,7 +1,7 @@
 /* global gettext */
 import React from 'react';
 import Cookies from 'js-cookie';
-import { DemographicsCollectionModal } from './DemographicsCollectionModal';
+import {DemographicsCollectionModal} from './DemographicsCollectionModal';
 
 export class DemographicsCollectionBanner extends React.Component {
 
@@ -45,14 +45,14 @@ export class DemographicsCollectionBanner extends React.Component {
         await fetch(`${this.props.lmsRootUrl}/api/demographics/v1/demographics/status/`, requestOptions);
         // No matter what the response is from the API call we always allow the learner to dismiss the 
         // banner when clicking the dismiss button
-        this.setState({ hideBanner: true });
+        this.setState({hideBanner: true});
     }
 
     render() {
         if (!(this.state.hideBanner)) {
             return (
                 <div>
-                    <a id="demographics-banner-link" className="btn" onClick={() => this.setState({ modalOpen: true })}>
+                    <a id="demographics-banner-link" className="btn" onClick={() => this.setState({modalOpen: true})}>
                         <div
                             className="demographics-banner d-flex justify-content-lg-between flex-row py-1 px-2 mb-2 mb-lg-4"
                             role="dialog"
@@ -82,7 +82,7 @@ export class DemographicsCollectionBanner extends React.Component {
                   {...this.props}
                   user={this.props.user}
                   open={this.state.modalOpen}
-                  closeModal={() => this.setState({ modalOpen: false })}
+                  closeModal={() => this.setState({modalOpen: false})}
                   dismissBanner={this.dismissBanner}
               />
                         }

@@ -52,8 +52,8 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                 ccBtn.click();
                 expect(this.model.get('options')).toEqual(
                     {
-ver: '4.0', BY: true, NC: true, ND: true, SA: false
-}
+                        ver: '4.0', BY: true, NC: true, ND: true, SA: false
+                    }
                 );
                 var arrBtn = this.view.$('li[data-license=all-rights-reserved] button');
                 arrBtn.click();
@@ -77,15 +77,15 @@ ver: '4.0', BY: true, NC: true, ND: true, SA: false
                 this.view.$('li[data-license=creative-commons] button').click();
                 expect(this.model.get('options')).toEqual(
                     {
-ver: '4.0', BY: true, NC: true, ND: true, SA: false
-}
+                        ver: '4.0', BY: true, NC: true, ND: true, SA: false
+                    }
                 );
                 // toggle NC option
                 this.view.$('li[data-option=NC]').click();
                 expect(this.model.get('options')).toEqual(
                     {
-ver: '4.0', BY: true, NC: false, ND: true, SA: false
-}
+                        ver: '4.0', BY: true, NC: false, ND: true, SA: false
+                    }
                 );
             });
 
@@ -93,8 +93,8 @@ ver: '4.0', BY: true, NC: false, ND: true, SA: false
                 this.view.$('li[data-license=creative-commons] button').click();
                 expect(this.model.get('options')).toEqual(
                     {
-ver: '4.0', BY: true, NC: true, ND: true, SA: false
-}
+                        ver: '4.0', BY: true, NC: true, ND: true, SA: false
+                    }
                 );
                 var BY = this.view.$('li[data-option=BY]');
                 expect(BY).toHaveClass('is-disabled');
@@ -103,8 +103,8 @@ ver: '4.0', BY: true, NC: true, ND: true, SA: false
                 // no change
                 expect(this.model.get('options')).toEqual(
                     {
-ver: '4.0', BY: true, NC: true, ND: true, SA: false
-}
+                        ver: '4.0', BY: true, NC: true, ND: true, SA: false
+                    }
                 );
             });
 
@@ -112,8 +112,8 @@ ver: '4.0', BY: true, NC: true, ND: true, SA: false
                 this.view.$('li[data-license=creative-commons] button').click();
                 expect(this.model.get('options')).toEqual(
                     {
-ver: '4.0', BY: true, NC: true, ND: true, SA: false
-}
+                        ver: '4.0', BY: true, NC: true, ND: true, SA: false
+                    }
                 );
                 // SA and ND conflict
                 var SA = this.view.$('li[data-option=SA]');
@@ -122,8 +122,8 @@ ver: '4.0', BY: true, NC: true, ND: true, SA: false
                 // ND should no longer be selected
                 expect(this.model.get('options')).toEqual(
                     {
-ver: '4.0', BY: true, NC: true, ND: false, SA: true
-}
+                        ver: '4.0', BY: true, NC: true, ND: false, SA: true
+                    }
                 );
 
                 // try to turn on ND option
@@ -131,8 +131,8 @@ ver: '4.0', BY: true, NC: true, ND: false, SA: true
                 ND.click();
                 expect(this.model.get('options')).toEqual(
                     {
-ver: '4.0', BY: true, NC: true, ND: true, SA: false
-}
+                        ver: '4.0', BY: true, NC: true, ND: true, SA: false
+                    }
                 );
             });
 

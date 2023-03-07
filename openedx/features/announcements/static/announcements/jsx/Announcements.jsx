@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { Button } from '@edx/paragon';
+import {Button} from '@edx/paragon';
 import $ from 'jquery';
 
 class AnnouncementSkipLink extends React.Component {
@@ -134,4 +134,4 @@ export default class AnnouncementsView {
     }
 }
 
-export { AnnouncementsView, AnnouncementList, AnnouncementSkipLink }
+export {AnnouncementsView, AnnouncementList, AnnouncementSkipLink}
