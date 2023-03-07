@@ -11,19 +11,19 @@ import AxiosCsrfTokenService from '../jwt_auth/AxiosCsrfTokenService';
 import FocusLock from 'react-focus-lock';
 
 const FIELD_NAMES = {
-    CURRENT_WORK: "current_work_sector",
-    FUTURE_WORK: "future_work_sector",
-    GENDER: "gender",
-    GENDER_DESCRIPTION: "gender_description",
-    INCOME: "income",
-    EDUCATION_LEVEL: "learner_education_level",
-    MILITARY: "military_history",
-    PARENT_EDUCATION: "parent_education_level",
+    CURRENT_WORK: 'current_work_sector',
+    FUTURE_WORK: 'future_work_sector',
+    GENDER: 'gender',
+    GENDER_DESCRIPTION: 'gender_description',
+    INCOME: 'income',
+    EDUCATION_LEVEL: 'learner_education_level',
+    MILITARY: 'military_history',
+    PARENT_EDUCATION: 'parent_education_level',
     // For some reason, ethnicity has the really long property chain to get to the choices
-    ETHNICITY_OPTIONS: "user_ethnicity.child.children.ethnicity",
-    ETHNICITY: "user_ethnicity",
-    WORK_STATUS: "work_status",
-    WORK_STATUS_DESCRIPTION: "work_status_description",
+    ETHNICITY_OPTIONS: 'user_ethnicity.child.children.ethnicity',
+    ETHNICITY: 'user_ethnicity',
+    WORK_STATUS: 'work_status',
+    WORK_STATUS_DESCRIPTION: 'work_status_description',
 };
 
 class DemographicsCollectionModal extends React.Component {
@@ -103,7 +103,7 @@ class DemographicsCollectionModal extends React.Component {
                 'X-CSRFToken': await this.retrieveDemographicsCsrfToken(url),
             },
             body: JSON.stringify({
-                [name]: value === "default" ? null : value,
+                [name]: value === 'default' ? null : value,
             }),
         };
         try {
@@ -273,11 +273,11 @@ class DemographicsCollectionModal extends React.Component {
                                     <br />
                                     <span aria-hidden="true" className="fa fa-info-circle" />
                                     {/* Need to strip out extra '"' characters in the marketingSiteBaseUrl prop or it tries to setup the href as a relative URL */}
-                                    <a className="pl-3" target="_blank" rel="noopener" href={`${this.props.marketingSiteBaseUrl}/demographics`.replace(/"/g, "")}>
+                                    <a className="pl-3" target="_blank" rel="noopener" href={`${this.props.marketingSiteBaseUrl}/demographics`.replace(/"/g, '')}>
                                         {gettext('Why does edX collect this information?')}
                                     </a>
                                     <br />
-                                    {this.state.fieldError && <p className="field-error">{gettext("An error occurred while attempting to retrieve or save the information below. Please try again later.")}</p>}
+                                    {this.state.fieldError && <p className="field-error">{gettext('An error occurred while attempting to retrieve or save the information below. Please try again later.')}</p>}
                                 </div>
                             )}
                         </Wizard.Header>
@@ -290,12 +290,12 @@ class DemographicsCollectionModal extends React.Component {
                                         selectId={FIELD_NAMES.GENDER}
                                         selectValue={wizardConsumer[FIELD_NAMES.GENDER]}
                                         selectOnChange={this.handleSelectChange}
-                                        labelText={gettext("What is your gender identity?")}
+                                        labelText={gettext('What is your gender identity?')}
                                         options={[
-                                            <option value="default" key="default">{gettext("Select gender")}</option>,
+                                            <option value="default" key="default">{gettext('Select gender')}</option>,
                                             this.loadOptions(FIELD_NAMES.GENDER)
                                         ]}
-                                        showInput={wizardConsumer[FIELD_NAMES.GENDER] == "self-describe"}
+                                        showInput={wizardConsumer[FIELD_NAMES.GENDER] == 'self-describe'}
                                         inputName={FIELD_NAMES.GENDER_DESCRIPTION}
                                         inputId={FIELD_NAMES.GENDER_DESCRIPTION}
                                         inputType="text"
@@ -306,8 +306,8 @@ class DemographicsCollectionModal extends React.Component {
                                     />
                                     {/* Ethnicity */}
                                     <MultiselectDropdown
-                                        label={gettext("Which of the following describes you best?")}
-                                        emptyLabel={gettext("Check all that apply")}
+                                        label={gettext('Which of the following describes you best?')}
+                                        emptyLabel={gettext('Check all that apply')}
                                         options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, { choices: [] }).choices}
                                         selected={wizardConsumer[FIELD_NAMES.ETHNICITY]}
                                         onChange={this.handleMultiselectChange}
@@ -327,7 +327,7 @@ class DemographicsCollectionModal extends React.Component {
                                     {/* Family Income */}
                                     <div className="d-flex flex-column pb-3">
                                         <label htmlFor={FIELD_NAMES.INCOME}>
-                                            {gettext("What was the total combined income, during the last 12 months, of all members of your family? ")}
+                                            {gettext('What was the total combined income, during the last 12 months, of all members of your family? ')}
                                         </label>
                                         <select
                                             onChange={this.handleSelectChange}
@@ -336,7 +336,7 @@ class DemographicsCollectionModal extends React.Component {
                                             value={wizardConsumer[FIELD_NAMES.INCOME]}
                                             disabled={this.state.fieldError}
                                         >
-                                            <option value="default">{gettext("Select income")}</option>
+                                            <option value="default">{gettext('Select income')}</option>
                                             {
                                                 this.loadOptions(FIELD_NAMES.INCOME)
                                             }
@@ -351,7 +351,7 @@ class DemographicsCollectionModal extends React.Component {
                                     {/* Military History */}
                                     <div className="d-flex flex-column pb-3">
                                         <label htmlFor={FIELD_NAMES.MILITARY}>
-                                            {gettext("Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?")}
+                                            {gettext('Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?')}
                                         </label>
                                         <select
                                             autoFocus
@@ -362,7 +362,7 @@ class DemographicsCollectionModal extends React.Component {
                                             value={wizardConsumer[FIELD_NAMES.MILITARY]}
                                             disabled={this.state.fieldError}
                                         >
-                                            <option value="default">{gettext("Select military status")}</option>
+                                            <option value="default">{gettext('Select military status')}</option>
                                             {
                                                 this.loadOptions(FIELD_NAMES.MILITARY)
                                             }
@@ -377,7 +377,7 @@ class DemographicsCollectionModal extends React.Component {
                                     {/* Learner Education Level */}
                                     <div className="d-flex flex-column pb-3">
                                         <label htmlFor={FIELD_NAMES.EDUCATION_LEVEL}>
-                                            {gettext("What is the highest level of education that you have achieved so far?")}
+                                            {gettext('What is the highest level of education that you have achieved so far?')}
                                         </label>
                                         <select
                                             className="form-control"
@@ -389,7 +389,7 @@ class DemographicsCollectionModal extends React.Component {
                                             value={wizardConsumer[FIELD_NAMES.EDUCATION_LEVEL]}
                                             disabled={this.state.fieldError}
                                         >
-                                            <option value="default">{gettext("Select level of education")}</option>
+                                            <option value="default">{gettext('Select level of education')}</option>
                                             {
                                                 this.loadOptions(FIELD_NAMES.EDUCATION_LEVEL)
                                             }
@@ -398,7 +398,7 @@ class DemographicsCollectionModal extends React.Component {
                                     {/* Parent/Guardian Education Level */}
                                     <div className="d-flex flex-column pb-3">
                                         <label htmlFor={FIELD_NAMES.PARENT_EDUCATION}>
-                                            {gettext("What is the highest level of education that any of your parents or guardians have achieved?")}
+                                            {gettext('What is the highest level of education that any of your parents or guardians have achieved?')}
                                         </label>
                                         <select
                                             className="form-control"
@@ -408,7 +408,7 @@ class DemographicsCollectionModal extends React.Component {
                                             value={wizardConsumer[FIELD_NAMES.PARENT_EDUCATION]}
                                             disabled={this.state.fieldError}
                                         >
-                                            <option value="default">{gettext("Select guardian education")}</option>
+                                            <option value="default">{gettext('Select guardian education')}</option>
                                             {
                                                 this.loadOptions(FIELD_NAMES.PARENT_EDUCATION)
                                             }
@@ -426,12 +426,12 @@ class DemographicsCollectionModal extends React.Component {
                                         selectId={FIELD_NAMES.WORK_STATUS}
                                         selectValue={wizardConsumer[FIELD_NAMES.WORK_STATUS]}
                                         selectOnChange={this.handleSelectChange}
-                                        labelText={"What is your current employment status?"}
+                                        labelText={'What is your current employment status?'}
                                         options={[
-                                            <option value="default" key="default">{gettext("Select employment status")}</option>,
+                                            <option value="default" key="default">{gettext('Select employment status')}</option>,
                                             this.loadOptions(FIELD_NAMES.WORK_STATUS)
                                         ]}
-                                        showInput={wizardConsumer[FIELD_NAMES.WORK_STATUS] == "other"}
+                                        showInput={wizardConsumer[FIELD_NAMES.WORK_STATUS] == 'other'}
                                         inputName={FIELD_NAMES.WORK_STATUS_DESCRIPTION}
                                         inputId={FIELD_NAMES.WORK_STATUS_DESCRIPTION}
                                         inputType="text"
@@ -443,7 +443,7 @@ class DemographicsCollectionModal extends React.Component {
                                     {/* Current Work Industry */}
                                     <div className="d-flex flex-column pb-3">
                                         <label htmlFor={FIELD_NAMES.CURRENT_WORK}>
-                                            {gettext("What industry do you currently work in?")}
+                                            {gettext('What industry do you currently work in?')}
                                         </label>
                                         <select
                                             className="form-control"
@@ -453,7 +453,7 @@ class DemographicsCollectionModal extends React.Component {
                                             value={wizardConsumer[FIELD_NAMES.CURRENT_WORK]}
                                             disabled={this.state.fieldError}
                                         >
-                                            <option value="default">{gettext("Select current industry")}</option>
+                                            <option value="default">{gettext('Select current industry')}</option>
                                             {
                                                 this.loadOptions(FIELD_NAMES.CURRENT_WORK)
                                             }
@@ -462,7 +462,7 @@ class DemographicsCollectionModal extends React.Component {
                                     {/* Future Work Industry */}
                                     <div className="d-flex flex-column pb-3">
                                         <label htmlFor={FIELD_NAMES.FUTURE_WORK}>
-                                            {gettext("What industry do you want to work in?")}
+                                            {gettext('What industry do you want to work in?')}
                                         </label>
                                         <select
                                             className="form-control"
@@ -472,7 +472,7 @@ class DemographicsCollectionModal extends React.Component {
                                             value={wizardConsumer[FIELD_NAMES.FUTURE_WORK]}
                                             disabled={this.state.fieldError}
                                         >
-                                            <option value="default">{gettext("Select prospective industry")}</option>
+                                            <option value="default">{gettext('Select prospective industry')}</option>
                                             {
                                                 this.loadOptions(FIELD_NAMES.FUTURE_WORK)
                                             }
@@ -485,13 +485,13 @@ class DemographicsCollectionModal extends React.Component {
                             <div className="demographics-modal-closer m-sm-0">
                                 <i className="fa fa-check" aria-hidden="true"></i>
                                 <h3>
-                                    {gettext("Thank you! You’re helping make edX better for everyone.")}
+                                    {gettext('Thank you! You’re helping make edX better for everyone.')}
                                 </h3>
                             </div>
                         </Wizard.Closer>
                         <Wizard.ErrorPage>
                             <div>
-                                {this.state.error.length ? this.state.error : gettext("An error occurred while attempting to retrieve or save the information below. Please try again later.")}
+                                {this.state.error.length ? this.state.error : gettext('An error occurred while attempting to retrieve or save the information below. Please try again later.')}
                             </div>
                         </Wizard.ErrorPage>
                     </Wizard>

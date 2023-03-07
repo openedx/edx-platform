@@ -19,7 +19,7 @@ class AnnouncementSkipLink extends React.Component {
     }
 
     render() {
-        return (<div>{"Skip to list of " + this.state.count + " announcements"}</div>)
+        return (<div>{'Skip to list of ' + this.state.count + ' announcements'}</div>)
     }
 }
 
@@ -90,11 +90,11 @@ class AnnouncementList extends React.Component {
             var prev_button = (
                 <div>
                     <Button
-                        className={["announcement-button", "prev"]}
+                        className={['announcement-button', 'prev']}
                         onClick={() => this.renderPrevPage()}
                         label="← previous"
                     />
-                    <span className="sr-only">{this.state.start_index + " - " + this.state.end_index + ") of " + this.state.count}</span>
+                    <span className="sr-only">{this.state.start_index + ' - ' + this.state.end_index + ') of ' + this.state.count}</span>
                 </div>
             );
         }
@@ -103,11 +103,11 @@ class AnnouncementList extends React.Component {
             var next_button = (
                 <div>
                     <Button
-                        className={["announcement-button", "next"]}
+                        className={['announcement-button', 'next']}
                         onClick={() => this.renderNextPage()}
                         label="next →"
                     />
-                    <span className="sr-only">{this.state.start_index + " - " + this.state.end_index + ") of " + this.state.count}</span>
+                    <span className="sr-only">{this.state.start_index + ' - ' + this.state.end_index + ') of ' + this.state.count}</span>
                 </div>
             );
         }

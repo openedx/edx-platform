@@ -140,7 +140,7 @@
                             if (!value) {
                                 label = _fn.validate.getLabel($el.attr('id'));
                                 customMsg = $el.data('errormsg-' + key) || false;
-                                liveValidationMsg =                                        $('#' + $el.attr('id') + '-validation-error-msg').text() || false;
+                                liveValidationMsg = $('#' + $el.attr('id') + '-validation-error-msg').text() || false;
 
                                 // If the field has a custom error msg attached, use it
                                 if (customMsg) {

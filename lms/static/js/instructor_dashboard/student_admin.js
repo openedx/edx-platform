@@ -87,7 +87,7 @@
                 fullErrorMessage = _.template(errorMessage)({
                     student_id: uniqStudentIdentifier
                 });
-                studentadmin.$enrollment_status.text(gettext("Retrieving enrollment status..."));
+                studentadmin.$enrollment_status.text(gettext('Retrieving enrollment status...'));
                 return $.ajax({
                     type: 'POST',
                     dataType: 'json',

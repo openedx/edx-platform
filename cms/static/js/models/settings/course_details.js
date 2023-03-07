@@ -11,7 +11,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             language: '',
             start_date: null,	// maps to 'start'
             end_date: null,		// maps to 'end'
-            certificates_display_behavior: "",
+            certificates_display_behavior: '',
             certificate_available_date: null,
             enrollment_start: null,
             enrollment_end: null,
@@ -44,9 +44,9 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
             var errors = {};
             const CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS = {
-                END: "end",
-                END_WITH_DATE: "end_with_date",
-                EARLY_NO_INFO: "early_no_info"
+                END: 'end',
+                END_WITH_DATE: 'end_with_date',
+                EARLY_NO_INFO: 'early_no_info'
             };
 
             newattrs = DateUtils.convertDateStringsToObjects(
@@ -91,7 +91,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
 
                     errors.certificates_display_behavior = StringUtils.interpolate(
                         gettext(
-                            "The certificate display behavior must be one of: {behavior_options}"
+                            'The certificate display behavior must be one of: {behavior_options}'
                         ),
                         {
                             behavior_options: Object.values(CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS).join(', ')
@@ -106,7 +106,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
                 ){
                     errors.certificates_display_behavior = StringUtils.interpolate(
                         gettext(
-                            "The certificates display behavior must be {valid_option} if certificate available date is set."
+                            'The certificates display behavior must be {valid_option} if certificate available date is set.'
                         ),
                         {
                             valid_option: CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE

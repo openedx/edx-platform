@@ -231,10 +231,10 @@ StudentAccountDeletionConfirmationModal.propTypes = {
 
 StudentAccountDeletionConfirmationModal.defaultProps = {
     onClose: () => {},
-    additionalSiteSpecificDeletionText: "",
-    mktgRootLink: "",
-    platformName: "",
-    siteName: "",
+    additionalSiteSpecificDeletionText: '',
+    mktgRootLink: '',
+    platformName: '',
+    siteName: '',
 };
 
 export default StudentAccountDeletionConfirmationModal;

@@ -415,7 +415,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
         it('verifies certificate exception can be deleted by clicking "delete" ', function() {
             var username = 'test1',
                 certificateExceptionSelector = "div.allowlisted-students table tr:contains('" + username + "')",
-                deleteBtnSelector =                        certificateExceptionSelector + ' td .delete-exception',
+                deleteBtnSelector = certificateExceptionSelector + ' td .delete-exception',
                 requests = AjaxHelpers.requests(this);
 
             $(deleteBtnSelector).click();

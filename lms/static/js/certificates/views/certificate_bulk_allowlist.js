@@ -215,7 +215,7 @@
                         );
                     }
                     if (row_errors.user_on_certificate_invalidation_list.length) {
-                        UserOnCertificateInvalidationList =                                row_errors.user_on_certificate_invalidation_list;
+                        UserOnCertificateInvalidationList = row_errors.user_on_certificate_invalidation_list;
                         generateDiv(
                             MESSAGE_GROUP.user_on_certificate_invalidation_list,
                             getDisplayText(

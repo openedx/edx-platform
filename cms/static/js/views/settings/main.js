@@ -34,7 +34,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#course-number').val(this.model.get('course_id'));
             this.$el.find('#course-name').val(this.model.get('run'));
             this.$el.find('.set-date').datepicker({ dateFormat: 'm/d/yy' });
-            this.$el.find("#certificates-display-behavior").val(this.model.get("certificates_display_behavior"));
+            this.$el.find('#certificates-display-behavior').val(this.model.get('certificates_display_behavior'));
             this.updateCertificatesDisplayBehavior();
 
             // Avoid showing broken image on mistyped/nonexistent image
@@ -113,7 +113,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             } else this.$el.find('.remove-course-introduction-video').hide();
 
             this.$el.find('#' + this.fieldToSelectorMap.effort).val(this.model.get('effort'));
-            this.$el.find("#" + this.fieldToSelectorMap.certificates_display_behavior).val(this.model.get('certificates_display_behavior'));
+            this.$el.find('#' + this.fieldToSelectorMap.certificates_display_behavior).val(this.model.get('certificates_display_behavior'));
             this.updateCertificatesDisplayBehavior();
 
             var courseImageURL = this.model.get('course_image_asset_path');
@@ -392,19 +392,19 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             if (!this.useV2CertDisplaySettings){
                 return;
             }
-            let showDatepicker = this.model.get("certificates_display_behavior") == "end_with_date";
+            let showDatepicker = this.model.get('certificates_display_behavior') == 'end_with_date';
             let datepicker = this.$el.find('#certificate-available-date');
             let certificateAvailableDateField = this.$el.find('#field-certificate-available-date');
 
             if (showDatepicker) {
                 datepicker.prop('disabled', false);
-                certificateAvailableDateField.removeClass("hidden");
+                certificateAvailableDateField.removeClass('hidden');
             } else {
                 datepicker.prop('disabled', true);
                 datepicker.val(null);
                 this.clearValidationErrors();
-                this.setAndValidate("certificate_available_date", null)
-                certificateAvailableDateField.addClass("hidden");
+                this.setAndValidate('certificate_available_date', null)
+                certificateAvailableDateField.addClass('hidden');
             }
         },
         revertView: function() {

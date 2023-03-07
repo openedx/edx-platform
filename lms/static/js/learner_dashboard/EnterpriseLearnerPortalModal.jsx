@@ -58,7 +58,7 @@ class EnterpriseLearnerPortalModal extends React.Component {
 
     handleEsc(e) {
         const { key } = e;
-        if (key === "Escape") {
+        if (key === 'Escape') {
             window.analytics.track('edx.ui.enterprise.lms.dashboard.learner_portal_modal.closed', {
                 enterpriseUUID: this.props.enterpriseCustomerUUID,
                 source: 'Escape',

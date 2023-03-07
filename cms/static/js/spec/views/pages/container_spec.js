@@ -54,12 +54,12 @@ function parameterized_suite(label, globalPageOptions) {
                 category: 'vertical'
             });
             window.course = new Course({
-                id: "5",
-                name: "Course Name",
-                url_name: "course_name",
-                org: "course_org",
-                num: "course_num",
-                revision: "course_rev"
+                id: '5',
+                name: 'Course Name',
+                url_name: 'course_name',
+                org: 'course_org',
+                num: 'course_num',
+                revision: 'course_rev'
             });
         });
 

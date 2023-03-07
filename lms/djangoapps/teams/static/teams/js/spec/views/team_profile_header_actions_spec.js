@@ -26,7 +26,7 @@ define([
             };
         };
 
-        createHeaderActionsView =            function(
+        createHeaderActionsView = function(
             requests,
             courseMaxTeamSize,
             currentUsername,
@@ -156,7 +156,7 @@ define([
             it('shows already member message', function() {
                 var requests = AjaxHelpers.requests(this);
                 var currentUsername = 'ma1';
-                var view =                    createHeaderActionsView(
+                var view = createHeaderActionsView(
                     requests, 1, currentUsername, createTeamModelData('teamA', 'teamAlpha', []));
 
                 // a get request will be sent to get user membership info

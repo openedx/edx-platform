@@ -23,12 +23,12 @@ class MultiselectDropdown extends React.Component {
     }
 
     componentDidMount() {
-        document.addEventListener("keydown", this.handleKeydown, false);
+        document.addEventListener('keydown', this.handleKeydown, false);
     }
 
     componentWillUnmount() {
 
-        document.removeEventListener("keydown", this.handleKeydown, false);
+        document.removeEventListener('keydown', this.handleKeydown, false);
     }
 
     findOption(data) {
@@ -94,7 +94,7 @@ class MultiselectDropdown extends React.Component {
 
     renderUnselect() {
         return this.props.selected.length > 0 && (
-            <button id="unselect-button" disabled={this.props.disabled} aria-label="Clear all selected" onClick={this.handleRemoveAllClick}>{gettext("Clear all")}</button>
+            <button id="unselect-button" disabled={this.props.disabled} aria-label="Clear all selected" onClick={this.handleRemoveAllClick}>{gettext('Clear all')}</button>
         )
     }
 
