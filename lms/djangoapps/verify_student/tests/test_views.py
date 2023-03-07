@@ -29,7 +29,7 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from common.test.utils import MockS3BotoMixin, XssTestMixin
+from common.test.utils import MockS3Boto3Mixin, XssTestMixin
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_PUBLIC_URL_ROOT
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
@@ -1227,7 +1227,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
 
 @ddt.ddt
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
+class TestSubmitPhotosForVerification(MockS3Boto3Mixin, TestVerificationBase):
     """
     Tests for submitting photos for verification.
     """
@@ -1924,7 +1924,7 @@ class TestPhotoURLView(TestVerificationBase):
     }
 )
 @ddt.ddt
-class TestDecodeImageViews(MockS3BotoMixin, TestVerificationBase):
+class TestDecodeImageViews(MockS3Boto3Mixin, TestVerificationBase):
     """
     Test for both face and photo id image decoding views
     """
