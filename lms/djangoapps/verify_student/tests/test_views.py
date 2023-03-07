@@ -1853,7 +1853,7 @@ class TestReverifyView(TestVerificationBase):
             "CERT_VERIFICATION_PATH": False,
         },
         "DAYS_GOOD_FOR": 10,
-        "STORAGE_CLASS": 'storages.backends.s3boto.S3BotoStorage',
+        "STORAGE_CLASS": 'storages.backends.s3boto3.S3Boto3Storage',
         "STORAGE_KWARGS": {
             'bucket': 'test-idv',
         },
@@ -1917,7 +1917,7 @@ class TestPhotoURLView(TestVerificationBase):
             "CERT_VERIFICATION_PATH": False,
         },
         "DAYS_GOOD_FOR": 10,
-        "STORAGE_CLASS": 'storages.backends.s3boto.S3BotoStorage',
+        "STORAGE_CLASS": 'storages.backends.s3boto3.S3Boto3Storage',
         "STORAGE_KWARGS": {
             'bucket': 'test-idv',
         },
