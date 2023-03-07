@@ -85,8 +85,7 @@ class AnnouncementList extends React.Component {
         var children = this.state.announcements.map(
             (announcement, index) => <Announcement key={index} content={announcement.content} />
         );
-        if (this.state.has_prev)
-        {
+        if (this.state.has_prev) {
             var prev_button = (
                 <div>
                     <Button
@@ -98,8 +97,7 @@ class AnnouncementList extends React.Component {
                 </div>
             );
         }
-        if (this.state.has_next)
-        {
+        if (this.state.has_next) {
             var next_button = (
                 <div>
                     <Button

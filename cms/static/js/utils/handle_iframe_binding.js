@@ -28,6 +28,7 @@ define(['jquery'], function($) {
                             var newString = getQString[0];
                             $(this).attr('src', newString + '?' + wmode + '&' + oldString);
                         }
+                    // eslint-disable-next-line brace-style
                     }
                     // The TinyMCE editor is hosted in an iframe, and before the iframe is
                     // removed we execute this code. To avoid throwing an error when setting the

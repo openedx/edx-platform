@@ -66,7 +66,7 @@ define(['js/views/baseview', 'underscore'], function(BaseView, _) {
          * the clear button.
          */
         render: function() {
-            if (!this.template) return;
+            if (!this.template) { return; }
 
             this.setValueInEditor(this.model.getDisplayValue());
 

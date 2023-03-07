@@ -26,11 +26,9 @@ function LoggedInUser({
                 <option key="not-course-specific" value="Not specific to a course">
                     {gettext('Not specific to a course')}
                 </option>
-                {userInformation.enrollments.map(enrollment =>
-                    (<option key={enrollment.course_id} value={enrollment.course_id}>
-                        {enrollment.course_name}
-                    </option>),
-                )}
+                {userInformation.enrollments.map(enrollment => (<option key={enrollment.course_id} value={enrollment.course_id}>
+                    {enrollment.course_name}
+                </option>),)}
             </select>
         </div>);
     } else {

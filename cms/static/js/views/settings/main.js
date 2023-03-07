@@ -110,7 +110,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#' + this.fieldToSelectorMap.intro_video).val(this.model.get('intro_video') || '');
             if (this.model.has('intro_video')) {
                 this.$el.find('.remove-course-introduction-video').show();
-            } else this.$el.find('.remove-course-introduction-video').hide();
+            } else { this.$el.find('.remove-course-introduction-video').hide(); }
 
             this.$el.find('#' + this.fieldToSelectorMap.effort).val(this.model.get('effort'));
             this.$el.find('#' + this.fieldToSelectorMap.certificates_display_behavior).val(this.model.get('certificates_display_behavior'));

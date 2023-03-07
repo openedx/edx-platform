@@ -112,7 +112,8 @@ const renderEnrollmentsSection = enrollments => (
                                 </div>
                             )}
                         </div>
-                    ))}
+                    )
+                )}
             </div>
         ))}
         <hr />
@@ -227,7 +228,8 @@ ProgramEnrollmentsInspectorPage.propTypes = {
                             is_active: PropTypes.bool,
                             mode: PropTypes.string,
                         }),
-                    })),
+                    })
+                ),
             }),
         ),
     }),

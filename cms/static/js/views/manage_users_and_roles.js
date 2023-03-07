@@ -176,7 +176,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 // in reverse order to show "Add" buttons to the left, "Remove" to the right
                 for (var i = this.roles.length - 1; i >= 0; i--) {
                     var other_role = this.roles[i];
-                    if (Math.abs(currentRoleIdx - i) !== 1) continue; // allows moving only to adjacent roles
+                    if (Math.abs(currentRoleIdx - i) !== 1) { continue; } // allows moving only to adjacent roles
                     result.push({
                         to_role: other_role.key,
                         label: (i < currentRoleIdx) ? this.roles[currentRoleIdx].name : other_role.name,

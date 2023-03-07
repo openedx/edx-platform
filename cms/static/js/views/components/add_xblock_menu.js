@@ -14,7 +14,8 @@ define(['jquery', 'js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
                 HtmlUtils.setHtml(
                     this.$el,
                     HtmlUtils.HTML(this.template({
-                        type: this.model.type, templates: this.model.templates,
+                        type: this.model.type,
+                        templates: this.model.templates,
                         support_legend: this.model.support_legend,
                         support_indicator_template: support_indicator_template,
                         support_legend_template: support_legend_template,

@@ -11,9 +11,7 @@ class ShowErrors extends React.Component {
                 <div className="alert alert-danger" role="alert">
                     <strong>{gettext('Please fix the following errors:')}</strong>
                     <ul>
-                        { Object.keys(this.props.errorList).map(key =>
-                            this.props.errorList[key] && <li key={key}>{this.props.errorList[key]}</li>,
-                        )}
+                        { Object.keys(this.props.errorList).map(key => this.props.errorList[key] && <li key={key}>{this.props.errorList[key]}</li>,)}
                     </ul>
                 </div>
             </div>);

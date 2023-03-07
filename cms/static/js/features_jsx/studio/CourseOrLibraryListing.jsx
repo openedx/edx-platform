@@ -38,18 +38,17 @@ export function CourseOrLibraryListing(props) {
     return (
         <ul className="list-courses">
             {
-                props.items.map((item, i) =>
-                    (
-                        <li key={i} className="course-item" data-course-key={item.course_key}>
-                            {item.url
-                                ? (
-                                    <a className={linkClass} href={item.url}>
-                                        {renderCourseMetadata(item, i)}
-                                    </a>
-                                )
-                                : renderCourseMetadata(item, i)
-                            }
-                            { item.lms_link && item.rerun_link
+                props.items.map((item, i) => (
+                    <li key={i} className="course-item" data-course-key={item.course_key}>
+                        {item.url
+                            ? (
+                                <a className={linkClass} href={item.url}>
+                                    {renderCourseMetadata(item, i)}
+                                </a>
+                            )
+                            : renderCourseMetadata(item, i)
+                        }
+                        { item.lms_link && item.rerun_link
               && <ul className="item-actions course-actions">
                   { allowReruns
                 && <li className="action action-rerun">
@@ -71,10 +70,9 @@ export function CourseOrLibraryListing(props) {
                       >{gettext('View Live')}</a>
                   </li>
               </ul>
-                            }
-                        </li>
-                    ),
-                )
+                        }
+                    </li>
+                ),)
             }
         </ul>
     );

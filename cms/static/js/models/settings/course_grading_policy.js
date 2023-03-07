@@ -42,13 +42,13 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 var newDate = new Date();
                 if (this.has('grace_period') && this.get('grace_period').hours) {
                     newDate.setHours(this.get('grace_period').hours);
-                } else newDate.setHours(0);
+                } else { newDate.setHours(0); }
                 if (this.has('grace_period') && this.get('grace_period').minutes) {
                     newDate.setMinutes(this.get('grace_period').minutes);
-                } else newDate.setMinutes(0);
+                } else { newDate.setMinutes(0); }
                 if (this.has('grace_period') && this.get('grace_period').seconds) {
                     newDate.setSeconds(this.get('grace_period').seconds);
-                } else newDate.setSeconds(0);
+                } else { newDate.setSeconds(0); }
 
                 return newDate;
             },

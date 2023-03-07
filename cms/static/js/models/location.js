@@ -39,7 +39,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
                         category: this.getNextField(payload),
                         name: this.getNextField(payload)
                     };
-                } else return null;
+                } else { return null; }
             } else {
                 return payload;
             }

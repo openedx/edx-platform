@@ -9,8 +9,8 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             course_id: '',
             run: '',
             language: '',
-            start_date: null,	// maps to 'start'
-            end_date: null,		// maps to 'end'
+            start_date: null, // maps to 'start'
+            end_date: null, // maps to 'end'
             certificates_display_behavior: '',
             certificate_available_date: null,
             enrollment_start: null,
@@ -23,7 +23,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             short_description: '',
             overview: '',
             intro_video: null,
-            effort: null,	// an int or null,
+            effort: null, // an int or null,
             license: null,
             course_image_name: '', // the filename
             course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
@@ -83,12 +83,11 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
                 );
             }
 
-            if (this.useV2CertDisplaySettings){
+            if (this.useV2CertDisplaySettings) {
                 if (
                     newattrs.certificates_display_behavior
                         && !(Object.values(CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS).includes(newattrs.certificates_display_behavior))
                 ) {
-
                     errors.certificates_display_behavior = StringUtils.interpolate(
                         gettext(
                             'The certificate display behavior must be one of: {behavior_options}'
@@ -100,10 +99,10 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
                 }
 
                 // Throw error if there's a value for certificate_available_date
-                if(
+                if (
                     (newattrs.certificate_available_date && newattrs.certificates_display_behavior != CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE)
                         || (!newattrs.certificate_available_date && newattrs.certificates_display_behavior == CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE)
-                ){
+                ) {
                     errors.certificates_display_behavior = StringUtils.interpolate(
                         gettext(
                             'The certificates display behavior must be {valid_option} if certificate available date is set.'
@@ -132,7 +131,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
                     ), range, true);
                 }
             }
-            if (!_.isEmpty(errors)) return errors;
+            if (!_.isEmpty(errors)) { return errors; }
         // NOTE don't return empty errors as that will be interpreted as an error state
         },
 
@@ -142,18 +141,18 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
         // returns the videosource for the preview which iss the key whose speed is closest to 1
             if (_.isEmpty(newsource)
-                  && !_.isEmpty(this.get('intro_video'))) this.set({intro_video: null}, {validate: true});
-            // TODO remove all whitespace w/in string
-            else {
-                if (this.get('intro_video') !== newsource) this.set('intro_video', newsource, {validate: true});
+                  && !_.isEmpty(this.get('intro_video'))) {
+                this.set({intro_video: null}, {validate: true});
+            } else {
+                // TODO remove all whitespace w/in string
+                if (this.get('intro_video') !== newsource) { this.set('intro_video', newsource, {validate: true}); }
             }
 
             return this.videosourceSample();
         },
 
         videosourceSample: function() {
-            if (this.has('intro_video')) return '//www.youtube.com/embed/' + this.get('intro_video');
-            else return '';
+            if (this.has('intro_video')) { return '//www.youtube.com/embed/' + this.get('intro_video'); } else { return ''; }
         },
 
         // Whether or not the course pacing can be toggled. If the course

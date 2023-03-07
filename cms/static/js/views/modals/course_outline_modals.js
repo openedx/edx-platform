@@ -404,7 +404,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         showProjectedDate: function() {
-            if (!this.getValue() || !course.get('start')) return;
+            if (!this.getValue() || !course.get('start')) { return; }
             var startDate = new Date(course.get('start'));
             // The value returned by toUTCString() is a string in the form Www, dd Mmm yyyy hh:mm:ss GMT
             var startDateList = startDate.toUTCString().split(' ')
@@ -422,12 +422,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             if (this.getValue() > 18){
                 this.$('#relative_weeks_due_warning_max').show();
                 BaseModal.prototype.disableActionButton.call(this.parent, 'save');
-            }
-            else if (this.getValue() < 1){
+            } else if (this.getValue() < 1){
                 this.$('#relative_weeks_due_warning_min').show()
                 BaseModal.prototype.disableActionButton.call(this.parent, 'save');
-            }
-            else {
+            } else {
                 this.$('#relative_weeks_due_warning_max').hide();
                 this.$('#relative_weeks_due_warning_min').hide();
                 this.showProjectedDate();
@@ -439,8 +437,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             AbstractEditor.prototype.afterRender.call(this);
             if (this.model.get('graded')) {
                 this.$('#relative_date_input').show()
-            }
-            else {
+            } else {
                 this.$('#relative_date_input').hide()
             }
             this.$('.field-due-in input').val(this.model.get('relative_weeks_due'));
@@ -450,9 +447,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getRequestData: function() {
             // Grab all the sections, map them to their block_ids, then return as an Array
-            var sectionIds = $('.outline-section').map(function(){return this.id;}).get()
+            var sectionIds = $('.outline-section').map(function(){ return this.id; }).get()
             // Grab all the subsections, map them to their block_ids, then return as an Array
-            var subsectionIds = $('.outline-subsection').map(function(){return this.id;}).get()
+            var subsectionIds = $('.outline-subsection').map(function(){ return this.id; }).get()
             var relative_weeks_due = null;
             if (this.getValue() < 19 && this.getValue() > 0 && $('#grading_type').val() !== 'notgraded') {
                 relative_weeks_due = this.getValue()

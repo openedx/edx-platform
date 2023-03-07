@@ -144,16 +144,14 @@ class FileUpload extends React.Component {
                 </div>
                 <div className="uploaded-files">
                     {
-                        this.state.fileList.map(file =>
-                            (<div key={file.fileToken} className="row">
-                                <div className="col-sm-12">
-                                    <span className="file-name">{file.fileName}</span>
-                                    <span className="file-action remove-upload">
-                                        <button className="btn btn-link" id={file.fileToken} onClick={this.removeFile}>{gettext('Remove file')}</button>
-                                    </span>
-                                </div>
-                            </div>),
-                        )
+                        this.state.fileList.map(file => (<div key={file.fileToken} className="row">
+                            <div className="col-sm-12">
+                                <span className="file-name">{file.fileName}</span>
+                                <span className="file-action remove-upload">
+                                    <button className="btn btn-link" id={file.fileToken} onClick={this.removeFile}>{gettext('Remove file')}</button>
+                                </span>
+                            </div>
+                        </div>),)
                     }
                 </div>
             </div>

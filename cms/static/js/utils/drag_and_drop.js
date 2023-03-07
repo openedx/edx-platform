@@ -47,6 +47,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                             parentList: parentList
                         };
                     }
+                // eslint-disable-next-line brace-style
                 }
                 // Otherwise, do check the container
                 else {
@@ -62,6 +63,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                             ele: $container,
                             attachMethod: 'prepend'
                         };
+                    // eslint-disable-next-line brace-style
                     }
                     // Otherwise the list is populated, and we should attach before/after a sibling
                     else {
@@ -85,6 +87,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                                         ele: $sibling,
                                         attachMethod: yChange > 0 ? 'after' : 'before'
                                     };
+                                // eslint-disable-next-line brace-style
                                 }
                                 // Element being dragged is before the drop target.
                                 else if (Math.abs(eleYEnd - siblingY) <= fudge) {
@@ -92,6 +95,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                                         ele: $sibling,
                                         attachMethod: 'before'
                                     };
+                                // eslint-disable-next-line brace-style
                                 }
                                 // Element being dragged is after the drop target.
                                 else if (Math.abs(eleY - siblingYEnd) <= fudge) {
@@ -108,6 +112,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                                         ele: $sibling,
                                         attachMethod: 'after'
                                     };
+                                // eslint-disable-next-line brace-style
                                 }
                                 // Dragging up or down into beginning of list.
                                 else if (j === 0 && Math.abs(eleY - siblingY) <= fudge) {
@@ -115,6 +120,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                                         ele: $sibling,
                                         attachMethod: 'before'
                                     };
+                                // eslint-disable-next-line brace-style
                                 }
                                 // Dragging down into end of list. Special handling required because
                                 // the element being dragged may be taller then the element being dragged over
@@ -235,6 +241,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                 var method = this.dragState.attachMethod;
                 destination[method]($ele);
                 this.handleReorder($ele);
+            // eslint-disable-next-line brace-style
             }
             // If the drag failed, send it back
             else {

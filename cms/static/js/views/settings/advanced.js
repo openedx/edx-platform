@@ -26,7 +26,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
         },
         render: function() {
         // catch potential outside call before template loaded
-            if (!this.template) return this;
+            if (!this.template) { return this; }
 
             var listEle$ = this.$el.find('.course-advanced-policy-list');
             listEle$.empty();
@@ -177,9 +177,14 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
         renderTemplate: function(key, model) {
             var newKeyId = _.uniqueId('policy_key_'),
                 newEle = this.template({
-                    key: key, display_name: model.display_name, help: model.help,
-                    value: JSON.stringify(model.value, null, 4), deprecated: model.deprecated,
-                    keyUniqueId: newKeyId, valueUniqueId: _.uniqueId('policy_value_'), hidden: model.hidden
+                    key: key,
+                    display_name: model.display_name,
+                    help: model.help,
+                    value: JSON.stringify(model.value, null, 4),
+                    deprecated: model.deprecated,
+                    keyUniqueId: newKeyId,
+                    valueUniqueId: _.uniqueId('policy_value_'),
+                    hidden: model.hidden
                 });
 
             this.fieldToSelectorMap[key] = newKeyId;

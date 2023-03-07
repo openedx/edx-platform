@@ -10,15 +10,11 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     onSelectBlock: blockId => dispatch(selectBlock(blockId)),
     fetchCourseBlocks:
-    (courseId, excludeBlockTypes) =>
-        dispatch(fetchCourseBlocks(courseId, excludeBlockTypes)),
+    (courseId, excludeBlockTypes) => dispatch(fetchCourseBlocks(courseId, excludeBlockTypes)),
     createProblemResponsesReportTask:
-    (problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation) =>
-        dispatch(
-            createProblemResponsesReportTask(
-                problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation,
-            ),
-        ),
+    (problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation) => dispatch(
+        createProblemResponsesReportTask(problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation,),
+    ),
 });
 
 const MainContainer = connect(

@@ -97,7 +97,7 @@ class CourseEntitlementView extends Backbone.View {
     */
         // Do not allow for enrollment when button is disabled
         const prevSession = this.entitlementModel.get('currentSessionId');
-        if (this.$('.enroll-btn-initial').hasClass('disabled')) return;
+        if (this.$('.enroll-btn-initial').hasClass('disabled')) { return; }
 
         // Grab the id for the desired session, a leave session event will return null
         this.currentSessionSelection = this.$('.session-select')
@@ -105,7 +105,8 @@ class CourseEntitlementView extends Backbone.View {
         const isLeavingSession = !this.currentSessionSelection;
 
         // Display the indicator icon
-        HtmlUtils.setHtml(this.$dateDisplayField,
+        HtmlUtils.setHtml(
+            this.$dateDisplayField,
             HtmlUtils.HTML('<span class="fa fa-spinner fa-spin" aria-hidden="true"></span>'),
         );
 
@@ -154,7 +155,8 @@ class CourseEntitlementView extends Backbone.View {
         this.$triggerOpenBtn.removeClass('hidden');
 
         // Display a success indicator
-        HtmlUtils.setHtml(this.$dateDisplayField,
+        HtmlUtils.setHtml(
+            this.$dateDisplayField,
             HtmlUtils.joinHtml(
                 HtmlUtils.HTML(successIconEl),
                 this.getAvailableSessionWithId(newSession).session_dates,

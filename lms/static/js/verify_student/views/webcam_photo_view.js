@@ -188,6 +188,7 @@ var edx = edx || {},
                             gettext("You don't seem to have a webcam connected.") + '  '
                             + gettext('Double-check that your webcam is connected and working to continue.')
                         );
+                    // eslint-disable-next-line brace-style
                     }
 
                     // If we're still waiting for the player to load, check

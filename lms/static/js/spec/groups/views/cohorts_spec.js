@@ -608,8 +608,14 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 AjaxHelpers.respondWithJson(
                     requests,
                     _.extend({
-                        unknown: [], added: [], present: [], changed: [], not_allowed: [],
-                        success: true, preassigned: [], invalid: []
+                        unknown: [],
+                        added: [],
+                        present: [],
+                        changed: [],
+                        not_allowed: [],
+                        success: true,
+                        preassigned: [],
+                        invalid: []
                     }, result)
                 );
             };

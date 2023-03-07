@@ -54,8 +54,10 @@ describe('Container Subviews', function() {
         published: false,
         has_changes: false,
         visibility_state: VisibilityState.unscheduled,
-        edited_on: 'Jul 02, 2014 at 14:20 UTC', edited_by: 'joe',
-        published_on: 'Jul 01, 2014 at 12:45 UTC', published_by: 'amako',
+        edited_on: 'Jul 02, 2014 at 14:20 UTC',
+        edited_by: 'joe',
+        published_on: 'Jul 01, 2014 at 12:45 UTC',
+        published_by: 'amako',
         currently_visible_to_students: false
     };
 
@@ -190,7 +192,9 @@ describe('Container Subviews', function() {
         it('renders correctly with published content', function() {
             renderContainerPage(this, mockContainerXBlockHtml);
             fetch({
-                published: true, has_changes: false, visibility_state: VisibilityState.ready,
+                published: true,
+                has_changes: false,
+                visibility_state: VisibilityState.ready,
                 release_date: 'Jul 02, 2030 at 14:20 UTC'
             });
             expect(containerPage.$(headerCss).text()).toContain('Published (not yet released)');
@@ -200,7 +204,9 @@ describe('Container Subviews', function() {
             expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
             fetch({
-                published: true, has_changes: true, visibility_state: VisibilityState.needsAttention,
+                published: true,
+                has_changes: true,
+                visibility_state: VisibilityState.needsAttention,
                 release_date: 'Jul 02, 2030 at 14:20 UTC'
             });
             expect(containerPage.$(headerCss).text()).toContain('Draft (Unpublished changes)');
@@ -210,7 +216,9 @@ describe('Container Subviews', function() {
             expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
             fetch({
-                published: true, has_changes: false, visibility_state: VisibilityState.live,
+                published: true,
+                has_changes: false,
+                visibility_state: VisibilityState.live,
                 release_date: 'Jul 02, 1990 at 14:20 UTC'
             });
             expect(containerPage.$(headerCss).text()).toContain('Published and Live');
@@ -220,7 +228,9 @@ describe('Container Subviews', function() {
             expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
             fetch({
-                published: true, has_changes: false, visibility_state: VisibilityState.unscheduled,
+                published: true,
+                has_changes: false,
+                visibility_state: VisibilityState.unscheduled,
                 release_date: null
             });
             expect(containerPage.$(headerCss).text()).toContain('Published (not yet released)');
@@ -348,8 +358,10 @@ describe('Container Subviews', function() {
             it('renders correctly when unreleased', function() {
                 renderContainerPage(this, mockContainerXBlockHtml);
                 fetch({
-                    visibility_state: VisibilityState.ready, released_to_students: false,
-                    release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"'
+                    visibility_state: VisibilityState.ready,
+                    released_to_students: false,
+                    release_date: 'Jul 02, 2014 at 14:20 UTC',
+                    release_date_from: 'Section "Week 1"'
                 });
                 expect(containerPage.$(releaseDateTitleCss).text()).toContain('Scheduled:');
                 expect(containerPage.$(releaseDateDateCss).text()).toContain('Jul 02, 2014 at 14:20 UTC');
@@ -359,8 +371,10 @@ describe('Container Subviews', function() {
             it('renders correctly when released', function() {
                 renderContainerPage(this, mockContainerXBlockHtml);
                 fetch({
-                    visibility_state: VisibilityState.live, released_to_students: true,
-                    release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"'
+                    visibility_state: VisibilityState.live,
+                    released_to_students: true,
+                    release_date: 'Jul 02, 2014 at 14:20 UTC',
+                    release_date_from: 'Section "Week 1"'
                 });
                 expect(containerPage.$(releaseDateTitleCss).text()).toContain('Released:');
                 expect(containerPage.$(releaseDateDateCss).text()).toContain('Jul 02, 2014 at 14:20 UTC');
@@ -370,8 +384,10 @@ describe('Container Subviews', function() {
             it('renders correctly when the release date is not set', function() {
                 renderContainerPage(this, mockContainerXBlockHtml);
                 fetch({
-                    visibility_state: VisibilityState.unscheduled, released_to_students: false,
-                    release_date: null, release_date_from: null
+                    visibility_state: VisibilityState.unscheduled,
+                    released_to_students: false,
+                    release_date: null,
+                    release_date_from: null
                 });
                 expect(containerPage.$(releaseDateTitleCss).text()).toContain('Release:');
                 expect(containerPage.$(releaseDateContentCss).text()).toContain('Unscheduled');
@@ -380,8 +396,10 @@ describe('Container Subviews', function() {
             it('renders correctly when the unit is not published', function() {
                 renderContainerPage(this, mockContainerXBlockHtml);
                 fetch({
-                    visibility_state: VisibilityState.needsAttention, released_to_students: true,
-                    release_date: 'Jul 02, 2014 at 14:20 UTC', release_date_from: 'Section "Week 1"'
+                    visibility_state: VisibilityState.needsAttention,
+                    released_to_students: true,
+                    release_date: 'Jul 02, 2014 at 14:20 UTC',
+                    release_date_from: 'Section "Week 1"'
                 });
                 containerPage.xblockPublisher.render();
                 expect(containerPage.$(releaseDateTitleCss).text()).toContain('Release:');

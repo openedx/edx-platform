@@ -216,6 +216,7 @@
                     if ((this.onTarget !== null) && (this.onTarget.uniqueId !== target.uniqueId)) {
                         this.onTarget.removeDraggable(this);
                         target.addDraggable(this);
+                    // eslint-disable-next-line brace-style
                     }
                     // If the draggable was moved from the slider to a
                     // target, remember the target, and add ID to the

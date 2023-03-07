@@ -6,6 +6,7 @@
     function waitForProtex() {
         if (typeof(protex) !== 'undefined' && protex) {
             protex.onInjectionDone('protex');
+        // eslint-disable-next-line brace-style
         }
         /* if (typeof(protex) !== "undefined") {
             //initializeProtex();
