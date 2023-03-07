@@ -11,6 +11,7 @@ from datetime import datetime
 
 import pytz
 import six
+from crum import get_current_request
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -21,6 +22,8 @@ from edx_ace import ace
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
 from six import text_type
+from openedx.features.edly.constants import COURSE_ENROLLMENT
+from openedx.features.edly.utils import is_config_enabled
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from submissions.models import score_set
 
@@ -124,7 +127,7 @@ def get_user_email_language(user):
 
 def enroll_email(
         course_id, student_email, auto_enroll=False, email_students=False,
-        email_params=None, language=None, context_vars=None
+        email_params=None, language=None, context_vars=None, site=None
 ):
     """
     Enroll a student by email.
@@ -165,7 +168,7 @@ def enroll_email(
             email_params['message_type'] = 'enrolled_enroll'
             email_params['email_address'] = student_email
             email_params['full_name'] = previous_state.full_name
-            send_mail_to_student(student_email, email_params, language=language, context_vars=context_vars)
+            send_mail_to_student(student_email, email_params, language=language, context_vars=context_vars, site=site)
 
     elif not is_email_retired(student_email):
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
@@ -174,7 +177,7 @@ def enroll_email(
         if email_students:
             email_params['message_type'] = 'allowed_enroll'
             email_params['email_address'] = student_email
-            send_mail_to_student(student_email, email_params, language=language, context_vars=context_vars)
+            send_mail_to_student(student_email, email_params, language=language, context_vars=context_vars, site=site)
 
     after_state = EmailEnrollmentState(course_id, student_email)
 
@@ -425,7 +428,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     return email_params
 
 
-def send_mail_to_student(student, param_dict, language=None, context_vars=None):
+def send_mail_to_student(student, param_dict, language=None, context_vars=None, site=None):
     """
     Construct the email using templates and then send it.
     `student` is the student's email address (a `str`),
@@ -450,7 +453,7 @@ def send_mail_to_student(student, param_dict, language=None, context_vars=None):
 
     Returns a boolean indicating whether the email was sent successfully.
     """
-
+    site = site or get_current_request().site
     # Add some helpers and microconfig subsitutions
     if 'display_name' in param_dict:
         param_dict['course_name'] = param_dict['display_name']
@@ -490,7 +493,8 @@ def send_mail_to_student(student, param_dict, language=None, context_vars=None):
     if from_email:
         message.options.update({'from_address': from_email})
 
-    ace.send(message)
+    if is_config_enabled(site, COURSE_ENROLLMENT):
+        ace.send(message)
 
 
 def render_message_to_string(subject_template, message_template, param_dict, language=None):

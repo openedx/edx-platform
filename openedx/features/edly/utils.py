@@ -590,3 +590,15 @@ def send_cert_email_to_course_staff(student_email, course_key, site_id, context_
 
         msg.options['from_address'] = from_address
         send_certificate_generation_email(msg, instructor_user, site)
+
+
+def is_config_enabled(site, conf_key):
+    """
+    Returns if the given email is enabled or not.
+    """
+    site_conf = getattr(site, "configuration", None)
+    if not site_conf:
+        return True
+
+    email_conf = site_conf.get_value('EMAILS_CONFIG', {})
+    return email_conf.get(conf_key, True)

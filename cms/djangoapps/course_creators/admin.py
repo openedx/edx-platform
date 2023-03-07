@@ -6,6 +6,7 @@ django admin page for the course creators table
 import logging
 from smtplib import SMTPException
 
+from crum import get_current_request
 from django.conf import settings
 from django.contrib import admin
 from django.core.mail import send_mail
@@ -14,6 +15,8 @@ from django.dispatch import receiver
 from course_creators.models import CourseCreator, send_admin_notification, send_user_notification, update_creator_state
 from course_creators.views import update_course_creator_group
 from edxmako.shortcuts import render_to_string
+from openedx.features.edly.constants import ROLE_ASSIGNED, ROLE_REVOKED
+from openedx.features.edly.utils import is_config_enabled
 
 log = logging.getLogger("studio.coursecreatoradmin")
 
@@ -104,10 +107,13 @@ def send_user_notification_callback(sender, **kwargs):
     else:
         # changed to unrequested or pending
         message_template = 'emails/course_creator_revoked.txt'
-    message = render_to_string(message_template, context)
 
+    message = render_to_string(message_template, context)
+    config_key = ROLE_ASSIGNED if updated_state == CourseCreator.GRANTED else ROLE_REVOKED
     try:
-        user.email_user(subject, message, studio_request_email)
+        site = get_current_request().site
+        if is_config_enabled(site, config_key):
+            user.email_user(subject, message, studio_request_email)
     except:
         log.warning(u"Unable to send course creator status e-mail to %s", user.email)
 

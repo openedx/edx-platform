@@ -450,7 +450,7 @@ def enroll_user_to_course(request_info, course_id, username_or_email, site_name=
                 email_params = get_email_params(course=course, auto_enroll=auto_enroll, site_name=site_name)
                 __ = enroll_email(
                     course_id, email, auto_enroll, email_students,
-                    email_params, language=language, context_vars=context_vars,
+                    email_params, language=language, context_vars=context_vars, site=thread_site
                 )
                 if user:
                     TASK_LOG.info(

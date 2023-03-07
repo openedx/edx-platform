@@ -19,3 +19,10 @@ STAFF_USERS = 'staff_users'
 WP_ADMIN_USERS = 'wp_admin_users'
 COURSE_AUTHORS = 'course_authors'
 PANEL_ADMINS = 'panel_admins'
+
+# EMAIL CONFIGS
+ACCOUNT_STATUS = 'account_status'
+COURSE_ENROLLMENT = 'course_enrollment'
+ROLE_ASSIGNED = 'role_assigned'
+ROLE_REVOKED = 'role_revoked'
+SUBSCRIPTION_EXPIRE = 'subscription_expire'

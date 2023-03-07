@@ -15,7 +15,9 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
+from openedx.features.edly.constants import SUBSCRIPTION_EXPIRE
 from openedx.features.edly.context_processor import Colour
+from openedx.features.edly.utils import is_config_enabled
 from openedx.features.subscriptions.message_types import ExpiredNotification, ImpendingExpiryNotification
 from openedx.features.subscriptions.models import UserSubscription
 from openedx.features.subscriptions.utils import get_subscription_renew_url
@@ -94,8 +96,9 @@ class Command(BaseCommand):
                         language=get_user_preference(user, LANGUAGE_KEY),
                         user_context={'full_name': user.profile.name}
                     )
-                    ace.send(msg)
-                    logger.info('Expiry notification email sent to user: %r', user.username)
+                    if is_config_enabled(site, SUBSCRIPTION_EXPIRE):
+                        ace.send(msg)
+                        logger.info('Expiry notification email sent to user: %r', user.username)
 
             except Exception:  # pylint: disable=broad-except
                 logger.exception('Could not send email for subscription expiry notification to user %s', user.username)
