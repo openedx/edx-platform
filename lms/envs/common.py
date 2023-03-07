@@ -3196,7 +3196,6 @@ INSTALLED_APPS = [
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
     'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
-    'openedx.features.learner_profile',
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
