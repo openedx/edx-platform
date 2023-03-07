@@ -30,26 +30,26 @@
         // the eslint warnings are being suppressed.
         extendsHelper(MarkdownEditingDescriptor, _super); // eslint-disable-line no-use-before-define
 
-        MarkdownEditingDescriptor.multipleChoiceTemplate = '( ) ' + // eslint-disable-line no-use-before-define
-            (gettext('incorrect')) + '\n( ) ' + (gettext('incorrect')) + '\n(x) ' + (gettext('correct')) + '\n';
+        MarkdownEditingDescriptor.multipleChoiceTemplate = '( ) ' // eslint-disable-line no-use-before-define
+            + (gettext('incorrect')) + '\n( ) ' + (gettext('incorrect')) + '\n(x) ' + (gettext('correct')) + '\n';
 
-        MarkdownEditingDescriptor.checkboxChoiceTemplate = '[x] ' + // eslint-disable-line no-use-before-define
-            (gettext('correct')) + '\n[ ] incorrect\n[x] correct\n';
+        MarkdownEditingDescriptor.checkboxChoiceTemplate = '[x] ' // eslint-disable-line no-use-before-define
+            + (gettext('correct')) + '\n[ ] incorrect\n[x] correct\n';
 
-        MarkdownEditingDescriptor.stringInputTemplate = '= ' + // eslint-disable-line no-use-before-define
-            (gettext('answer')) + '\n';
+        MarkdownEditingDescriptor.stringInputTemplate = '= ' // eslint-disable-line no-use-before-define
+            + (gettext('answer')) + '\n';
 
-        MarkdownEditingDescriptor.numberInputTemplate = '= ' + // eslint-disable-line no-use-before-define
-            (gettext('answer')) + ' +- 0.001%\n';
+        MarkdownEditingDescriptor.numberInputTemplate = '= ' // eslint-disable-line no-use-before-define
+            + (gettext('answer')) + ' +- 0.001%\n';
 
-        MarkdownEditingDescriptor.selectTemplate = '[[' + // eslint-disable-line no-use-before-define
-            (gettext('incorrect')) + ', (' + (gettext('correct')) + '), ' + (gettext('incorrect')) + ']]\n';
+        MarkdownEditingDescriptor.selectTemplate = '[[' // eslint-disable-line no-use-before-define
+            + (gettext('incorrect')) + ', (' + (gettext('correct')) + '), ' + (gettext('incorrect')) + ']]\n';
 
-        MarkdownEditingDescriptor.headerTemplate = '' + // eslint-disable-line no-use-before-define
-            (gettext('Header')) + '\n=====\n';
+        MarkdownEditingDescriptor.headerTemplate = '' // eslint-disable-line no-use-before-define
+            + (gettext('Header')) + '\n=====\n';
 
-        MarkdownEditingDescriptor.explanationTemplate = '[explanation]\n' + // eslint-disable-line no-use-before-define
-            (gettext('Short explanation')) + '\n[explanation]\n';
+        MarkdownEditingDescriptor.explanationTemplate = '[explanation]\n' // eslint-disable-line no-use-before-define
+            + (gettext('Short explanation')) + '\n[explanation]\n';
 
         function MarkdownEditingDescriptor(element) {
             var that = this;
@@ -381,8 +381,8 @@
                         options = group1.split(/\,\s*/g);
                         optiontag = '  <optioninput options="(';
                         for (i = 0; i < options.length; i += 1) {
-                            optiontag += "'" + options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1') + "'" +
-                                (i < options.length - 1 ? ',' : '');
+                            optiontag += "'" + options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1') + "'"
+                                + (i < options.length - 1 ? ',' : '');
                         }
                         optiontag += ')" correct="';
                         correct = /(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g.exec(group1);
@@ -415,13 +415,13 @@
                                 hintstr = ' <optionhint' + label + '>' + textHint.hint + '</optionhint>';
                             }
                             // xss-lint: disable=javascript-concat-html
-                            optionlines += '    <option' + correctstr + '>' + textHint.nothint + hintstr +
-                                '</option>\n';
+                            optionlines += '    <option' + correctstr + '>' + textHint.nothint + hintstr
+                                + '</option>\n';
                         }
                     }
                     // xss-lint: disable=javascript-concat-html
-                    return '\n<optionresponse>\n  <optioninput>\n' + optionlines +
-                        '  </optioninput>\n</optionresponse>\n\n';
+                    return '\n<optionresponse>\n  <optioninput>\n' + optionlines
+                        + '  </optioninput>\n</optionresponse>\n\n';
                 });
 
                 // multiple choice questions
@@ -493,8 +493,8 @@
                                 hintbody = abhint[2];
                                 hintbody = hintbody.replace('&lf;', '\n').trim();
                                 // xss-lint: disable=javascript-concat-html
-                                endHints += '    <compoundhint value="' + abhint[1].trim() + '">' + hintbody +
-                                    '</compoundhint>\n';
+                                endHints += '    <compoundhint value="' + abhint[1].trim() + '">' + hintbody
+                                    + '</compoundhint>\n';
                                 continue; // bail
                             }
 
@@ -516,14 +516,14 @@
                                 // <choicehint selected="true">You’re right that apple is a fruit.</choicehint>
                                 if (select) {
                                     // xss-lint: disable=javascript-concat-html
-                                    hints += '\n      <choicehint selected="true">' + select[2].trim() +
-                                        '</choicehint>';
+                                    hints += '\n      <choicehint selected="true">' + select[2].trim()
+                                        + '</choicehint>';
                                 }
                                 select = /{\s*(u|unselected):((.|\n)*?)}/i.exec(inner);
                                 if (select) {
                                     // xss-lint: disable=javascript-concat-html
-                                    hints += '\n      <choicehint selected="false">' + select[2].trim() +
-                                        '</choicehint>';
+                                    hints += '\n      <choicehint selected="false">' + select[2].trim()
+                                        + '</choicehint>';
                                 }
 
                                 // Blank out the original text only if the specific "selected" syntax is found
@@ -597,9 +597,9 @@
                             if (textHint.hint) {
                                 firstAnswer = textHint.nothint;
                                 // xss-lint: disable=javascript-concat-html
-                                hintLine = '  <correcthint' + textHint.labelassign + '>' +
+                                hintLine = '  <correcthint' + textHint.labelassign + '>'
                                 // xss-lint: disable=javascript-concat-html
-                                    textHint.hint + '</correcthint>\n';
+                                    + textHint.hint + '</correcthint>\n';
                             }
 
                             // Range case
@@ -614,9 +614,9 @@
                                 numericalResponseString = '<numericalresponse answer="' + answerData.answer + '">\n';
                                 if (answerData.default) {
                                     // xss-lint: disable=javascript-concat-html
-                                    numericalResponseString += '  <responseparam type="tolerance" default="' +
+                                    numericalResponseString += '  <responseparam type="tolerance" default="'
                                     // xss-lint: disable=javascript-concat-html
-                                        answerData.default + '" />\n';
+                                        + answerData.default + '" />\n';
                                 }
                             }
 
@@ -632,19 +632,19 @@
                                     // Do not add additional_answer if additional answer is not numerical (eg. or= ABC)
                                     // or contains range tolerance case (eg. or= (5,7)
                                     // or has tolerance (eg. or= 10 +- 0.02)
-                                    if (isNaN(parseFloat(orMatch[1])) ||
-                                        isRangeToleranceCase(orMatch[1]) ||
-                                        hasTolerance) {
+                                    if (isNaN(parseFloat(orMatch[1]))
+                                        || isRangeToleranceCase(orMatch[1])
+                                        || hasTolerance) {
                                         continue;
                                     }
 
                                     if (additionalTextHint.hint) {
                                         // xss-lint: disable=javascript-concat-html
-                                        additionalHintLine = '<correcthint' +
+                                        additionalHintLine = '<correcthint'
                                             // xss-lint: disable=javascript-concat-html
-                                            additionalTextHint.labelassign + '>' +
+                                            + additionalTextHint.labelassign + '>'
                                             // xss-lint: disable=javascript-concat-html
-                                            additionalTextHint.hint + '</correcthint>';
+                                            + additionalTextHint.hint + '</correcthint>';
                                     }
 
                                     // xss-lint: disable=javascript-concat-html
@@ -682,8 +682,8 @@
                             string = '<stringresponse answer="' + firstAnswer + '"' + typ + ' >\n';
                             if (textHint.hint) {
                                 // xss-lint: disable=javascript-concat-html
-                                string += '  <correcthint' + textHint.labelassign + '>' +
-                                    textHint.hint + '</correcthint>\n'; // xss-lint: disable=javascript-concat-html
+                                string += '  <correcthint' + textHint.labelassign + '>'
+                                    + textHint.hint + '</correcthint>\n'; // xss-lint: disable=javascript-concat-html
                             }
 
                             // Subsequent cases are not= or or=
@@ -692,9 +692,9 @@
                                 notMatch = /^not\=\s*(.*)/.exec(textHint.nothint);
                                 if (notMatch) {
                                     // xss-lint: disable=javascript-concat-html
-                                    string += '  <stringequalhint answer="' + notMatch[1] + '"' +
+                                    string += '  <stringequalhint answer="' + notMatch[1] + '"'
                                         // xss-lint: disable=javascript-concat-html
-                                        textHint.labelassign + '>' + textHint.hint + '</stringequalhint>\n';
+                                        + textHint.labelassign + '>' + textHint.hint + '</stringequalhint>\n';
 
                                     continue;
                                 }
@@ -705,9 +705,9 @@
                                     string += '  <additional_answer answer="' + orMatch[1] + '">';
                                     if (textHint.hint) {
                                         // xss-lint: disable=javascript-concat-html
-                                        string += '<correcthint' + textHint.labelassign + '>' +
+                                        string += '<correcthint' + textHint.labelassign + '>'
                                             // xss-lint: disable=javascript-concat-html
-                                            textHint.hint + '</correcthint>';
+                                            + textHint.hint + '</correcthint>';
                                     }
                                     string += '</additional_answer>\n';
                                 }
@@ -724,9 +724,9 @@
                 // replace explanations
                 xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
                     // xss-lint: disable=javascript-concat-html
-                    return '<solution>\n<div class="detailed-solution">\n' +
+                    return '<solution>\n<div class="detailed-solution">\n'
                         // xss-lint: disable=javascript-concat-html
-                        gettext('Explanation') + '\n\n' + p1 + '\n</div>\n</solution>';
+                        + gettext('Explanation') + '\n\n' + p1 + '\n</div>\n</solution>';
                 });
 
                 // replace code blocks

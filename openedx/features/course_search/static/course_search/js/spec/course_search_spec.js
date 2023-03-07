@@ -385,9 +385,9 @@ define([
                 expect(this.resultsView.$el.find('ol')[0]).toExist();
                 expect(this.resultsView.$el.find('li').length).toEqual(1);
                 expect(this.resultsView.$el).toContainHtml(
-                    this.collection.totalCount +
-                    ' result found for "' +
-                    this.collection.searchTerm + '"'
+                    this.collection.totalCount
+                    + ' result found for "'
+                    + this.collection.searchTerm + '"'
                 );
                 expect(this.resultsView.$el).toContainHtml('this is a short excerpt');
 

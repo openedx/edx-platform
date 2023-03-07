@@ -52,11 +52,11 @@ define(
         describe('ActiveVideoUploadListView', function() {
             beforeEach(function() {
                 setFixtures(
-                    '<div id="page-prompt"></div>' +
-                    '<div id="page-notification"></div>' +
-                    '<div id="reader-feedback"></div>' +
-                    '<div class="video-transcript-settings-wrapper"></div>' +
-                    '<button class="button course-video-settings-button"></button>'
+                    '<div id="page-prompt"></div>'
+                    + '<div id="page-notification"></div>'
+                    + '<div id="reader-feedback"></div>'
+                    + '<div class="video-transcript-settings-wrapper"></div>'
+                    + '<button class="button course-video-settings-button"></button>'
                 );
                 TemplateHelpers.installTemplate('active-video-upload');
                 TemplateHelpers.installTemplate('active-video-upload-list');
@@ -486,9 +486,9 @@ define(
                                         fileNames[i]
                                     );
                                     expect($.trim($uploadElem.find('.video-detail-status').text())).toEqual(
-                                        queued ?
-                                            ActiveVideoUpload.STATUS_QUEUED :
-                                            ActiveVideoUpload.STATUS_UPLOADING
+                                        queued
+                                            ? ActiveVideoUpload.STATUS_QUEUED
+                                            : ActiveVideoUpload.STATUS_UPLOADING
                                     );
                                     expect($uploadElem.find('.video-detail-progress').val()).toEqual(0);
                                     expect($uploadElem).not.toHaveClass('success');
@@ -552,8 +552,8 @@ define(
 
                                                 it('should update status and progress', function() {
                                                     var $uploadElem = this.view.$('.active-video-upload:first');
-                                                    if (subCaseInfo.isViewRefresh &&
-                                                        subCaseInfo.responseStatus === 204) {
+                                                    if (subCaseInfo.isViewRefresh
+                                                        && subCaseInfo.responseStatus === 204) {
                                                         expect(refreshSpy).toHaveBeenCalled();
                                                         if ($uploadElem.length > 0) {
                                                             expect(

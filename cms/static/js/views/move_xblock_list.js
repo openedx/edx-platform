@@ -192,8 +192,8 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
         breadcrumbInfo: function() {
             return {
                 breadcrumbs: _.map(this.visitedAncestors, function(ancestor) {
-                    return ancestor.get('category') === 'course' ?
-                        gettext('Course Outline') : ancestor.get('display_name');
+                    return ancestor.get('category') === 'course'
+                        ? gettext('Course Outline') : ancestor.get('display_name');
                 })
             };
         }

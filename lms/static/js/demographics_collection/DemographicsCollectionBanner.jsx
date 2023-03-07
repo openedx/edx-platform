@@ -77,8 +77,8 @@ export class DemographicsCollectionBanner extends React.Component {
                         </div>
                     </a>
                     <div>
-                        {this.state.modalOpen &&
-              <DemographicsCollectionModal
+                        {this.state.modalOpen
+              && <DemographicsCollectionModal
                   {...this.props}
                   user={this.props.user}
                   open={this.state.modalOpen}

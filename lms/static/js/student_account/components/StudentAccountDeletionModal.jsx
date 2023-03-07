@@ -133,8 +133,8 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                     open
                     body={(
                         <div>
-                            {responseError &&
-                <StatusAlert
+                            {responseError
+                && <StatusAlert
                     dialog={(
                         <div className="modal-alert">
                             <div className="icon-wrapper">

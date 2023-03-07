@@ -148,8 +148,8 @@ formulaEquationPreview.enable = function() {
      */
     function updatePage(inputData, response) {
         var requestStart = response.request_start;
-        if (requestStart == inputData.lastSent &&
-            !inputData.isWaitingForRequest) {
+        if (requestStart == inputData.lastSent
+            && !inputData.isWaitingForRequest) {
             // Disable icon.
             inputData.$img.css('visibility', 'hidden');
         }

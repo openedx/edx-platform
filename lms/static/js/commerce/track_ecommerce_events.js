@@ -16,9 +16,9 @@
             }
 
             if (
-                typeof optionalAttrs !== 'undefined' &&
-                optionalAttrs !== null &&
-                Object.keys(optionalAttrs).length > 0
+                typeof optionalAttrs !== 'undefined'
+                && optionalAttrs !== null
+                && Object.keys(optionalAttrs).length > 0
             ) {
                 allowedAttrs.forEach(function(allowedAttr) {
                     eventAttrs[allowedAttr] = optionalAttrs[allowedAttr];

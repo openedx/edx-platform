@@ -73,8 +73,8 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
         },
 
         onBeforeUnload: function() {
-            var dirty = this.areAnyConfigurationsDirty() ||
-                (this.experimentsEnabled && this.experimentGroupConfigurations.find(function(configuration) {
+            var dirty = this.areAnyConfigurationsDirty()
+                || (this.experimentsEnabled && this.experimentGroupConfigurations.find(function(configuration) {
                     return configuration.isDirty();
                 }));
 

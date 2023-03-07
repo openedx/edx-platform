@@ -157,8 +157,8 @@
                 this.lastSuccessMessageContext = context;
 
                 setTimeout(function() {
-                    if ((context === view.lastSuccessMessageContext) &&
-                        (view.getNotificationMessage().toString() === successMessage.toString())) {
+                    if ((context === view.lastSuccessMessageContext)
+                        && (view.getNotificationMessage().toString() === successMessage.toString())) {
                         if (view.editable === 'toggle') {
                             view.showCanEditMessage(true);
                         } else {
@@ -551,8 +551,8 @@
             },
 
             createGroupOptions: function() {
-                return !(_.isUndefined(this.options.groupOptions)) ? this.options.groupOptions :
-                    [{
+                return !(_.isUndefined(this.options.groupOptions)) ? this.options.groupOptions
+                    : [{
                         groupTitle: null,
                         selectOptions: this.options.options
                     }];
@@ -601,8 +601,8 @@
                     maxCharacters: this.options.maxCharacters || ''
                 }));
                 this.delegateEvents();
-                this.title((this.modelValue() || this.mode === 'edit') ?
-                    this.options.title : HtmlUtils.joinHtml(this.indicators.plus, this.options.title));
+                this.title((this.modelValue() || this.mode === 'edit')
+                    ? this.options.title : HtmlUtils.joinHtml(this.indicators.plus, this.options.title));
 
                 if (this.editable === 'toggle') {
                     this.showCanEditMessage(this.mode === 'display');

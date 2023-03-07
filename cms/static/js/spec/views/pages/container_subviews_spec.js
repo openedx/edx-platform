@@ -591,8 +591,8 @@ describe('Container Subviews', function() {
 
     describe('Message Area', function() {
         var messageSelector = '.container-message .warning',
-            warningMessage = 'Caution: The last published version of this unit is live. ' +
-                'By publishing changes you will change the student experience.';
+            warningMessage = 'Caution: The last published version of this unit is live. '
+                + 'By publishing changes you will change the student experience.';
 
         it('is empty for a unit that is not currently visible to students', function() {
             renderContainerPage(this, mockContainerXBlockHtml, {

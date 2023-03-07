@@ -133,16 +133,16 @@ export class StudentAccountDeletion extends React.Component {
                     inputRef={(input) => { this.modalTrigger = input; }}
                     onClick={this.loadDeletionModal}
                 />
-                {showError &&
-          <StatusAlert
+                {showError
+          && <StatusAlert
               dialog={(
                   <div className="modal-alert">
                       <div className="icon-wrapper">
                           <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
                       </div>
                       <div className="alert-content">
-                          {socialAuthConnected && isActive &&
-                    <p dangerouslySetInnerHTML={{ __html: socialAuthError }} />
+                          {socialAuthConnected && isActive
+                    && <p dangerouslySetInnerHTML={{ __html: socialAuthError }} />
                           }
                           {!isActive && <p dangerouslySetInnerHTML={{ __html: activationError }} /> }
                       </div>

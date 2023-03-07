@@ -648,8 +648,8 @@
                 expect(Caption.hideCaptions).toHaveBeenCalledWith(false);
             });
 
-            msg = 'use cookie to show/hide transcripts if they have not been ' +
-                    'loaded yet';
+            msg = 'use cookie to show/hide transcripts if they have not been '
+                    + 'loaded yet';
             it(msg, function() {
                 Caption.loaded = false;
                 Caption.hideCaptionsOnLoad = false;
@@ -679,8 +679,8 @@
                 expect(Caption.loaded).toBeTruthy();
             });
 
-            msg = 'on success: change language on touch devices when ' +
-                 'transcripts have not been rendered yet';
+            msg = 'on success: change language on touch devices when '
+                 + 'transcripts have not been rendered yet';
             it(msg, function() {
                 state.isTouch = true;
                 Caption.loaded = true;
@@ -746,8 +746,8 @@
                 expect(Caption.hideCaptions.calls.mostRecent().args[0]).toEqual(true);
             });
 
-            msg = 'on error: for Html5 player an attempt to fetch transcript ' +
-                    'with youtubeId if there are no additional transcripts';
+            msg = 'on error: for Html5 player an attempt to fetch transcript '
+                    + 'with youtubeId if there are no additional transcripts';
             it(msg, function() {
                 spyOn(Caption, 'fetchAvailableTranslations');
                 spyOn(Caption, 'fetchCaption').and.callThrough();
@@ -768,8 +768,8 @@
                 expect(Caption.hideClosedCaptions.calls.count()).toEqual(1);
             });
 
-            msg = 'on success: when fetchCaption called with fetch_with_youtubeId to ' +
-                    'get transcript with youtubeId for html5';
+            msg = 'on success: when fetchCaption called with fetch_with_youtubeId to '
+                    + 'get transcript with youtubeId for html5';
             it(msg, function() {
                 spyOn(Caption, 'fetchAvailableTranslations');
                 spyOn(Caption, 'fetchCaption').and.callThrough();
@@ -788,8 +788,8 @@
                 expect(Caption.fetchCaption.calls.count()).toEqual(1);
             });
 
-            msg = 'on error: fetch available translations if there are ' +
-                    'additional transcripts';
+            msg = 'on error: fetch available translations if there are '
+                    + 'additional transcripts';
             it(msg, function() {
                 $.ajax
                     .and.callFake(function(settings) {
@@ -1051,9 +1051,9 @@
                     progressSliderHeight = state.el.find('.slider').height();
                     controlHeight = state.el.find('.video-controls').height();
                     shouldBeHeight = parseInt((
-                        videoWrapperHeight -
-                        0.5 * progressSliderHeight -
-                        controlHeight
+                        videoWrapperHeight
+                        - 0.5 * progressSliderHeight
+                        - controlHeight
                     ), 10);
 
                     expect(realHeight).toBe(shouldBeHeight);
@@ -1272,8 +1272,8 @@
             });
 
             describe(
-                'when same transcript gets the focus through mouse after ' +
-                'having focus through TAB key',
+                'when same transcript gets the focus through mouse after '
+                + 'having focus through TAB key',
                 function() {
                     beforeEach(function() {
                         state.videoCaption.isMouseFocus = false;
@@ -1294,8 +1294,8 @@
                 });
 
             describe(
-                'when a second transcript gets focus through mouse after ' +
-                'first had focus through TAB key',
+                'when a second transcript gets focus through mouse after '
+                + 'first had focus through TAB key',
                 function() {
                     var $subDataLiIdx0, $subDataLiIdx1;
 

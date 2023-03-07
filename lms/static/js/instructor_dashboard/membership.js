@@ -674,9 +674,9 @@ such that the value can be defined later than this assignment (file load order).
                     } else {
                         allowed.push(studentResults);
                     }
-                } else if (dataFromServer.action === 'unenroll' &&
-                      !studentResults.before.enrollment &&
-                      !studentResults.before.allowed) {
+                } else if (dataFromServer.action === 'unenroll'
+                      && !studentResults.before.enrollment
+                      && !studentResults.before.allowed) {
                     notunenrolled.push(studentResults);
                 } else if (!studentResults.after.enrollment) {
                     notenrolled.push(studentResults);

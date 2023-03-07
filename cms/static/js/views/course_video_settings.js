@@ -90,9 +90,9 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             if (this.activeTranscriptionPlan) {
                 this.selectedProvider = this.activeTranscriptionPlan.provider;
                 this.selectedFidelityPlan = this.activeTranscriptionPlan.cielo24_fidelity;
-                this.selectedTurnaroundPlan = this.selectedProvider === CIELO24 ?
-                    this.activeTranscriptionPlan.cielo24_turnaround :
-                    this.activeTranscriptionPlan.three_play_turnaround;
+                this.selectedTurnaroundPlan = this.selectedProvider === CIELO24
+                    ? this.activeTranscriptionPlan.cielo24_turnaround
+                    : this.activeTranscriptionPlan.three_play_turnaround;
                 this.activeLanguages = this.activeTranscriptionPlan.preferred_languages;
                 this.selectedVideoSourceLanguage = this.activeTranscriptionPlan.video_source_language;
             } else {
@@ -187,8 +187,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
         reRenderView: function() {
             var $courseVideoSettingsContentEl = this.$el.find('.course-video-settings-content'),
-                dateModified = this.activeTranscriptionPlan ?
-                    moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
+                dateModified = this.activeTranscriptionPlan
+                    ? moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
 
             if (!this.selectedProvider) {
                 // Hide organization credentials and transcript preferences views
@@ -772,8 +772,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
         renderTranscriptPreferences: function() {
             var $courseVideoSettingsContentEl = this.$el.find('.course-video-settings-content'),
-                dateModified = this.activeTranscriptionPlan ?
-                    moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
+                dateModified = this.activeTranscriptionPlan
+                    ? moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
 
             HtmlUtils.setHtml(
                 $courseVideoSettingsContentEl,
@@ -799,8 +799,8 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         render: function() {
-            var dateModified = this.activeTranscriptionPlan ?
-                moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
+            var dateModified = this.activeTranscriptionPlan
+                ? moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
 
             HtmlUtils.setHtml(this.$el, this.template({}));
 
@@ -824,12 +824,12 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 $courseVideoSettingsContainer = this.$el.find('.course-video-settings-container'),
                 initialPositionTop = $courseVideoSettingsContainer.offset().top,
                 // Button right position =  width of window - button left position - button width - paddings - border.
-                $courseVideoSettingsButtonRight = $(window).width() -
-                    $courseVideoSettingsButton.offset().left -
-                    $courseVideoSettingsButton.width() -
-                    $courseVideoSettingsButton.css('padding-left').replace('px', '') -
-                    $courseVideoSettingsButton.css('padding-right').replace('px', '') -
-                    $courseVideoSettingsButton.css('border-width').replace('px', '') - 5; // Extra pixles for slack;
+                $courseVideoSettingsButtonRight = $(window).width()
+                    - $courseVideoSettingsButton.offset().left
+                    - $courseVideoSettingsButton.width()
+                    - $courseVideoSettingsButton.css('padding-left').replace('px', '')
+                    - $courseVideoSettingsButton.css('padding-right').replace('px', '')
+                    - $courseVideoSettingsButton.css('border-width').replace('px', '') - 5; // Extra pixles for slack;
 
             // Set to windows total height
             $courseVideoSettingsContainer.css('height', $(window).height());

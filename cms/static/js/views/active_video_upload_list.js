@@ -380,8 +380,8 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 // validate file type
                 if (!_.contains(self.videoSupportedFileFormats, fileType)) {
                     error = gettext(
-                        '{filename} is not in a supported file format. ' +
-                            'Supported file formats are {supportedFileFormats}.'
+                        '{filename} is not in a supported file format. '
+                            + 'Supported file formats are {supportedFileFormats}.'
                     )
                         .replace('{filename}', fileName)
                         .replace('{supportedFileFormats}', self.videoSupportedFileFormats.join(' and '));
@@ -421,8 +421,8 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 if (model.get('status') === ActiveVideoUpload.STATUS_COMPLETED) {
                     completedModels.push(model);
                     completedIndexes.push(index - completedIndexes.length);
-                    completedMessages.push(model.get('fileName') +
-                            gettext(': video upload complete.'));
+                    completedMessages.push(model.get('fileName')
+                            + gettext(': video upload complete.'));
                 }
             });
             for (idx = 0; idx < completedIndexes.length; idx++) {

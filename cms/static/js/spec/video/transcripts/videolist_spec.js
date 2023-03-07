@@ -163,8 +163,8 @@ define(
                 var triggerCallArgs;
                 return jasmine.waitUntil(function() {
                     triggerCallArgs = Backbone.trigger.calls.mostRecent().args;
-                    return Backbone.trigger.calls.count() === 1 &&
-                    triggerCallArgs[0] === 'transcripts:basicTabFieldChanged';
+                    return Backbone.trigger.calls.count() === 1
+                    && triggerCallArgs[0] === 'transcripts:basicTabFieldChanged';
                 });
             };
 
@@ -641,8 +641,8 @@ define(
                         .always(done);
                 });
 
-                it('On filling less than 3 fields, remaining fields should have ' +
-'placeholders for video types that were not filled yet',
+                it('On filling less than 3 fields, remaining fields should have '
++ 'placeholders for video types that were not filled yet',
                 function(done) {
                     var view = createVideoListView(this.mockServer),
                         defaultPlaceholders = view.placeholders;

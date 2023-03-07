@@ -65,17 +65,17 @@
             initialize: function(options) {
                 this.options = _.extend({}, this.options, options);
                 if (!this.options.type) {
-                    throw 'SystemFeedback: type required (given ' + // eslint-disable-line no-throw-literal
-                            JSON.stringify(this.options) + ')';
+                    throw 'SystemFeedback: type required (given ' // eslint-disable-line no-throw-literal
+                            + JSON.stringify(this.options) + ')';
                 }
                 if (!this.options.intent) {
-                    throw 'SystemFeedback: intent required (given ' + // eslint-disable-line no-throw-literal
-                            JSON.stringify(this.options) + ')';
+                    throw 'SystemFeedback: intent required (given ' // eslint-disable-line no-throw-literal
+                            + JSON.stringify(this.options) + ')';
                 }
                 this.setElement($('#page-' + this.options.type));
                 // handle single "secondary" action
-                if (this.options.actions && this.options.actions.secondary &&
-                            !_.isArray(this.options.actions.secondary)) {
+                if (this.options.actions && this.options.actions.secondary
+                            && !_.isArray(this.options.actions.secondary)) {
                     this.options.actions.secondary = [this.options.actions.secondary];
                 }
                 return this;
@@ -129,8 +129,8 @@
             },
 
             hide: function() {
-                if (this.shownAt && $.isNumeric(this.options.minShown) &&
-                            this.options.minShown > new Date() - this.shownAt) {
+                if (this.shownAt && $.isNumeric(this.options.minShown)
+                            && this.options.minShown > new Date() - this.shownAt) {
                     clearTimeout(this.hideTimeout);
                     this.hideTimeout = setTimeout(_.bind(this.hide, this),
                         this.options.minShown - (new Date() - this.shownAt));

@@ -22,14 +22,14 @@ export function CourseOrLibraryListing(props) {
                     <span className="label">{gettext('Course Number:')}</span>
                     <span className="value">{item.number}</span>
                 </span>
-                { item.run &&
-            <span className="course-run metadata-item">
+                { item.run
+            && <span className="course-run metadata-item">
                 <span className="label">{gettext('Course Run:')}</span>
                 <span className="value">{item.run}</span>
             </span>
                 }
-                { item.can_edit === false &&
-            <span className="extra-metadata">{gettext('(Read-only)')}</span>
+                { item.can_edit === false
+            && <span className="extra-metadata">{gettext('(Read-only)')}</span>
                 }
             </div>
         </div>
@@ -49,10 +49,10 @@ export function CourseOrLibraryListing(props) {
                                 )
                                 : renderCourseMetadata(item, i)
                             }
-                            { item.lms_link && item.rerun_link &&
-              <ul className="item-actions course-actions">
-                  { allowReruns &&
-                <li className="action action-rerun">
+                            { item.lms_link && item.rerun_link
+              && <ul className="item-actions course-actions">
+                  { allowReruns
+                && <li className="action action-rerun">
                     <a
                         href={item.rerun_link}
                         className="button rerun-button"

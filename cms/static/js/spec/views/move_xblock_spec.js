@@ -274,8 +274,8 @@ describe('MoveXBlock', function() {
 
         expect(displayedBreadcrumbs).toEqual(
             _.map(visitedCategories, function(visitedCategory) {
-                return visitedCategory === 'course' ?
-                    'Course Outline' : visitedCategory + '_display_name_' + xblockIndex;
+                return visitedCategory === 'course'
+                    ? 'Course Outline' : visitedCategory + '_display_name_' + xblockIndex;
             })
         );
     };

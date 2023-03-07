@@ -83,11 +83,11 @@ export function LearnerAnalyticsDashboard(props) {
             <div className="main-block">
                 <div className="analytics-group">
                     <h2 className="group-heading">Grading</h2>
-                    {gradeBreakdown && 
-            <h3 className="section-heading">Weight</h3>
+                    {gradeBreakdown 
+            && <h3 className="section-heading">Weight</h3>
                     }
-                    {gradeBreakdown && 
-            <div className="grading-weight-wrapper">
+                    {gradeBreakdown 
+            && <div className="grading-weight-wrapper">
                 <div className="chart-wrapper">
                     <CircleChart
                         slices={gradeBreakdown}
@@ -120,8 +120,8 @@ export function LearnerAnalyticsDashboard(props) {
                 <h2 className="group-heading">Timing</h2>
                 <div className="week-streak-wrapper">
                     <h3 className="section-heading">Week streak</h3>
-                    {week_streak > 0 && 
-            <div className="streak-icon-wrapper" aria-hidden="true">{getStreakIcons(week_streak)}</div>
+                    {week_streak > 0 
+            && <div className="streak-icon-wrapper" aria-hidden="true">{getStreakIcons(week_streak)}</div>
                     }
                     <p>{getStreakString(week_streak)}</p>
                     <p className="streak-encouragement">{getStreakEncouragement(week_streak)}</p>

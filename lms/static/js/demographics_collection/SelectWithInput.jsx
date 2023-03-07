@@ -31,8 +31,8 @@ export const SelectWithInput = (props) => {
             >
                 {options}
             </select>
-            {showInput &&
-        <input
+            {showInput
+        && <input
             className="form-control"
             aria-label={`${selectName} description field`}
             type={inputType}

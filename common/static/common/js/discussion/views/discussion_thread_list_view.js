@@ -307,9 +307,8 @@
                 lastThread = ref ? ref.get('id') : void 0;
                 if (lastThread) {
                     this.once('threads:rendered', function() {
-                        var classSelector =
-                            ".forum-nav-thread[data-id='" + lastThread + "'] + .forum-nav-thread " +
-                            '.forum-nav-thread-link';
+                        var classSelector =                            ".forum-nav-thread[data-id='" + lastThread + "'] + .forum-nav-thread "
+                            + '.forum-nav-thread-link';
                         return $(classSelector).focus();
                     });
                 } else {
@@ -524,8 +523,8 @@
                             if (!_.isNull(response.corrected_text)) {
                                 noResponseMsg = _.escape(
                                     gettext(
-                                        'No results found for {original_query}. ' +
-                                        'Showing results for {suggested_query}.'
+                                        'No results found for {original_query}. '
+                                        + 'Showing results for {suggested_query}.'
                                     )
                                 );
                                 message = edx.HtmlUtils.interpolateHtml(

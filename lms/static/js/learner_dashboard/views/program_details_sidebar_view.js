@@ -35,8 +35,8 @@ class ProgramDetailsSidebarView extends Backbone.View {
 
     render() {
         const data = $.extend({}, this.model.toJSON(), {
-            programCertificate: this.programCertificate ?
-                this.programCertificate.toJSON() : {},
+            programCertificate: this.programCertificate
+                ? this.programCertificate.toJSON() : {},
             programRecordUrl: this.programRecordUrl,
             industryPathways: this.industryPathways,
             creditPathways: this.creditPathways,

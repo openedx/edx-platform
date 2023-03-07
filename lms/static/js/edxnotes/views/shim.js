@@ -21,11 +21,11 @@
      **/
         Annotator.Plugin.Auth.prototype.haveValidToken = function() {
             return (
-                this._unsafeToken &&
-            this._unsafeToken.sub &&
-            this._unsafeToken.exp &&
-            this._unsafeToken.iat &&
-            this.timeToExpiry() > 0
+                this._unsafeToken
+            && this._unsafeToken.sub
+            && this._unsafeToken.exp
+            && this._unsafeToken.iat
+            && this.timeToExpiry() > 0
             );
         };
 

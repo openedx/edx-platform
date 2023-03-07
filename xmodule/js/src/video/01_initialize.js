@@ -358,22 +358,22 @@
                             }
                         },
                         savedVideoPosition: function(value) {
-                            return storage.getItem('savedVideoPosition', true) ||
-                            Number(value) ||
-                            0;
+                            return storage.getItem('savedVideoPosition', true)
+                            || Number(value)
+                            || 0;
                         },
                         speed: function(value) {
                             return storage.getItem('speed', true) || value;
                         },
                         generalSpeed: function(value) {
-                            return storage.getItem('general_speed') ||
-                            value ||
-                            '1.0';
+                            return storage.getItem('general_speed')
+                            || value
+                            || '1.0';
                         },
                         transcriptLanguage: function(value) {
-                            return storage.getItem('language') ||
-                            value ||
-                            'en';
+                            return storage.getItem('language')
+                            || value
+                            || 'en';
                         },
                         ytTestTimeout: function(value) {
                             value = parseInt(value, 10);
@@ -477,8 +477,8 @@
                 // alternate sources should automatically play.
                 if (!_prepareHTML5Video(this)) {
                     console.log(
-                        '[Video info]: Continue loading ' +
-                'YouTube video.'
+                        '[Video info]: Continue loading '
+                + 'YouTube video.'
                     );
 
                     // Non-YouTube sources were not found either.
@@ -581,8 +581,8 @@
                     });
                     $(scriptTag).on('error', function() {
                         console.log(
-                            '[Video info]: YouTube returned an error for ' +
-                    'video with id "' + self.id + '".'
+                            '[Video info]: YouTube returned an error for '
+                    + 'video with id "' + self.id + '".'
                         );
                         // If the video is already loaded in `_waitForYoutubeApi` by the
                         // time we get here, then we shouldn't load it again.
@@ -720,9 +720,9 @@
             function youtubeId(speed) {
                 var currentSpeed = this.isFlashMode() ? this.speed : '1.0';
 
-                return this.videos[speed] ||
-                this.videos[currentSpeed] ||
-                this.videos['1.0'];
+                return this.videos[speed]
+                || this.videos[currentSpeed]
+                || this.videos['1.0'];
             }
 
             function getDuration() {

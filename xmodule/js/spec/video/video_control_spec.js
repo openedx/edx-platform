@@ -65,8 +65,8 @@
                 });
 
             it(
-                'saved position is after start-time, ' +
-                'timer slider and VCR set to saved position',
+                'saved position is after start-time, '
+                + 'timer slider and VCR set to saved position',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -81,8 +81,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:15 / 1:00');
@@ -95,8 +95,8 @@
                 });
 
             it(
-                'saved position is negative, ' +
-                'timer slider and VCR set to start-time',
+                'saved position is negative, '
+                + 'timer slider and VCR set to start-time',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -111,8 +111,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:10 / 1:00');
@@ -125,8 +125,8 @@
                 });
 
             it(
-                'saved position is not a number, ' +
-                'timer slider and VCR set to start-time',
+                'saved position is not a number, '
+                + 'timer slider and VCR set to start-time',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -141,8 +141,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:10 / 1:00');
@@ -155,8 +155,8 @@
                 });
 
             it(
-                'saved position is greater than end-time, ' +
-                'timer slider and VCR set to start-time',
+                'saved position is greater than end-time, '
+                + 'timer slider and VCR set to start-time',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -171,8 +171,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:10 / 1:00');
@@ -187,8 +187,8 @@
 
         describe('constructor with end-time', function() {
             it(
-                'saved position is 0, timer slider and VCR set to 0:00 ' +
-                'and ending at specified end-time',
+                'saved position is 0, timer slider and VCR set to 0:00 '
+                + 'and ending at specified end-time',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -203,8 +203,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:00 / 0:20');
@@ -217,8 +217,8 @@
                 });
 
             it(
-                'saved position is after start-time, ' +
-                'timer slider and VCR set to saved position',
+                'saved position is after start-time, '
+                + 'timer slider and VCR set to saved position',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -233,8 +233,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:15 / 0:20');
@@ -263,8 +263,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:00 / 0:20');
@@ -277,8 +277,8 @@
                 });
 
             it(
-                'saved position is not a number, ' +
-                'timer slider and VCR set to 0:00',
+                'saved position is not a number, '
+                + 'timer slider and VCR set to 0:00',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -293,8 +293,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:00 / 0:20');
@@ -308,8 +308,8 @@
 
             // TODO: Fix!
             it(
-                'saved position is greater than end-time, ' +
-                'timer slider and VCR set to 0:00',
+                'saved position is greater than end-time, '
+                + 'timer slider and VCR set to 0:00',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -324,8 +324,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:00 / 0:20');
@@ -356,8 +356,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:10 / 0:20');
@@ -370,8 +370,8 @@
                 });
 
             it(
-                'saved position is after start-time, ' +
-                'timer slider and VCR set to saved position',
+                'saved position is after start-time, '
+                + 'timer slider and VCR set to saved position',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -387,8 +387,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:15 / 0:20');
@@ -401,8 +401,8 @@
                 });
 
             it(
-                'saved position is negative, ' +
-                'timer slider and VCR set to start-time',
+                'saved position is negative, '
+                + 'timer slider and VCR set to start-time',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -418,8 +418,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:10 / 0:20');
@@ -432,8 +432,8 @@
                 });
 
             it(
-                'saved position is not a number, ' +
-                'timer slider and VCR set to start-time',
+                'saved position is not a number, '
+                + 'timer slider and VCR set to start-time',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -449,8 +449,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:10 / 0:20');
@@ -463,8 +463,8 @@
                 });
 
             it(
-                'saved position is greater than end-time, ' +
-                'timer slider and VCR set to start-time',
+                'saved position is greater than end-time, '
+                + 'timer slider and VCR set to start-time',
                 function(done) {
                     var duration, sliderEl, expectedValue;
 
@@ -480,8 +480,8 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
-                        return isFinite(duration) && duration > 0 &&
-                        isFinite(state.videoPlayer.startTime);
+                        return isFinite(duration) && duration > 0
+                        && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
                         expect(expectedValue).toHaveText('0:10 / 0:20');

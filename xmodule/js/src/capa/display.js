@@ -7,8 +7,8 @@
 
 (function() {
     'use strict';
-    var indexOfHelper = [].indexOf ||
-        function(item) {
+    var indexOfHelper = [].indexOf
+        || function(item) {
             var i, len;
             for (i = 0, len = this.length; i < len; i++) {
                 if (i in this && this[i] === item) {

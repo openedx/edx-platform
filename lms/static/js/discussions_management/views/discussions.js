@@ -45,8 +45,8 @@
                 this.updateTopicVisibility(this.getSelectedScheme(), this.getTopicNav());
                 this.renderTopics();
 
-                if (this.isSchemeAvailable(COHORT) ||
-                        (!this.isSchemeAvailable(COHORT) && this.getSelectedScheme() === COHORT)) {
+                if (this.isSchemeAvailable(COHORT)
+                        || (!this.isSchemeAvailable(COHORT) && this.getSelectedScheme() === COHORT)) {
                     this.showCohortSchemeControl(true);
                 }
                 return this;

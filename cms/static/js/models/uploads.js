@@ -45,9 +45,9 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                     return RegExp(('(?:.+)\\.(' + formats.join('|') + ')$'), 'i');
                 };
 
-            return (attrs.mimeTypes.length === 0 && attrs.fileFormats.length === 0) ||
-                _.contains(attrs.mimeTypes, file.type) ||
-                getRegExp(attrs.fileFormats).test(file.name);
+            return (attrs.mimeTypes.length === 0 && attrs.fileFormats.length === 0)
+                || _.contains(attrs.mimeTypes, file.type)
+                || getRegExp(attrs.fileFormats).test(file.name);
         },
         // Return strings for the valid file types and extensions this
         // uploader accepts, formatted as natural language

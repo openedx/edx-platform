@@ -276,8 +276,8 @@ define([
             this.view.$('.show-groups').click();
             assertShowEmptyUsages(
                 this.view,
-                'This Group Configuration is not in use. ' +
-                'Start by adding a content experiment to any Unit via the'
+                'This Group Configuration is not in use. '
+                + 'Start by adding a content experiment to any Unit via the'
             );
         });
 
@@ -545,9 +545,9 @@ define([
             assertCannotDeleteUsed(
                 this,
                 'Cannot delete when in use by an experiment',
-                'This configuration is currently used in content ' +
-                'experiments. If you make changes to the groups, you may ' +
-                'need to edit those experiments.'
+                'This configuration is currently used in content '
+                + 'experiments. If you make changes to the groups, you may '
+                + 'need to edit those experiments.'
             );
         });
 

@@ -182,8 +182,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 )
             );
             assignmentType = assignmentType || MOCK_MANUAL_ASSIGNMENT;
-            var manualMessage = 'Learners are added to this cohort only when you provide their email addresses ' +
-                    'or usernames on this page.';
+            var manualMessage = 'Learners are added to this cohort only when you provide their email addresses '
+                    + 'or usernames on this page.';
             var randomMessage = 'Learners are added to this cohort automatically.';
             var message = (assignmentType === MOCK_MANUAL_ASSIGNMENT) ? manualMessage : randomMessage;
             expect(header.find('.cohort-management-group-setup .setup-value').text().trim().split('\n')[0]).toBe(message);
@@ -216,10 +216,10 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
         };
 
         beforeEach(function() {
-            setFixtures('<ul class="instructor-nav">' +
-                    '<li class="nav-item"><button type="button" data-section="cohort_management" ' +
-                    'class="active-section">Cohort Management</button></li></ul><div></div>' +
-                    '<div class="cohort-management"><div class="cohort-state-message"></div></div>');
+            setFixtures('<ul class="instructor-nav">'
+                    + '<li class="nav-item"><button type="button" data-section="cohort_management" '
+                    + 'class="active-section">Cohort Management</button></li></ul><div></div>'
+                    + '<div class="cohort-management"><div class="cohort-state-message"></div></div>');
             TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohorts');
             TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-form');
             TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-selector');
@@ -454,8 +454,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     {cohorts: createMockCohort(defaultCohortName, 1, 0, null, null, assignmentType)}
                 );
                 verifyMessage(
-                    'The ' + defaultCohortName + ' cohort has been created.' +
-                            ' You can manually add students to this cohort below.',
+                    'The ' + defaultCohortName + ' cohort has been created.'
+                            + ' You can manually add students to this cohort below.',
                     'confirmation'
                 );
                 verifyHeader(1, defaultCohortName, 0, MOCK_RANDOM_ASSIGNMENT);
@@ -639,8 +639,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 respondToAdd({preassigned: ['unknown@sample.com']});
                 respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
                 verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
-                verifyDetailedMessage('1 learner was pre-assigned for this cohort. ' +
-                        'This learner will automatically be added to the cohort when they enroll in the course.',
+                verifyDetailedMessage('1 learner was pre-assigned for this cohort. '
+                        + 'This learner will automatically be added to the cohort when they enroll in the course.',
                 'warning',
                 ['unknown@sample.com']);
                 expect(getStudentInput().val()).toBe('');

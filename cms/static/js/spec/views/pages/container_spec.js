@@ -81,8 +81,8 @@ function parameterized_suite(label, globalPageOptions) {
         getContainerPage = function(options, componentTemplates) {
             var default_options = {
                 model: model,
-                templates: componentTemplates === undefined ?
-                    EditHelpers.mockComponentTemplates : componentTemplates,
+                templates: componentTemplates === undefined
+                    ? EditHelpers.mockComponentTemplates : componentTemplates,
                 el: $('#content')
             };
             return new PageClass(_.extend(options || {}, globalPageOptions, default_options));

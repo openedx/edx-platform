@@ -152,14 +152,14 @@
                 state.browserIsFirefox = userAgent.indexOf('firefox') > -1;
                 state.browserIsChrome = userAgent.indexOf('chrome') > -1;
                 // Chrome includes both "Chrome" and "Safari" in the user agent.
-                state.browserIsSafari = (userAgent.indexOf('safari') > -1 &&
-                                 !state.browserIsChrome);
+                state.browserIsSafari = (userAgent.indexOf('safari') > -1
+                                 && !state.browserIsChrome);
 
                 // Browser can play HLS videos if either `Media Source Extensions`
                 // feature is supported or browser is safari (native HLS support)
                 state.canPlayHLS = state.HLSVideoSources.length > 0 && (HLS.isSupported() || state.browserIsSafari);
-                state.HLSOnlySources = state.config.sources.length > 0 &&
-                               state.config.sources.length === state.HLSVideoSources.length;
+                state.HLSOnlySources = state.config.sources.length > 0
+                               && state.config.sources.length === state.HLSVideoSources.length;
 
                 commonPlayerConfig = {
                     playerVars: state.videoPlayer.playerVars,
@@ -396,8 +396,8 @@
                     // than end-time. Also, we must make sure that this is only done
                     // once per video playing from start to end.
                     if (
-                        this.videoPlayer.endTime !== null &&
-                this.videoPlayer.endTime <= this.videoPlayer.currentTime
+                        this.videoPlayer.endTime !== null
+                && this.videoPlayer.endTime <= this.videoPlayer.currentTime
                     ) {
                         this.videoPlayer.pause();
 
@@ -464,8 +464,8 @@
                 if (this.videoPlayer.isPlaying()) {
                     this.videoPlayer.stopTimer();
                 }
-                var isUnplayed = this.videoPlayer.isUnstarted() ||
-                         this.videoPlayer.isCued();
+                var isUnplayed = this.videoPlayer.isUnstarted()
+                         || this.videoPlayer.isCued();
 
                 // Use `cueVideoById` method for youtube video that is not played before.
                 if (isUnplayed && this.isYoutubeType()) {
@@ -608,8 +608,8 @@
                 // For more information, please see the PR that introduced this change:
                 //     https://github.com/openedx/edx-platform/pull/2841
                 if (
-                    (this.isHtml5Mode() || availablePlaybackRates.length > 1) &&
-            this.isYoutubeType()
+                    (this.isHtml5Mode() || availablePlaybackRates.length > 1)
+            && this.isYoutubeType()
                 ) {
                     if (availablePlaybackRates.length === 1 && !this.isTouch) {
                         // This condition is needed in cases when Firefox version is
@@ -728,8 +728,8 @@
 
                 videoPlayer.endTime = this.config.endTime;
                 if (
-                    videoPlayer.endTime <= videoPlayer.startTime ||
-            videoPlayer.endTime >= duration
+                    videoPlayer.endTime <= videoPlayer.startTime
+            || videoPlayer.endTime >= duration
                 ) {
                     videoPlayer.endTime = null;
                 } else if (this.isFlashMode()) {
@@ -754,26 +754,26 @@
 
                 if (startTime > 0) {
                     if (
-                        startTime < savedVideoPosition &&
-                (endTime > savedVideoPosition || endTime === null) &&
+                        startTime < savedVideoPosition
+                && (endTime > savedVideoPosition || endTime === null)
 
                 // We do not want to jump to the end of the video.
                 // We subtract 1 from the duration for a 1 second
                 // safety net.
-                savedVideoPosition < duration - 1
+                && savedVideoPosition < duration - 1
                     ) {
                         time = savedVideoPosition;
                     } else {
                         time = startTime;
                     }
                 } else if (
-                    savedVideoPosition > 0 &&
-            (endTime > savedVideoPosition || endTime === null) &&
+                    savedVideoPosition > 0
+            && (endTime > savedVideoPosition || endTime === null)
 
             // We do not want to jump to the end of the video.
             // We subtract 1 from the duration for a 1 second
             // safety net.
-            savedVideoPosition < duration - 1
+            && savedVideoPosition < duration - 1
                 ) {
                     time = savedVideoPosition;
                 }

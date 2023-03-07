@@ -192,9 +192,9 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     useNewProblemEditor = primaryHeader.attr("use-new-editor-problem"),
                     blockType = primaryHeader.attr("data-block-type");
 
-                if( (useNewTextEditor === "True" && blockType === "html") ||
-                        (useNewVideoEditor === "True" && blockType === "video") ||
-                        (useNewProblemEditor === "True" && blockType === "problem")
+                if( (useNewTextEditor === "True" && blockType === "html")
+                        || (useNewVideoEditor === "True" && blockType === "video")
+                        || (useNewProblemEditor === "True" && blockType === "problem")
                 ) {
                     var destinationUrl = primaryHeader.attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(primaryHeader.attr("data-usage-id"));
                     window.location.href = destinationUrl;
@@ -395,9 +395,9 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 var matchBlockTypeFromLocator = /\@(.*?)\+/;
                 var blockType = data.locator.match(matchBlockTypeFromLocator);
             }
-            if((useNewTextEditor === "True" && blockType.includes("html")) ||
-                    (useNewVideoEditor === "True" && blockType.includes("video"))||
-                    (useNewProblemEditor === "True" && blockType.includes("problem"))
+            if((useNewTextEditor === "True" && blockType.includes("html"))
+                    || (useNewVideoEditor === "True" && blockType.includes("video"))
+                    ||(useNewProblemEditor === "True" && blockType.includes("problem"))
             ){
                 var destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
                 window.location.href = destinationUrl;

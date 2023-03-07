@@ -655,8 +655,8 @@
                                 jasmine.waitUntil(function() {
                                     duration = state.videoPlayer.duration();
 
-                                    return state.videoPlayer.isPlaying() &&
-                        state.videoPlayer.initialSeekToStartTime === false;
+                                    return state.videoPlayer.isPlaying()
+                        && state.videoPlayer.initialSeekToStartTime === false;
                                 }).then(function() {
                                     expect(state.videoPlayer.startTime).toBe(START_TIME);
                                     expect(state.videoPlayer.endTime).toBe(END_TIME);
@@ -846,8 +846,8 @@
                     });
 
                     $.each(['iPad', 'Android'], function(index, device) {
-                        var message = 'controls become visible after playing starts ' +
-                    'on ' + device;
+                        var message = 'controls become visible after playing starts '
+                    + 'on ' + device;
 
                         it(message, function(done) {
                             var controls;

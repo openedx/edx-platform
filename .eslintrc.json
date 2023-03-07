@@ -70,7 +70,6 @@
     "no-var": "off",
     "object-curly-newline": "off",
     "object-shorthand": "off",
-    "operator-linebreak": "off",
     "prefer-arrow-callback": "off",
     "prefer-destructuring": "off",
     "prefer-rest-params": "off",

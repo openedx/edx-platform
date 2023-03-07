@@ -51,8 +51,8 @@
             template: HtmlUtils.template(cardTemplate),
 
             switchOnConfiguration: function(square_result, list_result) {
-                return this.callIfFunction(this.configuration) === 'square_card' ?
-                    square_result : list_result;
+                return this.callIfFunction(this.configuration) === 'square_card'
+                    ? square_result : list_result;
             },
 
             callIfFunction: function(value) {
@@ -64,9 +64,9 @@
             },
 
             className: function() {
-                var result = 'card ' +
-                                 this.switchOnConfiguration('square-card', 'list-card') + ' ' +
-                                 this.callIfFunction(this.cardClass);
+                var result = 'card '
+                                 + this.switchOnConfiguration('square-card', 'list-card') + ' '
+                                 + this.callIfFunction(this.cardClass);
                 if (this.callIfFunction(this.pennant)) {
                     result += ' has-pennant';
                 }

@@ -43,8 +43,8 @@ define([
                                 // Include videos that are not in the active video upload list,
                                 // or that are marked as Upload Complete
                                 var isActive = activeVideos.where({videoId: video.get('edx_video_id')});
-                                return isActive.length === 0 ||
-                                       isActive[0].get('status') === ActiveVideoUpload.STATUS_COMPLETE;
+                                return isActive.length === 0
+                                       || isActive[0].get('status') === ActiveVideoUpload.STATUS_COMPLETE;
                             }),
                             updatedView = new PreviousVideoUploadListView({
                                 videoImageUploadURL: videoImageUploadURL,

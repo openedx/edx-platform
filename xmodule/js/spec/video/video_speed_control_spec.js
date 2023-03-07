@@ -79,8 +79,8 @@
                         expect($speedControl).not.toHaveClass('is-opened');
                     });
 
-                it('do not close the speed menu on mouseleave if a speed ' +
-                    'entry has focus', function() {
+                it('do not close the speed menu on mouseleave if a speed '
+                    + 'entry has focus', function() {
                     // Open speed meenu. Focus is on last speed entry.
                     $speedControl.trigger(keyPressEvent(KEY.ENTER));
                     $speedControl.mouseenter().mouseleave();

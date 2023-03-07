@@ -581,8 +581,8 @@
                         var canFetchWithYoutubeId;
                         console.log('[Video info]: ERROR while fetching captions.');
                         console.log(
-                            '[Video info]: STATUS:', textStatus +
-                            ', MESSAGE:', '' + errorThrown
+                            '[Video info]: STATUS:', textStatus
+                            + ', MESSAGE:', '' + errorThrown
                         );
                         // If initial list of languages has more than 1 item, check
                         // for availability other transcripts.
@@ -940,8 +940,8 @@
                     // The second and second to last elements turn automatic scrolling
                     // off again as it may have been enabled in captionBlur.
                     if (
-                        captionIndex <= 1 ||
-                        captionIndex >= this.sjson.getSize() - 2
+                        captionIndex <= 1
+                        || captionIndex >= this.sjson.getSize() - 2
                     ) {
                         this.autoScrolling = false;
                     }
@@ -965,8 +965,8 @@
                 // direction we are tabbing. So we could be on the first element and
                 // tabbing back out of the captions or on the last element and tabbing
                 // forward out of the captions.
-                if (captionIndex === 0 ||
-                    captionIndex === this.sjson.getSize() - 1) {
+                if (captionIndex === 0
+                    || captionIndex === this.sjson.getSize() - 1) {
                     this.autoScrolling = true;
                 }
             },
@@ -994,9 +994,9 @@
                 // Automatic scrolling gets disabled if one of the captions has
                 // received focus through tabbing.
                 if (
-                    !this.frozen &&
-                    el.length &&
-                    this.autoScrolling
+                    !this.frozen
+                    && el.length
+                    && this.autoScrolling
                 ) {
                     this.subtitlesEl.scrollTo(
                         el,
@@ -1058,9 +1058,9 @@
                     newIndex = this.sjson.search.apply(this.sjson, params);
 
                     if (
-                        typeof newIndex !== 'undefined' &&
-                        newIndex !== -1 &&
-                        this.currentIndex !== newIndex
+                        typeof newIndex !== 'undefined'
+                        && newIndex !== -1
+                        && this.currentIndex !== newIndex
                     ) {
                         if (typeof this.currentIndex !== 'undefined') {
                             this.subtitlesEl
@@ -1359,13 +1359,13 @@
                 var height = 0,
                     state = this.state;
                 // on page load captionHidden = undefined
-                if ((state.captionsHidden === undefined && this.hideCaptionsOnLoad) ||
-                    state.captionsHidden === true
+                if ((state.captionsHidden === undefined && this.hideCaptionsOnLoad)
+                    || state.captionsHidden === true
                 ) {
                     // In case of html5 autoshowing subtitles, we adjust height of
                     // subs, by height of scrollbar.
-                    height = state.el.find('.video-controls').height() +
-                        0.5 * state.el.find('.slider').height();
+                    height = state.el.find('.video-controls').height()
+                        + 0.5 * state.el.find('.slider').height();
                     // Height of videoControl does not contain height of slider.
                     // css is set to absolute, to avoid yanking when slider
                     // autochanges its height.

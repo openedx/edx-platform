@@ -45,8 +45,8 @@ class ProgramCardView extends Backbone.View {
     }
 
     postRender() {
-        if (navigator.userAgent.indexOf('MSIE') !== -1 ||
-        navigator.appVersion.indexOf('Trident/') > 0) {
+        if (navigator.userAgent.indexOf('MSIE') !== -1
+        || navigator.appVersion.indexOf('Trident/') > 0) {
             /* Microsoft Internet Explorer detected in. */
             window.setTimeout(() => {
                 this.reLoadBannerImage();
@@ -59,9 +59,9 @@ class ProgramCardView extends Backbone.View {
         const progress = this.progressModel ? this.progressModel.toJSON() : false;
 
         if (progress) {
-            progress.total = progress.completed +
-        progress.in_progress +
-        progress.not_started;
+            progress.total = progress.completed
+        + progress.in_progress
+        + progress.not_started;
 
             progress.percentage = {
                 completed: ProgramCardView.getWidth(progress.completed, progress.total),

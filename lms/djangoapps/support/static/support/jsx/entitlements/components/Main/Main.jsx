@@ -43,8 +43,8 @@ const MainContent = (props) => {
                 />
             </div>
             {
-                props.entitlements.length > 0 ?
-                    <EntitlementSupportTableContainer ecommerceUrl={props.ecommerceUrl} /> : null
+                props.entitlements.length > 0
+                    ? <EntitlementSupportTableContainer ecommerceUrl={props.ecommerceUrl} /> : null
             }
         </div>
     );

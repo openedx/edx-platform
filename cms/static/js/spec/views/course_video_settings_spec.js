@@ -150,10 +150,10 @@ define(
             verifyMessage = function(state, message) {
                 var icon = state === 'error' ? 'fa-info-circle' : 'fa-check-circle';
                 expect($courseVideoSettingsEl.find('.course-video-settings-message-wrapper.' + state).html()).toEqual(
-                    '<div class="course-video-settings-message">' +
-                    '<span class="icon fa ' + icon + '" aria-hidden="true"></span>' +
-                    '<span>' + message + '</span>' +
-                    '</div>'
+                    '<div class="course-video-settings-message">'
+                    + '<span class="icon fa ' + icon + '" aria-hidden="true"></span>'
+                    + '<span>' + message + '</span>'
+                    + '</div>'
                 );
             };
 
@@ -310,8 +310,8 @@ define(
 
             beforeEach(function() {
                 setFixtures(
-                    '<div class="video-transcript-settings-wrapper"></div>' +
-                    '<button class="button course-video-settings-button"></button>'
+                    '<div class="video-transcript-settings-wrapper"></div>'
+                    + '<button class="button course-video-settings-button"></button>'
                 );
                 TemplateHelpers.installTemplate('course-video-settings');
                 renderCourseVideoSettingsView(activeTranscriptPreferences, transcriptionPlans);
@@ -713,8 +713,8 @@ define(
                 expect($courseVideoSettingsEl.find('.transcription-account-details.warning')).toExist();
                 // Verify message
                 expect($courseVideoSettingsEl.find('.transcription-account-details').html()).toEqual(
-                    '<span>This action updates the ' + courseVideoSettingsView.selectedProvider +
-                    ' information for your entire organization.</span>'
+                    '<span>This action updates the ' + courseVideoSettingsView.selectedProvider
+                    + ' information for your entire organization.</span>'
                 );
             });
 

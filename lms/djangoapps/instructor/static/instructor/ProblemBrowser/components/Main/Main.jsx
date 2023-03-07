@@ -36,19 +36,20 @@ export default class Main extends React.Component {
         const { selectedBlock, onSelectBlock } = this.props;
         let selectorType = <Button onClick={this.handleToggleDropdown} label={gettext('Select a section or problem')} />;
         if (this.props.showBtnUi === 'false') {
-            selectorType =
-                // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-        (<span
-            onClick={this.handleToggleDropdown}
-            className={['problem-selector']}
-        >
-            <span>{selectedBlock || 'Select a section or problem'}</span>
-            <span className={['pull-right']}>
-                <Icon
-                    className={['fa', 'fa-sort']}
-                />
-            </span>
-        </span>);
+            selectorType = (
+            // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
+                <span
+                    onClick={this.handleToggleDropdown}
+                    className={['problem-selector']}
+                >
+                    <span>{selectedBlock || 'Select a section or problem'}</span>
+                    <span className={['pull-right']}>
+                        <Icon
+                            className={['fa', 'fa-sort']}
+                        />
+                    </span>
+                </span>
+            );
         }
 
         return (
@@ -62,13 +63,15 @@ export default class Main extends React.Component {
                         disabled
                         hidden={this.props.showBtnUi === 'false'}
                     />
-                    {this.state.showDropdown &&
-            <BlockBrowserContainer
-                onSelectBlock={(blockId) => {
-                    this.hideDropdown();
-                    onSelectBlock(blockId);
-                }}
-            />}
+                    {this.state.showDropdown
+            && (
+                <BlockBrowserContainer
+                    onSelectBlock={(blockId) => {
+                        this.hideDropdown();
+                        onSelectBlock(blockId);
+                    }}
+                />
+            )}
                     <Button
                         onClick={this.initiateReportGeneration}
                         name="list-problem-responses-csv"

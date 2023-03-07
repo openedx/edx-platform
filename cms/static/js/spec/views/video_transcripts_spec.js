@@ -118,9 +118,9 @@ define(
 
             beforeEach(function() {
                 setFixtures(
-                    '<div id="page-prompt"></div>' +
-                    '<div id="page-notification"></div>' +
-                    '<section class="wrapper-assets"></section>'
+                    '<div id="page-prompt"></div>'
+                    + '<div id="page-notification"></div>'
+                    + '<section class="wrapper-assets"></section>'
                 );
                 TemplateHelpers.installTemplate('previous-video-upload-list');
                 renderView(transcripts);

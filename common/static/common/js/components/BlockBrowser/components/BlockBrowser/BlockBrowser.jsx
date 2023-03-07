@@ -45,8 +45,8 @@ export const BlockList = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot }
                     onClick={() => onSelectBlock(block.id)}
                     label={block.display_name}
                 />
-                {block.children &&
-        <Button
+                {block.children
+        && <Button
             onClick={() => onChangeRoot(block.id)}
             label={RightIcon}
         />

@@ -93,23 +93,23 @@ var edx = edx || {};
                 } else {
                     diagAttr['data-refund-info'] = gettext('You will not be refunded the amount you paid.');
                 }
-                diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the purchased course ' +
-                                                   '{courseName} ({courseNumber})?');
+                diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the purchased course '
+                                                   + '{courseName} ({courseNumber})?');
             } else if (enrollmentMode !== 'verified') {
-                diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from {courseName} ' +
-                                                   '({courseNumber})?');
+                diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from {courseName} '
+                                                   + '({courseNumber})?');
             } else if (showRefundOption && !isCourseVoucherRefundable) {
-                diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
-                                                   '{certNameLong}  track of {courseName}  ({courseNumber})?');
+                diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified '
+                                                   + '{certNameLong}  track of {courseName}  ({courseNumber})?');
             } else if (showRefundOption) {
-                diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
-                                                   '{certNameLong}  track of {courseName}  ({courseNumber})?');
+                diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified '
+                                                   + '{certNameLong}  track of {courseName}  ({courseNumber})?');
                 diagAttr['data-refund-info'] = gettext('You will be refunded the amount you paid.');
             } else {
-                diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
-                                                   '{certNameLong} track of {courseName} ({courseNumber})?');
-                diagAttr['data-refund-info'] = gettext('The refund deadline for this course has passed, ' +
-                     'so you will not receive a refund.');
+                diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified '
+                                                   + '{certNameLong} track of {courseName} ({courseNumber})?');
+                diagAttr['data-refund-info'] = gettext('The refund deadline for this course has passed, '
+                     + 'so you will not receive a refund.');
             }
 
             return diagAttr;
@@ -186,8 +186,8 @@ var edx = edx || {};
                     $('#unenroll_course_id').val($(event.target).data('course-id'));
                 } else {
                     $('#unenroll_error').text(
-                        gettext('Unable to determine whether we should give you a refund because' +
-                                ' of System Error. Please try again later.')
+                        gettext('Unable to determine whether we should give you a refund because'
+                                + ' of System Error. Please try again later.')
                     ).stop()
                         .css('display', 'block');
 
@@ -196,8 +196,8 @@ var edx = edx || {};
             });
             request.fail(function() {
                 $('#unenroll_error').text(
-                    gettext('Unable to determine whether we should give you a refund because' +
-                                ' of System Error. Please try again later.')
+                    gettext('Unable to determine whether we should give you a refund because'
+                                + ' of System Error. Please try again later.')
                 ).stop()
                     .css('display', 'block');
 
@@ -238,12 +238,12 @@ var edx = edx || {};
                             // xss-lint: disable=javascript-jquery-append
                             $('#activate-account-modal p').append(
                                 // xss-lint: disable=javascript-concat-html
-                                '<svg  style="vertical-align:bottom" width="20" height="20"' +
+                                '<svg  style="vertical-align:bottom" width="20" height="20"'
                          // xss-lint: disable=javascript-concat-html
-                         'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
+                         + 'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
                          // xss-lint: disable=javascript-concat-html
-                         '<path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="#178253"/>\n' +
-                         '</svg>'
+                         + '<path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="#178253"/>\n'
+                         + '</svg>'
                             );
                         }, 500); // adding timeout to make spinner animation longer
                 }
@@ -253,12 +253,12 @@ var edx = edx || {};
             // xss-lint: disable=javascript-jquery-append
             $('#activate-account-modal p').append(
                 // xss-lint: disable=javascript-concat-html
-                '<svg  class="fa-pulse" style="vertical-align:bottom" width="20" height="20"' +
+                '<svg  class="fa-pulse" style="vertical-align:bottom" width="20" height="20"'
                // xss-lint: disable=javascript-concat-html
-               'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
+               + 'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n'
                // xss-lint: disable=javascript-concat-html
-               '<path d="M22 12A10 10 0 116.122 3.91l1.176 1.618A8 8 0 1020 12h2z" fill="#6c757d"/>\n' +
-               '</svg>'
+               + '<path d="M22 12A10 10 0 116.122 3.91l1.176 1.618A8 8 0 1020 12h2z" fill="#6c757d"/>\n'
+               + '</svg>'
             );
         });
 

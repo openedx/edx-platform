@@ -233,12 +233,12 @@
 
                     title = (
                         interpolate_text(
-                            ngettext('{numPreassigned} learner was pre-assigned for this cohort. ' +
-                                    'This learner will automatically be added to the cohort when ' +
-                                    'they enroll in the course.',
-                            '{numPreassigned} learners were pre-assigned for this cohort. ' +
-                                    'These learners will automatically be added to the cohort when ' +
-                                    'they enroll in the course.',
+                            ngettext('{numPreassigned} learner was pre-assigned for this cohort. '
+                                    + 'This learner will automatically be added to the cohort when '
+                                    + 'they enroll in the course.',
+                            '{numPreassigned} learners were pre-assigned for this cohort. '
+                                    + 'These learners will automatically be added to the cohort when '
+                                    + 'they enroll in the course.',
                             numPreassigned),
                             {numPreassigned: numPreassigned}
                         )
@@ -263,12 +263,12 @@
                 numErrors = modifiedUsers.unknown.length + modifiedUsers.invalid.length + modifiedUsers.not_allowed.length;
                 if (numErrors > 0) {
                     createErrorDetails = function(unknownUsers, invalidEmails, notAllowed, showAllErrors) {
-                        var unknownErrorsShown = showAllErrors ? unknownUsers.length :
-                            Math.min(errorLimit, unknownUsers.length);
-                        var invalidErrorsShown = showAllErrors ? invalidEmails.length :
-                            Math.min(errorLimit - unknownUsers.length, invalidEmails.length);
-                        var notAllowedErrorsShown = showAllErrors ? notAllowed.length :
-                            Math.min(errorLimit - notAllowed.length, notAllowed.length);
+                        var unknownErrorsShown = showAllErrors ? unknownUsers.length
+                            : Math.min(errorLimit, unknownUsers.length);
+                        var invalidErrorsShown = showAllErrors ? invalidEmails.length
+                            : Math.min(errorLimit - unknownUsers.length, invalidEmails.length);
+                        var notAllowedErrorsShown = showAllErrors ? notAllowed.length
+                            : Math.min(errorLimit - notAllowed.length, notAllowed.length);
                         details = [];
 
                         for (i = 0; i < unknownErrorsShown; i++) {

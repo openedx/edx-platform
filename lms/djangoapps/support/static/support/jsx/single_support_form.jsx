@@ -239,13 +239,13 @@ class RenderForm extends React.Component {
         if (event.keyCode === enterKeyCode) {
             window.location.href = suggestions[activeSuggestion].html_url;
         } else if (event.keyCode === upArrowKeyCode) {
-            (activeSuggestion === 0) ?
-                this.setState({ activeSuggestion: suggestions.length - 1 }) :
-                this.setState({ activeSuggestion: activeSuggestion - 1 });
+            (activeSuggestion === 0)
+                ? this.setState({ activeSuggestion: suggestions.length - 1 })
+                : this.setState({ activeSuggestion: activeSuggestion - 1 });
         } else if (event.keyCode === downArrowKeyCode) {
-            (activeSuggestion + 1 === suggestions.length) ?
-                this.setState({ activeSuggestion: 0 }) :
-                this.setState({ activeSuggestion: activeSuggestion + 1 });
+            (activeSuggestion + 1 === suggestions.length)
+                ? this.setState({ activeSuggestion: 0 })
+                : this.setState({ activeSuggestion: activeSuggestion + 1 });
         }
     }
 

@@ -133,12 +133,12 @@ const validateInputs = () => {
 export const ProgramEnrollmentsInspectorPage = props => (
     <div>
         {JSON.stringify(props.learnerInfo) !== '{}' && (<h2> Search Results </h2>)}
-        {props.learnerInfo.user &&
-      renderUserSection(props.learnerInfo.user)}
-        {props.learnerInfo.id_verification &&
-      renderVerificationSection(props.learnerInfo.id_verification)}
-        {props.learnerInfo.enrollments &&
-      renderEnrollmentsSection(props.learnerInfo.enrollments)}
+        {props.learnerInfo.user
+      && renderUserSection(props.learnerInfo.user)}
+        {props.learnerInfo.id_verification
+      && renderVerificationSection(props.learnerInfo.id_verification)}
+        {props.learnerInfo.enrollments
+      && renderEnrollmentsSection(props.learnerInfo.enrollments)}
         <form method="get">
             <h2>Search For A Masters Learner Below</h2>
             {props.error && (

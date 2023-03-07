@@ -1028,8 +1028,8 @@
 
             var isValidUrl = util.isValidUrl(url),
                 isValidDesc = (
-                    descInput.checkValidity() &&
-                    (descInput.required ? description.length : true)
+                    descInput.checkValidity()
+                    && (descInput.required ? description.length : true)
                 );
 
             if ((isValidUrl && isValidDesc) || isCancel) {
@@ -1462,9 +1462,9 @@
             buttons.undo = makeButton('wmd-undo-button', gettext('Undo (Ctrl+Z)'), '-200px', null, -1);
             buttons.undo.execute = function(manager) { if (manager) manager.undo(); };
 
-            var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
-                gettext('Redo (Ctrl+Y)') :
-                gettext('Redo (Ctrl+Shift+Z)'); // mac and other non-Windows platforms
+            var redoTitle = /win/.test(nav.platform.toLowerCase())
+                ? gettext('Redo (Ctrl+Y)')
+                : gettext('Redo (Ctrl+Shift+Z)'); // mac and other non-Windows platforms
 
             buttons.redo = makeButton('wmd-redo-button', redoTitle, '-220px', null, -1);
             buttons.redo.execute = function(manager) { if (manager) manager.redo(); };

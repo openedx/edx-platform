@@ -176,8 +176,8 @@ describe('Formula Equation Preview', function() {
             // Either it makes a request or jumps straight into displaying ''.
             jasmine.waitUntil(function() {
                 // (Short circuit if `inputAjax` is indeed called)
-                return window.Problem.inputAjax.calls.count() > 0 ||
-                    window.MathJax.Hub.Queue.calls.count() > 0;
+                return window.Problem.inputAjax.calls.count() > 0
+                    || window.MathJax.Hub.Queue.calls.count() > 0;
             }).then(function() {
                 // Expect the request not to have been called.
                 expect(window.Problem.inputAjax).not.toHaveBeenCalled();
@@ -202,8 +202,8 @@ describe('Formula Equation Preview', function() {
                 return Date.now() > end; // Stop when we get to `end`.
             }).then(function() {
                 jasmine.waitUntil(function() {
-                    return window.Problem.inputAjax.calls.count() > 0 &&
-                        window.Problem.inputAjax.calls.mostRecent().args[3].formula === value;
+                    return window.Problem.inputAjax.calls.count() > 0
+                        && window.Problem.inputAjax.calls.mostRecent().args[3].formula === value;
                 }).then(_.bind(function() {
                     // There should be 2 or 3 calls (depending on leading edge).
                     expect(window.Problem.inputAjax.calls.count()).not.toBeGreaterThan(3);

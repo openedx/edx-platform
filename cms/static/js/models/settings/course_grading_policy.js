@@ -82,8 +82,8 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 if (this.get('is_credit_course') && _.has(attrs, 'minimum_grade_credit')) {
                     // Getting minimum grade cutoff value
                     minimumGradeCutoff = _.min(_.values(attrs.grade_cutoffs));
-                    if (isNaN(attrs.minimum_grade_credit) || attrs.minimum_grade_credit === null ||
-                      attrs.minimum_grade_credit < minimumGradeCutoff) {
+                    if (isNaN(attrs.minimum_grade_credit) || attrs.minimum_grade_credit === null
+                      || attrs.minimum_grade_credit < minimumGradeCutoff) {
                         return {
                             minimum_grade_credit: StringUtils.interpolate(
                                 gettext('Not able to set passing grade to less than %(minimum_grade_cutoff)s%.'),

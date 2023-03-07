@@ -61,14 +61,14 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             if (newattrs.start_date && newattrs.end_date && newattrs.start_date >= newattrs.end_date) {
                 errors.end_date = gettext('The course end date must be later than the course start date.');
             }
-            if (newattrs.start_date && newattrs.enrollment_start &&
-                  newattrs.start_date < newattrs.enrollment_start) {
+            if (newattrs.start_date && newattrs.enrollment_start
+                  && newattrs.start_date < newattrs.enrollment_start) {
                 errors.enrollment_start = gettext(
                     'The course start date must be later than the enrollment start date.'
                 );
             }
-            if (newattrs.enrollment_start && newattrs.enrollment_end &&
-                  newattrs.enrollment_start >= newattrs.enrollment_end) {
+            if (newattrs.enrollment_start && newattrs.enrollment_end
+                  && newattrs.enrollment_start >= newattrs.enrollment_end) {
                 errors.enrollment_end = gettext(
                     'The enrollment start date cannot be after the enrollment end date.'
                 );
@@ -76,8 +76,8 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
                 errors.enrollment_end = gettext('The enrollment end date cannot be after the course end date.');
             }
-            if (this.showCertificateAvailableDate && newattrs.end_date && newattrs.certificate_available_date &&
-                    newattrs.certificate_available_date < newattrs.end_date) {
+            if (this.showCertificateAvailableDate && newattrs.end_date && newattrs.certificate_available_date
+                    && newattrs.certificate_available_date < newattrs.end_date) {
                 errors.certificate_available_date = gettext(
                     'The certificate available date must be later than the course end date.'
                 );
@@ -141,8 +141,8 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
         set_videosource: function(newsource) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
         // returns the videosource for the preview which iss the key whose speed is closest to 1
-            if (_.isEmpty(newsource) &&
-                  !_.isEmpty(this.get('intro_video'))) this.set({intro_video: null}, {validate: true});
+            if (_.isEmpty(newsource)
+                  && !_.isEmpty(this.get('intro_video'))) this.set({intro_video: null}, {validate: true});
             // TODO remove all whitespace w/in string
             else {
                 if (this.get('intro_video') !== newsource) this.set('intro_video', newsource, {validate: true});
