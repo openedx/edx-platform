@@ -2,6 +2,7 @@
 define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-ui-toolkit/js/utils/string-utils'],
     function(Backbone, Location, CourseGraderCollection, StringUtils) {
         'use strict';
+
         var CourseGradingPolicy = Backbone.Model.extend({
             defaults: {
                 graders: null, // CourseGraderCollection

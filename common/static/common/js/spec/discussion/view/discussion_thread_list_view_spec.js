@@ -4,6 +4,7 @@
 */
 (function() {
     'use strict';
+
     describe('DiscussionThreadListView', function() {
         var checkThreadsOrdering, expectFilter, makeView, renderSingleThreadWithProps, setupAjax;
 

@@ -12,6 +12,7 @@ define(
     ],
     function($, ActiveVideoUpload, ActiveVideoUploadListView, StringUtils, TemplateHelpers, AjaxHelpers) {
         'use strict';
+
         var concurrentUploadLimit = 2,
             POST_URL = '/test/post/url',
             VIDEO_ID = 'video101',

@@ -12,6 +12,7 @@ define(
     function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
         LicenseModel, LicenseView, TranscriptUtils, VideoList, VideoTranslations, HtmlUtils) {
         'use strict';
+
         var Metadata = {};
 
         Metadata.Editor = BaseView.extend({

@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['jquery', 'js/student_account/utils', 'jquery.cookie'], function($, Utils) {
         var MultipleEnterpriseInterface = {
 

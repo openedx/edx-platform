@@ -6,6 +6,7 @@ define(
     ],
     function($, Backbone, _, TranscriptUtils, HtmlUtils) {
         'use strict';
+
         var FileUploader = Backbone.View.extend({
             invisibleClass: 'is-invisible',
 

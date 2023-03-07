@@ -1,6 +1,7 @@
 define(['jquery', 'js/student_account/utils'],
     function($, Utils) {
         'use strict';
+
         describe('edxUserCookie', function() {
             var user,
                 edxUserInfoCookieName = 'edx-user-info',

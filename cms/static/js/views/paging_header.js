@@ -7,6 +7,7 @@ define([
     'text!templates/paging-header.underscore'
 ], function(_, Backbone, gettext, HtmlUtils, StringUtils, pagingHeaderTemplate) {
     'use strict';
+
     var PagingHeader = Backbone.View.extend({
         events: {
             'click .next-page-link': 'nextPage',

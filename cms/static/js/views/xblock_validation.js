@@ -1,6 +1,7 @@
 define(['jquery', 'underscore', 'js/views/baseview', 'gettext', 'edx-ui-toolkit/js/utils/html-utils'],
     function($, _, BaseView, gettext, HtmlUtils) {
         'use strict';
+
         /**
          * View for xblock validation messages as displayed in Studio.
          */

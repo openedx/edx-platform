@@ -7,6 +7,7 @@ define([
     'common/js/spec_helpers/page_helpers'
 ], function(Backbone, _, TopicTeamsView, AjaxHelpers, TeamSpecHelpers, PageHelpers) {
     'use strict';
+
     describe('Topic Teams View', function() {
         var requests, teamsView;
 

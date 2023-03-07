@@ -11,6 +11,7 @@ define(
     ],
     function($, _, Backbone, AjaxHelpers, Utils, Editor, VideoList, MetadataModel, AbstractEditor, MessageManager) {
         'use strict';
+
         describe('CMS.Views.Metadata.VideoList', function() {
             var videoListEntryTemplate = readFixtures(
                     'video/transcripts/metadata-videolist-entry.underscore'

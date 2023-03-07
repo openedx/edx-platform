@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/utils/utils', 'edx-ui-toolkit/js/utils/html-utils'
     ], function($, _, Annotator, Utils, HtmlUtils) {

@@ -4,6 +4,7 @@ define(
     ],
     function($, _, Squire) {
         'use strict';
+
         // TODO: fix BLD-1100 Disabled due to intermittent failure on master and in PR builds
         xdescribe('VideoTranslations', function() {
             var TranslationsEntryTemplate = readFixtures(

@@ -17,6 +17,7 @@ define([
     'js/views/baseview'
 ], function(BaseView) {
     'use strict';
+
     var ListView = BaseView.extend({
         events: {
             'click .action-add': 'onAddItem',

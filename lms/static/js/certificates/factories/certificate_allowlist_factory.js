@@ -3,6 +3,7 @@
 
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'js/certificates/views/certificate_allowlist',

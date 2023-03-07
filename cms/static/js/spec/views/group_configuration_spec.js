@@ -12,6 +12,7 @@ define([
     PartitionGroupDetailsView, ContentGroupEditorView, PartitionGroupItemView
 ) {
     'use strict';
+
     var SELECTORS = {
         detailsView: '.group-configuration-details',
         editView: '.group-configuration-edit',

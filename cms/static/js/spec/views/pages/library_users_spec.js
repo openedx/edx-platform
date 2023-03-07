@@ -4,6 +4,7 @@ define([
 ],
 function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
     'use strict';
+
     describe('Library Instructor Access Page', function() {
         var changeRoleUrl = 'dummy_change_role_url/@@EMAIL@@';
         var team_member_fixture = readFixtures('team-member.underscore');

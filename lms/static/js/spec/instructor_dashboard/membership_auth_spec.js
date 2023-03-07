@@ -4,6 +4,7 @@ define(['jquery',
     'js/instructor_dashboard/membership'],
 function($, AjaxHelpers) {
     'use strict';
+
     describe('Membership.AuthListWidget', function() {
         var membership, // eslint-disable-line no-unused-vars
             changeSelectedList;

@@ -6,6 +6,7 @@ define([
 ],
 function($, AjaxHelpers) {
     'use strict';
+
     describe('edx.instructor_dashboard.certificates.regenerate_certificates', function() {
         var $regenerate_certificates_button = null,
             $certificate_regeneration_status = null,

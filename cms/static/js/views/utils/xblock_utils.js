@@ -5,6 +5,7 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
     'js/models/xblock_info', 'edx-ui-toolkit/js/utils/string-utils'],
 function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
     'use strict';
+
     var addXBlock, duplicateXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField, VisibilityState,
         getXBlockVisibilityClass, getXBlockListTypeClass, updateXBlockFields, getXBlockType, findXBlockInfo,
         moveXBlock;

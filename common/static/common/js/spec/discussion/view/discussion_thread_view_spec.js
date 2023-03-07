@@ -4,6 +4,7 @@
 */
 (function() {
     'use strict';
+
     describe('DiscussionThreadView', function() {
         var assertContentVisible, assertExpandedContentVisible, assertResponseCountAndPaginationCorrect,
             createAjaxResponseJson, createTestResponseJson, postResponse, renderWithContent, renderWithTestResponses;

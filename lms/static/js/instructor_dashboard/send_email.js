@@ -2,6 +2,7 @@
 
 (function() {
     'use strict';
+
     var KeywordValidator, PendingInstructorTasks,
         createEmailContentTable, createEmailMessageViews, createTaskListTable,
         plantTimeout, statusAjaxError;

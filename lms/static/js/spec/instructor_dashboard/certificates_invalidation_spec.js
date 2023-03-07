@@ -9,6 +9,7 @@ define([
 function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationView,
     CertificateInvalidationCollection) {
     'use strict';
+
     describe('Field validation of invalidation model.', function() {
         var certificate_invalidation = null;
         var assertValid = function(fields, isValid, expectedErrors) {

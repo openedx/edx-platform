@@ -3,6 +3,7 @@ define(
         'js/views/course_video_settings', 'common/js/spec_helpers/template_helpers'],
     function($, _, Backbone, AjaxHelpers, CourseVideoSettingsView, TemplateHelpers) {
         'use strict';
+
         describe('CourseVideoSettingsView', function() {
             var $courseVideoSettingsEl,
                 courseVideoSettingsView,

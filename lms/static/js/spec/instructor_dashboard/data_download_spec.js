@@ -7,6 +7,7 @@ define([
 ],
 function($, id, AjaxHelper) {
     'use strict';
+
     describe('edx.instructor_dashboard.data_download', function() {
         var requests, $selected, dataDownload, url, errorMessage;
 

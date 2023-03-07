@@ -1,5 +1,7 @@
 (function($) { // eslint-disable-line wrap-iife
-    'use strict';
+    
+'use strict';
+
     $.fn.extend({
         /*
          * leanModal prepares an element to be a modal dialog.  Call it once on the

@@ -17,6 +17,7 @@
  */
 (function(define) {
     'use strict';
+
     define(['jquery',
         'underscore',
         'backbone',

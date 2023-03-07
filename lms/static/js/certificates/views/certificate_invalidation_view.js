@@ -3,6 +3,7 @@
 
 (function(define) {
     'use strict';
+
     define(
         ['jquery', 'underscore', 'gettext', 'backbone', 'js/certificates/models/certificate_invalidation'],
 

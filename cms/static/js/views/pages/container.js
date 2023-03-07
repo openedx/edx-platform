@@ -11,6 +11,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
     EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
     ContainerSubviews, UnitOutlineView, XBlockUtils) {
     'use strict';
+
     var XBlockContainerPage = BasePage.extend({
         // takes XBlockInfo as a model
 

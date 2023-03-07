@@ -10,6 +10,7 @@ such that the value can be defined later than this assignment (file load order).
 
 (function() {
     'use strict';
+
     var AuthListWidget,
         Membership,
         BatchEnrollment,

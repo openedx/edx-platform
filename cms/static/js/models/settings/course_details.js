@@ -3,6 +3,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
 ],
 function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
     'use strict';
+
     var CourseDetails = Backbone.Model.extend({
         defaults: {
             org: '',

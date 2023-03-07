@@ -1,5 +1,6 @@
 function escapeSelector(id) {
     'use strict';
+
     // Wrapper around window.CSS.escape that uses a fallback method if CSS.escape is not available.  This is designed to
     // serialize a string to be used as a valid css selector.  See
     // https://drafts.csswg.org/cssom/#the-css.escape()-method For example, this can be used with xblock and course ids,

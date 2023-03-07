@@ -6,6 +6,7 @@ define([
     'teams/js/models/topic'
 ], function(Backbone, _, TeamCollection, TopicCollection, TopicModel) {
     'use strict';
+
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         createMockTopicData, createMockTopicCollection, createMockTopic,
         createMockContext,

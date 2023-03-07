@@ -1,6 +1,7 @@
 /* globals Discussion, DiscussionSpecHelper, DiscussionThreadProfileView, Thread */
 (function() {
     'use strict';
+
     describe('DiscussionThreadProfileView', function() {
         var checkBody, checkPostWithImages, makeThread, makeView, spyConvertMath;
         beforeEach(function() {

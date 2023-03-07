@@ -7,6 +7,7 @@ define([
     'teams/js/views/team_profile'
 ], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamModel, TeamProfileView) {
     'use strict';
+
     describe('TeamProfileView', function() {
         var profileView, createTeamProfileView, createTeamModelData, clickLeaveTeam,
             teamModel,

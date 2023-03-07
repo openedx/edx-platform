@@ -14,6 +14,7 @@ define([
 function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, CourseVideoSettingsView,
     HtmlUtils, StringUtils, activeVideoUploadListTemplate) {
     'use strict';
+
     var ActiveVideoUploadListView,
         CONVERSION_FACTOR_GBS_TO_BYTES = 1000 * 1000 * 1000;
     ActiveVideoUploadListView = BaseView.extend({

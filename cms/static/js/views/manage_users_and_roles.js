@@ -5,6 +5,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
     'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils'],
 function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
     'use strict';
+
     var default_messages = {
         defaults: {
             confirmation: gettext('Ok'),

@@ -4,6 +4,7 @@ define([
 ],
 function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupListView) {
     'use strict';
+
     var GroupConfigurationsPage = BasePage.extend({
         initialize: function(options) {
             var currentScheme,

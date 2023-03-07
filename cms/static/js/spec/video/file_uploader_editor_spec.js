@@ -4,6 +4,7 @@ define(
     ],
     function($, _, Squire) {
         'use strict';
+
         describe('FileUploader', function() {
             var FileUploaderTemplate = readFixtures(
                     'metadata-file-uploader-entry.underscore'

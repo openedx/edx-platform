@@ -6,6 +6,7 @@
  */
 (function(define) {
     'use strict';
+
     define([], function() {
         var trackUpsellClick = function(elt, linkName, optionalAttrs) {
             var eventAttrs = {linkName: linkName};

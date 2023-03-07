@@ -2,6 +2,7 @@
 
 (function() {
     'use strict';
+
     // eslint-disable-next-line no-unused-vars
     var DataDownloadV2, PendingInstructorTasks, ReportDownloads, statusAjaxError;
 

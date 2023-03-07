@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     // VideoContextMenu module.
     define(
         'video/095_video_context_menu.js',

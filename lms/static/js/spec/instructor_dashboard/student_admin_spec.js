@@ -2,7 +2,9 @@
 define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function($, StudentAdmin, AjaxHelpers) {
         // 'js/instructor_dashboard/student_admin'
-        'use strict';
+        
+'use strict';
+
         describe('edx.instructor_dashboard.student_admin.StudentAdmin', function() {
             var studentadmin, dashboardApiUrl, uniqStudentIdentifier, alertMsg;
 

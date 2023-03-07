@@ -3,6 +3,7 @@ define([
 ],
 function(_, str, Backbone, gettext, GroupModel) {
     'use strict';
+
     var GroupCollection = Backbone.Collection.extend({
         model: GroupModel,
         comparator: 'order',

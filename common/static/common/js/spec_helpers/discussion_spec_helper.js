@@ -1,6 +1,7 @@
 /* global _, Content, Discussion, DiscussionCourseSettings, DiscussionUtil, DiscussionUser */
 (function() {
     'use strict';
+
     this.DiscussionSpecHelper = (function() {
         function DiscussionSpecHelper() {
         }

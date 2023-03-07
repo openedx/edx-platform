@@ -5,6 +5,7 @@ define([
     $, _, Annotator, AjaxHelpers, NotesVisibilityFactory, NotesCollector, Helpers
 ) {
     'use strict';
+
     describe('EdxNotes ToggleNotesFactory', function() {
         var params = {
             endpoint: '/test_endpoint/',

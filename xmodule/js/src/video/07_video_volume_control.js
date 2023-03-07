@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     // VideoVolumeControl module.
     define(
         'video/07_video_volume_control.js', ['edx-ui-toolkit/js/utils/html-utils'],

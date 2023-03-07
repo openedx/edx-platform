@@ -1,6 +1,7 @@
 /* globals _, NotificationModel, NotificationView, interpolate_text */
 (function(define) {
     'use strict';
+
     define(['backbone', 'underscore', 'jquery', 'gettext', 'js/groups/views/cohort_form',
         'edx-ui-toolkit/js/utils/html-utils', 'string_utils', 'js/models/notification', 'js/views/notification'],
     function(Backbone, _, $, gettext, CohortFormView, HtmlUtils) {

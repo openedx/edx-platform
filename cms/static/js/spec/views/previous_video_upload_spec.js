@@ -3,6 +3,7 @@ define(
         'common/js/spec_helpers/view_helpers'],
     function($, _, Backbone, PreviousVideoUploadView, TemplateHelpers, ViewHelpers) {
         'use strict';
+
         describe('PreviousVideoUploadView', function() {
             var render = function(modelData) {
                 var defaultData = {

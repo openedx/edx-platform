@@ -1,5 +1,6 @@
 describe('escapeSelector', function() {
     'use strict';
+
     var escapeSelector = window.escapeSelector;
 
     it('correctly escapes css', function() {
@@ -29,6 +30,7 @@ describe('escapeSelector', function() {
 
 describe('Formula Equation Preview', function() {
     'use strict';
+
     var formulaEquationPreview = window.formulaEquationPreview;
     beforeEach(function() {
         // Simulate an environment conducive to a FormulaEquationInput

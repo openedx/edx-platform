@@ -1,6 +1,7 @@
 /* globals _, Backbone, Content, Discussion, DiscussionUtil, DiscussionThreadView, DiscussionThreadListView */
 (function() {
     'use strict';
+
     /* eslint-disable */
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {

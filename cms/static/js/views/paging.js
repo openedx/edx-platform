@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['underscore', 'backbone', 'gettext'],
         function(_, Backbone, gettext) {
             var PagingView = Backbone.View.extend({

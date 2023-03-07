@@ -2,6 +2,7 @@
 
 (function() {
     'use strict';
+
     var IntervalManager, KeywordValidator,
         createEmailContentTable, createEmailMessageViews,
         findAndAssert, pWrapper, plantInterval, plantTimeout,

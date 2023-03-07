@@ -9,6 +9,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
     CourseHighlightsEnableView
 ) {
     'use strict';
+
     var expandedLocators, CourseOutlinePage;
 
     CourseOutlinePage = BasePage.extend({

@@ -28,6 +28,7 @@ such that the value can be defined later than this assignment (file load order).
 
 (function() {
     'use strict';
+
     var $activeSection,
         CSS_ACTIVE_SECTION, CSS_IDASH_SECTION, CSS_INSTRUCTOR_CONTENT, CSS_INSTRUCTOR_NAV, HASH_LINK_PREFIX,
         SafeWaiter, plantTimeout, sectionsHaveLoaded, setupInstructorDashboard,

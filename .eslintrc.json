@@ -48,7 +48,6 @@
     "import/no-amd": "off",
     "import/no-dynamic-require": "off",
     "import/no-unresolved": "off",
-    "lines-around-directive": "off",
     "max-len": "off",
     "newline-per-chained-call": "off",
     "no-console": "off",

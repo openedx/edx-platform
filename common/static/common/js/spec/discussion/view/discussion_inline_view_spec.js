@@ -4,6 +4,7 @@
  */
 (function() {
     'use strict';
+
     describe('DiscussionInlineView', function() {
         var createTestView, showDiscussion, setNextAjaxResult,
             TEST_THREAD_TITLE = 'Test thread title';

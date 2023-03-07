@@ -1,5 +1,6 @@
 (function(undefined) {
     'use strict';
+
     describe('VideoSpeedControl', function() {
         var state, oldOTBD;
 

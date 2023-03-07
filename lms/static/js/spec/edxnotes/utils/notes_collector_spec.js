@@ -5,6 +5,7 @@ define([
     $, _, Annotator, AjaxHelpers, NotesFactory, NotesCollector, Helpers
 ) {
     'use strict';
+
     describe('EdxNotes NotesCollector', function() {
         beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');

@@ -1,5 +1,6 @@
 (function(requirejs, require, define) {
     'use strict';
+
     define(
         'video/08_video_speed_control.js', [
             'video/00_iterator.js',

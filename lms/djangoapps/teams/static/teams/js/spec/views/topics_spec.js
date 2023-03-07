@@ -3,6 +3,7 @@ define([
     'teams/js/spec_helpers/team_spec_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function(Backbone, _, TopicCollection, TopicsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
+
     describe('TopicsView', function() {
         var initialTopics, topicCollection, createTopicsView, triggerUpdateEvent;
 

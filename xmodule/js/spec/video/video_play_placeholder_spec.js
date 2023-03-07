@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     describe('VideoPlayPlaceholder', function() {
         var state, oldOTBD;
 

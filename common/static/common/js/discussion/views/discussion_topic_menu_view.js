@@ -2,6 +2,7 @@
 
 (function() {
     'use strict';
+
     if (Backbone) {
         this.DiscussionTopicMenuView = Backbone.View.extend({
             events: {

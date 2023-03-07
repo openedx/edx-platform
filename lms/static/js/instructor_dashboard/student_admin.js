@@ -2,6 +2,7 @@
 
 (function() {
     'use strict';
+
     var PendingInstructorTasks, createTaskListTable, findAndAssert, statusAjaxError;
 
     statusAjaxError = function() {

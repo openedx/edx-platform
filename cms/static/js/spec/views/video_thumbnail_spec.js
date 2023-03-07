@@ -3,6 +3,7 @@ define(
         'js/views/video_thumbnail', 'js/views/previous_video_upload_list', 'common/js/spec_helpers/template_helpers'],
     function($, _, Backbone, AjaxHelpers, VideoThumbnailView, PreviousVideoUploadListView, TemplateHelpers) {
         'use strict';
+
         describe('VideoThumbnailView', function() {
             var IMAGE_UPLOAD_URL = '/videos/upload/image',
                 UPLOADED_IMAGE_URL = 'images/upload_success.jpg',

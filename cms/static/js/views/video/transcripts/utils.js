@@ -1,5 +1,6 @@
 define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
     'use strict';
+
     return (function() {
         var Storage = {};
 

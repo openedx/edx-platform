@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     describe('VideoPlayPauseControl', function() {
         var state, oldOTBD;
 

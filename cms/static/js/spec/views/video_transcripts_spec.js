@@ -3,6 +3,7 @@ define(
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers'],
     function($, _, Backbone, VideoTranscriptsView, PreviousVideoUploadListView, AjaxHelpers, TemplateHelpers) {
         'use strict';
+
         describe('VideoTranscriptsView', function() {
             var videoTranscriptsView,
                 renderView,

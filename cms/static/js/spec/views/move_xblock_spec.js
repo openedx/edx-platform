@@ -15,6 +15,7 @@ import 'mock-ajax';
 describe('MoveXBlock', function() {
 
     'use strict';
+
     var modal, showModal, renderViews, createXBlockInfo, createCourseOutline, courseOutlineOptions,
         parentChildMap, categoryMap, createChildXBlockInfo, xblockAncestorInfo, courseOutline,
         verifyBreadcrumbViewInfo, verifyListViewInfo, getDisplayedInfo, clickForwardButton,

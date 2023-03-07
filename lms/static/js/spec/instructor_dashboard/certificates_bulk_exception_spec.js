@@ -4,6 +4,7 @@ define([
 ],
 function($, CertificateBulkAllowlistView) {
     'use strict';
+
     describe('certificate bulk exceptions generation', function() {
         var certificate_bulk_exception_url = 'test/url/';
         var SELECTORS = {
