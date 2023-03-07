@@ -40,7 +40,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Setup npm
-      run: npm i -g npm@8.5.x
+      run: npm i -g npm@8.18.x
 
     - name: Get pip cache dir
       id: pip-cache-dir
