@@ -3,11 +3,11 @@ Migrating Apple users while switching teams on Apple
 
 This document explains how to migrate apple signed-in users in the event of
 switching teams on the Apple Developer console. When a user uses Apple to sign in,
-edx receives an `id_token from apple containing user information`_, including
+LMS receives an `id_token from apple containing user information`_, including
 user's unique identifier with key `sub`. This unique identifier is unique to
 Apple team this user belongs to. Upon switching teams on Apple, developers need
 to migrate users from one team to another i.e. migrate users' unique
-identifiers. In edx, users' unique apple identifiers are stored in
+identifiers. In the LMS, users' unique apple identifiers are stored in
 social_django.models.UserSocialAuth.uid. Following is an outline specifying the
 migration process.
 
