@@ -151,7 +151,9 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        A Bash implementation of XModule asset copying. The aforementioned attributes will be moved from the XModule-style XBlock classes into a simple static JSON file, which the Bash script will be able to read.
        
-       The initial implementation of build-assets.sh may just point at ``xmodule_assets``.
+       The initial implementation of build-assets.sh may just point the existing ``xmodule_assets`` script.
+
+       Eventually, if possible, it would be desirable to `entirely remove this step <https://github.com/openedx/edx-platform/issues/31624>`_.
    
    * - + **Build stage 3: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
 
@@ -261,6 +263,11 @@ Either way, the migration path is straightforward:
      - ``scripts/build-assets.sh --watch themes``
 
 The options accepted by ``openedx-assets`` will all be valid inputs to ``scripts/build-assets.sh``.
+
+See also
+********
+
+OpenCraft has also performed a discovery on a `modernized system for static assets for XBlocks in xmodule <https://docs.google.com/document/d/1FqsvXpvrzsi2Ekk9RttUpcT2Eg0NxenFmV52US_psFU>`_. Its scope overlaps with this ADR's in a way that makes it great supplemental reading.
 
 Rejected Alternatives
 *********************
