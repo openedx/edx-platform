@@ -85,7 +85,7 @@ Three particular issues have surfaced in Developer Experience Working Group disc
      - Remove all Python dependencies from the static asset build process, such that changes to Python code or requirements do not always have to result in a static asset rebuild.
 
    * - In Tutor, using a local copy of edx-platform overwrites the Docker image's pre-installed node_modules and pre-built static assets, requiring developers to reinstall & rebuild in order to get a working platform.
-     - Better parameterize the input and output paths edx-platform asset build, such that it may `search for node_modules outside of edx-platform <https://github.com/openedx/wg-developer-experience/issues/150> and `generate assets outside of edx-platform <https://github.com/openedx/wg-developer-experience/issues/151>`.
+     - Better parameterize the input and output paths edx-platform asset build, such that it may `search for node_modules outside of edx-platform <https://github.com/openedx/wg-developer-experience/issues/150>`_ and `generate assets outside of edx-platform <https://github.com/openedx/wg-developer-experience/issues/151>`_.
 
 All of these potential solutions would involve refactoring or entirely replacing parts of the current asset processing system.
 
