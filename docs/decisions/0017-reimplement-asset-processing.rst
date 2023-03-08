@@ -13,10 +13,11 @@ Status
 
 **Provisional**
 
-The status will be moved to  *Accepted* upon completion of reimplementation.
+The status will be moved to *Accepted* upon completion of reimplementation. Related work:
 
-* Issue tracking reimplementation progress: (LINK HERE)
-* Deprecation of paver asset system: (LINK HERE)
+* `[DEPR]: Asset processing in Paver <https://github.com/openedx/edx-platform/issues/31895>`_
+* `Process edx-platform assets without Paver <https://github.com/openedx/edx-platform/issues/31798>`_
+* `Process edx-platform assets without Python <https://github.com/openedx/edx-platform/issues/31800>`_
 
 
 Context
@@ -221,14 +222,14 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 Migration
 =========
 
-The old asset processing system will be `proposed for deprecation (TODO: link to issue) <http://example.com/depr>`_ upon provisional acceptance of this ADR.
+We will `communicate the deprecation <https://github.com/openedx/edx-platform/issues/31895>`_ of the old asset system upon provisional acceptance of this ADR.
 
-The old and new systems will both be available for at least one named release. Operators will encouraged to try the new asset processing system and report any issues they find. Eventually, the old asset processing system will be entirely removed.
+The old and new systems will both be available for at least one named release. Operators will encouraged to try the new asset processing system and report any issues they find. The old asset system will print deprecation warnings, recommending equivalent new commands to operators. Eventually, the old asset processing system will be entirely removed.
 
 Tutor migration guide
 ---------------------
 
-Tutor provides the `openedx-assets <https://github.com/overhangio/tutor/blob/v15.3.0/tutor/templates/build/openedx/bin/openedx-assets>`_ Python script on its edx-platform images for building, collection, and watching. The script uses a mix its own implementation and calls out to edx-platform's paver tasks, avoiding the most troublesome parts of the paver tasks. The script and its interface were the inspiration for the new build.sh that this ADAR describes.
+Tutor provides the `openedx-assets <https://github.com/overhangio/tutor/blob/v15.3.0/tutor/templates/build/openedx/bin/openedx-assets>`_ Python script on its edx-platform images for building, collection, and watching. The script uses a mix of its own implementation and calls out to edx-platform's paver tasks, avoiding the most troublesome parts of the paver tasks. The script and its interface were the inspiration for the new build.sh that this ADR describes.
 
 As a consequence of this ADR, Tutor will either need to:
 
