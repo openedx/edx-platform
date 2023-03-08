@@ -171,7 +171,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Note: libsass is pinned to a 2015 version with a non-trivial upgrade path. Installing it requires compiling a large C extension, noticeably affecting Docker image build time.
 
-     - ``scripts/build-assets.sh common``
+     - ``scripts/build-assets.sh css``
 
        Bash reimplementation, calling ``node-sass`` and ``rtlcss``.
    
@@ -250,7 +250,7 @@ Either way, the migration path is straightforward:
    * - ``openedx-assets xmodule``
      - ``scripts/build-assets.sh xmodule``
    * - ``openedx-assets common``
-     - ``scripts/build-assets.sh common``
+     - ``scripts/build-assets.sh css``
    * - ``openedx-assets themes``
      - ``scripts/build-assets.sh themes``
    * - ``openedx-assets collect``
