@@ -149,11 +149,10 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
      - ``scripts/build-assets.sh xmodule``
 
-       A Bash implementation of XModule asset copying. The aforementioned attributes will be moved from the XModule-style XBlock classes into a simple static JSON file, which the Bash script will be able to read.
-       
-       The initial implementation of build-assets.sh may just point the existing ``xmodule_assets`` script.
+       Initially, this command will just call out to the existing ``xmodule_assets`` command. Eventually, in order to make this step Python-free, we will need do either one or both of the following:
 
-       Eventually, if possible, it would be desirable to `entirely remove this step <https://github.com/openedx/edx-platform/issues/31624>`_.
+       + `Reimplement this step in Bash <https://github.com/openedx/edx-platform/issues/31611>`_.
+       + `Remove the need for this step entirely <https://github.com/openedx/edx-platform/issues/31624>`_.
    
    * - + **Build stage 3: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
 
