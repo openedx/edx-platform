@@ -7,9 +7,9 @@ import logging
 
 from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
-from openedx.features.edly.tasks import trigger_dataloader
 from six import text_type
 
+from openedx.features.edly.tasks import trigger_dataloader
 from xmodule.modulestore.django import SignalHandler
 
 from .models import CourseOverview
