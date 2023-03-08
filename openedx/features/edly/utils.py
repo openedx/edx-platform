@@ -13,24 +13,18 @@ from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Q
-from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from edx_rest_api_client.client import EdxRestApiClient
-from edx_rest_api_client.exceptions import SlumberBaseException
-from six import text_type
 from student.message_types import CertificateGeneration
 from student.models import CourseAccessRole
 from student.roles import CourseInstructorRole, CourseStaffRole, GlobalCourseCreatorRole, GlobalStaff, UserBasedRole
 from util.organizations_helpers import get_organizations
-from xmodule.modulestore.django import SignalHandler, modulestore
+from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.branding.api import get_privacy_url, get_tos_and_honor_code_url
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
-from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration.helpers import get_current_site_configuration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
@@ -513,32 +507,6 @@ def is_course_org_same_as_site_org(site, course_id):
 
     LOGGER.info('Course organization does not match site organization')
     return False
-
-
-@receiver(SignalHandler.course_published)
-def trigger_dataloader(sender, course_key, **kwargs):   # pylint: disable=unused-argument
-    """
-    Run dataloader for specific course on course_published signal.
-    """
-    partner = course_key.org
-    catalog_integraton = CatalogIntegration.current()
-    discovery_worker = catalog_integraton.get_service_user()
-    user_jwt = create_jwt_for_user(discovery_worker)
-    catalog_api = catalog_integraton.internal_api_url
-    url_parse = urlparse(catalog_api)
-    catalog_api = '{}://{}'.format(url_parse.scheme, url_parse.netloc)
-    discovery_client = EdxRestApiClient(catalog_api, jwt=user_jwt)
-    try:
-        res = discovery_client.edly_api.v1.dataloader.post(
-            {
-                'partner': partner,
-                'course_id': text_type(course_key),
-                'service': 'lms',
-            }
-        )
-        LOGGER.info(res)
-    except SlumberBaseException as exp:
-        LOGGER.error(str(exp))
 
 
 def send_certificate_generation_email(msg, user, site):

@@ -7,6 +7,8 @@ import logging
 
 from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
+from openedx.features.edly.tasks import trigger_dataloader
+from six import text_type
 
 from xmodule.modulestore.django import SignalHandler
 
@@ -31,6 +33,7 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
         previous_course_overview = None
     updated_course_overview = CourseOverview.load_from_module_store(course_key)
     _check_for_course_changes(previous_course_overview, updated_course_overview)
+    trigger_dataloader.delay(course_key.org, text_type(course_key))
 
 
 @receiver(SignalHandler.course_deleted)
