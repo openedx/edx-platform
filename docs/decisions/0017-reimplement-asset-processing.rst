@@ -125,7 +125,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        A Python-defined task that calls out to each build stage.
 
-     - ``assets/build.sh``
+     - ``scripts/build-assets.sh``
 
        A Bash script that contains all build stages, with subcommands available for running each stage separately. Its command-line interface inspired by Tutor's ``openedx-assets`` script. The script will be runnable on any POSIX system, including macOS and Ubuntu and it will linted for common shell scripting mistakes using `shellcheck <https://www.shellcheck.net>`_.
      
@@ -135,7 +135,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Implemented in Python within update_assets. There is no standalone command for it.
 
-     - ``assets/build.sh npm``
+     - ``scripts/build-assets.sh npm``
 
        Pure Bash reimplementation.
  
@@ -147,11 +147,11 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Equivalent paver task and console script, both pointing at to an application-level Python module. That module inspects attributes from legacy XModule-style XBlock classes in order to determine which static assets to copy and what to name them.
 
-     - ``assets/build.sh xmodule``
+     - ``scripts/build-assets.sh xmodule``
 
        A Bash implementation of XModule asset copying. The aforementioned attributes will be moved from the XModule-style XBlock classes into a simple static JSON file, which the Bash script will be able to read.
        
-       The initial implementation of build.sh may just point at ``xmodule_assets``.
+       The initial implementation of build-assets.sh may just point at ``xmodule_assets``.
    
    * - + **Build stage 3: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
 
@@ -159,7 +159,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Python wrapper around a call to webpack. Invokes the ``./manage.py [lms|cms] print_setting`` multiple times in order to determine Django settings, adding which can add 20+ seconds to the build.
 
-     - ``assets/build.sh webpack``
+     - ``scripts/build-assets.sh webpack``
 
        Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up. Open edX distributions, such as Tutor, can choose how to supply the Django-setting-derived parameters in an efficient manner.
    
@@ -171,11 +171,11 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Note: libsass is pinned to a 2015 version with a non-trivial upgrade path. Installing it requires compiling a large C extension, noticeably affecting Docker image build time.
 
-     - ``assets/build.sh common``
+     - ``scripts/build-assets.sh common``
 
        Bash reimplementation, calling ``node-sass`` and ``rtlcss``.
    
-       The initial implementation of build.sh may use ``sassc``, a CLI provided by libsass, instead of node-sass. Then, ``sassc`` can be replaced by ``node-sass`` as part of a subsequent `edx-platform frontend framework upgrade effort <https://github.com/openedx/edx-platform/issues/31616>`_.
+       The initial implementation of build-assets.sh may use ``sassc``, a CLI provided by libsass, instead of node-sass. Then, ``sassc`` can be replaced by ``node-sass`` as part of a subsequent `edx-platform frontend framework upgrade effort <https://github.com/openedx/edx-platform/issues/31616>`_.
 
    * - + **Build stage 5: Compile themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
 
@@ -187,7 +187,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
      - ``./manage.py [lms|cms] compile_sass``, or
 
-       ``assets/build.sh themes --theme-dirs ...``
+       ``scripts/build-assets.sh themes --theme-dirs ...``
 
        The management command will remain available, but it will need to be updated to point at the Bash script, which will replace the paver task (see build stage 4 for details).
 
@@ -211,13 +211,13 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Paver task that invokes ``webpack --watch`` for Webpack assets and watchdog (a Python library) for other assets.
 
-     - ``assets/build.sh --watch <stage>``
+     - ``scripts/build-assets.sh --watch <stage>``
 
        (where ``<stage>`` is optionally one of the build stages described above. If provided, only that stage's assets will be watched.)
 
        Bash wrappers around invocation(s) of `watchman <https://facebook.github.io/watchman/>`_, a popular file-watching library maintained by Meta. Watchman is already installed into edx-platform (and other services) via the pywatchman pip wrapper package.
 
-       Note: This adds a Python dependency to build.sh. However, we could be clear that watchman is an *optional* dependency of build.sh which enables the optional ``--watch`` feature. This would keep the *build* action Python-free. Alternatively, watchman is also available Python-free via apt and homebrew.
+       Note: This adds a Python dependency to build-assets.sh. However, we could be clear that watchman is an *optional* dependency of build-assets.sh which enables the optional ``--watch`` feature. This would keep the *build* action Python-free. Alternatively, watchman is also available Python-free via apt and homebrew.
 
 Migration
 =========
@@ -229,7 +229,7 @@ The old and new systems will both be available for at least one named release. O
 Tutor migration guide
 ---------------------
 
-Tutor provides the `openedx-assets <https://github.com/overhangio/tutor/blob/v15.3.0/tutor/templates/build/openedx/bin/openedx-assets>`_ Python script on its edx-platform images for building, collection, and watching. The script uses a mix of its own implementation and calls out to edx-platform's paver tasks, avoiding the most troublesome parts of the paver tasks. The script and its interface were the inspiration for the new build.sh that this ADR describes.
+Tutor provides the `openedx-assets <https://github.com/overhangio/tutor/blob/v15.3.0/tutor/templates/build/openedx/bin/openedx-assets>`_ Python script on its edx-platform images for building, collection, and watching. The script uses a mix of its own implementation and calls out to edx-platform's paver tasks, avoiding the most troublesome parts of the paver tasks. The script and its interface were the inspiration for the new build-assets.sh that this ADR describes.
 
 As a consequence of this ADR, Tutor will either need to:
 
@@ -244,21 +244,21 @@ Either way, the migration path is straightforward:
    * - Existing Tutor-provided command
      - New upstream command
    * - ``openedx-assets build``
-     - ``assets/build.sh``
+     - ``scripts/build-assets.sh``
    * - ``openedx-assets npm``
-     - ``assets/build.sh npm``
+     - ``scripts/build-assets.sh npm``
    * - ``openedx-assets xmodule``
-     - ``assets/build.sh xmodule``
+     - ``scripts/build-assets.sh xmodule``
    * - ``openedx-assets common``
-     - ``assets/build.sh common``
+     - ``scripts/build-assets.sh common``
    * - ``openedx-assets themes``
-     - ``assets/build.sh themes``
+     - ``scripts/build-assets.sh themes``
    * - ``openedx-assets collect``
      - ``./manage.py [lms|cms] collectstatic --noinput``
    * - ``openedx-assets watch-themes``
-     - ``assets/build.sh --watch themes``
+     - ``scripts/build-assets.sh --watch themes``
 
-The options accepted by ``openedx-assets`` will all be valid inputs to ``assets/build.sh``.
+The options accepted by ``openedx-assets`` will all be valid inputs to ``scripts/build-assets.sh``.
 
 Rejected Alternatives
 *********************
