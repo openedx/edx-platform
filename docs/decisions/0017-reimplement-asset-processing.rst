@@ -137,7 +137,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
      - ``scripts/build-assets.sh npm``
 
-       Pure Bash reimplementation.
+       Pure Bash reimplementation. See *Rejected Alternatives* for a note about this.
  
    * - + **Build stage 2: Copy XModule fragments** from the xmodule source tree over to input directories for Webpack and SCSS compilation. This is required for a hard-coded list of old XModule-style XBlocks. This is not required for new pure XBlocks, which include (or pip-install) their assets into edx-platform as ready-to-serve JS/CSS/etc fragments.
 
@@ -264,6 +264,13 @@ The options accepted by ``openedx-assets`` will all be valid inputs to ``scripts
 
 Rejected Alternatives
 *********************
+
+Copy node_modules via npm post-install
+======================================
+
+It was noted that `npm supports lifecycle scripts <https://docs.npmjs.com/cli/v6/using-npm/scripts#pre--post-scripts>`_ in package.json, including ``postinstall``. We could use a post-install script to copy assets out of node_modules; this would occurr automatically after ``npm install``. Arguably, this would be more idiomatic than this ADR's proposal of ``scripts/build-assets.sh npm``.
+
+For now, we decided against this. While it seems like a good potential future improvement, we are currently unsure how it would interact with `moving node_modules out of edx-platform in Tutor <https://github.com/openedx/wg-developer-experience/issues/150>`_, which is a motivation behind this ADR. For example, if node_modules could be located anywhere on the image, then we are not sure how the post-install script could know its target directory without us hard-coding Tutor's directory structure into the script.
 
 Live with the problem
 ======================
