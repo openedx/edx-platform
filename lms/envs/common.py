@@ -1624,6 +1624,8 @@ MIDDLEWARE = [
     'openedx.features.edly.middleware.EdlyOrganizationAccessMiddleware',
 
     'edly_panel_app.middleware.EdlyUserActivityMiddleware',
+
+    'wiki.middleware.RequestCache',
 ]
 
 # Edly Configuration
