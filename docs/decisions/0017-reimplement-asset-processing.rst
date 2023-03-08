@@ -159,9 +159,11 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Python wrapper around a call to webpack. Invokes the ``./manage.py [lms|cms] print_setting`` multiple times in order to determine Django settings, adding which can add 20+ seconds to the build.
 
-     - ``scripts/build-assets.sh webpack``
+     - ``scripts/build-assets.sh webpack $(./manage.py lms print_asset_settings)``
 
-       Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up. Open edX distributions, such as Tutor, can choose how to supply the Django-setting-derived parameters in an efficient manner.
+       Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up.
+
+       The print_asset_settings management command will be added as well. It will print the set of Django settings needed for the asset build in a way that build-assets.sh can accept as input. Some distributions may not need to call this command; Tutor, for example, will probably render the settings directly into the build-assets.sh call.
    
    * - + **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
