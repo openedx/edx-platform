@@ -87,10 +87,17 @@ def class_students_changed(sender, instance, action, **kwargs):
         GenLog.create_remove_student_log(instance, list(pk_set))
 
 
-@receiver(PROBLEM_RAW_SCORE_CHANGED)
+@receiver(post_save, sender=BlockCompletion)
 def problem_raw_score_changed_handler(sender, **kwargs):
+    instance = kwargs['instance']
+    course_id = str(instance.context_key)
+    if not instance.context_key.is_course:
+        return
+    usage_id = str(instance.block_key)
+    user_id = instance.user_id
+
     genplus_learning_tasks.update_unit_and_lesson_completions.apply_async(
-        args=[kwargs.get('user_id'), kwargs.get('course_id'), kwargs.get('usage_id')]
+        args=[user_id, course_id, usage_id]
     )
 
 
