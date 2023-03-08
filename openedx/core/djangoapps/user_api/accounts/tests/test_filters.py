@@ -10,6 +10,7 @@ from rest_framework import status
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestRenderInvalidAccountSettings(PipelineStep):
@@ -100,6 +101,15 @@ class TestAccountSettingsFilters(SharedModuleStoreTestCase):
     """
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp()
+        self.user = UserFactory.create(
+            username="somestudent",
+            first_name="Student",
+            last_name="Person",
+            email="robot@robot.org",
+            is_active=True,
+            password="password",
+        )
+        self.client.login(username=self.user.username, password="password")
         self.account_settings_url = '/account/settings'
 
     @override_settings(
@@ -226,6 +236,6 @@ class TestAccountSettingsFilters(SharedModuleStoreTestCase):
             modification comparing it with the effects of TestAccountSettingsRender.
             - The view response is HTTP_200_OK.
         """
-        response = self.client.get(self.course_about_url)
+        response = self.client.get(self.account_settings_url)
 
         self.assertNotContains(response, "This page left intentionally blank. Feel free to add your own content.")
