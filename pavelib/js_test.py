@@ -111,7 +111,7 @@ def diff_coverage(options):
     """
     Build the diff coverage reports
     """
-    compare_branch = options.get('compare_branch', 'origin/master')
+    compare_branch = options.get('compare_branch', 'origin/2u/project-theseus')
 
     # Find all coverage XML files (both Python and JavaScript)
     xml_reports = []

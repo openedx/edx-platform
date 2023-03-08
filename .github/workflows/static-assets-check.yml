@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - 2u/project-theseus
 
 jobs:
   static_assets_check:
