@@ -263,7 +263,37 @@ The options accepted by ``openedx-assets`` will all be valid inputs to ``scripts
 Rejected Alternatives
 *********************
 
-* **Avoid work on edx-platform asset tooling; just wait until all frontends have been replatformed into MFEs**. See the Context section above for why this was rejected.
+Live with the problem
+======================
 
-* **Rather than replace paver-based asset processing, try to improve it in place.** The effort required to do this seemed comparable to the effort required to perform a full rewrite, and it would not yield any caching benefits of a Python-free asset pipeline.
+We could avoid committing any work to edx-platform asset tooling, and instead just wait until all frontends have been replatformed into MFEs. See the *Context* section above for why this was rejected.
+
+Improve existing system
+=======================
+
+Rather than replace it, we could try to improve the existing Paver-based asset processing system. However, the effort required to do this seemed comparable to the effort required to perform a full rewrite, and it would not yield any caching benefits of a Python-free asset pipeline.
+
+Rewrite asset processing in Python
+==================================
+
+Some of the benefits of dropping Paver could still be achieved even if we re-wrote the asset processing system using, for example, Python and Click. However, entirely dropping Python from the asset build in favor of Bash has promising benefits:
+
+Asset build independence
+------------------------
+
+When building a container image, we want to be able to build static assets without first copying any Python code or requirements lists from edx-platform into the build context. That way, only changes to system requirements, npm requirements, or the assets themselves would trigger an asset rebuild.
+
+Encouraging simplicity
+----------------------
+
+The asset pipeline only needs to perform a handful of simple tasks, primarily copying files and invoking shell commands. It does NOT need to be extensible, as we do not want new frontend features to be added to the edx-platform repository. On the contrary, simplicity and obviousness of implementation are virtues. Bash is particularly suited for these sort of scripts.
+
+However, Python (like any modern application language) encourages developers to modularize, build abstractions, use clever control flow, and employ indirection. This is particularly noticeable with the Paver assets build, which is a thousand lines long and difficult to understand.
+
+Ease of transition to standard tools
+------------------------------------
+
+Ideally, the entire asset build would stem from a call to ``npm build`` rather than a call to a bespoke script (whether Paver or Bash). Generally speaking, the more edx-platform can work with standard frontend tooling, the easier it'll be for folks to use, understand, and maintain it.
+
+When bespoke asset building logic is implemented in Bash, it is easier to integrate or replace that logic with a standard tool. Standard JS tools often can run hooks written in JS or Shell. On the other hand, frontend tools typically do not integrate with Python scripts.
 
