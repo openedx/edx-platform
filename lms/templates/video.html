@@ -46,27 +46,31 @@ from openedx.core.djangolib.js_utils import (
 
     <div class="focus_grabber last"></div>
 
-    % if (download_video_link or track or handout or branding_info) and not hide_downloads:
+    % if (download_video_link or track or handout or branding_info or public_video_url) and not hide_downloads:
     <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
     <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">
-        % if download_video_link:
-        <div class="wrapper-download-video">
-            <h4 class="hd hd-5">${_('Video')}</h4>
-            <a class="btn-link video-sources video-download-button" href="${download_video_link}">
-                ${_('Download video file')}
-            </a>
-            % if public_video_url:
-            <br/>
-            <a
-                class="btn-link"
-                id="twitter-share-button"
-                href="${public_video_url}"
-                target="_blank"
-            >
-                ${_('Share on Twitter')}
-            </a>
-            % endif
-        </div>
+        % if download_video_link or public_video_url:
+            <div class="wrapper-download-video">
+                <h4 class="hd hd-5">${_('Video')}</h4>
+                % if download_video_link:
+                    <a class="btn-link video-sources video-download-button" href="${download_video_link}">
+                        ${_('Download video file')}
+                    </a>
+                % endif
+                % if download_video_link and public_video_url:
+                    <br>
+                % endif
+                % if public_video_url:
+                    <a
+                        class="btn-link"
+                        id="twitter-share-button"
+                        href="${public_video_url}"
+                        target="_blank"
+                    >
+                        ${_('Share on Twitter')}
+                    </a>
+                % endif
+            </div>
         % endif
         % if track:
         <div class="wrapper-download-transcripts">

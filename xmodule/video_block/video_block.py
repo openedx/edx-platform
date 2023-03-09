@@ -24,6 +24,7 @@ from django.conf import settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from lxml import etree
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import AssetLocator
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
@@ -494,10 +495,14 @@ class VideoBlock(
         """
         Returns the public video url
         """
-        return urljoin(
-            settings.LMS_ROOT_URL,
-            reverse('render_public_video_xblock', kwargs={'usage_key_string': str(self.location)})
-        ) if self.public_access and self._is_lms_platform() else None
+        if self.public_access and self._is_lms_platform():
+            from lms.djangoapps.courseware.toggles import PUBLIC_VIDEO_SHARE
+            if PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key):
+                return urljoin(
+                    settings.LMS_ROOT_URL,
+                    reverse('render_public_video_xblock', kwargs={'usage_key_string': str(self.location)})
+                )
+        return None
 
     def validate(self):
         """
