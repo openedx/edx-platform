@@ -246,7 +246,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         editXBlock: function(event, options) {
             event.preventDefault();
 
-            if(!options || options.view !== 'visibility_view'){
+            if (!options || options.view !== 'visibility_view') {
                 const primaryHeader = $(event.target).closest('.xblock-header-primary');
 
                 var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
@@ -457,14 +457,14 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
 
             // find the block type in the locator if availible
-            if(data.hasOwnProperty('locator')){
+            if(data.hasOwnProperty('locator')) {
                 var matchBlockTypeFromLocator = /\@(.*?)\+/;
                 var blockType = data.locator.match(matchBlockTypeFromLocator);
             }
             if((useNewTextEditor === 'True' && blockType.includes('html'))
                     || (useNewVideoEditor === 'True' && blockType.includes('video'))
                     || (useNewProblemEditor === 'True' && blockType.includes('problem'))
-            ){
+            ) {
                 var destinationUrl = `${this.$('.xblock-header-primary').attr('authoring_MFE_base_url')}/${blockType[1]}/${encodeURI(data.locator)}`;
                 window.location.href = destinationUrl;
                 return;
