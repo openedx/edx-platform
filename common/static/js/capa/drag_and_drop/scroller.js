@@ -52,7 +52,7 @@
 
                 // We scroll by changing the 'margin-left' CSS property smoothly.
                 state.sliderEl.animate({
-                    'margin-left': showElLeftMargin + 'px'
+                    'margin-left': `${showElLeftMargin}px`
                 }, 100, function() {
                     updateArrowOpacity();
                 });
@@ -123,7 +123,7 @@
 
                 // We scroll by changing the 'margin-left' CSS property smoothly.
                 state.sliderEl.animate({
-                    'margin-left': showElLeftMargin + 'px'
+                    'margin-left': `${showElLeftMargin}px`
                 }, 100, function() {
                     updateArrowOpacity();
                 });

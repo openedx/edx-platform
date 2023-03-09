@@ -34,7 +34,7 @@
 
                 if (this.getCurrentTopicId()) {
                     this.setTopic(this.$('.post-topic option').filter(
-                        '[data-discussion-id="' + this.getCurrentTopicId() + '"]'
+                        `[data-discussion-id="${this.getCurrentTopicId()}"]`
                     ));
                 } else if ($general.length > 0) {
                     this.setTopic($general.first());
@@ -101,7 +101,7 @@
                 if (topicElement) {
                     name = topicElement.html();
                     _.each(topicElement.parents('optgroup'), function(item) {
-                        name = $(item).attr('label') + ' / ' + name;
+                        name = `${$(item).attr('label')} / ${name}`;
                     });
                     return name;
                 } else {

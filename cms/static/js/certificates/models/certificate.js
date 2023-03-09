@@ -67,7 +67,7 @@ function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeS
 
             // If no url is defined for the signatories child collection we'll need to create that here as well
             if (!this.isNew() && !this.get('signatories').url) {
-                this.get('signatories').url = this.collection.url + '/' + this.get('id') + '/signatories';
+                this.get('signatories').url = `${this.collection.url}/${this.get('id')}/signatories`;
             }
         },
 

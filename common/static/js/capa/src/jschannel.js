@@ -249,7 +249,7 @@ var Channel = (function() {
                 exists = hasWin(s_boundChans[origin][scope]);
             }
         }
-        if (exists) { throw "A channel is already bound to the same window which overlaps with origin '" + origin + "' and has scope '" + scope + "'"; }
+        if (exists) { throw `A channel is already bound to the same window which overlaps with origin '${origin}' and has scope '${scope}'`; }
 
         if (typeof s_boundChans[origin] !== 'object') { s_boundChans[origin] = { }; }
         if (typeof s_boundChans[origin][scope] !== 'object') { s_boundChans[origin][scope] = []; }
@@ -388,7 +388,7 @@ var Channel = (function() {
                 if (cfg.debugOutput && window.console && window.console.log) {
                     // try to stringify, if it doesn't work we'll let javascript's built in toString do its magic
                     try { if (typeof m !== 'string') { m = JSON.stringify(m); } } catch (e) { }
-                    console.log('[' + chanId + '] ' + m);
+                    console.log(`[${chanId}] ${m}`);
                 }
             };
 
@@ -455,11 +455,11 @@ var Channel = (function() {
                     origin: origin,
                     invoke: function(cbName, v) {
                         // verify in table
-                        if (!inTbl[id]) { throw 'attempting to invoke a callback of a nonexistent transaction: ' + id; }
+                        if (!inTbl[id]) { throw `attempting to invoke a callback of a nonexistent transaction: ${id}`; }
                         // verify that the callback name is valid
                         var valid = false;
                         for (var i = 0; i < callbacks.length; i++) { if (cbName === callbacks[i]) { valid = true; break; } }
-                        if (!valid) { throw "request supports no such callback '" + cbName + "'"; }
+                        if (!valid) { throw `request supports no such callback '${cbName}'`; }
 
                         // send callback invocation
                         postMessage({id: id, callback: cbName, params: v});
@@ -467,7 +467,7 @@ var Channel = (function() {
                     error: function(error, message) {
                         completed = true;
                         // verify in table
-                        if (!inTbl[id]) { throw 'error called for nonexistent message: ' + id; }
+                        if (!inTbl[id]) { throw `error called for nonexistent message: ${id}`; }
 
                         // remove transaction from table
                         delete inTbl[id];
@@ -478,7 +478,7 @@ var Channel = (function() {
                     complete: function(v) {
                         completed = true;
                         // verify in table
-                        if (!inTbl[id]) { throw 'complete called for nonexistent message: ' + id; }
+                        if (!inTbl[id]) { throw `complete called for nonexistent message: ${id}`; }
                         // remove transaction from table
                         delete inTbl[id];
                         // send complete
@@ -500,7 +500,7 @@ var Channel = (function() {
                 return window.setTimeout(function() {
                     if (outTbl[transId]) {
                         // XXX: what if client code raises an exception here?
-                        var msg = 'timeout (' + timeout + "ms) exceeded on method '" + method + "'";
+                        var msg = `timeout (${timeout}ms) exceeded on method '${method}'`;
                         (1, outTbl[transId].error)('timeout_error', msg);
                         delete outTbl[transId];
                         delete s_transIds[transId];
@@ -518,7 +518,7 @@ var Channel = (function() {
                     try {
                         cfg.gotMessageObserver(origin, m);
                     } catch (e) {
-                        debug('gotMessageObserver() raised an exception: ' + e.toString());
+                        debug(`gotMessageObserver() raised an exception: ${e.toString()}`);
                     }
                 }
 
@@ -590,14 +590,14 @@ var Channel = (function() {
                     }
                 } else if (m.id && m.callback) {
                     if (!outTbl[m.id] || !outTbl[m.id].callbacks || !outTbl[m.id].callbacks[m.callback]) {
-                        debug('ignoring invalid callback, id:' + m.id + ' (' + m.callback + ')');
+                        debug(`ignoring invalid callback, id:${m.id} (${m.callback})`);
                     } else {
                         // XXX: what if client code raises an exception here?
                         outTbl[m.id].callbacks[m.callback](m.params);
                     }
                 } else if (m.id) {
                     if (!outTbl[m.id]) {
-                        debug('ignoring invalid response: ' + m.id);
+                        debug(`ignoring invalid response: ${m.id}`);
                     } else {
                         // XXX: what if client code raises an exception here?
                         if (m.error) {
@@ -636,7 +636,7 @@ var Channel = (function() {
 
                 // delay posting if we're not ready yet.
                 var verb = (ready ? 'post  ' : 'queue ');
-                debug(verb + ' message: ' + JSON.stringify(msg));
+                debug(`${verb} message: ${JSON.stringify(msg)}`);
                 if (!force && !ready) {
                     pendingQueue.push(msg);
                 } else {
@@ -644,7 +644,7 @@ var Channel = (function() {
                         try {
                             cfg.postMessageObserver(cfg.origin, msg);
                         } catch (e) {
-                            debug('postMessageObserver() raised an exception: ' + e.toString());
+                            debug(`postMessageObserver() raised an exception: ${e.toString()}`);
                         }
                     }
 
@@ -683,7 +683,7 @@ var Channel = (function() {
                 // tries to unbind a bound message handler.  returns false if not possible
                 unbind: function(method) {
                     if (regTbl[method]) {
-                        if (!(delete regTbl[method])) { throw ("can't delete method: " + method); }
+                        if (!(delete regTbl[method])) { throw (`can't delete method: ${method}`); }
                         return true;
                     }
                     return false;
@@ -692,7 +692,7 @@ var Channel = (function() {
                     if (!method || typeof method !== 'string') { throw "'method' argument to bind must be string"; }
                     if (!cb || typeof cb !== 'function') { throw 'callback missing from bind params'; }
 
-                    if (regTbl[method]) { throw "method '" + method + "' is already bound!"; }
+                    if (regTbl[method]) { throw `method '${method}' is already bound!`; }
                     regTbl[method] = cb;
                     return this;
                 },

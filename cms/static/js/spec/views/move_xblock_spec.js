@@ -144,8 +144,8 @@ describe('MoveXBlock', function() {
     createChildXBlockInfo = function(category, outlineOptions, xblockIndex) {
         var childInfo = {
             category: categoryMap[category],
-            display_name: category + '_display_name_' + xblockIndex,
-            id: category + '_ID_' + xblockIndex
+            display_name: `${category}_display_name_${xblockIndex}`,
+            id: `${category}_ID_${xblockIndex}`
         };
         return createXBlockInfo(parentChildMap[category], outlineOptions, childInfo);
     };
@@ -236,11 +236,11 @@ describe('MoveXBlock', function() {
      */
     verifyListViewInfo = function(category, expectedXBlocksCount, hasCurrentLocation) {
         var displayedInfo = getDisplayedInfo();
-        expect(displayedInfo.categoryText).toEqual(modal.moveXBlockListView.categoriesText[category] + ':');
+        expect(displayedInfo.categoryText).toEqual(`${modal.moveXBlockListView.categoriesText[category]}:`);
         expect(displayedInfo.xblockCount).toEqual(expectedXBlocksCount);
         expect(displayedInfo.xblockDisplayNames).toEqual(
             _.map(_.range(expectedXBlocksCount), function(xblockIndex) {
-                return category + '_display_name_' + xblockIndex;
+                return `${category}_display_name_${xblockIndex}`;
             })
         );
         if (category === 'component') {
@@ -276,7 +276,7 @@ describe('MoveXBlock', function() {
         expect(displayedBreadcrumbs).toEqual(
             _.map(visitedCategories, function(visitedCategory) {
                 return visitedCategory === 'course'
-                    ? 'Course Outline' : visitedCategory + '_display_name_' + xblockIndex;
+                    ? 'Course Outline' : `${visitedCategory}_display_name_${xblockIndex}`;
             })
         );
     };
@@ -288,7 +288,7 @@ describe('MoveXBlock', function() {
      */
     clickForwardButton = function(buttonIndex) {
         buttonIndex = buttonIndex || 0; // eslint-disable-line no-param-reassign
-        modal.moveXBlockListView.$el.find('[data-item-index="' + buttonIndex + '"] button').click();
+        modal.moveXBlockListView.$el.find(`[data-item-index="${buttonIndex}"] button`).click();
     };
 
     /**
@@ -429,7 +429,7 @@ describe('MoveXBlock', function() {
         });
         modal.$el.find('.modal-actions .action-move').click();
         sendMoveXBlockRequest(requests, sourceLocator);
-        AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/' + sourceParentLocator);
+        AjaxHelpers.expectJsonRequest(requests, 'GET', `/xblock/${sourceParentLocator}`);
         AjaxHelpers.respondWithJson(requests, sourceParentXBlockInfo);
         expect(getMovedAlertNotification().html().length).not.toEqual(0);
         verifyConfirmationFeedbackTitleText(sourceDisplayName);

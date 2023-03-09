@@ -17,10 +17,10 @@ define([
                 $submitBtn = $('.submit-button'),
                 $chooseBtn = $('.view-import .choose-file-button'),
                 defaults = [
-                    gettext('There was an error during the upload process.') + '\n',
-                    gettext('There was an error while unpacking the file.') + '\n',
-                    gettext('There was an error while verifying the file you submitted.') + '\n',
-                    dbError + '\n'
+                    `${gettext('There was an error during the upload process.')}\n`,
+                    `${gettext('There was an error while unpacking the file.')}\n`,
+                    `${gettext('There was an error while verifying the file you submitted.')}\n`,
+                    `${dbError}\n`
                 ],
                 unloading = false,
                 previousImport = Import.storedImport(),
@@ -116,7 +116,7 @@ define([
                                         Import.reset();
                                         onComplete();
 
-                                        alert(gettext('Your import has failed.') + '\n\n' + errMsg); // eslint-disable-line max-len, no-alert
+                                        alert(`${gettext('Your import has failed.')}\n\n${errMsg}`); // eslint-disable-line max-len, no-alert
                                     }
                                 }
                             });
@@ -130,7 +130,7 @@ define([
 
                 progressall: function(e, data) {
                     var percentInt = data.loaded / data.total * 100,
-                        percentVal = parseInt(percentInt, 10) + '%',
+                        percentVal = `${parseInt(percentInt, 10)}%`,
                         doneAt;
                     // Firefox makes ProgressEvent.loaded equal ProgressEvent.total only
                     // after receiving a response from the server (see Mozilla bug 637002),

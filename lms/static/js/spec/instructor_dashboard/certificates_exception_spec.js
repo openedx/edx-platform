@@ -194,8 +194,8 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
             var fixture;
             setFixtures();
             fixture = readFixtures('templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore');
-            setFixtures("<script type='text/template' id='certificate-allowlist-tpl'>" + fixture + '</script>'
-                    + "<div class='allowlisted-students' id='allowlisted-students'></div>");
+            setFixtures(`<script type='text/template' id='certificate-allowlist-tpl'>${fixture}</script>`
+                    + `<div class='allowlisted-students' id='allowlisted-students'></div>`);
 
             this.certificate_allowlist = new CertificateAllowlistCollection(certificatesExceptionsJson, {
                 parse: true,
@@ -247,9 +247,9 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
                 {user_name: user, notes: notes, user_email: email}
             ]);
 
-            expect(view.$el.find('table tbody tr td:contains("' + user + '")').parent().html())
+            expect(view.$el.find(`table tbody tr td:contains("${user}")`).parent().html())
                 .toMatch(notes);
-            expect(view.$el.find('table tbody tr td:contains("' + user + '")').parent().html())
+            expect(view.$el.find(`table tbody tr td:contains("${user}")`).parent().html())
                 .toMatch(email);
         });
 
@@ -331,10 +331,10 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
             );
 
             setFixtures(
-                "<script type='text/template' id='certificate-allowlist-editor-tpl'>" + fixture + '</script>'
-                    + "<script type='text/template' id='certificate-allowlist-tpl'>" + fixture2 + '</script>'
-                    + "<div id='certificate-allowlist-editor'></div>"
-                    + "<div class='allowlisted-students' id='allowlisted-students'></div>"
+                `<script type='text/template' id='certificate-allowlist-editor-tpl'>${fixture}</script>`
+                    + `<script type='text/template' id='certificate-allowlist-tpl'>${fixture2}</script>`
+                    + `<div id='certificate-allowlist-editor'></div>`
+                    + `<div class='allowlisted-students' id='allowlisted-students'></div>`
             );
 
             certificateAllowlist = new CertificateAllowlistCollection(certificatesExceptionsJson, {
@@ -374,7 +374,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
             var errorMessages = {
                 empty_user_name_email: 'Student username/email field is required and can not be empty. '
                     + 'Kindly fill in username/email and then press "Add to Exception List" button.',
-                duplicate_user: '<p>' + (duplicateUser) + ' already in exception list.</p>'
+                duplicate_user: `<p>${duplicateUser} already in exception list.</p>`
             };
 
             // click 'Add Exception' button with empty username/email field
@@ -416,8 +416,8 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
 
         it('verifies certificate exception can be deleted by clicking "delete" ', function() {
             var username = 'test1',
-                certificateExceptionSelector = "div.allowlisted-students table tr:contains('" + username + "')",
-                deleteBtnSelector = certificateExceptionSelector + ' td .delete-exception',
+                certificateExceptionSelector = `div.allowlisted-students table tr:contains('${username}')`,
+                deleteBtnSelector = `${certificateExceptionSelector} td .delete-exception`,
                 requests = AjaxHelpers.requests(this);
 
             $(deleteBtnSelector).click();

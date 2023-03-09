@@ -22,7 +22,7 @@
             dispatcher.listenTo(form, 'search', function(query) {
                 results.showLoadingMessage();
                 collection.performSearch(query);
-                router.navigate('search/' + query, {replace: true});
+                router.navigate(`search/${query}`, {replace: true});
             });
 
             dispatcher.listenTo(form, 'clear', function() {

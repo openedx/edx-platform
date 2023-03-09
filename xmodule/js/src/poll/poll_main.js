@@ -24,9 +24,9 @@
 
                     _this.answersObj[index].statsEl.show();
                     // eslint-disable-next-line max-len
-                    _this.answersObj[index].numberEl.html(HtmlUtils.HTML('' + value + ' (' + percentValue.toFixed(1) + '%)').toString());
+                    _this.answersObj[index].numberEl.html(HtmlUtils.HTML(`${value} (${percentValue.toFixed(1)}%)`).toString());
                     _this.answersObj[index].percentEl.css({
-                        width: '' + percentValue.toFixed(1) + '%'
+                        width: `${percentValue.toFixed(1)}%`
                     });
                 });
             },
@@ -49,7 +49,7 @@
                 // Send the data to the server as an AJAX request. Attach a callback that will
                 // be fired on server's response.
                 $.postWithPrefix(
-                    _this.ajax_url + '/' + answer, {},
+                    `${_this.ajax_url}/${answer}`, {},
                     function(response) {
                         console.log('success! response = ');
                         console.log(response);
@@ -81,7 +81,7 @@
                 // Send the data to the server as an AJAX request. Attach a callback that will
                 // be fired on server's response.
                 $.postWithPrefix(
-                    this.ajax_url + '/' + 'reset_poll',
+                    `${this.ajax_url}/` + `reset_poll`,
                     {},
                     function(response) {
                         console.log('success! response = ');
@@ -293,7 +293,7 @@
                 this.jsonConfig = JSON.parse(this.questionEl.children('.poll_question_div').html());
 
                 $.postWithPrefix(
-                    '' + this.questionEl.data('ajax-url') + '/' + 'get_state', {},
+                    `${this.questionEl.data('ajax-url')}/` + `get_state`, {},
                     function(response) {
                         _this.jsonConfig.poll_answer = response.poll_answer;
                         _this.jsonConfig.total = response.total;
@@ -312,8 +312,8 @@
                 return;
             } catch (err) {
                 console.log(
-                    'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
-                    'Error messsage: "' + err.message + '".'
+                    `ERROR: Invalid JSON config for poll ID "${this.id}".`,
+                    `Error messsage: "${err.message}".`
                 );
 
                 return;

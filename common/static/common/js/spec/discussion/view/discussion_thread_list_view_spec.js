@@ -226,7 +226,7 @@
 
         describe('should filter correctly', function() {
             return _.each(['all', 'unread', 'unanswered', 'flagged'], function(filterVal) {
-                it('for ' + filterVal, function() {
+                it(`for ${filterVal}`, function() {
                     expectFilter(filterVal);
                     this.view.$('.forum-nav-filter-main-control').val(filterVal).change();
                     return expect($.ajax).toHaveBeenCalled();
@@ -734,7 +734,7 @@
                         .first()
                         .text()
                         .trim()
-                ).toEqual(newCommentsOnUnreadThread + ' new');
+                ).toEqual(`${newCommentsOnUnreadThread} new`);
             });
 
             it('should display every thread as read if hideReadState: true is passed to the constructor', function() {

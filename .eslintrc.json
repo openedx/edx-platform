@@ -69,7 +69,6 @@
     "prefer-arrow-callback": "off",
     "prefer-destructuring": "off",
     "prefer-rest-params": "off",
-    "prefer-template": "off",
     "radix": "off",
     "react/jsx-indent-props": ["error", 4],
     "react/prop-types": "off",

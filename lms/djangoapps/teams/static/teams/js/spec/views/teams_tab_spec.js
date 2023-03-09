@@ -96,7 +96,7 @@ define([
 
             it('displays and focuses an error message when trying to navigate to a nonexistent team', function() {
                 var teamsTabView = createTeamsTabView();
-                teamsTabView.router.navigate('teams/' + TeamSpecHelpers.testTopicID + '/no_such_team', {trigger: true});
+                teamsTabView.router.navigate(`teams/${TeamSpecHelpers.testTopicID}/no_such_team`, {trigger: true});
                 AjaxHelpers.expectRequest(requests, 'GET', '/api/team/v0/teams/no_such_team?expand=user', null);
                 AjaxHelpers.respondWithError(requests, 404);
                 expectError(teamsTabView, 'The team "no_such_team" could not be found.');
@@ -105,7 +105,7 @@ define([
 
             it('displays and focuses an error message when it receives a 401 AJAX response', function() {
                 var teamsTabView = createTeamsTabView().render();
-                teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID, {trigger: true});
+                teamsTabView.router.navigate(`topics/${TeamSpecHelpers.testTopicID}`, {trigger: true});
                 AjaxHelpers.respondWithError(requests, 401);
                 expectError(teamsTabView, 'Your request could not be completed. Reload the page and try again.');
                 expectFocus(teamsTabView.$('.warning'));
@@ -113,7 +113,7 @@ define([
 
             it('displays and focuses an error message when it receives a 500 AJAX response', function() {
                 var teamsTabView = createTeamsTabView().render();
-                teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID, {trigger: true});
+                teamsTabView.router.navigate(`topics/${TeamSpecHelpers.testTopicID}`, {trigger: true});
                 AjaxHelpers.respondWithError(requests, 500);
                 expectError(
                     teamsTabView,
@@ -139,7 +139,7 @@ define([
         describe('Analytics Events', function() {
             SpecHelpers.withData({
                 'fires a page view event for the topic page': [
-                    'topics/' + TeamSpecHelpers.testTopicID,
+                    `topics/${TeamSpecHelpers.testTopicID}`,
                     {
                         page_name: 'single-topic',
                         topic_id: TeamSpecHelpers.testTopicID,
@@ -147,7 +147,7 @@ define([
                     }
                 ],
                 'fires a page view event for the team page': [
-                    'teams/' + TeamSpecHelpers.testTopicID + '/test_team_id',
+                    `teams/${TeamSpecHelpers.testTopicID}/test_team_id`,
                     {
                         page_name: 'single-team',
                         topic_id: TeamSpecHelpers.testTopicID,
@@ -155,7 +155,7 @@ define([
                     }
                 ],
                 'fires a page view event for the search team page': [
-                    'topics/' + TeamSpecHelpers.testTopicID + '/search',
+                    `topics/${TeamSpecHelpers.testTopicID}/search`,
                     {
                         page_name: 'search-teams',
                         topic_id: TeamSpecHelpers.testTopicID,
@@ -163,7 +163,7 @@ define([
                     }
                 ],
                 'fires a page view event for the new team page': [
-                    'topics/' + TeamSpecHelpers.testTopicID + '/create-team',
+                    `topics/${TeamSpecHelpers.testTopicID}/create-team`,
                     {
                         page_name: 'new-team',
                         topic_id: TeamSpecHelpers.testTopicID,
@@ -171,7 +171,7 @@ define([
                     }
                 ],
                 'fires a page view event for the edit team page': [
-                    'teams/' + TeamSpecHelpers.testTopicID + '/test_team_id/edit-team',
+                    `teams/${TeamSpecHelpers.testTopicID}/test_team_id/edit-team`,
                     {
                         page_name: 'edit-team',
                         topic_id: TeamSpecHelpers.testTopicID,
@@ -358,7 +358,7 @@ define([
                 AjaxHelpers.respondWithJson(requests, { count: 0 });
                 expect(teamsTabView.$('.page-title').text()).toBe('Team Search');
                 expect(teamsTabView.$('.page-description').text()).toBe(
-                    'Showing results for "' + newString + '"'
+                    `Showing results for "${newString}"`
                 );
             });
 

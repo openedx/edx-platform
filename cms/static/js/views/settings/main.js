@@ -87,33 +87,33 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             DateUtils.setupDatePicker('enrollment_end', this);
             DateUtils.setupDatePicker('upgrade_deadline', this);
 
-            this.$el.find('#' + this.fieldToSelectorMap.overview).val(this.model.get('overview'));
+            this.$el.find(`#${this.fieldToSelectorMap.overview}`).val(this.model.get('overview'));
             this.codeMirrorize(null, $('#course-overview')[0]);
 
             if (this.model.get('title') !== '') {
-                this.$el.find('#' + this.fieldToSelectorMap.title).val(this.model.get('title'));
+                this.$el.find(`#${this.fieldToSelectorMap.title}`).val(this.model.get('title'));
             } else {
-                var displayName = this.$el.find('#' + this.fieldToSelectorMap.title).attr('data-display-name');
-                this.$el.find('#' + this.fieldToSelectorMap.title).val(displayName);
+                var displayName = this.$el.find(`#${this.fieldToSelectorMap.title}`).attr('data-display-name');
+                this.$el.find(`#${this.fieldToSelectorMap.title}`).val(displayName);
             }
-            this.$el.find('#' + this.fieldToSelectorMap.subtitle).val(this.model.get('subtitle'));
-            this.$el.find('#' + this.fieldToSelectorMap.duration).val(this.model.get('duration'));
-            this.$el.find('#' + this.fieldToSelectorMap.description).val(this.model.get('description'));
+            this.$el.find(`#${this.fieldToSelectorMap.subtitle}`).val(this.model.get('subtitle'));
+            this.$el.find(`#${this.fieldToSelectorMap.duration}`).val(this.model.get('duration'));
+            this.$el.find(`#${this.fieldToSelectorMap.description}`).val(this.model.get('description'));
 
-            this.$el.find('#' + this.fieldToSelectorMap.short_description).val(this.model.get('short_description'));
-            this.$el.find('#' + this.fieldToSelectorMap.about_sidebar_html).val(
+            this.$el.find(`#${this.fieldToSelectorMap.short_description}`).val(this.model.get('short_description'));
+            this.$el.find(`#${this.fieldToSelectorMap.about_sidebar_html}`).val(
                 this.model.get('about_sidebar_html')
             );
             this.codeMirrorize(null, $('#course-about-sidebar-html')[0]);
 
             this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
-            this.$el.find('#' + this.fieldToSelectorMap.intro_video).val(this.model.get('intro_video') || '');
+            this.$el.find(`#${this.fieldToSelectorMap.intro_video}`).val(this.model.get('intro_video') || '');
             if (this.model.has('intro_video')) {
                 this.$el.find('.remove-course-introduction-video').show();
             } else { this.$el.find('.remove-course-introduction-video').hide(); }
 
-            this.$el.find('#' + this.fieldToSelectorMap.effort).val(this.model.get('effort'));
-            this.$el.find('#' + this.fieldToSelectorMap.certificates_display_behavior).val(this.model.get('certificates_display_behavior'));
+            this.$el.find(`#${this.fieldToSelectorMap.effort}`).val(this.model.get('effort'));
+            this.$el.find(`#${this.fieldToSelectorMap.certificates_display_behavior}`).val(this.model.get('certificates_display_behavior'));
             this.updateCertificatesDisplayBehavior();
 
             var courseImageURL = this.model.get('course_image_asset_path');
@@ -130,16 +130,16 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
 
             var pre_requisite_courses = this.model.get('pre_requisite_courses');
             pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
-            this.$el.find('#' + this.fieldToSelectorMap.pre_requisite_courses).val(pre_requisite_courses);
+            this.$el.find(`#${this.fieldToSelectorMap.pre_requisite_courses}`).val(pre_requisite_courses);
 
             if (this.model.get('entrance_exam_enabled') == 'true') {
-                this.$('#' + this.fieldToSelectorMap.entrance_exam_enabled).attr('checked', this.model.get('entrance_exam_enabled'));
+                this.$(`#${this.fieldToSelectorMap.entrance_exam_enabled}`).attr('checked', this.model.get('entrance_exam_enabled'));
                 this.$('.div-grade-requirements').show();
             } else {
-                this.$('#' + this.fieldToSelectorMap.entrance_exam_enabled).removeAttr('checked');
+                this.$(`#${this.fieldToSelectorMap.entrance_exam_enabled}`).removeAttr('checked');
                 this.$('.div-grade-requirements').hide();
             }
-            this.$('#' + this.fieldToSelectorMap.entrance_exam_minimum_score_pct).val(this.model.get('entrance_exam_minimum_score_pct'));
+            this.$(`#${this.fieldToSelectorMap.entrance_exam_minimum_score_pct}`).val(this.model.get('entrance_exam_minimum_score_pct'));
 
             var selfPacedButton = this.$('#course-pace-self-paced'),
                 instructorPacedButton = this.$('#course-pace-instructor-paced'),
@@ -233,16 +233,16 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             var value;
             var index = event.currentTarget.getAttribute('data-index');
             switch (event.currentTarget.id) {
-            case 'course-learning-info-' + index:
+            case `course-learning-info-${index}`:
                 value = $(event.currentTarget).val();
                 var learningInfo = this.model.get('learning_info');
                 learningInfo[index] = value;
                 this.showNotificationBar();
                 break;
-            case 'course-instructor-name-' + index:
-            case 'course-instructor-title-' + index:
-            case 'course-instructor-organization-' + index:
-            case 'course-instructor-bio-' + index:
+            case `course-instructor-name-${index}`:
+            case `course-instructor-title-${index}`:
+            case `course-instructor-organization-${index}`:
+            case `course-instructor-bio-${index}`:
                 value = $(event.currentTarget).val();
                 var field = event.currentTarget.getAttribute('data-field'),
                     instructors = this.model.get('instructor_info').instructors.slice(0);
@@ -250,12 +250,12 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 this.model.set('instructor_info', {instructors: instructors});
                 this.showNotificationBar();
                 break;
-            case 'course-instructor-image-' + index:
+            case `course-instructor-image-${index}`:
                 instructors = this.model.get('instructor_info').instructors.slice(0);
                 instructors[index].image = $(event.currentTarget).val();
                 this.model.set('instructor_info', {instructors: instructors});
                 this.showNotificationBar();
-                this.updateImagePreview(event.currentTarget, '#course-instructor-image-preview-' + index);
+                this.updateImagePreview(event.currentTarget, `#course-instructor-image-preview-${index}`);
                 break;
             case 'course-image-url':
                 this.updateImageField(event, 'course_image_name', '#course-image');
@@ -345,7 +345,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             if (this.model.has('intro_video')) {
                 this.model.set_videosource(null);
                 this.$el.find('.current-course-introduction-video iframe').attr('src', '');
-                this.$el.find('#' + this.fieldToSelectorMap.intro_video).val('');
+                this.$el.find(`#${this.fieldToSelectorMap.intro_video}`).val('');
                 this.$el.find('.remove-course-introduction-video').hide();
             }
         },
@@ -379,7 +379,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                     }
                 });
                 cmTextArea = this.codeMirrors[thisTarget.id].getInputField();
-                cmTextArea.setAttribute('id', thisTarget.id + '-cm-textarea');
+                cmTextArea.setAttribute('id', `${thisTarget.id}-cm-textarea`);
             }
         },
 

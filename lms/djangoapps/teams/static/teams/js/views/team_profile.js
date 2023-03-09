@@ -125,7 +125,7 @@
                         HtmlUtils.template(teamMemberTemplate)({
                             imageUrl: membership.user.profile_image.image_url_medium,
                             username: membership.user.username,
-                            memberProfileUrl: '/u/' + membership.user.username
+                            memberProfileUrl: `/u/${membership.user.username}`
                         })
                     );
                 });

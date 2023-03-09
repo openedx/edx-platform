@@ -161,7 +161,7 @@
                 );
             },
             actionUrl: function() {
-                return '#teams/' + this.model.get('topic_id') + '/' + this.model.get('id');
+                return `#teams/${this.model.get('topic_id')}/${this.model.get('id')}`;
             },
             // eslint-disable-next-line no-unused-vars
             getTopic: function(topicId) {

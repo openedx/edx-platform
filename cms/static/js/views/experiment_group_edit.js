@@ -19,7 +19,7 @@ function(BaseView, _, str, gettext, groupEditTemplate) {
 
         className: function() {
             var index = this.model.collection.indexOf(this.model);
-            return 'field-group group group-' + index;
+            return `field-group group group-${index}`;
         },
 
         initialize: function() {

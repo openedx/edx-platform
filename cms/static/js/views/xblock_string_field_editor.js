@@ -27,7 +27,7 @@ define(['js/views/baseview', 'js/views/utils/xblock_utils', 'edx-ui-toolkit/js/u
                 this.fieldName = this.$el.data('field');
                 this.fieldDisplayName = this.$el.data('field-display-name');
                 this.template = this.loadTemplate('xblock-string-field-editor');
-                this.model.on('change:' + this.fieldName, this.onChangeField, this);
+                this.model.on(`change:${this.fieldName}`, this.onChangeField, this);
             },
 
             render: function() {

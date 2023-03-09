@@ -145,7 +145,7 @@
 
                     describe('when on a touch based device', function() {
                         $.each(['iPad', 'Android'], function(index, device) {
-                            it('create video volume control on' + device, function() {
+                            it(`create video volume control on${device}`, function() {
                                 window.onTouchBasedDevice.and.returnValue([device]);
                                 state = jasmine.initializePlayer();
 
@@ -846,8 +846,8 @@
                     });
 
                     $.each(['iPad', 'Android'], function(index, device) {
-                        var message = 'controls become visible after playing starts '
-                    + 'on ' + device;
+                        var message = `controls become visible after playing starts `
+                    + `on ${device}`;
 
                         it(message, function(done) {
                             var controls;

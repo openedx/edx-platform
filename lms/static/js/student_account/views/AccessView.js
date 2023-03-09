@@ -258,15 +258,15 @@
 
             toggleForm: function(e) {
                 var type = $(e.currentTarget).data('type'),
-                    $form = $('#' + type + '-form'),
+                    $form = $(`#${type}-form`),
                     scrollX = window.scrollX,
                     scrollY = window.scrollY,
                     queryParams = url('?'),
-                    queryStr = queryParams.length > 0 ? '?' + queryParams : '';
+                    queryStr = queryParams.length > 0 ? `?${queryParams}` : '';
 
                 e.preventDefault();
 
-                window.analytics.track('edx.bi.' + type + '_form.toggled', {
+                window.analytics.track(`edx.bi.${type}_form.toggled`, {
                     category: 'user-engagement'
                 });
 
@@ -288,12 +288,12 @@
 
                 // Update url without reloading page
                 if (type != 'institution_login' && type != 'reset') {
-                    History.pushState(null, document.title, '/' + type + queryStr);
+                    History.pushState(null, document.title, `/${type}${queryStr}`);
                 }
                 analytics.page('login_and_registration', type);
 
                 // Focus on the form
-                $('#' + type).focus();
+                $(`#${type}`).focus();
 
                 // Maintain original scroll position
                 window.scrollTo(scrollX, scrollY);

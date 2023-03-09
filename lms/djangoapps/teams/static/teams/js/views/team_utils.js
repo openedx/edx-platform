@@ -32,8 +32,8 @@
                     return StringUtils.interpolate(
                     // Translators: The following message displays the number of members on a team.
                         ngettext(
-                            formatString + ' Member',
-                            formatString + ' Members',
+                            `${formatString} Member`,
+                            `${formatString} Members`,
                             maxMemberCount || memberCount
                         ),
                         parameters, true

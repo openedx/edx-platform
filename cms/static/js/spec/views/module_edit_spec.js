@@ -124,7 +124,7 @@ describe('ModuleEdit', function() {
             });
             it('loads the module preview via ajax on the view element', function() {
                 expect($.ajax).toHaveBeenCalledWith({
-                    url: '/xblock/' + this.moduleEdit.model.id + '/student_view',
+                    url: `/xblock/${this.moduleEdit.model.id}/student_view`,
                     type: 'GET',
                     cache: false,
                     headers: {
@@ -133,7 +133,7 @@ describe('ModuleEdit', function() {
                     success: jasmine.any(Function)
                 });
                 expect($.ajax).not.toHaveBeenCalledWith({
-                    url: '/xblock/' + this.moduleEdit.model.id + '/studio_view',
+                    url: `/xblock/${this.moduleEdit.model.id}/studio_view`,
                     type: 'GET',
                     headers: {
                         Accept: 'application/json'
@@ -146,7 +146,7 @@ describe('ModuleEdit', function() {
             it('loads the editing view via ajax on demand', function() {
                 var mockXBlockEditorHtml;
                 expect($.ajax).not.toHaveBeenCalledWith({
-                    url: '/xblock/' + this.moduleEdit.model.id + '/studio_view',
+                    url: `/xblock/${this.moduleEdit.model.id}/studio_view`,
                     type: 'GET',
                     cache: false,
                     headers: {
@@ -201,7 +201,7 @@ describe('ModuleEdit', function() {
                     ]
                 });
                 expect($.ajax).toHaveBeenCalledWith({
-                    url: '/xblock/' + this.moduleEdit.model.id + '/studio_view',
+                    url: `/xblock/${this.moduleEdit.model.id}/studio_view`,
                     type: 'GET',
                     cache: false,
                     headers: {

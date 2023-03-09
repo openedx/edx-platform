@@ -115,7 +115,7 @@
             showCreateTeamForm: function(event) {
                 event.preventDefault();
                 Backbone.history.navigate(
-                    'topics/' + this.model.id + '/create-team',
+                    `topics/${this.model.id}/create-team`,
                     {trigger: true}
                 );
             },

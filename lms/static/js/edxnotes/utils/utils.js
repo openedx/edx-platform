@@ -15,7 +15,7 @@
      *   string<br>
      */
         var nl2br = function(str) {
-            return (str + '').replace(/(\r\n|\n\r|\r|\n)/g, '<br>');
+            return (`${str}`).replace(/(\r\n|\n\r|\r|\n)/g, '<br>');
         };
 
         return {

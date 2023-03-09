@@ -87,7 +87,7 @@ class MultiselectDropdown extends React.Component {
             .map(selected => this.findOption(selected).display_name)
             .join(', ');
         if (selectedList.length > 60) {
-            return selectedList.substring(0, 55) + '...'
+            return `${selectedList.substring(0, 55)}...`
         }
         return selectedList;
     }

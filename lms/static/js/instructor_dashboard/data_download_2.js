@@ -38,7 +38,7 @@
             this.$data_display_table = $('.data-display-table-holder');
             this.$downloadProblemReport = $('#download-problem-report');
             this.$tabSwitch = $('.data-download-nav .btn-link');
-            this.$selectedSection = $('#' + this.$tabSwitch.first().attr('data-section'));
+            this.$selectedSection = $(`#${this.$tabSwitch.first().attr('data-section')}`);
             this.$learnerStatus = $('.learner-status');
 
             this.ERROR_MESSAGES = {
@@ -75,7 +75,7 @@
              * Show and hide selected tab data
              */
             this.$tabSwitch.click(function(event) {
-                var selectedSection = '#' + $(this).attr('data-section');
+                var selectedSection = `#${$(this).attr('data-section')}`;
                 event.preventDefault();
                 $('.data-download-nav .btn-link').removeClass('active-section');
                 $('section.tab-data').hide();
@@ -117,7 +117,7 @@
                 var errorMessage = dataDownloadObj.ERROR_MESSAGES[selectedOption.val()];
 
                 if (selectedOption.data('directdownload')) {
-                    location.href = selectedOption.data('endpoint') + '?csv=true';
+                    location.href = `${selectedOption.data('endpoint')}?csv=true`;
                 } else if (selectedOption.data('datatable')) {
                     dataDownloadObj.renderDataTable(selectedOption);
                 } else {

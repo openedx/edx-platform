@@ -150,11 +150,11 @@ define(
 
             verifyMessage = function(state, message) {
                 var icon = state === 'error' ? 'fa-info-circle' : 'fa-check-circle';
-                expect($courseVideoSettingsEl.find('.course-video-settings-message-wrapper.' + state).html()).toEqual(
-                    '<div class="course-video-settings-message">'
-                    + '<span class="icon fa ' + icon + '" aria-hidden="true"></span>'
-                    + '<span>' + message + '</span>'
-                    + '</div>'
+                expect($courseVideoSettingsEl.find(`.course-video-settings-message-wrapper.${state}`).html()).toEqual(
+                    `<div class="course-video-settings-message">`
+                    + `<span class="icon fa ${icon}" aria-hidden="true"></span>`
+                    + `<span>${message}</span>`
+                    + `</div>`
                 );
             };
 
@@ -163,7 +163,7 @@ define(
                 // Check None provider is selected.
                 expect($transcriptProvidersListEl.find('input[type=radio]:checked').val()).toEqual(selectedProvider.value); // eslint-disable-line max-len
                 _.each(providers, function(provider, key) {
-                    $transcriptProvidersListEl.find('label[for=transcript-provider-' + key + ']').val(provider.displayName); // eslint-disable-line max-len
+                    $transcriptProvidersListEl.find(`label[for=transcript-provider-${key}]`).val(provider.displayName); // eslint-disable-line max-len
                 });
             };
 
@@ -219,15 +219,15 @@ define(
             };
 
             verifyOrganizationCredentialField = function(fieldName, label) {
-                var elementSelector = courseVideoSettingsView.selectedProvider + '-' + fieldName;
+                var elementSelector = `${courseVideoSettingsView.selectedProvider}-${fieldName}`;
                 // Verify that correct label is shown.
                 expect(
-                    $courseVideoSettingsEl.find('.' + elementSelector + '-wrapper label .title').html()
+                    $courseVideoSettingsEl.find(`.${elementSelector}-wrapper label .title`).html()
                 ).toEqual(label);
 
                 // Verify that credential field is shown.
                 expect(
-                    $courseVideoSettingsEl.find('.' + elementSelector + '-wrapper .' + elementSelector)
+                    $courseVideoSettingsEl.find(`.${elementSelector}-wrapper .${elementSelector}`)
                 ).toExist();
             };
 
@@ -235,7 +235,7 @@ define(
                 // Verify that success message is shown.
                 verifyMessage(
                     'success',
-                    transcriptionPlans[courseVideoSettingsView.selectedProvider].display_name + ' credentials saved'
+                    `${transcriptionPlans[courseVideoSettingsView.selectedProvider].display_name} credentials saved`
                 );
 
                 // Also verify that transcript credential state is updated.
@@ -253,7 +253,7 @@ define(
                 if ($courseVideoSettingsEl.find('.selected-transcript-provider').length) {
                     $courseVideoSettingsEl.find('.selected-transcript-provider .action-change-provider').click();
                 }
-                $courseVideoSettingsEl.find('#transcript-provider-' + selectedProvider).click();
+                $courseVideoSettingsEl.find(`#transcript-provider-${selectedProvider}`).click();
             };
 
             resetProvider = function() {
@@ -279,7 +279,7 @@ define(
 
                 // Provide organization credentials.
                 _.each(fieldValues, function(key) {
-                    $courseVideoSettingsEl.find('.' + courseVideoSettingsView.selectedProvider + '-' + key).val(key);
+                    $courseVideoSettingsEl.find(`.${courseVideoSettingsView.selectedProvider}-${key}`).val(key);
                 });
                 // Click save organization credentials button to save credentials.
                 $courseVideoSettingsEl.find('.action-update-org-credentials').click();
@@ -714,8 +714,8 @@ define(
                 expect($courseVideoSettingsEl.find('.transcription-account-details.warning')).toExist();
                 // Verify message
                 expect($courseVideoSettingsEl.find('.transcription-account-details').html()).toEqual(
-                    '<span>This action updates the ' + courseVideoSettingsView.selectedProvider
-                    + ' information for your entire organization.</span>'
+                    `<span>This action updates the ${courseVideoSettingsView.selectedProvider
+                    } information for your entire organization.</span>`
                 );
             });
 
@@ -740,12 +740,12 @@ define(
                 $courseVideoSettingsEl.find('.action-update-org-credentials').click();
 
                 verifyPreferanceErrorState(
-                    $courseVideoSettingsEl.find('.' + courseVideoSettingsView.selectedProvider + '-api-key-wrapper'),
+                    $courseVideoSettingsEl.find(`.${courseVideoSettingsView.selectedProvider}-api-key-wrapper`),
                     true
                 );
 
                 verifyPreferanceErrorState(
-                    $courseVideoSettingsEl.find('.' + courseVideoSettingsView.selectedProvider + '-api-secret-wrapper'),
+                    $courseVideoSettingsEl.find(`.${courseVideoSettingsView.selectedProvider}-api-secret-wrapper`),
                     true
                 );
             });

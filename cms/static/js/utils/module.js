@@ -12,9 +12,9 @@ define(['underscore'], function(_) {
 
     var getUpdateUrl = function(locator) {
         if (_.isUndefined(locator)) {
-            return urlRoot + '/';
+            return `${urlRoot}/`;
         } else {
-            return urlRoot + '/' + locator;
+            return `${urlRoot}/${locator}`;
         }
     };
     return {

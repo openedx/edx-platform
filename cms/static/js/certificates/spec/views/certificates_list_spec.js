@@ -54,7 +54,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             }, {add: true});
 
             this.collection = new CertificatesCollection([], {
-                certificateUrl: '/certificates/' + window.course.id
+                certificateUrl: `/certificates/${window.course.id}`
             });
             this.model.set('id', 0);
             this.view = new CertificatesListView({

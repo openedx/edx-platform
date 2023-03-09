@@ -39,7 +39,7 @@
                     $.each(li.toArray().reverse(), function(index, link) {
                         expect($(link).attr('data-speed')).toEqual(state.speeds[index]);
                         expect($(link).find('.speed-option').text()).toBe(
-                            state.speeds[index] + 'x'
+                            `${state.speeds[index]}x`
                         );
                     });
                 });
@@ -47,7 +47,7 @@
 
             describe('when running on touch based device', function() {
                 $.each(['iPad', 'Android'], function(index, device) {
-                    it('is not rendered on' + device, function() {
+                    it(`is not rendered on${device}`, function() {
                         window.onTouchBasedDevice.and.returnValue([device]);
                         state = jasmine.initializePlayer();
 

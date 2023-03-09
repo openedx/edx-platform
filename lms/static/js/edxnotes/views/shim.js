@@ -47,9 +47,9 @@
             // Add screen reader label for edit mode. Note that the id of the tags element will not always be "1".
             // It depends on the number of annotatable components on the page.
                 var tagsField = $('li.annotator-item >input', this.annotator.editor.element).attr('id');
-                if ($("label.sr[for='" + tagsField + "']", this.annotator.editor.element).length === 0) {
+                if ($(`label.sr[for='${tagsField}']`, this.annotator.editor.element).length === 0) {
                     HtmlUtils.prepend(
-                        $('#' + tagsField, this.annotator.editor.element),
+                        $(`#${tagsField}`, this.annotator.editor.element),
                         $(HtmlUtils.joinHtml(
                             HtmlUtils.HTML('<label class="sr" for='),
                             tagsField,
@@ -105,7 +105,7 @@
                     this.unfreezeAll();
                 } else {
                 // Unfreeze only this instance and unbound associated 'click.edxnotes:freeze' handler
-                    $(document).off('click.edxnotes:freeze' + this.uid);
+                    $(document).off(`click.edxnotes:freeze${this.uid}`);
                     this.isFrozen = false;
                 }
 
@@ -215,9 +215,9 @@
             // Add screen reader label for the note area. Note that the id of the tags element will not always be "0".
             // It depends on the number of annotatable components on the page.
                 var noteField = $('li.annotator-item >textarea', this.element).attr('id');
-                if ($("label.sr[for='" + noteField + "']", this.element).length === 0) {
+                if ($(`label.sr[for='${noteField}']`, this.element).length === 0) {
                     HtmlUtils.prepend(
-                        $('#' + noteField, this.element),
+                        $(`#${noteField}`, this.element),
                         $(HtmlUtils.joinHtml(
                             HtmlUtils.HTML('<label class="sr" for='),
                             noteField,
@@ -303,7 +303,7 @@
                     this.removeEvents();
                     this.viewer.element.unbind('mouseover mouseout');
                     this.uid = _.uniqueId();
-                    $(document).on('click.edxnotes:freeze' + this.uid, _.bind(this.unfreeze, this));
+                    $(document).on(`click.edxnotes:freeze${this.uid}`, _.bind(this.unfreeze, this));
                     this.isFrozen = true;
                 }
                 return this;
@@ -318,7 +318,7 @@
                         mouseout: this.startViewerHideTimer
                     });
                     this.viewer.hide();
-                    $(document).off('click.edxnotes:freeze' + this.uid);
+                    $(document).off(`click.edxnotes:freeze${this.uid}`);
                     this.isFrozen = false;
                     Annotator.frozenSrc = null;
                 }

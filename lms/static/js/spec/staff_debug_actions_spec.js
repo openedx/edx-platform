@@ -13,15 +13,15 @@ function(Backbone, $, tmp, AjaxHelpers) {
         var courseId = 'course-v1:edX+DemoX+1';
         var location = 'block-v1:edX+DemoX+1+type@problem+block@9518dd51055b40cd82feb01502644c89';
         var locationName = 'test_loc';
-        var usernameFixtureID = 'sd_fu_' + locationName;
+        var usernameFixtureID = `sd_fu_${locationName}`;
         var $usernameFixture = $('<input>', {id: usernameFixtureID, placeholder: 'userman'});
-        var scoreFixtureID = 'sd_fs_' + locationName;
+        var scoreFixtureID = `sd_fs_${locationName}`;
         var $scoreFixture = $('<input>', {id: scoreFixtureID, placeholder: '0'});
         var escapableLocationName = 'test\.\*\+\?\^\:\$\{\}\(\)\|\]\[loc';
-        var escapableFixtureID = 'sd_fu_' + escapableLocationName;
+        var escapableFixtureID = `sd_fu_${escapableLocationName}`;
         var $escapableFixture = $('<input>', {id: escapableFixtureID, placeholder: 'userman'});
         var esclocationName = 'P2:problem_1';
-        var escapableId = 'result_' + esclocationName;
+        var escapableId = `result_${esclocationName}`;
         var $escapableResultArea = $('<div>', {id: escapableId});
 
         describe('getURL ', function() {
@@ -49,15 +49,15 @@ function(Backbone, $, tmp, AjaxHelpers) {
             it('gets the placeholder username if input field is empty', function() {
                 $('body').append($usernameFixture);
                 expect(StaffDebug.getUser(locationName)).toBe('userman');
-                $('#' + usernameFixtureID).remove();
+                $(`#${usernameFixtureID}`).remove();
             });
             it('gets a filled in name if there is one', function() {
                 $('body').append($usernameFixture);
-                $('#' + usernameFixtureID).val('notuserman');
+                $(`#${usernameFixtureID}`).val('notuserman');
                 expect(StaffDebug.getUser(locationName)).toBe('notuserman');
 
-                $('#' + usernameFixtureID).val('');
-                $('#' + usernameFixtureID).remove();
+                $(`#${usernameFixtureID}`).val('');
+                $(`#${usernameFixtureID}`).remove();
             });
             it('gets the placeholder name if the id has escapable characters', function() {
                 $('body').append($escapableFixture);
@@ -69,15 +69,15 @@ function(Backbone, $, tmp, AjaxHelpers) {
             it('gets the placeholder score if input field is empty', function() {
                 $('body').append($scoreFixture);
                 expect(StaffDebug.getScore(locationName)).toBe('0');
-                $('#' + scoreFixtureID).remove();
+                $(`#${scoreFixtureID}`).remove();
             });
             it('gets a filled in score if there is one', function() {
                 $('body').append($scoreFixture);
-                $('#' + scoreFixtureID).val('1');
+                $(`#${scoreFixtureID}`).val('1');
                 expect(StaffDebug.getScore(locationName)).toBe('1');
 
-                $('#' + scoreFixtureID).val('');
-                $('#' + scoreFixtureID).remove();
+                $(`#${scoreFixtureID}`).val('');
+                $(`#${scoreFixtureID}`).remove();
             });
         });
         describe('doInstructorDashAction success', function() {
@@ -92,7 +92,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
                 StaffDebug.doInstructorDashAction(action);
                 AjaxHelpers.respondWithJson(requests, action);
                 expect($('#idash_msg').text()).toBe('Successfully reset the attempts for user userman');
-                $('#result_' + locationName).remove();
+                $(`#result_${locationName}`).remove();
             });
         });
         describe('doInstructorDashAction error', function() {
@@ -107,7 +107,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
                 StaffDebug.doInstructorDashAction(action);
                 AjaxHelpers.respondWithTextError(requests);
                 expect($('#idash_msg').text()).toBe('Failed to reset attempts for user. Unknown Error Occurred.');
-                $('#result_' + locationName).remove();
+                $(`#result_${locationName}`).remove();
             });
         });
         describe('reset', function() {
@@ -128,7 +128,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual(
                     '/courses/course-v1:edX+DemoX+1/instructor/api/reset_student_attempts'
                 );
-                $('#' + usernameFixtureID).remove();
+                $(`#${usernameFixtureID}`).remove();
             });
         });
         describe('deleteStudentState', function() {
@@ -150,7 +150,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
                     '/courses/course-v1:edX+DemoX+1/instructor/api/reset_student_attempts'
                 );
 
-                $('#' + usernameFixtureID).remove();
+                $(`#${usernameFixtureID}`).remove();
             });
         });
         describe('rescore', function() {
@@ -171,7 +171,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual(
                     '/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem'
                 );
-                $('#' + usernameFixtureID).remove();
+                $(`#${usernameFixtureID}`).remove();
             });
         });
         describe('rescoreIfHigher', function() {
@@ -192,14 +192,14 @@ function(Backbone, $, tmp, AjaxHelpers) {
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual(
                     '/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem'
                 );
-                $('#' + usernameFixtureID).remove();
+                $(`#${usernameFixtureID}`).remove();
             });
         });
         describe('overrideScore', function() {
             it('makes an ajax call with the expected parameters', function() {
                 $('body').append($usernameFixture);
                 $('body').append($scoreFixture);
-                $('#' + scoreFixtureID).val('1');
+                $(`#${scoreFixtureID}`).val('1');
                 spyOn($, 'ajax');
                 StaffDebug.overrideScore(courseId, locationName, location);
 
@@ -214,7 +214,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual(
                     '/courses/course-v1:edX+DemoX+1/instructor/api/override_problem_score'
                 );
-                $('#' + usernameFixtureID).remove();
+                $(`#${usernameFixtureID}`).remove();
             });
         });
     });

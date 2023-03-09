@@ -67,7 +67,7 @@
             expect(cssLeft).toBeCloseTo(posX - 15, 1);
             expect(cssTop).toBeCloseTo(posY - 15, 1);
             expect(state.inputEl.val()).toBe(
-                '[' + Math.round(posX) + ',' + Math.round(posY) + ']'
+                `[${Math.round(posX)},${Math.round(posY)}]`
             );
         });
 
@@ -101,7 +101,7 @@
             expect(cssLeft).toBeCloseTo(posX - 15, 1);
             expect(cssTop).toBeCloseTo(posY - 15, 1);
             expect(state.inputEl.val()).toBe(
-                '[' + Math.round(posX) + ',' + Math.round(posY) + ']'
+                `[${Math.round(posX)},${Math.round(posY)}]`
             );
         });
     });

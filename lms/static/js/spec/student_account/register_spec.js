@@ -410,7 +410,7 @@
                 expect(view.validate).toHaveBeenCalledWith($password[0]);
 
                 // Verify that no submission errors are visible
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(0);
 
                 // Form button should be disabled on success.
                 expect(view.$submitButton).toHaveAttr('disabled');
@@ -450,7 +450,7 @@
                 submitForm(false);
 
                 // Verify that submission errors are visible
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(1);
 
                 // Expect that auth complete is NOT triggered
                 expect(authComplete).toBe(false);
@@ -496,7 +496,7 @@
                 AjaxHelpers.respondWithError(requests);
 
                 // Expect that an error is displayed and that auth complete is NOT triggered
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(1);
                 expect(authComplete).toBe(false);
 
                 // If we try again and succeed, the error should go away
@@ -506,7 +506,7 @@
                 AjaxHelpers.respondWithJson(requests, {});
 
                 // Expect that the error is hidden and that auth complete is triggered
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(0);
                 expect(authComplete).toBe(true);
 
                 // Form button should be disabled on success.

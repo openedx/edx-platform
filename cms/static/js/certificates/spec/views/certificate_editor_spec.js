@@ -111,7 +111,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             }, this.newModelOptions);
 
             this.collection = new CertificatesCollection([this.model], {
-                certificateUrl: '/certificates/' + window.course.id
+                certificateUrl: `/certificates/${window.course.id}`
             });
             this.model.set('id', 0);
             this.view = new CertificateEditorView({
@@ -220,8 +220,8 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
 
                     // now delete anyone of the signatory, Add signatory should be enabled.
                     var signatory = this.model.get('signatories').at(0);
-                    var text = 'Delete "' + signatory.get('name') + '" from the list of signatories?';
-                    clickDeleteItem(this, text, SELECTORS.signatoryDeleteButton + ':first');
+                    var text = `Delete "${signatory.get('name')}" from the list of signatories?`;
+                    clickDeleteItem(this, text, `${SELECTORS.signatoryDeleteButton}:first`);
                     expect(this.view.$(SELECTORS.addSignatoryButton)).not.toHaveClass('disableClick');
                 }
             );
@@ -273,8 +273,8 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 var signatory_url = '/certificates/signatory';
                 signatory.url = signatory_url;
                 spyOn(signatory, 'isNew').and.returnValue(false);
-                var text = 'Delete "' + signatory.get('name') + '" from the list of signatories?';
-                clickDeleteItem(this, text, SELECTORS.signatoryDeleteButton + ':first', signatory_url);
+                var text = `Delete "${signatory.get('name')}" from the list of signatories?`;
+                clickDeleteItem(this, text, `${SELECTORS.signatoryDeleteButton}:first`, signatory_url);
                 expect(this.model.get('signatories').length).toEqual(total_signatories - 1);
             });
 
@@ -287,8 +287,8 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 var total_signatories = this.model.get('signatories').length;
                 var signatory_url = '/certificates/signatory';
                 signatory.url = signatory_url;
-                var text = 'Delete "' + signatory.get('name') + '" from the list of signatories?';
-                showConfirmPromptAndClickCancel(this.view, SELECTORS.signatoryDeleteButton + ':first', text);
+                var text = `Delete "${signatory.get('name')}" from the list of signatories?`;
+                showConfirmPromptAndClickCancel(this.view, `${SELECTORS.signatoryDeleteButton}:first`, text);
                 expect(this.model.get('signatories').length).toEqual(total_signatories);
             });
 

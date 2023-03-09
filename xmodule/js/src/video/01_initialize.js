@@ -427,7 +427,7 @@
                         if (_.isFunction(conversions[option])) {
                             value = conversions[option].call(this, value);
                         } else {
-                            throw new TypeError(option + ' is not a function.');
+                            throw new TypeError(`${option} is not a function.`);
                         }
                     }
                     config[option] = value;
@@ -581,8 +581,8 @@
                     });
                     $(scriptTag).on('error', function() {
                         console.log(
-                            '[Video info]: YouTube returned an error for '
-                    + 'video with id "' + self.id + '".'
+                            `[Video info]: YouTube returned an error for `
+                    + `video with id "${self.id}".`
                         );
                         // If the video is already loaded in `_waitForYoutubeApi` by the
                         // time we get here, then we shouldn't load it again.

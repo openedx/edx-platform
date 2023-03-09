@@ -19,8 +19,8 @@ function($, CertificateBulkAllowlistView) {
             );
 
             setFixtures(
-                "<script type='text/template' id='certificate-bulk-allowlist-tpl'>" + fixture + '</script>'
-                    + "<div class='bulk-allowlist-exception'></div>"
+                `<script type='text/template' id='certificate-bulk-allowlist-tpl'>${fixture}</script>`
+                    + `<div class='bulk-allowlist-exception'></div>`
             );
 
             this.view = new CertificateBulkAllowlistView({

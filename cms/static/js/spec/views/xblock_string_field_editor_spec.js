@@ -33,12 +33,12 @@ describe('XBlockStringFieldEditorView', function() {
         updatedDisplayName = 'Updated Display Name';
         TemplateHelpers.installTemplate('xblock-string-field-editor');
         appendSetFixtures(
-            '<div class="wrapper-xblock-field incontext-editor is-editable"'
-                + 'data-field="display_name" data-field-display-name="Display Name">'
-                + '<h1 class="page-header-title xblock-field-value incontext-editor-value">'
-                + '<span class="title-value">' + initialDisplayName + '</span>'
-                + '</h1>'
-                + '</div>'
+            `<div class="wrapper-xblock-field incontext-editor is-editable"`
+                + `data-field="display_name" data-field-display-name="Display Name">`
+                + `<h1 class="page-header-title xblock-field-value incontext-editor-value">`
+                + `<span class="title-value">${initialDisplayName}</span>`
+                + `</h1>`
+                + `</div>`
         );
     });
 
@@ -149,11 +149,11 @@ describe('XBlockStringFieldEditorView', function() {
         });
 
         it('renders open angle bracket in input field', function() {
-            expectInputMatchesModelDisplayName(updatedDisplayName + '<');
+            expectInputMatchesModelDisplayName(`${updatedDisplayName}<`);
         });
 
         it('renders close angle bracket in input field', function() {
-            expectInputMatchesModelDisplayName('>' + updatedDisplayName);
+            expectInputMatchesModelDisplayName(`>${updatedDisplayName}`);
         });
     });
 });

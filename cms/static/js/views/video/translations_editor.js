@@ -35,7 +35,7 @@ define(
                     languageMap = {};
 
                 if (!tpl) {
-                    console.error("Couldn't load template for item: " + templateName);
+                    console.error(`Couldn't load template for item: ${templateName}`);
                 }
 
                 this.templateItem = _.template(tpl);

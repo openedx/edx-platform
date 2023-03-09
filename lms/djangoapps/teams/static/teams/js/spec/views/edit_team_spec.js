@@ -58,9 +58,9 @@ define([
 
                 _.each(fieldsData, function(fieldData) {
                     if (fieldData[2] === 'error') {
-                        expect(teamEditView.$(fieldData[0].split(' ')[0] + '.error').length).toBe(1);
+                        expect(teamEditView.$(`${fieldData[0].split(' ')[0]}.error`).length).toBe(1);
                     } else if (fieldData[2] === 'success') {
-                        expect(teamEditView.$(fieldData[0].split(' ')[0] + '.error').length).toBe(0);
+                        expect(teamEditView.$(`${fieldData[0].split(' ')[0]}.error`).length).toBe(0);
                     }
                 });
 
@@ -80,7 +80,7 @@ define([
                         language: 'en',
                         country: 'US',
                         membership: [],
-                        url: '/api/team/v0/teams/' + editTeamID
+                        url: `/api/team/v0/teams/${editTeamID}`
                     },
                     {
                         parse: true
@@ -239,7 +239,7 @@ define([
 
             it('can create a team', function() {
                 assertTeamCreateUpdateInfo(
-                    this, createTeamData, teamsUrl, 'teams/' + TeamSpecHelpers.testTopicID + '/123'
+                    this, createTeamData, teamsUrl, `teams/${TeamSpecHelpers.testTopicID}/123`
                 );
             });
 
@@ -260,7 +260,7 @@ define([
             });
 
             it('changes route on cancel click', function() {
-                assertRedirectsToCorrectUrlOnCancel('topics/' + TeamSpecHelpers.testTopicID);
+                assertRedirectsToCorrectUrlOnCancel(`topics/${TeamSpecHelpers.testTopicID}`);
             });
         });
 
@@ -279,8 +279,8 @@ define([
                 copyTeamsData.language = 'fr';
 
                 assertTeamCreateUpdateInfo(
-                    this, copyTeamsData, teamsUrl + editTeamID + '?expand=user',
-                    'teams/' + TeamSpecHelpers.testTopicID + '/' + editTeamID
+                    this, copyTeamsData, `${teamsUrl + editTeamID}?expand=user`,
+                    `teams/${TeamSpecHelpers.testTopicID}/${editTeamID}`
                 );
             });
 
@@ -293,15 +293,15 @@ define([
             });
 
             it('shows an error message for HTTP 500', function() {
-                assertShowMessageOnError(this, editTeamData, teamsUrl + editTeamID + '?expand=user', 500);
+                assertShowMessageOnError(this, editTeamData, `${teamsUrl + editTeamID}?expand=user`, 500);
             });
 
             it('shows correct error message when server returns an error', function() {
-                assertShowMessageOnError(this, editTeamData, teamsUrl + editTeamID + '?expand=user', 400);
+                assertShowMessageOnError(this, editTeamData, `${teamsUrl + editTeamID}?expand=user`, 400);
             });
 
             it('changes route on cancel click', function() {
-                assertRedirectsToCorrectUrlOnCancel('teams/' + TeamSpecHelpers.testTopicID + '/' + editTeamID);
+                assertRedirectsToCorrectUrlOnCancel(`teams/${TeamSpecHelpers.testTopicID}/${editTeamID}`);
             });
         });
     });

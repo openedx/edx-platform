@@ -31,13 +31,13 @@ define(['backbone', 'underscore'], function(Backbone, _) {
                 if (_.isBoolean(value)) {
                     return value ? key : null;
                 } else {
-                    return key + '=' + value;
+                    return `${key}=${value}`;
                 }
             });
             // filter out nulls
             optionStrings = _.filter(optionStrings, _.identity);
             // build license string and return
-            return type + ': ' + optionStrings.join(' ');
+            return `${type}: ${optionStrings.join(' ')}`;
         },
 
         setFromString: function(string, options) {

@@ -26,7 +26,7 @@
                     var sortColumn = this.collection.sortColumn;
                     this.renderPageItems();
                     this.$('.column-sort-link').removeClass('current-sort');
-                    this.$('#' + sortColumn).addClass('current-sort');
+                    this.$(`#${sortColumn}`).addClass('current-sort');
                 },
 
                 onError: function() {
@@ -55,7 +55,7 @@
                 filterableColumnInfo: function(filterColumn) {
                     var filterInfo = this.filterableColumns[filterColumn];
                     if (!filterInfo) {
-                        throw "Unregistered filter column '" + filterInfo + '"';
+                        throw `Unregistered filter column '${filterInfo}"`;
                     }
                     return filterInfo;
                 },
@@ -91,7 +91,7 @@
                 sortableColumnInfo: function(sortColumn) {
                     var sortInfo = this.sortableColumns[sortColumn];
                     if (!sortInfo) {
-                        throw "Unregistered sort column '" + sortColumn + '"';
+                        throw `Unregistered sort column '${sortColumn}"`;
                     }
                     return sortInfo;
                 },

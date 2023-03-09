@@ -8,10 +8,10 @@
      * @return The loaded template.
      */
         var loadTemplate = function(name) {
-            var templateSelector = '#' + name + '-tpl',
+            var templateSelector = `#${name}-tpl`,
                 templateText = $(templateSelector).text();
             if (!templateText) {
-                console.error('Failed to load ' + name + ' template');
+                console.error(`Failed to load ${name} template`);
             }
             return _.template(templateText);
         };

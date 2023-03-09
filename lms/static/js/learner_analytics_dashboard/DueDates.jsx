@@ -26,7 +26,7 @@ class DueDates extends React.Component {
             return type;
         } else {
             this.renderLabels[type] += 1;
-            return type + ' ' + this.renderLabels[type];
+            return `${type} ${this.renderLabels[type]}`;
         }
     }
 

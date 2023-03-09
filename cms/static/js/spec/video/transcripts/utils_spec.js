@@ -104,7 +104,7 @@ define(
                 ];
 
                 $.each(wrongArgumentLists, function(index, element) {
-                    it(element.argName + ' argument(s) is/are absent', function() {
+                    it(`${element.argName} argument(s) is/are absent`, function() {
                         var result = Utils.getField.apply(this, element.list);
 
                         expect(result).toBeUndefined();
@@ -221,7 +221,7 @@ define(
             it('Method: getYoutubeLink', function() {
                 var videoId = 'video_id',
                     result = Utils.getYoutubeLink(videoId),
-                    expectedResult = 'http://youtu.be/' + videoId;
+                    expectedResult = `http://youtu.be/${videoId}`;
 
                 expect(result).toBe(expectedResult);
             });
@@ -263,7 +263,7 @@ define(
                 describe('Wrong arguments ', function() {
                     it('youtube videoId is wrong', function() {
                         var videoId = 'wrong_id',
-                            link = 'http://youtu.be/' + videoId,
+                            link = `http://youtu.be/${videoId}`,
                             result = Utils.parseLink(link);
 
                         expect(result).toEqual({mode: 'incorrect'});

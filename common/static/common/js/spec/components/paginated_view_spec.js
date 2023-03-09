@@ -29,7 +29,7 @@ define([
             generateItems = function(numItems) {
                 return _.map(_.range(numItems), function(i) {
                     return {
-                        text: 'item ' + i
+                        text: `item ${i}`
                     };
                 });
             };
@@ -84,7 +84,7 @@ define([
         function expectFooter(options) {
             var footerEl = testView.$('.test-paging-footer');
             expect(footerEl.text())
-                .toMatch(new RegExp(options.currentPage + '\\s+out of\\s+\/\\s+' + options.totalPages));
+                .toMatch(new RegExp(`${options.currentPage}\\s+out of\\s+\/\\s+${options.totalPages}`));
             expect(footerEl.hasClass('hidden')).toBe(options.isHidden);
         }
 

@@ -7,9 +7,9 @@
         var selector;
         requestToken = requestToken || $(element).data('request-token');
         if (requestToken) {
-            selector = '.' + blockClass + '[data-request-token="' + requestToken + '"]';
+            selector = `.${blockClass}[data-request-token="${requestToken}"]`;
         } else {
-            selector = '.' + blockClass;
+            selector = `.${blockClass}`;
         }
         // After an element is initialized, a class is added to it. To avoid repeat initialization, no
         // elements with that class should be selected.
@@ -26,12 +26,12 @@
             initFnName = $element.data('init');
 
         if (runtime && version && initFnName) {
-            return new window[runtime]['v' + version]();
+            return new window[runtime][`v${version}`]();
         } else {
             if (runtime || version || initFnName) {
                 console.log(
-                    'Block ' + $element.outerHTML + ' is missing data-runtime, data-runtime-version or data-init, '
-                    + 'and can\'t be initialized'
+                    `Block ${$element.outerHTML} is missing data-runtime, data-runtime-version or data-init, `
+                    + `and can't be initialized`
                 );
             } // else this XBlock doesn't have a JS init function.
             return null;
@@ -114,7 +114,7 @@
          */
         initializeAside: function(element) {
             var blockUsageId = $(element).data('block-id');
-            var blockElement = $(element).siblings('[data-usage-id="' + blockUsageId + '"]')[0];
+            var blockElement = $(element).siblings(`[data-usage-id="${blockUsageId}"]`)[0];
 
             return constructBlock(element, [blockElement, initArgs(element)]);
         },

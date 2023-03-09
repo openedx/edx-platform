@@ -251,7 +251,7 @@ define(
                     helpers = {};
 
                 _.each(categories, function(item) {
-                    helpers['is' + str.titleize(item)] = function() {
+                    helpers[`is${str.titleize(item)}`] = function() {
                         return this.get('category') === item;
                     };
                 }, this);

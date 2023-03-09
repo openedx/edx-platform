@@ -37,7 +37,7 @@
                 this.container.append(this.$el);
                 this.$submitBtn = this.$('.post-update');
                 this.addField($threadTypeSelector);
-                this.$('#' + formId + '-post-type-' + this.threadType).attr('checked', true);
+                this.$(`#${formId}-post-type-${this.threadType}`).attr('checked', true);
                 // Only allow the topic field for course threads, as standalone threads
                 // cannot be moved.
                 if (this.isTabMode()) {

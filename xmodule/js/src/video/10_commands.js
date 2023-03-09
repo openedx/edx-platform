@@ -45,7 +45,7 @@
                 if (_.has(this.commands, command)) {
                     this.commands[command].execute.apply(this, [this.state].concat(args));
                 } else {
-                    console.log('Command "' + command + '" is not available.');
+                    console.log(`Command "${command}" is not available.`);
                 }
             },
 

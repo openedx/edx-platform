@@ -137,8 +137,8 @@ define([
         it('should truncate values of some fields', function() {
             var oldNote = $.extend({}, note, {text: Helpers.LONG_TEXT, tags: ['review', Helpers.LONG_TEXT]}),
                 newNote = $.extend({}, note, {
-                    text: Helpers.LONG_TEXT + '123',
-                    quote: Helpers.LONG_TEXT + '123',
+                    text: `${Helpers.LONG_TEXT}123`,
+                    quote: `${Helpers.LONG_TEXT}123`,
                     tags: ['short', 'tags', 'will', 'stay', Helpers.LONG_TEXT]
                 });
 

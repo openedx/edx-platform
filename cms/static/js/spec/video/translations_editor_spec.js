@@ -65,7 +65,7 @@ define(
 
                                 return {
                                     pass: passed,
-                                    message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                    message: `Expected ${actual}${passed ? '' : ' not'} to equal ${expected}`
                                 };
                             }
                         };
@@ -83,7 +83,7 @@ define(
 
                                 return {
                                     pass: passed,
-                                    message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                    message: `Expected ${actual}${passed ? '' : ' not'} to equal ${expected}`
                                 };
                             }
                         };

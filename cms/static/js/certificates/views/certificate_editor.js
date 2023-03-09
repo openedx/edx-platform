@@ -39,7 +39,7 @@ function($, _, Backbone, gettext,
                 'collection-edit',
                 'certificates',
                 'certificate-edit',
-                'certificate-edit-' + index
+                `certificate-edit-${index}`
             ].join(' ');
         },
 

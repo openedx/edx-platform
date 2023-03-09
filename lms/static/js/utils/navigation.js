@@ -20,7 +20,7 @@ var edx = edx || {},
                     button = null;
 
                 if (index > -1) {
-                    button = $('.accordion .button-chapter:eq(' + index + ')');
+                    button = $(`.accordion .button-chapter:eq(${index})`);
                 }
 
                 return button;

@@ -47,7 +47,7 @@
             expectedText = '';
             if (truncatedText) {
                 testText = new Array(100).join('test ');
-                expectedText = testText.substring(0, 139) + '…';
+                expectedText = `${testText.substring(0, 139)}…`;
             } else {
                 testText = 'Test body';
                 expectedText = 'Test body';
@@ -61,16 +61,16 @@
                     if (i === 0) {
                         expectedHtml = expectedHtml + imageTag;
                     } else {
-                        expectedHtml = expectedHtml + '<em>image omitted</em>';
+                        expectedHtml = `${expectedHtml}<em>image omitted</em>`;
                     }
                 }
             }
-            threadData.body = threadData.body + '<em>' + testText + '</em></p>';
+            threadData.body = `${threadData.body}<em>${testText}</em></p>`;
             if (numberOfImages > 1) {
-                expectedHtml = expectedHtml + '<em>' + expectedText
-                    + '</em></p><p><em>Some images in this post have been omitted</em></p>';
+                expectedHtml = `${expectedHtml}<em>${expectedText
+                }</em></p><p><em>Some images in this post have been omitted</em></p>`;
             } else {
-                expectedHtml = expectedHtml + '<em>' + expectedText + '</em></p>';
+                expectedHtml = `${expectedHtml}<em>${expectedText}</em></p>`;
             }
             view = makeView(makeThread(threadData));
             view.render();
@@ -89,7 +89,7 @@
                 outputHtmlStripped = outputHtmlStripped.replace('Some images in this post have been omitted', '');
                 outputHtmlStripped = outputHtmlStripped.replace('image omitted', '');
                 inputHtmlStripped = threadData.body.replace(/(<([^>]+)>)/ig, '');
-                expectedOutput = inputHtmlStripped.substring(0, 139) + '…';
+                expectedOutput = `${inputHtmlStripped.substring(0, 139)}…`;
                 expect(outputHtmlStripped).toEqual(expectedOutput);
                 return expect(view.$el.find('.post-body').html().indexOf('…')).toBeGreaterThan(0);
             }
@@ -110,14 +110,14 @@
             });
             it('untruncated text with markdown body', function() {
                 var view;
-                this.threadData.body = '<p>' + this.imageTag + '<em>Google top search engine</em></p>';
+                this.threadData.body = `<p>${this.imageTag}<em>Google top search engine</em></p>`;
                 view = makeView(makeThread(this.threadData));
                 return checkBody(false, view, this.threadData);
             });
             it('truncated text with markdown body', function() {
                 var testText, view;
                 testText = new Array(100).join('test ');
-                this.threadData.body = '<p>' + this.imageTag + this.imageTag + '<em>' + testText + '</em></p>';
+                this.threadData.body = `<p>${this.imageTag}${this.imageTag}<em>${testText}</em></p>`;
                 view = makeView(makeThread(this.threadData));
                 return checkBody(true, view, this.threadData);
             });
@@ -128,8 +128,8 @@
                 for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
                     truncatedText = _ref1[_j];
                     it(
-                        'body with ' + numImages + ' images and ' + (truncatedText ? 'truncated' : 'untruncated')
-                        + ' text',
+                        `body with ${numImages} images and ${truncatedText ? 'truncated' : 'untruncated'
+                        } text`,
                         // eslint-disable no-loop-func
                         function() {
                             return checkPostWithImages(numImages, truncatedText, this.threadData, this.imageTag);

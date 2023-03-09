@@ -31,26 +31,26 @@
         // the eslint warnings are being suppressed.
         extendsHelper(MarkdownEditingDescriptor, _super); // eslint-disable-line no-use-before-define
 
-        MarkdownEditingDescriptor.multipleChoiceTemplate = '( ) ' // eslint-disable-line no-use-before-define
-            + (gettext('incorrect')) + '\n( ) ' + (gettext('incorrect')) + '\n(x) ' + (gettext('correct')) + '\n';
+        MarkdownEditingDescriptor.multipleChoiceTemplate = `( ) ${// eslint-disable-line no-use-before-define
+            gettext('incorrect')}\n( ) ${gettext('incorrect')}\n(x) ${gettext('correct')}\n`;
 
-        MarkdownEditingDescriptor.checkboxChoiceTemplate = '[x] ' // eslint-disable-line no-use-before-define
-            + (gettext('correct')) + '\n[ ] incorrect\n[x] correct\n';
+        MarkdownEditingDescriptor.checkboxChoiceTemplate = `[x] ${// eslint-disable-line no-use-before-define
+            gettext('correct')}\n[ ] incorrect\n[x] correct\n`;
 
-        MarkdownEditingDescriptor.stringInputTemplate = '= ' // eslint-disable-line no-use-before-define
-            + (gettext('answer')) + '\n';
+        MarkdownEditingDescriptor.stringInputTemplate = `= ${// eslint-disable-line no-use-before-define
+            gettext('answer')}\n`;
 
-        MarkdownEditingDescriptor.numberInputTemplate = '= ' // eslint-disable-line no-use-before-define
-            + (gettext('answer')) + ' +- 0.001%\n';
+        MarkdownEditingDescriptor.numberInputTemplate = `= ${// eslint-disable-line no-use-before-define
+            gettext('answer')} +- 0.001%\n`;
 
-        MarkdownEditingDescriptor.selectTemplate = '[[' // eslint-disable-line no-use-before-define
-            + (gettext('incorrect')) + ', (' + (gettext('correct')) + '), ' + (gettext('incorrect')) + ']]\n';
+        MarkdownEditingDescriptor.selectTemplate = `[[${// eslint-disable-line no-use-before-define
+            gettext('incorrect')}, (${gettext('correct')}), ${gettext('incorrect')}]]\n`;
 
-        MarkdownEditingDescriptor.headerTemplate = '' // eslint-disable-line no-use-before-define
-            + (gettext('Header')) + '\n=====\n';
+        MarkdownEditingDescriptor.headerTemplate = `${// eslint-disable-line no-use-before-define
+            gettext('Header')}\n=====\n`;
 
-        MarkdownEditingDescriptor.explanationTemplate = '[explanation]\n' // eslint-disable-line no-use-before-define
-            + (gettext('Short explanation')) + '\n[explanation]\n';
+        MarkdownEditingDescriptor.explanationTemplate = `[explanation]\n${// eslint-disable-line no-use-before-define
+            gettext('Short explanation')}\n[explanation]\n`;
 
         function MarkdownEditingDescriptor(element) {
             var that = this;
@@ -224,7 +224,7 @@
                     } else {
                         revisedLines += ' ';
                     }
-                    revisedLines += choiceEnd + ' ' + line + '\n';
+                    revisedLines += `${choiceEnd} ${line}\n`;
                 }
                 return revisedLines;
             } else {
@@ -293,14 +293,14 @@
                 // <label>question</label> <description>description</description>
                 xml = xml.replace(/>>([^]+?)<</gm, function(match, questionText) {
                     var result = questionText.split('||'),
-                        label = '<label>' + result[0] + '</label>\n'; // xss-lint: disable=javascript-concat-html
+                        label = `<label>${result[0]}</label>\n`; // xss-lint: disable=javascript-concat-html
 
                     // don't add empty <description> tag
                     if (result.length === 1 || !result[1]) {
                         return label;
                     }
                     // xss-lint: disable=javascript-concat-html
-                    return label + '<description>' + result[1] + '</description>\n';
+                    return `${label}<description>${result[1]}</description>\n`;
                 });
 
                 // Pull out demand hints,  || a hint ||
@@ -312,7 +312,7 @@
                         inner = /\s*\|\|(.*?)\|\|/.exec(options[i]);
                         if (inner) {
                             // xss-lint: disable=javascript-concat-html
-                            demandhints += '  <hint>' + inner[1].trim() + '</hint>\n';
+                            demandhints += `  <hint>${inner[1].trim()}</hint>\n`;
                         }
                     }
                     return '';
@@ -344,7 +344,7 @@
                         if (labelmatch) {
                             hint = hint.replace(labelmatch[0], '').trim();
                             label = labelmatch[1].trim();
-                            labelassign = ' label="' + label + '"';
+                            labelassign = ` label="${label}"`;
                         }
                     }
                     if (detectParens) {
@@ -382,8 +382,8 @@
                         options = group1.split(/\,\s*/g);
                         optiontag = '  <optioninput options="(';
                         for (i = 0; i < options.length; i += 1) {
-                            optiontag += "'" + options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1') + "'"
-                                + (i < options.length - 1 ? ',' : '');
+                            optiontag += `'${options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1')}'${
+                                i < options.length - 1 ? ',' : ''}`;
                         }
                         optiontag += ')" correct="';
                         correct = /(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g.exec(group1);
@@ -392,7 +392,7 @@
                         }
                         optiontag += '">';
                         // xss-lint: disable=javascript-concat-html
-                        return '\n<optionresponse>\n' + optiontag + '</optioninput>\n</optionresponse>\n\n';
+                        return `\n<optionresponse>\n${optiontag}</optioninput>\n</optionresponse>\n\n`;
                     }
 
                     // new style  [[ many-lines ]]
@@ -405,22 +405,22 @@
                             if (!textHint.nothint) {
                                 throw new Error(gettext('An answer option has been left blank. Please review and edit the component.'));
                             }
-                            correctstr = ' correct="' + (textHint.parens ? 'True' : 'False') + '"';
+                            correctstr = ` correct="${textHint.parens ? 'True' : 'False'}"`;
                             hintstr = '';
                             if (textHint.hint) {
                                 label = textHint.label;
                                 if (label) {
-                                    label = ' label="' + label + '"';
+                                    label = ` label="${label}"`;
                                 }
                                 // xss-lint: disable=javascript-concat-html
-                                hintstr = ' <optionhint' + label + '>' + textHint.hint + '</optionhint>';
+                                hintstr = ` <optionhint${label}>${textHint.hint}</optionhint>`;
                             }
                             // xss-lint: disable=javascript-concat-html
-                            optionlines += '    <option' + correctstr + '>' + textHint.nothint + hintstr + '</option>\n';
+                            optionlines += `    <option${correctstr}>${textHint.nothint}${hintstr}</option>\n`;
                         }
                     }
                     // xss-lint: disable=javascript-concat-html
-                    return '\n<optionresponse>\n  <optioninput>\n' + optionlines + '  </optioninput>\n</optionresponse>\n\n';
+                    return `\n<optionresponse>\n  <optioninput>\n${optionlines}  </optioninput>\n</optionresponse>\n\n`;
                 });
 
                 // multiple choice questions
@@ -452,10 +452,10 @@
                             if (hint.hint) {
                                 value = hint.nothint;
                                 // xss-lint: disable=javascript-concat-html
-                                value = value + ' <choicehint' + hint.labelassign + '>' + hint.hint + '</choicehint>';
+                                value = `${value} <choicehint${hint.labelassign}>${hint.hint}</choicehint>`;
                             }
                             // xss-lint: disable=javascript-concat-html
-                            choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '</choice>\n';
+                            choices += `    <choice correct="${correct}"${fixed}>${value}</choice>\n`;
                         }
                     }
                     result = '<multiplechoiceresponse>\n';
@@ -492,7 +492,7 @@
                                 hintbody = abhint[2];
                                 hintbody = hintbody.replace('&lf;', '\n').trim();
                                 // xss-lint: disable=javascript-concat-html
-                                endHints += '    <compoundhint value="' + abhint[1].trim() + '">' + hintbody + '</compoundhint>\n';
+                                endHints += `    <compoundhint value="${abhint[1].trim()}">${hintbody}</compoundhint>\n`;
                                 continue; // bail
                             }
 
@@ -506,7 +506,7 @@
                             //   {unselected: Remember that apple is also a fruit.}}
                             hint = extractHint(value);
                             if (hint.hint) {
-                                inner = '{' + hint.hint + '}'; // parsing is easier if we put outer { } back
+                                inner = `{${hint.hint}}`; // parsing is easier if we put outer { } back
 
                                 // include \n since we are downstream of extractHint()
                                 select = /{\s*(s|selected):((.|\n)*?)}/i.exec(inner);
@@ -514,12 +514,12 @@
                                 // <choicehint selected="true">You’re right that apple is a fruit.</choicehint>
                                 if (select) {
                                     // xss-lint: disable=javascript-concat-html
-                                    hints += '\n      <choicehint selected="true">' + select[2].trim() + '</choicehint>';
+                                    hints += `\n      <choicehint selected="true">${select[2].trim()}</choicehint>`;
                                 }
                                 select = /{\s*(u|unselected):((.|\n)*?)}/i.exec(inner);
                                 if (select) {
                                     // xss-lint: disable=javascript-concat-html
-                                    hints += '\n      <choicehint selected="false">' + select[2].trim() + '</choicehint>';
+                                    hints += `\n      <choicehint selected="false">${select[2].trim()}</choicehint>`;
                                 }
 
                                 // Blank out the original text only if the specific "selected" syntax is found
@@ -529,7 +529,7 @@
                                 }
                             }
                             // xss-lint: disable=javascript-concat-html
-                            groupString += '    <choice correct="' + correct + '">' + value + hints + '</choice>\n';
+                            groupString += `    <choice correct="${correct}">${value}${hints}</choice>\n`;
                         }
                     }
 
@@ -593,7 +593,7 @@
                             if (textHint.hint) {
                                 firstAnswer = textHint.nothint;
                                 // xss-lint: disable=javascript-concat-html
-                                hintLine = '  <correcthint' + textHint.labelassign + '>' + textHint.hint + '</correcthint>\n';
+                                hintLine = `  <correcthint${textHint.labelassign}>${textHint.hint}</correcthint>\n`;
                             }
 
                             // Range case
@@ -601,14 +601,14 @@
                                 // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
                                 // = (5*2)*3 should not be used as range tolerance
                                 // xss-lint: disable=javascript-concat-html
-                                numericalResponseString = '<numericalresponse answer="' + firstAnswer + '">\n';
+                                numericalResponseString = `<numericalresponse answer="${firstAnswer}">\n`;
                             } else {
                                 answerData = getAnswerData(firstAnswer);
                                 // xss-lint: disable=javascript-concat-html
-                                numericalResponseString = '<numericalresponse answer="' + answerData.answer + '">\n';
+                                numericalResponseString = `<numericalresponse answer="${answerData.answer}">\n`;
                                 if (answerData.default) {
                                     // xss-lint: disable=javascript-concat-html
-                                    numericalResponseString += '  <responseparam type="tolerance" default="' + answerData.default + '" />\n';
+                                    numericalResponseString += `  <responseparam type="tolerance" default="${answerData.default}" />\n`;
                                 }
                             }
 
@@ -632,11 +632,11 @@
 
                                     if (additionalTextHint.hint) {
                                         // xss-lint: disable=javascript-concat-html
-                                        additionalHintLine = '<correcthint' + additionalTextHint.labelassign + '>' + additionalTextHint.hint + '</correcthint>';
+                                        additionalHintLine = `<correcthint${additionalTextHint.labelassign}>${additionalTextHint.hint}</correcthint>`;
                                     }
 
                                     // xss-lint: disable=javascript-concat-html
-                                    additionalAnswerString += '  <additional_answer answer="' + orMatch[1] + '">';
+                                    additionalAnswerString += `  <additional_answer answer="${orMatch[1]}">`;
                                     additionalAnswerString += additionalHintLine;
                                     additionalAnswerString += '</additional_answer>\n';
                                 }
@@ -667,11 +667,11 @@
                                 firstAnswer = firstAnswer.slice(1).trim();
                             }
                             // xss-lint: disable=javascript-concat-html
-                            string = '<stringresponse answer="' + firstAnswer + '"' + typ + ' >\n';
+                            string = `<stringresponse answer="${firstAnswer}"${typ} >\n`;
                             if (textHint.hint) {
                                 // xss-lint: disable=javascript-concat-html
-                                string += '  <correcthint' + textHint.labelassign + '>'
-                                    + textHint.hint + '</correcthint>\n'; // xss-lint: disable=javascript-concat-html
+                                string += `  <correcthint${textHint.labelassign}>${
+                                    textHint.hint}</correcthint>\n`; // xss-lint: disable=javascript-concat-html
                             }
 
                             // Subsequent cases are not= or or=
@@ -680,7 +680,7 @@
                                 notMatch = /^not\=\s*(.*)/.exec(textHint.nothint);
                                 if (notMatch) {
                                     // xss-lint: disable=javascript-concat-html
-                                    string += '  <stringequalhint answer="' + notMatch[1] + '"' + textHint.labelassign + '>' + textHint.hint + '</stringequalhint>\n';
+                                    string += `  <stringequalhint answer="${notMatch[1]}"${textHint.labelassign}>${textHint.hint}</stringequalhint>\n`;
 
                                     continue;
                                 }
@@ -688,10 +688,10 @@
                                 if (orMatch) {
                                     // additional_answer with answer= attribute
                                     // xss-lint: disable=javascript-concat-html
-                                    string += '  <additional_answer answer="' + orMatch[1] + '">';
+                                    string += `  <additional_answer answer="${orMatch[1]}">`;
                                     if (textHint.hint) {
                                         // xss-lint: disable=javascript-concat-html
-                                        string += '<correcthint' + textHint.labelassign + '>' + textHint.hint + '</correcthint>';
+                                        string += `<correcthint${textHint.labelassign}>${textHint.hint}</correcthint>`;
                                     }
                                     string += '</additional_answer>\n';
                                 }
@@ -708,13 +708,13 @@
                 // replace explanations
                 xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
                     // xss-lint: disable=javascript-concat-html
-                    return '<solution>\n<div class="detailed-solution">\n' + gettext('Explanation') + '\n\n' + p1 + '\n</div>\n</solution>';
+                    return `<solution>\n<div class="detailed-solution">\n${gettext('Explanation')}\n\n${p1}\n</div>\n</solution>`;
                 });
 
                 // replace code blocks
                 xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
                     // xss-lint: disable=javascript-concat-html
-                    return '<pre><code>' + p1 + '</code></pre>';
+                    return `<pre><code>${p1}</code></pre>`;
                 });
 
                 // split scripts and preformatted sections, and wrap paragraphs
@@ -753,7 +753,7 @@
 
                 // make temporary xml
                 // xss-lint: disable=javascript-concat-html
-                $xml = $($.parseXML('<prob>' + xml + '</prob>'));
+                $xml = $($.parseXML(`<prob>${xml}</prob>`));
                 responseType = $xml.find(responseTypesSelector);
 
                 // convert if there is only one responsetype
@@ -802,11 +802,11 @@
             finalDemandHints = '';
             if (demandHintTags.length) {
                 // xss-lint: disable=javascript-concat-html
-                finalDemandHints = '\n<demandhint>\n' + demandHintTags.join('') + '</demandhint>';
+                finalDemandHints = `\n<demandhint>\n${demandHintTags.join('')}</demandhint>`;
             }
             // make all responsetypes descendants of a single problem element
             // xss-lint: disable=javascript-concat-html
-            finalXml = '<problem>\n' + responseTypesXML.join('\n\n') + finalDemandHints + '\n</problem>';
+            finalXml = `<problem>\n${responseTypesXML.join('\n\n')}${finalDemandHints}\n</problem>`;
             return finalXml;
         };
 

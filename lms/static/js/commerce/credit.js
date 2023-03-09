@@ -11,7 +11,7 @@ var edx = edx || {};
 
     edx.commerce.credit.createCreditRequest = function(providerId, courseKey, username) {
         return $.ajax({
-            url: '/api/credit/v1/providers/' + providerId + '/request/',
+            url: `/api/credit/v1/providers/${providerId}/request/`,
             type: 'POST',
             headers: {
                 'X-CSRFToken': $.cookie('csrftoken')

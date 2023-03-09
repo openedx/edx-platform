@@ -86,7 +86,7 @@
                 this.options = _.extend({}, options);
                 this.startHeader = options.startHeader;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
-                    throw new Error('invalid mode: ' + this.mode);
+                    throw new Error(`invalid mode: ${this.mode}`);
                 }
                 this.readOnly = $('.discussion-module').data('read-only');
                 this.model.collection.on('reset', function(collection) {

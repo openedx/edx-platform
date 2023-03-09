@@ -22,7 +22,7 @@ define([
             return [
                 'collection',
                 'partition-group-details',
-                'partition-group-details-' + index
+                `partition-group-details-${index}`
             ].join(' ');
         },
 

@@ -323,7 +323,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
             var view = new FieldViews.LinkFieldView(fieldData).render();
 
             FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, fieldData.title, fieldData.helpMessage);
-            expect(view.$('.u-field-value > a .u-field-link-title-' + view.options.valueAttribute).text().trim()).toBe(fieldData.linkTitle);
+            expect(view.$(`.u-field-value > a .u-field-link-title-${view.options.valueAttribute}`).text().trim()).toBe(fieldData.linkTitle);
         });
 
         it("can't persist changes if persistChanges is off", function() {

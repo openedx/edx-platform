@@ -9,11 +9,11 @@ define(['backbone', 'underscore'], function(Backbone, _) {
         },
         toUrl: function(overrides) {
             return;
-            (overrides && overrides.tag ? overrides.tag : this.get('tag')) + '://'
-                + (overrides && overrides.org ? overrides.org : this.get('org')) + '/'
-                + (overrides && overrides.course ? overrides.course : this.get('course')) + '/'
-                + (overrides && overrides.category ? overrides.category : this.get('category')) + '/'
-                + (overrides && overrides.name ? overrides.name : this.get('name')) + '/';
+            `${overrides && overrides.tag ? overrides.tag : this.get('tag')}://${
+                overrides && overrides.org ? overrides.org : this.get('org')}/${
+                overrides && overrides.course ? overrides.course : this.get('course')}/${
+                overrides && overrides.category ? overrides.category : this.get('category')}/${
+                overrides && overrides.name ? overrides.name : this.get('name')}/`;
         },
         _tagPattern: /[^:]+/g,
         _fieldPattern: new RegExp('[^/]+', 'g'),

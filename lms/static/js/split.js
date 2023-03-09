@@ -50,12 +50,12 @@ _split = _split || (function(undef) {
                     + (separator.sticky ? 'y' : ''), // Firefox 3+
             lastLastIndex = 0,
             // Make `global` and avoid `lastIndex` issues by working with a copy
-            separator = new RegExp(separator.source, flags + 'g'),
+            separator = new RegExp(separator.source, `${flags}g`),
             separator2, match, lastIndex, lastLength;
         str += ''; // Type-convert
         if (!compliantExecNpcg) {
             // Doesn't need flags gy, but they don't hurt
-            separator2 = new RegExp('^' + separator.source + '$(?!\\s)', flags);
+            separator2 = new RegExp(`^${separator.source}$(?!\\s)`, flags);
         }
         /* Values for `limit`, per the spec:
          * If undefined: 4294967295 // Math.pow(2, 32) - 1

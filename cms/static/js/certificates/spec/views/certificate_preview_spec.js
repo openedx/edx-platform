@@ -43,7 +43,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
                 el: $('.preview-certificate'),
                 course_modes: ['test1', 'test2', 'test3'],
                 certificate_web_view_url: '/users/1/courses/orgX/009/2016?preview=test1',
-                certificate_activation_handler_url: '/certificates/activation/' + window.course.id,
+                certificate_activation_handler_url: `/certificates/activation/${window.course.id}`,
                 is_active: true
             });
             appendSetFixtures(this.view.render().el);
@@ -87,7 +87,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
                 this.view.$(SELECTORS.activate_certificate).click();
-                AjaxHelpers.expectJsonRequest(requests, 'POST', '/certificates/activation/' + window.course.id, {
+                AjaxHelpers.expectJsonRequest(requests, 'POST', `/certificates/activation/${window.course.id}`, {
                     is_active: false
                 });
                 ViewHelpers.verifyNotificationShowing(notificationSpy, /Deactivating/);
@@ -98,7 +98,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
                     notificationSpy = ViewHelpers.createNotificationSpy();
                 this.view.is_active = false;
                 this.view.$(SELECTORS.activate_certificate).click();
-                AjaxHelpers.expectJsonRequest(requests, 'POST', '/certificates/activation/' + window.course.id, {
+                AjaxHelpers.expectJsonRequest(requests, 'POST', `/certificates/activation/${window.course.id}`, {
                     is_active: true
                 });
                 ViewHelpers.verifyNotificationShowing(notificationSpy, /Activating/);

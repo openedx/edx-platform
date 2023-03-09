@@ -203,7 +203,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
                     if (self.maxFileSizeRedirectUrl) {
                         var instructions = gettext('Please follow the instructions here to upload a file elsewhere and link to it: {maxFileSizeRedirectUrl}')
                             .replace('{maxFileSizeRedirectUrl}', self.maxFileSizeRedirectUrl);
-                        error = error + ' ' + instructions;
+                        error = `${error} ${instructions}`;
                     }
 
                     self.largeFileErrorMsg = new NotificationView.Error({
@@ -262,7 +262,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         },
 
         showUploadFeedback: function(event, percentComplete) {
-            var percentVal = percentComplete + '%',
+            var percentVal = `${percentComplete}%`,
                 $progressFill = $('.upload-modal .progress-fill');
 
             $progressFill.width(percentVal);
@@ -319,7 +319,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
             this.pagingView.filterableColumns['js-asset-type-col'].displayName = assettypeLabel;
             this.pagingView.selectFilter('js-asset-type-col');
             this.closeFilterPopup(this.$el.find(
-                '.column-filter-link[data-assetfilter="' + assettype + '"]'));
+                `.column-filter-link[data-assetfilter="${assettype}"]`));
         },
 
         closeFilterPopup: function(element) {

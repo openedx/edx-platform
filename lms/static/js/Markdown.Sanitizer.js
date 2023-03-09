@@ -63,7 +63,7 @@
             tagname = tags[ctag].replace(/<\/?(\w+).*/, '$1');
             // skip any already paired tags
             // and skip tags in our ignore list; assume they're self-closed
-            if (tagpaired[ctag] || ignoredtags.search('<' + tagname + '>') > -1) { continue; } // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
+            if (tagpaired[ctag] || ignoredtags.search(`<${tagname}>`) > -1) { continue; } // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
 
             tag = tags[ctag];
             match = -1;
@@ -72,7 +72,7 @@
                 // this is an opening tag
                 // search forwards (next tags), look for closing tags
                 for (var ntag = ctag + 1; ntag < tagcount; ntag++) {
-                    if (!tagpaired[ntag] && tags[ntag] === '</' + tagname + '>') { // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
+                    if (!tagpaired[ntag] && tags[ntag] === `</${tagname}>`) { // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
                         match = ntag;
                         break;
                     }

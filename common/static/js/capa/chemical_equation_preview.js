@@ -17,7 +17,7 @@
             });
         }
 
-        prev_id = '#' + this.id + '_preview';
+        prev_id = `#${this.id}_preview`;
         preview_div = $(prev_id);
 
         // find the closest parent problems-wrapper and use that url

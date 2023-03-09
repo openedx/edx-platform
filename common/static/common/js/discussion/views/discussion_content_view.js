@@ -236,10 +236,10 @@
                     var funcName, selector;
                     selector = event[0];
                     funcName = event[1];
-                    obj['click ' + selector] = function(event) {
+                    obj[`click ${selector}`] = function(event) {
                         return this[funcName](event);
                     };
-                    obj['keydown ' + selector] = function(event) {
+                    obj[`keydown ${selector}`] = function(event) {
                         return DiscussionUtil.activateOnSpace(event, this[funcName]);
                     };
                     return obj;

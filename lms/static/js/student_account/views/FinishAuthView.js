@@ -78,7 +78,7 @@
                     var next = _.bind(this.enrollment, this);
                     this.checkEmailOptIn(next);
                 } catch (err) {
-                    this.updateTaskDescription(gettext('Error') + ': ' + err.message);
+                    this.updateTaskDescription(`${gettext('Error')}: ${err.message}`);
                     this.redirect(this.nextUrl);
                 }
             },
@@ -93,7 +93,7 @@
                 if (this.purchaseWorkflow) {
                     // Append the purchase_workflow parameter to indicate
                     // whether this is a bulk purchase or a single seat purchase
-                    redirectUrl += '?purchase_workflow=' + this.purchaseWorkflow;
+                    redirectUrl += `?purchase_workflow=${this.purchaseWorkflow}`;
                 }
                 return redirectUrl;
             },
@@ -134,7 +134,7 @@
                         The track selection page would allow the user to select the course mode
                         ("verified", "honor", etc.) -- or, if the only course mode was "honor",
                         it would redirect the user to the dashboard. */
-                        redirectUrl = this.appendPurchaseWorkflow(this.urls.trackSelection + courseId + '/');
+                        redirectUrl = this.appendPurchaseWorkflow(`${this.urls.trackSelection + courseId}/`);
                     } else if (this.courseMode === 'honor' || this.courseMode === 'audit') {
                         /* The newer version of the course details page allows the user
                         to specify which course mode to enroll as.  If the student has
@@ -144,7 +144,7 @@
                     } else {
                         /* If the user selected any other kind of course mode, send them
                         to the payment/verification flow. */
-                        redirectUrl = this.appendPurchaseWorkflow(this.urls.payment + courseId + '/');
+                        redirectUrl = this.appendPurchaseWorkflow(`${this.urls.payment + courseId}/`);
                     }
 
                     /* Attempt to auto-enroll the user in a free mode of the course,

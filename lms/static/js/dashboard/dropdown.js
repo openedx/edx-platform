@@ -10,8 +10,8 @@ var edx = edx || {};
     edx.dashboard.dropdown.toggleCourseActionsDropdownMenu = function(event) {
         var $target = $(event.currentTarget),
             dashboardIndex = $target.data().dashboardIndex,
-            $dropdown = $($target.data('dropdownSelector') || '#actions-dropdown-' + dashboardIndex),
-            $dropdownButton = $($target.data('dropdownButtonSelector') || '#actions-dropdown-link-' + dashboardIndex),
+            $dropdown = $($target.data('dropdownSelector') || `#actions-dropdown-${dashboardIndex}`),
+            $dropdownButton = $($target.data('dropdownButtonSelector') || `#actions-dropdown-link-${dashboardIndex}`),
             ariaExpandedState = ($dropdownButton.attr('aria-expanded') === 'true'),
             menuItems = $dropdown.find('a');
 

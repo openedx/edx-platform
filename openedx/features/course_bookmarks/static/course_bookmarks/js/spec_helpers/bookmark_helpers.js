@@ -21,10 +21,10 @@ define(
             for (i = 0; i < options.numBookmarksToCreate; i++) {
                 bookmarkInfo = {
                     id: i,
-                    display_name: 'UNIT_DISPLAY_NAME_' + i,
+                    display_name: `UNIT_DISPLAY_NAME_${i}`,
                     created: new Date().toISOString(),
                     course_id: 'COURSE_ID',
-                    usage_id: 'UNIT_USAGE_ID_' + i,
+                    usage_id: `UNIT_USAGE_ID_${i}`,
                     block_type: 'vertical',
                     path: [
                         {display_name: 'SECTION_DISPLAY_NAME', usage_id: 'SECTION_USAGE_ID'},
@@ -39,7 +39,7 @@ define(
         };
 
         var createBookmarkUrl = function(courseId, usageId) {
-            return '/courses/' + courseId + '/jump_to/' + usageId;
+            return `/courses/${courseId}/jump_to/${usageId}`;
         };
 
         var breadcrumbTrail = function(path, unitDisplayName) {
@@ -71,7 +71,7 @@ define(
                     .toBe(breadcrumbTrail(results[i].path, results[i].display_name));
 
                 expect($bookmark.find('.list-item-date').text().trim())
-                    .toBe('Bookmarked on ' + view.humanFriendlyDate(results[i].created));
+                    .toBe(`Bookmarked on ${view.humanFriendlyDate(results[i].created)}`);
             }
         };
 

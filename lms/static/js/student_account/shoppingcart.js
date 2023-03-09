@@ -21,7 +21,7 @@
              */
             addCourseToCart: function(courseId) {
                 $.ajax({
-                    url: this.urls.addCourse + courseId + '/',
+                    url: `${this.urls.addCourse + courseId}/`,
                     type: 'POST',
                     data: {},
                     headers: this.headers,

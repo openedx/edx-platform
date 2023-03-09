@@ -52,7 +52,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         return ViewUtils.runOperationShowingMessage(gettext('Adding'),
             function() {
                 var addOperation = $.Deferred();
-                analytics.track('Created a ' + category, {
+                analytics.track(`Created a ${category}`, {
                     course: course_location_analytics,
                     display_name: displayName
                 });
@@ -151,7 +151,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         );
 
         if (xblockInfo.get('is_prereq')) {
-            messageBody += ' ' + gettext('Any content that has listed this content as a prerequisite will also have access limitations removed.'); // eslint-disable-line max-len
+            messageBody += ` ${gettext('Any content that has listed this content as a prerequisite will also have access limitations removed.')}`; // eslint-disable-line max-len
             ViewUtils.confirmThenRunOperation(
                 StringUtils.interpolate(
                     gettext('Delete this {xblock_type} (and prerequisite)?'),

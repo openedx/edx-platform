@@ -34,7 +34,7 @@
                 this.startHeader = options.startHeader;
                 this.is_commentable_divided = options.is_commentable_divided;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
-                    throw new Error('invalid mode: ' + this.mode);
+                    throw new Error(`invalid mode: ${this.mode}`);
                 }
             };
 

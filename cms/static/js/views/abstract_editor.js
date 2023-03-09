@@ -6,7 +6,7 @@ define(['js/views/baseview', 'underscore'], function(BaseView, _) {
             var self = this;
             var templateName = _.result(this, 'templateName');
             // Backbone model cid is only unique within the collection.
-            this.uniqueId = _.uniqueId(templateName + '_');
+            this.uniqueId = _.uniqueId(`${templateName}_`);
             this.template = this.loadTemplate(templateName);
             // xss-lint: disable=javascript-jquery-html
             this.$el.html(this.template({model: this.model, uniqueId: this.uniqueId}));
@@ -87,10 +87,10 @@ define(['js/views/baseview', 'underscore'], function(BaseView, _) {
          * @returns The loaded template.
          */
         loadTemplate: function(name) {
-            var templateSelector = '#' + name,
+            var templateSelector = `#${name}`,
                 templateText = $(templateSelector).text();
             if (!templateText) {
-                console.error('Failed to load ' + name + ' template');
+                console.error(`Failed to load ${name} template`);
             }
             return _.template(templateText);
         }

@@ -13,7 +13,7 @@ var options = {
     includeCommonFiles: true,
 
     normalizePathsForCoverageFunc: function(appRoot, pattern) {
-        return path.join(appRoot, '/common/static/' + pattern);
+        return path.join(appRoot, `/common/static/${pattern}`);
     },
 
     libraryFiles: [

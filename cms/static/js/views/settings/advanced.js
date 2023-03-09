@@ -91,7 +91,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                     var firstNonWhite = stringValue.substring(0, 1);
                     if (firstNonWhite !== '{' && firstNonWhite !== '[' && firstNonWhite !== "'") {
                         try {
-                            stringValue = '"' + stringValue + '"';
+                            stringValue = `"${stringValue}"`;
                             JSONValue = JSON.parse(stringValue);
                             mirror.setValue(stringValue);
                         } catch (quotedE) {

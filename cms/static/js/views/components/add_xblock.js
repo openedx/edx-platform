@@ -46,8 +46,8 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Htm
             event.stopPropagation();
             type = $(event.currentTarget).data('type');
             this.$('.new-component').slideUp(250);
-            this.$('.new-component-' + type).slideDown(250);
-            this.$('.new-component-' + type + ' div').focus();
+            this.$(`.new-component-${type}`).slideDown(250);
+            this.$(`.new-component-${type} div`).focus();
         },
 
         closeNewComponent: function(event) {
@@ -57,7 +57,7 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Htm
             type = $(event.currentTarget).data('type');
             this.$('.new-component').slideDown(250);
             this.$('.new-component-templates').slideUp(250);
-            this.$('ul.new-component-type li button[data-type=' + type + ']').focus();
+            this.$(`ul.new-component-type li button[data-type=${type}]`).focus();
         },
 
         createNewComponent: function(event) {

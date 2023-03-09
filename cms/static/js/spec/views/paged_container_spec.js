@@ -18,11 +18,11 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
             previews: true
         };
         var options = _.extend(default_options, override_options);
-        return '<div class="xblock" data-request-token="request_token">'
-                + '<div class="container-paging-header"></div>'
-                + htmlResponseTpl(options)
-                + '<div class="container-paging-footer"></div>'
-                + '</div>';
+        return `<div class="xblock" data-request-token="request_token">`
+                + `<div class="container-paging-header"></div>${
+                    htmlResponseTpl(options)
+                }<div class="container-paging-footer"></div>`
+                + `</div>`;
     }
 
     var makePage = function(html_parameters) {
@@ -506,7 +506,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
                     defaultUrl = '/preview/xblock/handler/trigger_previews';
 
                 testSendsAjax = function(show_previews) {
-                    it('should send ' + (!show_previews) + ' when showChildrenPreviews was ' + show_previews, function() {
+                    it(`should send ${!show_previews} when showChildrenPreviews was ${show_previews}`, function() {
                         var requests = AjaxHelpers.requests(this);
                         pagingContainer.collection.showChildrenPreviews = show_previews;
                         pagingContainer.togglePreviews();
