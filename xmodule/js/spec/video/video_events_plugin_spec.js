@@ -1,4 +1,4 @@
-import '../helper.js'
+import '../helper.js';
 
 (function(undefined) {
     'use strict';

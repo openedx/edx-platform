@@ -183,7 +183,7 @@ import * as Time from 'time.js';
             state.videoSaveStatePlugin.onUnload();
             expect($.ajax).not.toHaveBeenCalledWith({
                 url: state.config.saveStateUrl
-            })
+            });
             state.config.saveStateEnabled = true;
             $.ajax.calls.reset();
             state.videoSaveStatePlugin.onUnload();
@@ -200,7 +200,7 @@ import * as Time from 'time.js';
             state.el.trigger('pause');
             expect($.ajax).not.toHaveBeenCalledWith({
                 url: state.config.saveStateUrl
-            })
+            });
             state.config.saveStateEnabled = true;
             state.el.trigger('pause');
             expect($.ajax).toHaveBeenCalledWith({
@@ -233,7 +233,7 @@ import * as Time from 'time.js';
             state.config.saveStateEnabled = false;
             state.config.recordedYoutubeIsAvailable = false;
             state.el.trigger('youtube_availability', [true]);
-            expect($.ajax).not.toHaveBeenCalled()
+            expect($.ajax).not.toHaveBeenCalled();
             state.config.saveStateEnabled = true;
             state.config.recordedYoutubeIsAvailable = false;
             state.el.trigger('youtube_availability', [true]);

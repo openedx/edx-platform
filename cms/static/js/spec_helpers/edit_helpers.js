@@ -138,4 +138,4 @@ export {
     installEditTemplates,
     showEditModal,
     verifyXBlockRequest,
-}
+};

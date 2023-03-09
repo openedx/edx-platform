@@ -3,7 +3,7 @@ import React from 'react';
 import get from 'lodash/get';
 import Wizard from './Wizard';
 import Cookies from 'js-cookie';
-import {SelectWithInput} from './SelectWithInput'
+import {SelectWithInput} from './SelectWithInput';
 import {MultiselectDropdown} from './MultiselectDropdown';
 import AxiosJwtTokenService from '../jwt_auth/AxiosJwtTokenService';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
@@ -66,7 +66,7 @@ class DemographicsCollectionModal extends React.Component {
             accessToken,
             refreshUrl,
         );
-        this.csrfTokenService = new AxiosCsrfTokenService(this.props.csrfTokenPath)
+        this.csrfTokenService = new AxiosCsrfTokenService(this.props.csrfTokenPath);
     }
 
     async componentDidMount() {
@@ -108,7 +108,7 @@ class DemographicsCollectionModal extends React.Component {
         };
         try {
             await this.jwtTokenService.getJwtToken();
-            await fetch(url, options)
+            await fetch(url, options);
         } catch (error) {
             this.setState({loading: false, fieldError: true, errorMessage: error});
         }
@@ -129,13 +129,13 @@ class DemographicsCollectionModal extends React.Component {
         this.setState(({selected}) => {
             // decline was previously selected
             if (selected[FIELD_NAMES.ETHNICITY].find(i => i === 'declined')) {
-                return {selected: {...selected, [FIELD_NAMES.ETHNICITY]: values.filter(value => value !== 'declined')}}
+                return {selected: {...selected, [FIELD_NAMES.ETHNICITY]: values.filter(value => value !== 'declined')}};
                 // decline was just selected
             } else if (decline) {
-                return {selected: {...selected, [FIELD_NAMES.ETHNICITY]: [decline]}}
+                return {selected: {...selected, [FIELD_NAMES.ETHNICITY]: [decline]}};
                 // anything else was selected
             } else {
-                return {selected: {...selected, [FIELD_NAMES.ETHNICITY]: values}}
+                return {selected: {...selected, [FIELD_NAMES.ETHNICITY]: values}};
             }
         });
     }
@@ -174,7 +174,7 @@ class DemographicsCollectionModal extends React.Component {
     // We gather the possible answers to any demographics questions from the OPTIONS of the api
     async getDemographicsQuestionOptions() {
         try {
-            const optionsResponse = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, {method: 'OPTIONS'})
+            const optionsResponse = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, {method: 'OPTIONS'});
             const demographicsOptions = await optionsResponse.json();
             return demographicsOptions;
         } catch (error) {
@@ -240,7 +240,7 @@ class DemographicsCollectionModal extends React.Component {
 
     render() {
         if (this.state.loading) {
-            return <div className="demographics-collection-modal d-flex justify-content-center align-items-start" />
+            return <div className="demographics-collection-modal d-flex justify-content-center align-items-start" />;
         }
         return (
             <FocusLock>
@@ -319,7 +319,7 @@ class DemographicsCollectionModal extends React.Component {
                                                 name: FIELD_NAMES.ETHNICITY,
                                                 value: wizardConsumer[FIELD_NAMES.ETHNICITY].map(ethnicity => ({ethnicity, value: ethnicity})),
                                             }
-                                        }
+                                        };
                                         this.handleSelectChange(e);
                                     }}
                                 />
@@ -493,7 +493,7 @@ class DemographicsCollectionModal extends React.Component {
                     </Wizard>
                 </div>
             </FocusLock>
-        )
+        );
     }
 }
 

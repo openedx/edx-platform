@@ -16,7 +16,7 @@ export default class Wizard extends React.Component {
             totalPages: 0,
             pages: [],
             wizardContext: {},
-        }
+        };
 
         this.wizardComplete = this.wizardComplete.bind(this);
     }
@@ -32,18 +32,18 @@ export default class Wizard extends React.Component {
 
     handleNext() {
         if (this.state.currentPage < this.props.children.length) {
-            this.setState(prevState => ({currentPage: prevState.currentPage + 1}))
+            this.setState(prevState => ({currentPage: prevState.currentPage + 1}));
         }
     }
 
     findSubComponentByType(type) {
-        return React.Children.toArray(this.props.children).filter(child => child.type.name === type)
+        return React.Children.toArray(this.props.children).filter(child => child.type.name === type);
     }
 
     // this needs to handle the case of no provided header
     renderHeader() {
         const header = this.findSubComponentByType(Wizard.Header.name)[0];
-        return header.props.children({currentPage: this.state.currentPage, totalPages: this.state.totalPages})
+        return header.props.children({currentPage: this.state.currentPage, totalPages: this.state.totalPages});
     }
 
     renderPage() {
@@ -74,7 +74,7 @@ export default class Wizard extends React.Component {
                     <button className="wizard-button colored" arial-label={gettext('close questionnaire')} onClick={this.props.onWizardComplete}>{gettext('Close')}</button>
                 </div>
             </div>
-        )
+        );
     }
 
     /**

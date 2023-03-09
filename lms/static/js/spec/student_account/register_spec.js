@@ -514,7 +514,7 @@
             });
 
             it('shows optional exposed fields', function() {
-                var formFields = FORM_DESCRIPTION.fields
+                var formFields = FORM_DESCRIPTION.fields;
                 formFields.push({
                     placeholder: '',
                     name: 'exposed_custom_optional_field',
@@ -525,15 +525,15 @@
                     exposed: true,
                     instructions: 'Check this field if you would like to.',
                     restrictions: {}
-                })
+                });
 
                 createRegisterView(this, formFields);
                 var elementClasses = view.$('.exposed-optional-fields').attr('class');
-                var elementChildren = view.$('.exposed-optional-fields .form-field')
+                var elementChildren = view.$('.exposed-optional-fields .form-field');
                 // Expect the exposed optional fields container does not have other
                 // classes assigned, like .hidden
                 expect(elementClasses).toEqual('exposed-optional-fields');
-                expect(elementChildren.length).toEqual(1)
+                expect(elementChildren.length).toEqual(1);
             });
 
             it('hides optional fields by default', function() {
