@@ -16,43 +16,15 @@ permissions:
 
 jobs:
   shellcheck:
-    runs-on: ubuntu-latest
-    steps:
-
-    - name: Check out this repository
-      uses: actions/checkout@v3
-
-    - name: Check out shared actions
-      uses: actions/checkout@v3
-      with:
-        repository: kdmccormick/openedx.github
-        #repository: openedx/.github
-        ref: kdmccormick/shellcheck-impl
-        path: ./openedx-dot-github
-
-    - name: Run ShellCheck!
-      uses: ./openedx-dot-github/.github/actions/shellcheck
-      with:
-
-        # REQUIRED:
-        # Directories to search for .sh files, space-separated, each relative
-        # to the root of the repository. Directories containing spaces or other
-        # Bash delimiters must be wrapped in single quotes.
-        root-dirs: "./scripts ./.github ./lms ./cms ./xmodule ./common/ ./openedx"
-
-        # OPTIONAL:
-        # ShellCheck version to install.
-        # Must be a tag or branch of https://github.com/koalaman/shellcheck.
-        # By default, the upstream action will use a reasonable, stable shellcheck version,
-        # which will be updated over time as new stable ShellCheck versions come out.
-        # If you want your repositoriy's build to be totally deterministic, though, then
-        # override with a specific version pin here, and manage updates ShellCheck yourself.
-        shellcheck-version: "v0.9.0"
-
-        # OPTIONAL:
-        # Command-line options to pass to ShellCheck.
-        # These options will be inserted into the shellcheck invocation, a la:
-        #   shellcheck <shellcheck-options> <input-files>
-        # For details of the options that are availble, run:
-        #   shellcheck --help
-        #shellcheck-options: ""
+    strategy:
+      matrix:
+        os: ["ubuntu", "macos"]
+    #uses: openedx/.github/.github/workflows/shellcheck.yml@master
+    uses: kdmccormick/openedx.github/.github/workflows/shellcheck.yml@kdmccormick/shellcheck-impl
+    with:
+      # For details on the meaning of each of these arguments, see:
+      # https://githu.com/openedx/.github/blob/master/.github/workflows/shellcheck.yml
+      root-dirs: "./scripts ./.github ./lms ./cms ./xmodule ./common/ ./openedx"
+      operating-system: "${{ matrix.os }}"
+      shellcheck-version: "v0.9.0"
+      #shellcheck-options: ""
