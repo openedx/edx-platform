@@ -133,17 +133,17 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
             expect($inlineDiscussionsForm.length).toBe(1);
             expect($courseWideDiscussionsForm.length).toBe(1);
 
-            expect($courseWideDiscussionsForm.text()).
-                toContain('Course-Wide Discussion Topics');
-            expect($courseWideDiscussionsForm.text()).
-                toContain('Select the course-wide discussion topics that you want to divide.');
+            expect($courseWideDiscussionsForm.text())
+                .toContain('Course-Wide Discussion Topics');
+            expect($courseWideDiscussionsForm.text())
+                .toContain('Select the course-wide discussion topics that you want to divide.');
 
             // Should see the inline discussions form and its content
             expect($inlineDiscussionsForm.length).toBe(1);
-            expect($inlineDiscussionsForm.text()).
-                toContain('Content-Specific Discussion Topics');
-            expect($inlineDiscussionsForm.text()).
-                toContain('Specify whether content-specific discussion topics are divided.');
+            expect($inlineDiscussionsForm.text())
+                .toContain('Content-Specific Discussion Topics');
+            expect($inlineDiscussionsForm.text())
+                .toContain('Specify whether content-specific discussion topics are divided.');
         };
 
         beforeEach(function() {

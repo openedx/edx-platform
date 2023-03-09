@@ -182,10 +182,10 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
             view.collection.add(model);
             expect(view.$el.find('table tbody tr').length).toBe(3);
 
-            expect(view.$el.find(`table tbody tr td:contains("${user}")`).parent().html()).
-                toMatch(notes);
-            expect(view.$el.find(`table tbody tr td:contains("${user}")`).parent().html()).
-                toMatch(user);
+            expect(view.$el.find(`table tbody tr td:contains("${user}")`).parent().html())
+                .toMatch(notes);
+            expect(view.$el.find(`table tbody tr td:contains("${user}")`).parent().html())
+                .toMatch(user);
 
             // Remove a model from collection
             var collection_model = view.collection.get({id: 2});
