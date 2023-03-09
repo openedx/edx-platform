@@ -64,7 +64,7 @@ describe('ModuleEdit', function() {
             });
         });
         describe('render', function() {
-            beforeEach(function () {
+            beforeEach(function() {
                 edit_helpers.installEditTemplates(true);
                 spyOn(this.moduleEdit, 'loadDisplay');
                 spyOn(this.moduleEdit, 'delegateEvents');
