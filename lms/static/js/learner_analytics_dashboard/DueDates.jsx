@@ -22,7 +22,7 @@ class DueDates extends React.Component {
 
     getLabel(type) {
         const {assignmentCounts} = this.props;
-        if (assignmentCounts[type] < 2 ) {
+        if (assignmentCounts[type] < 2) {
             return type;
         } else {
             this.renderLabels[type] += 1;

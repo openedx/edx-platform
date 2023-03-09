@@ -246,7 +246,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         editXBlock: function(event, options) {
             event.preventDefault();
 
-            if(!options || options.view !== 'visibility_view' ){
+            if(!options || options.view !== 'visibility_view'){
                 const primaryHeader = $(event.target).closest('.xblock-header-primary');
 
                 var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
@@ -254,7 +254,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     useNewProblemEditor = primaryHeader.attr('use-new-editor-problem'),
                     blockType = primaryHeader.attr('data-block-type');
 
-                if( (useNewTextEditor === 'True' && blockType === 'html')
+                if((useNewTextEditor === 'True' && blockType === 'html')
                         || (useNewVideoEditor === 'True' && blockType === 'video')
                         || (useNewProblemEditor === 'True' && blockType === 'problem')
                 ) {
