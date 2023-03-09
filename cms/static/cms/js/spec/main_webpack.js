@@ -12,6 +12,7 @@ import _ from 'underscore';
 import str from 'underscore.string';
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+
 window._ = _;
 window._.str = str;
 window.edx = window.edx || {};
