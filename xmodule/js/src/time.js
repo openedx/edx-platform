@@ -8,8 +8,8 @@ function format(time, formatFull) {
     seconds = Math.floor(time);
     minutes = Math.floor(seconds / 60);
     hours = Math.floor(minutes / 60);
-    seconds = seconds % 60;
-    minutes = minutes % 60;
+    seconds %= 60;
+    minutes %= 60;
 
     if (formatFull) {
         return `${_pad(hours)}:${_pad(minutes)}:${_pad(seconds % 60)}`;

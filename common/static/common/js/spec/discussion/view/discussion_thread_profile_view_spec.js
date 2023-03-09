@@ -57,9 +57,9 @@
                     _ref >= 0 ? _i <= _ref : _i >= _ref;
                     i = _ref >= 0 ? ++_i : --_i
                 ) {
-                    threadData.body = threadData.body + imageTag;
+                    threadData.body += imageTag;
                     if (i === 0) {
-                        expectedHtml = expectedHtml + imageTag;
+                        expectedHtml += imageTag;
                     } else {
                         expectedHtml = `${expectedHtml}<em>image omitted</em>`;
                     }

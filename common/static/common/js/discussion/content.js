@@ -208,7 +208,7 @@
             Content.prototype.incrementVote = function(increment) {
                 var newVotes;
                 newVotes = _.clone(this.get('votes'));
-                newVotes.up_count = newVotes.up_count + increment;
+                newVotes.up_count += increment;
                 return this.set('votes', newVotes);
             };
 
