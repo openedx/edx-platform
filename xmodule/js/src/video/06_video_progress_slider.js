@@ -332,8 +332,8 @@ mind, or whether to act, and in acting, to live."
                         return interpolate(msg, {value: value}, true);
                     };
 
-                seconds = seconds % 60;
-                minutes = minutes % 60;
+                seconds %= 60;
+                minutes %= 60;
 
                 if (hours) {
                     return `${i18n(hours, 'hour')} ${

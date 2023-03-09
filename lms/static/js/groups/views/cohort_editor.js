@@ -181,6 +181,7 @@
                     _.each(modifiedUsers.changed, function(changedInfo) {
                         oldCohort = changedInfo.previous_cohort;
                         if (oldCohort in movedByCohort) {
+                            // eslint-disable-next-line operator-assignment
                             movedByCohort[oldCohort] = movedByCohort[oldCohort] + 1;
                         } else {
                             movedByCohort[oldCohort] = 1;
