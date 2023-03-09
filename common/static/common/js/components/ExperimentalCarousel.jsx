@@ -11,7 +11,7 @@ function NextArrow(props) {
     } = props;
     const showArrow = slideCount - currentSlide > displayedSlides;
     const opts = {
-        className: classNames('js-carousel-nav', 'carousel-arrow', 'next', 'btn btn-secondary', {'active': showArrow}),
+        className: classNames('js-carousel-nav', 'carousel-arrow', 'next', 'btn btn-secondary', {active: showArrow}),
         onClick
     };
 
@@ -32,7 +32,7 @@ function PrevArrow(props) {
     const {currentSlide, onClick} = props;
     const showArrow = currentSlide > 0;
     const opts = {
-        className: classNames('js-carousel-nav', 'carousel-arrow', 'prev', 'btn btn-secondary', {'active': showArrow}),
+        className: classNames('js-carousel-nav', 'carousel-arrow', 'prev', 'btn btn-secondary', {active: showArrow}),
         onClick
     };
 
