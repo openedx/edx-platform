@@ -40,9 +40,11 @@
 
 var path = require('path');
 var _ = require('underscore');
+
 var appRoot = path.join(__dirname, '../../../../');
 var webdriver = require('selenium-webdriver');
 var firefox = require('selenium-webdriver/firefox');
+
 var webpackConfig = require(path.join(appRoot, 'webpack.dev.config.js'));
 
 // The following crazy bit is to work around the webpack.optimize.CommonsChunkPlugin
