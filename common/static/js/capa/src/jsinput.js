@@ -141,7 +141,7 @@ var JSInput = (function($, undefined) {
                     jsonValue = storedState;
                 }
 
-                if (typeof (jsonValue) === 'object') {
+                if (typeof jsonValue === 'object') {
                     stateValue = jsonValue.state;
                 } else {
                     stateValue = jsonValue;

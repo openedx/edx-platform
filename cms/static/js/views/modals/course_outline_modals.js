@@ -1254,7 +1254,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                         advancedTab.editors.push(TimedExaminationPreferenceEditor);
                     }
 
-                    if (typeof (xblockInfo.get('is_prereq')) !== 'undefined') {
+                    if (typeof xblockInfo.get('is_prereq') !== 'undefined') {
                         advancedTab.editors.push(AccessEditor);
                     }
 

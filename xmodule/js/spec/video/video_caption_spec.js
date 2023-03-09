@@ -137,7 +137,7 @@
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
                             url: transcriptURL,
                             notifyOnError: false,
-                            data: void (0),
+                            data: void 0,
                             success: jasmine.any(Function),
                             error: jasmine.any(Function)
                         });

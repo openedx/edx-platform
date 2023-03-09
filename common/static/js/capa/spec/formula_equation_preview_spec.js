@@ -85,7 +85,7 @@ describe('Formula Equation Preview', function() {
         window.MathJax.Hub.getAllJax = jasmine.createSpy('MathJax.Hub.getAllJax')
             .and.returnValue([this.jax]);
         window.MathJax.Hub.Queue = function(callback) {
-            if (typeof (callback) === 'function') {
+            if (typeof callback === 'function') {
                 callback();
             }
         };

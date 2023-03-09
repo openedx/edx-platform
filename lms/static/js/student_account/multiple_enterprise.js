@@ -76,7 +76,7 @@
                 var regex;
                 regex = RegExp('/enterprise/.*/course/.*/enroll');
                 if (typeof url !== 'string' || !regex.test(url)) {
-                    return void (0);
+                    return void 0;
                 }
                 return url.split('/')[2];
             },

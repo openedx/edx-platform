@@ -579,7 +579,7 @@ var Channel = (function() {
                                     message = JSON.stringify(e);
                                     /* On MSIE8, this can result in 'out of memory', which
                                      * leaves message undefined. */
-                                    if (typeof (message) === 'undefined') { message = e.toString(); }
+                                    if (typeof message === 'undefined') { message = e.toString(); }
                                 } catch (e2) {
                                     message = e.toString();
                                 }
