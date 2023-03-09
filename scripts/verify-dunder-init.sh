@@ -18,7 +18,6 @@
 
 set -euo pipefail # Strict mode.
 
-ls $whoops
 
 ## Directories that contain Python source code, but for which we don't care
 ## whether or not there's a __init__.py file.
