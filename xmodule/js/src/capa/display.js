@@ -907,8 +907,8 @@
             this.el.find('.choicegroup').each(function(i, choicegroupBlock) {
                 var checked;
                 checked = false;
-                $(choicegroupBlock).find('input[type=checkbox], input[type=radio]').
-                    each(function(j, checkboxOrRadio) {
+                $(choicegroupBlock).find('input[type=checkbox], input[type=radio]')
+                    .each(function(j, checkboxOrRadio) {
                         if ($(checkboxOrRadio).is(':checked')) {
                             checked = true;
                         }

@@ -49,9 +49,9 @@ $(function() {
         });
 
         if (cancel_submit) {
-            $('.status.message.submission-error').
-                removeClass('is-hidden').
-                focus();
+            $('.status.message.submission-error')
+                .removeClass('is-hidden')
+                .focus();
             $('html, body').animate({scrollTop: 0}, 'fast');
             return false;
         }
@@ -72,10 +72,10 @@ $(function() {
         toggleSubmitButton(true);
         json = $.parseJSON(jqXHR.responseText);
         $('.status.message.submission-error').addClass('is-shown').focus();
-        $('.status.message.submission-error .message-copy').
-            text(gettext('There has been an error processing your survey.')).
-            stop().
-            css('display', 'block');
+        $('.status.message.submission-error .message-copy')
+            .text(gettext('There has been an error processing your survey.'))
+            .stop()
+            .css('display', 'block');
     });
 });
 
@@ -83,14 +83,14 @@ function toggleSubmitButton(enable) {
     var $submitButton = $('form .form-actions #submit');
 
     if (enable) {
-        $submitButton.
-            removeClass('is-disabled').
-            attr('aria-disabled', false).
-            removeProp('disabled');
+        $submitButton
+            .removeClass('is-disabled')
+            .attr('aria-disabled', false)
+            .removeProp('disabled');
     } else {
-        $submitButton.
-            addClass('is-disabled').
-            attr('aria-disabled', true).
-            prop('disabled', true);
+        $submitButton
+            .addClass('is-disabled')
+            .attr('aria-disabled', true)
+            .prop('disabled', true);
     }
 }
