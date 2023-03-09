@@ -444,9 +444,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getRequestData: function() {
             // Grab all the sections, map them to their block_ids, then return as an Array
-            var sectionIds = $('.outline-section').map(function(){ return this.id; }).get();
+            var sectionIds = $('.outline-section').map(function() { return this.id; }).get();
             // Grab all the subsections, map them to their block_ids, then return as an Array
-            var subsectionIds = $('.outline-subsection').map(function(){ return this.id; }).get();
+            var subsectionIds = $('.outline-subsection').map(function() { return this.id; }).get();
             var relative_weeks_due = null;
             if (this.getValue() > 0 && $('#grading_type').val() !== 'notgraded') {
                 relative_weeks_due = this.getValue();

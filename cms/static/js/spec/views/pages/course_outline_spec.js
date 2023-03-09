@@ -2235,7 +2235,7 @@ describe('CourseOutlinePage', function() {
                 ])
             ]);
 
-            it('can show correct editors for self_paced course with custom pacing', function(){
+            it('can show correct editors for self_paced course with custom pacing', function() {
                 outlinePage.$('.outline-subsection .configure-button').click();
                 expect($('.edit-settings-release').length).toBe(0);
                 // Due date input exists for custom pacing self paced courses
