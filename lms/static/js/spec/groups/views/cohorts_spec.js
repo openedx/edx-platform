@@ -456,7 +456,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 );
                 verifyMessage(
                     `The ${defaultCohortName} cohort has been created.`
-                            + ` You can manually add students to this cohort below.`,
+                            + ' You can manually add students to this cohort below.',
                     'confirmation'
                 );
                 verifyHeader(1, defaultCohortName, 0, MOCK_RANDOM_ASSIGNMENT);

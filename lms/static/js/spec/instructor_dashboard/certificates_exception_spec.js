@@ -195,7 +195,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
             setFixtures();
             fixture = readFixtures('templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore');
             setFixtures(`<script type='text/template' id='certificate-allowlist-tpl'>${fixture}</script>`
-                    + `<div class='allowlisted-students' id='allowlisted-students'></div>`);
+                    + '<div class=\'allowlisted-students\' id=\'allowlisted-students\'></div>');
 
             this.certificate_allowlist = new CertificateAllowlistCollection(certificatesExceptionsJson, {
                 parse: true,
@@ -333,8 +333,8 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
             setFixtures(
                 `<script type='text/template' id='certificate-allowlist-editor-tpl'>${fixture}</script>`
                     + `<script type='text/template' id='certificate-allowlist-tpl'>${fixture2}</script>`
-                    + `<div id='certificate-allowlist-editor'></div>`
-                    + `<div class='allowlisted-students' id='allowlisted-students'></div>`
+                    + '<div id=\'certificate-allowlist-editor\'></div>'
+                    + '<div class=\'allowlisted-students\' id=\'allowlisted-students\'></div>'
             );
 
             certificateAllowlist = new CertificateAllowlistCollection(certificatesExceptionsJson, {

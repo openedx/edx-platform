@@ -18,11 +18,11 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
             previews: true
         };
         var options = _.extend(default_options, override_options);
-        return `<div class="xblock" data-request-token="request_token">`
+        return '<div class="xblock" data-request-token="request_token">'
                 + `<div class="container-paging-header"></div>${
                     htmlResponseTpl(options)
                 }<div class="container-paging-footer"></div>`
-                + `</div>`;
+                + '</div>';
     }
 
     var makePage = function(html_parameters) {

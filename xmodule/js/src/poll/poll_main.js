@@ -81,7 +81,7 @@
                 // Send the data to the server as an AJAX request. Attach a callback that will
                 // be fired on server's response.
                 $.postWithPrefix(
-                    `${this.ajax_url}/` + `reset_poll`,
+                    `${this.ajax_url}/` + 'reset_poll',
                     {},
                     function(response) {
                         console.log('success! response = ');
@@ -293,7 +293,7 @@
                 this.jsonConfig = JSON.parse(this.questionEl.children('.poll_question_div').html());
 
                 $.postWithPrefix(
-                    `${this.questionEl.data('ajax-url')}/` + `get_state`, {},
+                    `${this.questionEl.data('ajax-url')}/` + 'get_state', {},
                     function(response) {
                         _this.jsonConfig.poll_answer = response.poll_answer;
                         _this.jsonConfig.total = response.total;

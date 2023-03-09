@@ -846,7 +846,7 @@
                     });
 
                     $.each(['iPad', 'Android'], function(index, device) {
-                        var message = `controls become visible after playing starts `
+                        var message = 'controls become visible after playing starts '
                     + `on ${device}`;
 
                         it(message, function(done) {

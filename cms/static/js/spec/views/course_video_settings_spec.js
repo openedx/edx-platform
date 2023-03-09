@@ -151,10 +151,10 @@ define(
             verifyMessage = function(state, message) {
                 var icon = state === 'error' ? 'fa-info-circle' : 'fa-check-circle';
                 expect($courseVideoSettingsEl.find(`.course-video-settings-message-wrapper.${state}`).html()).toEqual(
-                    `<div class="course-video-settings-message">`
+                    '<div class="course-video-settings-message">'
                     + `<span class="icon fa ${icon}" aria-hidden="true"></span>`
                     + `<span>${message}</span>`
-                    + `</div>`
+                    + '</div>'
                 );
             };
 
