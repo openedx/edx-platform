@@ -77,7 +77,9 @@
         DiscussionUtil.generateDiscussionLink = function(cls, txt, handler) {
             return $('<a>')
                 .addClass('discussion-link').attr('href', '#')
-                .addClass(cls).text(txt).click(function() { return handler(this); });
+                .addClass(cls)
+                .text(txt)
+                .click(function() { return handler(this); });
         };
 
         DiscussionUtil.urlFor = function(name, param, param1, param2) {

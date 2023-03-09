@@ -49,7 +49,6 @@
     "import/no-dynamic-require": "off",
     "import/no-unresolved": "off",
     "max-len": "off",
-    "newline-per-chained-call": "off",
     "no-console": "off",
     "no-lonely-if": "off",
     "no-param-reassign": "off",
