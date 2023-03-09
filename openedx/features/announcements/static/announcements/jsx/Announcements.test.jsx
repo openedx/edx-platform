@@ -9,7 +9,7 @@ describe('Announcements component', () => {
         const component = renderer.create(
             <AnnouncementSkipLink />,
         );
-        component.root.instance.setState({'count': 10});
+        component.root.instance.setState({count: 10});
         const tree = component.toJSON();
         expect(tree).toMatchSnapshot();
     });
