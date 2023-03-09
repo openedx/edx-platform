@@ -24,7 +24,7 @@ jobs:
     with:
       # For details on the meaning of each of these arguments, see:
       # https://githu.com/openedx/.github/blob/master/.github/workflows/shellcheck.yml
-      exclude-patterns: "./node_modules/*"
+      exclude-patterns: "./*"
       operating-system: "${{ matrix.os }}"
       shellcheck-version: "v0.9.0"
       #shellcheck-options: ""
