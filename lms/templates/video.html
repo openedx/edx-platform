@@ -55,6 +55,17 @@ from openedx.core.djangolib.js_utils import (
             <a class="btn-link video-sources video-download-button" href="${download_video_link}">
                 ${_('Download video file')}
             </a>
+            % if public_video_url:
+            <br/>
+            <a
+                class="btn-link"
+                id="twitter-share-button"
+                href="${public_video_url}"
+                target="_blank"
+            >
+                ${_('Share on Twitter')}
+            </a>
+            % endif
         </div>
         % endif
         % if track:
@@ -117,3 +128,19 @@ from openedx.core.djangolib.js_utils import (
   }
 </script>
 % endif;
+% if public_video_url:
+<script>
+  $("#twitter-share-button").click(function() {
+    var tweetText = encodeURIComponent("Here\'s a fun clip from a class I\'m taking on @edXonline.\n\n");
+    var utmQuery =  $.param({
+      utm_source: 'twitter',
+      utm_medium: 'social',
+      utm_campaign: 'social-share-exp',
+    });
+    var url = encodeURIComponent(this.href + "?" + utmQuery);
+    var tweetUrl = "https://twitter.com/intent/tweet?text=" + tweetText + "&url=" + url;
+    window.open(tweetUrl,'targetWindow','toolbar=no,location=0,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400');
+    return false;
+  });
+</script>
+% endif

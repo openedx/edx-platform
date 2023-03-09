@@ -18,8 +18,10 @@ import json
 import logging
 from collections import OrderedDict, defaultdict
 from operator import itemgetter
+from urllib.parse import urljoin
 
 from django.conf import settings
+from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
@@ -28,6 +30,7 @@ from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
@@ -474,8 +477,27 @@ class VideoBlock(
             'track': track_url,
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
+            # provide the video url iif the video is public and we are in LMS.
+            # Reverse render_public_video_xblock is not available in studio.
+            'public_video_url': self._get_public_video_url(),
         }
+
         return self.runtime.service(self, 'mako').render_template('video.html', template_context)
+
+    def _is_lms_platform(self):
+        """
+        Returns True if the platform is LMS.
+        """
+        return isinstance(self.xmodule_runtime, LmsModuleSystem)
+
+    def _get_public_video_url(self):
+        """
+        Returns the public video url
+        """
+        return urljoin(
+            settings.LMS_ROOT_URL,
+            reverse('render_public_video_xblock', kwargs={'usage_key_string': str(self.location)})
+        ) if self.public_access and self._is_lms_platform() else None
 
     def validate(self):
         """

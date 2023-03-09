@@ -53,7 +53,7 @@ from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverride
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from .test_video_handlers import BaseTestVideoXBlock, TestVideo
-from .test_video_xml import SOURCE_XML
+from .test_video_xml import SOURCE_XML, PUBLIC_SOURCE_XML
 
 MODULESTORES = {
     ModuleStoreEnum.Type.mongo: TEST_DATA_MONGO_MODULESTORE,
@@ -132,6 +132,7 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
         }
 
         mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
@@ -215,6 +216,7 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
         }
 
         mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
@@ -224,6 +226,25 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
         assert get_context_dict_from_string(context) == expected_result
         assert expected_result['download_video_link'] == 'example.mp4'
         assert expected_result['display_name'] == 'A Name'
+
+
+@ddt.ddt
+class TestVideoPublicAccess(BaseTestVideoXBlock):
+    """Test video public access."""
+    DATA = PUBLIC_SOURCE_XML
+    MODEL_DATA = {
+        'data': DATA,
+    }
+    METADATA = {}
+
+    @ddt.data(True, False)
+    def test_public_video_url(self, is_lms_platform):
+        """Test public video url."""
+        assert self.item_descriptor.public_access is True
+        with patch.object(self.item_descriptor, '_is_lms_platform', return_value=is_lms_platform):
+            context = self.item_descriptor.render(STUDENT_VIEW).content
+            # public video url iif is_lms_platform and public_access are true
+            assert bool(get_context_dict_from_string(context)['public_video_url']) is is_lms_platform
 
 
 @ddt.ddt
@@ -356,6 +377,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
         }
 
         for data in cases:
@@ -476,6 +498,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
         }
         initial_context['metadata']['duration'] = None
 
@@ -602,6 +625,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
             'metadata': metadata
         }
 
@@ -775,6 +799,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
             'metadata': metadata,
         }
 
@@ -888,6 +913,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
+            'public_video_url': None,
             'poster': 'null',
         }
         initial_context['metadata']['duration'] = None
@@ -984,6 +1010,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
+            'public_video_url': None,
             'poster': 'null',
         }
         initial_context['metadata']['duration'] = None
@@ -2254,6 +2281,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
+            'public_video_url': None,
             'poster': json.dumps(OrderedDict({
                 'url': 'http://img.youtube.com/vi/ZwkTiUPN0mg/0.jpg',
                 'type': 'youtube'
@@ -2335,6 +2363,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
+            'public_video_url': None,
             'poster': 'null'
         }
         return context
