@@ -1,6 +1,6 @@
 module.exports = {
     'globals': {
-        'gettext': (t) => { return t; },
+        'gettext': (t) => t,
     },
     'modulePaths': [
         'common/static/common/js/components',
