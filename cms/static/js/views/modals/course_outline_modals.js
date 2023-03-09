@@ -412,7 +412,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             // This text will look like Mmm dd, yyyy (i.e. Jul 26, 2021)
             this.$('#relative_weeks_due_start_date').text(`${startDateList[2]} ${startDateList[1]}, ${startDateList[3]}`);
             var projectedDate = new Date(startDate);
-            projectedDate.setDate(projectedDate.getDate() + this.getValue()*7);
+            projectedDate.setDate(projectedDate.getDate() + this.getValue() * 7);
             var projectedDateList = projectedDate.toUTCString().split(' ');
             this.$('#relative_weeks_due_projected_due_in').text(`${projectedDateList[2]} ${projectedDateList[1]}, ${projectedDateList[3]}`);
             this.$('#relative_weeks_due_projected').show();

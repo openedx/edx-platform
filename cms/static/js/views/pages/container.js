@@ -463,7 +463,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             }
             if((useNewTextEditor === 'True' && blockType.includes('html'))
                     || (useNewVideoEditor === 'True' && blockType.includes('video'))
-                    ||(useNewProblemEditor === 'True' && blockType.includes('problem'))
+                    || (useNewProblemEditor === 'True' && blockType.includes('problem'))
             ){
                 var destinationUrl = `${this.$('.xblock-header-primary').attr('authoring_MFE_base_url')}/${blockType[1]}/${encodeURI(data.locator)}`;
                 window.location.href = destinationUrl;

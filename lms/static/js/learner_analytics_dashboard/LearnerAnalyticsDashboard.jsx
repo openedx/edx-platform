@@ -56,7 +56,7 @@ function getStreakEncouragement(count) {
 }
 
 function getStreakString(count) {
-    const unit = (count ===1) ? 'week' : 'weeks';
+    const unit = (count === 1) ? 'week' : 'weeks';
     return (count > 0) ? `Active ${count} ${unit} in a row` : false;
 }
 
