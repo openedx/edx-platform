@@ -4,7 +4,7 @@ import 'jquery.smoothScroll';
 
 'use strict';
 
-var toggleSock = function (e) {
+var toggleSock = function(e) {
     e.preventDefault();
 
     var $btnShowSockLabel = $(this).find('.copy-show');
@@ -33,7 +33,7 @@ var toggleSock = function (e) {
     });
 };
 
-domReady(function () {
+domReady(function() {
     // toggling footer additional support
     $('.cta-show-sock').bind('click', toggleSock);
 });
