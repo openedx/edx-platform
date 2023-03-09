@@ -18,4 +18,4 @@ export default function XBlockValidationFactory(validationMessages, hasEditingUr
     }
 };
 
-export {XBlockValidationFactory}
+export {XBlockValidationFactory};

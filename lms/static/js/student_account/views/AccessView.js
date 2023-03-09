@@ -117,7 +117,7 @@
                             mode: this.activeForm
                         })
                     )
-                )
+                );
                 this.postRender();
 
                 return this;

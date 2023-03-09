@@ -88,7 +88,7 @@ class LibrarySourcedBlockPicker extends React.Component {
     }
 
     onLibrarySearchInput(event) {
-        event.persist()
+        event.persist();
         this.setState({
             searchedLibrary: event.target.value,
         });
@@ -101,7 +101,7 @@ class LibrarySourcedBlockPicker extends React.Component {
     }
 
     onXBlockSearchInput(event) {
-        event.persist()
+        event.persist();
         if (!this.debouncedFetchXblocks) {
             this.debouncedFetchXblocks = _.debounce(value => {
                 this.fetchXblocks(this.state.selectedLibrary, value);

@@ -26,4 +26,4 @@ export default function LibraryFactory(componentTemplates, XBlockInfoJson, optio
     });
 };
 
-export {LibraryFactory}
+export {LibraryFactory};

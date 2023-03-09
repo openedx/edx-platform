@@ -408,10 +408,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             if (!this.getValue() || !course.get('start')) { return; }
             var startDate = new Date(course.get('start'));
             // The value returned by toUTCString() is a string in the form Www, dd Mmm yyyy hh:mm:ss GMT
-            var startDateList = startDate.toUTCString().split(' ')
+            var startDateList = startDate.toUTCString().split(' ');
             // This text will look like Mmm dd, yyyy (i.e. Jul 26, 2021)
             this.$('#relative_weeks_due_start_date').text(`${startDateList[2]} ${startDateList[1]}, ${startDateList[3]}`);
-            var projectedDate = new Date(startDate)
+            var projectedDate = new Date(startDate);
             projectedDate.setDate(projectedDate.getDate() + this.getValue()*7);
             var projectedDateList = projectedDate.toUTCString().split(' ');
             this.$('#relative_weeks_due_projected_due_in').text(`${projectedDateList[2]} ${projectedDateList[1]}, ${projectedDateList[3]}`);
@@ -433,9 +433,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
             if (this.model.get('graded')) {
-                this.$('#relative_date_input').show()
+                this.$('#relative_date_input').show();
             } else {
-                this.$('#relative_date_input').hide()
+                this.$('#relative_date_input').hide();
             }
             this.$('.field-due-in input').val(this.model.get('relative_weeks_due'));
             this.$('#relative_weeks_due_projected').hide();
@@ -444,12 +444,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getRequestData: function() {
             // Grab all the sections, map them to their block_ids, then return as an Array
-            var sectionIds = $('.outline-section').map(function(){ return this.id; }).get()
+            var sectionIds = $('.outline-section').map(function(){ return this.id; }).get();
             // Grab all the subsections, map them to their block_ids, then return as an Array
-            var subsectionIds = $('.outline-subsection').map(function(){ return this.id; }).get()
+            var subsectionIds = $('.outline-subsection').map(function(){ return this.id; }).get();
             var relative_weeks_due = null;
             if (this.getValue() > 0 && $('#grading_type').val() !== 'notgraded') {
-                relative_weeks_due = this.getValue()
+                relative_weeks_due = this.getValue();
             }
             window.analytics.track('edx.bi.studio.relative_date.saved', {
                 block_id: this.model.get('id'),
@@ -944,16 +944,16 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         showTipText: function() {
             if (this.model.get('published')) {
-                $('.un-published-tip').hide()
+                $('.un-published-tip').hide();
             } else {
-                $('.un-published-tip').show()
+                $('.un-published-tip').show();
             }
-            let enabledForGraded = course.get('discussions_settings').enable_graded_units
+            let enabledForGraded = course.get('discussions_settings').enable_graded_units;
             if (this.model.get('graded') && !enabledForGraded) {
                 $('#discussion_enabled').prop('disabled', true);
-                $('.graded-tip').show()
+                $('.graded-tip').show();
             } else {
-                $('.graded-tip').hide()
+                $('.graded-tip').hide();
             }
         },
 

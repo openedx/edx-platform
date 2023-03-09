@@ -32,9 +32,9 @@ import '../../common/static/common/js/vendor/sinon.js';
 import 'jquery.ui';
 
 // These
-import './src/video/10_main.js'
-import './spec/helper.js'
-import './spec/video_helper.js'
+import './src/video/10_main.js';
+import './spec/helper.js';
+import './spec/video_helper.js';
 
 // These are the tests that will be run
 import './spec/video/async_process_spec.js';

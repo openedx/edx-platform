@@ -21,4 +21,4 @@ export default function TextbooksFactory(textbooksJson) {
     });
 };
 
-export {TextbooksFactory}
+export {TextbooksFactory};

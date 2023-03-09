@@ -247,7 +247,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             event.preventDefault();
 
             if(!options || options.view !== 'visibility_view' ){
-                const primaryHeader = $(event.target).closest('.xblock-header-primary')
+                const primaryHeader = $(event.target).closest('.xblock-header-primary');
 
                 var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
                     useNewVideoEditor = primaryHeader.attr('use-new-editor-video'),

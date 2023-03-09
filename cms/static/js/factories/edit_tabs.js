@@ -23,4 +23,4 @@ export default function EditTabsFactory(courseLocation, explicitUrl) {
     });
 };
 
-export {EditTabsFactory}
+export {EditTabsFactory};

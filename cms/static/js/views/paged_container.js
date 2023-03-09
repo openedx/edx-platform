@@ -109,7 +109,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                         if (originalDone) {
                             originalDone();
                         }
-                    }
+                    };
                     self.handleXBlockFragment(fragment, options);
                 }
             });
