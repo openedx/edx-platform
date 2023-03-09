@@ -24,7 +24,6 @@ from django.conf import settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from lxml import etree
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import AssetLocator
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
