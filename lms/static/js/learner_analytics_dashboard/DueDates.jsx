@@ -35,14 +35,12 @@ class DueDates extends React.Component {
         this.renderLabels = this.initLabelTracker(assignmentCounts);
 
         return dates.sort((a, b) => new Date(a.due) > new Date(b.due))
-            .map(({format, due}, index) => {
-                return (
-                    <li className="date-item" key={index}>
-                        <div className="label">{this.getLabel(format)}</div>
-                        <div className="data">{this.getDate(due)}</div>
-                    </li>
-                );
-            });
+            .map(({format, due}, index) => (
+                <li className="date-item" key={index}>
+                    <div className="label">{this.getLabel(format)}</div>
+                    <div className="data">{this.getDate(due)}</div>
+                </li>
+            ));
     }
 
     initLabelTracker(list) {
