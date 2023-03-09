@@ -1458,7 +1458,7 @@ describe('CourseOutlinePage', function() {
             $('.wrapper-modal-window .action-save').click();
         });
 
-        it('can select the onboarding exam when a course supports onboarding', function () {
+        it('can select the onboarding exam when a course supports onboarding', function() {
             var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({
                     has_changes: true,
@@ -2191,7 +2191,7 @@ describe('CourseOutlinePage', function() {
             expect($modalWindow.find('.outline-subsection')).not.toExist();
         });
 
-        describe('Self Paced with Custom Personalized Learner Schedules (PLS)', function () {
+        describe('Self Paced with Custom Personalized Learner Schedules (PLS)', function() {
             beforeEach(function() {
                 var mockCourseJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({}, [
@@ -2235,7 +2235,7 @@ describe('CourseOutlinePage', function() {
                 ])
             ]);
 
-            it('can show correct editors for self_paced course with custom pacing', function (){
+            it('can show correct editors for self_paced course with custom pacing', function(){
                 outlinePage.$('.outline-subsection .configure-button').click();
                 expect($('.edit-settings-release').length).toBe(0);
                 // Due date input exists for custom pacing self paced courses
@@ -2470,7 +2470,7 @@ describe('CourseOutlinePage', function() {
             expect(messages).toContainText('Contains staff only content');
         });
 
-        describe('discussion settings', function () {
+        describe('discussion settings', function() {
             it('hides discussion settings if unit level discussions are disabled', function() {
                 getUnitStatus({}, {unit_level_discussions: false});
                 outlinePage.$('.outline-unit .configure-button').click();

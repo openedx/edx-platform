@@ -125,7 +125,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
              * at 100 millisecond intervals until element is found or
              * Polling is reached
              */
-        scrollToElement: function () {
+        scrollToElement: function() {
             this.findElementPollingTimeout -= this.pollingDelay;
 
             const elementID = window.location.hash.replace('#', '');
