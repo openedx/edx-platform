@@ -106,7 +106,7 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
                 empty_user_name_email: 'Student username/email field is required and can not be empty. '
                         + 'Kindly fill in username/email and then press "Invalidate Certificate" button.',
                 duplicate_user: `Certificate of ${duplicate_user} has already been invalidated. `
-                        + `Please check your spelling and retry.`,
+                        + 'Please check your spelling and retry.',
                 server_error: 'Server Error, Please refresh the page and try again.',
                 from_server: 'Test Message from server'
             },
@@ -141,10 +141,10 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
             );
 
             setFixtures(
-                `<div class='certificate-invalidation-container'>`
-                    + `   <h2>Invalidate Certificates</h2> `
-                    + `   <div id='certificate-invalidation'></div>`
-                    + `</div>`
+                '<div class=\'certificate-invalidation-container\'>'
+                    + '   <h2>Invalidate Certificates</h2> '
+                    + '   <div id=\'certificate-invalidation\'></div>'
+                    + '</div>'
                     + `<script type='text/template' id='certificate-invalidation-tpl'>${fixture}</script>`
             );
 

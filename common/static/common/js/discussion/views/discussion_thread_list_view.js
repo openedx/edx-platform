@@ -309,7 +309,7 @@
                 if (lastThread) {
                     this.once('threads:rendered', function() {
                         var classSelector = `.forum-nav-thread[data-id='${lastThread}'] + .forum-nav-thread `
-                            + `.forum-nav-thread-link`;
+                            + '.forum-nav-thread-link';
                         return $(classSelector).focus();
                     });
                 } else {

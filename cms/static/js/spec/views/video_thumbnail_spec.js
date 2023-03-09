@@ -220,7 +220,7 @@ define(
             });
 
             it('calls readMessage with correct message', function() {
-                var errorMessage = `Image upload failed. This image file type is not supported. Supported file `
+                var errorMessage = 'Image upload failed. This image file type is not supported. Supported file '
                     + `types are ${videoThumbnailView.getVideoImageSupportedFileFormats().humanize}.`,
                     successData = {
                         files: [createFakeImageFile()],

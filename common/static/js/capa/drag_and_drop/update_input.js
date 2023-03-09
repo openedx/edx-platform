@@ -188,9 +188,9 @@
             if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                 if (reportError !== false) {
                     console.log(
-                        `ERROR: In answer there exists a `
+                        'ERROR: In answer there exists a '
                     + `draggable ID "${draggableId}". No `
-                    + `draggable with this ID could be found.`
+                    + 'draggable with this ID could be found.'
                     );
                 }
 
@@ -200,9 +200,9 @@
             if ((target = getById(state, 'targets', targetId)) === null) {
                 if (reportError !== false) {
                     console.log(
-                        `ERROR: In answer there exists a target `
+                        'ERROR: In answer there exists a target '
                     + `ID "${targetId}". No target with this `
-                    + `ID could be found.`
+                    + 'ID could be found.'
                     );
                 }
 
@@ -226,9 +226,9 @@
 
                         if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                             console.log(
-                                `ERROR: In answer there exists a `
+                                'ERROR: In answer there exists a '
                             + `draggable ID "${draggableId}". No `
-                            + `draggable with this ID could be found.`
+                            + 'draggable with this ID could be found.'
                             );
 
                             continue;

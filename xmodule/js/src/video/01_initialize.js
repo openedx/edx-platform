@@ -581,7 +581,7 @@
                     });
                     $(scriptTag).on('error', function() {
                         console.log(
-                            `[Video info]: YouTube returned an error for `
+                            '[Video info]: YouTube returned an error for '
                     + `video with id "${self.id}".`
                         );
                         // If the video is already loaded in `_waitForYoutubeApi` by the
