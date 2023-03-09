@@ -1,14 +1,14 @@
 /* global gettext */
 import React from 'react';
 import get from 'lodash/get';
-import Wizard from './Wizard';
 import Cookies from 'js-cookie';
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+import FocusLock from 'react-focus-lock';
+import Wizard from './Wizard';
 import {SelectWithInput} from './SelectWithInput';
 import {MultiselectDropdown} from './MultiselectDropdown';
 import AxiosJwtTokenService from '../jwt_auth/AxiosJwtTokenService';
-import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import AxiosCsrfTokenService from '../jwt_auth/AxiosCsrfTokenService';
-import FocusLock from 'react-focus-lock';
 
 const FIELD_NAMES = {
     CURRENT_WORK: 'current_work_sector',
