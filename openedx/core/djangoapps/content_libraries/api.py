@@ -92,10 +92,13 @@ from openedx.core.djangoapps.content_libraries.signals import (
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_BLOCK_DELETED,
 )
-from openedx.core.djangoapps.olx_rest_api.block_serializer import XBlockSerializer
-from openedx.core.djangoapps.xblock.api import get_block_display_name, load_block
-from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
-from openedx.core.djangoapps.xblock.runtime.olx_parsing import XBlockInclude
+from openedx.core.djangoapps.olx_rest_api.api import serialize_modulestore_block_for_blockstore
+from openedx.core.djangoapps.xblock.api import (
+    get_block_display_name,
+    get_learning_context_impl,
+    load_block,
+    XBlockInclude,
+)
 from openedx.core.lib.blockstore_api import (
     get_bundle,
     get_bundles,
@@ -1258,7 +1261,7 @@ class EdxModulestoreImportClient(BaseEdxImportClient):
         Get block OLX by serializing it from modulestore directly.
         """
         block = self.modulestore.get_item(block_key)
-        data = XBlockSerializer(block)
+        data = serialize_modulestore_block_for_blockstore(block)
         return {'olx': data.olx_str,
                 'static_files': {s.name: s for s in data.static_files}}
 
