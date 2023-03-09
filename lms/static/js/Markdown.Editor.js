@@ -236,7 +236,7 @@
 
     function findAnEmptyToolbar(toolbarClassName) {
         var toolbars = doc.getElementsByClassName(toolbarClassName);
-        for (var i=0; i < toolbars.length; ++i) {
+        for (var i = 0; i < toolbars.length; ++i) {
             var aToolbar = toolbars[i];
             if (aToolbar.children.length == 0) {
                 var anEmptyToolbar = aToolbar;
