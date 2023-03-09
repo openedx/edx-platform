@@ -64,7 +64,7 @@ describe('Formula Equation Preview', function() {
 
         this.oldDGEBI = document.getElementById;
         document.getElementById = function(id) {
-            return $('*#' + id)[0] || null;
+            return $(`*#${id}`)[0] || null;
         };
 
         // Catch the AJAX requests
@@ -195,7 +195,7 @@ describe('Formula Equation Preview', function() {
             var $input = $('#input_THE_ID');
             var value;
             function inputAnother(iter) {
-                value = 'math input ' + iter;
+                value = `math input ${iter}`;
                 $input.val(value).trigger('input');
             }
 

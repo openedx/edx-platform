@@ -39,7 +39,7 @@
                 this.mode = options.mode || 'inline';
                 this.startHeader = options.startHeader;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
-                    throw new Error('invalid mode: ' + this.mode);
+                    throw new Error(`invalid mode: ${this.mode}`);
                 }
                 this.course_settings = options.course_settings;
                 this.is_commentable_divided = options.is_commentable_divided;
@@ -58,7 +58,7 @@
                     is_discussion_division_enabled: this.course_settings.get('is_discussion_division_enabled'),
                     mode: this.mode,
                     startHeader: this.startHeader,
-                    form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
+                    form_id: this.mode + (this.topicId ? `-${this.topicId}` : '')
                 });
                 edx.HtmlUtils.setHtml(
                     this.$el,

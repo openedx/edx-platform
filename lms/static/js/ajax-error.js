@@ -9,7 +9,7 @@ $(document).ajaxError(function(event, jXHR) {
 
         if (window.confirm(message)) {
             var currentLocation = window.location.pathname;
-            window.location.href = '/login?next=' + encodeURIComponent(currentLocation);
+            window.location.href = `/login?next=${encodeURIComponent(currentLocation)}`;
         }
     }
 });

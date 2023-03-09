@@ -8,7 +8,7 @@ define([
         // highlighting labels when fields are focused in
         $('form :input')
             .focus(function() {
-                $('label[for="' + this.id + '"]').addClass('is-focused');
+                $(`label[for="${this.id}"]`).addClass('is-focused');
             })
             .blur(function() {
                 $('label').removeClass('is-focused');

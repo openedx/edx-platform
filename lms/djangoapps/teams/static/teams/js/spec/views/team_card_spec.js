@@ -77,7 +77,7 @@ function($, _, moment, TeamSpecHelpers, TeamCardView, Team, Topic) {
         });
 
         it('navigates to the associated team page when its action button is clicked', function() {
-            expect(view.$('.action').attr('href')).toEqual('#teams/' + teamsetID + '/' + teamID);
+            expect(view.$('.action').attr('href')).toEqual(`#teams/${teamsetID}/${teamID}`);
         });
 
         describe('Profile Image Thumbnails', function() {

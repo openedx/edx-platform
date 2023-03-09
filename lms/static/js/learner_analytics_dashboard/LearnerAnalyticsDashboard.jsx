@@ -101,7 +101,7 @@ export function LearnerAnalyticsDashboard(props) {
                     />
                 </div>
                 <CircleChartLegend data={gradeBreakdown} />
-               </div>
+            </div>
                     }
 
                     <h3 className="section-heading">Graded Assignments</h3>

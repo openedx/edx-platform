@@ -30,14 +30,14 @@
             initialize: function() {
                 var ItemListView = this.listViewClass.extend({
                     tagName: 'div',
-                    className: this.type + '-container',
+                    className: `${this.type}-container`,
                     itemViewClass: this.itemViewClass
                 });
                 this.listView = new ItemListView({collection: this.collection});
                 this.headerView = this.createHeaderView();
                 this.footerView = this.createFooterView();
                 this.collection.on('page_changed', function() {
-                    this.$('.sr-is-focusable.sr-' + this.type + '-view').focus();
+                    this.$(`.sr-is-focusable.sr-${this.type}-view`).focus();
                 }, this);
             },
 
@@ -61,12 +61,12 @@
 
             render: function() {
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.viewTemplate)({type: this.type}));
-                this.assign(this.listView, '.' + this.type + '-list');
+                this.assign(this.listView, `.${this.type}-list`);
                 if (this.headerView) {
-                    this.assign(this.headerView, '.' + this.type + '-paging-header');
+                    this.assign(this.headerView, `.${this.type}-paging-header`);
                 }
                 if (this.footerView) {
-                    this.assign(this.footerView, '.' + this.type + '-paging-footer');
+                    this.assign(this.footerView, `.${this.type}-paging-footer`);
                 }
                 return this;
             },

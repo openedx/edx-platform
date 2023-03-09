@@ -2,7 +2,7 @@
 // Build StaffDebug object
 var StaffDebug = (function() {
     var getURL = function(courseId, action) {
-        return '/courses/' + courseId + '/instructor/api/' + action;
+        return `/courses/${courseId}/instructor/api/${action}`;
     };
 
     var sanitizeString = function(string) {
@@ -11,18 +11,18 @@ var StaffDebug = (function() {
 
     var getUser = function(locationName) {
         var sanitizedLocationName = sanitizeString(locationName);
-        var uname = $('#sd_fu_' + sanitizedLocationName).val();
+        var uname = $(`#sd_fu_${sanitizedLocationName}`).val();
         if (uname === '') {
-            uname = $('#sd_fu_' + sanitizedLocationName).attr('placeholder');
+            uname = $(`#sd_fu_${sanitizedLocationName}`).attr('placeholder');
         }
         return uname;
     };
 
     var getScore = function(locationName) {
         var sanitizedLocationName = sanitizeString(locationName);
-        var score = $('#sd_fs_' + sanitizedLocationName).val();
+        var score = $(`#sd_fs_${sanitizedLocationName}`).val();
         if (score === '') {
-            score = $('#sd_fs_' + sanitizedLocationName).attr('placeholder');
+            score = $(`#sd_fs_${sanitizedLocationName}`).attr('placeholder');
         }
         return score;
     };
@@ -48,7 +48,7 @@ var StaffDebug = (function() {
                     {text: text}
                 );
                 edx.HtmlUtils.setHtml(
-                    $('#result_' + sanitizeString(action.locationName)),
+                    $(`#result_${sanitizeString(action.locationName)}`),
                     edx.HtmlUtils.HTML(html)
                 );
             },
@@ -72,7 +72,7 @@ var StaffDebug = (function() {
                     {text: text}
                 );
                 edx.HtmlUtils.setHtml(
-                    $('#result_' + sanitizeString(action.locationName)),
+                    $(`#result_${sanitizeString(action.locationName)}`),
                     edx.HtmlUtils.HTML(html)
                 );
             },

@@ -90,7 +90,7 @@ delete webpackConfig[0].entry;
  * @return {String}
  */
 function junitNameFormatter(browser, result) {
-    return result.suite[0] + ': ' + result.description;
+    return `${result.suite[0]}: ${result.description}`;
 }
 
 /**
@@ -99,7 +99,7 @@ function junitNameFormatter(browser, result) {
  * @return {String}
  */
 function junitClassNameFormatter(browser) {
-    return 'Javascript.' + browser.name.split(' ')[0];
+    return `Javascript.${browser.name.split(' ')[0]}`;
 }
 
 /**
@@ -184,10 +184,10 @@ function junitSettings(config) {
 function defaultNormalizeFunc(appRoot, pattern) { // eslint-disable-line no-shadow
     var pat = pattern;
     if (pat.match(/^common\/js/)) {
-        pat = path.join(appRoot, '/common/static/' + pat);
+        pat = path.join(appRoot, `/common/static/${pat}`);
     } else if (pat.match(/^xmodule_js\/common_static/)) {
-        pat = path.join(appRoot, '/common/static/'
-            + pat.replace(/^xmodule_js\/common_static\//, ''));
+        pat = path.join(appRoot, `/common/static/${
+            pat.replace(/^xmodule_js\/common_static\//, '')}`);
     }
     return pat;
 }

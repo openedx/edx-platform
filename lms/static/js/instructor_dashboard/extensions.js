@@ -123,11 +123,11 @@
         extensions.prototype.fail_with_error = function(id, msg, xhr) {
             var $taskError, $taskResponse, data,
                 message = msg;
-            $taskError = this.$section.find('#' + id + ' .request-response-error');
-            $taskResponse = this.$section.find('#' + id + ' .request-response');
+            $taskError = this.$section.find(`#${id} .request-response-error`);
+            $taskResponse = this.$section.find(`#${id} .request-response`);
             this.clear_display();
             data = $.parseJSON(xhr.responseText);
-            message += ': ' + data.error;
+            message += `: ${data.error}`;
             $taskResponse.empty();
             $taskError.empty();
             $taskError.text(message);
@@ -136,8 +136,8 @@
 
         extensions.prototype.display_response = function(id, data) {
             var $taskError, $taskResponse;
-            $taskError = this.$section.find('#' + id + ' .request-response-error');
-            $taskResponse = this.$section.find('#' + id + ' .request-response');
+            $taskError = this.$section.find(`#${id} .request-response-error`);
+            $taskResponse = this.$section.find(`#${id} .request-response`);
             $taskError.empty().hide();
             $taskResponse.empty().text(data);
             return $taskResponse.show();

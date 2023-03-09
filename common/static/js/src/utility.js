@@ -13,7 +13,7 @@ window.isExternal = function(url) {
     if (typeof match[2] === 'string'
             && match[2].length > 0
             // this regex removes the port number if it patches the current location's protocol
-            && match[2].replace(new RegExp(':(' + {'http:': 80, 'https:': 443}[location.protocol] + ')?$'), '') !== location.host) { return true; }
+            && match[2].replace(new RegExp(`:(${{'http:': 80, 'https:': 443}[location.protocol]})?$`), '') !== location.host) { return true; }
     return false;
 };
 
@@ -34,6 +34,6 @@ window.rewriteStaticLinks = function(content, from, to) {
     // handle http and https
     // escape all regex interpretable chars
     fromRe = from.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    var regex = new RegExp('(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_\+.~#?&//=]*))?' + fromRe, 'g');
+    var regex = new RegExp(`(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_\+.~#?&//=]*))?${fromRe}`, 'g');
     return content.replace(regex, replacer);
 };

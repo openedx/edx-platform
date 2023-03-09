@@ -214,7 +214,7 @@
             if (findExtraNewlines) {
                 regexText = '\\n*';
             }
-            this.before = this.before.replace(new re(regexText + '$', ''), replacementText);
+            this.before = this.before.replace(new re(`${regexText}$`, ''), replacementText);
         }
 
         if (this.after) {
@@ -263,9 +263,9 @@
     // and 8) and ONLY on button clicks.  Keyboard shortcuts work
     // normally since the focus never leaves the textarea.
     function PanelCollection(postfix) {
-        this.buttonBar = findAnEmptyToolbar('wmd-button-bar' + postfix);
-        this.preview = doc.getElementById('wmd-preview' + postfix);
-        this.input = doc.getElementById('wmd-input' + postfix);
+        this.buttonBar = findAnEmptyToolbar(`wmd-button-bar${postfix}`);
+        this.preview = doc.getElementById(`wmd-preview${postfix}`);
+        this.input = doc.getElementById(`wmd-input${postfix}`);
     }
 
     util.isValidUrl = function(url) {
@@ -289,7 +289,7 @@
     util.addEvent = function(elem, event, listener) {
         if (elem.attachEvent) {
             // IE only.  The "on" is mandatory.
-            elem.attachEvent('on' + event, listener);
+            elem.attachEvent(`on${event}`, listener);
         } else {
             // Other browsers.
             elem.addEventListener(event, listener, false);
@@ -301,7 +301,7 @@
     util.removeEvent = function(elem, event, listener) {
         if (elem.detachEvent) {
             // IE only.  The "on" is mandatory.
-            elem.detachEvent('on' + event, listener);
+            elem.detachEvent(`on${event}`, listener);
         } else {
             // Other browsers.
             elem.removeEventListener(event, listener, false);
@@ -944,7 +944,7 @@
         }
 
         var pageSize = position.getPageSize();
-        style.height = pageSize[1] + 'px';
+        style.height = `${pageSize[1]}px`;
 
         if (uaSniffed.isIE) {
             style.left = doc.documentElement.scrollLeft;
@@ -1021,7 +1021,7 @@
                 url = url.replace(/^http:\/\/(https?|ftp):\/\//, '$1://');
                 // doesn't change url if started with '/' (local)
                 if (!/^(?:https?|ftp):\/\//.test(url) && url.charAt(0) !== '/') {
-                    url = 'http://' + url;
+                    url = `http://${url}`;
                 }
             }
 
@@ -1105,11 +1105,11 @@
             dialog.style.display = 'block';
             if (uaSniffed.isIE_5or6) {
                 dialog.style.position = 'absolute';
-                dialog.style.top = doc.documentElement.scrollTop + 200 + 'px';
+                dialog.style.top = `${doc.documentElement.scrollTop + 200}px`;
                 dialog.style.left = '50%';
             }
-            dialog.style.marginTop = -(position.getHeight(dialog) / 2) + 'px';
-            dialog.style.marginLeft = -(position.getWidth(dialog) / 2) + 'px';
+            dialog.style.marginTop = `${-(position.getHeight(dialog) / 2)}px`;
+            dialog.style.marginLeft = `${-(position.getWidth(dialog) / 2)}px`;
 
             urlInput = document.getElementById('new-url-input');
             urlErrorMsg = document.getElementById('new-url-input-field-message');
@@ -1338,13 +1338,13 @@
             var highlightYShift = '-40px';
             var image = button.getElementsByTagName('span')[0];
             if (isEnabled) {
-                image.style.backgroundPosition = button.XShift + ' ' + normalYShift;
+                image.style.backgroundPosition = `${button.XShift} ${normalYShift}`;
                 button.onmouseover = function() {
-                    image.style.backgroundPosition = this.XShift + ' ' + highlightYShift;
+                    image.style.backgroundPosition = `${this.XShift} ${highlightYShift}`;
                 };
 
                 button.onmouseout = function() {
-                    image.style.backgroundPosition = this.XShift + ' ' + normalYShift;
+                    image.style.backgroundPosition = `${this.XShift} ${normalYShift}`;
                 };
 
                 // IE tries to select the background image "button" text (it's
@@ -1386,7 +1386,7 @@
                 // of WMD from Git and install it from NPM / a maintained public fork.
                 button.removeAttribute('aria-disabled');
             } else {
-                image.style.backgroundPosition = button.XShift + ' ' + disabledYShift;
+                image.style.backgroundPosition = `${button.XShift} ${disabledYShift}`;
                 button.onmouseover = button.onmouseout = button.onclick = function() { };
                 // This line does not appear in vanilla WMD. It was added by edX to improve accessibility.
                 // It should become a separate commit applied to WMD's official HEAD if we remove this edited version
@@ -1409,7 +1409,7 @@
 
             var buttonRow = document.createElement('div');
             buttonRow.setAttribute('role', 'toolbar');
-            buttonRow.id = 'wmd-button-row' + postfix;
+            buttonRow.id = `wmd-button-row${postfix}`;
             buttonRow.className = 'wmd-button-row';
             buttonRow = buttonBar.appendChild(buttonRow);
             var xPosition = 0;
@@ -1417,7 +1417,7 @@
                 var button = document.createElement('button');
                 button.tabIndex = tabIndex;
                 button.className = 'wmd-button';
-                button.style.left = xPosition + 'px';
+                button.style.left = `${xPosition}px`;
                 xPosition += 25;
                 var buttonImage = document.createElement('span');
                 button.id = id + postfix;
@@ -1432,8 +1432,8 @@
             var makeSpacer = function(num) {
                 var spacer = document.createElement('span');
                 spacer.setAttribute('role', 'separator');
-                spacer.className = 'wmd-spacer wmd-spacer' + num;
-                spacer.id = 'wmd-spacer' + num + postfix;
+                spacer.className = `wmd-spacer wmd-spacer${num}`;
+                spacer.id = `wmd-spacer${num}${postfix}`;
                 buttonRow.appendChild(spacer);
                 xPosition += 25;
             };
@@ -1474,7 +1474,7 @@
                 var helpButtonImage = document.createElement('span');
                 helpButton.appendChild(helpButtonImage);
                 helpButton.className = 'wmd-button wmd-help-button';
-                helpButton.id = 'wmd-help-button' + postfix;
+                helpButton.id = `wmd-help-button${postfix}`;
                 helpButton.XShift = '-240px';
                 helpButton.isHelp = true;
                 helpButton.style.right = '0px';
@@ -1510,20 +1510,20 @@
 
     // Remove markdown symbols from the chunk selection.
     commandProto.unwrap = function(chunk) {
-        var txt = new re('([^\\n])\\n(?!(\\n|' + this.prefixes + '))', 'g');
+        var txt = new re(`([^\\n])\\n(?!(\\n|${this.prefixes}))`, 'g');
         chunk.selection = chunk.selection.replace(txt, '$1 $2');
     };
 
     commandProto.wrap = function(chunk, len) {
         this.unwrap(chunk); // xss-lint: disable=javascript-jquery-insertion
-        var regex = new re('(.{1,' + len + '})( +|$\\n?)', 'gm'),
+        var regex = new re(`(.{1,${len}})( +|$\\n?)`, 'gm'),
             that = this;
 
         chunk.selection = chunk.selection.replace(regex, function(line, marked) {
-            if (new re('^' + that.prefixes, '').test(line)) {
+            if (new re(`^${that.prefixes}`, '').test(line)) {
                 return line;
             }
-            return marked + '\n';
+            return `${marked}\n`;
         });
 
         chunk.selection = chunk.selection.replace(/\s+$/, '');
@@ -1554,8 +1554,8 @@
 
         // Remove stars if we have to since the button acts as a toggle.
         if ((prevStars >= nStars) && (prevStars != 2 || nStars != 1)) {
-            chunk.before = chunk.before.replace(re('[*]{' + nStars + '}$', ''), '');
-            chunk.after = chunk.after.replace(re('^[*]{' + nStars + '}', ''), '');
+            chunk.before = chunk.before.replace(re(`[*]{${nStars}}$`, ''), '');
+            chunk.after = chunk.after.replace(re(`^[*]{${nStars}}`, ''), '');
         } else if (!chunk.selection && starsAfter) {
             // It's not really clear why this code is necessary.  It just moves
             // some arbitrary stuff around.
@@ -1607,8 +1607,8 @@
 
         var addDefNumber = function(def) {
             refNumber++;
-            def = def.replace(/^[ ]{0,3}\[(\d+)\]:/, '  [' + refNumber + ']:');
-            defs += '\n' + def;
+            def = def.replace(/^[ ]{0,3}\[(\d+)\]:/, `  [${refNumber}]:`);
+            defs += `\n${def}`;
         };
 
         // note that
@@ -1644,7 +1644,7 @@
             chunk.selection = chunk.selection.replace(/\n*$/, '');
         }
 
-        chunk.after += '\n\n' + defs;
+        chunk.after += `\n\n${defs}`;
 
         return refOut;
     };
@@ -1665,7 +1665,7 @@
                 title = title.trim ? title.trim() : title.replace(/^\s*/, '').replace(/\s*$/, '');
                 title = $.trim(title).replace(/"/g, 'quot;').replace(/\(/g, '&#40;').replace(/\)/g, '&#41;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             }
-            return title ? link + ' "' + title + '"' : link;
+            return title ? `${link} "${title}"` : link;
         });
     }
 
@@ -1714,13 +1714,13 @@
                     // this by anchoring with ^, because in the case that the selection starts with two brackets, this
                     // would mean a zero-width match at the start. Since zero-width matches advance the string position,
                     // the first bracket could then not act as the "not a backslash" for the second.
-                    chunk.selection = (' ' + chunk.selection).replace(/([^\\](?:\\\\)*)(?=[[\]])/g, '$1\\').substr(1);
+                    chunk.selection = (` ${chunk.selection}`).replace(/([^\\](?:\\\\)*)(?=[[\]])/g, '$1\\').substr(1);
 
-                    var linkDef = ' [999]: ' + properlyEncoded(link);
+                    var linkDef = ` [999]: ${properlyEncoded(link)}`;
 
                     var num = that.addLinkDef(chunk, linkDef);
                     chunk.startTag = isImage ? '![' : '[';
-                    chunk.endTag = '][' + num + ']';
+                    chunk.endTag = `][${num}]`;
 
                     if (!chunk.selection) {
                         if (isImage) {
@@ -1881,7 +1881,7 @@
                     good = inChain; // c) the line is not empty and does not start with ">", so it matches if and only if we're in the chain
                 }
                 if (good) {
-                    match += line + '\n';
+                    match += `${line}\n`;
                 } else {
                     leftOver += match + line;
                     match = '\n';
@@ -1915,13 +1915,13 @@
             if (chunk.startTag) {
                 chunk.startTag = chunk.startTag.replace(/\n((>|\s)*)\n$/,
                     function(totalMatch, markdown) {
-                        return '\n' + markdown.replace(/^[ ]{0,3}>?[ \t]*$/gm, replacement) + '\n';
+                        return `\n${markdown.replace(/^[ ]{0,3}>?[ \t]*$/gm, replacement)}\n`;
                     });
             }
             if (chunk.endTag) {
                 chunk.endTag = chunk.endTag.replace(/^\n((>|\s)*)\n/,
                     function(totalMatch, markdown) {
-                        return '\n' + markdown.replace(/^[ ]{0,3}>?[ \t]*$/gm, replacement) + '\n';
+                        return `\n${markdown.replace(/^[ ]{0,3}>?[ \t]*$/gm, replacement)}\n`;
                     });
             }
         };
@@ -2031,10 +2031,10 @@
         var getItemPrefix = function() {
             var prefix;
             if (isNumberedList) {
-                prefix = ' ' + num + '. ';
+                prefix = ` ${num}. `;
                 num++;
             } else {
-                prefix = ' ' + bullet + ' ';
+                prefix = ` ${bullet} `;
             }
             return prefix;
         };
@@ -2108,7 +2108,7 @@
         chunk.startTag = prefix;
         var spaces = prefix.replace(/./g, ' ');
         this.wrap(chunk, SETTINGS.lineLength - spaces.length); // xss-lint: disable=javascript-jquery-insertion
-        chunk.selection = chunk.selection.replace(/\n/g, '\n' + spaces);
+        chunk.selection = chunk.selection.replace(/\n/g, `\n${spaces}`);
     };
 
     commandProto.doHeading = function(chunk, postProcessing) {

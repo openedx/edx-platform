@@ -17,7 +17,7 @@ define(
             });
 
             it('sends an event only for a course whose facebook link is clicked', function() {
-                $(".action-facebook[data-course-id='" + courseKey1 + "']").click();
+                $(`.action-facebook[data-course-id='${courseKey1}']`).click();
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.share_clicked', {
                     course_id: courseKey1,
                     social_media_site: 'facebook',
@@ -26,7 +26,7 @@ define(
                 expect(Logger.log.calls.count()).toEqual(1);
 
                 Logger.log.calls.reset();
-                $(".action-facebook[data-course-id='" + courseKey2 + "']").click();
+                $(`.action-facebook[data-course-id='${courseKey2}']`).click();
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.share_clicked', {
                     course_id: courseKey2,
                     social_media_site: 'facebook',
@@ -36,7 +36,7 @@ define(
             });
 
             it('sends an event only for a course whose twitter link is clicked', function() {
-                $(".action-twitter[data-course-id='" + courseKey1 + "']").click();
+                $(`.action-twitter[data-course-id='${courseKey1}']`).click();
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.share_clicked', {
                     course_id: courseKey1,
                     social_media_site: 'twitter',
@@ -45,7 +45,7 @@ define(
                 expect(Logger.log.calls.count()).toEqual(1);
 
                 Logger.log.calls.reset();
-                $(".action-twitter[data-course-id='" + courseKey2 + "']").click();
+                $(`.action-twitter[data-course-id='${courseKey2}']`).click();
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.share_clicked', {
                     course_id: courseKey2,
                     social_media_site: 'twitter',

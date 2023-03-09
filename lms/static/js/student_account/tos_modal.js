@@ -130,11 +130,11 @@
     $(document).ready(function() {
         var tosLinkSelector = '.checkbox-honor_code .supplemental-link a',
             closeButtonClass = 'modal-close-button',
-            closeButtonSelector = '.' + closeButtonClass,
+            closeButtonSelector = `.${closeButtonClass}`,
             contentClass = 'modal-content',
-            contentSelector = '.' + contentClass,
+            contentSelector = `.${contentClass}`,
             modalClass = 'tos-modal',
-            modalSelector = '.' + modalClass;
+            modalSelector = `.${modalClass}`;
 
         $('body').on('click', tosLinkSelector, function(event) {
             var link = event.target,

@@ -41,7 +41,7 @@
             editMembership: function(event) {
                 event.preventDefault();
                 Backbone.history.navigate(
-                    'teams/' + this.team.get('topic_id') + '/' + this.team.id + '/edit-team/manage-members',
+                    `teams/${this.team.get('topic_id')}/${this.team.id}/edit-team/manage-members`,
                     {trigger: true}
                 );
             },
@@ -53,7 +53,7 @@
                             action: 'delete',
                             team: self.team
                         });
-                        Backbone.history.navigate('topics/' + self.team.get('topic_id'), {trigger: true});
+                        Backbone.history.navigate(`topics/${self.team.get('topic_id')}`, {trigger: true});
                         TeamUtils.showMessage(
                             StringUtils.interpolate(
                                 gettext('Team "{team}" successfully deleted.'),

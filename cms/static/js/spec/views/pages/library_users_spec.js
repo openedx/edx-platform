@@ -10,8 +10,8 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
         var team_member_fixture = readFixtures('team-member.underscore');
 
         function setRole(email, role) {
-            var $user_li = $('li.user-item[data-email="' + email + '"]');
-            var $role_action = $('li.action-role a.make-' + role, $user_li);
+            var $user_li = $(`li.user-item[data-email="${email}"]`);
+            var $role_action = $(`li.action-role a.make-${role}`, $user_li);
             expect($role_action).toBeVisible();
             $role_action.click();
         }
@@ -110,7 +110,7 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 var promptSpy = ViewHelpers.createPromptSpy();
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 var email = 'honor@example.com';
-                $('.user-item[data-email="' + email + '"] .action-delete .delete').click();
+                $(`.user-item[data-email="${email}"] .action-delete .delete`).click();
                 ViewHelpers.verifyPromptShowing(promptSpy, 'Are you sure?');
                 ViewHelpers.confirmPrompt(promptSpy);
                 ViewHelpers.verifyPromptHidden(promptSpy);

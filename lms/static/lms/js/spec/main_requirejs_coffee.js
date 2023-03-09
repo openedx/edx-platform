@@ -23,7 +23,7 @@
                     define(name, [], function() { return globalValue; });
                 }
             } else {
-                console.error('Expected library to be included on page, but not found on window object: ' + name);
+                console.error(`Expected library to be included on page, but not found on window object: ${name}`);
             }
         };
         defineDependency('jQuery', 'jquery');

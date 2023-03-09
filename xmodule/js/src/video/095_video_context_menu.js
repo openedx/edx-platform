@@ -119,11 +119,11 @@
                 keyDownHandler: function() { },
                 delegateEvents: function() { },
                 undelegateEvents: function() {
-                    this.getElement().off('.' + this.id);
+                    this.getElement().off(`.${this.id}`);
                 },
                 addNamespace: function(events) {
                     return _.map(events.split(/\s+/), function(event) {
-                        return event + '.' + this.id;
+                        return `${event}.${this.id}`;
                     }, this).join(' ');
                 }
             });
@@ -190,7 +190,7 @@
 
                 createElement: function() {
                     return $('<ol />', {
-                        class: ['contextmenu', this.options.prefix + 'contextmenu'].join(' '),
+                        class: ['contextmenu', `${this.options.prefix}contextmenu`].join(' '),
                         role: 'menu',
                         tabindex: -1
                     });
@@ -366,13 +366,13 @@
                 delegateEvents: function() {
                     var self = this;
                     $(document)
-                        .on('click' + this.ns, function() {
+                        .on(`click${this.ns}`, function() {
                             if (_.isFunction(self.clickHandler)) {
                                 self.clickHandler.apply(this, arguments);
                             }
                             self.hide();
                         })
-                        .on('contextmenu' + this.ns, function() {
+                        .on(`contextmenu${this.ns}`, function() {
                             if (_.isFunction(self.contextmenuHandler)) {
                                 self.contextmenuHandler.apply(this, arguments);
                             }
@@ -396,22 +396,22 @@
                     var $spanElem,
                         $listElem,
                         $element = $('<li />', {
-                            class: ['submenu-item', 'menu-item', this.options.prefix + 'submenu-item'].join(' '),
+                            class: ['submenu-item', 'menu-item', `${this.options.prefix}submenu-item`].join(' '),
                             'aria-expanded': 'false',
                             'aria-haspopup': 'true',
-                            'aria-labelledby': 'submenu-item-label-' + this.id,
+                            'aria-labelledby': `submenu-item-label-${this.id}`,
                             role: 'menuitem',
                             tabindex: -1
                         });
 
                     $spanElem = $('<span />', {
-                        id: 'submenu-item-label-' + this.id,
+                        id: `submenu-item-label-${this.id}`,
                         text: this.options.label
                     });
                     this.label = $spanElem.appendTo($element);
 
                     $listElem = $('<ol />', {
-                        class: ['submenu', this.options.prefix + 'submenu'].join(' '),
+                        class: ['submenu', `${this.options.prefix}submenu`].join(' '),
                         role: 'menu'
                     });
 
@@ -499,7 +499,7 @@
             MenuItem = AbstractItem.extend({
                 createElement: function() {
                     var classNames = [
-                        'menu-item', this.options.prefix + 'menu-item',
+                        'menu-item', `${this.options.prefix}menu-item`,
                         this.options.isSelected ? 'is-selected' : ''
                     ].join(' ');
 
@@ -639,7 +639,7 @@
                             items: _.map(state.speeds, function(speed) {
                                 var isSelected = parseFloat(speed) === state.speed;
                                 return {
-                                    label: speed + 'x', callback: speedCallback, speed: speed, isSelected: isSelected
+                                    label: `${speed}x`, callback: speedCallback, speed: speed, isSelected: isSelected
                                 };
                             }),
                             initialize: function(menuitem) {

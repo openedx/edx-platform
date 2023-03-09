@@ -35,7 +35,7 @@ class Discussions extends React.Component {
         if (percent === 0) {
             percentWidth = '2px';
         } else {
-            percentWidth = 'calc((100% - 40px) * ' + percent + ')';
+            percentWidth = `calc((100% - 40px) * ${percent})`;
         }
         return (
             <div className="count-chart">

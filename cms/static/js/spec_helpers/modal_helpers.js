@@ -46,7 +46,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'common/js/spec_hel
         pressModalButton = function(selector, modal) {
             var modalElement, button;
             modalElement = getModalElement(modal);
-            button = modalElement.find(selector + ':visible');
+            button = modalElement.find(`${selector}:visible`);
             expect(button.length).toBe(1);
             button.click();
         };

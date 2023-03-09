@@ -151,7 +151,7 @@ define(
 
                 $dom.successStage
                     .find('.item-progresspoint-success-date')
-                    .text('(' + date + ' at ' + time + ' UTC)');
+                    .text(`(${date} at ${time} UTC)`);
 
                 break;
 

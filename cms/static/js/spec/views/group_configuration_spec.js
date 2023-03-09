@@ -675,9 +675,9 @@ define([
             verifyEditingGroup, respondToSave, expectGroupsVisible, correctValidationError;
 
         scopedGroupSelector = function(groupIndex, additionalSelectors) {
-            var groupSelector = '.partition-groups-list-item-' + groupIndex;
+            var groupSelector = `.partition-groups-list-item-${groupIndex}`;
             if (additionalSelectors) {
-                return groupSelector + ' ' + additionalSelectors;
+                return `${groupSelector} ${additionalSelectors}`;
             } else {
                 return groupSelector;
             }
@@ -860,7 +860,7 @@ define([
             var requests = AjaxHelpers.requests(this),
                 newGroupName = 'New Group Name',
                 view = renderView();
-            editNewGroup(view, {newName: '  ' + newGroupName + '  ', save: true});
+            editNewGroup(view, {newName: `  ${newGroupName}  `, save: true});
             respondToSave(requests, view);
             expect(view.collection.at(0).get('name')).toBe(newGroupName);
         });

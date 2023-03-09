@@ -27,7 +27,7 @@
             fieldType: 'generic',
 
             className: function() {
-                return 'u-field u-field-' + this.fieldType + ' u-field-' + this.options.valueAttribute;
+                return `u-field u-field-${this.fieldType} u-field-${this.options.valueAttribute}`;
             },
 
             tagName: 'div',
@@ -103,8 +103,8 @@
             },
 
             getMessage: function(messageStatus) {
-                if ((messageStatus + 'Message') in this) {
-                    return this[messageStatus + 'Message'].call(this);
+                if ((`${messageStatus}Message`) in this) {
+                    return this[`${messageStatus}Message`].call(this);
                 } else if (this.showMessages) {
                     return HtmlUtils.joinHtml(this.indicators[messageStatus], this.messages[messageStatus]);
                 }
@@ -198,7 +198,7 @@
                 this._super(options);
 
                 this.editable = _.isUndefined(this.options.editable) ? 'always' : this.options.editable;
-                this.$el.addClass('editable-' + this.editable);
+                this.$el.addClass(`editable-${this.editable}`);
 
                 if (this.editable === 'always') {
                     this.showEditMode(false);
@@ -299,7 +299,7 @@
             initialize: function(options) {
                 this._super(options);
                 _.bindAll(this, 'render', 'fieldValue', 'updateValueInField');
-                this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateValueInField);
+                this.listenTo(this.model, `change:${this.options.valueAttribute}`, this.updateValueInField);
             },
 
             render: function() {
@@ -368,7 +368,7 @@
             initialize: function(options) {
                 this._super(options);
                 _.bindAll(this, 'render', 'fieldValue', 'updateValueInField', 'saveValue');
-                this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateValueInField);
+                this.listenTo(this.model, `change:${this.options.valueAttribute}`, this.updateValueInField);
             },
 
             render: function() {
@@ -420,7 +420,7 @@
                     'saveValue', 'createGroupOptions');
                 this._super(options);
 
-                this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateValueInField);
+                this.listenTo(this.model, `change:${this.options.valueAttribute}`, this.updateValueInField);
             },
 
             render: function() {
@@ -582,7 +582,7 @@
                 _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'manageTextareaContentChange',
                     'fieldValue', 'saveValue', 'updateView');
                 this._super(options);
-                this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateView);
+                this.listenTo(this.model, `change:${this.options.valueAttribute}`, this.updateView);
             },
 
             render: function() {
@@ -626,7 +626,7 @@
                 var $charCount = $('.u-field-footer .current-char-count');
                 // Update character count for textarea
                 if (this.options.maxCharacters) {
-                    curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;
+                    curCharCount = $(`#u-field-textarea-${this.options.valueAttribute}`).val().length;
                     remainingCharCount = this.options.maxCharacters - curCharCount;
                     if (remainingCharCount < 20) {
                         $charCount.attr({

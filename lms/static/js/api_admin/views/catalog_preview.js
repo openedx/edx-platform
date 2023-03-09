@@ -40,7 +40,7 @@
              */
             previewQuery: function(event) {
                 event.preventDefault();
-                $.ajax(this.previewUrl + '?q=' + this.getQuery(), {
+                $.ajax(`${this.previewUrl}?q=${this.getQuery()}`, {
                     method: 'GET',
                     success: _.bind(this.renderCourses, this),
                     error: _.bind(function() {

@@ -56,7 +56,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
 
             var expectStepRendered = function(stepName) {
                 // Expect that the step container div rendered
-                expect($('.' + stepName).length > 0).toBe(true);
+                expect($(`.${stepName}`).length > 0).toBe(true);
             };
 
             beforeEach(function() {
@@ -65,7 +65,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
 
                 setFixtures('<div id="pay-and-verify-container"></div>');
                 $.each(TEMPLATES, function(index, templateName) {
-                    TemplateHelpers.installTemplate('templates/verify_student/' + templateName);
+                    TemplateHelpers.installTemplate(`templates/verify_student/${templateName}`);
                 });
             });
 

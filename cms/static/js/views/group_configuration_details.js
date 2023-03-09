@@ -23,7 +23,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
             return [
                 'collection',
                 'group-configuration-details',
-                'group-configuration-details-' + index
+                `group-configuration-details-${index}`
             ].join(' ');
         },
 

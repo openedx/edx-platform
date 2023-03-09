@@ -160,11 +160,11 @@ describe('CourseOutlinePage', function() {
     };
 
     getItemsOfType = function(type) {
-        return outlinePage.$('.outline-' + type);
+        return outlinePage.$(`.outline-${type}`);
     };
 
     getItemHeaders = function(type) {
-        return getItemsOfType(type).find('> .' + type + '-header');
+        return getItemsOfType(type).find(`> .${type}-header`);
     };
 
     verifyItemsExpanded = function(type, isExpanded) {
@@ -247,7 +247,7 @@ describe('CourseOutlinePage', function() {
             createCourseOutlinePageAndShowUnit(this, mockCourseJSON);
             getItemHeaders(type).find('.publish-button').click();
             $('.wrapper-modal-window .action-publish').click();
-            AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-' + type, {
+            AjaxHelpers.expectJsonRequest(requests, 'POST', `/xblock/mock-${type}`, {
                 publish: 'make_public'
             });
             expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -688,7 +688,7 @@ describe('CourseOutlinePage', function() {
                 var highlights = [],
                     i;
                 for (i = 0; i < numberOfHighlights; i++) {
-                    highlights.push('Highlight' + (i + 1));
+                    highlights.push(`Highlight${i + 1}`);
                 }
                 return highlights;
             };
@@ -1073,7 +1073,7 @@ describe('CourseOutlinePage', function() {
         };
 
         setContentVisibility = function(visibility) {
-            $('input[name=content-visibility][value=' + visibility + ']').prop('checked', true);
+            $(`input[name=content-visibility][value=${visibility}]`).prop('checked', true);
         };
 
         selectDisableSpecialExams = function() {
@@ -1122,7 +1122,7 @@ describe('CourseOutlinePage', function() {
         };
 
         expectShowCorrectness = function(showCorrectness) {
-            expect($('input[name=show-correctness][value=' + showCorrectness + ']').is(':checked')).toBe(true);
+            expect($(`input[name=show-correctness][value=${showCorrectness}]`).is(':checked')).toBe(true);
         };
 
         getMockNoPrereqOrExamsCourseJSON = function() {
@@ -2090,12 +2090,12 @@ describe('CourseOutlinePage', function() {
             var setShowCorrectness;
 
             setShowCorrectness = function(showCorrectness) {
-                $('input[name=show-correctness][value=' + showCorrectness + ']').click();
+                $(`input[name=show-correctness][value=${showCorrectness}]`).click();
             };
 
             describe('Show correctness set by subsection metadata.', function() {
                 $.each(['always', 'never', 'past_due'], function(index, showCorrectness) {
-                    it('show_correctness="' + showCorrectness + '"', function() {
+                    it(`show_correctness="${showCorrectness}"`, function() {
                         var mockCourseJSONCorrectness = createMockCourseJSON({}, [
                             createMockSectionJSON({}, [
                                 createMockSubsectionJSON({show_correctness: showCorrectness}, [])
@@ -2124,7 +2124,7 @@ describe('CourseOutlinePage', function() {
                 });
 
                 $.each(['never', 'past_due'], function(index, showCorrectness) {
-                    it('show_correctness="' + showCorrectness + '" updates settings, republishes', function() {
+                    it(`show_correctness="${showCorrectness}" updates settings, republishes`, function() {
                         var expectedSettings = $.extend(true, {}, defaultModalSettings, {publish: 'republish'});
                         expectedSettings.metadata.show_correctness = showCorrectness;
 

@@ -122,13 +122,13 @@
                         css_class: searchAlert.attributes.css_class
                     });
                     edx.HtmlUtils.append(self.$('.search-alerts'), content);
-                    return self.$('#search-alert-' + searchAlert.cid + ' .dismiss')
+                    return self.$(`#search-alert-${searchAlert.cid} .dismiss`)
                         .bind('click', searchAlert, function(event) {
                             return self.removeSearchAlert(event.data.cid);
                         });
                 });
                 this.searchAlertCollection.on('remove', function(searchAlert) {
-                    return self.$('#search-alert-' + searchAlert.cid).remove();
+                    return self.$(`#search-alert-${searchAlert.cid}`).remove();
                 });
                 this.searchAlertCollection.on('reset', function() {
                     return self.$('.search-alerts').empty();
@@ -163,7 +163,7 @@
                 this.clearSearchAlerts();
                 threadId = thread.get('id');
                 $content = this.renderThread(thread);
-                $currentElement = this.$('.forum-nav-thread[data-id=' + threadId + ']');
+                $currentElement = this.$(`.forum-nav-thread[data-id=${threadId}]`);
                 active = $currentElement.has('.forum-nav-thread-link.is-active').length !== 0;
                 $currentElement.replaceWith($content);
                 this.showMetadataAccordingToSort();
@@ -203,7 +203,7 @@
                     this.$('.forum-nav-filter-main').addClass('is-hidden');
                 }
                 this.$('.forum-nav-sort-control option').removeProp('selected');
-                this.$('.forum-nav-sort-control option[value=' + this.collection.sort_preference + ']')
+                this.$(`.forum-nav-sort-control option[value=${this.collection.sort_preference}]`)
                     .prop('selected', true);
                 this.displayedCollection.on('reset', this.renderThreads);
                 this.displayedCollection.on('thread:remove', this.renderThreads);
@@ -308,8 +308,8 @@
                 lastThread = ref ? ref.get('id') : void 0;
                 if (lastThread) {
                     this.once('threads:rendered', function() {
-                        var classSelector = ".forum-nav-thread[data-id='" + lastThread + "'] + .forum-nav-thread "
-                            + '.forum-nav-thread-link';
+                        var classSelector = `.forum-nav-thread[data-id='${lastThread}'] + .forum-nav-thread `
+                            + `.forum-nav-thread-link`;
                         return $(classSelector).focus();
                     });
                 } else {
@@ -383,14 +383,14 @@
             DiscussionThreadListView.prototype.setActiveThread = function(threadId) {
                 var $srElem;
                 this.$('.forum-nav-thread-link').find('.sr').remove();
-                this.$(".forum-nav-thread[data-id!='" + threadId + "'] .forum-nav-thread-link")
+                this.$(`.forum-nav-thread[data-id!='${threadId}'] .forum-nav-thread-link`)
                     .removeClass('is-active');
                 $srElem = edx.HtmlUtils.joinHtml(
                     edx.HtmlUtils.HTML('<span class="sr">'),
                     edx.HtmlUtils.ensureHtml(gettext('Current conversation')),
                     edx.HtmlUtils.HTML('</span>')
                 ).toString();
-                this.$(".forum-nav-thread[data-id='" + threadId + "'] .forum-nav-thread-link")
+                this.$(`.forum-nav-thread[data-id='${threadId}'] .forum-nav-thread-link`)
                     .addClass('is-active').find('.forum-nav-thread-wrapper-1')
                     .prepend($srElem);
             };

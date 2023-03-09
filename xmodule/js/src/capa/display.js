@@ -160,7 +160,7 @@
                 window.update_schematics();
             }
             problemPrefix = this.element_id.replace(/problem_/, '');
-            this.inputs = this.$('[id^="input_' + problemPrefix + '_"]');
+            this.inputs = this.$(`[id^="input_${problemPrefix}_"]`);
             this.$('div.action button').click(this.refreshAnswers);
             this.reviewButton = this.$('.notification-btn.review-btn');
             this.reviewButton.click(this.scroll_to_problem_meta);
@@ -322,7 +322,7 @@
 
         Problem.prototype.poll = function(previousTimeout, focusCallback) {
             var that = this;
-            return $.postWithPrefix('' + this.url + '/problem_get', function(response) {
+            return $.postWithPrefix(`${this.url}/problem_get`, function(response) {
                 var newTimeout;
                 // If queueing status changed, then render
                 that.new_queued_items = $(response.html).find('.xqueue');
@@ -374,7 +374,7 @@
         Problem.inputAjax = function(url, inputId, dispatch, data, callback) {
             data.dispatch = dispatch; // eslint-disable-line no-param-reassign
             data.input_id = inputId; // eslint-disable-line no-param-reassign
-            return $.postWithPrefix('' + url + '/input_ajax', data, callback);
+            return $.postWithPrefix(`${url}/input_ajax`, data, callback);
         };
 
         Problem.prototype.render = function(content, focusCallback) {
@@ -389,7 +389,7 @@
                     return typeof focusCallback === 'function' ? focusCallback() : void 0;
                 });
             } else {
-                return $.postWithPrefix('' + this.url + '/problem_get', function(response) {
+                return $.postWithPrefix(`${this.url}/problem_get`, function(response) {
                     edx.HtmlUtils.setHtml(that.el, edx.HtmlUtils.HTML(response.html));
                     return JavascriptLoader.executeModuleScripts(that.el, function() {
                         that.setupInputTypes();
@@ -479,7 +479,7 @@
 
         Problem.prototype.focus_on_notification = function(type) {
             var notification;
-            notification = this.$('.notification-' + type);
+            notification = this.$(`.notification-${type}`);
             if (notification.length > 0) {
                 notification.focus();
             }
@@ -490,7 +490,7 @@
         };
 
         Problem.prototype.focus_on_hint_notification = function(hintIndex) {
-            this.$('.notification-hint .notification-message > ol > li.hint-index-' + hintIndex).focus();
+            this.$(`.notification-hint .notification-message > ol > li.hint-index-${hintIndex}`).focus();
         };
 
         Problem.prototype.focus_on_save_notification = function() {
@@ -621,7 +621,7 @@
                         that.gentle_alert(response.responseJSON.success);
                     }
                 };
-                $.ajaxWithPrefix('' + this.url + '/problem_check', settings);
+                $.ajaxWithPrefix(`${this.url}/problem_check`, settings);
             }
         };
 
@@ -634,7 +634,7 @@
         Problem.prototype.submit_internal = function() {
             var that = this;
             Logger.log('problem_check', this.answers);
-            return $.postWithPrefix('' + this.url + '/problem_check', this.answers, function(response) {
+            return $.postWithPrefix(`${this.url}/problem_check`, this.answers, function(response) {
                 switch (response.success) {
                 case 'submitted':
                 case 'incorrect':
@@ -699,7 +699,7 @@
         Problem.prototype.reset_internal = function() {
             var that = this;
             Logger.log('problem_reset', this.answers);
-            return $.postWithPrefix('' + this.url + '/problem_reset', {
+            return $.postWithPrefix(`${this.url}/problem_reset`, {
                 id: this.id
             }, function(response) {
                 if (response.success) {
@@ -721,14 +721,14 @@
             Logger.log('problem_show', {
                 problem: this.id
             });
-            return $.postWithPrefix('' + this.url + '/problem_show', function(response) {
+            return $.postWithPrefix(`${this.url}/problem_show`, function(response) {
                 var answers;
                 answers = response.answers;
                 $.each(answers, function(key, value) {
                     var safeKey = key.replace(':', '\\:'); // fix for courses which use url_names with colons, e.g. problem:question1
                     var answer;
                     if (!$.isArray(value)) {
-                        answer = that.$('#answer_' + safeKey + ', #solution_' + safeKey);
+                        answer = that.$(`#answer_${safeKey}, #solution_${safeKey}`);
                         edx.HtmlUtils.setHtml(answer, edx.HtmlUtils.HTML(value));
                         Collapsible.setCollapsibles(answer);
 
@@ -804,7 +804,7 @@
         Problem.prototype.save_internal = function() {
             var that = this;
             Logger.log('problem_save', this.answers);
-            return $.postWithPrefix('' + this.url + '/problem_save', this.answers, function(response) {
+            return $.postWithPrefix(`${this.url}/problem_save`, this.answers, function(response) {
                 var saveMessage;
                 saveMessage = response.msg;
                 if (response.success) {
@@ -829,10 +829,10 @@
                 element = event.target; // eslint-disable-line no-param-reassign
             }
             elid = element.id.replace(/^input_/, '');
-            target = 'display_' + elid;
+            target = `display_${elid}`;
 
             // MathJax preprocessor is loaded by 'setupInputTypes'
-            preprocessorTag = 'inputtype_' + elid;
+            preprocessorTag = `inputtype_${elid}`;
             mathjaxPreprocessor = this.inputtypeDisplays[preprocessorTag];
             if (typeof MathJax !== 'undefined' && MathJax !== null && MathJax.Hub.getAllJax(target)[0]) {
                 jax = MathJax.Hub.getAllJax(target)[0];
@@ -846,7 +846,7 @@
 
         Problem.prototype.updateMathML = function(jax, element) {
             try {
-                $('#' + element.id + '_dynamath').val(jax.root.toMathML(''));
+                $(`#${element.id}_dynamath`).val(jax.root.toMathML(''));
             } catch (exception) {
                 if (!exception.restart) {
                     throw exception;
@@ -988,14 +988,14 @@
                 id = ($element.attr('id').match(/^inputtype_(.*)$/))[1];
                 return $element.find('input').on('change', function() {
                     var $status;
-                    $status = $('#status_' + id);
+                    $status = $(`#status_${id}`);
                     if ($status[0]) {
                         $status.removeAttr('class').addClass('status unanswered');
                     } else {
                         $('<span>', {
                             class: 'status unanswered',
                             style: 'display: inline-block;',
-                            id: 'status_' + id
+                            id: `status_${id}`
                         });
                     }
                     $element.find('label').find('span.status.correct').remove();
@@ -1007,7 +1007,7 @@
                 $select = $(element).find('select');
                 id = ($select.attr('id').match(/^input_(.*)$/))[1];
                 return $select.on('change', function() {
-                    return $('#status_' + id).removeAttr('class').addClass('unanswered')
+                    return $(`#status_${id}`).removeAttr('class').addClass('unanswered')
                         .find('.sr')
                         .text(gettext('unsubmitted'));
                 });
@@ -1068,8 +1068,8 @@
                 });
                 id = element.attr('id').replace(/^input_/, '');
                 CodeMirrorTextArea = CodeMirrorEditor.getInputField();
-                CodeMirrorTextArea.setAttribute('id', 'cm-textarea-' + id);
-                CodeMirrorTextArea.setAttribute('aria-describedby', 'cm-editor-exit-message-' + id + ' status_' + id);
+                CodeMirrorTextArea.setAttribute('id', `cm-textarea-${id}`);
+                CodeMirrorTextArea.setAttribute('aria-describedby', `cm-editor-exit-message-${id} status_${id}`);
                 return CodeMirrorEditor;
             }
         };
@@ -1084,8 +1084,8 @@
                 results = [];
                 for (i = 0, len = answer.length; i < len; i++) {
                     choice = answer[i];
-                    $inputLabel = $element.find('#input_' + inputId + '_' + choice + ' + label');
-                    $inputStatus = $element.find('#status_' + inputId);
+                    $inputLabel = $element.find(`#input_${inputId}_${choice} + label`);
+                    $inputStatus = $element.find(`#status_${inputId}`);
                     // If the correct answer was already Submitted before "Show Answer" was selected,
                     // the status HTML will already be present. Otherwise, inject the status HTML.
 
@@ -1113,7 +1113,7 @@
                 results = [];
                 for (i = 0, len = answer.length; i < len; i++) {
                     choice = answer[i];
-                    results.push($element.find('section#forinput' + choice).addClass('choicetextgroup_show_correct'));
+                    results.push($element.find(`section#forinput${choice}`).addClass('choicetextgroup_show_correct'));
                 }
                 return results;
             },
@@ -1180,7 +1180,7 @@
                 };
                 $element = $(element);
                 id = $element.attr('id').replace(/inputtype_/, '');
-                container = $element.find('#answer_' + id);
+                container = $element.find(`#answer_${id}`);
                 canvas = document.createElement('canvas');
                 canvas.width = container.data('width');
                 canvas.height = container.data('height');
@@ -1200,7 +1200,7 @@
                     });
                     edx.HtmlUtils.setHtml(container, edx.HtmlUtils.HTML(canvas));
                 } else {
-                    console.log('Answer is absent for image input with id=' + id); // eslint-disable-line no-console
+                    console.log(`Answer is absent for image input with id=${id}`); // eslint-disable-line no-console
                 }
             }
         };
@@ -1315,7 +1315,7 @@
             } else {
                 nextIndex = parseInt(hintIndex, 10) + 1;
             }
-            return $.postWithPrefix('' + this.url + '/hint_button', {
+            return $.postWithPrefix(`${this.url}/hint_button`, {
                 hint_index: nextIndex,
                 input_id: this.id
             }, function(response) {

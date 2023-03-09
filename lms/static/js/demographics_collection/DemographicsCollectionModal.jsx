@@ -366,7 +366,7 @@ class DemographicsCollectionModal extends React.Component {
                                         }
                                     </select>
                                 </div>
-                                                   </div>
+                            </div>
                             }
                         </Wizard.Page>
                         <Wizard.Page>
@@ -411,7 +411,7 @@ class DemographicsCollectionModal extends React.Component {
                                         }
                                     </select>
                                 </div>
-                                                   </div>
+                            </div>
                             }
                         </Wizard.Page>
                         <Wizard.Page>
@@ -474,7 +474,7 @@ class DemographicsCollectionModal extends React.Component {
                                         }
                                     </select>
                                 </div>
-                                                   </div>
+                            </div>
                             }
                         </Wizard.Page>
                         <Wizard.Closer>

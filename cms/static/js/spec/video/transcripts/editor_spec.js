@@ -181,7 +181,7 @@ define(
                 });
 
                 $.each(metadataDict, function(index, val) {
-                    it('toModels with argument as ' + index, function() {
+                    it(`toModels with argument as ${index}`, function() {
                         expect(transcripts.toModels(val)).toEqual(models);
                     });
                 });

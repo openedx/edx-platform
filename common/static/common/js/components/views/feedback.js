@@ -66,14 +66,14 @@
             initialize: function(options) {
                 this.options = _.extend({}, this.options, options);
                 if (!this.options.type) {
-                    throw 'SystemFeedback: type required (given ' // eslint-disable-line no-throw-literal
-                            + JSON.stringify(this.options) + ')';
+                    throw `SystemFeedback: type required (given ${// eslint-disable-line no-throw-literal
+                        JSON.stringify(this.options)})`;
                 }
                 if (!this.options.intent) {
-                    throw 'SystemFeedback: intent required (given ' // eslint-disable-line no-throw-literal
-                            + JSON.stringify(this.options) + ')';
+                    throw `SystemFeedback: intent required (given ${// eslint-disable-line no-throw-literal
+                        JSON.stringify(this.options)})`;
                 }
-                this.setElement($('#page-' + this.options.type));
+                this.setElement($(`#page-${this.options.type}`));
                 // handle single "secondary" action
                 if (this.options.actions && this.options.actions.secondary
                             && !_.isArray(this.options.actions.secondary)) {
@@ -154,13 +154,13 @@
                 // there can be only one active view of a given type at a time: only
                 // one alert, only one notification, only one prompt. Therefore, we'll
                 // use a singleton approach.
-                var singleton = SystemFeedback['active_' + this.options.type];
+                var singleton = SystemFeedback[`active_${this.options.type}`];
                 if (singleton && singleton !== this) {
                     singleton.stopListening();
                     singleton.undelegateEvents();
                 }
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(systemFeedbackTemplate)(this.options));
-                SystemFeedback['active_' + this.options.type] = this;
+                SystemFeedback[`active_${this.options.type}`] = this;
                 return this;
             },
 

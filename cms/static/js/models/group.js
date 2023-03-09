@@ -15,7 +15,7 @@ define([
         },
         url: function() {
             var parentModel = this.collection.parents[0];
-            return parentModel.urlRoot + '/' + encodeURIComponent(parentModel.id) + '/' + encodeURIComponent(this.id);
+            return `${parentModel.urlRoot}/${encodeURIComponent(parentModel.id)}/${encodeURIComponent(this.id)}`;
         },
 
         reset: function() {

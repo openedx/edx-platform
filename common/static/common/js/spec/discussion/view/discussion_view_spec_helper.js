@@ -58,9 +58,9 @@
             button = view.$el.find('.action-vote');
             expect(button.hasClass('is-checked')).toBe(user.voted(model));
             expect(button.attr('aria-checked')).toEqual(user.voted(model).toString());
-            expect(button.find('.vote-count').text()).toMatch('^' + (model.get('votes').up_count) + ' Votes?$');
+            expect(button.find('.vote-count').text()).toMatch(`^${model.get('votes').up_count} Votes?$`);
             return expect(button.find('.sr.js-sr-vote-count').text())
-                .toMatch('^there are currently ' + (model.get('votes').up_count) + ' votes?$');
+                .toMatch(`^there are currently ${model.get('votes').up_count} votes?$`);
         };
 
         DiscussionViewSpecHelper.checkRenderVote = function(view, model) {
@@ -91,7 +91,7 @@
             var initialVoteCount, _ref, _ref1;
             expect((_ref = model.id, __indexOf.call(user.get('upvoted_ids'), _ref) >= 0)).toBe(false);
             initialVoteCount = model.get('votes').up_count;
-            triggerVoteEvent(view, event, DiscussionUtil.urlFor('upvote_' + (model.get('type')), model.id) + '?ajax=1');
+            triggerVoteEvent(view, event, `${DiscussionUtil.urlFor(`upvote_${model.get('type')}`, model.id)}?ajax=1`);
             expect((_ref1 = model.id, __indexOf.call(user.get('upvoted_ids'), _ref1) >= 0)).toBe(true);
             return expect(model.get('votes').up_count).toEqual(initialVoteCount + 1);
         };
@@ -102,7 +102,7 @@
             expect((_ref = model.id, __indexOf.call(user.get('upvoted_ids'), _ref) >= 0)).toBe(true);
             initialVoteCount = model.get('votes').up_count;
             triggerVoteEvent(
-                view, event, DiscussionUtil.urlFor('undo_vote_for_' + (model.get('type')), model.id) + '?ajax=1'
+                view, event, `${DiscussionUtil.urlFor(`undo_vote_for_${model.get('type')}`, model.id)}?ajax=1`
             );
             expect(user.get('upvoted_ids')).toEqual([]);
             return expect(model.get('votes').up_count).toEqual(initialVoteCount - 1);

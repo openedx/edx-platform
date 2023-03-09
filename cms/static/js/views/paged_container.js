@@ -90,7 +90,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                 xblockUrl = xblockInfo.url();
 
             return $.ajax({
-                url: decodeURIComponent(xblockUrl) + '/' + view,
+                url: `${decodeURIComponent(xblockUrl)}/${view}`,
                 type: 'GET',
                 cache: false,
                 data: this.getRenderParameters(options.page_number, options.force_render),
@@ -102,7 +102,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                         self.page.updatePreviewButton(self.collection.showChildrenPreviews);
                         self.page.renderAddXBlockComponents();
                         if (options.force_render) {
-                            var $target = $('.studio-xblock-wrapper[data-locator="' + options.force_render + '"]');
+                            var $target = $(`.studio-xblock-wrapper[data-locator="${options.force_render}"]`);
                             // Scroll us to the element with a little buffer at the top for context.
                             ViewUtils.setScrollOffset($target, ($(window).height() * 0.10));
                         }
@@ -265,7 +265,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                 xblockUrl = this.model.url();
             return $.ajax({
                 // No runtime, so can't get this via the handler() call.
-                url: '/preview' + decodeURIComponent(xblockUrl) + '/handler/trigger_previews',
+                url: `/preview${decodeURIComponent(xblockUrl)}/handler/trigger_previews`,
                 type: 'POST',
                 data: JSON.stringify({showChildrenPreviews: !this.collection.showChildrenPreviews}),
                 dataType: 'json'

@@ -64,7 +64,7 @@
                     )
                 );
                 this.$('.tab-content').addClass('is-hidden');
-                this.$('.tab-content-' + tabName).removeClass('is-hidden').focus();
+                this.$(`.tab-content-${tabName}`).removeClass('is-hidden').focus();
             },
 
             saveSettings: function(event) {
@@ -93,7 +93,7 @@
                 var self = this,
                     cohorts = this.cohorts,
                     input = this.$('.cohort-management-group-add-students'),
-                    add_url = this.model.url() + '/add',
+                    add_url = `${this.model.url()}/add`,
                     students = input.val().trim(),
                     cohortId = this.model.id;
 

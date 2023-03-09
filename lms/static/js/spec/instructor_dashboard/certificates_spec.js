@@ -26,37 +26,37 @@ function($, AjaxHelpers) {
 
         var select_options = function(option_values) {
             $.each(option_values, function(index, element) {
-                $('#certificate-regenerating-form input[value=' + element + ']').click();
+                $(`#certificate-regenerating-form input[value=${element}]`).click();
             });
         };
 
         beforeEach(function() {
-            var fixture = '<section id="certificates">'
-                    + '<form id="certificate-regenerating-form" method="post" action="' + expected.url + '">'
-                    + '<p class="under-heading">To regenerate certificates for your course, '
-                    + '   chose the learners who will receive regenerated certificates and click <br> '
-                    + '   Regenerate Certificates.'
-                    + '</p>'
-                    + '<input id="certificate_status_downloadable" type="checkbox" name="certificate_statuses" '
-                    + '   value="downloadable">'
-                    + '<label style="display: inline" for="certificate_status_downloadable">'
-                    + '   Regenerate for learners who have already received certificates. (3)'
-                    + '</label><br>'
-                    + '<input id="certificate_status_notpassing" type="checkbox" name="certificate_statuses" '
-                    + '   value="notpassing">'
-                    + '<label style="display: inline" for="certificate_status_notpassing"> '
-                    + '   Regenerate for learners who have not received certificates. (1)'
-                    + '</label><br>'
-                    + '<input id="certificate_status_error" type="checkbox" name="certificate_statuses" '
-                    + '   value="error">'
-                    + '<label style="display: inline" for="certificate_status_error"> '
-                    + '   Regenerate for learners in an error state. (0)'
-                    + '</label><br>'
-                    + '<input type="button" class="btn-blue" id="btn-start-regenerating-certificates" '
-                    + '   value="Regenerate Certificates" data-endpoint="' + expected.url + '">'
-                    + '</form>'
-                    + '<div class="message certificate-regeneration-status"></div>'
-                    + '</section>';
+            var fixture = `<section id="certificates">`
+                    + `<form id="certificate-regenerating-form" method="post" action="${expected.url}">`
+                    + `<p class="under-heading">To regenerate certificates for your course, `
+                    + `   chose the learners who will receive regenerated certificates and click <br> `
+                    + `   Regenerate Certificates.`
+                    + `</p>`
+                    + `<input id="certificate_status_downloadable" type="checkbox" name="certificate_statuses" `
+                    + `   value="downloadable">`
+                    + `<label style="display: inline" for="certificate_status_downloadable">`
+                    + `   Regenerate for learners who have already received certificates. (3)`
+                    + `</label><br>`
+                    + `<input id="certificate_status_notpassing" type="checkbox" name="certificate_statuses" `
+                    + `   value="notpassing">`
+                    + `<label style="display: inline" for="certificate_status_notpassing"> `
+                    + `   Regenerate for learners who have not received certificates. (1)`
+                    + `</label><br>`
+                    + `<input id="certificate_status_error" type="checkbox" name="certificate_statuses" `
+                    + `   value="error">`
+                    + `<label style="display: inline" for="certificate_status_error"> `
+                    + `   Regenerate for learners in an error state. (0)`
+                    + `</label><br>`
+                    + `<input type="button" class="btn-blue" id="btn-start-regenerating-certificates" `
+                    + `   value="Regenerate Certificates" data-endpoint="${expected.url}">`
+                    + `</form>`
+                    + `<div class="message certificate-regeneration-status"></div>`
+                    + `</section>`;
 
             setFixtures(fixture);
             onCertificatesReady();

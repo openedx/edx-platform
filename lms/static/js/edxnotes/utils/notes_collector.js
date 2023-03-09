@@ -53,9 +53,9 @@
                 dataType: 'json',
                 headers: {'x-annotator-auth-token': searchRequestsData[0].params.token}
             };
-            searchEndpoint = searchRequestsData[0].params.endpoint + 'search/?';
+            searchEndpoint = `${searchRequestsData[0].params.endpoint}search/?`;
             usageIds = _.map(searchRequestsData, function(item) {
-                return 'usage_id=' + encodeURIComponent(item.params.usageId);
+                return `usage_id=${encodeURIComponent(item.params.usageId)}`;
             });
 
             // Search endpoint expects the below format for query params

@@ -4,7 +4,7 @@ $(function() {
 
     // form field label styling on focus
     $('form :input').focus(function() {
-        $("label[for='" + this.id + "']").parent().addClass('is-focused');
+        $(`label[for='${this.id}']`).parent().addClass('is-focused');
     }).blur(function() {
         $('label').parent().removeClass('is-focused');
     });

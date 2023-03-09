@@ -53,7 +53,7 @@ define([
                     language: 'en',
                     country: 'US',
                     membership: membership,
-                    url: '/api/team/v0/teams/' + editTeamID
+                    url: `/api/team/v0/teams/${editTeamID}`
                 };
             },
             createEditTeamMembersView = function(membership) {

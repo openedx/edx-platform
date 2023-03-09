@@ -85,7 +85,7 @@
             if (index === 0) {
                 $navItemList = $sequenceList.find('li').last();
             } else {
-                $navItemList = $sequenceList.find('li:eq(' + index + ')').prev();
+                $navItemList = $sequenceList.find(`li:eq(${index})`).prev();
             }
             $sequenceList.find('.tab').removeClass('visited').removeClass('focused');
             $navItemList.find('.tab').addClass('focused').focus();
@@ -97,7 +97,7 @@
             if (index === total) {
                 $navItemList = $sequenceList.find('li').first();
             } else {
-                $navItemList = $sequenceList.find('li:eq(' + index + ')').next();
+                $navItemList = $sequenceList.find(`li:eq(${index})`).next();
             }
             $sequenceList.find('.tab').removeClass('visited').removeClass('focused');
             $navItemList.find('.tab').addClass('focused').focus();
@@ -145,7 +145,7 @@
 
             if (positionLink && positionLink.data('page-title')) {
                 currentUnitTitle = positionLink.data('page-title');
-                newPageTitle = currentUnitTitle + ' | ' + this.base_page_title;
+                newPageTitle = `${currentUnitTitle} | ${this.base_page_title}`;
 
                 if (newPageTitle !== document.title) {
                     document.title = newPageTitle;
@@ -262,7 +262,7 @@
                         latestContent = latestData[0];
                         latestResponse = latestData[1];
                         self.content_container
-                            .find("[data-problem-id='" + problemId + "']")
+                            .find(`[data-problem-id='${problemId}']`)
                             .data('content', latestContent)
                             .data('problem-score', latestResponse.current_score)
                             .data('problem-total-possible', latestResponse.total_possible)
@@ -352,7 +352,7 @@
                 return;
             }
             event.preventDefault();
-            analyticsEventName = 'edx.ui.lms.sequence.' + direction + '_selected';
+            analyticsEventName = `edx.ui.lms.sequence.${direction}_selected`;
             isBottomNav = $(event.target).closest('nav[class="sequence-bottom"]').length > 0;
 
             if (isBottomNav) {
@@ -398,7 +398,7 @@
         };
 
         Sequence.prototype.link_for = function(position) {
-            return this.$('#sequence-list .nav-item[data-element=' + position + ']');
+            return this.$(`#sequence-list .nav-item[data-element=${position}]`);
         };
 
         Sequence.prototype.mark_visited = function(position) {

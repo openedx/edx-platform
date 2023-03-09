@@ -212,7 +212,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
             // Mark the new destination
             if (destinationEle && this.pointerInBounds(pointer, $ele)) {
                 $ele.addClass(this.validDropClass);
-                destinationEle.addClass('drop-target drop-target-' + destinationInfo.attachMethod);
+                destinationEle.addClass(`drop-target drop-target-${destinationInfo.attachMethod}`);
                 this.dragState.attachMethod = destinationInfo.attachMethod;
                 this.dragState.dropDestination = destinationEle;
             } else {

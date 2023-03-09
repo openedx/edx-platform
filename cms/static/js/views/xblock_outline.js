@@ -253,12 +253,12 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 if (locatorToShow === this.model.id) {
                     locatorElement = this.$el;
                 } else {
-                    locatorElement = this.$('.outline-item[data-locator="' + locatorToShow + '"]');
+                    locatorElement = this.$(`.outline-item[data-locator="${locatorToShow}"]`);
                 }
                 if (locatorElement.length > 0) {
                     ViewUtils.setScrollOffset(locatorElement, scrollOffset);
                 } else {
-                    console.error('Failed to show item with locator ' + locatorToShow + '');
+                    console.error(`Failed to show item with locator ${locatorToShow}`);
                 }
                 if (editDisplayName) {
                     locatorElement.find('> div[class$="header"] .xblock-field-value-edit').click();
@@ -285,7 +285,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
         },
 
         onUnitAdded: function(locator) {
-            ViewUtils.redirect('/container/' + locator + '?action=new');
+            ViewUtils.redirect(`/container/${locator}?action=new`);
         },
 
         onChildDeleted: function() {
@@ -317,7 +317,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                     section: 'course'
                 },
                 parentXblockType = xblockMap[xblockType];
-            return xblockElement.closest('.outline-' + parentXblockType);
+            return xblockElement.closest(`.outline-${parentXblockType}`);
         },
 
         /**

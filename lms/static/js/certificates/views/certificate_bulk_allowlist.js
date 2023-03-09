@@ -48,7 +48,7 @@
             },
 
             loadTemplate: function(name) {
-                var templateSelector = '#' + name + '-tpl',
+                var templateSelector = `#${name}-tpl`,
                     templateText = $(templateSelector).text();
                 return _.template(templateText);
             },
@@ -81,9 +81,9 @@
                 function generateDiv(group, heading, displayData) {
                     // inner function generate div and display response messages.
                     $('<div/>', {
-                        class: 'message ' + group
+                        class: `message ${group}`
                     }).appendTo('.bulk-exception-results').prepend( // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target,javascript-jquery-prepend
-                        "<button type='button' id= '" + group + "' class='arrow'> + </button>" + heading) // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
+                        `<button type='button' id= '${group}' class='arrow'> + </button>${heading}`) // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
                         .append($('<ul/>', {
                             class: group
                         }));
@@ -91,9 +91,9 @@
                     for (var i = 0; i < displayData.length; i++) { // eslint-disable-line vars-on-top
                         $('<li/>', {
                             text: displayData[i]
-                        }).appendTo('div.message > .' + group); // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target
+                        }).appendTo(`div.message > .${group}`); // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target
                     }
-                    $('div.message > .' + group).hide();
+                    $(`div.message > .${group}`).hide();
                 }
 
                 function getDisplayText(qty, group) {
@@ -103,52 +103,52 @@
                     switch (group) {
                     case MESSAGE_GROUP.successfully_added:
                         text = qty > 1
-                            ? gettext(qty + ' learners were successfully added to exception list')
-                            : gettext(qty + ' learner was successfully added to the exception list');
+                            ? gettext(`${qty} learners were successfully added to exception list`)
+                            : gettext(`${qty} learner was successfully added to the exception list`);
                         break;
 
                     case MESSAGE_GROUP.data_format_error:
                         text = qty > 1
-                            ? gettext(qty + ' records are not in the correct format and have not been added to'
-                                    + ' the exception list')
-                            : gettext(qty + ' record is not in the correct format and has not been added to the'
-                                    + ' exception list');
+                            ? gettext(`${qty} records are not in the correct format and have not been added to`
+                                    + ` the exception list`)
+                            : gettext(`${qty} record is not in the correct format and has not been added to the`
+                                    + ` exception list`);
                         break;
 
                     case MESSAGE_GROUP.user_not_exist:
                         text = qty > 1
-                            ? gettext(qty + ' learner accounts cannot be found and have not been added to the '
-                                    + 'exception list')
-                            : gettext(qty + ' learner account cannot be found and has not been added to the'
-                                    + ' exception list');
+                            ? gettext(`${qty} learner accounts cannot be found and have not been added to the `
+                                    + `exception list`)
+                            : gettext(`${qty} learner account cannot be found and has not been added to the`
+                                    + ` exception list`);
                         break;
 
                     case MESSAGE_GROUP.user_already_allowlisted:
                         text = qty > 1
-                            ? gettext(qty + ' learners already appear on the exception list in this course')
-                            : gettext(qty + ' learner already appears on the exception list in this course');
+                            ? gettext(`${qty} learners already appear on the exception list in this course`)
+                            : gettext(`${qty} learner already appears on the exception list in this course`);
                         break;
 
                     case MESSAGE_GROUP.user_not_enrolled:
                         text = qty > 1
-                            ? gettext(qty + ' learners are not enrolled in this course and have not added to the'
-                                    + ' exception list')
-                            : gettext(qty + ' learner is not enrolled in this course and has not been added to the'
-                                    + ' exception list');
+                            ? gettext(`${qty} learners are not enrolled in this course and have not added to the`
+                                    + ` exception list`)
+                            : gettext(`${qty} learner is not enrolled in this course and has not been added to the`
+                                    + ` exception list`);
                         break;
 
                     case MESSAGE_GROUP.user_on_certificate_invalidation_list:
                         text = qty > 1
-                            ? gettext(qty + ' learners have an active certificate invalidation in this course and'
-                                    + ' have not been added to the exception list')
-                            : gettext(qty + ' learner has an active certificate invalidation in this course and has'
-                                    + ' not been added to the exception list');
+                            ? gettext(`${qty} learners have an active certificate invalidation in this course and`
+                                    + ` have not been added to the exception list`)
+                            : gettext(`${qty} learner has an active certificate invalidation in this course and has`
+                                    + ` not been added to the exception list`);
                         break;
 
                     default:
                         text = qty > 1
-                            ? gettext(qty + ' learners encountered unknown errors')
-                            : gettext(qty + ' learner encountered an unknown error');
+                            ? gettext(`${qty} learners encountered unknown errors`)
+                            : gettext(`${qty} learner encountered an unknown error`);
                         break;
                     }
 
@@ -231,7 +231,7 @@
             toggleMessageDetails: function(event) {
                 if (event && event.preventDefault) { event.preventDefault(); }
                 var group = event.target.id;
-                $('div.message > .' + group).slideToggle('fast', function() {
+                $(`div.message > .${group}`).slideToggle('fast', function() {
                     if ($(this).is(':visible')) {
                         event.target.text = ' -- ';
                     } else {

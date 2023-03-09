@@ -1,6 +1,6 @@
 (function($) { // eslint-disable-line wrap-iife
-    
-'use strict';
+
+    'use strict';
 
     $.fn.extend({
         /*
@@ -88,22 +88,22 @@
                     $('iframe', modalId).attr('src', $('iframe', modalId).data('src'));
                     if ($(modalId).hasClass('email-modal')) {
                         $(modalId).css({
-                            width: 80 + '%',
-                            height: 80 + '%',
+                            width: `${80}%`,
+                            height: `${80}%`,
                             position: o.position,
                             opacity: 0,
                             'z-index': 11000,
-                            left: 10 + '%',
-                            top: 10 + '%'
+                            left: `${10}%`,
+                            top: `${10}%`
                         });
                     } else {
                         $(modalId).css({
                             position: o.position,
                             opacity: 0,
                             'z-index': 11000,
-                            left: 50 + '%',
-                            'margin-left': -($(modalId).outerWidth() / 2) + 'px',
-                            top: o.top + 'px'
+                            left: `${50}%`,
+                            'margin-left': `${-($(modalId).outerWidth() / 2)}px`,
+                            top: `${o.top}px`
                         });
                     }
 
@@ -139,7 +139,7 @@
             embed = $($(this).attr('href')).find('iframe');
             if (embed.length > 0 && embed.attr('src')) {
                 sep = (embed.attr('src').indexOf('?') > 0) ? '&' : '?';
-                embed.data('src', embed.attr('src') + sep + 'autoplay=1&rel=0');
+                embed.data('src', `${embed.attr('src') + sep}autoplay=1&rel=0`);
                 embed.attr('src', '');
             }
         });

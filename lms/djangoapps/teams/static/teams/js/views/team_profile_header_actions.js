@@ -142,7 +142,7 @@
             editTeam: function(event) {
                 event.preventDefault();
                 Backbone.history.navigate(
-                    'teams/' + this.topic.id + '/' + this.model.get('id') + '/edit-team',
+                    `teams/${this.topic.id}/${this.model.get('id')}/edit-team`,
                     {trigger: true}
                 );
             }

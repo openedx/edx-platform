@@ -21,7 +21,7 @@
 
             // Otherwise get the checked groups within the selected partition.
             element.find(
-                '.partition-group-visibility-' + partitionId + ' input:checked'
+                `.partition-group-visibility-${partitionId} input:checked`
             ).each(function(index, input) {
                 groupId = parseInt($(input).val(), 10);
 
@@ -44,7 +44,7 @@
             // If a partition is selected, display its groups.
             partitionId = parseInt($(event.target).val(), 10);
             if (partitionId >= 0) {
-                element.find('.partition-group-control-' + partitionId).removeClass('is-hidden');
+                element.find(`.partition-group-control-${partitionId}`).removeClass('is-hidden');
             }
         });
     }

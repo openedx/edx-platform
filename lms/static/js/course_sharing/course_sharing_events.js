@@ -6,7 +6,7 @@
 
     define(['jquery', 'logger'], function($, Logger) {
         return function(courseId) {
-            $(".action-facebook[data-course-id='" + courseId + "']").on('click', function() {
+            $(`.action-facebook[data-course-id='${courseId}']`).on('click', function() {
                 // Emit an event telling that the Facebook share link was clicked.
                 Logger.log('edx.course.share_clicked', {
                     course_id: courseId,
@@ -15,7 +15,7 @@
                 });
             });
 
-            $(".action-twitter[data-course-id='" + courseId + "']").on('click', function() {
+            $(`.action-twitter[data-course-id='${courseId}']`).on('click', function() {
                 // Emit an event telling that the Twitter share link was clicked.
                 Logger.log('edx.course.share_clicked', {
                     course_id: courseId,

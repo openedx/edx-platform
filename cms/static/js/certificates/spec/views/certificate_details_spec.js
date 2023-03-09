@@ -97,7 +97,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             }, this.newModelOptions);
 
             this.collection = new CertificatesCollection([this.model], {
-                certificateUrl: '/certificates/' + window.course.id
+                certificateUrl: `/certificates/${window.course.id}`
             });
             this.model.set('id', 0);
             this.view = new CertificateDetailsView({
@@ -121,7 +121,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         describe('The Certificate Details view', function() {
             it('should parse a JSON string collection into a Backbone model collection', function() {
                 var course_title = 'Test certificate course title override 2';
-                var CERTIFICATE_JSON = '[{"course_title": "' + course_title + '", "signatories":"[]"}]';
+                var CERTIFICATE_JSON = `[{"course_title": "${course_title}", "signatories":"[]"}]`;
                 this.collection.parse(CERTIFICATE_JSON);
                 var model = this.collection.at(1);
                 expect(model.get('course_title')).toEqual(course_title);

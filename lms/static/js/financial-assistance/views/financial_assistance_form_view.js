@@ -149,7 +149,7 @@
             addDefaultOption: function(array, index) {
                 if (array[index].options.length > 1) {
                     array[index].options.unshift({
-                        name: '- ' + gettext('Choose one') + ' -',
+                        name: `- ${gettext('Choose one')} -`,
                         value: '',
                         default: true
                     });

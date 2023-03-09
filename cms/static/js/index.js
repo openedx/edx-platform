@@ -89,13 +89,13 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
     var makeCancelHandler = function(addType) {
         return function(e) {
             e.preventDefault();
-            $('.new-' + addType + '-button').removeClass('is-disabled').attr('aria-disabled', false);
-            $('.wrapper-create-' + addType).removeClass('is-shown');
+            $(`.new-${addType}-button`).removeClass('is-disabled').attr('aria-disabled', false);
+            $(`.wrapper-create-${addType}`).removeClass('is-shown');
             // Clear out existing fields and errors
-            $('#create-' + addType + '-form input[type=text]').val('');
-            $('#' + addType + '_creation_error').html('');
-            $('.create-' + addType + ' .wrap-error').removeClass('is-shown');
-            $('.new-' + addType + '-save').off('click');
+            $(`#create-${addType}-form input[type=text]`).val('');
+            $(`#${addType}_creation_error`).html('');
+            $(`.create-${addType} .wrap-error`).removeClass('is-shown');
+            $(`.new-${addType}-save`).off('click');
         };
     };
 

@@ -65,7 +65,7 @@
                     // because sliders are used in other parts of Video.
                 });
                 $.each(['iPad', 'Android'], function(index, device) {
-                    it('build the slider on ' + device, function() {
+                    it(`build the slider on ${device}`, function() {
                         window.onTouchBasedDevice.and.returnValue([device]);
 
                         state = jasmine.initializePlayer();
@@ -240,8 +240,8 @@
                     left = testCase.startTime * step,
                     width = testCase.endTime * step - left,
                     expectedParams = {
-                        left: left + '%',
-                        width: width + '%'
+                        left: `${left}%`,
+                        width: `${width}%`
                     },
                     params = state.videoProgressSlider.getRangeParams(
                         testCase.startTime, testCase.endTime, testCase.duration

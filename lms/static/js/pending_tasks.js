@@ -35,7 +35,7 @@
             for (task_id in response) {
                 var task_dict = response[task_id];
                 // find the corresponding entry, and update it:
-                entry = $(_this.element).find('[data-task-id="' + task_id + '"]');
+                entry = $(_this.element).find(`[data-task-id="${task_id}"]`);
                 entry.find('.task-state').text(task_dict.task_state);
                 var duration_value = (task_dict.task_progress && task_dict.task_progress.duration_ms
                                         && Math.round(task_dict.task_progress.duration_ms / 1000)) || 'unknown';

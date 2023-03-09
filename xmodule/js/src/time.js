@@ -12,11 +12,11 @@ function format(time, formatFull) {
     minutes = minutes % 60;
 
     if (formatFull) {
-        return '' + _pad(hours) + ':' + _pad(minutes) + ':' + _pad(seconds % 60);
+        return `${_pad(hours)}:${_pad(minutes)}:${_pad(seconds % 60)}`;
     } else if (hours) {
-        return '' + hours + ':' + _pad(minutes) + ':' + _pad(seconds % 60);
+        return `${hours}:${_pad(minutes)}:${_pad(seconds % 60)}`;
     } else {
-        return '' + minutes + ':' + _pad(seconds % 60);
+        return `${minutes}:${_pad(seconds % 60)}`;
     }
 }
 
@@ -32,9 +32,9 @@ function convert(time, oldSpeed, newSpeed) {
 
 function _pad(number) {
     if (number < 10) {
-        return '0' + number;
+        return `0${number}`;
     } else {
-        return '' + number;
+        return `${number}`;
     }
 }
 

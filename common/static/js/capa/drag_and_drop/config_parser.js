@@ -206,11 +206,11 @@
 
         function attrIsString(obj, attr) {
             if (obj.hasOwnProperty(attr) === false) {
-                console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
+                console.log(`ERROR: Attribute "obj.${attr}" is not present.`);
 
                 return false;
             } else if (typeof obj[attr] !== 'string') {
-                console.log('ERROR: Attribute "obj.' + attr + '" is not a string.');
+                console.log(`ERROR: Attribute "obj.${attr}" is not a string.`);
 
                 return false;
             }
@@ -222,7 +222,7 @@
             var tempInt;
 
             if (obj.hasOwnProperty(attr) === false) {
-                console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
+                console.log(`ERROR: Attribute "obj.${attr}" is not present.`);
 
                 return false;
             }
@@ -230,7 +230,7 @@
             tempInt = parseInt(obj[attr], 10);
 
             if (isFinite(tempInt) === false) {
-                console.log('ERROR: Attribute "obj.' + attr + '" is not an integer.');
+                console.log(`ERROR: Attribute "obj.${attr}" is not an integer.`);
 
                 return false;
             }
@@ -243,7 +243,7 @@
         function attrIsBoolean(obj, attr, defaultVal) {
             if (obj.hasOwnProperty(attr) === false) {
                 if (defaultVal === undefined) {
-                    console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
+                    console.log(`ERROR: Attribute "obj.${attr}" is not present.`);
 
                     return false;
                 } else {
@@ -260,7 +260,7 @@
             } else if ((obj[attr] === 'true') || (obj[attr] === true)) {
                 obj[attr] = true;
             } else {
-                console.log('ERROR: Attribute "obj.' + attr + '" is not a boolean.');
+                console.log(`ERROR: Attribute "obj.${attr}" is not a boolean.`);
 
                 return false;
             }

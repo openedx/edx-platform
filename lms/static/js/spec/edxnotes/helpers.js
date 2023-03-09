@@ -76,15 +76,15 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                 iat: now
             };
 
-        return 'header.' + base64Encode(JSON.stringify(rawToken)) + '.signature';
+        return `header.${base64Encode(JSON.stringify(rawToken))}.signature`;
     };
     getChapter = function(name, location, index, children) {
         return {
             display_name: name,
-            location: 'i4x://chapter/' + location,
+            location: `i4x://chapter/${location}`,
             index: index,
             children: _.map(children, function(i) {
-                return 'i4x://section/' + i;
+                return `i4x://section/${i}`;
             })
         };
     };
@@ -92,9 +92,9 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     getSection = function(name, location, children) {
         return {
             display_name: name,
-            location: 'i4x://section/' + location,
+            location: `i4x://section/${location}`,
             children: _.map(children, function(i) {
-                return 'i4x://unit/' + i;
+                return `i4x://unit/${i}`;
             })
         };
     };
@@ -102,7 +102,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     getUnit = function(name, location) {
         return {
             display_name: name,
-            location: 'i4x://unit/' + location,
+            location: `i4x://unit/${location}`,
             url: 'http://example.com'
         };
     };
@@ -193,14 +193,14 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 
         for (var i = 0; i < options.numNotesToCreate; i++) {
             var notesInfo = {
-                chapter: getChapter('First Chapter__' + i, 1, 0, [2]),
-                section: getSection('First Section__' + i, 2, [3]),
-                unit: getUnit('First Unit__' + i, 3),
+                chapter: getChapter(`First Chapter__${i}`, 1, 0, [2]),
+                section: getSection(`First Section__${i}`, 2, [3]),
+                unit: getUnit(`First Unit__${i}`, 3),
                 created: new Date().toISOString(),
                 updated: new Date().toISOString(),
-                text: 'text__' + i,
-                quote: 'Note__' + i,
-                tags: ['tag__' + i, 'tag__' + i + 1]
+                text: `text__${i}`,
+                quote: `Note__${i}`,
+                tags: [`tag__${i}`, `tag__${i}${1}`]
             };
 
             data.results.push(notesInfo);

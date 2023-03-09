@@ -12,7 +12,7 @@
         DiscussionUtil.rightKey = 39;
 
         DiscussionUtil.getTemplate = function(id) {
-            return $('script#' + id).html();
+            return $(`script#${id}`).html();
         };
 
         DiscussionUtil.setUser = function(user) {
@@ -82,39 +82,39 @@
 
         DiscussionUtil.urlFor = function(name, param, param1, param2) {
             return {
-                follow_discussion: '/courses/' + $$course_id + '/discussion/' + param + '/follow',
-                unfollow_discussion: '/courses/' + $$course_id + '/discussion/' + param + '/unfollow',
-                create_thread: '/courses/' + $$course_id + '/discussion/' + param + '/threads/create',
-                update_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/update',
-                create_comment: '/courses/' + $$course_id + '/discussion/threads/' + param + '/reply',
-                delete_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/delete',
-                flagAbuse_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/flagAbuse',
-                unFlagAbuse_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/unFlagAbuse',
-                flagAbuse_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/flagAbuse',
-                unFlagAbuse_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/unFlagAbuse',
-                upvote_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/upvote',
-                downvote_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/downvote',
-                pin_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/pin',
-                un_pin_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/unpin',
-                undo_vote_for_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/unvote',
-                follow_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/follow',
-                unfollow_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/unfollow',
-                update_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/update',
-                endorse_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/endorse',
-                create_sub_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/reply',
-                delete_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/delete',
-                upvote_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/upvote',
-                downvote_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/downvote',
-                undo_vote_for_comment: '/courses/' + $$course_id + '/discussion/comments/' + param + '/unvote',
-                upload: '/courses/' + $$course_id + '/discussion/upload',
-                users: '/courses/' + $$course_id + '/discussion/users',
-                search: '/courses/' + $$course_id + '/discussion/forum/search',
-                retrieve_discussion: '/courses/' + $$course_id + '/discussion/forum/' + param + '/inline',
-                retrieve_single_thread: '/courses/' + $$course_id + '/discussion/forum/' + param + '/threads/' + param1,
-                openclose_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/close',
-                user_profile: '/courses/' + $$course_id + '/discussion/forum/users/' + param,
-                followed_threads: '/courses/' + $$course_id + '/discussion/forum/users/' + param + '/followed',
-                threads: '/courses/' + $$course_id + '/discussion/forum',
+                follow_discussion: `/courses/${$$course_id}/discussion/${param}/follow`,
+                unfollow_discussion: `/courses/${$$course_id}/discussion/${param}/unfollow`,
+                create_thread: `/courses/${$$course_id}/discussion/${param}/threads/create`,
+                update_thread: `/courses/${$$course_id}/discussion/threads/${param}/update`,
+                create_comment: `/courses/${$$course_id}/discussion/threads/${param}/reply`,
+                delete_thread: `/courses/${$$course_id}/discussion/threads/${param}/delete`,
+                flagAbuse_thread: `/courses/${$$course_id}/discussion/threads/${param}/flagAbuse`,
+                unFlagAbuse_thread: `/courses/${$$course_id}/discussion/threads/${param}/unFlagAbuse`,
+                flagAbuse_comment: `/courses/${$$course_id}/discussion/comments/${param}/flagAbuse`,
+                unFlagAbuse_comment: `/courses/${$$course_id}/discussion/comments/${param}/unFlagAbuse`,
+                upvote_thread: `/courses/${$$course_id}/discussion/threads/${param}/upvote`,
+                downvote_thread: `/courses/${$$course_id}/discussion/threads/${param}/downvote`,
+                pin_thread: `/courses/${$$course_id}/discussion/threads/${param}/pin`,
+                un_pin_thread: `/courses/${$$course_id}/discussion/threads/${param}/unpin`,
+                undo_vote_for_thread: `/courses/${$$course_id}/discussion/threads/${param}/unvote`,
+                follow_thread: `/courses/${$$course_id}/discussion/threads/${param}/follow`,
+                unfollow_thread: `/courses/${$$course_id}/discussion/threads/${param}/unfollow`,
+                update_comment: `/courses/${$$course_id}/discussion/comments/${param}/update`,
+                endorse_comment: `/courses/${$$course_id}/discussion/comments/${param}/endorse`,
+                create_sub_comment: `/courses/${$$course_id}/discussion/comments/${param}/reply`,
+                delete_comment: `/courses/${$$course_id}/discussion/comments/${param}/delete`,
+                upvote_comment: `/courses/${$$course_id}/discussion/comments/${param}/upvote`,
+                downvote_comment: `/courses/${$$course_id}/discussion/comments/${param}/downvote`,
+                undo_vote_for_comment: `/courses/${$$course_id}/discussion/comments/${param}/unvote`,
+                upload: `/courses/${$$course_id}/discussion/upload`,
+                users: `/courses/${$$course_id}/discussion/users`,
+                search: `/courses/${$$course_id}/discussion/forum/search`,
+                retrieve_discussion: `/courses/${$$course_id}/discussion/forum/${param}/inline`,
+                retrieve_single_thread: `/courses/${$$course_id}/discussion/forum/${param}/threads/${param1}`,
+                openclose_thread: `/courses/${$$course_id}/discussion/threads/${param}/close`,
+                user_profile: `/courses/${$$course_id}/discussion/forum/users/${param}`,
+                followed_threads: `/courses/${$$course_id}/discussion/forum/users/${param}/followed`,
+                threads: `/courses/${$$course_id}/discussion/forum`,
                 enable_notifications: '/notification_prefs/enable/',
                 disable_notifications: '/notification_prefs/disable/',
                 notifications_status: '/notification_prefs/status/'
@@ -312,11 +312,11 @@
             return this.processEachMathAndCode(htmlSnippet, function(s, type) {
                 if (type === 'display') {
                     return s.replace(RE_DISPLAYMATH, function($0, $1) {
-                        return '\\[' + $1 + '\\]';
+                        return `\\[${$1}\\]`;
                     });
                 } else if (type === 'inline') {
                     return s.replace(RE_INLINEMATH, function($0, $1) {
-                        return '\\(' + $1 + '\\)';
+                        return `\\(${$1}\\)`;
                     });
                 } else {
                     return s;
@@ -326,10 +326,10 @@
 
         DiscussionUtil.makeWmdEditor = function($content, $local, cls_identifier) {
             var appended_id, editor, elem, id, imageUploadUrl, placeholder, _processor;
-            elem = $local('.' + cls_identifier);
+            elem = $local(`.${cls_identifier}`);
             placeholder = elem.data('placeholder');
             id = elem.data('id');
-            appended_id = '-' + cls_identifier + '-' + id;
+            appended_id = `-${cls_identifier}-${id}`;
             imageUploadUrl = this.urlFor('upload');
             _processor = function(self) {
                 return function(text) {
@@ -338,25 +338,25 @@
                 };
             };
             editor = Markdown.makeWmdEditor(elem, appended_id, imageUploadUrl, _processor(this));
-            this.wmdEditors['' + cls_identifier + '-' + id] = editor;
+            this.wmdEditors[`${cls_identifier}-${id}`] = editor;
             if (placeholder) {
-                elem.find('#wmd-input' + appended_id).attr('placeholder', placeholder);
+                elem.find(`#wmd-input${appended_id}`).attr('placeholder', placeholder);
             }
             return editor;
         };
 
         DiscussionUtil.getWmdEditor = function($content, $local, cls_identifier) {
             var elem, id;
-            elem = $local('.' + cls_identifier);
+            elem = $local(`.${cls_identifier}`);
             id = elem.attr('data-id');
-            return this.wmdEditors['' + cls_identifier + '-' + id];
+            return this.wmdEditors[`${cls_identifier}-${id}`];
         };
 
         DiscussionUtil.getWmdInput = function($content, $local, cls_identifier) {
             var elem, id;
-            elem = $local('.' + cls_identifier);
+            elem = $local(`.${cls_identifier}`);
             id = elem.attr('data-id');
-            return $local('#wmd-input-' + cls_identifier + '-' + id);
+            return $local(`#wmd-input-${cls_identifier}-${id}`);
         };
 
         DiscussionUtil.getWmdContent = function($content, $local, cls_identifier) {
@@ -395,7 +395,7 @@
             while (true) {
                 if (RE_INLINEMATH.test(htmlString)) {
                     htmlString = htmlString.replace(RE_INLINEMATH, function($0, $1, $2, $3) {
-                        processedHtmlString += $1 + processor('$' + $2 + '$', 'inline');
+                        processedHtmlString += $1 + processor(`$${$2}$`, 'inline');
                         return $3;
                     });
                 } else if (RE_DISPLAYMATH.test(htmlString)) {
@@ -403,7 +403,7 @@
                         /*
                          corrected mathjax rendering in preview
                          */
-                        processedHtmlString += $1 + processor('$$' + $2 + '$$', 'display');
+                        processedHtmlString += $1 + processor(`$$${$2}$$`, 'display');
                         return $3;
                     });
                 } else {
@@ -416,7 +416,7 @@
             htmlString = htmlString.replace(new RegExp(ESCAPED_DOLLAR, 'g'), '\\$');
             htmlString = htmlString.replace(/\\\\\\\\/g, ESCAPED_BACKSLASH);
             htmlString = htmlString.replace(/\\begin\{([a-z]*\*?)\}([\s\S]*?)\\end\{\1\}/img, function($0, $1, $2) {
-                return processor(('\\begin{' + $1 + '}') + $2 + ('\\end{' + $1 + '}'));
+                return processor(`\\begin{${$1}}${$2}\\end{${$1}}`);
             });
             htmlString = htmlString.replace(new RegExp(ESCAPED_BACKSLASH, 'g'), '\\\\\\\\');
             htmlString = htmlString.replace(new RegExp(LATEX_SCRIPT, 'g'), '{}');

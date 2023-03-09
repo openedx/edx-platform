@@ -27,7 +27,7 @@
             },
 
             loadTemplate: function(name) {
-                var templateSelector = '#' + name + '-tpl',
+                var templateSelector = `#${name}-tpl`,
                     templateText = $(templateSelector).text();
                 return _.template(templateText);
             },
@@ -89,7 +89,7 @@
             },
 
             escapeAndShowMessage: function(message) {
-                $(this.message_div + '>p').remove();
+                $(`${this.message_div}>p`).remove();
                 // eslint-disable-next-line max-len
                 this.$(this.message_div).removeClass('hidden').append(HtmlUtils.joinHtml(HtmlUtils.HTML('<p>'), message, HtmlUtils.HTML('</p>')).toString());
             },

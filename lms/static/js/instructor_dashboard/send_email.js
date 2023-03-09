@@ -76,7 +76,7 @@
                     if (!validation.isValid) {
                         message = gettext(
                             'There are invalid keywords in your email. Check the following keywords and try again.');
-                        message += '\n' + validation.invalidKeywords.join('\n');
+                        message += `\n${validation.invalidKeywords.join('\n')}`;
                         alert(message); // eslint-disable-line no-alert
                         return false;
                     }
@@ -100,9 +100,9 @@
                         'You are sending an email message with the subject {subject} to the following recipients.');
                     for (i = 0, len = targets.length; i < len; i++) {
                         target = targets[i];
-                        confirmMessage += '\n-' + displayTarget(target);
+                        confirmMessage += `\n-${displayTarget(target)}`;
                     }
-                    confirmMessage += '\n\n' + gettext('Is this OK?');
+                    confirmMessage += `\n\n${gettext('Is this OK?')}`;
                     fullConfirmMessage = confirmMessage.replace('{subject}', subject);
                     if (confirm(fullConfirmMessage)) { // eslint-disable-line no-alert
                         sendData = {
@@ -204,7 +204,7 @@
                 $('input[name="send_to"]:checked+label').each(function() {
                     return targets.push(this.innerText.replace(/\s*\n.*/g, ''));
                 });
-                return $('.send_to_list').text(gettext('Send to:') + ' ' + targets.join(', '));
+                return $('.send_to_list').text(`${gettext('Send to:')} ${targets.join(', ')}`);
             });
         }
 

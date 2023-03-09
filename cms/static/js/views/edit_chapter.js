@@ -12,7 +12,7 @@ function(_, $, gettext, HtmlUtils, BaseView, FileUploadModel, UploadDialogView, 
         },
         tagName: 'li',
         className: function() {
-            return 'field-group chapter chapter' + this.model.get('order');
+            return `field-group chapter chapter${this.model.get('order')}`;
         },
         render: function() {
             HtmlUtils.setHtml(

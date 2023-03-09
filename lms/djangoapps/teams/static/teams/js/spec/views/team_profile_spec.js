@@ -105,7 +105,7 @@ define([
 
                 // expect a request to DELETE the team membership
                 AjaxHelpers.expectJsonRequest(
-                    requests, 'DELETE', '/api/team/v0/team_membership/test-team,' + TeamSpecHelpers.testUser
+                    requests, 'DELETE', `/api/team/v0/team_membership/test-team,${TeamSpecHelpers.testUser}`
                 );
                 AjaxHelpers.respondWithNoContent(requests);
 
@@ -234,10 +234,10 @@ define([
                     if (members === 1) {
                         expectedMemberMsg = '1 Member';
                     } else {
-                        expectedMemberMsg = members + ' Members';
+                        expectedMemberMsg = `${members} Members`;
                     }
                 } else {
-                    expectedMemberMsg = members + ' / 6 Members';
+                    expectedMemberMsg = `${members} / 6 Members`;
                 }
                 expect(view.$('.team-capacity').text()).toContain(expectedMemberMsg);
                 expect(view.$('.team-member').length).toBe(members);
@@ -280,7 +280,7 @@ define([
                     // assert tooltip text.
                     expect(view.$('.member-profile p').text()).toBe(TeamSpecHelpers.testUser);
                     // assert user profile page url.
-                    expect(view.$('.member-profile').attr('href')).toBe('/u/' + TeamSpecHelpers.testUser);
+                    expect(view.$('.member-profile').attr('href')).toBe(`/u/${TeamSpecHelpers.testUser}`);
 
                     // Verify that the leave team link is present
                     expect(view.$(leaveTeamLinkSelector).text()).toContain('Leave Team');

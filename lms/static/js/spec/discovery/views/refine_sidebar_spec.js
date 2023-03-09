@@ -58,7 +58,7 @@ define([
 
         it('expands and collapses facet', function() {
             var options = _.range(20).map(function(number) {
-                return {facet: 'org', term: 'test' + number, count: 1};
+                return {facet: 'org', term: `test${number}`, count: 1};
             });
             this.facetOptions.reset(options);
             this.sidebar.render();

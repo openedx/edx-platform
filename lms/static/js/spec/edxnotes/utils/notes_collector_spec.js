@@ -27,7 +27,7 @@ define([
                 NotesFactory.factory(wrapper, {
                     endpoint: '/test_endpoint/',
                     user: 'a user',
-                    usageId: 'usage ' + index,
+                    usageId: `usage ${index}`,
                     courseId: 'a course',
                     token: token,
                     tokenUrl: '/test_token_url'

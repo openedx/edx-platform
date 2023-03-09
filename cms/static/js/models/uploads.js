@@ -42,7 +42,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             var attrs = this.attributes,
                 getRegExp = function(formats) {
                 // Creates regular expression like: /(?:.+)\.(jpg|png|gif)$/i
-                    return RegExp(('(?:.+)\\.(' + formats.join('|') + ')$'), 'i');
+                    return RegExp((`(?:.+)\\.(${formats.join('|')})$`), 'i');
                 };
 
             return (attrs.mimeTypes.length === 0 && attrs.fileFormats.length === 0)
@@ -57,7 +57,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             if (attrs.mimeTypes.concat(attrs.fileFormats).length === 1) {
                 return {
                     fileTypes: this.fileTypes()[0],
-                    fileExtensions: '.' + this.fileTypes()[0].toLowerCase()
+                    fileExtensions: `.${this.fileTypes()[0].toLowerCase()}`
                 };
             }
             var or = gettext('or');
@@ -73,7 +73,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                 fileExtensions: formatTypes(
                     _.map(this.fileTypes(),
                         function(type) {
-                            return '.' + type.toLowerCase();
+                            return `.${type.toLowerCase()}`;
                         })
                 )
             };

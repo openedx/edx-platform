@@ -49,7 +49,7 @@ define(
                     },
                     collection = new Backbone.Collection(_.map(_.range(numVideos), function(num, index) {
                         return new Backbone.Model(
-                            _.extend({}, defaultData, {edx_video_id: 'dummy_id_' + index}, modelData)
+                            _.extend({}, defaultData, {edx_video_id: `dummy_id_${index}`}, modelData)
                         );
                     }));
                 videoListView = new PreviousVideoUploadListView({
@@ -192,7 +192,7 @@ define(
                 AjaxHelpers.expectRequest(
                     requests,
                     'POST',
-                    IMAGE_UPLOAD_URL + '/dummy_id_' + videoViewIndex,
+                    `${IMAGE_UPLOAD_URL}/dummy_id_${videoViewIndex}`,
                     new FormData()
                 );
 
@@ -220,8 +220,8 @@ define(
             });
 
             it('calls readMessage with correct message', function() {
-                var errorMessage = 'Image upload failed. This image file type is not supported. Supported file '
-                    + 'types are ' + videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.',
+                var errorMessage = `Image upload failed. This image file type is not supported. Supported file `
+                    + `types are ${videoThumbnailView.getVideoImageSupportedFileFormats().humanize}.`,
                     successData = {
                         files: [createFakeImageFile()],
                         submit: function() {}
@@ -270,8 +270,8 @@ define(
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                     .trim()).toEqual(
-                    'Image upload failed. The selected image must be larger than '
-                    + videoThumbnailView.getVideoImageMinSize().humanize + '.'
+                    `Image upload failed. The selected image must be larger than ${
+                        videoThumbnailView.getVideoImageMinSize().humanize}.`
                 );
             });
 
@@ -285,8 +285,8 @@ define(
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                     .trim()).toEqual(
-                    'Image upload failed. The selected image must be smaller than '
-                    + videoThumbnailView.getVideoImageMaxSize().humanize + '.'
+                    `Image upload failed. The selected image must be smaller than ${
+                        videoThumbnailView.getVideoImageMaxSize().humanize}.`
                 );
             });
 
@@ -322,8 +322,8 @@ define(
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                     .trim()).toEqual(
-                    'Image upload failed. This image file type is not supported. Supported file types are '
-                    + videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.'
+                    `Image upload failed. This image file type is not supported. Supported file types are ${
+                        videoThumbnailView.getVideoImageSupportedFileFormats().humanize}.`
                 );
             });
 

@@ -161,7 +161,7 @@
 
                 for (i = 0; i < len; i++) {
                     $el = $(elements[i]);
-                    $label = $form.find('label[for=' + $el.attr('id') + ']');
+                    $label = $form.find(`label[for=${$el.attr('id')}]`);
                     key = $el.attr('name') || false;
 
                     // Due to a bug in firefox, whitespaces in email type field are not removed.
@@ -190,7 +190,7 @@
                                     HtmlUtils.append($validationNode, HtmlUtils.HTML($n));
                                 }
 
-                                $desc = $form.find('#' + $el.attr('id') + '-desc');
+                                $desc = $form.find(`#${$el.attr('id')}-desc`);
                                 $desc.remove();
                             }
 
@@ -213,7 +213,7 @@
             },
 
             get_error_validation_node: function($el, $form) {
-                var $node = $form.find('#' + $el.attr('id') + '-validation-error-msg');
+                var $node = $form.find(`#${$el.attr('id')}-validation-error-msg`);
                 return $node.find('ul');
             },
 
@@ -306,7 +306,7 @@
             },
 
             clearFormErrors: function() {
-                var query = '.' + this.formErrorsJsHook;
+                var query = `.${this.formErrorsJsHook}`;
                 this.clearFormFeedbackItems(query);
             },
 

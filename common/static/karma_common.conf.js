@@ -13,7 +13,7 @@ var options = {
     useRequireJs: false,
 
     normalizePathsForCoverageFunc: function(appRoot, pattern) {
-        return path.join(appRoot, '/common/static/' + pattern);
+        return path.join(appRoot, `/common/static/${pattern}`);
     },
 
     // Avoid adding files to this list. Use RequireJS.

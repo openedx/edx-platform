@@ -55,11 +55,11 @@
 
             search: function(event) {
                 // Fetch the certificate collection for the given user
-                var url = '/support/certificates?user=' + this.getUserFilter();
+                var url = `/support/certificates?user=${this.getUserFilter()}`;
 
                 // course id is optional.
                 if (this.getCourseFilter()) {
-                    url += '&course_id=' + this.getCourseFilter();
+                    url += `&course_id=${this.getCourseFilter()}`;
                 }
 
                 // Prevent form submission, since we're handling it ourselves.

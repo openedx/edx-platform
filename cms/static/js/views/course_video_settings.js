@@ -612,7 +612,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             var $OrganizationApiSecretWrapperEl,
                 $OrganizationUsernameWrapperEl,
                 isValid = true,
-                $OrganizationApiKeyWrapperEl = this.$el.find('.' + this.selectedProvider + '-api-key-wrapper');
+                $OrganizationApiKeyWrapperEl = this.$el.find(`.${this.selectedProvider}-api-key-wrapper`);
 
             // Explicit None selected case.
             if (this.selectedProvider === '') {
@@ -627,7 +627,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             }
 
             if (this.selectedProvider === THREE_PLAY_MEDIA) {
-                $OrganizationApiSecretWrapperEl = this.$el.find('.' + this.selectedProvider + '-api-secret-wrapper');
+                $OrganizationApiSecretWrapperEl = this.$el.find(`.${this.selectedProvider}-api-secret-wrapper`);
                 if ($OrganizationApiSecretWrapperEl.find('input').val() === '') {
                     isValid = false;
                     this.addErrorState($OrganizationApiSecretWrapperEl);
@@ -635,7 +635,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     this.clearPreferenceErrorState($OrganizationApiSecretWrapperEl);
                 }
             } else {
-                $OrganizationUsernameWrapperEl = this.$el.find('.' + this.selectedProvider + '-username-wrapper');
+                $OrganizationUsernameWrapperEl = this.$el.find(`.${this.selectedProvider}-username-wrapper`);
                 if ($OrganizationUsernameWrapperEl.find('input').val() === '') {
                     isValid = false;
                     this.addErrorState($OrganizationUsernameWrapperEl);
@@ -688,15 +688,15 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             var self = this,
                 username,
                 apiSecret,
-                apiKey = this.$el.find('.' + this.selectedProvider + '-api-key').val();
+                apiKey = this.$el.find(`.${this.selectedProvider}-api-key`).val();
 
             // First clear response status if present already
             this.clearResponseStatus();
 
             if (this.selectedProvider === THREE_PLAY_MEDIA) {
-                apiSecret = this.$el.find('.' + this.selectedProvider + '-api-secret').val();
+                apiSecret = this.$el.find(`.${this.selectedProvider}-api-secret`).val();
             } else {
-                username = this.$el.find('.' + this.selectedProvider + '-username').val();
+                username = this.$el.find(`.${this.selectedProvider}-username`).val();
             }
 
             $.postJSON(self.transcriptCredentialsHandlerUrl, {

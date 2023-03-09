@@ -9,7 +9,7 @@
             DiscussionSpecHelper.setUnderscoreFixtures();
             window.$$course_id = 'edX/999/test';
             spyOn(DiscussionUtil, 'makeWmdEditor').and.callFake(function($content, $local, cls_identifier) {
-                return $local('.' + cls_identifier).html('<textarea></textarea>');
+                return $local(`.${cls_identifier}`).html('<textarea></textarea>');
             });
             this.discussion = new Discussion([], {
                 pages: 1
@@ -254,7 +254,7 @@
                 }
             };
             return _.each(['tab', 'inline'], function(mode) {
-                it('resets the form in ' + mode + ' mode', function() {
+                it(`resets the form in ${mode} mode`, function() {
                     return checkPostCancelReset(mode, this.discussion, this.course_settings);
                 });
             });

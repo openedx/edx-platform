@@ -190,8 +190,8 @@ mind, or whether to act, and in acting, to live."
                     width = endTime * step - left;
 
                 return {
-                    left: left + '%',
-                    width: width + '%'
+                    left: `${left}%`,
+                    width: `${width}%`
                 };
             }
 
@@ -336,12 +336,12 @@ mind, or whether to act, and in acting, to live."
                 minutes = minutes % 60;
 
                 if (hours) {
-                    return i18n(hours, 'hour') + ' '
-                    + i18n(minutes, 'minute') + ' '
-                    + i18n(seconds, 'second');
+                    return `${i18n(hours, 'hour')} ${
+                        i18n(minutes, 'minute')} ${
+                        i18n(seconds, 'second')}`;
                 } else if (minutes) {
-                    return i18n(minutes, 'minute') + ' '
-                    + i18n(seconds, 'second');
+                    return `${i18n(minutes, 'minute')} ${
+                        i18n(seconds, 'second')}`;
                 }
 
                 return i18n(seconds, 'second');

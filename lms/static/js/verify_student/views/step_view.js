@@ -28,7 +28,7 @@ var edx = edx || {};
         },
 
         render: function() {
-            var templateHtml = $('#' + this.templateName + '-tpl').html();
+            var templateHtml = $(`#${this.templateName}-tpl`).html();
 
             // Allow subclasses to add additional information
             // to the template context, perhaps asynchronously.

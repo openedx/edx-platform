@@ -63,7 +63,7 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
         courseModeChanged: function(event) {
             $('.preview-certificate-link').attr('href', function(index, value) {
                 return value.replace(/preview=([^&]+)/, function() {
-                    return 'preview=' + event.target.options[event.target.selectedIndex].text;
+                    return `preview=${event.target.options[event.target.selectedIndex].text}`;
                 });
             });
         },
