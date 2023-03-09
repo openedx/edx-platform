@@ -38,4 +38,4 @@ function _pad(number) {
     }
 }
 
-export {format, formatFull, convert}
+export {format, formatFull, convert};

@@ -87,7 +87,7 @@ export default class ExperimentalCarousel extends React.Component {
                 },
                 tabIndex: tabIndex,
                 className: 'carousel-item'
-            }
+            };
 
             return (
                 <div {...carouselLinkProps}>

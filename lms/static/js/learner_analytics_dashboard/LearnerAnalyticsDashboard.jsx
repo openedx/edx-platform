@@ -15,7 +15,7 @@ function arrayToObject(array) {
         const key = Object.keys(obj)[0];
         accumulator[key] = obj[key];
         return accumulator;
-    }, {})
+    }, {});
 }
 
 function countByType(type, assignments) {
@@ -24,7 +24,7 @@ function countByType(type, assignments) {
         if (format === type) {
             count += 1;
         }
-    })
+    });
     return count;
 }
 
@@ -37,7 +37,7 @@ function getAssignmentCounts(types, assignments) {
     const countsArray = types.map((type) => {
         return {
             [type]: countByType(type, assignments)
-        }
+        };
     });
 
     return arrayToObject(countsArray);
@@ -69,7 +69,7 @@ export function LearnerAnalyticsDashboard(props) {
             value: weight,
             label: type,
             sliceIndex: index + 1
-        }
+        };
     });
 
     // Get a list of assignment types minus duplicates

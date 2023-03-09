@@ -85,6 +85,6 @@ class Discussions extends React.Component {
 Discussions.propTypes = {
     content_authored: PropTypes.number.isRequired,
     thread_votes: PropTypes.number.isRequired
-}
+};
 
 export default Discussions;

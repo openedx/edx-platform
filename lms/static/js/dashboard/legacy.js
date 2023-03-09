@@ -272,7 +272,7 @@ var edx = edx || {};
                 display: 'block',
                 'z-index': 0
             });
-            $('#activate-account-modal').focus()
+            $('#activate-account-modal').focus();
         }
 
         $('.action-email-settings').each(function(index) {

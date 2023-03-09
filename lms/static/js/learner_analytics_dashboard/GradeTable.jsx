@@ -68,7 +68,7 @@ class GradeTable extends React.Component {
                     </tr>
                 </tfoot>
             </table>
-        )
+        );
     }
 };
 
@@ -77,6 +77,6 @@ GradeTable.propTypes = {
     grades: PropTypes.array.isRequired,
     passingGrade: PropTypes.number.isRequired,
     percentGrade: PropTypes.number.isRequired
-}
+};
 
 export default GradeTable;
