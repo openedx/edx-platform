@@ -210,7 +210,7 @@ describe('CourseOutlinePage', function() {
     setSelfPacedCustomPLS = function() {
         setSelfPaced();
         course.set('is_custom_relative_dates_active', true);
-    }
+    };
 
     createCourseOutlinePage = function(test, courseJSON, createOnly) {
         requests = AjaxHelpers.requests(test);
@@ -2210,7 +2210,7 @@ describe('CourseOutlinePage', function() {
 
             selectRelativeWeeksSubsection = function(weeks) {
                 $('#due_in').val(weeks).trigger('keyup');
-            }
+            };
 
             mockCustomPacingServerValuesJson = createMockSectionJSON({
                 release_date: 'Jan 01, 2970 at 05:00 UTC'
@@ -2304,7 +2304,7 @@ describe('CourseOutlinePage', function() {
                 $('#grading_type').val('notgraded').trigger('change');
                 $('#due_in').val('').trigger('change');
                 expect($('#relative_date_input').css('display')).toBe('none');
-            })
+            });
 
             it('shows validation error on relative date', function() {
                 outlinePage.$('.outline-subsection .configure-button').click();
@@ -2371,7 +2371,7 @@ describe('CourseOutlinePage', function() {
                     'Contains staff only content'
                 );
             });
-        })
+        });
     });
 
     // Note: most tests for units can be found in Bok Choy

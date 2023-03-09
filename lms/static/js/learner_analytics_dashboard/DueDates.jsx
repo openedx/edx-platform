@@ -51,7 +51,7 @@ class DueDates extends React.Component {
         return labels.reduce((accumulator, key) => {
             accumulator[key] = 0;
             return accumulator;
-        }, {})
+        }, {});
     }
 
     renderList() {
@@ -73,6 +73,6 @@ class DueDates extends React.Component {
 
 DueDates.propTypes = {
     dates: PropTypes.array.isRequired
-}
+};
 
 export default DueDates;

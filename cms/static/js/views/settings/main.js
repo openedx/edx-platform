@@ -402,7 +402,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 datepicker.prop('disabled', true);
                 datepicker.val(null);
                 this.clearValidationErrors();
-                this.setAndValidate('certificate_available_date', null)
+                this.setAndValidate('certificate_available_date', null);
                 certificateAvailableDateField.addClass('hidden');
             }
         },

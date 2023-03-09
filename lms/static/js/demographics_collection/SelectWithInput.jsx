@@ -46,5 +46,5 @@ export const SelectWithInput = (props) => {
         />
             }
         </div>
-    )
-}
+    );
+};
