@@ -36,6 +36,18 @@ from openedx.core.djangoapps.programs.utils import (
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.djangolib.markup import HTML
 
+# Mock Subscription Data
+# TODO: get from api
+subscription_data = {
+    'is_eligible_for_subscription': True,
+    'subscription_price': '$39',
+    'subscription_start_date': '2023-03-18',
+    'subscription_state': 'active_trial',
+    'trial_end_date': '2023-03-18',
+    'trial_end_time': '3:54 pm',
+    'trial_length': 7,
+}
+
 
 class ProgramsFragmentView(EdxFragmentView):
     """
@@ -60,7 +72,13 @@ class ProgramsFragmentView(EdxFragmentView):
 
         context = {
             'marketing_url': get_program_marketing_url(programs_config, mobile_only),
-            'programs': meter.engaged_programs,
+            # TODO: get from api
+            'programs': [
+                {
+                    'subscription_data': subscription_data,
+                    **program
+                } for program in meter.engaged_programs
+            ],
             'progress': meter.progress()
         }
         html = render_to_string('learner_dashboard/programs_fragment.html', context)
@@ -128,15 +146,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'user_preferences': get_user_preferences(user),
             # TODO: get from api
             'program_data': {
-                'subscription_data': {
-                    'is_eligible_for_subscription': True,
-                    'subscription_price': '$39',
-                    'subscription_start_date': '2023-07-14',
-                    'subscription_state': 'active',
-                    'trial_end_date': '2023-07-14',
-                    'trial_end_time': '3:54 pm',
-                    'trial_length': 7,
-                },
+                'subscription_data': subscription_data,
                 **program_data
             },
             'course_data': course_data,

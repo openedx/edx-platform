@@ -86,6 +86,22 @@ $btn-color-primary: $primary-dark;
   }
 }
 
+.program-details-alerts {
+  .page-banner {
+    margin: 0;
+    padding: 0px 40px 48px;
+    gap: 24px;
+  }
+}
+
+.program-details-tab-alerts {
+  .page-banner {
+    margin: 0;
+    padding: 0 40px;
+    gap: 24px;
+  }
+}
+
 // CSS for April 2017 version of Program Details Page
 .program-details {
   .window-wrap {
