@@ -19,11 +19,13 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu", "macos"]
-    #uses: openedx/.github/.github/workflows/shellcheck.yml@master
-    uses: kdmccormick/openedx.github/.github/workflows/shellcheck.yml@kdmccormick/shellcheck-impl
+    uses: openedx/.github/.github/workflows/shellcheck.yml@master
     with:
       # For details on the meaning of each of these arguments, see:
       # https://githu.com/openedx/.github/blob/master/.github/workflows/shellcheck.yml
+      # We exclude `./node_modules/*` by default because we want people to easily be able to
+      # copy and run the command locally.  Local copies of most of our services have a `./node_modules`
+      # directory that we want to ignore.
       exclude-patterns: "./node_modules/*"
       operating-system: "${{ matrix.os }}"
       shellcheck-version: "v0.9.0"
