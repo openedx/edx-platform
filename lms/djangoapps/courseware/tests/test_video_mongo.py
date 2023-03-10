@@ -251,7 +251,8 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
                 patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=enable_public_share):
             context = self.item_descriptor.render(STUDENT_VIEW).content
             # public video url iif PUBLIC_VIDEO_SHARE waffle and is_lms_platform, public_access are true
-            assert bool(get_context_dict_from_string(context)['public_video_url']) is (is_lms_platform and enable_public_share)
+            assert bool(get_context_dict_from_string(context)['public_video_url']) \
+                is (is_lms_platform and enable_public_share)
 
 
 @ddt.ddt
