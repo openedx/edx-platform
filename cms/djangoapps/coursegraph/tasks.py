@@ -3,7 +3,8 @@ This file contains a management command for exporting the modulestore to
 neo4j, a graph database.
 """
 
-
+import csv
+import io
 import logging
 
 from celery import shared_task
@@ -14,6 +15,7 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
 import py2neo  # pylint: disable=unused-import
+import requests
 from py2neo import Graph, Node, Relationship
 
 try:
@@ -77,6 +79,38 @@ def serialize_item(item):
         fields['time_last_dumped_to_neo4j'] = str(timezone.now())
 
     return fields, block_type
+
+
+def serialize_item_csv(item, index):
+    """
+    Args:
+        item: an XBlock
+
+    Returns:
+        fields: a *limited* dictionary of an XBlock's field names and values
+        block_type: the name of the XBlock's type (i.e. 'course'
+        or 'problem')
+    """
+    from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+
+    course_key = item.scope_ids.usage_id.course_key
+    block_type = item.scope_ids.block_type
+
+    rtn_fields = {
+        'org': course_key.org,
+        'course_key': str(course_key),
+        'course': course_key.course,
+        'run': course_key.run,
+        'location': str(item.location),
+        'display_name': item.display_name_with_default.replace("'", "\'"),
+        'block_type': block_type,
+        'detached': 1 if block_type in DETACHED_XBLOCK_TYPES else 0,
+        'edited_on': str(getattr(item, 'edited_on', '')),
+        'time_last_dumped':  str(timezone.now()),
+        'order': index,
+    }
+
+    return rtn_fields, block_type
 
 
 def coerce_types(value):
@@ -221,6 +255,52 @@ def serialize_course(course_id):
     return nodes, relationships
 
 
+def serialize_course_csv(course_id):
+    """
+    Serializes a course into a CSV of nodes and relationships.
+
+    Args:
+        course_id: CourseKey of the course we want to serialize
+
+    Returns:
+        nodes: a csv of nodes for the course
+        relationships: a csv of relationships between nodes
+    """
+    # Import is placed here to avoid model import at project startup.
+    from xmodule.modulestore.django import modulestore
+
+    # create a location to node mapping we'll need later for
+    # writing relationships
+    location_to_node = {}
+    items = modulestore().get_items(course_id)
+
+    # create nodes
+    i = 0
+    for item in items:
+        i += 1
+        fields, block_type = serialize_item_csv(item, i)
+        location_to_node[strip_branch_and_version(item.location)] = fields
+
+    # create relationships
+    relationships = []
+    for item in items:
+        for index, child in enumerate(item.get_children()):
+            parent_node = location_to_node.get(strip_branch_and_version(item.location))
+            child_node = location_to_node.get(strip_branch_and_version(child.location))
+
+            if parent_node is not None and child_node is not None:
+                relationship = {
+                    'course_key': str(course_id),
+                    'parent_location': str(parent_node["location"]),
+                    'child_location': str(child_node["location"]),
+                    'order': index
+                }
+                relationships.append(relationship)
+
+    nodes = list(location_to_node.values())
+    return nodes, relationships
+
+
 def should_dump_course(course_key, graph):
     """
     Only dump the course if it's been changed since the last time it's been
@@ -262,6 +342,97 @@ def should_dump_course(course_key, graph):
             f"update date {last_this_command_was_run} < published date {course_last_published_date}"
         )
     return (needs_update, update_reason)
+
+
+@shared_task
+@set_code_owner_attribute
+def dump_course_to_clickhouse(course_key_string, connection_overrides=None):
+    """
+    Serializes a course and writes it to neo4j.
+
+    Arguments:
+        course_key_string: course key for the course to be exported
+        connection_overrides (dict):  overrides to ClickHouse connection
+            parameters specified in `settings.COURSEGRAPH_CONNECTION`.
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    nodes, relationships = serialize_course_csv(course_key)
+    celery_log.info(
+        "Now dumping %s to ClickHouse: %d nodes and %d relationships",
+        course_key,
+        len(nodes),
+        len(relationships),
+    )
+
+    course_string = str(course_key)
+
+    try:
+        host = "http://clickhouse:8123/"
+        auth = ("ch_lms", "foo")
+
+        # Params that begin with "param_" will be used in the query replacement
+        # all others are ClickHouse settings.
+        params = {
+            # Needed to actually run DELETE operations
+            "allow_experimental_lightweight_delete": 1,
+            # Fail early on bulk inserts
+            "input_format_allow_errors_num": 1,
+            "input_format_allow_errors_ratio": 0.1,
+            # Used in the DELETE queries, but harmless elsewhere
+            "param_course_string": course_string
+        }
+
+        del_relationships = "DELETE FROM coursegraph.coursegraph_relationships " \
+                            "WHERE course_key = {course_string:String}"
+
+        del_nodes = "DELETE FROM coursegraph.coursegraph_nodes WHERE course_key = {course_string:String}"
+
+        for sql in (del_relationships, del_nodes):
+            celery_log.info(sql)
+            response = requests.post(host, data=sql, params=params, auth=auth)
+            response.raise_for_status()
+            celery_log.info(response.headers)
+            celery_log.info(response)
+            celery_log.info(response.text)
+
+        # TODO: Make these predefined queries?
+        # https://clickhouse.com/docs/en/interfaces/http/#predefined_http_interface
+        # "query" is a special param for the query, it's the best way to get the FORMAT CSV in there.
+        params["query"] = "INSERT INTO coursegraph.coursegraph_nodes FORMAT CSV"
+
+        output = io.StringIO()
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+
+        for node in nodes:
+            writer.writerow(node.values())
+
+        response = requests.post(host, data=output.getvalue(), params=params, auth=auth)
+        celery_log.info(response.headers)
+        celery_log.info(response)
+        celery_log.info(response.text)
+        response.raise_for_status()
+
+        # Just overwriting the previous query
+        params["query"] = "INSERT INTO coursegraph.coursegraph_relationships FORMAT CSV"
+        output = io.StringIO()
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+
+        for relationship in relationships:
+            writer.writerow(relationship.values())
+
+        response = requests.post(host, data=output.getvalue(), params=params, auth=auth)
+        celery_log.info(response.headers)
+        celery_log.info(response)
+        celery_log.info(response.text)
+        response.raise_for_status()
+
+        celery_log.info("Completed dumping %s to ClickHouse", course_key)
+
+    except Exception:  # pylint: disable=broad-except
+        celery_log.exception(
+            "Error trying to dump course %s to ClickHouse!",
+            course_string
+        )
 
 
 @shared_task
@@ -346,6 +517,57 @@ class ModuleStoreSerializer:
             course_keys = [course_key for course_key in course_keys if course_key not in skip_keys]
         return cls(course_keys)
 
+    def dump_courses_to_clickhouse(self, connection_overrides=None, override_cache=False):
+        """
+        Iterates through a list of courses in a modulestore, serializes them to csv,
+        then submits tasks to post them to ClickHouse.
+
+        Arguments:
+            connection_overrides (dict): overrides to ClickHouse connection
+                parameters specified in `settings.COURSEGRAPH_CONNECTION`.
+            override_cache: serialize the courses even if they've been recently
+                serialized
+
+        Returns: two lists--one of the courses that were successfully written
+            to ClickHouse and one of courses that were not.
+        """
+        total_number_of_courses = len(self.course_keys)
+
+        submitted_courses = []
+        skipped_courses = []
+
+        for index, course_key in enumerate(self.course_keys):
+            # first, clear the request cache to prevent memory leaks
+            RequestCache.clear_all_namespaces()
+
+            (needs_dump, reason) = (True, "")  # TODO: should_dump_course_clickhouse(course_key)
+
+            if not override_cache and not needs_dump:
+                log.info("skipping submitting %s, since it hasn't changed", course_key)
+                skipped_courses.append(str(course_key))
+                continue
+
+            if override_cache:
+                reason = "override_cache is True"
+
+            log.info(
+                "Now submitting %s for export to ClickHouse, because %s: course %d of %d total courses",
+                course_key,
+                reason,
+                index + 1,
+                total_number_of_courses,
+            )
+
+            dump_course_to_clickhouse.apply_async(
+                kwargs=dict(
+                    course_key_string=str(course_key),
+                    connection_overrides=connection_overrides,
+                )
+            )
+            submitted_courses.append(str(course_key))
+
+        return submitted_courses, skipped_courses
+
     def dump_courses_to_neo4j(self, connection_overrides=None, override_cache=False):
         """
         Method that iterates through a list of courses in a modulestore,
@@ -353,7 +575,7 @@ class ModuleStoreSerializer:
         Arguments:
             connection_overrides (dict): overrides to Neo4j connection
                 parameters specified in `settings.COURSEGRAPH_CONNECTION`.
-            override_cache: serialize the courses even if they'be been recently
+            override_cache: serialize the courses even if they've been recently
                 serialized
 
         Returns: two lists--one of the courses that were successfully written
