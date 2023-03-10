@@ -1646,12 +1646,14 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
     """
     try:
         cc_comment = Comment(id=comment_id).retrieve()
+        reverse_order = request.GET.get('reverse_order', False)
         cc_thread, context = _get_thread_and_context(
             request,
             cc_comment["thread_id"],
             retrieve_kwargs={
                 "with_responses": True,
                 "recursive": True,
+                "reverse_order": reverse_order,
             }
         )
         if cc_thread["thread_type"] == "question":
