@@ -227,7 +227,7 @@ class AppleIdAuth(BaseOAuth2):
                 # with the new team-scoped apple-ids', use the transfer_sub to match to old apple ids'
                 # belonging to already signed-in users.
                 AppleMigrationUserIdInfo = apps.get_model('third_party_auth', 'AppleMigrationUserIdInfo')
-                user_apple_id_info = AppleMigrationUserIdInfo.objects.filter(transfer_id=transfer_sub)
+                user_apple_id_info = AppleMigrationUserIdInfo.objects.filter(transfer_id=transfer_sub).first()
                 old_apple_id = user_apple_id_info.old_apple_id
                 if social_django.models.DjangoStorage.user.get_social_auth(provider=self.name, uid=old_apple_id):
                     user_apple_id_info.new_apple_id = response.get(self.ID_KEY)
