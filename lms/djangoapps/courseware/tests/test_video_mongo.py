@@ -48,6 +48,7 @@ from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
+from lms.djangoapps.courseware.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -237,14 +238,21 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
     }
     METADATA = {}
 
-    @ddt.data(True, False)
-    def test_public_video_url(self, is_lms_platform):
+    @ddt.data(
+        (True, False),
+        (False, False),
+        (True, True),
+    )
+    @ddt.unpack
+    def test_public_video_url(self, is_lms_platform, enable_public_share):
         """Test public video url."""
         assert self.item_descriptor.public_access is True
-        with patch.object(self.item_descriptor, '_is_lms_platform', return_value=is_lms_platform):
+        with patch.object(self.item_descriptor, '_is_lms_platform', return_value=is_lms_platform), \
+                patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=enable_public_share):
             context = self.item_descriptor.render(STUDENT_VIEW).content
-            # public video url iif is_lms_platform and public_access are true
-            assert bool(get_context_dict_from_string(context)['public_video_url']) is is_lms_platform
+            # public video url iif PUBLIC_VIDEO_SHARE waffle and is_lms_platform, public_access are true
+            assert bool(get_context_dict_from_string(context)['public_video_url']) \
+                is (is_lms_platform and enable_public_share)
 
 
 @ddt.ddt
