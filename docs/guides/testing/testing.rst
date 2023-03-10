@@ -236,7 +236,7 @@ If you run into flakiness, check (and feel free to contribute to) this
 Running Javascript Unit Tests
 -----------------------------
 
-Before running Javascript unit tests, you will need to have be running Firefox or Chrome in a container visible to your edx-platform container. If running this in devstack, you can run ``make dev.up.firefox`` or ``make dev.up.chrome``. Firefox is the default browser for the tests, so if you decide to use chrome, you will need to prefix the test command with ``SELENIUM_BROWSER=chrome SELENIUM_HOST=edx.devstack.chrome`` (if using devstack).
+Before running Javascript unit tests, you will need to have be running Firefox or Chrome in a place visible to edx-platform. If running this in devstack, you can run ``make dev.up.firefox`` or ``make dev.up.chrome``. Firefox is the default browser for the tests, so if you decide to use chrome, you will need to prefix the test command with ``SELENIUM_BROWSER=chrome SELENIUM_HOST=edx.devstack.chrome`` (if using devstack).
 
 We use Jasmine to run JavaScript unit tests. To run all the JavaScript
 tests::
