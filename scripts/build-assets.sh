@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-ABOUT="Build static assets for edx-platform"
+ABOUT="Build static assets for edx-platform."
 
 # Enable stricter error handling.
 set -euo pipefail
@@ -20,17 +20,19 @@ COL_OFF="\e[0m"   # Normal color
 
 # Print script usage information.
 show_usage ( ) {
-	echo "Usage: $SCRIPT_NAME [<OPTIONS>] <STAGE> [<OPTIONS>]"
+	echo "Usage: $SCRIPT_NAME [<OPTIONS>] [<STAGE>] [<OPTIONS>]"
 	echo
 	echo "$ABOUT"
 	echo
+	echo "You can specify one build stage."
+	echo "Otherwise, all of them will be run."
+    echo
 	echo "Stages:"
-	echo "    build              (Default) Run all build stages"
-	echo "    npm                Copy static assets from node_modules"
-	echo "    xmodule            Process assets from xmodule"
-	echo "    webpack            Run webpack"
-	echo "    common             Compile static assets for common theme"
-	echo "    themes             Compile static assets for custom themes"
+	echo "    npm                Copy npm-installed assets"
+	echo "    xmodule            Copy XModule fragments"
+	echo "    webpack            Run Webpack"
+	echo "    css                Compile default SCSS"
+	echo "    themes             Compile themes' SCSS"
 	echo
 	echo "Options:"
 	echo "    -h|--help                       Display this help message."
@@ -352,7 +354,7 @@ while [[ "$#" -gt 0 ]] ; do
 			fi
 			;;
 
-		build|npm|xmodule|webpack|common|themes)
+		npm|xmodule|webpack|css|themes)
 			if [[ -z "$stage" ]] ; then
 				stage="$1"
 			else
@@ -370,14 +372,9 @@ while [[ "$#" -gt 0 ]] ; do
 	esac
 done
 
-if [[ -z "$stage" ]] ; then
-	# Assume a full "build" if no stage is specified.
-	stage="build"
-fi
+if [[ -z "$stage" ]] || [[ "$stage" = npm ]] ; then
 
-if [[ "$stage" = build ]] || [[ "$stage" = npm ]] ; then
-
-	log_section_start "Copying static assets from node_modules..."
+	log_section_start "Copying npm-installed assets..."
 
 	# Vendor destination paths for assets.
 	# These are not configurable yet, but that will change as part of
@@ -439,10 +436,9 @@ if [[ "$stage" = build ]] || [[ "$stage" = npm ]] ; then
 		"$run" cp --force "$node_modules/squirejs/src/Squire.js" "$js_vendor_path" || true  # that's "tolerate if these files don't exist."
 	fi
 
-	log_section_end "Done copying static assets from node_modules."
-fi
+	log_section_end "Done copying npm-installed assets."
 
-if [[ "$stage" = build ]] || [[ "$stage" = xmodule ]] ; then
+if [[ -z "$stage" ]] || [[ "$stage" = xmodule ]] ; then
 
 	log_section_start "Processing assets from xmodule..."
 
@@ -458,9 +454,9 @@ if [[ "$stage" = build ]] || [[ "$stage" = xmodule ]] ; then
 	log_section_end "Done processing assets from xmodule."
 fi
 
-if [[ "$stage" = build ]] || [[ "$stage" = webpack ]] ; then
+if [[ -z "$stage" ]] || [[ "$stage" = webpack ]] ; then
 
-	log_section_start "Running webpack..."
+	log_section_start "Running Webpack..."
 
 	node_env="production"
 	if [[ "$env" = dev ]]; then
@@ -473,7 +469,7 @@ if [[ "$stage" = build ]] || [[ "$stage" = webpack ]] ; then
 		"STATIC_ROOT_CMS=$static_root_cms" \
 		webpack --progress "--config=webpack.$env.config.js"
 
-	log_section_end "Done running webpack."
+	log_section_end "Done running Webpack."
 fi
 
 # SCSS source roots.
@@ -509,9 +505,9 @@ cms_css="cms/static/css"
 certs_css="lms/static/certificates/css"
 
 
-if [[ "$stage" = build ]] || [[ "$stage" = common ]] ; then
+if [[ -z "$stage" ]] || [[ "$stage" = css ]] ; then
 
-	log_section_start "Compiling static assets for common theme..."
+	log_section_start "Compiling default SCSS..."
 
 	if [[ -n "$do_lms" ]] ; then
 		log "Compiling default LMS SCSS."
@@ -524,7 +520,7 @@ if [[ "$stage" = build ]] || [[ "$stage" = common ]] ; then
 		compile_scss_dir "$env" "$cms_scss" "$cms_css" "${cms_includes[@]}"
 	fi
 
-	log_section_end "Done compiling static assets for common theme."
+	log_section_end "Done compiling default SCSS."
 fi
 
 theme_paths=()
@@ -546,11 +542,11 @@ for theme_dir in "${theme_dirs[@]}" ; do
 	done
 done
 
-if [[ "$stage" = build ]] || [[ "$stage" = themes ]] ; then
+if [[ -z "$stage" ]] || [[ "$stage" = themes ]] ; then
 
 	for theme_path in "${theme_paths[@]}" ; do
 
-		log_section_start "Compiling static assets for custom theme: $theme_path..."
+		log_section_start "Compiling SCSS for theme at: $theme_path..."
 
 		# Theme SCSS source roots.
 		theme_lms_scss="$theme_path/lms/static/sass"
@@ -611,7 +607,7 @@ if [[ "$stage" = build ]] || [[ "$stage" = themes ]] ; then
 			fi
 		fi
 
-		log_section_end "Done compiling theme: $theme_path"
+		log_section_end "Done compiling SCSS for theme at: $theme_path"
 	done
 
 fi
