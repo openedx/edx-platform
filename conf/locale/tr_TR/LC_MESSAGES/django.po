@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-12 20:42+0000\n"
+"POT-Creation-Date: 2023-03-05 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -776,15 +776,15 @@ msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
-msgstr "Ders no belirtilmedi"
+msgstr "Ders kimliği belirtilmedi"
 
 #: common/djangoapps/student/views/management.py
 msgid "Invalid course id"
-msgstr "Geçersiz ders no"
+msgstr "Geçersiz ders kimliği"
 
 #: common/djangoapps/student/views/management.py
 msgid "Course id is invalid"
-msgstr "Ders no geçersiz"
+msgstr "Ders kimliği geçersiz"
 
 #: common/djangoapps/student/views/management.py
 msgid "Could not enroll"
@@ -1673,7 +1673,7 @@ msgstr "Hesap Kilidini Aç"
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/signup_modal.html
 msgid "Close"
-msgstr "Kapa"
+msgstr "Kapat"
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
 #, python-format
@@ -1877,7 +1877,7 @@ msgstr ""
 "Bu, %(platform_name)splatformunda tanımlı %(old_email)s adresinin "
 "%(new_email)s ile değişimini onaylamak içindir. Eğer bu talebi siz "
 "yapmadıysanız, lütfen bizimle derhal iletişime geçin. İletişim bilgisi "
-"burada listelenmiştir::"
+"burada listelenmiştir:"
 
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.txt
@@ -2192,7 +2192,7 @@ msgstr "Bizimle İletişime Geçin"
 
 #: lms/djangoapps/branding/api.py
 msgid "Help Center"
-msgstr " Yardım Merkezi"
+msgstr "Yardım Merkezi"
 
 #: lms/djangoapps/branding/api.py
 msgid "Security"
@@ -2580,8 +2580,8 @@ msgid ""
 "successfully completed, received a passing grade, and was awarded this "
 "{platform_name} {certificate_type} Certificate of Completion in "
 msgstr ""
-"başarılı bir şekilde tamamlandı, geçerli not alındı, ve {platform_name} "
-"Platformu {certificate_type} Bitirme Sertifikası'na hak kazanıldı"
+"başarılı bir şekilde tamamladı, geçer not aldı, ve {platform_name} Platformu"
+" {certificate_type} Bitirme Sertifikası'na hak kazandı"
 
 #. Translators: This text describes the purpose (and therefore, value) of a
 #. course certificate
@@ -3454,9 +3454,9 @@ msgid ""
 "We're creating your certificate. You can keep working in your courses and a "
 "link to it will appear here and on your Dashboard when it is ready."
 msgstr ""
-"Şuan sertifikanızı oluşturuyoruz. Derslerinizde çalışmaya devam "
-"edebilirsiniz ve sertifika hazır olduğunda ona olan bağlantı burada ve kendi"
-" Ana Panelinizde belirecek."
+"Şu an sertifikanızı oluşturuyoruz. Derslerinizde çalışmaya devam "
+"edebilirsiniz ve sertifika hazır olduğunda ona olan bağlantı burada ve Ana "
+"Panelinizde belirecek."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate has been invalidated"
@@ -3586,7 +3586,7 @@ msgstr "Yıllık Hanehalkı Geliri"
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "Tell us about your current financial situation. Why do you need assistance?"
-msgstr "Mâli durumunuzdan bahsedin. Neden yardıma ihtiyacınız var ?"
+msgstr "Mâli durumunuzdan bahsedin. Neden yardıma ihtiyacınız var?"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -3595,7 +3595,7 @@ msgid ""
 msgstr ""
 "Öğrenme ya da mesleki hedeflerinizden bahsedin. Bu dersten alacağınız Onaylı"
 " Sertifika belirttiğiniz hedeflerinizi gerçekleştirmenize nasıl yardımcı "
-"olacak ?"
+"olacak?"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -3603,11 +3603,11 @@ msgid ""
 "you complete the course work and receive a certificate?"
 msgstr ""
 "Bu ders için planlarınızdan bahsedin. Bu ders çalışmalarını tamamlamada ve "
-"sertifika almanızda size yardımcı olacak hangi adımları izleyeceksiniz ?"
+"sertifika almanızda size yardımcı olacak hangi adımları izleyeceksiniz?"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 1250 and 2500 characters or so in your response."
-msgstr "Cevabınızı yaklaşık 1250-2500 kelime arasında olacak şekilde yazın."
+msgstr "Cevabınızı yaklaşık 1250 ila 2500 karakter olacak şekilde yazın."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -3630,7 +3630,7 @@ msgid ""
 msgstr ""
 "Bu başvuruda sağladığım bilgilerin (mali bilgiler hariç) {platform_name} "
 "platformunun pazarlanması amacıyla {platform_name} platformu tarafından "
-"kullanmasına izin veriyorum."
+"kullanılmasına izin veriyorum."
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -3919,6 +3919,8 @@ msgid ""
 "The provided parameters were invalid. Make sure you've provided at least one"
 " valid usage key for `problem_locations`."
 msgstr ""
+"Sağlanan parametreler geçersizdi. `problem_locations` için en az bir geçerli"
+" kullanım anahtarı sağladığınızdan emin olun."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The requesting user is not authenticated."
@@ -4942,7 +4944,7 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Whether to display this block in the table of contents"
-msgstr ""
+msgstr "İçindekiler kısmında bu block'un gösterilip gösterilmeyeceği"
 
 #. Translators: "TOC" stands for "Table of Contents"
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -4950,6 +4952,8 @@ msgid ""
 "What format this block is in (used for deciding which grader to apply, and "
 "what to show in the TOC)"
 msgstr ""
+"Bu block hangi formatta (hangi notlandırıcının kullanılacağına, "
+"İçindekiler'de gösterileceğine karar vermek amacıyla kullanılır) "
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
@@ -5183,7 +5187,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/views.py
 msgid "No teamset found in given course with given id"
-msgstr ""
+msgstr "Verilen kimlikli bir takım yapılandırması bulunamadı"
 
 #: lms/djangoapps/teams/views.py
 msgid "username or (team_id or teamset_id) must be specified."
@@ -5940,7 +5944,7 @@ msgstr "Bu e-posta iletisi %(lms_url)s tarafından otomatik olarak gönderildi"
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
 #, python-format
 msgid "%(display_name)s"
-msgstr ""
+msgstr "%(display_name)s"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
@@ -8362,6 +8366,7 @@ msgid "Success"
 msgstr "Başarı"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Eylemler"
@@ -24078,6 +24083,14 @@ msgstr "Erişim Ayarları"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Erişim Ver"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

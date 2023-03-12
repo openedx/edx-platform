@@ -7962,6 +7962,7 @@ msgstr ""
 msgid "Success"
 msgstr "Zrobione"
 
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Czynności"
@@ -23312,6 +23313,14 @@ msgstr "Ustawienia dostępu"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Ustal dostęp"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

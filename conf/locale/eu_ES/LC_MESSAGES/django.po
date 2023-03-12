@@ -7574,6 +7574,7 @@ msgid "Success"
 msgstr "Ondo"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Ekintzak"
@@ -21636,6 +21637,14 @@ msgstr "Sarbide-ezarpenak"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Ezarri sarbidea"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
