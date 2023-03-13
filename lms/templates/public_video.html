@@ -22,7 +22,9 @@ from django.utils.translation import gettext as _
 
 <%block name="body_extra">
 <nav class="public-video-share-cta" aria-label="Learn More">
-  <img class="org-logo" src="${org_logo}" alt="Organization Logo"/>
+  % if org_logo:
+    <img class="org-logo" src="${org_logo}" alt="Organization Logo"/>
+  % endif
   <div class="nav-links">
     <a class="btn-learn-more btn" href="${learn_more_url}">
       ${_("Learn more about this course")}
