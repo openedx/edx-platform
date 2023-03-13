@@ -1,0 +1,21 @@
+<div class="message certificate-status col-12 md-col-8">
+    <span class="card-msg"><%- gettext('Certificate Status') %></span>
+    <div><%- gettext('Needs verified certificate ') %></div>
+</div>
+<% if ( !['active', 'active_trial'].includes(subscription_state) ) { %>
+    <div class="action d-flex flex-column align-items-start align-items-md-end">
+        <a href="" class="btn-brand btn cta-primary upgrade-button single-course-run program_dashboard_course_upsell_button">
+            <%- gettext('Upgrade with a subscription') %>
+        </a>
+        <span class="subscription-info-upsell">
+            <%- StringUtils.interpolate(
+                gettext(
+                    subscription_state === 'inactive'
+                    ? 'Pay {price}/month for all courses in this program'
+                    : 'Pay {price}/mos after {day}-day free trial'
+                ),
+                { price: subscription_price, day: trial_length },
+            ) %>
+        </span>
+    </div>
+<% } %>
