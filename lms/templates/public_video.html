@@ -21,8 +21,9 @@ from django.utils.translation import gettext as _
 </%block>
 
 <%block name="body_extra">
-<nav class="public-video-share-cta nav-links" aria-label="Learn More">
-  <div>
+<nav class="public-video-share-cta" aria-label="Learn More">
+  <img class="org-logo" src="${org_logo}" alt="Organization Logo"/>
+  <div class="nav-links">
     <a class="btn-learn-more btn" href="${learn_more_url}">
       ${_("Learn more about this course")}
     </a>

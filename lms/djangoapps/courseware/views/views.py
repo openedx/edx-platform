@@ -38,6 +38,7 @@ from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_filters.learning.filters import CourseAboutRenderStarted
+from organizations.api import get_course_organization
 from pytz import UTC
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from rest_framework import status
@@ -1784,9 +1785,11 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
         })
         course_about_page_url, enroll_url = self.get_public_video_cta_button_urls(course)
         social_sharing_metadata = self.get_social_sharing_metadata(course, video_block)
+        org_logo = self.get_organization_logo_from_course(course)
         context = {
             'fragment': fragment,
             'course': course,
+            'org_logo': org_logo,
             'social_sharing_metadata': social_sharing_metadata,
             'learn_more_url': course_about_page_url,
             'enroll_url': enroll_url,
@@ -1797,6 +1800,16 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             'is_mobile_app': False,
         }
         return 'public_video.html', context
+    
+    def get_organization_logo_from_course(self, course):
+        """
+        Get organization logo for this course
+        """
+        course_org = get_course_organization(course.id)
+
+        if course_org and course_org['logo']:
+            return course_org['logo'].url
+        return None
 
     def get_social_sharing_metadata(self, course, video_block):
         """

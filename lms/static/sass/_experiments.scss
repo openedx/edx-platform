@@ -516,8 +516,15 @@
 // AU 972 Social Video Sharing Page
 .public-video-share-cta {
   position: relative;
-  float: right;
   z-index: 1;
+
+  .org-logo{
+    height: 40px;
+  }
+
+  .nav-links{
+    float: right;
+  }
 
   .btn-learn-more{
     @extend %btn-shims;
