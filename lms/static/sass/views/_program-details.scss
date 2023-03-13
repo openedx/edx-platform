@@ -443,6 +443,34 @@ $btn-color-primary: $primary-dark;
     }
   }
 
+  .upgrade-subscription {
+    margin: 10px 15px 10px 5px;
+    gap: 15px;
+  }
+
+  .subscription-icon-restart {
+    width: 24px;
+    height: 24px;
+    margin-inline-end: 8px;
+  }
+
+  .subscription-icon-arrow-upright {
+    display: inline-flex;
+    align-items: center;
+    width: 15px;
+    height: 15px;
+    margin-inline-start: 8px;
+  }
+
+  .subscription-info {
+    font-size: 0.9375em;
+    color: $gray-500;
+  }
+
+  .subscription-info-upsell {
+    margin-top: 0.25rem;
+    font-size: 0.8125em;
+  }
 
   .program-course-card {
     width: 100%;
@@ -640,12 +668,26 @@ $btn-color-primary: $primary-dark;
 .program-sidebar {
   padding: $baseline*1.5 $baseline*0.5;
 
-  .program-record {
+  .program-record,.subscription-info {
     text-align: left;
     padding-bottom: 2em;
   }
 
-  .motivating-section {
+  .subscription-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: #414141;
+    font-size: 1.125rem;
+
+    .subscription-link {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+    }
+  }
+
+  .sidebar-section {
     @include margin-left($baseline*0.75);
 
     font-size: 0.9375em;
