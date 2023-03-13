@@ -40,10 +40,20 @@ class ProgramHeaderView extends Backbone.View {
     return logo;
   }
 
+  getIsSubscribed() {
+    const subscriptionData = this.model.get('programData').subscription_data;
+
+    return (
+      subscriptionData.is_eligible_for_subscription &&
+      ['active', 'active_trial'].includes(subscriptionData.subscription_state)
+    );
+  }
+
   render() {
     const data = $.extend(this.model.toJSON(), {
       breakpoints: this.breakpoints,
       logo: this.getLogo(),
+      isSubscribed: this.getIsSubscribed(),
     });
 
     if (this.model.get('programData')) {

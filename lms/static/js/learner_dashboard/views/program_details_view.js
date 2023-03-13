@@ -1,6 +1,7 @@
 /* globals gettext */
 
 import Backbone from 'backbone';
+import moment from 'moment';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
@@ -10,9 +11,21 @@ import CourseCardView from './course_card_view';
 import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
 
+import restartIcon from '../../../images/restart-icon.svg';
 import pageTpl from '../../../templates/learner_dashboard/program_details_view.underscore';
 import tabPageTpl from '../../../templates/learner_dashboard/program_details_tab_view.underscore';
 import trackECommerceEvents from '../../commerce/track_ecommerce_events';
+
+// Utility function to get the next billing date for a subscription
+// TODO: may get from api later
+function getNextBillingDate(startDate) {
+  const subscriptionStartDate = moment(startDate, 'YYYY-MM-DD');
+  const currentMonthDifference = moment().diff(subscriptionStartDate, 'months');
+
+  return subscriptionStartDate
+    .add(currentMonthDifference + 1, 'months')
+    .format('MMMM DD, YYYY');
+};
 
 class ProgramDetailsView extends Backbone.View {
   constructor(options) {
@@ -32,7 +45,17 @@ class ProgramDetailsView extends Backbone.View {
     } else {
       this.tpl = HtmlUtils.template(pageTpl);
     }
-    this.programModel = new Backbone.Model(this.options.programData);
+
+    const {
+      subscription_data: subscriptionData,
+      ...programData
+    } = this.options.programData;
+
+    subscriptionData.subscription_billing_date = getNextBillingDate(subscriptionData.subscription_start_date);
+    subscriptionData.trial_end_date = moment(subscriptionData.trial_end_date, 'YYYY-MM-DD').format('MMMM DD, YYYY');
+
+    this.programModel = new Backbone.Model(programData);
+    this.subscriptionModel = new Backbone.Model(subscriptionData);
     this.courseData = new Backbone.Model(this.options.courseData);
     this.certificateCollection = new Backbone.Collection(this.options.certificateData);
     this.completedCourseCollection = new CourseCardCollection(
@@ -84,9 +107,13 @@ class ProgramDetailsView extends Backbone.View {
       creditPathways: this.options.creditPathways,
       discussionFragment: this.options.discussionFragment,
       live_fragment: this.options.live_fragment,
-
+      restartIcon: restartIcon,
     };
-    data = $.extend(data, this.programModel.toJSON());
+    data = $.extend(
+      data,
+      this.programModel.toJSON(),
+      this.subscriptionModel.toJSON()
+    );
     HtmlUtils.setHtml(this.$el, this.tpl(data));
     this.postRender();
   }
@@ -130,6 +157,7 @@ class ProgramDetailsView extends Backbone.View {
       el: '.js-program-sidebar',
       model: this.programModel,
       courseModel: this.courseData,
+      subscriptionModel: this.subscriptionModel,
       certificateCollection: this.certificateCollection,
       programRecordUrl: this.options.urls.program_record_url,
       industryPathways: this.options.industryPathways,

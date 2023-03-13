@@ -24,6 +24,7 @@ class CourseCardView extends Backbone.View {
     this.enrollModel = new EnrollModel();
     if (options.context) {
       this.urlModel = new Backbone.Model(options.context.urls);
+      this.subscriptionModel = new Backbone.Model(options.context.programData.subscription_data);
       this.enrollModel.urlRoot = this.urlModel.get('commerce_api_url');
     }
     this.context = options.context || {};
@@ -86,6 +87,7 @@ class CourseCardView extends Backbone.View {
       this.upgradeMessage = new UpgradeMessageView({
         $el: $upgradeMessage,
         model: this.model,
+        subscriptionModel: this.subscriptionModel,
       });
 
       $certStatus.remove();
