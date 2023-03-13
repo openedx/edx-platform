@@ -3084,6 +3084,41 @@ class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
         self.assertEqual(expected_status_code, response.status_code)
         self.assertEqual(expected_status_code, embed_response.status_code)
 
+    def test_get_org_logo_none(self):
+        # Given a course with no organizational logo
+        self.setup_course()
+        target_video = self.video_block_public
+
+        # When I render the page
+        response = self.get_response(usage_key=target_video.location, is_embed=False)
+        content = response.content.decode('utf-8')
+
+        # Then the page does not render an org logo
+        org_logo = re.search(f'<img .*class=[\'"]org-logo[\'"].*>', content)
+        self.assertIsNone(org_logo)
+
+    @patch('lms.djangoapps.courseware.views.views.get_course_organization')
+    def test_get_org_logo(self, mock_get_org):
+        # Given a course with an organizational logo
+        self.setup_course()
+        target_video = self.video_block_public
+
+        mock_org_logo_url = "/assets/foo"
+        mock_org_logo = MagicMock()
+        mock_org_logo.url = mock_org_logo_url
+
+        mock_get_org.return_value = {
+            "logo": mock_org_logo
+        }
+
+        # When I render the page
+        response = self.get_response(usage_key=target_video.location, is_embed=False)
+        content = response.content.decode('utf-8')
+
+        # Then the page does render an org logo
+        org_logo = re.search(f'<img .*class=[\'"]org-logo[\'"].*src=[\'"]{mock_org_logo_url}[\'"].*>', content)
+        self.assertIsNotNone(org_logo)
+
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
