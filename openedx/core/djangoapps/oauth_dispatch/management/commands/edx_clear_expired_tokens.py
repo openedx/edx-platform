@@ -20,6 +20,11 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = "Clear expired access tokens and refresh tokens for Django OAuth Toolkit"
 
+    def _add_boolean_flag(self, parser, name, default=False):
+        parser.add_argument(f'--{name}', dest=name, action='store_true')
+        parser.add_argument(f'--no-{name}', dest=name, action='store_false')
+        parser.set_defaults(**{name: default})
+
     def add_arguments(self, parser):
         parser.add_argument('--batch_size',
                             action='store',
@@ -40,6 +45,9 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                             type=str,
                             default='',
                             help='Comma-separated list of application IDs for which tokens will NOT be removed')
+        self._add_boolean_flag(parser, 'refresh-tokens', True)
+        self._add_boolean_flag(parser, 'access-tokens', True)
+        self._add_boolean_flag(parser, 'grants', True)
 
     def clear_table_data(self, query_set, batch_size, model, sleep_time):  # lint-amnesty, pylint: disable=missing-function-docstring
         total_deletions = 0
@@ -81,12 +89,15 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         now = timezone.now()
         refresh_expire_at = self.get_expiration_time(now)
 
-        query_set = RefreshToken.objects.filter(access_token__expires__lt=refresh_expire_at).exclude(
-            application_id__in=excluded_application_ids)
-        self.clear_table_data(query_set, batch_size, RefreshToken, sleep_time)
+        if options['refresh-tokens']:
+            query_set = RefreshToken.objects.filter(access_token__expires__lt=refresh_expire_at).exclude(
+                application_id__in=excluded_application_ids)
+            self.clear_table_data(query_set, batch_size, RefreshToken, sleep_time)
 
-        query_set = AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now)
-        self.clear_table_data(query_set, batch_size, AccessToken, sleep_time)
+        if options['access-tokens']:
+            query_set = AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now)
+            self.clear_table_data(query_set, batch_size, AccessToken, sleep_time)
 
-        query_set = Grant.objects.filter(expires__lt=now)
-        self.clear_table_data(query_set, batch_size, Grant, sleep_time)
+        if options['grants']:
+            query_set = Grant.objects.filter(expires__lt=now)
+            self.clear_table_data(query_set, batch_size, Grant, sleep_time)
