@@ -1800,7 +1800,7 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             'is_mobile_app': False,
         }
         return 'public_video.html', context
-    
+
     def get_organization_logo_from_course(self, course):
         """
         Get organization logo for this course

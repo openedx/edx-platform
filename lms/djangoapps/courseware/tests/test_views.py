@@ -3094,7 +3094,7 @@ class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
         content = response.content.decode('utf-8')
 
         # Then the page does not render an org logo
-        org_logo = re.search(f'<img .*class=[\'"]org-logo[\'"].*>', content)
+        org_logo = re.search('<img .*class=[\'"]org-logo[\'"].*>', content)
         self.assertIsNone(org_logo)
 
     @patch('lms.djangoapps.courseware.views.views.get_course_organization')
