@@ -79,8 +79,6 @@ class XBlockSerializer:
                     with filesystem.open(file_path, 'rb') as fh:
                         data = fh.read()
                     self.static_files.append(StaticFile(name=unit_file.name, data=data, url=None))
-        # Apply some transformations to the OLX:
-        self.transform_olx(olx_node, usage_id=block.scope_ids.usage_id)
         # Recursively serialize the children:
         if block.has_children:
             for child in block.get_children():

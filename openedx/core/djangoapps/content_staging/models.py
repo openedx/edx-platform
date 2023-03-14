@@ -8,8 +8,9 @@ import logging
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
 from opaque_keys.edx.django.models import LearningContextKeyField
+
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 log = logging.getLogger(__name__)
 
@@ -65,8 +66,18 @@ class StagedContent(models.Model):
     # What course or library this content comes from, if it exists in the CMS already. If it doesn't, leave this blank.
     source_context = LearningContextKeyField(max_length=255)
 
+    def get_source_context_title(self) -> str:
+        """ Get the title of the source context, if any """
+        if self.source_context and self.source_context.is_course:
+            course_overview = get_course_overview_or_none(self.source_context)
+            if course_overview:
+                return course_overview.display_name_with_default
+        # Just return the ID as the name, if it's empty or is not a course.
+        return self.source_context
+
     @classmethod
     def get_clipboard_content(cls, user_id: int) -> StagedContent|None:
+        """ Get the current clipboard contents for the specified user """
         return cls.objects.filter(
             user_id=user_id,
             purpose=cls.Purpose.CLIPBOARD,

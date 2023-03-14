@@ -295,8 +295,43 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
 
         copyXBlock: function(event) {
             event.preventDefault();
-            // This is a new feature, hidden behind a feature flag.
-            alert("Copying of XBlocks is coming soon.");
+            const clipboardEndpoint = "/api/content-staging/v1/clipboard/";
+            const element = this.findXBlockElement(event.target);
+            const usageKeyToCopy = element.data('locator');
+            // Start showing a "Copying" notification:
+            ViewUtils.runOperationShowingMessage(gettext('Copying'), () => {
+                return $.postJSON(
+                    clipboardEndpoint,
+                    { usage_key: usageKeyToCopy },
+                ).then((data) => {
+                    const status = data.staged_content?.status;
+                    if (status === "ready") {
+                        // The XBlock has been copied and is ready to use.
+                        return data;
+                    } else if (status === "loading") {
+                        // The clipboard is being loaded asynchonously. Poll the endpoint until the copying process is
+                        // complete:
+                        const deferred = $.Deferred;
+                        const checkStatus = () => {
+                            $.getJSON(clipboardEndpoint, (pollData) => {
+                                const newStatus = pollData.staged_content?.status;
+                                if (newStatus === "ready") {
+                                    deferred.resolve(pollData);
+                                } else if (newStatus === "loading") {
+                                    setTimeout(checkStatus, 1_000);
+                                } else {
+                                    deferred.reject();
+                                    throw new Error(`Unexpected clipboard status "${newStatus}" in successful API response.`);
+                                }
+                            })
+                        }
+                        setTimeout(checkStatus, 1_000);
+                        return deferred;
+                    } else {
+                        throw new Error(`Unexpected clipboard status "${status}" in successful API response.`);
+                    }
+                });
+            });
         },
 
         duplicateComponent: function(xblockElement) {

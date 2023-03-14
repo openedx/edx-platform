@@ -12,7 +12,9 @@ from rest_framework.views import APIView
 from common.djangoapps.student.auth import has_studio_read_access
 
 from openedx.core.lib.api.view_utils import view_auth_classes
+from xmodule import block_metadata_utils
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .block_serializer import XBlockSerializer
 from .models import StagedContent
@@ -40,7 +42,7 @@ class ClipboardEndpoint(APIView):
         clipboard, and if so what?)
         """
         staged_content = StagedContent.get_clipboard_content(request.user.id)
-        return Response(UserClipboardSerializer({staged_content: staged_content}).data)
+        return Response(UserClipboardSerializer({"staged_content": staged_content}).data)
 
     @apidocs.schema(
         parameters=[
@@ -52,7 +54,8 @@ class ClipboardEndpoint(APIView):
         ],
         responses={
             200: UserClipboardSerializer,
-            404: "The requested usage key does not exist, or you do not have permission to read it.",
+            403: "You do not have permission to read the specified usage key.",
+            404: "The requested usage key does not exist.",
         },
     )
     @atomic
@@ -77,8 +80,12 @@ class ClipboardEndpoint(APIView):
             raise PermissionDenied("You must be a member of the course team in Studio to export OLX using this API.")
 
         # Get the OLX of the content
-        block = modulestore().get_item(usage_key)
-        block_data = XBlockSerializer(block).data
+        try:
+            block = modulestore().get_item(usage_key)
+        except ItemNotFoundError:
+            raise NotFound("The requested usage key does not exist.")
+
+        block_data = XBlockSerializer(block)
         # Mark all of the user's existing StagedContent rows as EXPIRED
         StagedContent.objects.filter(user=request.user, purpose=StagedContent.Purpose.CLIPBOARD).update(
             status=StagedContent.Status.EXPIRED,
@@ -89,11 +96,12 @@ class ClipboardEndpoint(APIView):
             purpose=StagedContent.Purpose.CLIPBOARD,
             status=StagedContent.Status.READY,
             block_type=usage_key.block_type,
-            olx=block_data["olx_str"],
-            display_name=block.display_name,
+            olx=block_data.olx_str,
+            display_name=block_metadata_utils.display_name_with_default(block),
             source_context=usage_key.context_key,
         )
 
         # Return the current clipboard exactly as if GET was called:
         staged_content = StagedContent.get_clipboard_content(request.user.id)
-        return Response(UserClipboardSerializer({staged_content: staged_content}).data)
+        serializer = UserClipboardSerializer({"staged_content": staged_content})
+        return Response(serializer.data)

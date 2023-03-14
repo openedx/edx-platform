@@ -11,7 +11,7 @@ class StagedContentSerializer(serializers.ModelSerializer):
     Serializer for staged content. Doesn't include the OLX by default.
     """
     # The title of the course that the content came from originally, if relevant
-    source_context_title = serializers.CharField(allow_blank=True)
+    source_context_title = serializers.CharField(allow_blank=True, source="get_source_context_title")
 
     class Meta:
         model = StagedContent
@@ -25,6 +25,7 @@ class StagedContentSerializer(serializers.ModelSerializer):
             # We don't include OLX; it may be large
             'display_name',
             'source_context',
+            'source_context_title',
         ]
 
 
