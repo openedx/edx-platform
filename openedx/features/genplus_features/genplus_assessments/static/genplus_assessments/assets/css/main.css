@@ -581,14 +581,19 @@ blockquote cite {
   display: inline-block;
   vertical-align: middle;
   white-space: normal;
-  width: 370px;
+  width: 360px;
 }
 .rating-assessment .year-info {
   display: inline-block;
   vertical-align: middle;
   position: relative;
-  width: 220px;
+  width: 240px;
   padding: 10px;
+}
+.rating-assessment .year-info .text {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1.2;
 }
 .rating-assessment .year-info img {
   float: left;
@@ -750,10 +755,10 @@ blockquote cite {
   margin-right: 0.5rem;
 }
 .completion-badges li img {
-  filter: grayscale(1);
+  opacity: 0.5;
 }
 .completion-badges li.active img {
-  filter: grayscale(0);
+  opacity: 1;
 }
 .completion-badges li.active .image-frame {
   border-color: #eecae2;
@@ -800,9 +805,6 @@ blockquote cite {
   color: #ff0d5a;
 }
 
-.booster-badges {
-  page-break-before: always;
-}
 .booster-badges:before, .booster-badges:after {
   content: "";
   display: table;
@@ -834,6 +836,25 @@ blockquote cite {
 }
 .booster-badges .badges li img {
   max-width: 6rem;
+}
+
+.icon-info {
+  color: #ff0d5a;
+  border: 1px solid #ff0d5a;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+  height: 20px;
+  width: 20px;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 15px;
+  line-height: 16px;
+  margin-bottom: 2px;
+}
+
+.list-unstyled {
+  list-style: none;
 }
 
 header.alt {

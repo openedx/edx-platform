@@ -9,10 +9,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=2.0">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <!-- <link rel="stylesheet" href="${static.url('genplus_assessments/assets/css/main.css')}"> -->
-  <title></title>
+  <title>Assessment Report</title>
 </head>
 <body>
   <div class="wrapper">
@@ -21,7 +19,7 @@
         <div class="intro">
           <p>You are making excellent progress towards becoming a Gen+ leader – well done! This report shows just how much you have learned and all the growth you have made. You’re ready to keep using these skills in learning, life and work!</p>
         </div>
-          <div class="unit-completion">
+        <div class="unit-completion">
           <h3>Units completed so far</h3>
           <ul class="completion-badges">
             % for unit in student_data.get('units'):
@@ -48,7 +46,7 @@
             % for badge in student_data.get('booster_badges'):
               <li>
                 <img src="${ badge.get('image_url') }" alt="">
-                <span class="date">${ badge.get('created').strftime('%d-%m-%Y') }</span>
+                <span class="date">${ badge.get('created').strftime('%d/%m/%Y') }</span>
               </li>
             % endfor
           </ul>
@@ -73,34 +71,36 @@
                   <div class="question-text">
                     <p><strong>Question ${ question_id }: &nbsp;</strong>${ question.get('problem_statement')}</p>
                   </div>
-                  % if question.get('total_problem_score'):
                   <div class="year-info start">
                     <img src="${static.url('genplus_assessments/assets/images/start.png')}" width="32" alt="" />
                     <ul class="star-rating">
-                      % for i, star in enumerate(range(question.get('total_problem_score', 0))):
-                        % if i < question.get('score_start_of_year'):
-                          <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
-                        % else:
-                          <li><img src="${static.url('genplus_assessments/assets/images/star-outline.png')}" width="25" alt="Favourite" /></li>
-                        % endif
-                      % endfor
+                      % if question.get('total_problem_score'):
+                        % for i, star in enumerate(range(question.get('total_problem_score', 0))):
+                          % if i < question.get('score_start_of_year'):
+                            <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+                          % else:
+                            <li><img src="${static.url('genplus_assessments/assets/images/star-outline.png')}" width="25" alt="Favourite" /></li>
+                          % endif
+                        % endfor
+                      % endif
                     </ul>
                   </div>
-                  % endif
-                  % if question.get('total_problem_score'):
                   <div class="year-info end">
                     <img src="${static.url('genplus_assessments/assets/images/end.png')}" width="32" alt="" />
                     <ul class="star-rating">
-                      % for i, star in enumerate(range(question.get('total_problem_score', 0))):
-                        % if i < question.get('score_end_of_year'):
-                          <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
-                        % else:
-                          <li><img src="${static.url('genplus_assessments/assets/images/star-outline.png')}" width="25" alt="Favourite" /></li>
-                        % endif
-                      % endfor
+                      % if question.get('total_problem_score') and question.get('score_end_of_year') > 0:
+                        % for i, star in enumerate(range(question.get('total_problem_score', 0))):
+                          % if i < question.get('score_end_of_year'):
+                            <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
+                          % else:
+                            <li><img src="${static.url('genplus_assessments/assets/images/star-outline.png')}" width="25" alt="Favourite" /></li>
+                          % endif
+                        % endfor
+                      % else:
+                        <li><strong class="icon-info">&#x21;</strong><span class="text">Still to<br />complete</span></li>
+                      % endif
                     </ul>
                   </div>
-                  % endif
                 </div>
                 <hr />
               % elif question.get('assessment_type') == 'genz_text_assessment':
@@ -109,26 +109,30 @@
                     <p><strong>Question ${ question_id }: &nbsp;</strong>${ question.get('problem_statement')}</p>
                   </div>
                   <div class="answers">
-                    % if question.get('response_start_of_year'):
                     <div class="answer-list start-year">
                       <img src="${static.url('genplus_assessments/assets/images/start.png')}" width="32" alt="" />
-                      <ul>
-                        % for response in question.get('response_start_of_year', []):
-                          <li>${ response }</li>
-                        % endfor
-                      </ul>
+                      % if question.get('response_start_of_year'):
+                        <ul>
+                          % for response in question.get('response_start_of_year', []):
+                            <li>${ response }</li>
+                          % endfor
+                        </ul>
+                      % endif
                     </div>
-                    % endif
-                    % if question.get('response_end_of_year'):
                     <div class="answer-list end-year">
                       <img src="${static.url('genplus_assessments/assets/images/end.png')}" width="32" alt="" />
-                      <ul>
-                        % for response in question.get('response_end_of_year', []):
-                          <li>${ response }</li>
-                        % endfor
-                      </ul>
+                      % if question.get('response_end_of_year'):
+                        <ul>
+                          % for response in question.get('response_end_of_year', []):
+                            <li>${ response }</li>
+                          % endfor
+                        </ul>
+                      % else:
+                        <ul class="list-unstyled">
+                          <li><p><strong class="icon-info">&#x21;</strong> Still to complete</p></li>
+                        </ul>
+                      % endif
                     </div>
-                    % endif
                   </div>
                 </div>
                 <hr />
@@ -200,7 +204,7 @@
             % for badge in student_data.get('booster_badges'):
               <li>
                 <img src="${ badge.get('image_url') }" alt="">
-                <span class="date">${ badge.get('created').strftime('%d-%m-%Y') }</span>
+                <span class="date">${ badge.get('created').strftime('%d/%m/%Y') }</span>
               </li>
             % endfor
           </ul>
@@ -224,7 +228,7 @@
                   % for comment in value.get('comments'):
                     <blockquote>
                       <q>${ comment.get('description') }</q>
-                      <cite>${ comment.get('datetime').strftime('%d-%m-%Y') }</cite>
+                      <cite>${ comment.get('datetime').strftime('%d/%m/%Y') }</cite>
                     </blockquote>
                   % endfor
                 % endfor

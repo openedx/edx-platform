@@ -303,15 +303,21 @@ blockquote {
     display: inline-block;
     vertical-align: middle;
     white-space: normal;
-    width: 370px;
+    width: 360px;
   }
 
   .year-info {
     display: inline-block;
     vertical-align: middle;
     position: relative;
-    width: 220px;
+    width: 240px;
     padding: 10px;
+
+    .text {
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1.2;
+    }
 
     img {
       float: left;
@@ -480,13 +486,13 @@ blockquote {
     margin-right: .5rem;
 
     img {
-      filter: grayscale(1);
+      opacity: .5;
     }
 
     &.active {
 
         img {
-          filter: grayscale(0);
+          opacity: 1;
         }
 
         .image-frame {
@@ -550,7 +556,6 @@ blockquote {
 }
 
 .booster-badges {
-  page-break-before: always;
   @include clearfix;
 
   h2,
@@ -582,4 +587,23 @@ blockquote {
       }
     }
   }
+}
+
+.icon-info {
+  color: $pink;
+  border: 1px solid $pink;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+  height: 20px;
+  width: 20px;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 15px;
+  line-height: 16px;
+  margin-bottom: 2px;
+}
+
+.list-unstyled {
+  list-style: none;
 }
