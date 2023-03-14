@@ -16,7 +16,7 @@ aiosignal==1.3.1
     #   aiohttp
 alabaster==0.7.13
     # via sphinx
-algoliasearch==3.0.0
+algoliasearch==2.6.3
     # via -r requirements/edx/testing.txt
 amqp==5.1.1
     # via
