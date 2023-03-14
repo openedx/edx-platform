@@ -12,6 +12,7 @@ class StagedContentSerializer(serializers.ModelSerializer):
     """
     # The title of the course that the content came from originally, if relevant
     source_context_title = serializers.CharField(allow_blank=True, source="get_source_context_title")
+    olx_url = serializers.HyperlinkedIdentityField(view_name="staged-content-olx", lookup_field="id")
 
     class Meta:
         model = StagedContent
@@ -22,7 +23,8 @@ class StagedContentSerializer(serializers.ModelSerializer):
             'purpose',
             'status',
             'block_type',
-            # We don't include OLX; it may be large
+            # We don't include OLX; it may be large. But we include the URL to retrieve it.
+            'olx_url',
             'display_name',
             'source_context',
             'source_context_title',

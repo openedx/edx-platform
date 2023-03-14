@@ -309,9 +309,9 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                         // The XBlock has been copied and is ready to use.
                         return data;
                     } else if (status === "loading") {
-                        // The clipboard is being loaded asynchonously. Poll the endpoint until the copying process is
-                        // complete:
-                        const deferred = $.Deferred;
+                        // The clipboard is being loaded asynchonously.
+                        // Poll the endpoint until the copying process is complete:
+                        const deferred = $.Deferred();
                         const checkStatus = () => {
                             $.getJSON(clipboardEndpoint, (pollData) => {
                                 const newStatus = pollData.staged_content?.status;

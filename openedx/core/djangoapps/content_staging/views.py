@@ -1,6 +1,8 @@
 import logging
 
 from django.db.transaction import atomic
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
@@ -24,6 +26,26 @@ log = logging.getLogger(__name__)
 
 
 @view_auth_classes(is_authenticated=True)
+class StagedContentOLXEndpoint(APIView):
+    """
+    API Endpoint to get the OLX of any given StagedContent.
+    """
+
+    def get(self, request, id):
+        """
+        Get the OLX of the given StagedContent object.
+        """
+        staged_content = get_object_or_404(StagedContent,
+            # Users can only access their own staged content:
+            user=request.user.id,
+            pk=id,
+        )
+        return HttpResponse(staged_content.olx, headers={
+            "Content-Type": f"application/vnd.openedx.xblock.v1.{staged_content.block_type}+xml",
+        })
+
+
+@view_auth_classes(is_authenticated=True)
 class ClipboardEndpoint(APIView):
     """
     API Endpoint that can be used to get the status of the current user's
@@ -39,10 +61,11 @@ class ClipboardEndpoint(APIView):
     def get(self, request):
         """
         Get the status of the user's clipboard. (Is there any content in the
-        clipboard, and if so what?)
+        clipboard, and if so what?) This does not return the OLX.
         """
         staged_content = StagedContent.get_clipboard_content(request.user.id)
-        return Response(UserClipboardSerializer({"staged_content": staged_content}).data)
+        serializer = UserClipboardSerializer({"staged_content": staged_content}, context={"request": request})
+        return Response(serializer.data)
 
     @apidocs.schema(
         parameters=[
@@ -102,6 +125,4 @@ class ClipboardEndpoint(APIView):
         )
 
         # Return the current clipboard exactly as if GET was called:
-        staged_content = StagedContent.get_clipboard_content(request.user.id)
-        serializer = UserClipboardSerializer({"staged_content": staged_content})
-        return Response(serializer.data)
+        return self.get(request)
