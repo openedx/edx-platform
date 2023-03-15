@@ -30,7 +30,6 @@ from edxval.api import (
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
-from lms.djangoapps.courseware.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
@@ -43,6 +42,7 @@ from ..videos import (
     ENABLE_VIDEO_UPLOAD_PAGINATION,
     KEY_EXPIRATION_IN_SECONDS,
     VIDEO_IMAGE_UPLOAD_ENABLED,
+    PUBLIC_VIDEO_SHARE,
     StatusDisplayStrings,
     TranscriptProvider,
     _get_default_video_image_url,
@@ -1573,23 +1573,56 @@ class VideoUrlsCsvTestCase(
 
 
 @ddt.ddt
-class VideoSharingEnabledTestCase(
+class GetVideoFeaturesTestCase(
     VideoStudioAccessTestsMixin,
     CourseTestCase
 ):
-    """Test cases for the CSV download endpoint for video uploads"""
+    """Test cases for the get_video_features endpoint """
     def setUp(self):
         super().setUp()
         self.url = self.get_url_for_course_key()
 
     def get_url_for_course_key(self, course_id=None):
+        """ Helper to generate a url for a course key """
         course_id = course_id or str(self.course.id)
-        return reverse_course_url("video_sharing_enabled", course_id)
+        return reverse_course_url("video_features", course_id)
+
+    def test_basic(self):
+        """ Test for expected return keys """
+        response = self.client.get(self.get_url_for_course_key())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            set(response.json().keys()),
+            {
+                'videoSharingEnabled',
+                'allowThumbnailUpload',
+            }
+        )
 
     @ddt.data(True, False)
-    def test_video_sharing_enabled(self, is_enabled):
-        with override_waffle_flag(PUBLIC_VIDEO_SHARE, is_enabled):
+    def test_video_share_enabled(self, is_enabled):
+        """ Test the public video share flag """
+        self._test_video_feature(
+            PUBLIC_VIDEO_SHARE,
+            'videoSharingEnabled',
+            override_waffle_flag,
+            is_enabled,
+        )
+
+    @ddt.data(True, False)
+    def test_video_image_upload_enabled(self, is_enabled):
+        """ Test the video image upload switch """
+        self._test_video_feature(
+            VIDEO_IMAGE_UPLOAD_ENABLED,
+            'allowThumbnailUpload',
+            override_waffle_switch,
+            is_enabled,
+        )
+
+    def _test_video_feature(self, flag, key, override_fn, is_enabled):
+        """ Test that setting a waffle flag or switch on or off will cause the expected result """
+        with override_fn(flag, is_enabled):
             response = self.client.get(self.get_url_for_course_key())
 
         self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(response.json(), {'videoSharingEnabled': is_enabled})
+        self.assertEqual(response.json()[key], is_enabled)

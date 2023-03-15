@@ -66,7 +66,7 @@ __all__ = [
     'video_encodings_download',
     'video_images_handler',
     'video_images_upload_enabled',
-    'video_sharing_enabled',
+    'get_video_features',
     'transcript_preferences_handler',
     'generate_video_upload_link_handler',
 ]
@@ -281,15 +281,18 @@ def video_images_upload_enabled(request):
 @ensure_valid_course_key
 @login_required
 @require_GET
-def video_sharing_enabled(request, course_key_string):
-    """Is the public video sharing feature enabled for this course"""
+def get_video_features(request, course_key_string):
+    """ Return a dict with info about which video features are enabled """
     course_key = CourseKey.from_string(course_key_string)
     course = get_course_and_check_access(course_key, request.user)
     if not course:
         return HttpResponseNotFound()
 
-    enabled = PUBLIC_VIDEO_SHARE.is_enabled(course_key)
-    return JsonResponse({'videoSharingEnabled': enabled})
+    features = {
+        'allowThumbnailUpload': VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled(),
+        'videoSharingEnabled': PUBLIC_VIDEO_SHARE.is_enabled(course_key),
+    }
+    return JsonResponse(features)
 
 
 def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnaround,
