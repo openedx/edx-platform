@@ -161,6 +161,7 @@
 # Diego Rojas <diego.rojas@edunext.co>, 2017
 # Poxtic <erandelle@outlook.com>, 2017
 # Javier Galnares Arias <javigalnares@yahoo.es>, 2015
+# Jesica Greco, 2023
 # Jose Antonio Sanchez Romero <isc.antonio.sr@gmail.com>, 2017
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017,2022
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
@@ -177,9 +178,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-26 20:42+0000\n"
+"POT-Creation-Date: 2023-03-05 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017,2022\n"
+"Last-Translator: Jesica Greco, 2023\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -10752,11 +10753,13 @@ msgstr "Habilitar discusión"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Topics for unpublished units would not be created"
-msgstr ""
+msgstr "No se crearían temas para unidades no publicadas"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Please enable discussions for graded units from course authoring app"
 msgstr ""
+"Habilitar los debates para las unidades calificadas desde la aplicación de "
+"creación de cursos"
 
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"

@@ -8733,6 +8733,7 @@ msgid "Success"
 msgstr "Opération réussie"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Actions"
@@ -24944,6 +24945,14 @@ msgstr "Paramètres d'accès"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Définir l'accès"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

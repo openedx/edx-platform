@@ -22577,6 +22577,14 @@ msgid "Set Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
 msgstr ""
 

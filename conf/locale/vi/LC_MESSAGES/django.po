@@ -7412,6 +7412,7 @@ msgstr ""
 msgid "Success"
 msgstr "Thành công"
 
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Actions"
@@ -22204,6 +22205,14 @@ msgstr "Những Thiết lập Truy cập"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Thiết lạp Truy cập"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
