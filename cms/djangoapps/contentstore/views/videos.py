@@ -45,6 +45,8 @@ from rest_framework.response import Response
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse, expect_json
+from common.djangoapps.util.views import ensure_valid_course_key
+from lms.djangoapps.courseware.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
@@ -64,6 +66,7 @@ __all__ = [
     'video_encodings_download',
     'video_images_handler',
     'video_images_upload_enabled',
+    'video_sharing_enabled',
     'transcript_preferences_handler',
     'generate_video_upload_link_handler',
 ]
@@ -273,6 +276,20 @@ def video_images_upload_enabled(request):
         return JsonResponse({'allowThumbnailUpload': False})
 
     return JsonResponse({'allowThumbnailUpload': True})
+
+
+@ensure_valid_course_key
+@login_required
+@require_GET
+def video_sharing_enabled(request, course_key_string):
+    """Is the public video sharing feature enabled for this course"""
+    course_key = CourseKey.from_string(course_key_string)
+    course = get_course_and_check_access(course_key, request.user)
+    if not course:
+        return HttpResponseNotFound()
+
+    enabled = PUBLIC_VIDEO_SHARE.is_enabled(course_key)
+    return JsonResponse({'videoSharingEnabled': enabled})
 
 
 def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnaround,

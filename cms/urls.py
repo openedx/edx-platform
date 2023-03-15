@@ -162,8 +162,13 @@ urlpatterns = oauth2_urlpatterns + [
             contentstore_views.generate_video_upload_link_handler, name='generate_video_upload_link'),
     re_path(fr'^video_images/{settings.COURSE_KEY_PATTERN}(?:/(?P<edx_video_id>[-\w]+))?$',
             contentstore_views.video_images_handler, name='video_images_handler'),
-    path('video_images_upload_enabled', contentstore_views.video_images_upload_enabled,
+    path('', contentstore_views.video_images_upload_enabled,
          name='video_images_upload_enabled'),
+    re_path(
+        fr'^video_sharing_enabled/{settings.COURSE_KEY_PATTERN}',
+        contentstore_views.video_sharing_enabled,
+        name='video_sharing_enabled'
+    ),
     re_path(fr'^transcript_preferences/{settings.COURSE_KEY_PATTERN}$',
             contentstore_views.transcript_preferences_handler, name='transcript_preferences_handler'),
     re_path(fr'^transcript_credentials/{settings.COURSE_KEY_PATTERN}$',

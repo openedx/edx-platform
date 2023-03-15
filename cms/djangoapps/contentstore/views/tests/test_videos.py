@@ -30,6 +30,7 @@ from edxval.api import (
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
+from lms.djangoapps.courseware.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
@@ -159,11 +160,10 @@ class VideoUploadTestBase:
         )
 
 
-class VideoUploadTestMixin(VideoUploadTestBase):
+class VideoStudioAccessTestsMixin:
     """
-    Test cases for the video upload feature
+    Base Access tests for studio video views
     """
-
     def test_anon_user(self):
         self.client.logout()
         response = self.client.get(self.url)
@@ -184,6 +184,11 @@ class VideoUploadTestMixin(VideoUploadTestBase):
         response = client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
+
+class VideoPipelineStudioAccessTestsMixin:
+    """
+    Access tests for video views that rely on the video pipeline
+    """
     def test_video_pipeline_not_enabled(self):
         settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] = False
         self.assertEqual(self.client.get(self.url).status_code, 404)
@@ -329,7 +334,13 @@ class VideoUploadPostTestsMixin:
 @override_settings(VIDEO_UPLOAD_PIPELINE={
     "VEM_S3_BUCKET": "vem_test_bucket", "BUCKET": "test_bucket", "ROOT_PATH": "test_root"
 })
-class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, CourseTestCase):
+class VideosHandlerTestCase(
+    VideoUploadTestBase,
+    VideoStudioAccessTestsMixin,
+    VideoPipelineStudioAccessTestsMixin,
+    VideoUploadPostTestsMixin,
+    CourseTestCase
+):
     """Test cases for the main video upload endpoint"""
 
     VIEW_NAME = 'videos_handler'
@@ -841,7 +852,11 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
 @override_settings(VIDEO_UPLOAD_PIPELINE={
     "VEM_S3_BUCKET": "vem_test_bucket", "BUCKET": "test_bucket", "ROOT_PATH": "test_root"
 })
-class GenerateVideoUploadLinkTestCase(VideoUploadTestBase, VideoUploadPostTestsMixin, CourseTestCase):
+class GenerateVideoUploadLinkTestCase(
+    VideoUploadTestBase,
+    VideoUploadPostTestsMixin,
+    CourseTestCase
+):
     """
     Test cases for the main video upload endpoint
     """
@@ -1472,7 +1487,12 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
 
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
-class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
+class VideoUrlsCsvTestCase(
+    VideoUploadTestBase,
+    VideoStudioAccessTestsMixin,
+    VideoPipelineStudioAccessTestsMixin,
+    CourseTestCase
+):
     """Test cases for the CSV download endpoint for video uploads"""
 
     VIEW_NAME = "video_encodings_download"
@@ -1550,3 +1570,26 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             response["Content-Disposition"],
             "attachment; filename*=utf-8''n%C3%B3n-%C3%A4scii_video_urls.csv"
         )
+
+
+@ddt.ddt
+class VideoSharingEnabledTestCase(
+    VideoStudioAccessTestsMixin,
+    CourseTestCase
+):
+    """Test cases for the CSV download endpoint for video uploads"""
+    def setUp(self):
+        super().setUp()
+        self.url = self.get_url_for_course_key()
+
+    def get_url_for_course_key(self, course_id=None):
+        course_id = course_id or str(self.course.id)
+        return reverse_course_url("video_sharing_enabled", course_id)
+
+    @ddt.data(True, False)
+    def test_video_sharing_enabled(self, is_enabled):
+        with override_waffle_flag(PUBLIC_VIDEO_SHARE, is_enabled):
+            response = self.client.get(self.get_url_for_course_key())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(response.json(), {'videoSharingEnabled': is_enabled})
