@@ -361,6 +361,7 @@ class UserCreationForm(EmailRequiredMixin, BaseUserCreationForm):
 
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
+    inlines = (UserProfileInline, AccountRecoveryInline)
     form = UserChangeForm
     add_form = UserCreationForm
     add_fieldsets = (

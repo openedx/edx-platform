@@ -13,6 +13,7 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, \
     FavoriteArticle, ReflectionAnswer, Reflection, \
     ArticleViewLog, PortfolioEntry, Quote, AlertBarEntry, HelpGuide, HelpGuideRating, PortfolioReflection
+from openedx.features.genplus_features.genplus_teach.constants import AcademicYears
 from openedx.features.genplus_features.genplus.api.v1.mixins import GenzMixin
 from openedx.features.genplus_features.genplus.models import Teacher, Skill
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
@@ -37,7 +38,7 @@ class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
     serializer_class = ArticleSerializer
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['title', 'content']
-    filterset_fields = ('skill', 'media_type', 'gtcs', 'is_completed', 'is_archived')
+    filterset_fields = ('skill', 'media_type', 'gtcs', 'is_completed', 'academic_year', 'is_archived')
     filterset_class = ArticleFilter
     queryset = Article.objects.exclude(is_draft=True)
 
@@ -284,10 +285,12 @@ class FiltersViewSet(viewsets.ViewSet):
         gtcs_serializer = GtcsSerializer(Gtcs.objects.all(), many=True)
         skills_serializer = SkillSerializer(Skill.objects.all(), many=True)
         media_type_serializer = MediaTypeSerializer(MediaType.objects.all(), many=True)
+        academic_year = AcademicYears.__LIST__
         data = {
             'gtcs': gtcs_serializer.data,
             'skills': skills_serializer.data,
-            'media_types': media_type_serializer.data
+            'media_types': media_type_serializer.data,
+            'academic_year': academic_year
         }
         return Response(data)
 
@@ -348,20 +351,20 @@ class PortfolioReflectionView(generics.ListAPIView):
         search = self.request.query_params.get('search', '')
         skill = self.request.query_params.get('skill')
         gtcs = self.request.query_params.get('standard')
-        
+
         query = (
             Q(portfolio__teacher=teacher) & (
                 Q(portfolio__title__icontains=search)
                 | Q(portfolio__description__icontains=search)
             )
         )
-        
+
         if skill:
             query &= Q(portfolio__skill__id=skill)
-        
+
         if gtcs:
             query &= Q(portfolio__gtcs__id=gtcs)
-        
+
         if not (skill or gtcs):
             query |= (
                 Q(reflection__teacher=teacher) & (

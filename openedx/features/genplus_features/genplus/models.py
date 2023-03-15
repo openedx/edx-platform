@@ -86,7 +86,9 @@ class GenUser(models.Model):
     year_of_entry = models.CharField(max_length=32, null=True, blank=True)
     registration_group = models.CharField(max_length=32, null=True, blank=True)
     has_password_changed = models.BooleanField(default=True,
-                                               help_text='Mark this as false to force user to change it password.')
+                                               help_text='If selected, the user has changed their password. '
+                                                         'De-select to force user to change password '
+                                                         '(enforced immediately).')
 
     @property
     def is_student(self):
@@ -267,13 +269,13 @@ class GenLog(TimeStampedModel):
         return self.description
 
     @classmethod
-    def create_remove_student_log(cls, gen_class, student_ids):
+    def create_student_log(cls, gen_class, student_ids, log_type):
         remove_student_logs = []
         for student in Student.objects.filter(id__in=student_ids):
             remove_student_logs.append(
                 cls(
-                    gen_log_type=GenLogTypes.STUDENT_REMOVED_FROM_CLASS,
-                    description=f'{student.gen_user.email} removed from class {gen_class.name}',
+                    gen_log_type=log_type,
+                    description=f'{student.gen_user.email} {log_type} {gen_class.name}',
                     metadata={
                         'email': student.gen_user.email,
                         'identity_guid': student.gen_user.identity_guid,

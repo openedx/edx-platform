@@ -118,8 +118,9 @@ class GenLogTypes:
     """
     RM_UNIFY_PROVISION_UPDATE_USER_DELETE = 'RMUnify provision update user deleted'
     STUDENT_REMOVED_FROM_CLASS = 'Student removed from class'
+    STUDENT_ADDED_TO_CLASS = 'Student added to class'
 
-    __ALL__ = (RM_UNIFY_PROVISION_UPDATE_USER_DELETE, STUDENT_REMOVED_FROM_CLASS)
+    __ALL__ = (RM_UNIFY_PROVISION_UPDATE_USER_DELETE, STUDENT_REMOVED_FROM_CLASS, STUDENT_ADDED_TO_CLASS)
     __MODEL_CHOICES__ = (
         (gen_log_type, gen_log_type) for gen_log_type in __ALL__
     )

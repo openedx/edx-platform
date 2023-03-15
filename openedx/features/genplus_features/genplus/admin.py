@@ -441,5 +441,9 @@ class StudentAdmin(admin.ModelAdmin):
                 program_data[program.year_group.name] = "Not enrolled yet"
         return str(program_data)
 
+@admin.register(GenLog)
+class GenLog(admin.ModelAdmin):
+    list_filter = ('gen_log_type', )
+    search_fields = ('metadata',)
+    list_display = ('description', 'gen_log_type', 'metadata', 'created')
 
-admin.site.register(GenLog)
