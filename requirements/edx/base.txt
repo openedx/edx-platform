@@ -763,7 +763,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/base.in
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.in
-openedx-events==7.0.0
+openedx-events==5.1.0
     # via
     #   -r requirements/edx/base.in
     #   edx-event-bus-kafka
