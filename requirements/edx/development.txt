@@ -392,7 +392,7 @@ django-filter==22.1
     #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-blockstore
-django-ipware==5.0.0
+django-ipware==4.0.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
