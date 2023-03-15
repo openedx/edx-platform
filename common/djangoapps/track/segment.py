@@ -20,8 +20,9 @@ def track(user_id, event_name, properties=None, context=None):
     """
     Wrapper for emitting Segment track event, including augmenting context information from middleware.
     """
-
-    if event_name is not None and hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
+    segment_key = settings.LMS_SEGMENT_KEY if hasattr(settings, 'LMS_SEGMENT_KEY') else None
+    if event_name is not None and segment_key:
+        analytics.write_key = segment_key
         properties = properties or {}
         segment_context = dict(context) if context else {}
         tracking_context = tracker.get_tracker().resolve_context()
@@ -66,6 +67,8 @@ def identify(user_id, properties, context=None):
     """
     Wrapper for emitting Segment identify event.
     """
-    if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
+    segment_key = settings.LMS_SEGMENT_KEY if hasattr(settings, 'LMS_SEGMENT_KEY') else None
+    if segment_key:
+        analytics.write_key = segment_key
         segment_context = dict(context) if context else {}
         analytics.identify(user_id, properties, segment_context)
