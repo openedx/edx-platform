@@ -3,9 +3,12 @@
 
 import json
 import logging
+from functools import lru_cache
 from time import time
 
 from django.conf import settings
+from django.dispatch import receiver
+from django.test.signals import setting_changed
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_rbac.utils import create_role_auth_claim_for_user
 from jwkest import jwk
@@ -247,12 +250,31 @@ def _attach_profile_claim(payload, user):
     })
 
 
+@lru_cache
+def _load_signer_and_keys(use_asymmetric_key, secret):
+    """
+    Load the currently configured JWS signer and keys.
+
+    This is cached because otherwise on every request 1) we'd have to round-trip
+    some JSON and 2) the JWS signer would have to compute p, q, dp, dq, and qi
+    (unless those are pre-computed in the keys, which we'd like not to have to
+    rely on). It's not clear if these have significant performance penalty, but
+    it's easier to just cache.
+
+    Returns:
+        Tuple of configured JWS instance and signing keys.
+    """
+    pass
+
+
 def _encode_and_sign(payload, use_asymmetric_key, secret):
     """Encode and sign the provided payload."""
     keys = jwk.KEYS()
 
     if use_asymmetric_key:
         serialized_keypair = json.loads(settings.JWT_AUTH['JWT_PRIVATE_SIGNING_JWK'])
+        if 'p' in serialized_keypair:
+            breakpoint()
         keys.add(serialized_keypair)
         algorithm = settings.JWT_AUTH['JWT_SIGNING_ALGORITHM']
     else:
@@ -263,3 +285,9 @@ def _encode_and_sign(payload, use_asymmetric_key, secret):
     data = json.dumps(payload)
     jws = JWS(data, alg=algorithm)
     return jws.sign_compact(keys=keys)
+
+
+@receiver(setting_changed)
+def _reset_state(sender, **kwargs):  # pylint: disable=unused-argument
+    """Reset caches when settings change during unit tests."""
+    _load_signer_and_keys.cache_clear()
