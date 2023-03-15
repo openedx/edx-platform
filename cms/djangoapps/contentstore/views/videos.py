@@ -487,7 +487,6 @@ def _get_and_validate_course(course_key_string, user):
     # For now, assume all studio users that have access to the course can upload videos.
     # In the future, we plan to add a new org-level role for video uploaders.
     course = get_course_and_check_access(course_key, user)
-    return course
 
     if (
         settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] and
@@ -808,7 +807,7 @@ def storage_service_bucket():
         params = {
             'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
             'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY,
-            # 'security_token': settings.AWS_SECURITY_TOKEN
+            'security_token': settings.AWS_SECURITY_TOKEN
 
         }
     else:
