@@ -1739,7 +1739,7 @@ class BasePublicVideoXBlockView(View):
         """
         Load course and video from modulestore.
         Raises 404 if:
-         - courseware.public_video_share waffle flag is not enabled for this course
+         - video_config.public_video_share waffle flag is not enabled for this course
          - block is not video
          - block is not marked as "public_access"
          """
