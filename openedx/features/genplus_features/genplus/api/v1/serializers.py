@@ -4,6 +4,7 @@ from openedx.features.genplus_features.genplus.models import Teacher, Character,
 from openedx.features.genplus_features.common.display_messages import ErrorMessages
 from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.hashers import check_password
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -193,13 +194,19 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError(ErrorMessages.OLD_PASSWORD_ERROR)
         return value
 
+    def validate_new_password1(self, value):
+        # check if new password is not same as the old one
+        if check_password(value, self.user.password):
+            raise serializers.ValidationError(ErrorMessages.NEW_SAME_AS_OLD_PASSWORD_ERROR)
+        return value
+
+
+
     def validate(self, attrs):
         self.set_password_form = self.set_password_form_class(
             user=self.user, data=attrs
         )
-
         if not self.set_password_form.is_valid():
-            print(self.set_password_form.errors)
             raise serializers.ValidationError(self.set_password_form.errors)
         return attrs
 

@@ -22,6 +22,7 @@ class SuccessMessages:
 class ErrorMessages:
     INTERNAL_SERVER = 'Some error occur on the server. The request can not be completed for now.'
     OLD_PASSWORD_ERROR = "Your old password was entered incorrectly. Please enter it again."
+    NEW_SAME_AS_OLD_PASSWORD_ERROR = "Your new password cannot be the same as old one. Please enter a different one."
     ACTION_VALIDATION_ERROR = 'Action can only be add or remove'
     CLASS_ALREADY_ADDED = '{class_name} is already added in your classes.'
     LESSON_ALREADY_UNLOCKED = 'You cannot lock the lesson which is already unlocked.'
