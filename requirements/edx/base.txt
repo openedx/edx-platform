@@ -1058,7 +1058,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==3.0.1
+snowflake-connector-python==3.0.0
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via

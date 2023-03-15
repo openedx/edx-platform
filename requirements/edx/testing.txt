@@ -1402,7 +1402,7 @@ sniffio==1.3.0
     #   anyio
     #   httpcore
     #   httpx
-snowflake-connector-python==3.0.1
+snowflake-connector-python==3.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
