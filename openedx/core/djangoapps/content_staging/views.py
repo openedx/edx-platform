@@ -40,6 +40,10 @@ class StagedContentOLXEndpoint(APIView):
             user=request.user.id,
             pk=id,
         )
+        if staged_content.status != StagedContent.Status.READY:
+            # If the status is LOADING, the OLX may not be generated/valid yet.
+            # If the status is ERROR or EXPIRED, this row is no longer usable.
+            raise NotFound("The requested content is not available.")
         return HttpResponse(staged_content.olx, headers={
             "Content-Type": f"application/vnd.openedx.xblock.v1.{staged_content.block_type}+xml",
         })
@@ -81,7 +85,6 @@ class ClipboardEndpoint(APIView):
             404: "The requested usage key does not exist.",
         },
     )
-    @atomic
     def post(self, request):
         """
         Put some piece of content into the user's clipboard.
@@ -107,22 +110,22 @@ class ClipboardEndpoint(APIView):
             block = modulestore().get_item(usage_key)
         except ItemNotFoundError:
             raise NotFound("The requested usage key does not exist.")
-
         block_data = XBlockSerializer(block)
-        # Mark all of the user's existing StagedContent rows as EXPIRED
-        StagedContent.objects.filter(user=request.user, purpose=StagedContent.Purpose.CLIPBOARD).update(
-            status=StagedContent.Status.EXPIRED,
-        )
-        # Insert a new StagedContent row for this
-        StagedContent.objects.create(
-            user=request.user,
-            purpose=StagedContent.Purpose.CLIPBOARD,
-            status=StagedContent.Status.READY,
-            block_type=usage_key.block_type,
-            olx=block_data.olx_str,
-            display_name=block_metadata_utils.display_name_with_default(block),
-            source_context=usage_key.context_key,
-        )
 
-        # Return the current clipboard exactly as if GET was called:
-        return self.get(request)
+        with atomic():
+            # Mark all of the user's existing StagedContent rows as EXPIRED
+            StagedContent.objects.filter(user=request.user, purpose=StagedContent.Purpose.CLIPBOARD).update(
+                status=StagedContent.Status.EXPIRED,
+            )
+            # Insert a new StagedContent row for this
+            StagedContent.objects.create(
+                user=request.user,
+                purpose=StagedContent.Purpose.CLIPBOARD,
+                status=StagedContent.Status.READY,
+                block_type=usage_key.block_type,
+                olx=block_data.olx_str,
+                display_name=block_metadata_utils.display_name_with_default(block),
+                source_context=usage_key.context_key,
+            )
+            # Return the current clipboard exactly as if GET was called:
+            return self.get(request)
