@@ -635,7 +635,7 @@ def _section_data_download(course, access):
         ),
     }
     ######### EOL #############
-     try:
+    try:
         from eol_report_analytics import views
         section_data['has_eol_report_analytics'] = True
         section_data['eol_report_analytics_url'] = '{}?{}'.format(reverse('eol_report_analytics:data'), urllib.parse.urlencode({'course': str(course_key)}))
