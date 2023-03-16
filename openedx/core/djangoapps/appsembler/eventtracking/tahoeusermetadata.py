@@ -186,7 +186,7 @@ class TahoeUserMetadataProcessor(object):
         try:
             user_id = utils.get_user_id_from_event(event)
         except AttributeError:
-            logger.warning(
+            logger.debug(
                 "TahoeUserMetadataProcessor passed invalid type to "
                 "get_user_id_from_event: {}. Likely innocuous. "
                 "Logging and continuing.".format(event)
