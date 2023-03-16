@@ -183,14 +183,13 @@ class TahoeUserMetadataProcessor(object):
         # a bulk enrollment or exception certificate triggering the event.  Only use the
         # user from event itself.
 
-        event_data = event.get('data')
         try:
-            user_id = utils.get_user_id_from_event(event_data)
+            user_id = utils.get_user_id_from_event(event)
         except AttributeError:
-            logger.warning(
+            logger.debug(
                 "TahoeUserMetadataProcessor passed invalid type to "
                 "get_user_id_from_event: {}. Likely innocuous. "
-                "Logging and continuing.".format(event_data)
+                "Logging and continuing.".format(event)
             )
         else:
             if user_id:
