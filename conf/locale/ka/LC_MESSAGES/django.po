@@ -7693,6 +7693,7 @@ msgstr ""
 msgid "Success"
 msgstr "წარმატება"
 
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "მოქმედებები"
@@ -10627,8 +10628,10 @@ msgid "Count"
 msgstr "დათვლა"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "შეიყვანეთ კომპონენტების რაოდენობა, რომ ყოველმა სტუდენტმა ნახოს."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -22810,6 +22813,14 @@ msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

@@ -7542,6 +7542,7 @@ msgstr ""
 msgid "Success"
 msgstr "Mafanikio"
 
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Matendo"
@@ -10355,7 +10356,9 @@ msgid "Count"
 msgstr "Hesabu"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
 msgstr ""
 
 #: xmodule/library_content_block.py
@@ -22086,6 +22089,14 @@ msgstr "Mitegesho ya Kuyafikia maudhui"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Tegesha Upatikaji maudhui"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

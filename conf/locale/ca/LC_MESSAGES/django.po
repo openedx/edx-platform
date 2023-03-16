@@ -7444,6 +7444,7 @@ msgid "Success"
 msgstr "Éxit"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Accions"
@@ -10159,7 +10160,9 @@ msgid "Count"
 msgstr ""
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
 msgstr ""
 
 #: xmodule/library_content_block.py
@@ -22586,6 +22589,14 @@ msgstr "Configuració d'accés"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Estableix l'accés"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

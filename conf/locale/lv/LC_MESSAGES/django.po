@@ -7861,6 +7861,7 @@ msgid "Success"
 msgstr "Veiksmīgi"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Darbības"
@@ -10848,8 +10849,10 @@ msgid "Count"
 msgstr "Skaits"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "Ievadiet komponentu skaitu, kurus rādīt katram audzēknim."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -22690,6 +22693,14 @@ msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

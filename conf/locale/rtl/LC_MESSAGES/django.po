@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-26 20:35+0000\n"
-"PO-Revision-Date: 2023-02-26 20:35:55.019139\n"
+"POT-Creation-Date: 2023-03-12 20:35+0000\n"
+"PO-Revision-Date: 2023-03-12 20:35:55.895088\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8218,6 +8218,7 @@ msgid "Success"
 msgstr "Snɔɔǝss"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Ⱥɔʇᴉøns"
@@ -14332,6 +14333,14 @@ msgstr "Ɇ-ɯɐᴉl"
 msgid "Return To %s"
 msgstr "Ɍǝʇnɹn Ŧø %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr "Łǝɐɹn ɯøɹǝ ɐbønʇ ʇɥᴉs ɔønɹsǝ"
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr "Ɇnɹøll ᴉn ʇɥᴉs ɔønɹsǝ"
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14712,6 +14721,12 @@ msgstr "Đøʍnløɐds ɐnd ʇɹɐnsɔɹᴉdʇs"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16048,11 +16063,6 @@ msgstr "Ȼlᴉɔʞ ʇɥǝ lᴉnʞ ʇø sǝǝ ɯʎ ɔǝɹʇᴉɟᴉɔɐʇǝ."
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Ᵽøsʇ øn Fɐɔǝbøøʞ"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -23955,6 +23965,14 @@ msgstr "Ⱥɔɔǝss Sǝʇʇᴉnƃs"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Sǝʇ Ⱥɔɔǝss"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr "Ȼødʎ"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr "Mɐnɐƃǝ Ⱥɔɔǝss"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

@@ -1,5 +1,5 @@
-Justifying new Django applications in edx-platform
-==================================================
+Justifying new Django applications in the edx-platform repository
+=================================================================
 
 Status
 ------
@@ -10,12 +10,18 @@ Context
 The Open edX platform is moving toward a more modular architecture. The goal is to transition from a monolithic application in edx-platform to one in which this repository represents a small, stable core with volatility pushed into extensions and plugins. To that end, much of the original edx-platform repository has been split out into micro-frontends, other microservices, plugins, and libraries. However, there are still a number of optional and non-core Django applications within edx-platform and new ones continue to be added.
 For more information on plugins in particular, see the `Django Apps Plugin README`_.
 
+There is guidance on creating new applications in general in `OEP-49`_. This ADR should be taken as an extension of that OEP with particular guidance for adding new apps in the edx-platform repository itself.
+
+.. _OEP-49: https://open-edx-proposals.readthedocs.io/en/latest/best-practices/oep-0049-django-app-patterns.html
+
 .. _Django Apps Plugin README: https://github.com/openedx/edx-django-utils/blob/master/edx_django_utils/plugins/README.rst
 
 
 Decision
 --------
-From the adoption of this ADR, no new Django applications should be added into the edx-platform repository without an accompanying ADR explaining why the application cannot or should not be created in a new repository or included in an existing external plugin or library.
+From the adoption of this ADR, when adding a new app to the edx-platform repository, the accompanying ADR (as required in `this section of OEP-49`_) must include a justification for why this application cannot or should not be created in a different repository.
+
+.. _this section of OEP-49: https://open-edx-proposals.readthedocs.io/en/latest/best-practices/oep-0049-django-app-patterns.html#docs-decisions-0001-purpose-of-this-app-rst
 
 Further Guidance
 ----------------

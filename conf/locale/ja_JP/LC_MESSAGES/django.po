@@ -7503,6 +7503,7 @@ msgstr ""
 msgid "Success"
 msgstr "成功"
 
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "アクション"
@@ -10265,8 +10266,10 @@ msgid "Count"
 msgstr "数"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "各受講者に表示するコンポーネント数を入力してください。"
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -21590,6 +21593,14 @@ msgstr "アクセス設定"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "アクセスを設定"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

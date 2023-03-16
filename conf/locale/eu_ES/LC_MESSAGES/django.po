@@ -7574,6 +7574,7 @@ msgid "Success"
 msgstr "Ondo"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Ekintzak"
@@ -10389,8 +10390,10 @@ msgid "Count"
 msgstr "Kopurua"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "Idatzi zenbat osagai erakutsiko zaion ikasle bakoitzari."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -21634,6 +21637,14 @@ msgstr "Sarbide-ezarpenak"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Ezarri sarbidea"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

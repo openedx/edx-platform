@@ -274,7 +274,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-12 20:42+0000\n"
+"POT-Creation-Date: 2023-03-05 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -8693,6 +8693,7 @@ msgid "Success"
 msgstr "Éxito"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Acciones"
@@ -11888,8 +11889,12 @@ msgid "Count"
 msgstr "Cantidad"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "Ingrese el número de componentes que se mostrará a cada estudiante."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
+"Ingrese el número de componentes para mostrar a cada estudiante. Ajústelo a "
+"-1 para mostrar todos los componentes."
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -24904,6 +24909,14 @@ msgstr "Configuraciones de Acceso"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Configuración de Acceso"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr "Copiar"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr "Administrar acceso"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

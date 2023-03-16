@@ -7962,6 +7962,7 @@ msgstr ""
 msgid "Success"
 msgstr "Zrobione"
 
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Czynności"
@@ -10958,8 +10959,10 @@ msgid "Count"
 msgstr "Suma"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "Wpisz liczbę elementów, które chcesz wyświetlić każdemu studentowi."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -23310,6 +23313,14 @@ msgstr "Ustawienia dostępu"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Ustal dostęp"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

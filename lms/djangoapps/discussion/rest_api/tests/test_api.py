@@ -1888,7 +1888,8 @@ class CreateThreadTest(
             'body': 'Test body',
             'url': '',
             'user_forums_roles': [FORUM_ROLE_STUDENT],
-            'user_course_roles': []
+            'user_course_roles': [],
+            'from_mfe_sidebar': False,
         }
 
     def test_basic_in_blackout_period(self):
@@ -1975,6 +1976,7 @@ class CreateThreadTest(
                 "url": "",
                 "user_forums_roles": [FORUM_ROLE_STUDENT, FORUM_ROLE_MODERATOR],
                 "user_course_roles": [],
+                "from_mfe_sidebar": False,
             }
         )
 
@@ -2007,7 +2009,8 @@ class CreateThreadTest(
             'body': 'Test body',
             'url': '',
             'user_forums_roles': [FORUM_ROLE_STUDENT],
-            'user_course_roles': []
+            'user_course_roles': [],
+            'from_mfe_sidebar': False,
         }
 
     @ddt.data(
@@ -2257,6 +2260,7 @@ class CreateCommentTest(
             "url": "",
             "user_forums_roles": [FORUM_ROLE_STUDENT],
             "user_course_roles": [],
+            "from_mfe_sidebar": False,
         }
         if parent_id:
             expected_event_data["response"] = {"id": parent_id}
@@ -2353,6 +2357,7 @@ class CreateCommentTest(
             "url": "",
             "user_forums_roles": [FORUM_ROLE_STUDENT, FORUM_ROLE_MODERATOR],
             "user_course_roles": [],
+            "from_mfe_sidebar": False,
         }
         if parent_id:
             expected_event_data["response"] = {"id": parent_id}

@@ -105,6 +105,7 @@
 # Translators:
 # abby li <yc.li@eliteu.cn>, 2019
 # 肖寒 <bookman@vip.163.com>, 2013
+# Cecilia Liu, 2023
 # Changyue Wang <peterwang.dut@gmail.com>, 2014-2015
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2019
@@ -161,6 +162,7 @@
 # BertZou <turingcat@gmail.com>, 2015
 # bnw, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
+# Cecilia Liu, 2023
 # chalow <charlotteouya@hotmail.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2014-2015
 # CharlotteDing <kikyoru@hotmail.com>, 2015
@@ -7863,6 +7865,7 @@ msgid "Success"
 msgstr "成功"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "操作"
@@ -10639,8 +10642,10 @@ msgid "Count"
 msgstr "计算"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "输入显示给每个学生的组件数量。"
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -11870,7 +11875,7 @@ msgstr "不安全的tar文件，正在取消导入。"
 
 #: cms/djangoapps/contentstore/errors.py
 msgid "User permission denied."
-msgstr ""
+msgstr "用户权限被拒绝。"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 #, python-brace-format
@@ -12173,7 +12178,7 @@ msgstr "{platform_name} 支持等级:"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"
-msgstr ""
+msgstr "开放性题目"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
@@ -12272,14 +12277,16 @@ msgstr "课程成功被导出到Git源"
 msgid "Vertical"
 msgstr "纵列块"
 
+#: cms/djangoapps/contentstore/views/helpers.py
 #: cms/templates/course_outline.html lms/templates/ccx/schedule.html
 #: lms/templates/seq_block.html
 msgid "Section"
-msgstr "章"
+msgstr "章节"
 
+#: cms/djangoapps/contentstore/views/helpers.py
 #: lms/templates/ccx/schedule.html
 msgid "Subsection"
-msgstr "节"
+msgstr "子章节"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Some chunks missed during file upload. Please try again"
@@ -12517,7 +12524,7 @@ msgstr "添加日期"
 
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Status"
-msgstr ""
+msgstr "状态"
 
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
@@ -17287,7 +17294,7 @@ msgstr "学生邮箱或者用户名"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Choose the graded subsection:"
-msgstr ""
+msgstr "请选择评分单元："
 
 #. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
 #. format the system requires.
@@ -17299,7 +17306,7 @@ msgstr "请输入新的截止日期和时间(UTC 时间，请以 {format_string}
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reason for extension"
-msgstr ""
+msgstr "延期原因"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
@@ -17313,13 +17320,13 @@ msgstr "查看已授权的宽限期"
 msgid ""
 "Here you can see what extensions have been granted on particular subsection "
 "or for a particular student."
-msgstr ""
+msgstr "您在此处可以查看特定单元中已经授予给特定学生的延期时间。"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
 "Choose a graded subsection and click the button to obtain a list of all "
 "students who have extensions for the given subsection."
-msgstr ""
+msgstr "请选择一个评分单元，单击可获得当前单元已延期的学生名单。"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List all students with due date extensions"
@@ -17342,11 +17349,11 @@ msgid ""
 "Resetting a problem's due date rescinds a due date extension for a student "
 "on a particular subsection. This will revert the due date for the student "
 "back to the problem's original due date."
-msgstr ""
+msgstr "重设问题的截止日期将会取消学生特定小节截止日期的延长期，学生的截止日期将还原到问题的原始截止日期。"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reason for reset"
-msgstr ""
+msgstr "重置原因"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
@@ -21934,6 +21941,14 @@ msgstr "访问设置"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "设置访问限制"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

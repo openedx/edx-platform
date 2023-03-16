@@ -305,3 +305,22 @@ class TestCourseRecommendationApiView(TestCase):
         assert segment_track_mock.call_count == 1
         assert segment_track_mock.call_args[0][1] == "edx.bi.user.recommendations.viewed"
         self.assertEqual(segment_track_mock.call_args[0][2]["is_control"], expected_is_control)
+
+    @override_waffle_flag(ENABLE_LEARNER_HOME_AMPLITUDE_RECOMMENDATIONS, active=True)
+    @mock.patch(
+        "lms.djangoapps.learner_home.recommendations.views.is_user_enrolled_in_ut_austin_masters_program"
+    )
+    def test_no_recommendations_for_masters_program_learners(
+        self, is_user_enrolled_in_ut_austin_masters_program_mock
+    ):
+        """
+        Verify API returns no recommendations if a user is enrolled in UT Austin masters program.
+        """
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = True
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content.get("isControl"), None)
+        self.assertEqual(response_content.get("courses"), [])
