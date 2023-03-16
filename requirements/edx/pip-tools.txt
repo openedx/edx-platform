@@ -18,7 +18,7 @@ pyproject-hooks==1.0.0
     # via build
 tomli==2.0.1
     # via build
-wheel==0.38.4
+wheel==0.40.0
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
