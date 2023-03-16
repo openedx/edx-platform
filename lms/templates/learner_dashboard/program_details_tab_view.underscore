@@ -1,4 +1,5 @@
 <header class="js-program-header program-header full-width-banner"></header>
+<div class="js-program-details-alerts program-details-tab-alerts program-subscription-alert-wrapper col-12 col-xl-8"></div>
 <!-- TODO: consider if article is the most appropriate element here -->
 
 <% if (programTabViewEnabled) { %>

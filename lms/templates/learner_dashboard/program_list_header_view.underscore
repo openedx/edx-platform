@@ -1,0 +1,4 @@
+<div class="col-12 col-xl-9 px-2">
+	<h2><%- gettext('My programs') %></h2>
+	<div class="js-program-list-alerts program-list-alerts program-subscription-alert-wrapper"></div>
+</div>

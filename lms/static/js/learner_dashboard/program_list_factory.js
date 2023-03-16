@@ -3,6 +3,7 @@ import ProgramCardView from './views/program_card_view';
 import ProgramCollection from './collections/program_collection';
 import ProgressCollection from './collections/program_progress_collection';
 import SidebarView from './views/sidebar_view';
+import HeaderView from './views/program_list_header_view';
 
 function ProgramListFactory(options) {
     const progressCollection = new ProgressCollection();
@@ -10,6 +11,12 @@ function ProgramListFactory(options) {
     if (options.userProgress) {
         progressCollection.set(options.userProgress);
         options.progressCollection = progressCollection; // eslint-disable-line no-param-reassign
+    }
+
+    if (options.programsData.length) {
+        new HeaderView({
+            context: options,
+        }).render();
     }
 
     new CollectionListView({
