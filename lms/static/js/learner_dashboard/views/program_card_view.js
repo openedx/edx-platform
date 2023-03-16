@@ -32,12 +32,24 @@ class ProgramCardView extends Backbone.View {
         this.render();
     }
 
+    getIsSubscribed() {
+        const subscriptionData = this.model.get('subscription_data');
+
+        return (
+            subscriptionData.is_eligible_for_subscription &&
+            ['active', 'active_trial'].includes(subscriptionData.subscription_state)
+        );
+    }
+
     render() {
         const orgList = this.model.get('authoring_organizations').map(org => gettext(org.key));
         const data = $.extend(
             this.model.toJSON(),
             this.getProgramProgress(),
-            { orgList: orgList.join(' ') },
+            {
+                orgList: orgList.join(' '),
+                isSubscribed: this.getIsSubscribed(),
+            },
         );
 
         HtmlUtils.setHtml(this.$el, this.tpl(data));

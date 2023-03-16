@@ -1,0 +1,19 @@
+<div class="page-banner d-flex flex-column">
+    <% _.each(alertList, function({ title, message, url, urlText }){ %>
+        <div class="alert alert-warning alert-button-container flex-column flex-sm-row align-items-sm-center justify-content-sm-between m-0" role="alert">
+            <div class="alert-container d-flex" >
+                <span class="icon icon-alert fa fa-warning alert-message-height m-0" aria-hidden="true"></span>
+                <div class="alert-container d-flex flex-column align-items-start">
+                    <h4 class="alert-heading m-0"><%- title %></h4>
+                    <% // xss-lint: disable=underscore-not-escaped %>
+                    <p class="alert-message alert-message-height m-0"><%= message %></p>
+                </div>
+            </div>
+            <% if (url && urlText) { %>
+            <a href="<%- url %>" class="btn-brand btn cta-primary view-detail-button">
+                <%- urlText %>
+            </a>
+            <% } %>
+        </div>
+    <% }); %>
+</div>
