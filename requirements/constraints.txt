@@ -82,3 +82,5 @@ pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticke
 # we should stop using this
 boto==2.39.0
 
+social-auth-core==4.3.0
+docutils==0.19
