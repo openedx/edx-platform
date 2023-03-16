@@ -16,7 +16,7 @@ aiosignal==1.3.1
     #   aiohttp
 alabaster==0.7.13
     # via sphinx
-algoliasearch==2.6.3
+algoliasearch==3.0.0
     # via -r requirements/edx/testing.txt
 amqp==5.1.1
     # via
@@ -67,7 +67,7 @@ attrs==22.2.0
     #   openedx-blockstore
     #   openedx-events
     #   pytest
-babel==2.11.0
+babel==2.12.1
     # via
     #   -r requirements/edx/testing.txt
     #   enmerkar
@@ -105,16 +105,14 @@ boto==2.39.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-boto3==1.7.0
+boto3==1.26.92
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.10.84
+botocore==1.29.92
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   boto3
     #   s3transfer
@@ -520,8 +518,6 @@ docopt==0.6.2
     # via -r requirements/edx/testing.txt
 docutils==0.19
     # via
-    #   -r requirements/edx/testing.txt
-    #   botocore
     #   sphinx
     #   sphinx-mdinclude
 done-xblock==2.0.5
@@ -724,7 +720,7 @@ fastavro==1.7.3
     # via
     #   -r requirements/edx/testing.txt
     #   openedx-events
-filelock==3.9.0
+filelock==3.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   snowflake-connector-python
@@ -840,7 +836,7 @@ jinja2==3.1.2
     #   coreschema
     #   diff-cover
     #   sphinx
-jmespath==0.10.0
+jmespath==1.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   boto3
@@ -1404,7 +1400,7 @@ rules==3.3
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-proctoring
-s3transfer==0.1.13
+s3transfer==0.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   boto3
@@ -1428,7 +1424,7 @@ semantic-version==2.10.0
     #   edx-drf-extensions
 shapely==2.0.1
     # via -r requirements/edx/testing.txt
-simplejson==3.18.3
+simplejson==3.18.4
     # via
     #   -r requirements/edx/testing.txt
     #   sailthru-client
@@ -1491,11 +1487,11 @@ snowflake-connector-python==3.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-social-auth-app-django==5.0.0
+social-auth-app-django==5.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
-social-auth-core==4.3.0
+social-auth-core==4.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
@@ -1630,6 +1626,7 @@ uritemplate==4.1.1
 urllib3==1.26.15
     # via
     #   -r requirements/edx/testing.txt
+    #   botocore
     #   elasticsearch
     #   geoip2
     #   pact-python
@@ -1683,7 +1680,7 @@ webob==1.8.7
     # via
     #   -r requirements/edx/testing.txt
     #   xblock
-wheel==0.38.4
+wheel==0.40.0
     # via
     #   -r requirements/edx/pip-tools.txt
     #   pip-tools
