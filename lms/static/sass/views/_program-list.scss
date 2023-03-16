@@ -1,3 +1,20 @@
+.program-list-alerts {
+  .page-banner {
+    margin-top: 24px;
+    gap: 24px;
+  }
+
+  .view-detail-button {
+    background: theme-color("success");
+    border-color: theme-color("success");
+    border-radius: 0;
+    color: $white;
+    padding: 7px;
+    text-align: center;
+    font-size: 0.875rem;
+  }
+}
+
 .program-list-wrapper {
   @include make-row();
 
@@ -17,6 +34,13 @@
 
   @include media-breakpoint-up(sm) {
     @include make-col(9);
+  }
+
+  .subscription-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 10;
   }
 }
 

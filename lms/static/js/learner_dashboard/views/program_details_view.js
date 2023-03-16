@@ -10,6 +10,7 @@ import CourseCardCollection from '../collections/course_card_collection';
 import CourseCardView from './course_card_view';
 import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
+import AlertListView, { mapAlertTypeToAlertHOF } from './program_alert_list_view';
 
 import restartIcon from '../../../images/restart-icon.svg';
 import pageTpl from '../../../templates/learner_dashboard/program_details_view.underscore';
@@ -50,6 +51,16 @@ class ProgramDetailsView extends Backbone.View {
             subscription_data: subscriptionData,
             ...programData
         } = this.options.programData;
+
+        // TODO: get from api
+        const alertList = [
+            { type: 'no_enrollment' },
+            { type: 'subscription_trial_expiring' },
+        ];
+
+        this.alertCollection = new Backbone.Collection(
+            alertList.map(mapAlertTypeToAlertHOF('program_details', programData, subscriptionData)),
+        );
 
         subscriptionData.subscription_billing_date = getNextBillingDate(subscriptionData.subscription_start_date);
         subscriptionData.trial_end_date = moment(subscriptionData.trial_end_date, 'YYYY-MM-DD').format('MMMM DD, YYYY');
@@ -123,6 +134,12 @@ class ProgramDetailsView extends Backbone.View {
         this.headerView = new HeaderView({
             model: new Backbone.Model(this.options),
         });
+
+        if (this.alertCollection.length > 0) {
+            this.alertListView = new AlertListView({
+                alertCollection: this.alertCollection,
+            });
+        }
 
         if (this.remainingCourseCollection.length > 0) {
             new CollectionListView({
