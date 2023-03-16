@@ -11,6 +11,7 @@ from lms.djangoapps.learner_recommendations.utils import (
     _has_country_restrictions,
     filter_recommended_courses,
     get_amplitude_course_recommendations,
+    get_cross_product_recommendations
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -239,3 +240,17 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
             expected_recommendations.append(self._mock_get_course_data(course_key))
 
         assert filtered_courses == expected_recommendations
+
+
+@ddt.ddt
+class TestGetCrossProductRecommendationsMethod(TestCase):
+    """Test for get_cross_product_recommendations method"""
+
+    @ddt.data(
+        ('adamX+HUM2x', ['AdelaideX+AddictionX', 'AdelaideX+AnalyticsX']),
+        ('HarvardX+CS50P', ['AdelaideX+AddictionY', 'AdelaideX+AnalyticsY']),
+        ('NoKeyAssociated', None)
+    )
+    @ddt.unpack
+    def test_get_cross_product_recommendations_method(self, course_key, expected_response):
+        assert get_cross_product_recommendations(course_key) == expected_response
