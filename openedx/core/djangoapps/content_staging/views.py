@@ -46,6 +46,7 @@ class StagedContentOLXEndpoint(APIView):
             raise NotFound("The requested content is not available.")
         return HttpResponse(staged_content.olx, headers={
             "Content-Type": f"application/vnd.openedx.xblock.v1.{staged_content.block_type}+xml",
+            "Content-Disposition": f'attachment; filename="{staged_content.olx_filename}"',
         })
 
 

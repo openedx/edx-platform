@@ -5,6 +5,7 @@ from __future__ import annotations  # in lieu of typing.Self
 import logging
 # from typing import Self # Needs Python 3.11
 
+from defusedxml import ElementTree
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -65,6 +66,23 @@ class StagedContent(models.Model):
     display_name = models.CharField(max_length=1024)
     # What course or library this content comes from, if it exists in the CMS already. If it doesn't, leave this blank.
     source_context = LearningContextKeyField(max_length=255)
+
+    def _get_url_name(self) -> str:
+        """
+        Get the url_name from the OLX, if it's set on the root node. May return
+        an empty string.
+        """
+        try:
+            root_node = ElementTree.fromstring(self.olx)
+            return root_node.attrib.get("url_name", "")
+        except ElementTree.ParseError as err:
+            log.warning(f"StagedContent: Unable to parse OLX to get url_name", exc_info=err)
+            return ""
+        
+    @property
+    def olx_filename(self) -> str:
+        """ Get a filename that can be used for the OLX content of this staged content """
+        return f"{self._get_url_name() or self.block_type}.xml"
 
     def get_source_context_title(self) -> str:
         """ Get the title of the source context, if any """
