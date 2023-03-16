@@ -90,5 +90,3 @@ babel==2.11.0
 social-auth-app-django==5.0.0
 algoliasearch==2.6.3
 django-ipware==4.0.2
-lti-consumer-xblock==8.0.1
-openedx-events==5.1.0
